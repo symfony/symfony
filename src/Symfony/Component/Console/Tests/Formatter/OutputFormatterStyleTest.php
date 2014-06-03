@@ -63,16 +63,16 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("\033[7;8mfoo\033[27;28m", $style->apply('foo'));
 
         $style->setOption('bold');
-        $this->assertEquals("\033[7;8;1mfoo\033[27;28;21m", $style->apply('foo'));
+        $this->assertEquals("\033[7;8;1mfoo\033[27;28;22m", $style->apply('foo'));
 
         $style->unsetOption('reverse');
-        $this->assertEquals("\033[8;1mfoo\033[28;21m", $style->apply('foo'));
+        $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
 
         $style->setOption('bold');
-        $this->assertEquals("\033[8;1mfoo\033[28;21m", $style->apply('foo'));
+        $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
 
         $style->setOptions(array('bold'));
-        $this->assertEquals("\033[1mfoo\033[21m", $style->apply('foo'));
+        $this->assertEquals("\033[1mfoo\033[22m", $style->apply('foo'));
 
         try {
             $style->setOption('foo');

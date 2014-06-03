@@ -342,6 +342,19 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Slices the list of nodes by $offset and $length.
+     *
+     * @param int $offset
+     * @param int $length
+     *
+     * @return Crawler A Crawler instance with the sliced nodes
+     */
+    public function slice($offset = 0, $length = -1)
+    {
+        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
+    }
+
+    /**
      * Reduces the list of nodes by calling an anonymous function.
      *
      * To remove a node from the list, the anonymous function must return false.

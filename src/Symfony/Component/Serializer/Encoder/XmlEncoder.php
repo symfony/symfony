@@ -305,7 +305,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $node->nodeValue;
         }
 
-        if (1 === $node->childNodes->length && XML_TEXT_NODE === $node->firstChild->nodeType) {
+        if (1 === $node->childNodes->length && in_array($node->firstChild->nodeType, array(XML_TEXT_NODE, XML_CDATA_SECTION_NODE))) {
             return $node->firstChild->nodeValue;
         }
 

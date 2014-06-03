@@ -247,8 +247,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
      *
      * @param string $key   The Cache-Control directive name
      * @param mixed  $value The Cache-Control directive value
-     *
-     * @api
      */
     public function addCacheControlDirective($key, $value = true)
     {
@@ -263,8 +261,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key The Cache-Control directive
      *
      * @return bool true if the directive exists, false otherwise
-     *
-     * @api
      */
     public function hasCacheControlDirective($key)
     {
@@ -277,8 +273,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * @param string $key The directive name
      *
      * @return mixed|null The directive value if defined, null otherwise
-     *
-     * @api
      */
     public function getCacheControlDirective($key)
     {
@@ -289,8 +283,6 @@ class HeaderBag implements \IteratorAggregate, \Countable
      * Removes a Cache-Control directive.
      *
      * @param string $key The Cache-Control directive
-     *
-     * @api
      */
     public function removeCacheControlDirective($key)
     {

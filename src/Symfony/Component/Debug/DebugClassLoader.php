@@ -175,7 +175,7 @@ class DebugClassLoader
             $refl = new \ReflectionClass($class);
             $name = $refl->getName();
 
-            if ($name !== $class) {
+            if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
         }

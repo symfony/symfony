@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-23T16:37:46Z
+
+As this template should almost be overridden anyway, I propose to slightly change the default template to get rid of this part (sending an email.)
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-05-23T16:55:21Z
+
+I'm building my first symfony webapp so need to check for how to do that 'overridden anyway."
+
+I just edited the file on github ... sorry I missed http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+I'll try next week to fix those issue.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-05-23T19:33:21Z
+
+@clemens-tolboom I assume Fabien meant that you could remove the entire part regarfing sending an email in the template. It is recommended that you override your error templates in your application. You should in this case not rely on the default ones.
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-05-26T08:07:05Z
+
+@peterrehm by overriding the template still does not give me a mail address into the template.
+
+I'm not sure we must have an email address but it's not injected by `exception.html.twig`
+
+I thinks it's good to have an email address available for a 500 error page. Even the default one.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-05-26T08:30:46Z
+
+@clemens-tolboom You can override the entire template with a custom one with all the informations you want to have. http://symfony.com/doc/current/cookbook/controller/error_pages.html#customizing-the-404-page-and-other-error-pages So this way you can include your own logic.
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-05-26T08:38:42Z
+
+@peterrehm thanks for the XRef :-)
+
+/me forgot the http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request again :( ... tbc
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-26T09:42:04Z
+
+@clemens-tolboom you can still edit your PR's description

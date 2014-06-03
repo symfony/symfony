@@ -465,7 +465,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (isset($this->loading[$id])) {
-            throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id), 0, $e);
+            throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
         }
 
         if (!$this->hasDefinition($id) && isset($this->aliasDefinitions[$id])) {

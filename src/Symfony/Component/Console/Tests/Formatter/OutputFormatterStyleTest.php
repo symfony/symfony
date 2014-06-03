@@ -18,7 +18,7 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $style = new OutputFormatterStyle('green', 'black', array('bold', 'underscore'));
-        $this->assertEquals("\033[32;40;1;4mfoo\033[39;49;21;24m", $style->apply('foo'));
+        $this->assertEquals("\033[32;40;1;4mfoo\033[39;49;22;24m", $style->apply('foo'));
 
         $style = new OutputFormatterStyle('red', null, array('blink'));
         $this->assertEquals("\033[31;5mfoo\033[39;25m", $style->apply('foo'));

@@ -1007,6 +1007,51 @@ class Response
     }
 
     /**
+     * Modifies the response so that it returns a 412 status code.
+     *
+     * @return Response
+     */
+    public function setPreconditionFailed()
+    {
+        $this->setStatusCode(412);
+
+        return $this;
+    }
+
+    /**
+     * Determines if the Response validators (ETag, Last-Modified) do not match
+     * a conditional value specified in the Request.
+     *
+     * If the Response has at least one precondition failed, it sets the status code to 412 by
+     * calling the setPreconditionFailed() method.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Boolean true if the Response validators do not match the Request, false otherwise
+     *
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
+     */
+    public function hasPreconditionFailed(Request $request)
+    {
+        if (!$this->isValidateable()) {
+            return false;
+        }
+
+        $etags = $request->getEtags();
+        $etags[] = '*';
+        $preconditionFailed = !in_array($this->getEtag(), $etags);
+
+        $lastModified = $request->headers->get('If-Modified-Since', false);
+        $preconditionFailed |= $lastModified !== $this->headers->get('Last-Modified');
+
+        if ($preconditionFailed) {
+            $this->setPreconditionFailed();
+        }
+
+        return $preconditionFailed;
+    }
+
+    /**
      * Returns true if the response includes a Vary header.
      *
      * @return bool    true if the response includes a Vary header, false otherwise

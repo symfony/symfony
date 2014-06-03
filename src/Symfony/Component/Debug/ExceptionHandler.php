@@ -207,29 +207,24 @@ class ExceptionHandler
                 $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
-                    $class = $this->abbrClass($e['class']);
-                    $message = nl2br($e['message']);
+                    $class = $this->formatClass($e['class']);
+                    $message = nl2br(htmlspecialchars($e['message'], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
                     $content .= sprintf(<<<EOF
                         <div class="block_exception clear_fix">
-                            <h2><span>%d/%d</span> %s: %s</h2>
+                            <h2><span>%d/%d</span> %s%s:<br />%s</h2>
                         </div>
                         <div class="block">
                             <ol class="traces list_exception">
 
 EOF
-                        , $ind, $total, $class, $message);
+                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
                     foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
-                            $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
+                            $content .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                         }
                         if (isset($trace['file']) && isset($trace['line'])) {
-                            if ($linkFormat = ini_get('xdebug.file_link_format')) {
-                                $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
-                                $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
-                            } else {
-                                $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
-                            }
+                            $content .= $this->formatPath($trace['file'], $trace['line']);
                         }
                         $content .= "</li>\n";
                     }
@@ -305,8 +300,8 @@ EOF;
                 overflow: hidden;
                 word-wrap: break-word;
             }
-            .sf-reset li a { background:none; color:#868686; text-decoration:none; }
-            .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }
+            .sf-reset a { background:none; color:#868686; text-decoration:none; }
+            .sf-reset a:hover { background:none; color:#313131; text-decoration:underline; }
             .sf-reset ol { padding: 10px 0; }
             .sf-reset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
                 -webkit-border-radius: 10px;
@@ -342,11 +337,25 @@ EOF;
 EOF;
     }
 
-    private function abbrClass($class)
+    private function formatClass($class)
     {
         $parts = explode('\\', $class);
 
         return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+    }
+
+    private function formatPath($path, $line)
+    {
+        $path = htmlspecialchars($path, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset);
+        $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
+
+        if ($linkFormat = ini_get('xdebug.file_link_format')) {
+            $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
+
+            return sprintf(' <a href="%s" title="Go to source">in %s line %d</a>', $link, $file, $line);
+        }
+
+        return sprintf(' <a title="in %s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">in %s line %d</a>', $path, $file, $line);
     }
 
     /**
@@ -361,7 +370,7 @@ EOF;
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
+                $formattedValue = sprintf("<em>object</em>(%s)", $this->formatClass($item[1]));
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {

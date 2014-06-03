@@ -151,7 +151,7 @@ class ErrorHandler
                 $context = $c;
             }
 
-            $exception = sprintf('%s: %s in %s line %d', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message, $file, $line);
+            $exception = sprintf('%s: %s', isset($this->levels[$level]) ? $this->levels[$level] : $level, $message);
             if ($context && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                 // Checking for class existence is a work around for https://bugs.php.net/42098
                 $exception = new ContextErrorException($exception, 0, $level, $file, $line, $context);
@@ -317,12 +317,11 @@ class ErrorHandler
         set_error_handler('var_dump', 0);
         ini_set('display_errors', 1);
 
-        $level = isset($this->levels[$error['type']]) ? $this->levels[$error['type']] : $error['type'];
-        $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);
+        $exception = sprintf('%s: %s', $this->levels[$error['type']], $error['message']);
         if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
-            $exception = new OutOfMemoryException($message, 0, $error['type'], $error['file'], $error['line'], 3, false);
+            $exception = new OutOfMemoryException($exception, 0, $error['type'], $error['file'], $error['line'], 3, false);
         } else {
-            $exception = new FatalErrorException($message, 0, $error['type'], $error['file'], $error['line'], 3, true);
+            $exception = new FatalErrorException($exception, 0, $error['type'], $error['file'], $error['line'], 3, true);
 
             foreach ($this->getFatalErrorHandlers() as $handler) {
                 if ($e = $handler->handleError($error, $exception)) {

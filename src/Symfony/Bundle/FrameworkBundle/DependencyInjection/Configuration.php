@@ -445,7 +445,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->arrayNode('static_method')
-                            ->defaultValue(array('loadClassMetadata'))
+                            ->defaultValue(array('loadValidatorMetadata'))
                             ->prototype('scalar')->end()
                             ->treatFalseLike(array())
                             ->validate()

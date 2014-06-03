@@ -274,7 +274,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame(array($xmlMappings), $calls[3][1]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
     }

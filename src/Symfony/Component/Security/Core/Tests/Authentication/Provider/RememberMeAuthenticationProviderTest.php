@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -42,6 +42,22 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $token = $this->getSupportedToken(null, 'key2');
 
         $provider->authenticate($token);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
+     */
+    public function testAuthenticateWhenPreChecksFails()
+    {
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+        $userChecker->expects($this->once())
+            ->method('checkPreAuth')
+            ->will($this->throwException(new DisabledException()))
+        ;
+
+        $provider = $this->getProvider($userChecker);
+
+        $provider->authenticate($this->getSupportedToken());
     }
 
     /**

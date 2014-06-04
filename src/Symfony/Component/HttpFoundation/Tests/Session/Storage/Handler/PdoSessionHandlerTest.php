@@ -135,6 +135,28 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
+    public function testReadingRequiresExactlySameId()
+    {
+        $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
+        $storage->open('', 'sid');
+        $storage->write('id', 'data');
+        $storage->write('test', 'data');
+        $storage->write('space ', 'data');
+        $storage->close();
+
+        $storage->open('', 'sid');
+        $readDataCaseSensitive = $storage->read('ID');
+        $readDataNoCharFolding = $storage->read('tést');
+        $readDataKeepSpace = $storage->read('space ');
+        $readDataExtraSpace = $storage->read('space  ');
+        $storage->close();
+
+        $this->assertSame('', $readDataCaseSensitive, 'Retrieval by ID should be case-sensitive (collation setting)');
+        $this->assertSame('', $readDataNoCharFolding, 'Retrieval by ID should not do character folding (collation setting)');
+        $this->assertSame('data', $readDataKeepSpace, 'Retrieval by ID requires spaces as-is');
+        $this->assertSame('', $readDataExtraSpace, 'Retrieval by ID requires spaces as-is');
+    }
+
     /**
      * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace)
      */

@@ -240,6 +240,19 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
+    public function testDecodeCdataWrappingAndWhitespace()
+    {
+        $expected = array(
+            'firstname' => 'Paul <or Me>',
+        );
+
+        $xml = '<?xml version="1.0"?>'."\n".
+            '<response><firstname>'."\n".
+                '<![CDATA[Paul <or Me>]]></firstname></response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
+    }
+
     public function testDecodeScalarWithAttribute()
     {
         $source = '<?xml version="1.0"?>'."\n".

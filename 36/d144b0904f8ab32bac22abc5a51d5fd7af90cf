@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by polyfractal at 2014-03-27T14:28:09Z
+
+I forked this a while ago so that I could get the changes into my project.  It dawned on me that `Parser.php` needs modification to make these changes visible to the end-user...otherwise they are inaccessible (not sure why I didn't think of that originally).
+
+My changes are in this commit (https://github.com/polyfractal/Yaml/commit/b0a08f32ea15e04d8e15c3ddecf84088033cf0ba), we should probably add something similar to this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-27T15:10:09Z
+
+Code updated thanks!
+
+---------------------------------------------------------------------------
+
+by polyfractal at 2014-03-27T16:52:06Z
+
+Awesome!  Can't wait for this to be merged so I can stop maintaining a separate fork :)
+
+---------------------------------------------------------------------------
+
+by RichardErtel at 2014-04-03T19:42:12Z
+
+wonderful! :+1:
+waiting for merge :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-09T08:19:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-10T17:01:02Z
+
+:+1: also
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-10T17:05:06Z
+
+@nicolas-grekas you cannot give a +1 on your own PRs. It does not count :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-03T21:16:31Z
+
+@nicolas-grekas Can you rebase on current master?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-03T22:21:54Z
+
+@nicolas-grekas lol. You :+1: your work ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-03T22:26:53Z
+
+Well, it's @polyfractal's work, I only tried to cleanup the code in #10114 :-P
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-03T22:30:48Z
+
+if so, you could amend your commit to keep him as contributor ;)
+(git ci --amend --author="...")
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-06-04T00:50:11Z
+
+@lyrixx is ok, he has one commit and @polyfractal has the other commit. I believe is fair :blush:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-06-04T00:59:48Z
+
+also could you please add documentation PR for this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-04T06:50:51Z
+
+@fabpot rebase done
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-04T07:25:17Z
+
+oups, I did not see it. gravatar are too small ;)

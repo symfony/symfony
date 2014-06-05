@@ -242,7 +242,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time";
-            case 'sqlsrv' && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
+            case 'sqlsrv' === $driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
                 // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                 // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
                 return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id) " .

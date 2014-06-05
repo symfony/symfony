@@ -226,3 +226,26 @@ Validator
        ->getValidator();
    ```
 
+
+Yaml Component
+--------------
+
+ * The way Yaml handles duplicate keys in an array was changed from `rewrite with the
+   last element` behavior to ignoring all the elements with the same key after the first one.
+
+   Example:
+
+   ```
+   parentElement:
+       firstChild: foo
+       secondChild: 123
+       firstChild: bar
+   ```
+
+   Before:
+
+   This would be parsed in an array like this: `["parentElement" => ["firstChild" => "bar", "secondChild" => 123]]`
+
+   After:
+
+   The first value is used: `["parentElement" => ["firstChild" => "foo", "secondChild" => 123]]`

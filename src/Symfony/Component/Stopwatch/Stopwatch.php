@@ -33,6 +33,9 @@ class Stopwatch
         $this->sections = $this->activeSections = array('__root__' => new Section('__root__'));
     }
 
+    /**
+     * @return Section[]
+     */
     public function getSections()
     {
         return $this->sections;

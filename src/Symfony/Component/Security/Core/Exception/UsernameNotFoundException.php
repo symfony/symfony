@@ -69,4 +69,12 @@ class UsernameNotFoundException extends AuthenticationException
 
         parent::unserialize($parentData);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMessageData()
+    {
+        return array('{{ username }}' => $this->username);
+    }
 }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-29T10:34:01Z
+
+this can't be accepted without a test reproducing the issue to prevent regressions
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-12T09:45:46Z
+
+@darles Can you add some tests?

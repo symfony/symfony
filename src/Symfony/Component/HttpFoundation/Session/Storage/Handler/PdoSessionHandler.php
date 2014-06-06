@@ -19,6 +19,9 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * This means requests for the same session will wait until the other one finished.
  * PHPs internal files session handler also works this way.
  *
+ * Session data is a binary string that can contain non-printable characters like the null byte.
+ + For this reason this handler base64 encodes the data to be able to save it in a character column.
+ *
  * Attention: Since SQLite does not support row level locks but locks the whole database,
  * it means only one session can be accessed at a time. Even different sessions would wait
  * for another to finish. So saving session in SQLite should only be considered for
@@ -192,13 +195,12 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        // Session data can contain non binary safe characters so we need to encode it.
         $encoded = base64_encode($data);
 
         // The session ID can be different from the one previously received in read()
         // when the session ID changed due to session_regenerate_id(). So we have to
         // do an insert or update even if we created a row in read() for locking.
-        // We use a MERGE SQL query when supported by the database.
+        // We use a single MERGE SQL query when supported by the database.
 
         try {
             $mergeSql = $this->getMergeSql();
@@ -221,17 +223,30 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
 
-            // Since we have a lock on the session, this is safe to do. Otherwise it would be prone to
-            // race conditions in high concurrency. And if it's a regenerated session ID it should be
-            // unique anyway.
+            // When MERGE is not supported, like in Postgres, we have to use this approach that can result in
+            // duplicate key errors when the same session is written simultaneously. We can just catch such an
+            // error and re-execute the update. This is similar to a serializable transaction with retry logic
+            // on serialization failures but without the overhead and without possible false positives due to
+            // longer gap locking.
+            // Since we have a lock on the session, the above case should not happen. And if it's a regenerated
+            // session ID it should be unique anyway.
             if (!$updateStmt->rowCount()) {
-                $insertStmt = $this->pdo->prepare(
-                    "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)"
-                );
-                $insertStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
-                $insertStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
-                $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
-                $insertStmt->execute();
+                try {
+                    $insertStmt = $this->pdo->prepare(
+                        "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)"
+                    );
+                    $insertStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
+                    $insertStmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+                    $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
+                    $insertStmt->execute();
+                } catch (\PDOException $e) {
+                    // Handle integrity violation SQLSTATE 23000 (or a subclass like 23505 in Postgres) for duplicate keys
+                    if (0 === strpos($e->getCode(), '23')) {
+                        $updateStmt->execute();
+                    } else {
+                        throw $e;
+                    }
+                }
             }
         } catch (\PDOException $e) {
             $this->rollback();
@@ -353,9 +368,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->idCol = $this->idCol";
                 break;
-            case 'sqlsrv':
+            // todo: implement locking for SQL Server < 2008
+            case 'sqlsrv' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
                 // MS SQL Server requires MERGE be terminated by semicolon
-                $sql = "MERGE INTO $this->table USING (SELECT 'x' AS dummy) AS src ON ($this->idCol = :id) " .
+                $sql = "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->idCol = $this->idCol;";
                 break;
@@ -397,9 +413,10 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time";
-            case 'sqlsrv':
-                // MS SQL Server requires MERGE be terminated by semicolon
-                return "MERGE INTO $this->table USING (SELECT 'x' AS dummy) AS src ON ($this->idCol = :id) " .
+            case 'sqlsrv' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>='):
+                // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
+                // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
+                return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id) " .
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) " .
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time;";
             case 'sqlite':

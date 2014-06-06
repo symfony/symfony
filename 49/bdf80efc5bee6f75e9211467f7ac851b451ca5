@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-05T08:39:28Z
+
+> BTW maybe we should raise an error in cases like this?
+
+nope we should not. the Yaml spec defines that the first element should be used in this case
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-05T09:55:28Z
+
+Logging a warning could be useful
+
+---------------------------------------------------------------------------
+
+by nikita2206 at 2014-06-05T11:42:53Z
+
+@stof  are you sure? [Yaml 1.2 spec](http://www.yaml.org/spec/1.2/spec.html#mapping//) says the opposite
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-05T12:31:27Z
+
+The 1.2 spec says that key must be unique. The 1.1 spec had an additional paragraph saying that even though keys must be unique, parsers should ignore subsequent keys
+
+---------------------------------------------------------------------------
+
+by nikita2206 at 2014-06-05T12:48:07Z
+
+@stof well I actually feel like I shouldn't even care about it because it would be my mistake to have the same key in a mapping node, so I'm not gonna object. But I think it would be nice to have a notice in the UPGRADE file :)

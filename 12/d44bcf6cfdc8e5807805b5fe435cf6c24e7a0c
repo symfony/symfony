@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-05-09T08:01:11Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-05-23T12:21:02Z
+
+Any reason not to merge this?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-23T12:25:31Z
+
+@umpirsky yes. 2.5 reached its feature freeze 1.5 month ago so no new features are merged in it anymore. and merging 2.6 PRs has not started yet
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-05-23T12:29:27Z
+
+@stof So basically this PR just waits for 2.6?

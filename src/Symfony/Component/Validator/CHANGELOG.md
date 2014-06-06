@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added `allowEmpty` to File validator
+
 2.5.0
 -----
 

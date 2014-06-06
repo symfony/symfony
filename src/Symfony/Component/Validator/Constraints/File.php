@@ -25,10 +25,12 @@ class File extends Constraint
 {
     public $maxSize = null;
     public $mimeTypes = array();
+    public $allowEmpty = true;
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';
     public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
+    public $allowEmptyMessage = 'Empty file is not allowed.';
 
     public $uploadIniSizeErrorMessage   = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
     public $uploadFormSizeErrorMessage  = 'The file is too large.';

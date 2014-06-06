@@ -319,6 +319,36 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($file, $constraint);
     }
 
+    public function testAllowEmpty()
+    {
+        fwrite($this->file, '', 0);
+
+        $constraint = new File(array(
+            'allowEmpty' => true,
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
+    public function testDisallowEmpty()
+    {
+        fwrite($this->file, '', 0);
+
+        $constraint = new File(array(
+            'allowEmpty'        => false,
+            'allowEmptyMessage' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage');
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+    }
+
     /**
      * @dataProvider uploadedFileErrorProvider
      */

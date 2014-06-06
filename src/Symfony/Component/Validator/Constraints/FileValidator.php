@@ -199,6 +199,10 @@ class FileValidator extends ConstraintValidator
                 ));
             }
         }
+
+        if (!$constraint->allowEmpty && 0 === filesize($path)) {
+            $this->context->addViolation($constraint->allowEmptyMessage);
+        }
     }
 
     private static function moreDecimalsThan($double, $numberOfDecimals)

@@ -7,6 +7,14 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.16 (2014-05-31)
+
+ * bug #11014 [Validator] Remove property and method targets from the optional and required constraints (jakzal)
+ * bug #10983 [DomCrawler] Fixed charset detection in html5 meta charset tag (77web)
+ * bug #10979 Make rootPath part of regex greedy (artursvonda)
+ * bug #10995 [TwigBridge][Trans]set %count% only on transChoice from the current context. (aitboudad)
+ * bug #10987 [DomCrawler] Fixed a forgotten case of complex XPath queries (stof)
+
 * 2.3.15 (2014-05-22)
 
  * reverted #10908

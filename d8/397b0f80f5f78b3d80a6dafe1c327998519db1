@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by egeloen at 2014-06-03T15:48:21Z
+
+@fabpot @stof Is it the right way to go? I use the same function in one of my bundle and would like to know if it is good or not :)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-06-03T15:54:01Z
+
+This should land in `2.3` branch, as there was "bump" for the Twig version.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2014-06-03T16:59:00Z
+
+@stloyd @stof Should I resubmit it on the 2.3 branch? I see fabpot have already changed a line I will change too but only on the 2.5 branch. Additionally, I see the 2.3 branch requires 1.11 whereas the classes I replaced have been deprecated since Twig 1.12.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-06-03T17:01:59Z
+
+@egeloen IIRC Fabien can merge manually with his tool to the correct branch, and this should land in `2.3` as it requires Twig [`~1.12`](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bridge/Twig/composer.json#L20), probably "main" `composer.json` file was in lower version for some reason.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2014-06-03T17:10:12Z
+
+@stloyd Thx for the explanation!
+
+@stof Is it better now?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-03T17:22:31Z
+
+@egeloen if one of the composer.json files allows Twig 1.11, it should be fixed. The symfony code is only compatible with 1.12+ already (it already uses the Twig_Simple* classes)
+
+---------------------------------------------------------------------------
+
+by egeloen at 2014-06-03T17:27:27Z
+
+@stof Done

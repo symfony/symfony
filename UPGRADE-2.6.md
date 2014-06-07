@@ -105,8 +105,8 @@ Security
 HttpFoundation
 --------------
 
- * The PdoSessionHandler to store sessions in a database changed significantly.
-   - It now implements session locking to prevent loss of data by concurrent access to the same session.
+ * The `PdoSessionHandler` to store sessions in a database changed significantly.
+   - By default, it now implements session locking to prevent loss of data by concurrent access to the same session.
      - It does so using a transaction between opening and closing a session. For this reason, it's not
        recommended to use the same database connection that you also use for your application logic.
        Otherwise you have to make sure to access your database after the session is closed and committed.
@@ -115,11 +115,16 @@ HttpFoundation
      - Since accessing a session now blocks when the same session is still open, it is best practice to
        save the session as soon as you don't need to write to it anymore. For example, read-only AJAX
        request to a session can save the session immediately after opening it to increase concurrency.
+     - As alternative to transactional locking you can also use advisory locks which do not require a transaction.
+       Additionally, you can also revert back to no locking in case you have custom logic to deal with race conditions
+       like an optimistic concurrency control approach. The locking strategy can be chosen by passing the corresponding
+       constant as `lock_mode` option, e.g. `new PdoSessionHandler($pdoOrDsn, array('lock_mode' => PdoSessionHandler::LOCK_NONE))`.
+       For more information please read the class documentation.
    - The expected schema of the table changed.
      - Session data is binary text that can contain null bytes and thus should also be saved as-is in a
        binary column like BLOB. For this reason, the handler does not base64_encode the data anymore.
      - A new column to store the lifetime of a session is required. This allows to have different
        lifetimes per session configured via session.gc_maxlifetime ini setting.
      - You would need to migrate the table manually if you want to keep session information of your users.
-     - You could use PdoSessionHandler::createTable to initialize a correctly defined table depending on
+     - You could use `PdoSessionHandler::createTable` to initialize a correctly defined table depending on
        the used database vendor.

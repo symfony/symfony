@@ -33,7 +33,7 @@ class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
         $validatorFactory = new ConstraintValidatorFactory();
-        $executionContextFactory = new ExecutionContextFactory($this->translator, 'trans_domain');
+        $executionContextFactory = new ExecutionContextFactory($this->translator, self::TRANS_DOMAIN);
         $this->validator = new RecursiveValidator($executionContextFactory, $this->metadataFactory, $validatorFactory);
     }
 
@@ -41,13 +41,13 @@ class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
     {
         $constraints = new Collection(array(
             'shelves' => new All(array('constraints' => array(
-                    new Collection(array(
-                        'name'  => new ConstraintA(),
-                        'books' => new All(array('constraints' => array(
-                                new ConstraintA()
-                            )))
-                    ))
-                ))),
+                new Collection(array(
+                    'name'  => new ConstraintA(),
+                    'books' => new All(array('constraints' => array(
+                        new ConstraintA()
+                    )))
+                ))
+            ))),
             'name' => new ConstraintA()
         ));
         $data = array(
@@ -69,7 +69,7 @@ class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
             '[shelves][0][books][1]',
             '[shelves][1][books][0]',
             '[shelves][1][books][2]',
-            '[name]'
+            '[name]',
         );
 
         $context = new LegacyExecutionContext($this->validator, 'Root', $this->metadataFactory, $this->translator, self::TRANS_DOMAIN);

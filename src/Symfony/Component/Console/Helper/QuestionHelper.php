@@ -127,154 +127,63 @@ class QuestionHelper extends Helper
 
         $output->write($message);
 
-        $autocomplete = $question->getAutocompleterValues();
-        if (null === $autocomplete || !$this->hasSttyAvailable()) {
-            $ret = false;
-            if ($question->isHidden()) {
-                try {
-                    $ret = trim($this->getHiddenResponse($output, $inputStream));
-                } catch (\RuntimeException $e) {
-                    if (!$question->isHiddenFallback()) {
-                        throw $e;
-                    }
-                }
-            }
+        if (!InputReader::isEachKeyPressModeAvailable()) {
+            $answer = $this->processHidden($output, $question);
 
-            if (false === $ret) {
-                $ret = fgets($inputStream, 4096);
-                if (false === $ret) {
+            if (false === $answer) {
+                $answer = fgets($inputStream, 4096);
+                if (false === $answer) {
                     throw new \RuntimeException('Aborted');
                 }
-                $ret = trim($ret);
             }
         } else {
-            $ret = trim($this->autocomplete($output, $question, $inputStream));
+            $autocomplete = $question->getAutocompleterValues();
+            if ($autocomplete) {
+                $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
+                $reader = new SuggestionInputReader($inputStream);
+                $reader->setWraps('<hl>', '</hl>');
+                $reader->setSuggestions($autocomplete);
+                $answer = $reader->read($output);
+            } else {
+                $answer = $this->processHidden($output, $question, $inputStream);
+                if (false === $answer) {
+                    $reader = new InputReader($inputStream);
+                    $answer = $reader->read($output);
+                }
+            }
         }
 
-        $ret = strlen($ret) > 0 ? $ret : $question->getDefault();
+        $answer = trim($answer);
+        $answer = strlen($answer) > 0 ? $answer : $question->getDefault();
 
         if ($normalizer = $question->getNormalizer()) {
-            return $normalizer($ret);
+            return $normalizer($answer);
         }
 
-        return $ret;
+        return $answer;
     }
 
     /**
-     * Autocompletes a question.
-     *
      * @param OutputInterface $output
      * @param Question $question
-     *
-     * @return string
+     * @param $inputStream
+     * @throws \Exception
+     * @throws \RuntimeException
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream)
+    private function processHidden(OutputInterface $output, Question $question, $inputStream)
     {
-        $autocomplete = $question->getAutocompleterValues();
-        $ret = '';
-
-        $i = 0;
-        $ofs = -1;
-        $matches = $autocomplete;
-        $numMatches = count($matches);
-
-        $sttyMode = shell_exec('stty -g');
-
-        // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
-        shell_exec('stty -icanon -echo');
-
-        // Add highlighted text style
-        $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
-
-        // Read a keypress
-        while (!feof($inputStream)) {
-            $c = fread($inputStream, 1);
-
-            // Backspace Character
-            if ("\177" === $c) {
-                if (0 === $numMatches && 0 !== $i) {
-                    $i--;
-                    // Move cursor backwards
-                    $output->write("\033[1D");
+        $answer = false;
+        if ($question->isHidden()) {
+            try {
+                $answer = $this->getHiddenResponse($output, $inputStream);
+            } catch (\RuntimeException $e) {
+                if (!$question->isHiddenFallback()) {
+                    throw $e;
                 }
-
-                if ($i === 0) {
-                    $ofs = -1;
-                    $matches = $autocomplete;
-                    $numMatches = count($matches);
-                } else {
-                    $numMatches = 0;
-                }
-
-                // Pop the last character off the end of our string
-                $ret = substr($ret, 0, $i);
-            } elseif ("\033" === $c) { // Did we read an escape sequence?
-                $c .= fread($inputStream, 2);
-
-                // A = Up Arrow. B = Down Arrow
-                if ('A' === $c[2] || 'B' === $c[2]) {
-                    if ('A' === $c[2] && -1 === $ofs) {
-                        $ofs = 0;
-                    }
-
-                    if (0 === $numMatches) {
-                        continue;
-                    }
-
-                    $ofs += ('A' === $c[2]) ? -1 : 1;
-                    $ofs = ($numMatches + $ofs) % $numMatches;
-                }
-            } elseif (ord($c) < 32) {
-                if ("\t" === $c || "\n" === $c) {
-                    if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = $matches[$ofs];
-                        // Echo out remaining chars for current match
-                        $output->write(substr($ret, $i));
-                        $i = strlen($ret);
-                    }
-
-                    if ("\n" === $c) {
-                        $output->write($c);
-                        break;
-                    }
-
-                    $numMatches = 0;
-                }
-
-                continue;
-            } else {
-                $output->write($c);
-                $ret .= $c;
-                $i++;
-
-                $numMatches = 0;
-                $ofs = 0;
-
-                foreach ($autocomplete as $value) {
-                    // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (0 === strpos($value, $ret) && $i !== strlen($value)) {
-                        $matches[$numMatches++] = $value;
-                    }
-                }
-            }
-
-            // Erase characters from cursor to end of line
-            $output->write("\033[K");
-
-            if ($numMatches > 0 && -1 !== $ofs) {
-                // Save cursor position
-                $output->write("\0337");
-                // Write highlighted text
-                $output->write('<hl>'.substr($matches[$ofs], $i).'</hl>');
-                // Restore cursor position
-                $output->write("\0338");
             }
         }
 
-        // Reset stty so it behaves normally again
-        shell_exec(sprintf('stty %s', $sttyMode));
-
-        return $ret;
+        return $answer;
     }
 
     /**

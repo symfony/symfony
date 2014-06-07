@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * [BC BREAK] changed exception.json.twig to match same structure as error.json.twig making clients independent of runtime environment.
+
 2.3.0
 -----
 

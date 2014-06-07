@@ -20,7 +20,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * PHPs internal files session handler also works this way.
  *
  * Session data is a binary string that can contain non-printable characters like the null byte.
- + For this reason this handler base64 encodes the data to be able to save it in a character column.
+ * For this reason this handler base64 encodes the data to be able to save it in a character column.
  *
  * Attention: Since SQLite does not support row level locks but locks the whole database,
  * it means only one session can be accessed at a time. Even different sessions would wait

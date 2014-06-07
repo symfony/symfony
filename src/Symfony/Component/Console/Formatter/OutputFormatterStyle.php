@@ -41,7 +41,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'white'     => array('set' => 47, 'unset' => 49)
     );
     private static $availableOptions = array(
-        'bold'          => array('set' => 1, 'unset' => 21),
+        'bold'          => array('set' => 1, 'unset' => 22),
         'underscore'    => array('set' => 4, 'unset' => 24),
         'blink'         => array('set' => 5, 'unset' => 25),
         'reverse'       => array('set' => 7, 'unset' => 27),
@@ -202,7 +202,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     public function apply($text)
     {
         $setCodes = array();
-        $unsetCode = array();
+        $unsetCodes = array();
 
         if (null !== $this->foreground) {
             $setCodes[] = $this->foreground['set'];

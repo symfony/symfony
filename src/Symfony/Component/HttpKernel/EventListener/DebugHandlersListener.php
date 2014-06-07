@@ -34,10 +34,11 @@ class DebugHandlersListener implements EventSubscriberInterface
     public function configure()
     {
         if ($this->exceptionHandler) {
-            $mainHandler = set_exception_handler('var_dump');
+            $handler = set_exception_handler('var_dump');
+            $handler = is_array($handler) ? $handler[0] : null;
             restore_exception_handler();
-            if ($mainHandler instanceof ExceptionHandler) {
-                $mainHandler->setHandler($this->exceptionHandler);
+            if ($handler instanceof ExceptionHandler) {
+                $handler->setHandler($this->exceptionHandler);
             }
             $this->exceptionHandler = null;
         }

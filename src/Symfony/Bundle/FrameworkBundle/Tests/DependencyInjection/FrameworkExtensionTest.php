@@ -274,7 +274,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame(array($xmlMappings), $calls[3][1]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
     }
@@ -322,7 +322,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
         $this->assertEquals(array(new Reference('annotation_reader')), $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[5][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[5][1]);
         // no cache this time
     }
 
@@ -341,7 +341,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[6][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[6][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(2, $xmlMappings);
@@ -373,7 +373,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(6, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setApiVersion', $calls[5][0]);
         $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
         // no cache, no annotations

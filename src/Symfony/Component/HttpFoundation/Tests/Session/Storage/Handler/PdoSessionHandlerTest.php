@@ -23,9 +23,9 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('This test requires SQLite support in your environment');
         }
 
-        $this->pdo = new \PDO("sqlite::memory:");
+        $this->pdo = new \PDO('sqlite::memory:');
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $sql = "CREATE TABLE sessions (sess_id VARCHAR(255) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)";
+        $sql = 'CREATE TABLE sessions (sess_id VARCHAR(128) PRIMARY KEY, sess_data TEXT, sess_time INTEGER)';
         $this->pdo->exec($sql);
     }
 

@@ -32,7 +32,7 @@ class LoggableTranslator implements TranslatorInterface
      * @param Translator      $translator The translator
      * @param LoggerInterface $logger     A logger instance
      */
-    public function __construct(Translator $translator, LoggerInterface $logger = null)
+    public function __construct(Translator $translator, LoggerInterface $logger)
     {
         $this->translator = $translator;
         $this->logger = $logger;
@@ -89,11 +89,11 @@ class LoggableTranslator implements TranslatorInterface
     }
 
     /**
-     * Logs for missing catalogue.
+     * Logs for missing translations.
      *
-     * @param string $id
-     * @param string $domain
-     * @param string $locale
+     * @param string      $id
+     * @param string|null $domain
+     * @param string|null $locale
      */
     private function log($id, $domain, $locale)
     {
@@ -107,7 +107,7 @@ class LoggableTranslator implements TranslatorInterface
 
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
-        if (null === $this->logger || $catalogue->defines($id, $domain)) {
+        if ($catalogue->defines($id, $domain)) {
             return;
         }
 

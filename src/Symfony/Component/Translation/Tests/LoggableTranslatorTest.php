@@ -17,12 +17,15 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class LoggableTranslatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTransWithNoTranslationIsLogged()
+    protected function setUp()
     {
         if (!interface_exists('Psr\Log\LoggerInterface')) {
             $this->markTestSkipped('The "LoggerInterface" is not available');
         }
+    }
 
+    public function testTransWithNoTranslationIsLogged()
+    {
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->exactly(2))
             ->method('warning')
@@ -37,10 +40,6 @@ class LoggableTranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransChoiceFallbackIsLogged()
     {
-        if (!interface_exists('Psr\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "LoggerInterface" is not available');
-        }
-
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
             ->method('debug')

@@ -37,7 +37,7 @@ class CodeExtension extends \Twig_Extension
     {
         if (empty($fileLinkFormat)) {
             $fileLinkFormat = ini_get('xdebug.file_link_format');
-            
+
             if (empty($fileLinkFormat)) {
                 $fileLinkFormat = get_cfg_var('xdebug.file_link_format');
             }

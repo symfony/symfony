@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-09T20:27:22Z
+
+This is not really a bugfix. There is no bug as the output is strictly equivalent (well, not exactly because of extra spaces being added, but anyway). It only fixes the detection of the ``</ul>`` by your IDE
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-10T07:38:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-10T13:22:23Z
+
+anyway, :+1:

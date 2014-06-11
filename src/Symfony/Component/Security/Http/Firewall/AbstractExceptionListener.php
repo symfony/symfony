@@ -49,6 +49,6 @@ abstract class AbstractExceptionListener
      *
      * @param GetResponseForExceptionEvent $event An GetResponseForExceptionEvent instance
      */
-    public abstract function onKernelException(GetResponseForExceptionEvent $event);
+    abstract public function onKernelException(GetResponseForExceptionEvent $event);
 
 }

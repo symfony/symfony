@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added a Process helper
+ * added a DebugFormatter helper
+
 2.5.0
 -----
 

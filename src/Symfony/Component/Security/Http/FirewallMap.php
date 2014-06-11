@@ -30,11 +30,7 @@ class FirewallMap implements FirewallMapInterface
      * @param array                     $listeners
      * @param AbstractExceptionListener $exceptionListener
      */
-    public function add(
-        RequestMatcherInterface $requestMatcher = null,
-        array $listeners = array(),
-        AbstractExceptionListener $exceptionListener = null
-    )
+    public function add(RequestMatcherInterface $requestMatcher = null, array $listeners = array(), AbstractExceptionListener $exceptionListener = null)
     {
         $this->map[] = array($requestMatcher, $listeners, $exceptionListener);
     }

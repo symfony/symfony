@@ -25,10 +25,8 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * ExceptionListener catches authentication exception and converts them to
@@ -36,7 +34,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ExceptionListener
+class ExceptionListener extends AbstractExceptionListener
 {
     private $context;
     private $providerKey;
@@ -57,26 +55,6 @@ class ExceptionListener
         $this->authenticationTrustResolver = $trustResolver;
         $this->errorPage = $errorPage;
         $this->logger = $logger;
-    }
-
-    /**
-     * Registers a onKernelException listener to take care of security exceptions.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     */
-    public function register(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->addListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
-    }
-
-    /**
-     * Unregisters the dispatcher.
-     *
-     * @param EventDispatcherInterface $dispatcher An EventDispatcherInterface instance
-     */
-    public function unregister(EventDispatcherInterface $dispatcher)
-    {
-        $dispatcher->removeListener(KernelEvents::EXCEPTION, array($this, 'onKernelException'));
     }
 
     /**

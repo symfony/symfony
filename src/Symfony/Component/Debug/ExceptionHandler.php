@@ -36,7 +36,8 @@ class ExceptionHandler
     private $debug;
     private $charset;
     private $handler;
-    private $caughtOutput = 0;
+    private $caughtBuffer;
+    private $caughtLength;
 
     public function __construct($debug = true, $charset = 'UTF-8')
     {
@@ -94,29 +95,25 @@ class ExceptionHandler
             return;
         }
 
-        $caughtOutput = 0;
+        $caughtLength = $this->caughtLength = 0;
 
-        $this->caughtOutput = false;
         ob_start(array($this, 'catchOutput'));
         $this->failSafeHandle($exception);
-        if (false === $this->caughtOutput) {
-            ob_end_clean();
+        while (null === $this->caughtBuffer && ob_end_flush()) {
+            // Empty loop, everything is in the condition
         }
-        if (isset($this->caughtOutput[0])) {
+        if (isset($this->caughtBuffer[0])) {
             ob_start(array($this, 'cleanOutput'));
-            echo $this->caughtOutput;
-            $caughtOutput = ob_get_length();
+            echo $this->caughtBuffer;
+            $caughtLength = ob_get_length();
         }
-        $this->caughtOutput = 0;
+        $this->caughtBuffer = null;
 
         try {
             call_user_func($this->handler, $exception);
-
-            if ($caughtOutput) {
-                $this->caughtOutput = $caughtOutput;
-            }
+            $this->caughtLength = $caughtLength;
         } catch (\Exception $e) {
-            if (!$caughtOutput) {
+            if (!$caughtLength) {
                 // All handlers failed. Let PHP handle that now.
                 throw $exception;
             }
@@ -388,7 +385,7 @@ EOF;
      */
     public function catchOutput($buffer)
     {
-        $this->caughtOutput = $buffer;
+        $this->caughtBuffer = $buffer;
 
         return '';
     }
@@ -398,9 +395,9 @@ EOF;
      */
     public function cleanOutput($buffer)
     {
-        if ($this->caughtOutput) {
+        if ($this->caughtLength) {
             // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtOutput);
+            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
             if (isset($cleanBuffer[0])) {
                 $buffer = $cleanBuffer;
             }

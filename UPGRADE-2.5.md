@@ -97,7 +97,7 @@ Validator
 
    After:
 
-   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compilant) to be
+   Default email validation is now done via a simple regex which may cause invalid emails (not RFC compliant) to be
    valid. This is the default behaviour.
 
    Strict email validation has to be explicitly activated in the configuration file by adding

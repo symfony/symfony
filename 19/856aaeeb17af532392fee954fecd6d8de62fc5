@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-11T12:44:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-11T13:26:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-11T13:27:11Z
+
+For the travis failure, it is because Travis updated their PHP version, and PHP broke BC in patch releases for the serialization. I asked the PHPUnit team to build a new version of the phar with the fixed version of the mocking library (should be done soon) and then I will ask the Travis team to update their phpunit version

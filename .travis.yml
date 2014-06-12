@@ -23,6 +23,7 @@ before_script:
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
+    - composer self-update
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
     - wget https://phar.phpunit.de/phpunit.phar && rm `which phpunit` && sudo cp phpunit.phar /usr/local/bin/phpunit && sudo chmod +x /usr/local/bin/phpunit
 

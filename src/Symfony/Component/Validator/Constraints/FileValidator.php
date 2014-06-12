@@ -29,7 +29,7 @@ class FileValidator extends ConstraintValidator
 
     const MB_BYTES = 1000000;
 
-    protected static $suffices = array(
+    private static $suffices = array(
         1 => 'bytes',
         self::KB_BYTES => 'kB',
         self::MB_BYTES => 'MB',
@@ -160,7 +160,7 @@ class FileValidator extends ConstraintValidator
                 $this->context->addViolation($constraint->maxSizeMessage, array(
                     '{{ size }}'    => $sizeAsString,
                     '{{ limit }}'   => $limitAsString,
-                    '{{ suffix }}'  => static::$suffices[$coef],
+                    '{{ suffix }}'  => self::$suffices[$coef],
                     '{{ file }}'    => $path,
                 ));
 

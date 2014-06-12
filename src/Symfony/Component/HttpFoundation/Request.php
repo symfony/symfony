@@ -972,7 +972,7 @@ class Request
      */
     public function getUser()
     {
-        return $this->server->get('PHP_AUTH_USER');
+        return $this->headers->get('PHP_AUTH_USER');
     }
 
     /**
@@ -982,7 +982,7 @@ class Request
      */
     public function getPassword()
     {
-        return $this->server->get('PHP_AUTH_PW');
+        return $this->headers->get('PHP_AUTH_PW');
     }
 
     /**

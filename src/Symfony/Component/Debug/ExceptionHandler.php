@@ -29,13 +29,15 @@ if (!defined('ENT_SUBSTITUTE')) {
  * available, the Response content is always HTML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
 class ExceptionHandler
 {
     private $debug;
     private $charset;
     private $handler;
-    private $caughtOutput = 0;
+    private $caughtBuffer;
+    private $caughtLength;
 
     public function __construct($debug = true, $charset = 'UTF-8')
     {
@@ -68,7 +70,7 @@ class ExceptionHandler
      */
     public function setHandler($handler)
     {
-        if (isset($handler) && !is_callable($handler)) {
+        if (null !== $handler && !is_callable($handler)) {
             throw new \LogicException('The exception handler must be a valid PHP callable.');
         }
         $old = $this->handler;
@@ -78,8 +80,47 @@ class ExceptionHandler
     }
 
     /**
-     * {@inheritdoc}
+     * Sends a response for the given Exception.
      *
+     * To be as fail-safe as possible, the exception is first handled
+     * by our simple exception handler, then by the user exception handler.
+     * The latter takes precedence and any output from the former is cancelled,
+     * if and only if nothing bad happens in this handling path.
+     */
+    public function handle(\Exception $exception)
+    {
+        if (null === $this->handler || $exception instanceof OutOfMemoryException) {
+            $this->failSafeHandle($exception);
+
+            return;
+        }
+
+        $caughtLength = $this->caughtLength = 0;
+
+        ob_start(array($this, 'catchOutput'));
+        $this->failSafeHandle($exception);
+        while (null === $this->caughtBuffer && ob_end_flush()) {
+            // Empty loop, everything is in the condition
+        }
+        if (isset($this->caughtBuffer[0])) {
+            ob_start(array($this, 'cleanOutput'));
+            echo $this->caughtBuffer;
+            $caughtLength = ob_get_length();
+        }
+        $this->caughtBuffer = null;
+
+        try {
+            call_user_func($this->handler, $exception);
+            $this->caughtLength = $caughtLength;
+        } catch (\Exception $e) {
+            if (!$caughtLength) {
+                // All handlers failed. Let PHP handle that now.
+                throw $exception;
+            }
+        }
+    }
+
+    /**
      * Sends a response for the given Exception.
      *
      * If you have the Symfony HttpFoundation component installed,
@@ -89,57 +130,14 @@ class ExceptionHandler
      * @see sendPhpResponse
      * @see createResponse
      */
-    public function handle(\Exception $exception)
+    private function failSafeHandle(\Exception $exception)
     {
-        if ($exception instanceof OutOfMemoryException) {
+        if (class_exists('Symfony\Component\HttpFoundation\Response', false)) {
+            $response = $this->createResponse($exception);
+            $response->sendHeaders();
+            $response->sendContent();
+        } else {
             $this->sendPhpResponse($exception);
-
-            return;
-        }
-
-        // To be as fail-safe as possible, the exception is first handled
-        // by our simple exception handler, then by the user exception handler.
-        // The latter takes precedence and any output from the former is cancelled,
-        // if and only if nothing bad happens in this handling path.
-
-        $caughtOutput = 0;
-
-        $this->caughtOutput = false;
-        ob_start(array($this, 'catchOutput'));
-        try {
-            if (class_exists('Symfony\Component\HttpFoundation\Response')) {
-                $response = $this->createResponse($exception);
-                $response->sendHeaders();
-                $response->sendContent();
-            } else {
-                $this->sendPhpResponse($exception);
-            }
-        } catch (\Exception $e) {
-            // Ignore this $e exception, we have to deal with $exception
-        }
-        if (false === $this->caughtOutput) {
-            ob_end_clean();
-        }
-        if (isset($this->caughtOutput[0])) {
-            ob_start(array($this, 'cleanOutput'));
-            echo $this->caughtOutput;
-            $caughtOutput = ob_get_length();
-        }
-        $this->caughtOutput = 0;
-
-        if (!empty($this->handler)) {
-            try {
-                call_user_func($this->handler, $exception);
-
-                if ($caughtOutput) {
-                    $this->caughtOutput = $caughtOutput;
-                }
-            } catch (\Exception $e) {
-                if (!$caughtOutput) {
-                    // All handlers failed. Let PHP handle that now.
-                    throw $exception;
-                }
-            }
         }
     }
 
@@ -396,7 +394,7 @@ EOF;
      */
     public function catchOutput($buffer)
     {
-        $this->caughtOutput = $buffer;
+        $this->caughtBuffer = $buffer;
 
         return '';
     }
@@ -406,9 +404,9 @@ EOF;
      */
     public function cleanOutput($buffer)
     {
-        if ($this->caughtOutput) {
+        if ($this->caughtLength) {
             // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtOutput);
+            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
             if (isset($cleanBuffer[0])) {
                 $buffer = $cleanBuffer;
             }

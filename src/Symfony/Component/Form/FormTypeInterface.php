@@ -21,7 +21,7 @@ interface FormTypeInterface
     /**
      * Builds the form.
      *
-     * This method is called for each type in the hierarchy starting form the
+     * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the form.
      *
      * @see FormTypeExtensionInterface::buildForm()
@@ -34,7 +34,7 @@ interface FormTypeInterface
     /**
      * Builds the form view.
      *
-     * This method is called for each type in the hierarchy starting form the
+     * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the view.
      *
      * A view of a form is built before the views of the child forms are built.
@@ -52,7 +52,7 @@ interface FormTypeInterface
     /**
      * Finishes the form view.
      *
-     * This method gets called for each type in the hierarchy starting form the
+     * This method gets called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the view.
      *
      * When this method is called, views of the form's children have already

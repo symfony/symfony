@@ -209,7 +209,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(80, $request->getPort());
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertEquals('testnopass', $request->getUser());
-        $this->assertNull($request->getPassword());
+        $this->assertSame('',$request->getPassword());
         $this->assertFalse($request->isSecure());
 
         $request = Request::create('http://test.com/?foo');

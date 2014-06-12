@@ -23,7 +23,7 @@ before_script:
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
-    - wget https://phar.phpunit.de/phpunit.phar && rm `which phpunit` && sudo cp phpunit.phar /usr/local/bin/phpunit && sudo chmod +x /usr/local/bin/phpunit
+    - phpunit --self-update
 
 script:
     - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || false

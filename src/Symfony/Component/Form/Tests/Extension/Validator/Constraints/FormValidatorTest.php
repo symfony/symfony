@@ -611,6 +611,28 @@ class FormValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($form, new Form());
     }
 
+    public function testNoViolationIfAllowExtraData()
+    {
+        $context = $this->getMockExecutionContext();
+
+        $form = $this
+            ->getBuilder('parent', null, array('allow_extra_fields' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->bind(array('foo' => 'bar'));
+
+        $context->expects($this->never())
+            ->method('addViolation');
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
+    }
+
     /**
      * @dataProvider getPostMaxSizeFixtures
      */

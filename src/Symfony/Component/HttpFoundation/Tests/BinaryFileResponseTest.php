@@ -19,7 +19,7 @@ class BinaryFileResponseTest extends ResponseTestCase
 {
     public function testConstruction()
     {
-    	$file = __DIR__ . '/../README.md';
+        $file = __DIR__ . '/../README.md';
         $response = new BinaryFileResponse($file, 404, array('X-Header' => 'Foo'), true, null, true, true);
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('Foo', $response->headers->get('X-Header'));
@@ -189,8 +189,8 @@ class BinaryFileResponseTest extends ResponseTestCase
              ->method('isReadable')
              ->will($this->returnValue(true));
         $file->expects($this->any())
-        	->method('getMTime')
-        	->will($this->returnValue(time()));
+             ->method('getMTime')
+             ->will($this->returnValue(time()));
 
         BinaryFileResponse::trustXSendFileTypeHeader();
         $response = new BinaryFileResponse($file);

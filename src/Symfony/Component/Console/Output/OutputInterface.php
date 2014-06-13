@@ -114,7 +114,7 @@ interface OutputInterface
     /**
      * Do not output any messages.
      *
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -123,7 +123,7 @@ interface OutputInterface
     /**
      * Increased verbosity of messages.
      *
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -132,7 +132,7 @@ interface OutputInterface
     /**
      * Informative non essential messages.
      *
-     * @return boolean
+     * @return bool
      *
      * @api
      */
@@ -141,7 +141,7 @@ interface OutputInterface
     /**
      * Debug messages.
      *
-     * @return boolean
+     * @return bool
      *
      * @api
      */

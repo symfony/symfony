@@ -1238,8 +1238,8 @@ class Process
      */
     private function getDescriptors()
     {
-        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty, $this->pty);
-        $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
+        $this->processPipes = new ProcessPipes($this->useFileHandles, $this->tty, $this->pty, $this->outputDisabled);
+        $descriptors = $this->processPipes->getDescriptors();
 
         if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild

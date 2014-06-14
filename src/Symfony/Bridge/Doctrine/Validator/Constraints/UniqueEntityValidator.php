@@ -78,8 +78,12 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $class = $em->getClassMetadata(get_class($entity));
-        /* @var $class \Doctrine\Common\Persistence\Mapping\ClassMetadata */
+        $className = $this->context->getClassName();
+        $class = $em->getClassMetadata($className);
+
+        if ($class->inheritanceType == \Doctrine\ORM\Mapping\ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE) {
+            $className = $class->rootEntityName;
+        }
 
         $criteria = array();
         foreach ($fields as $fieldName) {
@@ -87,7 +91,7 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf("The field '%s' is not mapped by Doctrine, so it cannot be validated for uniqueness.", $fieldName));
             }
 
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            $criteria[$fieldName] = $class->getFieldValue($entity, $fieldName);
 
             if ($constraint->ignoreNull && null === $criteria[$fieldName]) {
                 return;
@@ -113,7 +117,7 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository(get_class($entity));
+        $repository = $em->getRepository($className);
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first

@@ -90,20 +90,21 @@ EOF
 
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
 
-        $router = $input->getOption('router') ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
-        ;
-
         $builder = $this->createPhpProcessBuilder($input, $output, $env);
         $builder->setWorkingDirectory($input->getOption('docroot'));
         $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+        $process = $builder->getProcess();
+
+        if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
+            $callback = function ($type, $buffer) use ($output) {
                 $output->write($buffer);
-            }
-        });
+            };
+        } else {
+            $callback = null;
+            $process->disableOutput();
+        }
+
+        $process->run($callback);
     }
 
     private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)

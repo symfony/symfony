@@ -1265,6 +1265,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->hasPreviousSession());
     }
 
+    public function testIsDoNotTrack()
+    {
+    	$request = new Request();
+    	$isDNT = $request->isDoNotTrack();
+    	$this->assertFalse($isDNT);
+
+    	$request = new Request();
+    	$request->headers->set('DNT', '1');
+    	$isDNT = $request->isDoNotTrack();
+    	$this->assertTrue($isDNT);
+
+    	$request = new Request();
+    	$request->headers->set('DNT', '0');
+    	$isDNT = $request->isDoNotTrack();
+    	$this->assertFalse($isDNT);
+    }
+
     public function testToString()
     {
         $request = new Request();

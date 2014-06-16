@@ -1463,6 +1463,16 @@ class Request
     }
 
     /**
+     * Returns if the DNT header has been set on the request
+     *
+     * @return bool true if set and DNT is preferred
+     */
+    public function isDoNotTrack()
+    {
+        return $this->headers->get('dnt', false) == '1';
+    }
+
+    /**
      * Returns the preferred language.
      *
      * @param array $locales An array of ordered available locales

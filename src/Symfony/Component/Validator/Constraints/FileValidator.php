@@ -162,7 +162,7 @@ class FileValidator extends ConstraintValidator
                 $this->context->addViolation($constraint->maxSizeMessage, array(
                     '{{ size }}'    => $sizeAsString,
                     '{{ limit }}'   => $limitAsString,
-                    '{{ suffix }}'  => static::$suffices[$coef],
+                    '{{ suffix }}'  => self::$suffices[$coef],
                     '{{ file }}'    => $path,
                 ));
 

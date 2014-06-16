@@ -19,14 +19,15 @@ class BinaryFileResponseTest extends ResponseTestCase
 {
     public function testConstruction()
     {
-        $response = new BinaryFileResponse('README.md', 404, array('X-Header' => 'Foo'), true, null, true, true);
+        $file = __DIR__ . '/../README.md';
+        $response = new BinaryFileResponse($file, 404, array('X-Header' => 'Foo'), true, null, true, true);
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('Foo', $response->headers->get('X-Header'));
         $this->assertTrue($response->headers->has('ETag'));
         $this->assertTrue($response->headers->has('Last-Modified'));
         $this->assertFalse($response->headers->has('Content-Disposition'));
 
-        $response = BinaryFileResponse::create('README.md', 404, array(), true, ResponseHeaderBag::DISPOSITION_INLINE);
+        $response = BinaryFileResponse::create($file, 404, array(), true, ResponseHeaderBag::DISPOSITION_INLINE);
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertFalse($response->headers->has('ETag'));
         $this->assertEquals('inline; filename="README.md"', $response->headers->get('Content-Disposition'));
@@ -37,13 +38,13 @@ class BinaryFileResponseTest extends ResponseTestCase
      */
     public function testSetContent()
     {
-        $response = new BinaryFileResponse('README.md');
+        $response = new BinaryFileResponse(__FILE__);
         $response->setContent('foo');
     }
 
     public function testGetContent()
     {
-        $response = new BinaryFileResponse('README.md');
+        $response = new BinaryFileResponse(__FILE__);
         $this->assertFalse($response->getContent());
     }
 
@@ -160,7 +161,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request->headers->set('X-Sendfile-Type', 'X-Sendfile');
 
         BinaryFileResponse::trustXSendfileTypeHeader();
-        $response = BinaryFileResponse::create('README.md');
+        $response = BinaryFileResponse::create(__DIR__ . '/../README.md');
         $response->prepare($request);
 
         $this->expectOutputString('');
@@ -187,9 +188,12 @@ class BinaryFileResponseTest extends ResponseTestCase
         $file->expects($this->any())
              ->method('isReadable')
              ->will($this->returnValue(true));
+        $file->expects($this->any())
+             ->method('getMTime')
+             ->will($this->returnValue(time()));
 
         BinaryFileResponse::trustXSendFileTypeHeader();
-        $response = new BinaryFileResponse('README.md');
+        $response = new BinaryFileResponse($file);
         $reflection = new \ReflectionObject($response);
         $property = $reflection->getProperty('file');
         $property->setAccessible(true);
@@ -209,6 +213,6 @@ class BinaryFileResponseTest extends ResponseTestCase
 
     protected function provideResponse()
     {
-        return new BinaryFileResponse('README.md');
+        return new BinaryFileResponse(__DIR__ . '/../README.md');
     }
 }

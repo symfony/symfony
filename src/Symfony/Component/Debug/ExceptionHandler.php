@@ -34,15 +34,13 @@ if (!defined('ENT_SUBSTITUTE')) {
 class ExceptionHandler
 {
     private $debug;
-    private $charset;
     private $handler;
     private $caughtBuffer;
     private $caughtLength;
 
-    public function __construct($debug = true, $charset = 'UTF-8')
+    public function __construct($debug = true)
     {
         $this->debug = $debug;
-        $this->charset = $charset;
     }
 
     /**
@@ -56,7 +54,11 @@ class ExceptionHandler
     {
         $handler = new static($debug);
 
-        set_exception_handler(array($handler, 'handle'));
+        $prev = set_exception_handler(array($handler, 'handle'));
+        if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
+            restore_exception_handler();
+            $prev[0]->setExceptionHandler(array($handler, 'handle'));
+        }
 
         return $handler;
     }
@@ -206,7 +208,7 @@ class ExceptionHandler
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
                     $class = $this->formatClass($e['class']);
-                    $message = nl2br(htmlspecialchars($e['message'], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
+                    $message = nl2br(self::utf8Htmlize($e['message']));
                     $content .= sprintf(<<<EOF
                         <div class="block_exception clear_fix">
                             <h2><span>%d/%d</span> %s%s:<br />%s</h2>
@@ -344,7 +346,7 @@ EOF;
 
     private function formatPath($path, $line)
     {
-        $path = htmlspecialchars($path, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset);
+        $path = self::utf8Htmlize($path);
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
         if ($linkFormat = ini_get('xdebug.file_link_format')) {
@@ -372,7 +374,7 @@ EOF;
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {
-                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
+                $formattedValue = sprintf("'%s'", self::utf8Htmlize($item[1]));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -380,13 +382,32 @@ EOF;
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), true));
+                $formattedValue = str_replace("\n", '', var_export(self::utf8Htmlize((string) $item[1]), true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
         }
 
         return implode(', ', $result);
+    }
+
+    /**
+     * Returns an UTF-8 and HTML encoded string
+     */
+    protected static function utf8Htmlize($str)
+    {
+        if (!preg_match('//u', $str) && function_exists('iconv')) {
+            set_error_handler('var_dump', 0);
+            $charset = ini_get('default_charset');
+            if ('UTF-8' === $charset || $str !== @iconv($charset, $charset, $str)) {
+                $charset = 'CP1252';
+            }
+            restore_error_handler();
+
+            $str = iconv($charset, 'UTF-8', $str);
+        }
+
+        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /**

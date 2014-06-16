@@ -12,6 +12,8 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -58,5 +60,57 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new ExceptionHandler(true);
         $response = $handler->createResponse(new \RuntimeException('Foo', 0, new \RuntimeException('Bar')));
+    }
+
+    public function testHandle()
+    {
+        $exception = new \Exception('foo');
+
+        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+            $handler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('createResponse'));
+            $handler
+                ->expects($this->exactly(2))
+                ->method('createResponse')
+                ->will($this->returnValue(new Response()));
+        } else {
+            $handler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('sendPhpResponse'));
+            $handler
+                ->expects($this->exactly(2))
+                ->method('sendPhpResponse');
+        }
+
+        $handler->handle($exception);
+
+        $that = $this;
+        $handler->setHandler(function ($e) use ($exception, $that) {
+            $that->assertSame($exception, $e);
+        });
+
+        $handler->handle($exception);
+    }
+
+    public function testHandleOutOfMemoryException()
+    {
+        $exception = new OutOfMemoryException('foo', 0, E_ERROR, __FILE__, __LINE__);
+
+        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+            $handler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('createResponse'));
+            $handler
+                ->expects($this->once())
+                ->method('createResponse')
+                ->will($this->returnValue(new Response()));
+        } else {
+            $handler = $this->getMock('Symfony\Component\Debug\ExceptionHandler', array('sendPhpResponse'));
+            $handler
+                ->expects($this->once())
+                ->method('sendPhpResponse');
+        }
+
+        $that = $this;
+        $handler->setHandler(function ($e) use ($that) {
+            $that->fail('OutOfMemoryException should bypass the handler');
+        });
+
+        $handler->handle($exception);
     }
 }

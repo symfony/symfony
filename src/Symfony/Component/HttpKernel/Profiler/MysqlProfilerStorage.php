@@ -33,7 +33,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
             }
 
             $db = new \PDO($this->dsn, $this->username, $this->password);
-            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), method VARCHAR(6), url VARCHAR(255), time INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (method), KEY (url), KEY (parent))');
+            $db->exec('CREATE TABLE IF NOT EXISTS sf_profiler_data (token VARCHAR(255) PRIMARY KEY, data LONGTEXT, ip VARCHAR(64), method VARCHAR(6), url VARCHAR(255), time INTEGER UNSIGNED, duration INTEGER UNSIGNED, parent VARCHAR(255), created_at INTEGER UNSIGNED, KEY (created_at), KEY (ip), KEY (method), KEY (url), KEY (parent))');
 
             $this->db = $db;
         }
@@ -44,7 +44,7 @@ class MysqlProfilerStorage extends PdoProfilerStorage
     /**
      * {@inheritdoc}
      */
-    protected function buildCriteria($ip, $url, $start, $end, $limit, $method)
+    protected function buildCriteria($ip, $url, $start, $end, $limit, $method, $duration = null)
     {
         $criteria = array();
         $args = array();
@@ -72,6 +72,11 @@ class MysqlProfilerStorage extends PdoProfilerStorage
         if (!empty($end)) {
             $criteria[] = 'time <= :end';
             $args[':end'] = $end;
+        }
+
+        if (!empty($duration)) {
+            $criteria[] = 'duration >= :duration';
+            $args[':duration'] = $duration;
         }
 
         return array($criteria, $args);

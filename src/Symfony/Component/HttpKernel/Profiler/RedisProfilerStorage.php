@@ -51,7 +51,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $duration = null)
     {
         $indexName = $this->getIndexName();
 
@@ -71,7 +71,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent) = explode("\t", $item, 6);
+            list($itemToken, $itemIp, $itemMethod, $itemUrl, $itemTime, $itemParent, $itemDuration) = explode("\t", $item, 7);
 
             $itemTime = (int) $itemTime;
 
@@ -87,13 +87,18 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
+            if (!empty($duration) && $itemDuration < $duration) {
+                continue;
+            }
+
             $result[] = array(
-                'token'  => $itemToken,
-                'ip'     => $itemIp,
-                'method' => $itemMethod,
-                'url'    => $itemUrl,
-                'time'   => $itemTime,
-                'parent' => $itemParent,
+                'token'    => $itemToken,
+                'ip'       => $itemIp,
+                'method'   => $itemMethod,
+                'url'      => $itemUrl,
+                'time'     => $itemTime,
+                'parent'   => $itemParent,
+                'duration' => !empty($itemDuration) ? $itemDuration : null,
             );
             --$limit;
         }
@@ -166,6 +171,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
             'method'   => $profile->getMethod(),
             'url'      => $profile->getUrl(),
             'time'     => $profile->getTime(),
+            'duration' => $profile->getDuration(),
         );
 
         $profileIndexed = false !== $this->getValue($this->getItemName($profile->getToken()));
@@ -183,6 +189,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
                     $profile->getUrl(),
                     $profile->getTime(),
                     $profile->getParentToken(),
+                    $profile->getDuration(),
                 ))."\n";
 
                 return $this->appendValue($indexName, $indexRow, $this->lifetime);
@@ -250,6 +257,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
+        $profile->setDuration($data['duration']);
         $profile->setCollectors($data['data']);
 
         if (!$parent && $data['parent']) {

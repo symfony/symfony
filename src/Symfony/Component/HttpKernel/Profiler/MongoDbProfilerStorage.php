@@ -34,9 +34,9 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $duration = null)
     {
-        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time'))->sort(array('time' => -1))->limit($limit);
+        $cursor = $this->getMongo()->find($this->buildQuery($ip, $url, $method, $start, $end), array('_id', 'parent', 'ip', 'method', 'url', 'time', 'duration'))->sort(array('time' => -1))->limit($limit);
 
         $tokens = array();
         foreach ($cursor as $profile) {
@@ -76,13 +76,14 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $this->cleanup();
 
         $record = array(
-            '_id' => $profile->getToken(),
-            'parent' => $profile->getParentToken(),
-            'data' => base64_encode(serialize($profile->getCollectors())),
-            'ip' => $profile->getIp(),
-            'method' => $profile->getMethod(),
-            'url' => $profile->getUrl(),
-            'time' => $profile->getTime()
+            '_id'      => $profile->getToken(),
+            'parent'   => $profile->getParentToken(),
+            'data'     => base64_encode(serialize($profile->getCollectors())),
+            'ip'       => $profile->getIp(),
+            'method'   => $profile->getMethod(),
+            'url'      => $profile->getUrl(),
+            'time'     => $profile->getTime(),
+            'duration' => $profile->getDuration(),
         );
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));
@@ -163,10 +164,11 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
      * @param string $method
      * @param int    $start
      * @param int    $end
+     * @param int    $duration
      *
      * @return array
      */
-    private function buildQuery($ip, $url, $method, $start, $end)
+    private function buildQuery($ip, $url, $method, $start, $end, $duration = null)
     {
         $query = array();
 
@@ -194,6 +196,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             $query['time']['$lte'] = $end;
         }
 
+        if (!empty($duration)) {
+            $query['time']['$gte'] = $duration;
+        }
+
         return $query;
     }
 
@@ -205,13 +211,14 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     private function getData(array $data)
     {
         return array(
-            'token' => $data['_id'],
-            'parent' => isset($data['parent']) ? $data['parent'] : null,
-            'ip' => isset($data['ip']) ? $data['ip'] : null,
-            'method' => isset($data['method']) ? $data['method'] : null,
-            'url' => isset($data['url']) ? $data['url'] : null,
-            'time' => isset($data['time']) ? $data['time'] : null,
-            'data' => isset($data['data']) ? $data['data'] : null,
+            'token'    => $data['_id'],
+            'parent'   => isset($data['parent']) ? $data['parent'] : null,
+            'ip'       => isset($data['ip']) ? $data['ip'] : null,
+            'method'   => isset($data['method']) ? $data['method'] : null,
+            'url'      => isset($data['url']) ? $data['url'] : null,
+            'time'     => isset($data['time']) ? $data['time'] : null,
+            'data'     => isset($data['data']) ? $data['data'] : null,
+            'duration' => isset($data['duration']) ? $data['duration'] : null,
         );
     }
 
@@ -227,6 +234,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
+        $profile->setDuration($data['duration']);
         $profile->setCollectors(unserialize(base64_decode($data['data'])));
 
         return $profile;
@@ -240,7 +248,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     private function parseDsn($dsn)
     {
         if (!preg_match('#^(mongodb://.*)/(.*)/(.*)$#', $dsn, $matches)) {
-            return;
+            return null;
         }
 
         $server = $matches[1];

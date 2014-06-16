@@ -31,6 +31,7 @@ class Profile
     private $method;
     private $url;
     private $time;
+    private $duration;
 
     /**
      * @var Profile
@@ -132,6 +133,11 @@ class Profile
         return $this->method;
     }
 
+    /**
+     * Sets the request method.
+     *
+     * @param string $method
+     */
     public function setMethod($method)
     {
         $this->method = $method;
@@ -147,6 +153,11 @@ class Profile
         return $this->url;
     }
 
+    /**
+     * Sets the URL.
+     *
+     * @param string $url
+     */
     public function setUrl($url)
     {
         $this->url = $url;
@@ -155,7 +166,7 @@ class Profile
     /**
      * Returns the time.
      *
-     * @return string The time
+     * @return int The time
      */
     public function getTime()
     {
@@ -166,9 +177,38 @@ class Profile
         return $this->time;
     }
 
+    /**
+     * Sets the time.
+     *
+     * @param int $time
+     */
     public function setTime($time)
     {
         $this->time = $time;
+    }
+
+    /**
+     * Returns the duration.
+     *
+     * @return int The duration
+     */
+    public function getDuration()
+    {
+        if (null === $this->duration) {
+            return 0;
+        }
+
+        return $this->duration;
+    }
+
+    /**
+     * Sets the duration.
+     *
+     * @param int $duration
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
     }
 
     /**
@@ -270,6 +310,6 @@ class Profile
 
     public function __sleep()
     {
-        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'duration');
     }
 }

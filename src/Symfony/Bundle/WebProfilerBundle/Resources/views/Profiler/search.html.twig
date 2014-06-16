@@ -26,6 +26,9 @@
         <label for="end">Until</label>
         <input type="date" name="end" id="end" value="{{ end }}" placeholder="e.g. {{ 'now'|date('dd.mm.YYYY') }}">
         <div class="clear-fix"></div>
+        <label for="duration">Duration</label>
+        <input type="text" name="duration" id="duration" value="{{ duration }}">
+        <div class="clear-fix"></div>
         <label for="limit">Limit</label>
         <select name="limit" id="limit">
             {% for l in [10, 50, 100] %}

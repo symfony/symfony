@@ -119,7 +119,8 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         $catalogue = $loader->load(__DIR__.'/../fixtures/withnote.xlf', 'en', 'domain1');
 
         $this->assertEquals(array('notes' => array(array('priority' => 1, 'content' => 'foo'))), $catalogue->getMetadata('foo', 'domain1'));
-        $this->assertEquals(array('notes' => array(array('from' => 'foo', 'content' => 'bar'))), $catalogue->getMetadata('extra', 'domain1'));
+        // message without target
+        $this->assertNull($catalogue->getMetadata('extra', 'domain1'));
         $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux'))), $catalogue->getMetadata('key', 'domain1'));
     }
 }

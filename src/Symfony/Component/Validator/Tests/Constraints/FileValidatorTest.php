@@ -29,6 +29,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->initialize($this->context);
         $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
+        fwrite($this->file, ' ', 1);
     }
 
     protected function tearDown()
@@ -317,6 +318,21 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ));
 
         $this->validator->validate($file, $constraint);
+    }
+
+    public function testDisallowEmpty()
+    {
+        ftruncate($this->file, 0);
+
+        $constraint = new File(array(
+            'disallowEmptyMessage' => 'myMessage',
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage');
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
     }
 
     /**

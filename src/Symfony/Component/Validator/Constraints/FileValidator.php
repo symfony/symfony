@@ -121,8 +121,10 @@ class FileValidator extends ConstraintValidator
             return;
         }
 
-        if ($constraint->maxSize) {
-            $sizeInBytes = filesize($path);
+        $sizeInBytes = filesize($path);
+        if (0 === $sizeInBytes) {
+            $this->context->addViolation($constraint->disallowEmptyMessage);
+        } elseif ($constraint->maxSize) {
             $limitInBytes = (int) $constraint->maxSize;
 
             if (preg_match('/^\d++k$/', $constraint->maxSize)) {

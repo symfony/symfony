@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-07T20:39:41Z
+
+a test should be added, and the PR needs to be rebased as it conflicts with master.
+
+There is no need for a doc PR for this change
+
+---------------------------------------------------------------------------
+
+by scuben at 2014-06-10T06:40:12Z
+
+Thank you for your input stof. I think the PR is ready to merge. The Travis errors comes form other parts of the framework.
+
+---------------------------------------------------------------------------
+
+by scuben at 2014-06-13T15:48:12Z
+
+Thanks stof for your inputs. I updated my code, may you have another look?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-13T15:51:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by scuben at 2014-06-16T08:38:55Z
+
+Thank you for your feedback. Fixed all open issues on the code.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T09:27:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-16T09:30:01Z
+
+:+1:

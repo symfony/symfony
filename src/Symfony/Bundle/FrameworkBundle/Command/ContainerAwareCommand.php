@@ -36,7 +36,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
         if (null === $this->container) {
             $application = $this->getApplication();
             if (null === $application) {
-                throw new \LogicException('The application instance must be set.');
+                throw new \LogicException('The container cannot be retrieved as the application instance is not yet set.');
             }
 
             $this->container = $application->getKernel()->getContainer();

@@ -620,7 +620,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'audio/basic' => 'au',
         'audio/midi' => 'mid',
         'audio/mp4' => 'mp4a',
-        'audio/mpeg' => 'mpga',
+        'audio/mpeg' => 'mp3',
         'audio/ogg' => 'oga',
         'audio/s3m' => 's3m',
         'audio/silk' => 'sil',

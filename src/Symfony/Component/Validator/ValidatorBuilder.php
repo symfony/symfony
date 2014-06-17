@@ -62,27 +62,27 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $methodMappings = array();
 
     /**
-     * @var Reader
+     * @var Reader|null
      */
-    private $annotationReader = null;
+    private $annotationReader;
 
     /**
-     * @var MetadataFactoryInterface
+     * @var MetadataFactoryInterface|null
      */
     private $metadataFactory;
 
     /**
-     * @var ConstraintValidatorFactoryInterface
+     * @var ConstraintValidatorFactoryInterface|null
      */
     private $validatorFactory;
 
     /**
-     * @var CacheInterface
+     * @var CacheInterface|null
      */
     private $metadataCache;
 
     /**
-     * @var TranslatorInterface
+     * @var TranslatorInterface|null
      */
     private $translator;
 
@@ -92,12 +92,12 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $translationDomain;
 
     /**
-     * @var PropertyAccessorInterface
+     * @var PropertyAccessorInterface|null
      */
     private $propertyAccessor;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $apiVersion;
 

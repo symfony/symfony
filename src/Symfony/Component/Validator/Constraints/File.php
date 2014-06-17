@@ -24,8 +24,8 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class File extends Constraint
 {
-    public $maxSize = null;
-    public $binaryFormat = null;
+    public $maxSize;
+    public $binaryFormat;
     public $mimeTypes = array();
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';

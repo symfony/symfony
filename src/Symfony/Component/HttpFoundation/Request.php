@@ -1599,8 +1599,25 @@ class Request
      * @return bool    true if the request is an XMLHttpRequest, false otherwise
      *
      * @api
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function isXmlHttpRequest()
+    {
+        return $this->isAjaxRequest();
+    }
+
+    /**
+     * Returns true if the request is a XMLHttpRequest.
+     *
+     * It works if your JavaScript library set an X-Requested-With HTTP header.
+     * It is known to work with common JavaScript frameworks:
+     * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
+     *
+     * @return bool    true if the request is an XMLHttpRequest, false otherwise
+     *
+     * @api
+     */
+    public function isAjaxRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
     }

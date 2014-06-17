@@ -107,7 +107,7 @@ class ProfilerController
             'page'      => $page,
             'request'   => $request,
             'templates' => $this->getTemplateManager()->getTemplates($profile),
-            'is_ajax'   => $request->isXmlHttpRequest(),
+            'is_ajax'   => $request->isAjaxRequest(),
         )), 200, array('Content-Type' => 'text/html'));
     }
 

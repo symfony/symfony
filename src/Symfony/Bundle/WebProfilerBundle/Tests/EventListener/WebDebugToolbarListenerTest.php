@@ -210,11 +210,11 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = $this->getMock(
             'Symfony\Component\HttpFoundation\Request',
-            array('getSession', 'isXmlHttpRequest', 'getRequestFormat'),
+            array('getSession', 'isAjaxRequest', 'getRequestFormat'),
             array(), '', false
         );
         $request->expects($this->any())
-            ->method('isXmlHttpRequest')
+            ->method('isAjaxRequest')
             ->will($this->returnValue($isXmlHttpRequest));
         $request->expects($this->any())
             ->method('getRequestFormat')

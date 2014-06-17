@@ -1118,13 +1118,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testIsXmlHttpRequest()
     {
         $request = new Request();
-        $this->assertFalse($request->isXmlHttpRequest());
+        $this->assertFalse($request->isAjaxRequest());
 
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
-        $this->assertTrue($request->isXmlHttpRequest());
+        $this->assertTrue($request->isAjaxRequest());
 
         $request->headers->remove('X-Requested-With');
-        $this->assertFalse($request->isXmlHttpRequest());
+        $this->assertFalse($request->isAjaxRequest());
     }
 
     public function testIntlLocale()

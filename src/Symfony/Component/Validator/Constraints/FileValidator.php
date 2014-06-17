@@ -54,7 +54,7 @@ class FileValidator extends ConstraintValidator
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
                     if ($constraint->maxSize) {
-                        $limitInBytes = min(UploadedFile::getMaxFilesize(), (int) $constraint->maxSize);
+                        $limitInBytes = min(UploadedFile::getMaxFilesize(), $constraint->maxSize);
                     } else {
                         $limitInBytes = UploadedFile::getMaxFilesize();
                     }
@@ -118,7 +118,7 @@ class FileValidator extends ConstraintValidator
         if (0 === $sizeInBytes) {
             $this->context->addViolation($constraint->disallowEmptyMessage);
         } elseif ($constraint->maxSize) {
-            $limitInBytes = (int) $constraint->maxSize;
+            $limitInBytes = $constraint->maxSize;
 
             if ($sizeInBytes > $limitInBytes) {
                 // Convert the limit to the smallest possible number

@@ -49,19 +49,19 @@ class File extends Constraint
         if ($this->maxSize) {
             if (ctype_digit((string) $this->maxSize)) {
                 $this->maxSize = (int) $this->maxSize;
-                $this->binaryFormat = $this->binaryFormat === null ? false : $this->binaryFormat;
+                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
             } elseif (preg_match('/^\d++k$/i', $this->maxSize)) {
                 $this->maxSize = $this->maxSize * 1000;
-                $this->binaryFormat = $this->binaryFormat === null ? false : $this->binaryFormat;
+                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
             } elseif (preg_match('/^\d++M$/i', $this->maxSize)) {
                 $this->maxSize = $this->maxSize * 1000000;
-                $this->binaryFormat = $this->binaryFormat === null ? false : $this->binaryFormat;
-            } elseif (preg_match('/^\d++ki$/i', $this->maxSize)) {
+                $this->binaryFormat = null === $this->binaryFormat ? false : $this->binaryFormat;
+            } elseif (preg_match('/^\d++Ki$/i', $this->maxSize)) {
                 $this->maxSize = $this->maxSize << 10;
-                $this->binaryFormat = $this->binaryFormat === null ? true : $this->binaryFormat;
+                $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
             } elseif (preg_match('/^\d++Mi$/i', $this->maxSize)) {
                 $this->maxSize = $this->maxSize << 20;
-                $this->binaryFormat = $this->binaryFormat === null ? true : $this->binaryFormat;
+                $this->binaryFormat = null === $this->binaryFormat ? true : $this->binaryFormat;
             } else {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid maximum size', $this->maxSize));
             }

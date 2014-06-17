@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-17T22:40:55Z
+
+Updated, addressed @stof comments
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-14T12:27:14Z
+
+PR has been updated, comments have been addressed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-14T12:58:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-15T12:06:22Z
+
+Love that :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T07:20:50Z
+
+:+1:
+
+I think the PipesInterface should be tagged as ``@internal`` though
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T07:35:33Z
+
+@romainneutron Can you tag all internal classes to make it clear that BC rules do no apply to these classes?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-16T23:39:08Z
+
+Classes have been tagged, PR has been rebased

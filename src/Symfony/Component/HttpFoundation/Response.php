@@ -1075,12 +1075,16 @@ class Response
             return false;
         }
 
-        $lastModified = $request->headers->get('If-Modified-Since');
-        $notModified = false;
+        $notModified   = false;
+        $lastModified  = $this->headers->get('Last-Modified');
+        $modifiedSince = $request->headers->get('If-Modified-Since');
+
         if ($etags = $request->getEtags()) {
-            $notModified = (in_array($this->getEtag(), $etags) || in_array('*', $etags)) && (!$lastModified || $this->headers->get('Last-Modified') == $lastModified);
-        } elseif ($lastModified) {
-            $notModified = $lastModified == $this->headers->get('Last-Modified');
+            $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
+        }
+
+        if ($modifiedSince && $lastModified) {
+            $notModified = strtotime($modifiedSince) >= strtotime($lastModified) && (!$etags || $notModified);
         }
 
         if ($notModified) {

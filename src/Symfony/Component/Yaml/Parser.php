@@ -66,6 +66,7 @@ class Parser
 
         $data = array();
         $context = null;
+        $allowOverwrite = false;
         while ($this->moveToNextLine()) {
             if ($this->isCurrentLineEmpty()) {
                 continue;
@@ -133,6 +134,7 @@ class Parser
 
                 if ('<<' === $key) {
                     $mergeNode = true;
+                    $allowOverwrite = true;
                     if (isset($values['value']) && 0 === strpos($values['value'], '*')) {
                         $refName = substr($values['value'], 1);
                         if (!array_key_exists($refName, $this->refs)) {
@@ -202,9 +204,8 @@ class Parser
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         // Spec: Keys MUST be unique; first one wins.
-                        // Parser cannot abort this mapping earlier, since lines
-                        // are processed sequentially.
-                        if (!isset($data[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = null;
                         }
                     } else {
@@ -213,18 +214,16 @@ class Parser
                         $parser->refs =& $this->refs;
                         $value = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport);
                         // Spec: Keys MUST be unique; first one wins.
-                        // Parser cannot abort this mapping earlier, since lines
-                        // are processed sequentially.
-                        if (!isset($data[$key])) {
+                        // But overwriting is allowed when a merge node is used in current block.
+                        if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = $value;
                         }
                     }
                 } else {
                     $value = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     // Spec: Keys MUST be unique; first one wins.
-                    // Parser cannot abort this mapping earlier, since lines
-                    // are processed sequentially.
-                    if (!isset($data[$key])) {
+                    // But overwriting is allowed when a merge node is used in current block.
+                    if ($allowOverwrite || !isset($data[$key])) {
                         $data[$key] = $value;
                     }
                 }

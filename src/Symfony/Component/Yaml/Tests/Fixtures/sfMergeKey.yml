@@ -11,6 +11,8 @@ yaml: |
         b: Clark
         c: Brian
     bar: &bar
+        a: before
+        d: other
         <<: *foo
         x: Oren
     foo2: &foo2
@@ -24,4 +26,4 @@ yaml: |
     head:
         <<: [ *foo , *dong , *foo2 ]
 php: |
-    array('foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'), 'bar' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'x' => 'Oren'), 'foo2' => array('a' => 'Ballmer'), 'ding' => array('fi', 'fei', 'fo', 'fam'), 'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'), 'head' => array('a' => 'Ballmer', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'))
+    array('foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'), 'bar' => array('a' => 'before', 'd' => 'other', 'b' => 'Clark', 'c' => 'Brian', 'x' => 'Oren'), 'foo2' => array('a' => 'Ballmer'), 'ding' => array('fi', 'fei', 'fo', 'fam'), 'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'), 'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'))

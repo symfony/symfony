@@ -10,7 +10,6 @@
  */
 
 namespace Symfony\Component\Console\Question;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 
 /**
  * Represents a Question.

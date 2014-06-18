@@ -148,23 +148,23 @@ class Parser
                         $parser->refs =& $this->refs;
                         $parsed = $parser->parse($value, $exceptionOnInvalidType, $objectSupport);
 
-                        $merged = array();
                         if (!is_array($parsed)) {
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
-                        } elseif (isset($parsed[0])) {
+                        }
+
+                        $isProcessed = true;
+                        if (isset($parsed[0])) {
                             // Numeric array, merge individual elements
-                            foreach (array_reverse($parsed) as $parsedItem) {
+                            foreach ($parsed as $parsedItem) {
                                 if (!is_array($parsedItem)) {
                                     throw new ParseException('Merge items must be arrays.', $this->getRealCurrentLineNb() + 1, $parsedItem);
                                 }
-                                $merged = array_merge($parsedItem, $merged);
+                                $data = array_merge($data, $parsedItem);
                             }
                         } else {
-                            // Associative array, merge
-                            $merged = array_merge($merged, $parsed);
+                            // Associative array
+                            $data = $parsed;
                         }
-
-                        $isProcessed = $merged;
                     }
                 } elseif (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
                     $isRef = $matches['ref'];
@@ -173,9 +173,8 @@ class Parser
 
                 if ($isProcessed) {
                     // Merge keys
-                    $data = $isProcessed;
-                // hash
                 } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
+                    // hash
                     // if next line is less indented or equal, then it means that the current value is null
                     if (!$this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         // Spec: Keys MUST be unique; first one wins.

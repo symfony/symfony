@@ -40,7 +40,7 @@ class WindowsPipes extends AbstractPipes
 
     public function __construct($disableOutput, $input)
     {
-        $this->$disableOutput = (bool) $disableOutput;
+        $this->disableOutput = (bool) $disableOutput;
 
         if (!$this->disableOutput) {
             // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.

@@ -70,7 +70,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         }
 
         // do not capture redirects or modify XML HTTP Requests
-        if ($request->isXmlHttpRequest()) {
+        if ($request->isAjaxRequest()) {
             return;
         }
 

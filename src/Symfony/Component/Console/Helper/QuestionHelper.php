@@ -212,7 +212,7 @@ class QuestionHelper extends Helper
                 $c .= fread($inputStream, 2);
 
                 // A = Up Arrow. B = Down Arrow
-                if ('A' === $c[2] || 'B' === $c[2]) {
+                if (isset($c[2]) && ('A' === $c[2] || 'B' === $c[2])) {
                     if ('A' === $c[2] && -1 === $ofs) {
                         $ofs = 0;
                     }

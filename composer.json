@@ -79,14 +79,14 @@
         "egulias/email-validator": "~1.2"
     },
     "autoload": {
-        "psr-0": {
-            "Symfony\\Bridge\\Doctrine\\": "src/",
-            "Symfony\\Bridge\\Monolog\\": "src/",
-            "Symfony\\Bridge\\ProxyManager\\": "src/",
-            "Symfony\\Bridge\\Swiftmailer\\": "src/",
-            "Symfony\\Bridge\\Twig\\": "src/",
-            "Symfony\\Bundle\\": "src/",
-            "Symfony\\Component\\": "src/"
+        "psr-4": {
+            "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
+            "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
+            "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
+            "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
+            "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
+            "Symfony\\Bundle\\": "src/Symfony/Bundle/",
+            "Symfony\\Component\\": "src/Symfony/Component/"
         },
         "classmap": [
             "src/Symfony/Component/HttpFoundation/Resources/stubs",

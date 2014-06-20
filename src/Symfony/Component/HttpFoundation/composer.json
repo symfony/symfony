@@ -23,10 +23,9 @@
         "symfony/expression-language": "~2.4"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },
+        "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },
         "classmap": [ "Symfony/Component/HttpFoundation/Resources/stubs" ]
     },
-    "target-dir": "Symfony/Component/HttpFoundation",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

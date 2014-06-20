@@ -22,9 +22,8 @@
         "symfony/phpunit-bridge": "~2.7"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Yaml\\": "" }
+        "psr-4": { "Symfony\\Component\\Yaml\\": "" }
     },
-    "target-dir": "Symfony/Component/Yaml",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

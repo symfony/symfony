@@ -59,7 +59,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/../../../Fixtures/foo', 'foo'))
             ->getMock()
         ;
         $file

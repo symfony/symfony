@@ -180,8 +180,8 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request->headers->set('X-Accel-Mapping', $mapping);
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-                     ->disableOriginalConstructor()
-                     ->getMock();
+            ->setConstructorArgs(array(__DIR__.'/File/Fixtures/test'))
+            ->getMock();
         $file->expects($this->any())
              ->method('getRealPath')
              ->will($this->returnValue($realpath));

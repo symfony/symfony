@@ -48,7 +48,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
     protected function getMockFile()
     {
         return $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/../../Fixtures/foo', 'foo'))
             ->getMock();
     }
 }

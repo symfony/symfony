@@ -21,11 +21,8 @@
         "ocramius/proxy-manager": ">=0.3.1,<0.6-dev"
     },
     "autoload": {
-        "psr-0": {
-            "Symfony\\Bridge\\ProxyManager\\": ""
-        }
+        "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" }
     },
-    "target-dir": "Symfony/Bridge/ProxyManager",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

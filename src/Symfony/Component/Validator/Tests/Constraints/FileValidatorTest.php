@@ -262,7 +262,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
             ->getMock()
         ;
         $file
@@ -290,7 +290,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
             ->getMock()
         ;
         $file
@@ -318,7 +318,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
             ->getMock()
         ;
         $file
@@ -352,7 +352,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
             ->getMock()
         ;
         $file

@@ -63,8 +63,12 @@ class UniqueValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('hasField')
             ->will($this->returnValue(true))
         ;
-        $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
+        $reflParser = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionParser')
             ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $refl = $this->getMockBuilder('Doctrine\Common\Reflection\StaticReflectionProperty')
+            ->setConstructorArgs(array($reflParser, 'property-name'))
             ->setMethods(array('getValue'))
             ->getMock()
         ;

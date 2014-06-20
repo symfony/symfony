@@ -10,7 +10,6 @@
  */
 
 namespace Symfony\Component\Console\Question;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 
 /**
  * Represents a Question.
@@ -184,7 +183,7 @@ class Question
      *
      * @return Question The current instance
      *
-     * @throws InvalidArgumentException In case the number of attempts is invalid.
+     * @throws \InvalidArgumentException In case the number of attempts is invalid.
      */
     public function setMaxAttempts($attempts)
     {

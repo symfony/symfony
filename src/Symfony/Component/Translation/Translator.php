@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
@@ -54,17 +55,24 @@ class Translator implements TranslatorInterface
     private $selector;
 
     /**
+     * @var array
+     */
+    private $options = array();
+
+    /**
      * Constructor.
      *
      * @param string               $locale   The locale
      * @param MessageSelector|null $selector The message selector for pluralization
+     * @param array                $options  An array of options
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null)
+    public function __construct($locale, MessageSelector $selector = null, array $options = array())
     {
         $this->locale = $locale;
         $this->selector = $selector ?: new MessageSelector();
+        $this->setOptions($options);
     }
 
     /**
@@ -223,6 +231,75 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * Sets options.
+     *
+     * Available options:
+     *
+     *   * cache_dir:     The cache directory (or null to disable caching)
+     *   * debug:         Whether to enable debugging or not (false by default)
+     *
+     * @param array $options An array of options
+     *
+     * @throws \InvalidArgumentException When unsupported option is provided
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array(
+            'cache_dir'              => null,
+            'debug'                  => false,
+        );
+
+        // check option names and live merge, if errors are encountered Exception will be thrown
+        $invalid = array();
+        foreach ($options as $key => $value) {
+            if (array_key_exists($key, $this->options)) {
+                $this->options[$key] = $value;
+            } else {
+                $invalid[] = $key;
+            }
+        }
+
+        if ($invalid) {
+            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: "%s".', implode('", "', $invalid)));
+        }
+    }
+
+    /**
+     * Sets an option.
+     *
+     * @param string $key   The key
+     * @param mixed  $value The value
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setOption($key, $value)
+    {
+        if (!array_key_exists($key, $this->options)) {
+            throw new \InvalidArgumentException(sprintf('The Translator does not support the "%s" option.', $key));
+        }
+
+        $this->options[$key] = $value;
+    }
+
+    /**
+     * Gets an option value.
+     *
+     * @param string $key The key
+     *
+     * @return mixed The value
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getOption($key)
+    {
+        if (!array_key_exists($key, $this->options)) {
+            throw new \InvalidArgumentException(sprintf('The Translator does not support the "%s" option.', $key));
+        }
+
+        return $this->options[$key];
+    }
+
+    /**
      * Gets the loaders.
      *
      * @return array LoaderInterface[]
@@ -232,7 +309,22 @@ class Translator implements TranslatorInterface
         return $this->loaders;
     }
 
+    /**
+     * @param string $locale
+     */
     protected function loadCatalogue($locale)
+    {
+        if (null === $this->options['cache_dir']) {
+            $this->initializeCatalogue($locale);
+        } else {
+            $this->initializeCacheCatalogue($locale);
+        }
+    }
+
+    /**
+     * @param string $locale
+     */
+    protected function initializeCatalogue($locale)
     {
         try {
             $this->doLoadCatalogue($locale);
@@ -242,6 +334,61 @@ class Translator implements TranslatorInterface
             }
         }
         $this->loadFallbackCatalogues($locale);
+    }
+
+    /**
+     * @param string $locale
+     */
+    private function initializeCacheCatalogue($locale)
+    {
+        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
+        if (!$cache->isFresh()) {
+            $this->initializeCatalogue($locale);
+
+            $fallbackContent = '';
+            $current = '';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackSuffix = ucfirst(str_replace('-', '_', $fallback));
+
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
+EOF
+                    ,
+                    $fallbackSuffix,
+                    $fallback,
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    ucfirst(str_replace('-', '_', $current)),
+                    $fallbackSuffix
+                );
+                $current = $fallback;
+            }
+
+            $content = sprintf(<<<EOF
+<?php
+
+use Symfony\Component\Translation\MessageCatalogue;
+
+\$catalogue = new MessageCatalogue('%s', %s);
+
+%s
+return \$catalogue;
+
+EOF
+                ,
+                $locale,
+                var_export($this->catalogues[$locale]->all(), true),
+                $fallbackContent
+            );
+
+            $cache->write($content, $this->catalogues[$locale]->getResources());
+
+            return;
+        }
+
+        $this->catalogues[$locale] = include $cache;
     }
 
     private function doLoadCatalogue($locale)

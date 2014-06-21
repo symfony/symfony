@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
@@ -24,10 +23,6 @@ use Symfony\Component\Config\ConfigCache;
 class Translator extends BaseTranslator
 {
     protected $container;
-    protected $options = array(
-        'cache_dir' => null,
-        'debug'     => false,
-    );
     protected $loaderIds;
 
     /**
@@ -50,14 +45,7 @@ class Translator extends BaseTranslator
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
-        }
-
-        $this->options = array_merge($this->options, $options);
-
-        parent::__construct(null, $selector);
+        parent::__construct(null, $selector, $options);
     }
 
     /**
@@ -80,72 +68,10 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    protected function loadCatalogue($locale)
+    protected function initializeCatalogue($locale)
     {
-        if (isset($this->catalogues[$locale])) {
-            return;
-        }
-
-        if (null === $this->options['cache_dir']) {
-            $this->initialize();
-
-            return parent::loadCatalogue($locale);
-        }
-
-        $this->assertValidLocale($locale);
-
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
-        if (!$cache->isFresh()) {
-            $this->initialize();
-
-            parent::loadCatalogue($locale);
-
-            $fallbackContent = '';
-            $current = '';
-            $replacementPattern = '/[^a-z0-9_]/i';
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
-                $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
-
-                $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
-
-
-EOF
-                    ,
-                    $fallbackSuffix,
-                    $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true),
-                    $currentSuffix,
-                    $fallbackSuffix
-                );
-                $current = $fallback;
-            }
-
-            $content = sprintf(<<<EOF
-<?php
-
-use Symfony\Component\Translation\MessageCatalogue;
-
-\$catalogue = new MessageCatalogue('%s', %s);
-
-%s
-return \$catalogue;
-
-EOF
-                ,
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
-            );
-
-            $cache->write($content, $this->catalogues[$locale]->getResources());
-
-            return;
-        }
-
-        $this->catalogues[$locale] = include $cache;
+        $this->initialize();
+        parent::initializeCatalogue($locale);
     }
 
     protected function initialize()

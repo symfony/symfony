@@ -135,6 +135,8 @@ class LinkTest extends \PHPUnit_Framework_TestCase
             array('../../', 'http://localhost/', 'http://localhost/'),
             array('../../', 'http://localhost', 'http://localhost/'),
 
+            array('/foo', 'http://localhost?bar=1', 'http://localhost/foo'),
+            array('/foo', 'http://localhost#bar', 'http://localhost/foo'),
             array('/foo', 'file:///', 'file:///foo'),
             array('/foo', 'file:///bar/baz', 'file:///foo'),
             array('foo', 'file:///', 'file:///foo'),

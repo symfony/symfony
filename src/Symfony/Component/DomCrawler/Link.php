@@ -100,22 +100,14 @@ class Link
 
         // only an anchor
         if ('#' === $uri[0]) {
-            $baseUri = $this->currentUri;
-            if (false !== $pos = strpos($baseUri, '#')) {
-                $baseUri = substr($baseUri, 0, $pos);
-            }
+            $baseUri = $this->cleanupUri($this->currentUri);
 
             return $baseUri.$uri;
         }
 
         // only a query string
         if ('?' === $uri[0]) {
-            $baseUri = $this->currentUri;
-
-            // remove the query string from the current URI
-            if (false !== $pos = strpos($baseUri, '?')) {
-                $baseUri = substr($baseUri, 0, $pos);
-            }
+            $baseUri = $this->cleanupUri($this->currentUri);
 
             return $baseUri.$uri;
         }
@@ -129,7 +121,7 @@ class Link
 
         // absolute path
         if ('/' === $uri[0]) {
-            return $baseUri.$uri;
+            return $this->cleanupUri($baseUri).$uri;
         }
 
         // relative path
@@ -193,5 +185,27 @@ class Link
         }
 
         $this->node = $node;
+    }
+
+    /**
+     * Removes the query string and the anchor from the given uri.
+     *
+     * @param  string $uri The uri to clean
+     *
+     * @return string
+     */
+    private function cleanupUri($uri)
+    {
+        // Remove the query string from the uri
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
+
+        // Remove the anchor from the uri
+        if (false !== $pos = strpos($uri, '#')) {
+            $uri = substr($uri, 0, $pos);
+        }
+
+        return $uri;
     }
 }

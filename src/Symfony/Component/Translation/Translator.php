@@ -37,6 +37,14 @@ class Translator implements TranslatorInterface
     /**
      * @var array
      */
+    protected $options = array(
+        'cache_dir' => null,
+        'debug' => false,
+    );
+
+    /**
+     * @var array
+     */
     private $fallbackLocales = array();
 
     /**
@@ -55,11 +63,6 @@ class Translator implements TranslatorInterface
     private $selector;
 
     /**
-     * @var array
-     */
-    private $options = array();
-
-    /**
      * Constructor.
      *
      * @param string               $locale   The locale
@@ -72,7 +75,13 @@ class Translator implements TranslatorInterface
     {
         $this->locale = $locale;
         $this->selector = $selector ?: new MessageSelector();
-        $this->setOptions($options);
+
+        // check option names
+        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
+            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        }
+
+        $this->options = array_merge($this->options, $options);
     }
 
     /**
@@ -228,75 +237,6 @@ class Translator implements TranslatorInterface
         }
 
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
-    }
-
-    /**
-     * Sets options.
-     *
-     * Available options:
-     *
-     *   * cache_dir:     The cache directory (or null to disable caching)
-     *   * debug:         Whether to enable debugging or not (false by default)
-     *
-     * @param array $options An array of options
-     *
-     * @throws \InvalidArgumentException When unsupported option is provided
-     */
-    public function setOptions(array $options)
-    {
-        $this->options = array(
-            'cache_dir'              => null,
-            'debug'                  => false,
-        );
-
-        // check option names and live merge, if errors are encountered Exception will be thrown
-        $invalid = array();
-        foreach ($options as $key => $value) {
-            if (array_key_exists($key, $this->options)) {
-                $this->options[$key] = $value;
-            } else {
-                $invalid[] = $key;
-            }
-        }
-
-        if ($invalid) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: "%s".', implode('", "', $invalid)));
-        }
-    }
-
-    /**
-     * Sets an option.
-     *
-     * @param string $key   The key
-     * @param mixed  $value The value
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setOption($key, $value)
-    {
-        if (!array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the "%s" option.', $key));
-        }
-
-        $this->options[$key] = $value;
-    }
-
-    /**
-     * Gets an option value.
-     *
-     * @param string $key The key
-     *
-     * @return mixed The value
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function getOption($key)
-    {
-        if (!array_key_exists($key, $this->options)) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the "%s" option.', $key));
-        }
-
-        return $this->options[$key];
     }
 
     /**

@@ -95,59 +95,6 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
     }
 
-    public function testSetOptionsWithSupportedOptions()
-    {
-        $translator = new Translator('fr');
-        $translator->setOptions(array(
-            'cache_dir' => './cache',
-            'debug' => true,
-        ));
-
-        $this->assertSame('./cache', $translator->getOption('cache_dir'));
-        $this->assertTrue($translator->getOption('debug'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Translator does not support the following options: "option_foo"
-     */
-    public function testSetOptionsWithUnsupportedOptions()
-    {
-        $translator = new Translator('fr');
-        $translator->setOptions(array(
-            'cache_dir' => './cache',
-            'option_foo' => true,
-        ));
-    }
-
-    public function testSetOptionWithSupportedOption()
-    {
-        $translator = new Translator('fr');
-        $translator->setOption('cache_dir', './cache');
-
-        $this->assertSame('./cache', $translator->getOption('cache_dir'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Translator does not support the "option_foo" option
-     */
-    public function testSetOptionWithUnsupportedOption()
-    {
-        $translator = new Translator('fr');
-        $translator->setOption('option_foo', true);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Translator does not support the "option_foo" option
-     */
-    public function testGetOptionWithUnsupportedOption()
-    {
-        $translator = new Translator('fr');
-        $translator->getOption('option_foo', true);
-    }
-
     protected function getCatalogue($locale, $messages)
     {
         $catalogue = new MessageCatalogue($locale);

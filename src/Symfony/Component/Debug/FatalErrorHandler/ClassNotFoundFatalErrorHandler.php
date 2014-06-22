@@ -118,6 +118,13 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                     }
                 }
             }
+            if ($function[0] instanceof ComposerClassLoader) {
+                foreach ($function[0]->getPrefixesPsr4() as $prefix => $paths) {
+                    foreach ($paths as $path) {
+                        $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
+                    }
+                }
+            }
         }
 
         return array_unique($classes);

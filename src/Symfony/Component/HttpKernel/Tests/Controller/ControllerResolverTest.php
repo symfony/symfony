@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
-use Symfony\Component\HttpKernel\Tests\Logger;
 use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase
@@ -28,7 +28,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing');
-        $resolver = new ControllerResolver($logger);
+        $resolver = $this->createControllerResolver($logger);
 
         $request = Request::create('/');
         $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
@@ -36,7 +36,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithLambda()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $lambda = function () {});
@@ -46,7 +46,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithObjectAndInvokeMethod()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $this);
@@ -56,7 +56,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithObjectAndMethod()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', array($this, 'controllerMethod1'));
@@ -66,7 +66,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithClassAndMethod()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest', 'controllerMethod4'));
@@ -76,7 +76,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithObjectAndMethodAsString()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::controllerMethod1');
@@ -86,7 +86,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithClassAndInvokeMethod()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest');
@@ -99,7 +99,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetControllerOnObjectWithoutInvokeMethod()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', new \stdClass());
@@ -108,7 +108,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControllerWithFunction()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', 'Symfony\Component\HttpKernel\Tests\Controller\some_controller_function');
@@ -122,7 +122,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetControllerOnNonUndefinedFunction($controller)
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('_controller', $controller);
@@ -141,7 +141,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetArguments()
     {
-        $resolver = new ControllerResolver();
+        $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
         $controller = array(new self(), 'testGetArguments');
@@ -212,6 +212,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->attributes->set('_controller', 'foobar');
         $mock->getController($request);
+    }
+
+    protected function createControllerResolver(LoggerInterface $logger = null)
+    {
+        return new ControllerResolver($logger);
     }
 
     public function __invoke($foo, $bar = null)

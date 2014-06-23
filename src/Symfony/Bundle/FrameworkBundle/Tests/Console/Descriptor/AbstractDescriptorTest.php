@@ -110,7 +110,12 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $options['raw_output'] = true;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, $options);
-        $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+
+        if ('json' === $this->getFormat()) {
+            $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
+        } else {
+            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+        }
     }
 
     private function getDescriptionTestData(array $objects)

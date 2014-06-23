@@ -278,6 +278,26 @@
                 <source>This value should not be identical to {{ compared_value }}.</source>
                 <target>Deze waarde mag niet identiek zijn aan {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>De afbeeldingsverhouding is te groot ({{ ratio }}). Maximale verhouding is {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>De afbeeldingsverhouding is te klein ({{ ratio }}). Minimale verhouding is {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>De afbeelding is vierkant ({{ width }}x{{ height }}px). Vierkante afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>De afbeelding is liggend ({{ width }}x{{ height }}px). Liggende afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>De afbeelding is staand ({{ width }}x{{ height }}px). Staande afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

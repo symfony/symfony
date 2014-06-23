@@ -288,7 +288,7 @@
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>De afbeelding is een vierkant ({{ width }}x{{ height }}px). Vierkante afbeeldingen zijn niet toegestaan.</target>
+                <target>De afbeelding is vierkant ({{ width }}x{{ height }}px). Vierkante afbeeldingen zijn niet toegestaan.</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>

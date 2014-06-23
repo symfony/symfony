@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by megazoll at 2014-06-21T21:28:12Z
+
+Should I wait here while PR with Russian translations will be merged and 2.4 will be merged into master or send separate PR with Russian translation for empty file message?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-23T07:35:16Z
+
+:+1:
+
+@megazoll I've just updated master, so you can submit the Russian translation in this PR directly after rebsing it to current master. Thanks.
+
+---------------------------------------------------------------------------
+
+by megazoll at 2014-06-23T12:29:55Z
+
+@fabpot thank you, updated.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-23T12:37:31Z
+
+:+1:

@@ -904,4 +904,102 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
     }
+
+    public function testIsFile()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        touch($basePath.'file1');
+
+        $this->assertTrue($this->filesystem->isFile($basePath.'file1'));
+    }
+
+    public function testIsFileFails()
+    {
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file1';
+
+        $this->assertFalse($this->filesystem->isFile($file));
+    }
+
+    public function testIsFileTraversableObject()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        touch($basePath.'file1');
+        touch($basePath.'file2');
+
+        $files = new \ArrayObject(array(
+            $basePath.'file1', $basePath.'file2',
+        ));
+
+        $this->assertTrue($this->filesystem->isFile($files));
+    }
+
+    public function testInvalidFile()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        mkdir($basePath.'dir1');
+
+        $this->assertFalse($this->filesystem->isFile($basePath.'dir1'));
+    }
+
+    public function testInvalidFileTraversableObject()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        touch($basePath.'file1');
+        mkdir($basePath.'dir1');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir1', $basePath.'file1',
+        ));
+
+        $this->assertFalse($this->filesystem->isFile($files));
+    }
+
+    public function testIsDirectory()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        mkdir($basePath.'dir1');
+
+        $this->assertTrue($this->filesystem->isDirectory($basePath.'dir1'));
+    }
+
+    public function testIsDirectoryFails()
+    {
+        $directory = $this->workspace.DIRECTORY_SEPARATOR.'dir1';
+
+        $this->assertFalse($this->filesystem->isDirectory($directory));
+    }
+
+    public function testIsDirectoryTraversableObject()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        mkdir($basePath.'dir1');
+        mkdir($basePath.'dir2');
+
+        $directories = new \ArrayObject(array(
+            $basePath.'dir1', $basePath.'dir1',
+        ));
+
+        $this->assertTrue($this->filesystem->isDirectory($directories));
+    }
+
+    public function testInvalidDirectory()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        touch($basePath.'file1');
+
+        $this->assertFalse($this->filesystem->isDirectory($basePath.'file1'));
+    }
+
+    public function testInvalidDirectoryTraversableObject()
+    {
+        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
+        mkdir($basePath.'dir1');
+        touch($basePath.'file1');
+
+        $files = new \ArrayObject(array(
+            $basePath.'dir1', $basePath.'file1',
+        ));
+
+        $this->assertFalse($this->filesystem->isDirectory($files));
+    }
 }

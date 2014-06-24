@@ -462,6 +462,42 @@ class Filesystem
     }
 
     /**
+     * Checks if given parameter is file
+     *
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return bool    true if the file exists, false otherwise
+     */
+    public function isFile($files)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if (!is_file($file)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if given parameter is directory
+     *
+     * @param string|array|\Traversable $dirs A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return bool    true if the file exists, false otherwise
+     */
+    public function isDirectory($dirs)
+    {
+        foreach ($this->toIterator($dirs) as $file) {
+            if (!is_dir($file)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param mixed $files
      *
      * @return \Traversable

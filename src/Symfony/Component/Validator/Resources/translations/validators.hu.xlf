@@ -297,7 +297,11 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>A kép álló tájolású ({{ width }}x{{ height }}px). Az álló tájolású képek nem engedélyezettek.</target>
-            </trans-unit>            
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Üres fájl nem megengedett.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

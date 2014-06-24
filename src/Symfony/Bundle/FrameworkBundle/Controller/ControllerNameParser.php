@@ -46,6 +46,7 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
+        $originalController = $controller;
         if (3 != count($parts = explode(':', $controller))) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
@@ -54,8 +55,24 @@ class ControllerNameParser
         $controller = str_replace('/', '\\', $controller);
         $bundles = array();
 
-        // this throws an exception if there is no such bundle
-        foreach ($this->kernel->getBundle($bundle, false) as $b) {
+        try {
+            // this throws an exception if there is no such bundle
+            $allBundles = $this->kernel->getBundle($bundle, false);
+        } catch (\InvalidArgumentException $e) {
+            $message = sprintf(
+                'The "%s" (from the _controller value "%s") does not exist or is not enabled in your kernel!',
+                $bundle,
+                $originalController
+            );
+
+            if ($alternative = $this->findAlternative($bundle)) {
+                $message .= sprintf(' Did you mean "%s:%s:%s"?', $alternative, $controller, $action);
+            }
+
+            throw new \InvalidArgumentException($message, 0, $e);
+        }
+
+        foreach ($allBundles as $b) {
             $try = $b->getNamespace().'\\Controller\\'.$controller.'Controller';
             if (class_exists($try)) {
                 return $try.'::'.$action.'Action';
@@ -99,5 +116,34 @@ class ControllerNameParser
         }
 
         throw new \InvalidArgumentException(sprintf('Unable to find a bundle that defines controller "%s".', $controller));
+    }
+
+    /**
+     * Attempts to find a bundle that is *similar* to the given bundle name
+     *
+     * @param string $nonExistentBundleName
+     * @return string
+     */
+    private function findAlternative($nonExistentBundleName)
+    {
+        $bundleNames = array_map(function ($b) {
+            return $b->getName();
+        }, $this->kernel->getBundles());
+
+        $alternative = null;
+        $shortest = null;
+        foreach ($bundleNames as $bundleName) {
+            // if there's a partial match, return it immediately
+            if (false !== strpos($bundleName, $nonExistentBundleName)) {
+                return $bundleName;
+            }
+
+            $lev = levenshtein($nonExistentBundleName, $bundleName);
+            if ($lev <= strlen($nonExistentBundleName) / 3 && ($alternative === null || $lev < $shortest)) {
+                $alternative = $bundleName;
+            }
+        }
+
+        return $alternative;
     }
 }

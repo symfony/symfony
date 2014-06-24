@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-23T10:16:02Z
+
+Well, I cannot validate the content of the translations (I don't know Portuguese), but :+1:
+
+---------------------------------------------------------------------------
+
+by megazoll at 2014-06-23T12:46:51Z
+
+You should send PR into 2.4 branch.
+https://github.com/symfony/symfony/pull/11192
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-23T13:01:01Z
+
+@megazoll not needed. We can rebase it to apply it on 2.4 when merging (we have a tool doing the work for us)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-23T13:08:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dcsg at 2014-06-23T13:30:31Z
+
+@stof ok, if you want me to send the PR into 2.4 branch let me know ;)
+
+---------------------------------------------------------------------------
+
+by dcsg at 2014-06-24T14:31:07Z
+
+FYI I just added the translation for id 78

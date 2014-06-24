@@ -406,12 +406,14 @@ EOF
         $crawler = new Crawler($html);
         $columns = $crawler->filter('tr > td');
 
+        gc_collect_cycles();
         $before = memory_get_usage(true);
         for ($i = 0; $i < 10; $i++) {
             $crawler = new Crawler($html);
             $crawler->filter('tr > td');
         }
 
+        $this->assertEquals(0, gc_collect_cycles());
         $after = memory_get_usage(true);
 
         $this->assertEquals(0, $after - $before);

@@ -61,8 +61,10 @@ class CssSelector
             ->registerParserShortcut(new ClassParser())
             ->registerParserShortcut(new HashParser())
         ;
+        $resp = $translator->cssToXPath($cssExpr, $prefix);
+        $translator->destroy();
 
-        return $translator->cssToXPath($cssExpr, $prefix);
+        return $resp;
     }
 
     /**

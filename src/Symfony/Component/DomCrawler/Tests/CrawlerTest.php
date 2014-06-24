@@ -396,6 +396,28 @@ EOF
     }
 
     /**
+     * Asserts that filter do not memory leak
+     */
+    public function testFilterXPathMemoryUsage()
+    {
+        $html = '<tr><td>abc</td><td>dce</td><td>abc</td><td>dce</td><td>abc</td><td>dce</td><td>abc</td><td>dce</td><tr>';
+
+        // Run the script one time before starting the measure to bootstrap the memory
+        $crawler = new Crawler($html);
+        $columns = $crawler->filter('tr > td');
+
+        $before = memory_get_usage(true);
+        for ($i = 0; $i < 10; $i++) {
+            $crawler = new Crawler($html);
+            $crawler->filter('tr > td');
+        }
+
+        $after = memory_get_usage(true);
+
+        $this->assertEquals(0, $after - $before);
+    }
+
+    /**
      * @covers Symfony\Component\DomCrawler\Crawler::filterXPath
      */
     public function testFilterXPath()

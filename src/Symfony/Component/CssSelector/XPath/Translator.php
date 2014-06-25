@@ -85,6 +85,21 @@ class Translator implements TranslatorInterface
     }
 
     /**
+     * Resets local properties to there initial values
+     */
+    public function destroy()
+    {
+        $this->mainParser = null;
+        $this->shortcutParsers = array();
+        $this->extensions = array();
+        $this->nodeTranslators = array();
+        $this->combinationTranslators = array();
+        $this->functionTranslators = array();
+        $this->pseudoClassTranslators = array();
+        $this->attributeMatchingTranslators = array();
+    }
+
+    /**
      * @param string $element
      *
      * @return string

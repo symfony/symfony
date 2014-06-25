@@ -98,30 +98,23 @@ class Link
             return $this->currentUri;
         }
 
-        // only an anchor
-        if ('#' === $uri[0]) {
-            $baseUri = $this->cleanupUri($this->currentUri);
+        $baseUri = $this->cleanupUri($this->currentUri);
 
-            return $baseUri.$uri;
-        }
-
-        // only a query string
-        if ('?' === $uri[0]) {
-            $baseUri = $this->cleanupUri($this->currentUri);
-
+        // anchor or query string
+        if ('#' === $uri[0] || '?' === $uri[0]) {
             return $baseUri.$uri;
         }
 
         // absolute URL with relative schema
         if (0 === strpos($uri, '//')) {
-            return preg_replace('#^([^/]*)//.*$#', '$1', $this->currentUri).$uri;
+            return preg_replace('#^([^/]*)//.*$#', '$1', $baseUri).$uri;
         }
 
-        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $this->currentUri);
+        $baseUri = preg_replace('#^(.*?//[^/]*)(?:\/.*)?$#', '$1', $baseUri);
 
         // absolute path
         if ('/' === $uri[0]) {
-            return $this->cleanupUri($baseUri).$uri;
+            return $baseUri.$uri;
         }
 
         // relative path

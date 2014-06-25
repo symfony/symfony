@@ -15,17 +15,19 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Value must be a BIC (Bank Identifier Code).
- * 
+ *
  * Set the option $country to limit valid BICs to one country only.
- * 
+ *
  * Note: BIC validation is currently implemented only with the country filter
  * Bic::DE.
- * 
+ *
  * Validation of a German BIC uses the library BAV. BAV's default configuration
  * is not recommended for BIC validation. Use a configuration with one of the
- * following DataBackendContainer implementations: PDODataBackendContainer or 
+ * following DataBackendContainer implementations: PDODataBackendContainer or
  * DoctrineBackendContainer.
- * 
+ *
+ * This constraint depends on malkusch/bav.
+ *
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
@@ -33,6 +35,8 @@ use Symfony\Component\Validator\Constraint;
  *
  * @see \malkusch\bav\BAV::isValidBIC()
  * @see \malkusch\bav\ConfigurationRegistry::setConfiguration()
+ * @see Blz
+ * @see Konto
  * @api
  */
 class Bic extends Constraint
@@ -41,14 +45,14 @@ class Bic extends Constraint
      * @var string validate only German BIC
      */
     const DE = 'de';
-    
+
     /**
      * @var string Limits the validation only for one country.
      */
     public $country;
-    
+
     public $message = 'This value is not a valid BIC.';
-    
+
     /**
      * {@inheritdoc}
      */

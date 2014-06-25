@@ -32,10 +32,10 @@ class BicValidator extends ConstraintValidator
      * @var BAV
      */
     private $bav;
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      */
     public function initialize(ExecutionContextInterface $context)
@@ -47,10 +47,10 @@ class BicValidator extends ConstraintValidator
             throw new ValidatorException($e->getMessage(), $e->getCode(), $e);
         }
     }
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      * @throws ConstraintDefinitionException
      */

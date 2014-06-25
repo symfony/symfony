@@ -33,10 +33,10 @@ class KontoValidator extends ConstraintValidator
      * @var BAV
      */
     private $bav;
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      */
     public function initialize(ExecutionContextInterface $context)
@@ -48,7 +48,7 @@ class KontoValidator extends ConstraintValidator
             throw new ValidatorException($e->getMessage(), $e->getCode(), $e);
         }
     }
-    
+
     /**
      * @return string
      * @throws UnexpectedTypeException
@@ -73,12 +73,13 @@ class KontoValidator extends ConstraintValidator
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
+
         return (string) $value;
     }
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      */
     public function validate($value, Constraint $constraint)
@@ -95,14 +96,14 @@ class KontoValidator extends ConstraintValidator
             if (!is_object($value)) {
                 throw new UnexpectedTypeException($value, 'object');
             }
-            
+
             $blz = $this->getScalarProperty($value, $constraint->blz);
             $konto = $this->getScalarProperty($value, $constraint->konto);
-            
+
             if (empty($konto) && empty($blz)) {
                 return;
             }
-            
+
             if (!$this->bav->isValidBankAccount($blz, $konto)) {
                 $this->context->addViolation($constraint->message, array('{{ value }}' => $konto));
             }

@@ -40,7 +40,7 @@ class KontoValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new \stdClass();
         $entity->blz = '';
         $entity->konto = '';
-        
+
         $this->validator->validate($entity, new Konto(array('blz' => 'blz', 'konto' => 'konto')));
     }
 
@@ -57,17 +57,17 @@ class KontoValidatorTest extends \PHPUnit_Framework_TestCase
     public function getValidKontos()
     {
         $cases = array();
-        
+
         $case1 = new \stdClass();
         $case1->blz = '70169464';
         $case1->konto = '1112';
         $cases[] = array($case1);
-        
+
         $case2 = new \stdClass();
         $case2->blz = '70169464';
         $case2->konto = '67067';
         $cases[] = array($case2);
-        
+
         return $cases;
     }
 
@@ -94,17 +94,17 @@ class KontoValidatorTest extends \PHPUnit_Framework_TestCase
     public function getInvalidKontos()
     {
         $cases = array();
-        
+
         $case1 = new \stdClass();
         $case1->blz = '70169464';
         $case1->konto = '1234';
         $cases[] = array($case1);
-        
+
         $case2 = new \stdClass();
         $case2->blz = '1234';
         $case2->konto = '1234';
         $cases[] = array($case2);
-        
+
         return $cases;
     }
 }

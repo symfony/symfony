@@ -15,13 +15,17 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Value must be a German bank id (Bankleitzahl)
- * 
+ *
+ * This constraint depends on malkusch/bav.
+ *
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Markus Malkusch <markus@malkusch.de>
  *
  * @see \malkusch\bav\BAV::isValidBank()
+ * @see Bic
+ * @see Konto
  * @api
  */
 class Blz extends Constraint

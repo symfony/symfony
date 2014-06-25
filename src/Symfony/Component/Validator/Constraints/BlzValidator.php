@@ -31,10 +31,10 @@ class BlzValidator extends ConstraintValidator
      * @var BAV
      */
     private $bav;
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      */
     public function initialize(ExecutionContextInterface $context)
@@ -46,10 +46,10 @@ class BlzValidator extends ConstraintValidator
             throw new ValidatorException($e->getMessage(), $e->getCode(), $e);
         }
     }
-    
+
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws ValidatorException
      */
     public function validate($value, Constraint $constraint)

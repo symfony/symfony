@@ -14,6 +14,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\BicValidator;
 
+/**
+ * @large
+ */
 class BicDEValidatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $context;

@@ -98,10 +98,14 @@ class Link
             return $this->currentUri;
         }
 
+        // an anchor
+        if ('#' === $uri[0]) {
+            return $this->cleanupAnchor($this->currentUri).$uri;
+        }
+
         $baseUri = $this->cleanupUri($this->currentUri);
 
-        // anchor or query string
-        if ('#' === $uri[0] || '?' === $uri[0]) {
+        if ('?' === $uri[0]) {
             return $baseUri.$uri;
         }
 
@@ -189,14 +193,36 @@ class Link
      */
     private function cleanupUri($uri)
     {
-        // Remove the query string from the uri
+        return $this->cleanupQuery($this->cleanupAnchor($uri));
+    }
+
+    /**
+     * Remove the query string from the uri.
+     *
+     * @param $uri
+     *
+     * @return array
+     */
+    private function cleanupQuery($uri)
+    {
         if (false !== $pos = strpos($uri, '?')) {
-            $uri = substr($uri, 0, $pos);
+            return substr($uri, 0, $pos);
         }
 
-        // Remove the anchor from the uri
+        return $uri;
+    }
+
+    /**
+     * Remove the anchor from the uri.
+     *
+     * @param $uri
+     *
+     * @return string
+     */
+    private function cleanupAnchor($uri)
+    {
         if (false !== $pos = strpos($uri, '#')) {
-            $uri = substr($uri, 0, $pos);
+            return substr($uri, 0, $pos);
         }
 
         return $uri;

@@ -947,6 +947,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
+
+    public function testOptionsPassedToCustomDefaultCommand()
+    {
+        $command = new \FooCommand();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->setDefaultCommand($command->getName());
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('--ansi' => true));
+
+        $this->assertTrue($tester->getOutput()->isDecorated(), '->run() forces color output if --ansi is passed');
+    }
 }
 
 class CustomApplication extends Application

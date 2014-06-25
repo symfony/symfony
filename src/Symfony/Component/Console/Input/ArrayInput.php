@@ -118,9 +118,10 @@ class ArrayInput extends Input
     public function __toString()
     {
         $params = array();
+
         foreach ($this->parameters as $param => $val) {
             if ($param && '-' === $param[0]) {
-                $params[] = $param . ('' != $val ? '='.$this->escapeToken($val) : '');
+                $params[] = $param . (('' == $val || true === $val || false === $val) ? '':'='.$this->escapeToken($val));
             } else {
                 $params[] = $this->escapeToken($val);
             }

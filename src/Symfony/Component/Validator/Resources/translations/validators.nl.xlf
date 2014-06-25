@@ -278,6 +278,10 @@
                 <source>This value should not be identical to {{ compared_value }}.</source>
                 <target>Deze waarde mag niet identiek zijn aan {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Lege bestanden zijn niet toegestaan.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -28,6 +28,7 @@
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "~1.0",
+        "malkusch/bav": "~1.0",
         "symfony/expression-language": "~2.4"
     },
     "suggest": {
@@ -39,6 +40,7 @@
         "symfony/config": "",
         "egulias/email-validator": "Strict (RFC compliant) email validation",
         "symfony/property-access": "For using the 2.4 Validator API",
+        "malkusch/bav": "For using German bank validation",
         "symfony/expression-language": "For using the 2.4 Expression validator"
     },
     "autoload": {

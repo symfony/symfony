@@ -33,6 +33,10 @@ $filesystem->makePathRelative($endPath, $startPath);
 $filesystem->mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array());
 
 $filesystem->isAbsolutePath($file);
+
+$filesystem->isFile($files);
+
+$filesystem->isDirectory($directories);
 ```
 
 Resources

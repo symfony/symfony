@@ -37,13 +37,13 @@ class Filesystem
      */
     public function copy($originFile, $targetFile, $override = false)
     {
-        if (stream_is_local($originFile) && !is_file($originFile)) {
+        if (stream_is_local($originFile) && !$this->isFile($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
         }
 
         $this->mkdir(dirname($targetFile));
 
-        if (!$override && is_file($targetFile) && null === parse_url($originFile, PHP_URL_HOST)) {
+        if (!$override && $this->isFile($targetFile) && null === parse_url($originFile, PHP_URL_HOST)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         } else {
             $doCopy = true;
@@ -58,7 +58,7 @@ class Filesystem
             fclose($target);
             unset($source, $target);
 
-            if (!is_file($targetFile)) {
+            if (!$this->isFile($targetFile)) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
         }
@@ -75,7 +75,7 @@ class Filesystem
     public function mkdir($dirs, $mode = 0777)
     {
         foreach ($this->toIterator($dirs) as $dir) {
-            if (is_dir($dir)) {
+            if ($this->isDirectory($dir)) {
                 continue;
             }
 
@@ -138,7 +138,7 @@ class Filesystem
                 continue;
             }
 
-            if (is_dir($file) && !is_link($file)) {
+            if ($this->isDirectory($file) && !is_link($file)) {
                 $this->remove(new \FilesystemIterator($file));
 
                 if (true !== @rmdir($file)) {
@@ -146,7 +146,7 @@ class Filesystem
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
-                if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
+                if (defined('PHP_WINDOWS_VERSION_MAJOR') && $this->isDirectory($file)) {
                     if (true !== @rmdir($file)) {
                         throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
@@ -172,7 +172,7 @@ class Filesystem
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDirectory($file) && !is_link($file)) {
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
             if (true !== @chmod($file, $mode & ~$umask)) {
@@ -193,7 +193,7 @@ class Filesystem
     public function chown($files, $user, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDirectory($file) && !is_link($file)) {
                 $this->chown(new \FilesystemIterator($file), $user, true);
             }
             if (is_link($file) && function_exists('lchown')) {
@@ -220,7 +220,7 @@ class Filesystem
     public function chgrp($files, $group, $recursive = false)
     {
         foreach ($this->toIterator($files) as $file) {
-            if ($recursive && is_dir($file) && !is_link($file)) {
+            if ($recursive && $this->isDirectory($file) && !is_link($file)) {
                 $this->chgrp(new \FilesystemIterator($file), $group, true);
             }
             if (is_link($file) && function_exists('lchgrp')) {
@@ -387,9 +387,9 @@ class Filesystem
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
             if ($copyOnWindows) {
-                if (is_link($file) || is_file($file)) {
+                if (is_link($file) || $this->isFile($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
-                } elseif (is_dir($file)) {
+                } elseif ($this->isDirectory($file)) {
                     $this->mkdir($target);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
@@ -397,9 +397,9 @@ class Filesystem
             } else {
                 if (is_link($file)) {
                     $this->symlink($file->getLinkTarget(), $target);
-                } elseif (is_dir($file)) {
+                } elseif ($this->isDirectory($file)) {
                     $this->mkdir($target);
-                } elseif (is_file($file)) {
+                } elseif ($this->isFile($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
@@ -443,7 +443,7 @@ class Filesystem
     {
         $dir = dirname($filename);
 
-        if (!is_dir($dir)) {
+        if (!$this->isDirectory($dir)) {
             $this->mkdir($dir);
         } elseif (!is_writable($dir)) {
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
@@ -459,6 +459,42 @@ class Filesystem
         if (null !== $mode) {
             $this->chmod($filename, $mode);
         }
+    }
+
+    /**
+     * Checks if given parameter is file
+     *
+     * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return bool    true if the file exists, false otherwise
+     */
+    public function isFile($files)
+    {
+        foreach ($this->toIterator($files) as $file) {
+            if (!is_file($file)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if given parameter is directory
+     *
+     * @param string|array|\Traversable $dirs A filename, an array of files, or a \Traversable instance to check
+     *
+     * @return bool    true if the file exists, false otherwise
+     */
+    public function isDirectory($dirs)
+    {
+        foreach ($this->toIterator($dirs) as $file) {
+            if (!is_dir($file)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

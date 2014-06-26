@@ -69,4 +69,13 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
+
+    public function testEscapedId()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/escaped-id.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals(array('escaped "foo"' => 'escaped "bar"'), $catalogue->all('domain1'));
+    }
 }

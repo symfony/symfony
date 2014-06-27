@@ -67,6 +67,7 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",

@@ -20,6 +20,9 @@
         "symfony/dependency-injection": "~2.3",
         "ocramius/proxy-manager": ">=0.3.1,<0.6-dev"
     },
+    "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable"
+    },
     "autoload": {
         "psr-0": {
             "Symfony\\Bridge\\ProxyManager\\": ""

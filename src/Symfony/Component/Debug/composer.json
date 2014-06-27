@@ -20,6 +20,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/http-kernel": "~2.1",
         "symfony/http-foundation": "~2.1"
     },

@@ -19,6 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/yaml": "~2.0",
         "symfony/config": "~2.2",
         "symfony/expression-language": "~2.4"

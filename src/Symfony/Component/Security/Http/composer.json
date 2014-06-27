@@ -23,6 +23,7 @@
         "symfony/http-kernel": "~2.4"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/routing": "~2.2",
         "symfony/security-csrf": "~2.4",
         "psr/log": "~1.0"

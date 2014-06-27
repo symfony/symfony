@@ -20,6 +20,7 @@
         "symfony/translation": "~2.0"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.3",
         "symfony/yaml": "~2.0",

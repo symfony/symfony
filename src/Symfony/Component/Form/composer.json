@@ -23,6 +23,7 @@
         "symfony/property-access": "~2.3"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/validator": "~2.2",
         "symfony/http-foundation": "~2.2",
         "symfony/http-kernel": "~2.4",

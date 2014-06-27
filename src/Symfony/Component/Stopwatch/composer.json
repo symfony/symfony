@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Stopwatch\\": "" }
     },

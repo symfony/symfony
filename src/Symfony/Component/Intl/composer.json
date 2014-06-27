@@ -28,6 +28,7 @@
         "symfony/icu": "~1.0-RC"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/filesystem": ">=2.1"
     },
     "suggest": {

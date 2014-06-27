@@ -23,6 +23,7 @@
         "propel/propel1": "1.6.*"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {

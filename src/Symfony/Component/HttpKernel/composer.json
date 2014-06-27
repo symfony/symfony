@@ -23,6 +23,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/browser-kit": "~2.2",
         "symfony/class-loader": "~2.1",
         "symfony/config": "~2.0",

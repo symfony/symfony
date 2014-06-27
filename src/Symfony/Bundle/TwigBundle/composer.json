@@ -21,6 +21,7 @@
         "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.0",
         "symfony/config": "~2.2",

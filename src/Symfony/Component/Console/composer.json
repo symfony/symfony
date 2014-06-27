@@ -19,6 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "symfony/event-dispatcher": "~2.1",
         "symfony/process": "~2.1",
         "psr/log": "~1.0"

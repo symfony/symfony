@@ -19,6 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "phpunit/phpunit": ">=3.7@stable",
         "psr/log": "~1.0"
     },
     "suggest": {

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\Resources\stubs\FakeFile;
 
 class BinaryFileResponseTest extends ResponseTestCase
 {
@@ -179,18 +180,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request->headers->set('X-Sendfile-Type', 'X-Accel-Redirect');
         $request->headers->set('X-Accel-Mapping', $mapping);
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
-            ->setConstructorArgs(array(__DIR__.'/File/Fixtures/test'))
-            ->getMock();
-        $file->expects($this->any())
-             ->method('getRealPath')
-             ->will($this->returnValue($realpath));
-        $file->expects($this->any())
-             ->method('isReadable')
-             ->will($this->returnValue(true));
-        $file->expects($this->any())
-             ->method('getMTime')
-             ->will($this->returnValue(time()));
+        $file = new FakeFile($realpath, __DIR__.'/File/Fixtures/test');
 
         BinaryFileResponse::trustXSendFileTypeHeader();
         $response = new BinaryFileResponse($file);

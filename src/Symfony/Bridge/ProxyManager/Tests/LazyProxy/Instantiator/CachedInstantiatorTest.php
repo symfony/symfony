@@ -21,7 +21,6 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * @author Alex Moreno <alejandro.moreno@tdo.es>
  *
- * @covers \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\CachedInstantiator
  */
 class CachedInstantiatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,16 +30,11 @@ class CachedInstantiatorTest extends \PHPUnit_Framework_TestCase
     protected $instantiator;
 
     /**
-     * @var String
-     */
-    protected $path = '.';
-
-    /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
-        $this->instantiator = new CachedInstantiator($this->path);
+        $this->instantiator = new CachedInstantiator('.');
     }
 
     public function testInstantiateProxy()

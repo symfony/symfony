@@ -32,6 +32,8 @@ class CachedInstantiator implements InstantiatorInterface
 
     /**
      * Constructor
+     *
+     * @param string $proxiesPath      Path where we'll store temporary the proxy files.
      */
     public function __construct($proxiesPath)
     {

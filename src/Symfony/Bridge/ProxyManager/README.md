@@ -13,6 +13,3 @@ You can run the unit tests with the following command:
     $ phpunit
 
 [1]: https://github.com/Ocramius/ProxyManager
-
-How to use Lazy Loading
----------

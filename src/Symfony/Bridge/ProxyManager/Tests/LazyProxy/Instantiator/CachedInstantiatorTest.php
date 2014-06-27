@@ -19,7 +19,8 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\CachedInstantiator}
  *
- * @author Alex Moreno <alejandro.moreno@tdo.es>
+ * @author Alex Moreno <alex.m.lopez@capgemini.com>
+ * @author Dries Vanlerberghe <dries.vanlerberghe@capgemini.com>
  *
  */
 class CachedInstantiatorTest extends \PHPUnit_Framework_TestCase

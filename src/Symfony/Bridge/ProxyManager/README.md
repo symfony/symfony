@@ -16,11 +16,3 @@ You can run the unit tests with the following command:
 
 How to use Lazy Loading
 ---------
-
-Example code based in the one used in Drupal Symfony Inject:
-
-    if ($definition->isLazy()) {
-      $set_proxy_instantiator = TRUE;
-      $container_builder->setProxyInstantiator(new CachedInstantiator($proxies_path));
-      $definition->setLazy(true);
-    }

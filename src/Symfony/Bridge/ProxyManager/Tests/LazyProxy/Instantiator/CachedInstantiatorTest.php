@@ -32,7 +32,7 @@ class CachedInstantiatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @var String
-    */
+     */
     protected $path = '.';
 
     /**

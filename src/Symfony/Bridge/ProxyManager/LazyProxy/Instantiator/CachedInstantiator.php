@@ -20,38 +20,38 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  */
 class CachedInstantiator implements InstantiatorInterface
 {
-  /**
-   * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
-   */
-  private $factory;
+    /**
+     * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
+     */
+    private $factory;
 
-  /**
-   * Constructor
-   */
-  public function __construct($proxies_path)
-  {
-    $config = new Configuration();
-    $config->setProxiesTargetDir($proxies_path);
-    $fileLocator = new FileLocator($config->getProxiesTargetDir());
-    $config->setGeneratorStrategy(new FileWriterGeneratorStrategy($fileLocator));
+    /**
+     * Constructor
+     */
+    public function __construct($proxies_path)
+    {
+        $config = new Configuration();
+        $config->setProxiesTargetDir($proxies_path);
+        $fileLocator = new FileLocator($config->getProxiesTargetDir());
+        $config->setGeneratorStrategy(new FileWriterGeneratorStrategy($fileLocator));
 
-    $this->factory = new LazyLoadingValueHolderFactory($config);
-  }
+        $this->factory = new LazyLoadingValueHolderFactory($config);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
-  {
-    return $this->factory->createProxy(
-      $definition->getClass(),
-      function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
-        $wrappedInstance = call_user_func($realInstantiator);
+    /**
+     * {@inheritdoc}
+     */
+    public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
+    {
+        return $this->factory->createProxy(
+            $definition->getClass(),
+            function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
+                $wrappedInstance = call_user_func($realInstantiator);
 
-        $proxy->setProxyInitializer(null);
+                $proxy->setProxyInitializer(null);
 
-        return true;
-      }
-    );
-  }
+                return true;
+            }
+        );
+    }
 }

@@ -54,11 +54,24 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDenormalize()
+    public function testDenormalizeClass()
     {
         $obj = $this->normalizer->denormalize(
             array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
             __NAMESPACE__.'\GetSetDummy',
+            'any'
+        );
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+        $this->assertTrue($obj->isBaz());
+    }
+
+    public function testDenormalizeObject()
+    {
+        $obj = new GetSetDummy();
+        $obj = $this->normalizer->denormalize(
+            array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
+            $obj,
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());

@@ -129,32 +129,36 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
+        if (is_string($class)) {
+            $reflectionClass = new \ReflectionClass($class);
+            $constructor = $reflectionClass->getConstructor();
 
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
+            if ($constructor) {
+                $constructorParameters = $constructor->getParameters();
 
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
+                $params = array();
+                foreach ($constructorParameters as $constructorParameter) {
+                    $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
 
-                if (isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
-                } elseif (!$constructorParameter->isOptional()) {
-                    throw new RuntimeException(
-                        'Cannot create an instance of '.$class.
-                        ' from serialized data because its constructor requires '.
-                        'parameter "'.$constructorParameter->name.
-                        '" to be present.');
+                    if (isset($data[$paramName])) {
+                        $params[] = $data[$paramName];
+                        // don't run set for a parameter passed to the constructor
+                        unset($data[$paramName]);
+                    } elseif (!$constructorParameter->isOptional()) {
+                        throw new RuntimeException(
+                            'Cannot create an instance of '.$class.
+                            ' from serialized data because its constructor requires '.
+                            'parameter "'.$constructorParameter->name.
+                            '" to be present.');
+                    }
                 }
-            }
 
-            $object = $reflectionClass->newInstanceArgs($params);
+                $object = $reflectionClass->newInstanceArgs($params);
+            } else {
+                $object = new $class;
+            }
         } else {
-            $object = new $class;
+            $object = $class;
         }
 
         foreach ($data as $attribute => $value) {

@@ -107,7 +107,7 @@ class DialogHelper extends InputAwareHelper
 
         $output->write($question);
 
-        $inputStream = $this->inputStream ?: STDIN;
+        $inputStream = $this->inputStream ?: \STDIN;
 
         if (null === $autocomplete || !$this->hasSttyAvailable()) {
             $ret = fgets($inputStream, 4096);
@@ -288,7 +288,7 @@ class DialogHelper extends InputAwareHelper
             $sttyMode = shell_exec('stty -g');
 
             shell_exec('stty -echo');
-            $value = fgets($this->inputStream ?: STDIN, 4096);
+            $value = fgets($this->inputStream ?: \STDIN, 4096);
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {

@@ -68,13 +68,13 @@ EOF
         $filename = $input->getArgument('filename');
 
         if (!$filename) {
-            if (0 !== ftell(STDIN)) {
+            if (0 !== ftell(\STDIN)) {
                 throw new \RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
             $content = '';
-            while (!feof(STDIN)) {
-                $content .= fread(STDIN, 1024);
+            while (!feof(\STDIN)) {
+                $content .= fread(\STDIN, 1024);
             }
 
             return $this->display($input, $output, array($this->validate($content)));

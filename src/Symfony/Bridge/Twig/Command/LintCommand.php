@@ -90,13 +90,13 @@ EOF
         $filename = $input->getArgument('filename');
 
         if (!$filename) {
-            if (0 !== ftell(STDIN)) {
+            if (0 !== ftell(\STDIN)) {
                 throw new \RuntimeException("Please provide a filename or pipe template content to STDIN.");
             }
 
             $template = '';
-            while (!feof(STDIN)) {
-                $template .= fread(STDIN, 1024);
+            while (!feof(\STDIN)) {
+                $template .= fread(\STDIN, 1024);
             }
 
             return $this->display($input, $output, array($this->validate($twig, $template, uniqid('sf_'))));
@@ -132,6 +132,7 @@ EOF
             $twig->setLoader($realLoader);
         } catch (\Twig_Error $e) {
             $twig->setLoader($realLoader);
+
             return array('template' => $template, 'file' => $file, 'valid' => false, 'exception' => $e);
         }
 

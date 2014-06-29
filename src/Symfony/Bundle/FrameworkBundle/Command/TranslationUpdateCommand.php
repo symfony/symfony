@@ -141,7 +141,7 @@ EOF
         // save the files
         if ($input->getOption('force') === true) {
             $output->writeln('Writing files');
-            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath));
+            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
         }
     }
 }

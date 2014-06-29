@@ -25,7 +25,7 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
 
         $tempDir = sys_get_temp_dir();
         $dumper = new XliffFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir));
+        $dumper->dump($catalogue, array('path' => $tempDir, 'default_locale' => 'fr'));
 
         $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources-clean.xlf'), file_get_contents($tempDir.'/messages.en.xlf'));
 

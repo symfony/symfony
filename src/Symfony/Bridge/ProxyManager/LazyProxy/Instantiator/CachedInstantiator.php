@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
  *
  * @author Alex Moreno <alex.m.lopez@capgemini.com>
  * @author Dries Vanlerberghe <dries.vanlerberghe@capgemini.com>
- *
  */
 class CachedInstantiator implements InstantiatorInterface
 {

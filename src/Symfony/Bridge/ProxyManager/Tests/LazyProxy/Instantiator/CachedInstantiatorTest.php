@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Tests for {@see \Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\CachedInstantiator}
- *
  */
 class CachedInstantiatorTest extends \PHPUnit_Framework_TestCase
 {

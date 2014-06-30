@@ -22,6 +22,10 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
 
 /**
  * Lazy loading proxy generator (Using cached Proxy to improve performance).
+ *
+ * @author Alex Moreno <alex.m.lopez@capgemini.com>
+ * @author Dries Vanlerberghe <dries.vanlerberghe@capgemini.com>
+ *
  */
 class CachedInstantiator implements InstantiatorInterface
 {

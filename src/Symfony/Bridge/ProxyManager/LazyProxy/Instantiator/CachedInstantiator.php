@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInt
 class CachedInstantiator implements InstantiatorInterface
 {
     /**
-     * @var \ProxyManager\Factory\LazyLoadingValueHolderFactory
+     * @var LazyLoadingValueHolderFactory
      */
     private $factory;
 

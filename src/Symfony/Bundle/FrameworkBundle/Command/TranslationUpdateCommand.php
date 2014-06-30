@@ -35,7 +35,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ->setName('translation:update')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle where to load the messages'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle where to load the messages, defaults to app/Resources folder', null),
                 new InputOption(
                     'prefix', null, InputOption::VALUE_OPTIONAL,
                     'Override the default prefix', '__'
@@ -64,12 +64,17 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ->setDescription('Updates the translation file')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command extract translation strings from templates
-of a given bundle. It can display them or merge the new ones into the translation files.
+of a given bundle or the app folder. It can display them or merge the new ones into the translation files.
 When new translation strings are found it can automatically add a prefix to the translation
 message.
 
+Example running against a Bundle (AcmeBundle)
 <info>php %command.full_name% --dump-messages en AcmeBundle</info>
 <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+
+Example running against app messages (app/Resources folder)
+<info>php %command.full_name% --dump-messages en</info>
+<info>php %command.full_name% --force --prefix="new_" fr</info>
 
 EOF
             )
@@ -98,23 +103,33 @@ EOF
             return 1;
         }
 
+        // Define Root Path to App folder
+        $rootPath = $this->getApplication()->getKernel()->getRootDir();
+        $currentName = "app folder";
+
+        // Override with provided Bundle info
+        if (null !== $input->getArgument('bundle')) {
+            $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
+            $rootPath = $foundBundle->getPath();
+            $currentName = $foundBundle->getName();
+        }
+
         // get bundle directory
-        $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-        $bundleTransPath = $foundBundle->getPath().'/Resources/translations';
-        $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
+        $translationsPath = $rootPath.'/Resources/translations';
+        $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
 
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
-        $extractor->extract($foundBundle->getPath().'/Resources/views/', $extractedCatalogue);
+        $extractor->extract($rootPath.'/Resources/views/', $extractedCatalogue);
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
-        $loader->loadMessages($bundleTransPath, $currentCatalogue);
+        $loader->loadMessages($translationsPath, $currentCatalogue);
 
         // process catalogues
         $operation = $input->getOption('clean')
@@ -150,7 +165,7 @@ EOF
         // save the files
         if ($input->getOption('force') === true) {
             $output->writeln('Writing files');
-            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $bundleTransPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
+            $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $translationsPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
         }
     }
 }

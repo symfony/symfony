@@ -45,6 +45,30 @@ class PoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
     }
 
+    public function testLoadWithQuotedCharacters()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/quoted.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $messages = $catalogue->all('domain1');
+        $this->assertArrayHasKey("foo\nbar", $messages);
+        $this->assertSame("myfoo\nmybar", $messages["foo\nbar"]);
+    }
+
+    public function testLoadPluralsWithQuotedCharacters()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../fixtures/quoted-plurals.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $messages = $catalogue->all('domain1');
+        $this->assertArrayHasKey("foo\nbar", $messages);
+        $this->assertArrayHasKey("foos\nbars", $messages);
+        $this->assertSame("myfoo\nmybar", $messages["foo\nbar"]);
+        $this->assertSame("myfoo\nmybar|myfoos\nmybars", $messages["foos\nbars"]);
+    }
+
     public function testLoadDoesNothingIfEmpty()
     {
         $loader = new PoFileLoader();

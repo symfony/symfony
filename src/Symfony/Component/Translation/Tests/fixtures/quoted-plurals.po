@@ -1,0 +1,4 @@
+msgid "foo\nbar"
+msgid_plural "foos\nbars"
+msgstr[0] "myfoo\nmybar"
+msgstr[1] "myfoos\nmybars"

@@ -143,7 +143,9 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                     $params[] = $data[$paramName];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$paramName]);
-                } elseif (!$constructorParameter->isOptional()) {
+                } elseif ($constructorParameter->isOptional()) {
+                    $params[] = $constructorParameter->getDefaultValue();
+                } else {
                     throw new RuntimeException(
                         'Cannot create an instance of '.$class.
                         ' from serialized data because its constructor requires '.

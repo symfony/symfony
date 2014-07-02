@@ -57,7 +57,7 @@ class ProgressBar
     {
         // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
         $this->output = $output->isDecorated() ? $output : new NullOutput();
-        
+
         $this->setMaxSteps($max);
 
         if (!self::$formatters) {
@@ -159,11 +159,11 @@ class ProgressBar
 
     /**
      * Sets the progress bar maximal steps.
-     * 
+     *
      * Allows changing the max value after creating the object
      * This allows changing the max value in closure 
      * after instantiating ProgressBar in outer scope
-     * 
+     *
      * @param int $max
      */
     public function setMaxSteps($max)
@@ -172,7 +172,7 @@ class ProgressBar
             throw new \LogicException('You cannot change the max after calling start().');
         }
 
-        $this->max = (int)$max;
+        $this->max = (int) $max;
         $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
     }
 

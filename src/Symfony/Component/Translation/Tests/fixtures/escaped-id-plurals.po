@@ -5,4 +5,6 @@ msgstr ""
 "Language: en\n"
 
 msgid "escaped \"foo\""
-msgstr "escaped \"bar\""
+msgid_plural "escaped \"foos\""
+msgstr[0] "escaped \"bar\""
+msgstr[1] "escaped \"bars\""

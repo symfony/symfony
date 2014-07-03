@@ -12,25 +12,21 @@
     </tr>
 {%- endblock form_row %}
 
-{% block button_row %}
-{% spaceless %}
+{% block button_row -%}
     <tr>
         <td></td>
         <td>
-            {{ form_widget(form) }}
+            {{- form_widget(form) -}}
         </td>
     </tr>
-{% endspaceless %}
 {% endblock button_row %}
 
-{% block hidden_row %}
-{% spaceless %}
+{% block hidden_row -%}
     <tr style="display: none">
         <td colspan="2">
-            {{ form_widget(form) }}
+            {{- form_widget(form) -}}
         </td>
     </tr>
-{% endspaceless %}
 {% endblock hidden_row %}
 
 {% block form_widget_compound -%}
@@ -45,4 +41,4 @@
         {{- block('form_rows') -}}
         {{- form_rest(form) -}}
     </table>
-{% endblock form_widget_compound %}
+{%- endblock form_widget_compound %}

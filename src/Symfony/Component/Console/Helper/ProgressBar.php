@@ -549,7 +549,7 @@ class ProgressBar
             'verbose'            => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
             'verbose_nomax'      => ' %current% [%bar%] %elapsed:6s%',
 
-            'very_verbose'       => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
+            'very_verbose'       => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
             'very_verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
 
             'debug'              => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',

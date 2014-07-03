@@ -24,10 +24,12 @@ class Link
      * @var \DOMNode A \DOMNode instance
      */
     protected $node;
+
     /**
      * @var string The method to use for the link
      */
     protected $method;
+
     /**
      * @var string The URI of the page where the link is embedded (or the base href)
      */
@@ -187,7 +189,7 @@ class Link
     /**
      * Removes the query string and the anchor from the given uri.
      *
-     * @param  string $uri The uri to clean
+     * @param string $uri The uri to clean
      *
      * @return string
      */
@@ -199,9 +201,9 @@ class Link
     /**
      * Remove the query string from the uri.
      *
-     * @param $uri
+     * @param string $uri
      *
-     * @return array
+     * @return string
      */
     private function cleanupQuery($uri)
     {
@@ -215,7 +217,7 @@ class Link
     /**
      * Remove the anchor from the uri.
      *
-     * @param $uri
+     * @param string $uri
      *
      * @return string
      */

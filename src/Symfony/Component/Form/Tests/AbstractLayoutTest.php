@@ -1969,4 +1969,30 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         // no foo
         $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
     }
+
+    /**
+     * @group ticket-11277
+     */
+    public function testTextareaWithWhitespaceOnlyContentRetainsValue()
+    {
+        $form = $this->factory->createNamed('textarea', 'textarea', '  ');
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertContains('>  </textarea>', $html);
+    }
+
+    /**
+     * @group ticket-11277
+     */
+    public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
+    {
+        $form = $this->factory->createBuilder('form', array('textarea' => '  '))
+            ->add('textarea', 'textarea')
+            ->getForm();
+
+        $html = $this->renderForm($form->createView());
+
+        $this->assertContains('>  </textarea>', $html);
+    }
 }

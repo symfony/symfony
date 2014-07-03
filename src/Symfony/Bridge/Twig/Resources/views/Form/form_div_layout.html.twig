@@ -1,24 +1,19 @@
 {# Widgets #}
 
-{% block form_widget %}
-{% spaceless %}
+{% block form_widget -%}
     {% if compound %}
-        {{ block('form_widget_compound') }}
+        {{- block('form_widget_compound') -}}
     {% else %}
-        {{ block('form_widget_simple') }}
+        {{- block('form_widget_simple') -}}
     {% endif %}
-{% endspaceless %}
-{% endblock form_widget %}
+{%- endblock form_widget %}
 
-{% block form_widget_simple %}
-{% spaceless %}
-    {% set type = type|default('text') %}
+{% block form_widget_simple -%}
+    {% set type = type|default('text') -%}
     <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-{% endspaceless %}
-{% endblock form_widget_simple %}
+{%- endblock form_widget_simple %}
 
-{% block form_widget_compound %}
-{% spaceless %}
+{% block form_widget_compound -%}
     <div {{ block('widget_container_attributes') }}>
         {% if form.parent is empty %}
             {{ form_errors(form) }}
@@ -26,8 +21,7 @@
         {{ block('form_rows') }}
         {{ form_rest(form) }}
     </div>
-{% endspaceless %}
-{% endblock form_widget_compound %}
+{%- endblock form_widget_compound %}
 
 {% block collection_widget %}
 {% spaceless %}
@@ -38,9 +32,9 @@
 {% endspaceless %}
 {% endblock collection_widget %}
 
-{% block textarea_widget %}
+{% block textarea_widget -%}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
-{% endblock textarea_widget %}
+{%- endblock textarea_widget %}
 
 {% block choice_widget %}
 {% spaceless %}
@@ -275,15 +269,13 @@
 {% endspaceless %}
 {% endblock repeated_row %}
 
-{% block form_row %}
-{% spaceless %}
+{% block form_row -%}
     <div>
         {{ form_label(form) }}
         {{ form_errors(form) }}
         {{ form_widget(form) }}
     </div>
-{% endspaceless %}
-{% endblock form_row %}
+{%- endblock form_row %}
 
 {% block button_row %}
 {% spaceless %}
@@ -299,13 +291,11 @@
 
 {# Misc #}
 
-{% block form %}
-{% spaceless %}
+{% block form -%}
     {{ form_start(form) }}
         {{ form_widget(form) }}
     {{ form_end(form) }}
-{% endspaceless %}
-{% endblock form %}
+{%- endblock form %}
 
 {% block form_start %}
 {% spaceless %}
@@ -361,13 +351,11 @@
 
 {# Support #}
 
-{% block form_rows %}
-{% spaceless %}
+{% block form_rows -%}
     {% for child in form %}
-        {{ form_row(child) }}
+        {{- form_row(child) -}}
     {% endfor %}
-{% endspaceless %}
-{% endblock form_rows %}
+{%- endblock form_rows %}
 
 {% block widget_attributes %}
 {% spaceless %}

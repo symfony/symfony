@@ -303,8 +303,7 @@
     {% endfor %}
 {%- endblock form_rows %}
 
-{% block widget_attributes %}
-{% spaceless %}
+{% block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"
     {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
@@ -319,11 +318,9 @@
             {{- attrname }}="{{ attrvalue }}"
         {%- endif -%}
     {%- endfor -%}
-{% endspaceless %}
-{% endblock widget_attributes %}
+{%- endblock widget_attributes %}
 
-{% block widget_container_attributes %}
-{% spaceless %}
+{% block widget_container_attributes -%}
     {%- if id is not empty %}id="{{ id }}"{% endif -%}
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
@@ -335,11 +332,9 @@
             {{- attrname }}="{{ attrvalue }}"
         {%- endif -%}
     {%- endfor -%}
-{% endspaceless %}
-{% endblock widget_container_attributes %}
+{%- endblock widget_container_attributes %}
 
-{% block button_attributes %}
-{% spaceless %}
+{% block button_attributes -%}
     id="{{ id }}" name="{{ full_name }}"{% if disabled %} disabled="disabled"{% endif -%}
     {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
@@ -351,5 +346,4 @@
             {{- attrname }}="{{ attrvalue }}"
         {%- endif -%}
     {%- endfor -%}
-{% endspaceless %}
-{% endblock button_attributes %}
+{%- endblock button_attributes %}

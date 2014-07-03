@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by malarzm at 2014-01-27T15:27:06Z
+
+There's 1 Failure only for PHP 5.3 (https://travis-ci.org/symfony/symfony/jobs/17702052#L501) - is it Monday and the test started in one second and finished in another and that's the error?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-27T15:30:54Z
+
+don't worry about this particular test. We merged a fix for such timing failures in the 2.4 branch, but the 2.4 branch has not yet been merged into master since this fix.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2014-01-27T15:32:59Z
+
+Ok, thanks :)

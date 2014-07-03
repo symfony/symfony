@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-28T17:53:26Z
+
+This should be merged whenever it is ready on Travis (see http://blog.travis-ci.com/2014-04-28-upcoming-build-environment-updates/).
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-04-28T17:59:59Z
+
+why didn't you changed line 9 ? what about using hhvm and hhvm-nightly together ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-28T18:01:29Z
+
+Running the current stable is not needed as recent versions of HHM fix so many problems in Symfony. So, as I said, we will add the stable version whenever HHVM runs Symfony smoothly.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-28T18:02:36Z
+
+you forgot to update the line 9. you allow failure on hhvm-nightly, but you run on hhvm stable without allowing it to fail
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-04-28T18:02:52Z
+
+thanks @stof
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-28T18:15:28Z
+
+ah, right, fixed now.

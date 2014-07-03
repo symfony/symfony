@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-13T16:14:42Z
+
+Please don't make the file executable
+
+---------------------------------------------------------------------------
+
+by 1emming at 2014-06-13T16:20:16Z
+
+Sorry about the indentation, I'll fix that. I am not sure what I did wrong about making the file executable.
+Could you explain it a bit more? Like what file and how I changed something I shouldn't have?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-13T16:27:50Z
+
+Well, there is only 1 changed file in your PR.
+
+You changed the file permissions from 644 to 755, which is wrong. This file is not meant to be an executable.
+If you are on Windows (which does not have Unix permissions), you should configure your goit to ignore the fle permissions to avoid messing them. This is done by default when using the official git CLI client, but other git clients may not have such default. See http://stackoverflow.com/questions/1580596/how-do-i-make-git-ignore-file-mode-chmod-changes#answer-1580644 for the way to configure git to ignore them (you could run it with the ``--global`` flag to fix it for all repos at once)
+
+---------------------------------------------------------------------------
+
+by 1emming at 2014-06-13T16:31:56Z
+
+Thank you for the details and the link I'll look into that!

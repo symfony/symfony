@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-03T07:56:00Z
+
+According to the [pluralization rules](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Translation/PluralizationRules.php#L152), sk needs 3 alternatives, not 2
+
+---------------------------------------------------------------------------
+
+by birko at 2013-07-03T08:02:01Z
+
+sorry I previosly uploaded wrong file

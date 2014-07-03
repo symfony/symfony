@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2013-12-02T22:25:28Z
+
+fixed https://github.com/symfony/symfony/issues/9677
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-03T05:14:47Z
+
+@aitboudad nice, could you please add the PR template inside your description above?
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-12-03T09:55:14Z
+
+This should actually be merged in the 2.3 as it was introduced in that version.
+`You need version ~2.3 of the console for it.`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-03T10:13:55Z
+
+Can you open a new PR on 2.3?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2013-12-03T10:20:26Z
+
+@fabpot it was introduced in v 2.4
+https://github.com/symfony/symfony/commit/c0b59963b3a1f2473dce0e0a63e7afba0230255b

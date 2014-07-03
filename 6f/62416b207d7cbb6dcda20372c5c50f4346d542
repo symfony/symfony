@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-17T14:37:38Z
+
+why would you get ``['' => false]`` passed to the next step ? The value of a textarea does not end up in the keys.
+
+but anyway, it makes sense to use an empty string. Textarea are textual fields
+
+---------------------------------------------------------------------------
+
+by Berdir at 2014-04-17T14:41:22Z
+
+Because of this:
+
+```
+php > var_dump(http_build_query(array('example' => null), '', '&'));
+string(0) ""
+```
+
+Then we attempt to find the variable name of that, so we do $varName = substr($s, 0, 0)

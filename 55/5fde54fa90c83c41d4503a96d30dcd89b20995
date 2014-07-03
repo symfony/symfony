@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-24T09:36:41Z
+
+There is an issue here: you are handling retriesCount as a global variable. This is broken. Each Ajax loading through ``Sfjs.request`` (or ``Sfjs.load``) should have its own retrying count. Otherwise, it will simply not work when several ajax calls are done.
+
+And for other elements loaded through Ajax, retyring may not always make sense. IMO, the ``maxTry`` should be an argument passed to ``request()`` (and you pass ``maxTry - 1`` when retrying), and the WDT toolbar loading should be passing the argument.
+Retrying the loading of query explanations in the Doctrine panel does not make sense for instance.
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2014-04-24T09:47:25Z
+
+@stof yeah you're right I will update it, but I did not know that something else were using the `Sfjs.request` or `Sfjs.load`, thanks for the tips
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2014-04-24T18:57:08Z
+
+@stof updated

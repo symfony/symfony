@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-24T21:03:51Z
+
+Imo the application level Resources should be loaded first.
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2013-09-24T21:06:25Z
+
+You are right. I will update shortly.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-24T21:17:55Z
+
+And finally, would be good to cover this with tests.
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2013-09-24T22:32:17Z
+
+@jakzal app Resources will now take priority. I had to sort it by Child bundles (and removed prepending) to ensure that the priority is correct.
+
+---------------------------------------------------------------------------
+
+by trsteel88 at 2013-09-24T22:48:29Z
+
+@jakzal I am not too sure how to write tests for this use case as there will be no parent/child bundles to access from the tests?

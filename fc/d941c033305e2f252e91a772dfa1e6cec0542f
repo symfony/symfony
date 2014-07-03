@@ -1,0 +1,227 @@
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-30T21:20:54Z
+
+Added the helpers `form_start()` and `form_end()` which were missing before.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-31T10:11:55Z
+
+We discussed in #5493 whether `form_end()` should also imply `form_rest()`. @Tobion made the valid point that people might not always want to render all fields. I think this is an edge case tough, so I propose to imply `form_rest()` by default and make it possible to deactivate this using a variable `render_rest`.
+
+```
+{{ form_start(form) }}
+   {# ... #}
+{{ form_end(form) }}
+```
+
+or
+
+```
+{{ form_start(form) }}
+   {# ... #}
+{{ form_end(form, { 'render_rest': false }) }}
+```
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-31T11:21:34Z
+
+Another question that remains to be answered:
+
+With the current implementation, the attributes passed in the `attr` option are rendered both in the `<form>` tag (new) and in the `<div>`/`<table>` tag of the form (for BC).
+
+```
+$form = $this->createForm('my_form', $formData, array(
+    'attr' => array(
+        'id' => 'foo',
+        'class' => 'bar',
+    ),
+));
+```
+
+```
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <input type="submit">
+{{ form_end(form) }}
+
+->
+
+<form id="foo" class="bar">
+    <div id="foo" class="bar">
+        <!-- rows -->
+    </div>
+    <input type="submit">
+</form>
+```
+
+Solutions that come to mind:
+
+(a) Move the rendering of the attributes from the `<div>`/`<table>` tag to the `<form>` tag **for the root form**. This breaks BC because the `form_widget()` call for the root form does not output the attributes anymore then. Nested forms are not affected.
+
+```
+<form id="foo" class="bar">
+    <div><!-- no attrs! -->
+        <!-- rows -->
+    </div>
+    <input type="submit">
+</form>
+```
+
+(b) Don't render a `<div>` tag **for the root form** and do as in (a) for the table layout. This obviously also breaks BC. Nested forms are not affected.
+
+```
+<form id="foo" class="bar">
+    <!-- rows -->
+    <input type="submit">
+</form>
+```
+
+(c) Don't render any attributes in the `<form>` tag. Maintains full BC.
+
+```
+<form>
+    <div id="foo" class="bar">
+        <!-- rows -->
+    </div>
+    <input type="submit">
+</form>
+```
+
+Opinions?
+
+While (c) is the best solution from a BC point of view, I think it is rather unintuitive. As a newcomer, if I put a "class" attribute on a form, I would expect it to be on the outermost `<form>` tag, not on some `<div>` within.
+
+(a) and (b), on the other hand, break BC for those people that use `form_widget()` to render the complete form. I don't know how many people would be affected by this, [this poll](http://twtpoll.com/p3y7vb) tries to gather some data about that. IMO both (a) and (b) are more intuitive and future-proof.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-31T11:31:45Z
+
+Added the helper `form()` to prototype a complete form:
+
+```
+{{ form(form) }}
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2012-12-31T13:40:29Z
+
+@bschussek I think `{{ form_end(form, { 'render_rest': false }) }}` is fine.
+
+And to the question about attributes: I think we should *not* maintain BC here with c) because attributes are better applied to the parent. Using CSS you can easily select the child with `#formid > div` but not the other way round which would make it impossible the style the form element.
+So I would say a) or b) is better than c). And a) is better than b) because in HTML 4 Strict `<input>` element must be within a block element like `<div>`. So b) would not produce valid HTML 4 Strict. This restriction is not there in HTML5 anymore but your `id` validation also uses the HTML4 paradigm.
+All in all, IMO the best solution is a).
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-31T15:34:28Z
+
+> And a) is better than b) because in HTML 4 Strict `<input>` element must be within a block element like `<div>`. So b) would not produce valid HTML 4 Strict.
+
+@Tobion This is not correct. With (b), each row would still be wrapped in a `<div>`.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-01T14:14:09Z
+
+I propose to postpone the question about the wrapping `<div>` to a future PR.
+
+@fabpot This PR should be mergeable.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-02T14:53:21Z
+
+Updated the documentation.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2013-01-02T16:32:03Z
+
+Hi guys!
+
+I certainly don't mind the addition of the new features here, but I'm -1 on the BC breaks and deprecations. I don't love the deprecation of `form_enctype`, and I wish the `form_start` and `form_end` things would have come earlier, as we'll have a mixture on the web (think 2.0 + 2.1 versus 2.2+ docs, blog posts, etc) of things using `form_enctype` and `form_rest` versus `form_start` and `form_end`. Individually, I like the feature, but I'm not sure having this big change is worth it.
+
+Also, I really really don't like the deprecation of `form->bind` - this will affect far too many projects and the new `form->process` is just a "nice" feature, at the cost of so much BC breaking. Again, I'm not sure getting rid of the current way is worth it, but I'm also not sure that having both `form->bind` and `form->process` is clear either.
+
+Overall, I'd like to see these "nice" things added in a way where they can co-exist with what we have currently. These are really nice features, but there's so much code that will need to update and "education" that will need to happen because the form framework is already being used in so many places.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-02T16:38:56Z
+
+@weaverryan For reference, this PR does not contain any (immediate) BC breaks, just deprecations.
+
+We can leave in `form_enctype` without too much hassle if you feel that this is a problem. It is just not necessary anymore. We can also postpone the version where we remove this feature.
+
+`$form->bind($request)` was not only deprecated for cleanup purposes, but also for performance reasons. Currently, `BindRequestListener` is attached to and invoked for each and every form element. Upgrading this is very easy so I don't really see the necessity for leaving this in. Again, we can postpone the removal date here.
+
+---------------------------------------------------------------------------
+
+by jalliot at 2013-01-03T09:45:27Z
+
+What is the point of the `form_end` helper if it only renders a `</form>` tag?
+If it was implemented by a customizable block or if it rendered also `form_rest` then why not but in the current state it seems really overkill.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-03T09:49:40Z
+
+@jalliot `form_end` does also render `form_rest`
+
+---------------------------------------------------------------------------
+
+by jalliot at 2013-01-03T10:10:11Z
+
+@bschussek Oh right sorry... I did not refresh my page and did not see the new commits.
+
+---------------------------------------------------------------------------
+
+by michelsalib at 2013-01-05T16:21:48Z
+
+Really nice work @bschussek. I like the way the form component is taking. There is still a lot of work, but hey, forms are a complex thing.
+So it is a big :+1: for me.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-08T12:45:10Z
+
+Postponed to 2.3
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-13T14:07:51Z
+
+Reviewed again and rebased on master.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-13T14:18:41Z
+
+Again, the test failures on 5.3 seem unrelated to this PR. Reviewed and updated the documentation.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-13T14:20:08Z
+
+@bschussek the fix for 5.3 has just been merged
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-13T14:47:28Z
+
+Rebased again.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-04-17T19:28:57Z
+
+I'm guessing that this still won't handle the case where you have the data for two forms present e.g. the http method is something different that GET, but the query part of the uri contains the data submitted in a search in a previous step. Right now you need to know the form name and get such a data from the request and then bind manually.... This becomes annoying and tedious if you need to persist this through more than one step...

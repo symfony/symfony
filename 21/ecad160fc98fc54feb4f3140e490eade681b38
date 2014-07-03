@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by djlambert at 2013-12-08T17:12:05Z
+
+That makes complete sense. I was struggling with the word ```validate```, for some reason ```find``` escaped me. I combined both functions into ```getMask``` which now is the inverse of ```getCode```.

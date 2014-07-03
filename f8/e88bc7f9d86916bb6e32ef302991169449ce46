@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Koc at 2013-10-18T23:30:31Z
+
+Very useful, big +1. Currently we are tracking each ajax request, read X-Debug-Token and generate url for toolbar url using concatenation in JS.
+
+---------------------------------------------------------------------------
+
+by ludofleury at 2013-10-19T04:47:53Z
+
+I had the problem for my previous project API. Very nice way to fix it.
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-10-19T07:44:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2013-10-20T14:02:39Z
+
+According to [RFC 6648](http://tools.ietf.org/html/rfc6648), the practice of prefixing custom headers with "X-" is deprecated. I'd suggest using Debug-Token-Link as the header name instead (even though it's inconsistent with X-Debug-Token).
+
+---------------------------------------------------------------------------
+
+by Burgov at 2013-10-20T19:08:51Z
+
+:+1: would be useful in my pr #8896
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-10-20T21:20:45Z
+
+@fabpot I've update the code btw
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-10-30T17:25:18Z
+
+should be better now

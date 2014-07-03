@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-18T16:05:37Z
+
+Doing that in 2.2 is a BC break.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-09-18T16:09:37Z
+
+you are removing the logger rather than maybe actually using the logger for some useful reasons, not sure which is best
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-18T16:10:42Z
+
+Why is it a bc break? Its private property. Don't see how it can break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-18T16:16:38Z
+
+@Tobion Right and as PHP does not care if you pass additional parameters, we should be fine.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-18T16:48:13Z
+
+yep, it would be more a bc break if we start actually logging messages in this class ^^

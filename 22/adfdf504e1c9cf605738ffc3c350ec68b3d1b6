@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by michelsalib at 2012-12-16T00:35:49Z
+
+Looks very useful :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2012-12-16T20:07:15Z
+
+I don't like this implementation: your helper is stateful, meaning that using it twice in a command can led to weird side-effects as it will still contain some stuff from the previous table you rendered (for instance reusign the custom spearator for the second table)
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2012-12-16T21:39:57Z
+
+@stof Yes, I am aware of that, and I think users should be as well. Other helpers like `ProgressHelper' are no exception. The idea behind this helpers is to be stateful.
+
+For example, if you want to render tables with green borders, you set green border format and they will be green until you change border format. I don't see this as a weird side-effect.
+
+Other then that, I don't see a use case when this is not expected behavior, table style is usually standardized per application. And resetting all values to default is as easy as creating a new `TableHelper` instance.
+
+---------------------------------------------------------------------------
+
+by piotrpasich at 2012-12-21T09:12:03Z
+
++1 from my side. Nice feature
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2012-12-21T09:39:49Z
+
+:+1: could yield some nice debug commands :)
+
+---------------------------------------------------------------------------
+
+by Baachi at 2012-12-21T09:43:41Z
+
+:+1: Really nice!
+
+---------------------------------------------------------------------------
+
+by tyler-king at 2012-12-28T18:29:01Z
+
++1 this is really useful to have.
+
+---------------------------------------------------------------------------
+
+by Sukei at 2012-12-29T01:36:43Z
+
++1 really nice feature!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-01-01T23:43:37Z
+
+Isn't this table much to complicated for a great display in terminals? I think it is better to have something like:
+
+    ISBN           Title                     Author
+    =============  ========================  ================
+
+    99921-58-10-7  Divine Comedy             Dante Alighieri
+    9971-5-0210-0  A Tale of Two Cities      Charles Dickens
+    960-425-059-0  The Lord of the Rings     J. R. R. Tolkien
+    80-902734-1-6  And Then There Were None  Agatha Christie
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2013-01-01T23:53:29Z
+
+@WouterJ Current implementation is what I find most convenient, and is a default now, you can easily change this with something like:
+
+```php
+$table
+    ->setEdgeChar(' ')
+    ->setHorizontalBorderChar('=')
+    ->setVerticalBorderChar(' ')
+;
+```
+
+If community thinks some other default layout would be better, we can change it ofc.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-01-07T13:56:59Z
+
+@fabpot Skipping that small CS _issue_, I this it's good to be merged =)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T16:55:27Z
+
+Looks good to me. @umpirsky Can you take my comments into account, add a note in the CHANGELOG, and submit a PR for the documentation?
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2013-03-23T19:56:29Z
+
+@fabpot Thanks for useful comments, they are [fixed](https://github.com/umpirsky/symfony/commit/5e04c56f295a27c2fa17df73835d60aee5352c19).
+
+Where in changelog this feature belongs, I see it's planned for 2.3?
+
+I will try to submit documentation before the end of next week.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-25T23:40:15Z
+
+@umpirsky In the ``2.3.0`` section of the Console changelog.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T08:38:50Z
+
+@umpirsky Thanks for the update. I've reread the comments and I think @WouterJ suggestion is good. So, can you change the default look to what he suggests? Also, what about defining some named configuration so that you can easily use pre-defined templates?
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2013-03-26T08:50:00Z
+
+@fabpot Named configuration is great idea, I will try to fix something nice. Do you really like this borderless table? :)
+
+For example, table layout I used is used by mysql client. It have sense for commands like `doctrine:query:sql` or `doctrine:query:dql`. On the other hand @WouterJ layout can be handy for commands like `container:debug` or `router:debug`.
+
+It would be nice to get more feedback from other people about default table layout.
+
+---------------------------------------------------------------------------
+
+by pilot at 2013-03-26T09:22:38Z
+
+Mysql like table layouts is more convinient, but as @umpirsky say it's depend of commands for which try to use it, so maybe have a sense add a some params which configure table view from console?
+
+Like a `git log --pretty` add a `--style=mysql-table` or `--style=borderless`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T10:03:42Z
+
+I think we won't have an agreement on which default table layout we should use; that's why named configuration is probably needed.
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2013-03-26T10:10:15Z
+
+@fabpot But some configuration must be the default one.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2013-03-26T10:15:45Z
+
+if you are going to follow convention of most CLI tools, you start basic, then enhance from there, `--pretty`, `--verbose` etc...

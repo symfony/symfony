@@ -1,0 +1,288 @@
+---------------------------------------------------------------------------
+
+by stof at 2011-09-04T12:52:13Z
+
+all the constraint classes should now be tagged with ``@Annotation`` to make them usable as annotations.
+
+@danielholmes could you update the PR ?
+
+---------------------------------------------------------------------------
+
+by stof at 2011-11-11T14:59:54Z
+
+@danielholmes ping. could you update the PR according to the comments ?
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2011-11-12T15:09:07Z
+
+Hi @stof, apologies for the late reply on this one. Thanks for all the feedback, I've addressed it all now. Let me know if there's anything else.
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2012-04-03T18:33:48Z
+
+It would be cool to integrate this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-04-03T18:35:30Z
+
+@danielholmes could you rebase your PR as tests have been moved to a different location ?
+
+@bschussek can you review it ?
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2012-04-04T01:51:11Z
+
+I've rebased, moved the tests to the new locations and fixed them up to work with current code. Unfortunately the rebase looks a bit messy - not sure what I did wrong
+
+---------------------------------------------------------------------------
+
+by stof at 2012-04-04T02:20:16Z
+
+@danielholmes seems like you merged your older remote branch after rebasing instead of forcing the push. this means you duplicated the history instead of cleaning it. Here is the way to clean things:
+
+```bash
+# create a temp branch as backup
+git branch tmp
+
+# reset your branch before the wrong merge commit
+git reset --hard 677559d
+
+# cherry-pick the commit done after the merge to move the tests
+git cherry-pick 3da62d2
+
+# force the push to github to overwrite the old (messy) branch
+# /!\ take care to specify the branch name to be sure not to mess other branches in your github repo
+git push origin comparison_validators --force
+
+# eventually delete the backup branch once you checked on github that it went fine
+git branch -D tmp
+```
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2012-04-04T03:50:23Z
+
+Amazing! Thanks so much for the tip @stof , that did the trick
+
+---------------------------------------------------------------------------
+
+by vicb at 2012-07-03T08:32:16Z
+
+@danielholmes do you have time to update the PR according to the comments ?
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2012-07-03T08:40:49Z
+
+Right now is pretty bad timing for me. I'm flying to the US in 4 days so have a pretty tight schedule until then tying things off. I'll have time to look at it in about 7 days - hopefully that fits in okay with the release schedule
+
+---------------------------------------------------------------------------
+
+by vicb at 2012-07-03T09:00:04Z
+
+@danielholmes that will be ok. Thanks for your help.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-10-13T15:23:20Z
+
+@fabpot is there anything needed before merging this PR ? AFAIK, it was only waiting because we were in the 2.1 beta cycle
+
+---------------------------------------------------------------------------
+
+by fabpot at 2012-10-13T18:02:13Z
+
+ping @bschussek
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-10-14T11:13:04Z
+
+I like the idea behind these constraints in general, but I think the API can be improved. I think each constraint should either be usable to compare against concrete values or against the value of other fields. Also, the constraints should be property-level constraints, not class-level constraints. The API should be like this:
+
+```php
+<?php
+
+cass Entity
+{
+    /** @Assert\LessThan(10) */ equivalent of
+    /** @Assert\LessThan(value = 10) */
+    public $property1;
+
+    /** @Assert\LessThan(property = "property1") */
+    public $property2;
+
+    /** @Assert\LessThan(property = "author.settings.uploadLimit") */
+    public $property3;
+}
+```
+
+If the option "value" (=default option) is set, the field should be compared against that value. If the option "property" is set, the field should be compared against that other field (more precisely, property path).
+
+There are two ways to implement this currently:
+
+1. Via ExecutionContext::getRoot():
+  * Access ExecutionContext::getRoot() to retrieve the root object
+  * Access ExecutionContext::getPropertyPath() to retrive the current property path
+  * Replace the last element in the property path by the value of the "property" option
+  * Read that property path from the root object
+
+2. By storing the current object/array in ExecutionContext
+  * Read current object/array using ExecutionContext::get???()
+  * Read the property path in the "property" option from that object/array
+
+Alternative 1. can be implemented without changes to ExecutionContext, but has a worse performance. Alternative 2. requires changes to ExecutionContext (no BC break), is more efficient but requires a smart name for the accessor.
+
+Ideas:
+
+* getCurrentContainer()
+* getContainingValue() (as opposed to getCurrentValue())
+* ... ?
+
+Last note: The constraint "Equal" should be renamed to "Equals" for better reading (property foo *equals* property bar).
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-10-14T11:30:47Z
+
+I also would like to see the `*Or*` constraints replaced by generic logical tests. See #5749.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-10-14T12:30:39Z
+
+@bschussek your second solution would be similar to the one implemented in #3939, right ?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-10-14T16:10:23Z
+
+@stof Indeed.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-10-14T16:10:46Z
+
+Wrong button.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2012-12-11T07:48:01Z
+
+@bschussek What do we do here? Can it be closed in favor of #5749? Or are we still discussing which option would be better?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-13T12:50:43Z
+
+@fabpot I closed #5749, as there was no clear idea if it is needed nor how to implement it.
+
+@danielholmes Do you still want to work on this PR? I would like to see its feature set to be changed so that it supports:
+
+```php
+new LessThan(10) /* same as */ new LessThan(array('value' => 10))
+new LessThan(array('property' => 'some.property.path'))
+
+// same for
+
+new LessThanOrEqualTo(...)
+new GreaterThan(...)
+new GreaterThanOrEqualTo(...)
+new EqualTo(...)
+new NotEqualTo(...)
+
+// to check for identical values, let's add a "strict" option to EqualTo and NotEqualTo
+new EqualTo(array('property' => 'emailConfirmation', 'strict' => true))
+```
+
+Can you implement this?
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2012-12-13T22:21:04Z
+
+@bschussek Yes that all sounds fine, I'll be able to put some time in to it around xmas. Will ignore the And, Or, etc as you've indicated.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2012-12-14T11:44:40Z
+
+@danielholmes Great, thanks!
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2012-12-29T11:04:42Z
+
+@bschussek I've completed those api changes with tests. One thing i was unsure of was the property path handling. I noticed there's a Form component class you wrote - Symfony\Component\Form\Util\PropertyPath which seems to perform some of the property access code we have to do here. I can't think of any logical place it could go for the Validator component to share it though. Maybe it's too trivial to worry about sharing it.
+
+Anyway if you could run an eye over the property path stuff that would be greatly appreciated
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-07T07:46:50Z
+
+@danielholmes You are right. It's time to extract PropertyPath to a dedicated component.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-07T10:45:04Z
+
+See #6595
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2013-01-13T01:53:37Z
+
+@bschussek changed it to use PropertyAccess component now
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-13T11:54:33Z
+
+Looks good in general, see my comments inline :) Thanks again for working on this!
+
+---------------------------------------------------------------------------
+
+by danielholmes at 2013-01-14T05:07:11Z
+
+@bschussek Thanks for all the feedback - I've made those changes now. The part I'm a little unsure of is the FrameworkBundle changes (last commit) - please let me know if that's what you had in mind, and if there's anything wrong with it
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2013-03-17T11:44:43Z
+
+Could we hope to have this new feature in Symfony 2.3? Anyone can review it?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-03-17T13:20:48Z
+
+Good PR! Sorry for the late feedback.
+
+One more thing I'm wondering about: When the constraints are used in arrays, I guess it should be possible to compare against property paths in the array. For example:
+
+```
+$data = array(
+    'value' => -1,
+    'rule' => array(
+        'name' => 'Positive',
+        'threshold' => 0
+    )
+);
+
+$errors = $validator->validateValue($data, new Collection(array(
+    'value' => array(
+        new NotNull(),
+        new Type('numeric'),
+        new GreaterThan(array('property' => '[rule][threshold]')),
+    ),
+    'rule' => new Type('array'),
+)));
+```
+
+1. Could you please add a test for the array scenario? Obviously the test can be much simpler than my example.
+2. Does the option name "property" still make sense? Should we name it "propertyPath" or "path" instead?

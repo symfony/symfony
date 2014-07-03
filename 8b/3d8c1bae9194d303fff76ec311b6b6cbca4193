@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-06-18T07:40:41Z
+
+I'm -1 for this. Having a ``getConnection`` method in all handlers but returning a different thing for each of them is a bad idea IMO. It makes it impossible to use the method without some instanceof checks first
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-18T07:41:30Z
+
+or it should be protected only (making it usable for people extending the class, not for people using the session handler)
+
+---------------------------------------------------------------------------
+
+by dosten at 2013-06-18T14:44:51Z
+
+Changed getConnection() visibility to protected
+
+---------------------------------------------------------------------------
+
+by dosten at 2013-06-18T16:16:00Z
+
+The build failed because a problem in other component. I can't restart the job.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-19T09:28:11Z
+
+I'm also -1 on this for the same reasons as @stof, but also because this instances are injected and as such, they should be available in other ways.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-19T09:35:37Z
+
+@fabpot yes .. even if the connection is available some other way. how would one know what that way is? so it would require additional code/config to be able to know what was injected into session handler.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-19T09:45:46Z
+
+@lsmith77 when using them, you have to define the services yourself already. So you know how you injected them
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-19T09:46:52Z
+
+Why would you get the connection from the session handler?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-19T09:50:24Z
+
+i guess the use case is doing something session related. f.e. you might have enriched your session data with a user_id and now you want to query to find the list of active sessions. if you write all the code for your app yourself its obviously a non issue but i guess once you start having a 3rd party Bundle provide this capability it can lead to additional configuration steps. then again compiler passes in the 3rd party Bundle might be a solution instead.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-06-19T11:57:52Z
+
+Other use case is described in the related ticket: #7683 - allow session handlers to be extended.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-19T13:35:36Z
+
+allowing them to be extended is the use case to have a protected accessor indeed (maybe it could have a better name than ``getConnection()`` in some cases btw)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-19T13:57:08Z
+
+Having a protected method is fine by me for this use case, but the getter name should be chosen for each session handler, there is no need to have a uniformed method name here.
+
+---------------------------------------------------------------------------
+
+by dosten at 2013-06-19T14:45:06Z
+
+@fabpot Maybe getMongo, getPdo, etc?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-19T14:50:30Z
+
+@dii3g0 For the pdo handler, I would keep ``getConnection`` (it is common to name it a database connection). But ``getMemcache`` seems indeed better
+
+---------------------------------------------------------------------------
+
+by dosten at 2013-06-19T15:10:23Z
+
+getMongo; getMemcache; getMemcached; getConnection? it's fine to me except for getConnection instead of getPdo :/
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-06-19T15:12:20Z
+
+:+1: for specialized method names
+
+---------------------------------------------------------------------------
+
+by dosten at 2013-06-19T23:18:00Z
+
+Agree, I renamed accessor methods names for each session handler :thumbsup:

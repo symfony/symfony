@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-25T15:17:46Z
+
+-1 getter/setter tests are useless imo
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-25T18:54:15Z
+
+what is the motif @inalgnu ? raising the coverage of symfony? do these tests do that? also @WouterJ is right in a way, however tests also tell a story cc/ @briandoll :baby: , so maybe check if there are tests already that tell this story in the test suite ?
+
+---------------------------------------------------------------------------
+
+by inalgnu at 2014-02-25T23:48:18Z
+
+@cordoval yes, these tests aim to rise coverage.

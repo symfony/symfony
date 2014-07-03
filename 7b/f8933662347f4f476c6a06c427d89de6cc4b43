@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by bamarni at 2013-04-05T16:11:03Z
+
+great feature!
+
+1) Is the metadatabag appropriate for the PhpSessionStorage? As the session may be created and updated outside Symfony, information contained in it might be wrong.
+
+2) Imo the clear() method should be overrided in PhpSessionStorage, and it should only clear keys managed by Symfony instead of clearing the whole $_SESSION global, as Symfony can't work with what has been created out of the box (it has its own namespace), why should it remove it? To me this feature is only about sharing the storage driver, not the data.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-05T16:32:38Z
+
+@bamarni - point 1 -  the purpose of this is to allow Symfony to interface with a system where you cannot avoid it starting the session. This allows legacy code to do it's thing unhindered and for Symfony do manage it's stuff. The chance of a key collision is of course possible though remote, but the chance of the legacy code to overwrite the entire `$_SESSION` is always there - that's why I've been so vehemently opposed to doing anything like this (there are many other things that can go wrong too). But doing things this way is explicit, so I feel it gives the programmer plenty awareness of what they are doing. Together with the documentation, I think it's usecase will be clear.
+
+As for 2, that was well spotted. I will make the change now.
+
+---------------------------------------------------------------------------
+
+by stanlemon at 2013-04-05T17:56:02Z
+
+This would be a great addition, it would make my life introducing Symfony into legacy code a lot easier.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T16:30:44Z
+
+@fabpot - is this PR acceptable now before I start on the docs?
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-06T18:12:22Z
+
+Updated with docs PR.

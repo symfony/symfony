@@ -1,0 +1,157 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-01-10T12:59:54Z
+
+I rebased this PR and changed the default value of `$flatten` to true.
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2014-01-17T09:42:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by alexsegura at 2014-02-10T17:17:08Z
+
+:+1:
+
+This is a must have, currently `Form::getErrors` is just useless
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-02-11T16:30:46Z
+
+I don't like breaking BC at this point. What about adding a new method instead?
+
+---------------------------------------------------------------------------
+
+by Djeg at 2014-02-20T15:31:52Z
+
+:+1:
+
+Totaly agree ! I have to do that recursively each time i need it, a must have.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T17:42:40Z
+
+@webmozart What are we doing with this PR? I still think that breaking BC here is not a good idea. I know that FormatInterface is not marked with the `@api` tag but still...
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2014-03-03T18:44:14Z
+
+I can understand you think that breaking BC here is not a good idea, but sometimes, i think it is a better way than keeping useless functionnalities. Especially when the new version looks similar to what the functionality should have been from the beginning.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-03-03T18:48:53Z
+
+@fabpot the only thing that is breaking BC is if you implemented the `FormInterface` in a custom Form class or if you override that method. I don't believe many people did one of those things...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T19:06:24Z
+
+@WouterJ The returned value also changed... That's the biggest BC break for me.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-05T16:52:51Z
+
+We basically have two choices:
+
+(1) We leave this PR as is. This means:
+
+* People who implement `FormInterface` must add the new optional arguments to `getErrors()`.
+* People who use `getErrors()` need to use `iterator_to_array()` *if* they pass the errors to a function that only accepts arrays (`array` type hint, `array_*()`)
+
+Before:
+
+```php
+$errors = $form->getErrors();
+echo $errors[0];
+echo count($errors);
+
+$mappedErrors = array_map($callback, $errors);
+
+// Print all errors
+echo $form->getErrorsAsString();
+```
+
+After:
+
+```php
+$errors = $form->getErrors();
+echo $errors[0];
+echo count($errors);
+
+$mappedErrors = array_map($callback, iterator_to_array($errors));
+
+// Print all errors
+echo $form->getErrors($deep = true);
+
+// Count all errors
+echo count($form->getErrors($deep = true));
+
+// Get all errors as recursive iterator
+$errors = $form->getErrors($deep = true, $flatten = false);
+```
+
+(2) We leave `getErrors()` unchanged and add the new functionality to a new method instead. Name proposal: `getErrorIterator()`. This means:
+
+* People who implement `FormInterface` must add the new method `getErrorIterator()`.
+
+```php
+$errors = $form->getErrors();
+echo $errors[0];
+echo count($errors);
+
+$mappedErrors = array_map($callback, $errors);
+
+// Print all errors
+echo $form->getErrorIterator($deep = true);
+
+// Count all errors
+echo count($form->getErrorIterator($deep = true));
+
+// Get all errors as recursive iterator
+$errors = $form->getErrorIterator($deep = true, $flatten = false);
+```
+
+I created a poll which lets you select one of these answers: http://poll.fm/4obja. I will close the poll in a couple of days.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-03-05T17:50:29Z
+
+For BC I think it's safer to add a new method and deprecate the previous one (to be removed in 3.0).
+
+Instead of modifying the current `FormInterface`, why not adding a new `FormErrorInterface` (or something similar) so that a `Form` instance implements both `FormInterface` and `FormErrorInterface`? Those two interfaces may be merged in branch 3.0.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-03-08T16:21:41Z
+
+> Instead of modifying the current  FormInterface , why not adding a new  FormErrorInterface  (or something similar) so that a  Form  instance implements both  FormInterface  and  FormErrorInterface ?
+
+That's a huge code smell imo (sadly it's one of the result of the 100% BC promise). How am I going to typehint a form class where I want to use both the methods in FormInterface and the new FormErrorInterface? That's impossible...
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-08T17:15:22Z
+
+I agree with @WouterJ here. Also, `FormInterface` is not marked as API, so it *may* be changed for a good reason.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-11T09:33:56Z
+
+Since the poll didn't receive any votes anymore for a few days, I closed it now. The results can be seen here: https://polldaddy.com/poll/7853158/?view=results
+
+* 30 people (51%) voted for keeping the PR as it is: add additional parameters to `getErrors()` and change the return type to an iterator
+
+* 29 people (49%) voted for adding an extra method `getErrorIterator()`
+
+The poll shows that the community is just as split about this issue as we are. However, we have a majority, so I propose to merge the PR as it is based on the decision made by the voters.

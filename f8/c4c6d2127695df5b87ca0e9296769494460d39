@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2014-04-09T13:50:41Z
+
+Just `1048576`, same like it's used when error: `UPLOAD_ERR_INI_SIZE` occurs.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-09T13:52:13Z
+
+actually, I prefer `1024 * 1024` as everyone understands where it comes from.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-04-09T13:52:55Z
+
+Then other parts should be changed too I guess =)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-09T15:26:17Z
+
+@stloyd The first code (before the commit) was using the computed value. I already asked the change when reviewing the PR live.
+
+And anyway, OPCache will probably be able to optimize this computation according to what @jpauli presented yesterday (unless it works only for additions, which would be weird)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-09T15:27:19Z
+
+and yeah, changing it on line 50 would be logical
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-29T17:19:29Z
+
+wrong indention for array closing
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-29T17:19:41Z
+
+extra line

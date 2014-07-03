@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:57:32Z
+
+you need to set the ``REPORT_EXIT_STATUS`` env variable to ``1``, otherwise phpt tests don't make the suite fail when runnign ``make test`` (it is still not working properly in PHP 5.3 and 5.4 because of a bug in ``run-tests.php`` btw)
+
+And it is really needed to run the full Symfony testsuite again with the EventDispatcher extension ? This seems like a huge waste of time. It should maybe run only the testsuite of the EventDispatcher component
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T13:06:23Z
+
+@fabpot what is your strategy for handling the C extension reimplementing components ?
+Btw, I haven't seen your [blog post about your strategy regarding Hack](https://github.com/fabpot/Pimple/pull/122#issuecomment-41135969)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-01T08:14:31Z
+
+:+1: (testing the new gh tool, just ignore this comment)

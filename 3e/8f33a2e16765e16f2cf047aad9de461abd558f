@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-02-04T15:08:46Z
+
+@nicolas-grekas regarding the scope isolation, what would be the overhead of wrapping the require call in a function ? the autoloader is called quite often in a request
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-04T18:00:08Z
+
+The overhead should as little as calling a dummy function :
+
+```php
+$require = function () {return require func_get_arg(0);};
+$require($file)
+```
+instead of a plain `require $file;`
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-04T18:01:36Z
+
+@nicolas-grekas note that it should not be a Closure, otherwise you will not get the scope isolation on PHP 5.4+ (closure have access to ``$this`` by default)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-04T18:55:09Z
+
+Scope isolation suggested for composer (no closure, you're right), lets see where it goes:
+https://github.com/composer/composer/pull/2667
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-02-14T20:22:26Z
+
+Force pushed a new implementation : the previous one relied on get_included_files() instead of $classLoader->findFile(), but it is too hard to keep working with recursive autoload calls. I also added a test for case matching verifications.

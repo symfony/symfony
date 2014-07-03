@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-07T20:02:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-07T20:03:11Z
+
+and no, the requirements should not use dev-master
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-06-08T07:54:06Z
+
+@stof I meant why are
+```json
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/twig-bridge": "~2.5",
+        "symfony/http-kernel": "~2.1"
+    },
+    "require-dev": {
+        "symfony/stopwatch": "~2.2",
+        "symfony/dependency-injection": "~2.0",
+        "symfony/config": "~2.2",
+        "symfony/routing": "~2.1",
+        "symfony/templating": "~2.1"
+    },
+```
+not pinned on ~2.5 and `dev-master` not used but only defined
+```json
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.6-dev"
+        }
+    }
+```
+Shouldn't they all match the same symfony?
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-06-08T07:54:40Z
+
+The travis failure looks unrelated to my PR. What do I miss?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-08T14:07:40Z
+
+@clemens-tolboom The TwigBundle repo does not force you to use dev-master of other repos when using it. It sets its minimum requirement to the actual minimum requirement (i.e. it can work with any HttpKernel since 2.1 according to this constraint)

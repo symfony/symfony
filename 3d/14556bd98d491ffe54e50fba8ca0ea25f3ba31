@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-23T12:07:22Z
+
+Tests [are failing for GroupSequence and GroupSequenceProvider annotations](https://travis-ci.org/symfony/symfony/jobs/23583006#L673):
+
+```
+Doctrine\Common\Annotations\AnnotationException: [Semantical Error]
+  Annotation @Assert\GroupSequence is not allowed to be declared on class Symfony\Component\Validator\Tests\Fixtures\Entity.
+  You may only use this annotation on these code elements: PROPERTY, METHOD, ANNOTATION.
+```

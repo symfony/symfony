@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-28T22:30:41Z
+
+Isn't it a doctrine issue?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-01-29T05:36:00Z
+
+@ocramius Do you think this should be fixed in doctrine instead?
+
+---------------------------------------------------------------------------
+
+by merk at 2014-01-29T06:01:57Z
+
+It might be a doctrine issue - but I also think the Form component isn't really supposed to be replacing DateTime objects when the values are the same either. It is replacing references to correct DateTime values.
+
+---------------------------------------------------------------------------
+
+by Ocramius at 2014-01-29T06:24:07Z
+
+This requires to have D2 to handle some columns byVal instead of byRef - that is not possible right now.
+
+Yes, the fix is possibly in the ORM, but it's not feasible atm. Just avoid swapping the `DateTime` instance when not needed.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-01-29T06:39:12Z
+
+I think this fix should be merged to have a proper handling on the symfony side, if doctrine can fix that as well great - if not we are independent. It could also be that another ORM implementation might also compare byRef and we would have the same issue.

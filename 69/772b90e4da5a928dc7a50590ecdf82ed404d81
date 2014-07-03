@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-07-10T11:22:46Z
+
+This is not true, actual version is correct.
+
+Now you can see `$value < $this->min` and `$value > $this->max`, with your message it must be changed to: `$value <= $this->min` and `$value >= $this->max`.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-07-10T11:34:25Z
+
+@stloyd no. As the error is added for ``$value < $this->min``, it means that the valid values are ``$value >= $this->min``, i.e. greater than or equal
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-07-10T11:38:14Z
+
+Crap... I need to get :coffee: before commenting to prevent such stupid mistakes :panda_face:

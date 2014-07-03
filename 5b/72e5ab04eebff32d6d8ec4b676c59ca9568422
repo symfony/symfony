@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-16T07:50:20Z
+
+Hm I prefer explicit `return null`. I've met people that didn't know it's the same as `return` or no return and would argue `null` cannot be returned from this method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-16T07:52:36Z
+
+Well, people need to learn PHP then.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-04-16T07:56:40Z
+
+:+1: being consistent and across projects, great!
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-16T08:03:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-16T08:07:00Z
+
+:+1: for this (although I could agree with @Tobion), I prefer consistency over any specific style.
+
+---------------------------------------------------------------------------
+
+by Burgov at 2014-04-16T09:46:41Z
+
+i too prefer `return null;`, as well as explicitly returning `null` at the end of a function if there are other return statements in it
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-04-16T10:25:58Z
+
+i am with @jakzal and @Tobion :+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-04-16T11:40:49Z
+
+And what if an interface explicitly states to return either a value or null?
+
+---------------------------------------------------------------------------
+
+by aderuwe at 2014-04-16T11:45:55Z
+
+I prefer being explicit over implicit, too, but :+1: for the consistency regardless.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-16T11:56:19Z
+
+@sstok What do you mean? This PR is just about removing code that does not do anything.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-04-16T12:50:50Z
+
+Well it wasn't clear if that was the case, as it stated `always use return; instead of return null; (the current code base uses both);` it wasn't clear to me if this also applies when you must to return null.
+
+---------------------------------------------------------------------------
+
+by mayeco at 2014-04-17T05:55:47Z
+
+@sstok if you must return null just don't use return in the function and PHP will return null when the function ends.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-17T10:11:02Z
+
+@fabpot Given that fabbot already validates this, I suggest merging the PR to avoid having such changes done by all other PRs out there

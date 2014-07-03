@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Berdir at 2014-03-15T10:43:34Z
+
+Thanks for the reviews.
+
+-. Improved docs
+-  changed getNormalier() and getDenormalizer() to no longer throw exceptions, updated calling code accordingly.
+- format is weird, there's a lot of code that assumes it is provided but a lot of internal methods have $format = null for no apparent reason and of the public methods, deserialize() requires it but it's optional for normalize()/denormalize. Made it required for private methods now, as it's always passed to them.
+
+Wasn't sure if I should squash the changes, but keeping it as a separate commit as that's easier to review.
+
+---------------------------------------------------------------------------
+
+by Berdir at 2014-03-15T13:39:20Z
+
+Hah, nice catch, yes that makes no sense but is already like that in HEAD. FIxed. More proof that the whole $format stuff is very inconsistent and apparently not well tested.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-03-24T08:48:49Z
+
+Not directly related, but the cache thing is extremly inconveniant if you specify an Interface when denormalizing.

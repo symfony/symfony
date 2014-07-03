@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-04-01T13:03:24Z
+
+rather than "not yet", maybe add a checkbox list with the TODO items
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-01T13:06:09Z
+
+@stof I'm working on your comment https://github.com/symfony/symfony/pull/9811#issuecomment-30843262
+It does not seem possible to inject the InputInterface in QuestionHelper constructor as it's built in Application constructor.
+
+Do you have an idea about doing something different than what's been done in #8452?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T13:18:37Z
+
+given that it is a new class (and so no BC concern), it would make sense to pass the input as an argument along the output IMO. We are already passing the output because we need to display the question. It would make sense to pass the input as well given that we are dealing with asking for input
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-01T13:25:05Z
+
+Alright, I've passed InputInterface and OutputInterface in the constructor (as we do in the latest Table helper)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T14:41:45Z
+
+The Table helper is different. This QuestionHelper is designed as a stateless service object (registered in the HelperSet) while the Table object is a stateful one-time object (you create a new Table instance for each table you render). This is why passing them as arguments might be better.
+The QuestionHelper is a good fit for the HelperSet because it does not hold configuration and so can be called several times without side-effects. It would be good to keep it this way (the QuestionHelper should be registered in the HelperSet btw).
+
+I think that the concept of HelperSet could be deprecated in 3.0 if we push toward using DI in commands (the HelperSet is just a service locator); However, for this to be useful, we will probably need to change a bit the architecture: the output implementation is currently a service able to output text, not a value object representing the output like the Response is in Symfony. However, it is a scoped service as it is passed to the ``run()`` method (or more often created inside the ``run()`` method using the default implementation). The input is a value object on the other hand, but it also holds some additional property which would impact other code (the interactive mode, set by options registered by the Application rather than input dedicated to the command, which would actually be seen as scoped parameters as well). This is why we suffer to have helpers depending on the input and output. The console component is not built to help using DI with it.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T14:49:10Z
+
+related to my previous comment, if you look at PhpSpec and Behat, which are both complex command-line apps requiring to be able to push output in different places (for instance in event listeners), they are both injecting the output as a synthetic service, which is what it really is (the input is not a service in them either)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-02T11:00:27Z
+
+Hello, I've addressed comments and added unit tests.
+This PR is ready for review, only doc PR is missing
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-02T15:19:05Z
+
+I just added a fix to the question implementation : When using a ChoiceQuestion, the result is not the index of the choice anymore, but its value.

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-10-24T09:14:35Z
+
+This will be broken in case the output contains some tags which are not registered as styling tags (and so will not be removed) or when it contains escaped tags

@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-03-12T13:07:58Z
+
+@felds could you please explain your use case and fix [the build errors indicated by fabbot](http://status.fabbot.io/symfony/symfony/ae3f02fd8cf31b49cbcbf119698eb9511b188012)?
+
+---------------------------------------------------------------------------
+
+by felds at 2014-03-12T17:54:19Z
+
+@jakzal
+
+The fabbot alert is just about formatting. I'll be fixing this later.
+
+A “simple” use case would be:
+
+PHP
+---
+
+```php
+// Model/Region.php
+class Region
+{
+    private $name;
+    // ...
+    public function __toString()
+    {
+        return $this->name;
+    }
+}
+
+// Model/Dish.php
+class Dish
+{
+    private $name;
+    private $region; // nullable
+    // ...
+    public function __toString()
+    {
+        return $this->name;
+    }
+}
+
+// Model/Event.php
+class Event
+{
+    private $dish;
+}
+
+// Form/EventType.php
+class EventType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('dish', null, [
+                'group_by' => 'region',
+            ])
+        ;
+    }
+}
+```
+
+Pseudo-data
+-----------
+
+```yaml
+region:
+    asia: { name: Asia }
+    mediterranean_sea: { name: Mediterranean Sea }
+dish:
+    sushi: { name: Sushi, region: asia }
+    lasagna: { name: Lasagna, region: mediterranean_sea }
+    kafta: { name: Kafta }
+    feijoada: { name: Feijoada }
+```
+
+Results
+-------
+
+In the current implementation, the form component would try to use the 'region' field
+as an array index, resulting in an Exception, since this is not allowed in PHP.
+
+I fixed it by always casting the field as a string, relying on `Region::__toString()`,
+as does the component already do with `Dish::__toString()` (otherwise configured).
+
+The final select would be something like:
+
+> **Asian**
+>     Sushi
+> **Mediterranean Sea**
+>     Lasagna
+> Kafta
+> Feijoada
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-12T17:56:46Z
+
+@felds the fabbot complain is about the description of your PR
+
+---------------------------------------------------------------------------
+
+by felds at 2014-03-12T18:00:58Z
+
+@stof fixed (I think). is there any way to re-run the fabbot task?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-20T14:46:46Z
+
+@fabpot :+1:

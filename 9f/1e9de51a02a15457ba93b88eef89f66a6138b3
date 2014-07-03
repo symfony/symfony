@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by polyfractal at 2014-03-27T14:28:09Z
+
+I forked this a while ago so that I could get the changes into my project.  It dawned on me that `Parser.php` needs modification to make these changes visible to the end-user...otherwise they are inaccessible (not sure why I didn't think of that originally).
+
+My changes are in this commit (https://github.com/polyfractal/Yaml/commit/b0a08f32ea15e04d8e15c3ddecf84088033cf0ba), we should probably add something similar to this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-27T15:10:09Z
+
+Code updated thanks!
+
+---------------------------------------------------------------------------
+
+by polyfractal at 2014-03-27T16:52:06Z
+
+Awesome!  Can't wait for this to be merged so I can stop maintaining a separate fork :)

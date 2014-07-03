@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-05-16T08:28:41Z
+
+@bschussek `Symfony/Bundle/FrameworkBundle/Resources/views/FormTable/button_row.html.php` should be changed too, and test: `Symfony/Component/Form/Tests/AbstractTableLayoutTest.php`
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-05-16T08:33:15Z
+
+@stloyd Why?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-05-16T08:41:06Z
+
+@bschussek Check: #8043 & #8053.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-05-16T08:45:37Z
+
+Both #8043 and #8053 were wrong. The PHP template and the test are fine. :)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-05-16T09:46:55Z
+
+@bschussek This should go to `2.3` probably as #8043 is there =)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-05-16T09:52:09Z
+
+Ah, I didn't see that branch exists yet. @fabpot do you need a new PR?

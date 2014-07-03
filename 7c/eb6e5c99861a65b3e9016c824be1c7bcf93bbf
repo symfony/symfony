@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T17:48:44Z
+
+For the `getRawResponse()` method name, here are some other options: `getOriginalResponse()`, `getUpstreamResponse()`, yours here ...
+
+`getUpstreamResponse()` is probably my preferred choice.
+
+---------------------------------------------------------------------------
+
+by malukenho at 2013-04-24T17:50:59Z
+
+getUpstreamResponse() is good!
+
+---------------------------------------------------------------------------
+
+by Korpch at 2013-04-24T17:52:56Z
+
++1 for the getUpstreamResponse
+
+---------------------------------------------------------------------------
+
+by chrsm at 2013-04-24T18:01:15Z
+
++1 getUpstreamResponse()
+
+---------------------------------------------------------------------------
+
+by AnthonySterling at 2013-04-24T18:01:51Z
+
+`getUpstreamResponse()` :thumbsup:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-04-24T18:07:09Z
+
+`getRawResponse`. For me
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2013-04-24T18:12:20Z
+
++1 for `getRawResponse`. It looks more consistent with the `filter` verb.
+
+---------------------------------------------------------------------------
+
+by borisguery at 2013-04-24T18:12:47Z
+
+The phpdoc states:
+> The unfiltered response is the response instance that is returned by the code that handles requests.
+
+Therefore I would go for `getRawResponse()` which is a more widely used couple along with the concept of filters.
+
+It makes more sense to me to associate `filter` and `raw`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T18:20:04Z
+
+I have also added a `getUpstreamRequest()` method for consistency. So, we now have 4 methods to deals with the input and output:
+
+* `getRequest` and `getResponse` to get the "unified" request/response objects (always BrowserKit instances)
+* `getUpstreamRequest` and `getUpstreamResponse` to get the upstream request/response instances (the classes depends on the client implementation)
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2013-04-24T18:41:50Z
+
+The term "upstream" somehow implies proxying going on, which isn't really the case here. As the original gets filtered, I'd go with `getRawResponse()` or `getUnfilteredResponse()`, but the latter is worse since some might argue that `getFilteredResponse()` would be better (as in "the response that has been filtered").
+
+Maybe `getOriginResponse()` as to the client, any sort of intermediary is transparent - what he gets is what looks to be the response from the origin server.
+
+---------------------------------------------------------------------------
+
+by skoop at 2013-04-24T18:45:04Z
+
+getUnfilteredResponse() has my preference, as it clearly implies that nothing has been done to it yet. getRawResponse() does have a similar implication though, so it's purely a matter of preference for me to go for getUnfilteredResponse().
+
+---------------------------------------------------------------------------
+
+by malukenho at 2013-04-24T18:47:07Z
+
+So, silex has the same problem in httpkernel or not?
+
+2013/4/24 Stefan Koopmanschap <notifications@github.com>
+
+> getUnfilteredResponse() has my preference, as it clearly implies that
+> nothing has been done to it yet. getRawResponse() does have a similar
+> implication though, so it's purely a matter of preference for me to go for
+> getUnfilteredResponse().
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/7835#issuecomment-16956295>
+> .
+>
+
+--
+*Jefersson Nathan*
+*Desenvolvedor Web - PHP Sergipe GU Founder*
+*http://www.phpse.net*
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T18:47:17Z
+
+`getOriginResponse` as suggested by @dzuelke seems the best option.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-24T18:51:31Z
+
+:+1: for `getOriginResponse`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T18:56:49Z
+
+There is another possibility to lower the impact of the BC break (for Symfony full-stack and Silex users). We keep the origin request/response access via the `getRequest()` and `getResponse()` method and we add new methods to get access to the "internal" BrowserKit request/response objects (which are rarely useful anyway -- `getInternalRequest()` and `getInternalResponse()`).
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by jaitsu87 at 2013-04-24T19:06:11Z
+
+I think it makes more sense to leave `getRequest()` and `getResponse()` as they are, and add new methods like you suggest. BC is always a good thing, and it would certainly ease the upgrade process to 2.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T19:12:37Z
+
+This PR now implements (via the second commit) the second option where the getRequest() and getResponse() are not changed but new methods are introduced to get access to the internal request/response objects. As you can see, no changes are needed outside of the BrowserKit component. So, no changes will be needed to Symfony projects.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-25T06:20:18Z
+
+I think we now have the definitive patch. The good news is that there are no BC breaks anymore.
+
+Instead:
+
+* I have added two new methods on the Client to allow access to the BrowserKit request and response (there were not available before);
+
+* I have updated the PHPDoc of BrowserKit to reflect what the methods currently do (this is where we have a BC break but the PHPDoc was wrong before).
+
+So, that way, no code need to be updated (Silex, Symfony, or even Goutte will still work as before).

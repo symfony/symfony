@@ -1,0 +1,152 @@
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-02T16:58:22Z
+
+Apart from a few missing tests, this PR is pretty much complete now. Feedback welcome.
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-01-02T17:18:36Z
+
+@bschussek could be a good nice to have... after the 100+ form issues are tackled !
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-02T17:55:01Z
+
+Support for validation groups in submit buttons added.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-02T17:57:03Z
+
+This PR is now complete. I adapted the description above.
+
+---------------------------------------------------------------------------
+
+by marijn at 2013-01-02T23:28:15Z
+
+@vicb I understand your frustration but I think your comment about the outstanding issues is uncalled for...
+
+Nice addition @bschussek! I've long wondered why buttons are not a part of the framework :+1:
+
+---------------------------------------------------------------------------
+
+by willdurand at 2013-01-03T18:40:48Z
+
+That's nice, really, it's really useful and well-designed, so thanks @bschussek.
+
+But as @vicb there are (a few) issues related to the Form component, and it would be nice to focus on fixing them (IMO).
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-01-05T12:29:47Z
+
+Changing validation_group depending on the button is great, but I wonder if its a good idea to allow a event (onclick) when a button is clicked. I have some forms that have a 'cancel' button and depending which button is clicked 'submit' or cancel the form is either processed or the user is redirected to another page.
+
+But as binding/bounding a complete form to determine if cancel was clicked could a performance hit, I wonder if its better to keep using the 'old' method for that.
+
+And the <button> 's label, its not uncommon to use HTML (Twitter Bootstrap for instance) knowing that Twig automatically escapes the label.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-05T14:48:14Z
+
+> Changing validation_group depending on the button is great, but I wonder if its a good idea to allow a event (onclick) when a button is clicked.
+
+@sstok What do you mean by that? Have you actually looked at the code of this PR?
+
+> But as binding/bounding a complete form to determine if cancel was clicked could a performance hit, I wonder if its better to keep using the 'old' method for that.
+
+Performance is not affected (significantly) by this PR.
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-01-05T15:56:06Z
+
+A was talking in general, in JavaScript you can apply an event handler on a button for when its clicked.
+I was wondering if something similar would be useful for the Form component, as choosing the validation_group depending on which button was clicked can be seen as an event.
+
+As an example I have form with a normal submit button for saving and a cancel button which when clicked redirects the user back to the viewing page. Currently I'm checking this with.
+
+ ```php
+
+if ($this->request->request->has('cancel')) {
+    $isCancelled = true;
+
+    return $this->onCancel($items) ?: true;
+}
+
+$this->form->bind($this->request);
+if ($this->form->isValid()) {
+    $this->onConfirm($items);
+
+    return true;
+}
+
+```
+
+The form is only binded when its actually gonna be used, but as binding a form even tho I'm only checking if a button was checked could be performance hit (compared to what I'm using now). I was wondering if supporting events when clicked could be useful. It was just a thought.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-05T15:59:54Z
+
+@sstok I see. You can drop your thoughts in #6576 if you like.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-01-08T12:44:50Z
+
+Postponed to 2.3
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-11T15:35:22Z
+
+I rebased this branch on master now, fixed a few issues and wrote the documentation that is linked above. Unless reviews discover problems, this PR is ready for merging.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-13T13:36:16Z
+
+The latest build fail seems to be unrelated to the content of this PR. The build succeeded on 5.4.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-13T14:12:36Z
+
+@bschussek see #7662
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-13T14:47:10Z
+
+Rebased again.
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2013-04-14T17:10:26Z
+
++1 Usefull to ease the creation of multi step forms. It would be interesting to write a simple usage case sample for multipage forms.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-04-14T20:54:06Z
+
+:+1: Very useful to detect the clicked button (eg: save / preview).
+
+What is the BC break you mention in the description ?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-14T21:58:43Z
+
+@GromNaN copied from the changelog: ``[BC BREAK] setting the option "validation_groups" to ``false`` now disables validation instead of assuming group "Default"``
+@bschussek it should be mentionned in the UPGRADE file at the root as it is a BC break
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-15T09:10:02Z
+
+@stof Good point, added this.

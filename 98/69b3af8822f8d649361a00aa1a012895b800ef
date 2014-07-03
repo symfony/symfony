@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-29T10:39:12Z
+
+see https://travis-ci.org/romainneutron/symfony/jobs/6722947
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-29T10:59:25Z
+
+why putting the code inside a try/catch instead of using @expectedException / @expectedExceptionMessage annotations ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-29T11:38:33Z
+
+To be sure the expected exception is thrown by the `wait` method. But it can move it in the annotations if it is required.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-29T11:48:19Z
+
+or you could use $this->setExpectedException('Exception'); just before your `wait` ?
+I'm not against the try/catch, just wanted to understand your implementation because, right now, the only assertion made (and counted) is the message one
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-29T13:32:25Z
+
+I've addressed @pborreli suggestion
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-29T13:39:13Z
+
+thanks :panda_face:

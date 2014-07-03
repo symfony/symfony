@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-21T00:04:58Z
+
+should we write regression tests for these changes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-21T09:43:20Z
+
+I'm not sure to understand what you envision @cordoval.
+We could add a test for the DebugClassLoader::getClassLoader() method, but as it's implementation is trivial, I don't see the benefit. Can you elaborate and drive me to a patch please?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-21T13:32:29Z
+
+true we are not backporting this, and the test acknowledging this code is removed in future versions may not be needed

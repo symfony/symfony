@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-11T12:00:37Z
+
+@Tobion Thank you so much for working on this issue, this is much appreciated. Is it ready to be merged? Or do you also want to implement lazy connections as well in this PR?
+
+---------------------------------------------------------------------------
+
+by drak at 2014-04-11T14:10:22Z
+
+@Tobion The PR looks good.
+
+If I remember correctly you should not throw exceptions inside `write()` or `close()` because they will never be caught. In general you should return bool where required as it tells the PHP engine (which calls these methods internally) if things worked correctly - no return is also OK since it evaluates to false anyhow. If the methods return false they do not trigger errors. `read()` evaluates false to an empty string. If a read() fails, it's taken to be a record not found.
+
+Is that helpful?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-11T17:12:46Z
+
+@fabpot yes it's ready. Lazy connections would only be for master anyway.
+
+So if we want to make it respect the SessionHandlerInterface we should not throw exceptions but return false. But then I wonder how to best warn developers if something went wrong. For example when a developer forgots to create the table and we just return false everywhere, the dev would have hard times debugging the problem. One solution could be to use a logger in the class and log errors instead of throwing exceptions, or we can use `trigger_error()` which then depends how the error handler is configured. @drak what do you think?
+
+---------------------------------------------------------------------------
+
+by drak at 2014-04-11T17:24:15Z
+
+Oh gosh sorry I meant to say that in my post but forgot. I was going to suggest adding a logger or raise a PHP userspace error. Logger would be better IMO.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-11T17:54:50Z
+
+> Warning As of PHP 5.0.5 the write and close handlers are called after object destruction and therefore cannot use objects or throw exceptions.
+www.php.net/manual/en/function.session-set-save-handler.php
+
+What does it mean they cannot use objects? PDO and the possible logger are objects as well.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-11T18:12:17Z
+
+Ok how I interpret it, is that objects are only destructed before write/close when you didn't call session_write_close() or session_register_shutdown() explicitly but relied on PHP to do it automatically at termination of the script (legacy style). So we should be fine.

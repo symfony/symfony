@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by bamarni at 2013-04-29T20:00:38Z
+
+Is this considered as a bug? I've setup a minimalist project showing this : https://github.com/bamarni/sandbox , here I'd expect the embedded response always to be refreshed, but it's not the case, even though there is a ```Cache-Control: no-cache, must-revalidate``` header getting set, browsers grab copy from their cache.
+
+If you press Ctrl + F5 you'll see it gets refreshed properly, removing valdation headers for this specific use case fixes the issue, maybe it's too agressive and there is something more approriate?

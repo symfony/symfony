@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by sun at 2014-05-15T00:17:57Z
+
+To my knowledge, this turns Symfony's YAML parser into the first of all PHP implementations that does not violate the spec on the aspect of duplicate keys.
+
+The PECL YAML extension also fails on that requirement.
+
+FWIW, Python's [PyYAML](http://pyyaml.org/ticket/128) is struggling with this bug, too.
+
+---------------------------------------------------------------------------
+
+by sun at 2014-05-15T00:35:11Z
+
+The reported test failures are not related to this PR:
+
+> Running src/Symfony/Component/Yaml tests
+> OK (177 tests, 463 assertions)

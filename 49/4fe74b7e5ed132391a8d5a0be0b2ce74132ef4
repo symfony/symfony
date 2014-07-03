@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-08-12T22:02:38Z
+
+This change [broke loads of tests](https://travis-ci.org/symfony/symfony/jobs/10128321#L244).
+
+---------------------------------------------------------------------------
+
+by thunderer at 2013-08-13T08:09:36Z
+
+Sorry, I did run only Config component test suite. Now I've fixed the issue and ran all Symfony tests - 2 failed in Locale component, but seem unrelated (both failed before and after change).

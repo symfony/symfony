@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-03T14:02:44Z
+
+Thanks for fixing. This should be merged into 2.1 as I've done it wrong there.
+
+---------------------------------------------------------------------------
+
+by Stelian at 2013-06-03T14:59:26Z
+
+Can someone redo the travis build please? It failed because of the stopwatch.

@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by danielcsgomes at 2014-01-04T20:52:57Z
+
+@jakzal thanks for your tip. Now is more simple and works fine. Do you think is ok to be merged? (after squash)
+
+---------------------------------------------------------------------------
+
+by danielcsgomes at 2014-01-04T20:59:20Z
+
+Also I do need to create an entry in documentation for the feature. Will take care of that.
+
+---------------------------------------------------------------------------
+
+by danielcsgomes at 2014-01-07T10:15:12Z
+
+@jakzal @fabpot is the implementation ok? Docs are already created as well.
+
+---------------------------------------------------------------------------
+
+by piotrpasich at 2014-01-07T10:18:33Z
+
+Looks ok for me :+1:
+On the other hand, is it possible to create some configuration option in config.yml for this feature?
+
+---------------------------------------------------------------------------
+
+by danielcsgomes at 2014-01-07T10:26:17Z
+
+@piotrpasich that is Framework related. Also I do think for the framework itself could not make so much sense to do that, but if it does IMO it should be a different PR
+
+---------------------------------------------------------------------------
+
+by piotrpasich at 2014-01-07T10:29:09Z
+
+@danielcsgomes I'm not sure if this should be in second PR, but ok. We can open a new issue to remember about this change.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-07T10:30:31Z
+
+@piotrpasich I'm -1 for adding an option in `config.yml`. To me, the possibility to change the default command is very specific and probably never a good idea in the full-stack framework itself.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-07T10:44:15Z
+
+I see an issue here (something we faced in PhpSpec, where we finally chose to remove the overwrite of the default command for now): the default command cannot get arguments (the first one would be interpreted as a command name), so changing the default command will only be reliable if the custom command does not have arguments
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-07T12:49:58Z
+
+@stof That's to be expected as we are talking about a "default" command to be executed when **no** arguments are passed to the console application. So, this PR is different from #9564, where you might want to create a Console app with only 1 command.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-07T12:53:48Z
+
+yeah, I'm just warning that it might cause some issues if pople start expecting the command to work fully when using it as the default one
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-01-07T12:55:17Z
+
+Well, I think @danielcsgomes did a good work at the documentation for this PR. The article clearly has 2 sections: setting the default and creating a one command app. Both explain other ways to do it, so I don't think people will get confused.

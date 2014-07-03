@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-24T17:48:29Z
+
+Can you add a test that was failing before your fix?
+
+---------------------------------------------------------------------------
+
+by shieldo at 2013-07-24T21:56:28Z
+
+I've added a case to the test for `CountryValidator` as that consumes the country data directly. I don't know whether that's the best place for this, but it's a test that was failing and now passes.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2013-07-26T06:31:17Z
+
+BTW: Is it really only the country data that's not merged back or is it everything?
+e.g also currencies, languages,...
+
+---------------------------------------------------------------------------
+
+by shieldo at 2013-07-26T10:10:43Z
+
+This issue only refers to countries as this is the concern of the RegionBundle, but it would be worth checking other data sets.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2013-07-31T14:14:02Z
+
+As it happens, yes, it looks like currencies and languages would suffer from the same issue.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2013-08-04T13:16:29Z
+
+I've made a similar change to the `LanguageBundle` and put it into the same commit - I couldn't reproduce the issue for either the `LocaleBundle` or the `CurrencyBundle`.  It could be, though, that the method signature for `AbstractBundle::readEntry` should have the `$mergeFallback` parameter defaulting to `true` instead, as it seems to me this should probably be default behaviour.
+
+---------------------------------------------------------------------------
+
+by shieldo at 2013-08-27T11:01:13Z
+
+Any chance of a merge?  (Or, consideration of the `$mergeFallback` parameter as above?)  This would fix a big BC break for me.  Thanks!
+
+---------------------------------------------------------------------------
+
+by kriswillis at 2013-08-27T11:12:40Z
+
+This would also help me out; it's holding back a production update from 2.2 to 2.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-27T13:07:12Z
+
+ping @bschussek
+
+---------------------------------------------------------------------------
+
+by penfold45 at 2013-09-10T16:33:23Z
+
+Hi just tripped over this issue too while upgrading to 2.3. Cannot go live with this till there is a fix and really want to start playing with 2.3 please.

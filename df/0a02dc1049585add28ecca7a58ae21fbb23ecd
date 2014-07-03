@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-06-04T12:39:19Z
+
+ping @tecbot @drmonty @Strate if you guys want to check the patch and/or try it in your apps.
+
+---------------------------------------------------------------------------
+
+by drmonty at 2013-06-04T13:06:34Z
+
+Hm, I'm receiving
+
+```
+PHP Fatal error:  Access level to Symfony\Component\DependencyInjection\ContainerBuilder::$aliases must be protected (as in class Symfony\Component\DependencyInjection\Container) or weaker in /vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/ContainerBuilder.php on line 35
+```
+
+after apply this commit and generating autoload files.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-06-04T13:13:18Z
+
+Pushed a fix for the ContainerBuilder class. Let's see if travis builds this time.
+
+---------------------------------------------------------------------------
+
+by drmonty at 2013-06-04T13:26:55Z
+
+@Seldaek fixed my issue, thanks :+1: :)
+
+---------------------------------------------------------------------------
+
+by tecbot at 2013-06-04T13:37:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-04T13:39:39Z
+
+@Seldaek could you write a test reproducing the bug (instantiating the service first and then the alias and checking both are the same instance) to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-06-05T09:51:34Z
+
+I added a test for aliases of aliases that verifies everything gets the same instance as the shared aliased service.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-05T13:37:53Z
+
+@fabpot Please merge this. This regression is breaking lots of stuff in 2.3.0 (I think it should even have deserved a fix before the stable release but this is too late for that)

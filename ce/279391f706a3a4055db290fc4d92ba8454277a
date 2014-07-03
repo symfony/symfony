@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-07T08:04:25Z
+
+Can you paste before/after screenshots?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-07T12:42:20Z
+
+```cli
+php app/console container:debug --parameters
+````
+
+![screenshot 2013-12-07 07 40 17](https://f.cloud.github.com/assets/328359/1698263/deac8d5c-5f3c-11e3-9bab-da1c2019290a.png)
+
+![screenshot 2013-12-07 07 41 38](https://f.cloud.github.com/assets/328359/1698265/ef6bb834-5f3c-11e3-92dc-47f69929995b.png)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-07T12:42:34Z
+
+@fabpot ^^
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-11T11:09:45Z
+
+done @fabpot , would be good if you are around working on symfony/symfony today to meet :baby: I am 5 minutes from the Westin :baby:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-11T11:51:41Z
+
+@Burgov this proposal is inspired by twig's way of doing things so this should be better
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T16:40:32Z
+
+ping @cordoval
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-16T18:00:10Z
+
+@fabpot i am still on transit in Heathrow London now, i will tackle things as soon as I reach a safe heaven
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-21T18:56:35Z
+
+ok finally taking this :baby:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-21T19:08:53Z
+
+done @fabpot ^^ :baby:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-23T15:38:48Z
+
+@cordoval Can you take some time to finish this one, it's quite easy but should be done se that everything works in the same way with and without mbstring, which is not the case in the PR.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T16:04:38Z
+
+@fabpot yeah i will finish this one for sure, just that niece and daughter are playing around on and off.
+
+:baby: :girl: :girl:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T20:38:20Z
+
+done @stloyd @jakzal

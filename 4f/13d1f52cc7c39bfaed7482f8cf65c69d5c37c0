@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-15T17:04:46Z
+
+Can you rebase now that #9768 has been merged?
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-15T19:50:55Z
+
+Thank you for feedback, I'm agree, going to fix all that things and rebase tomorrow (my flight back home starts in few hours). Thank you, hacking day was a great expierence for me.
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-17T21:40:37Z
+
+My mistake in merging/rebasing, need some time to fix.
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-17T23:34:48Z
+
+And finally: fixed, squashed, rebased, ready for merge. @fabpot, @cordoval, is this PR OK now?
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-18T08:26:12Z
+
+@fabpot, there i fixed it.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-18T08:35:23Z
+
+:shipit:
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-18T08:49:06Z
+
+@fabpot, deal with it. Should i squash commits?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-18T08:50:37Z
+
+deal -> dealt
+
+also he will squash things, don't think there is need but you can try before he merges

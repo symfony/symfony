@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by singles at 2013-07-20T21:42:52Z
+
+Heh, PHP5.3 don't have JSON_PRETTY_PRINT constant. So, in this case is there possibility to use somebody's code (with annotation of course about an author) - like this https://github.com/GerHobbelt/nicejson-php/blob/master/nicejson.php ?
+
+Another solutions is to:
+
+1. Remove JsonDumper
+2. Throw exception in PHP < 5.4
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-07-20T22:27:50Z
+
+Instead of relying on a generic JSON prettifier, you can generate it line by line:
+
+```php
+$lines = array();
+foreach ($messages->all($domain) as $key => $value) {
+    $lines[] = json_encode($key) . ': ' . json_encode($value)
+}
+return '{' . PHP_EOL . '    ' . implode(',' . PHP_EOL . '    ', $lines) . PHP_EOL . '}';
+```
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-07-27T22:04:23Z
+
+@singles Great addition..thanks for the PR!
+
+---------------------------------------------------------------------------
+
+by singles at 2013-07-28T12:35:45Z
+
+Should I squash these commits into one and/or open new PR?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-07-28T12:59:52Z
+
+Just squash them
+
+---------------------------------------------------------------------------
+
+by stof at 2013-08-05T09:11:18Z
+
+you also need to create the service in FrameworkBundle to register it
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-10T20:29:29Z
+
+I don't see the need for a JSON loader/dumper. First, we already have plenty options, then, and AFAIK, there is no standard for translations in a JSON file, and finally, writing JSON is a PITA.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-11T02:43:07Z
+
+I think JSON is useful because web translation services usually support it and it gives you more flexibility for writing a custom tool for editing yourself.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-11T06:51:00Z
+
+@hacfi Which online tool are you talking about? Any examples?
+
+---------------------------------------------------------------------------
+
+by singles at 2013-08-11T07:53:00Z
+
+@fabpot Crowdin for example http://crowdin.net/page/tour/supported-formats
+
+About this JSON PITA thing - I would say that is a subjective opinion.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-08-12T07:05:49Z
+
+We're using https://phraseapp.com/ and the provider we used before (can't
+remember the name right now) supported it as well.
+
+On Sunday, August 11, 2013, Fabien Potencier wrote:
+
+> @hacfi <https://github.com/hacfi> Which online tool are you talking
+> about? Any examples?
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/8534#issuecomment-22453447>
+> .
+>

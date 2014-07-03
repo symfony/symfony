@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-17T17:22:00Z
+
+What about the [twig template](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig)?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-17T22:03:50Z
+
+@jakzal Twig does not consider ``0`` as empty: https://github.com/fabpot/Twig/blob/master/lib/Twig/Extension/Core.php#L1337
+
+---------------------------------------------------------------------------
+
+by dczech at 2014-01-17T22:15:11Z
+
+@all stof explained all doubts, thx

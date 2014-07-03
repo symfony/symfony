@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-11-09T13:12:41Z
+
+This should fix #9474, however someone should be validated if it is actually not creating any side effects. In general only the invalid classes have been changed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T15:30:58Z
+
+@peterrehm Will you have time to finish this PR?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-12-29T19:10:24Z
+
+@fabpot I will dig into that again the next days..

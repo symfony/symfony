@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-12T07:12:11Z
+
+There are other occurrences of this pattern in `src/Symfony/Component/Intl/ResourceBundle/Reader/BinaryBundleReader.php` and `src/Symfony/Component/Intl/ResourceBundle/Transformer/Rule/LocaleBundleTransformationRule.php`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-12T07:13:01Z
+
+Also, it looks like that it returns `null`, not `false` in PHP.
+
+---------------------------------------------------------------------------
+
+by idn2104 at 2014-04-12T07:55:59Z
+
+Thanks, I meant to write ``false`` where I wrote `null` earlier.
+
+From the documentation it seems it should return ```false```: http://www.php.net/manual/en/resourcebundle.create.php
+```Returns ResourceBundle object or FALSE on error.```
+
+If it does return false, then
+```src/Symfony/Component/Intl/ResourceBundle/Reader/BinaryBundleReader.php``` and ```src/Symfony/Component/Intl/ResourceBundle/Transformer/Rule/LocaleBundleTransformationRule.php```
+might not handle invalid bundles correctly, since ```false === null``` does not hold, and both of these error-check using ```if (null === $bundle) {```. I can't say for sure since I haven't tested it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-12T08:04:02Z
+
+I've tested it and it does return `null`, not `false` (at least on PHP 5.3 and PHP 5.5 -- so it looks like the documentation is wrong).
+
+---------------------------------------------------------------------------
+
+by idn2104 at 2014-04-12T08:17:09Z
+
+Confirmed, I've made the changes and updated the other two classes.
+
+Is there a reason to use `if (null === $bundle)` instead of `if (!$bundle)`?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-04-12T08:55:09Z
+
+> Is there a reason to use if (null === $bundle) instead of if (!$bundle)?
+
+We always do a strict comparisation of `null`.

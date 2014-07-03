@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-28T13:53:45Z
+
+given that it is a subclass of ``SplFileInfo``, it could indeed be left out. And if we put it explciitly, it should be ``File``, not ``File\File``, as we have a use statement for the class
+
+---------------------------------------------------------------------------
+
+by anlutro at 2014-04-28T15:30:16Z
+
+Thanks, fixed that.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-28T15:38:31Z
+
+@anlutro I don't see the changes asked by @stof in your latest commit. Forgot to push?
+
+---------------------------------------------------------------------------
+
+by anlutro at 2014-04-28T15:42:32Z
+
+Oops, yes. Pushed again now.

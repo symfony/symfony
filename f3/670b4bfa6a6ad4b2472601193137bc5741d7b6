@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-11-30T23:21:34Z
+
+Output:
+
+```
+>(9)[~/dev/labs/se](master *%) cat app/config/config.yml | php app/console  yml:lint
+OK
+>(9)[~/dev/labs/se](master *%) app/console  yml:lint @AcmeDemoBundle
+OK in /home/greg/dev/labs/se/src/Acme/DemoBundle/Resources/config/routing.yml
+>(9)[~/dev/labs/se](master *%) app/console  yml:lint app
+OK in app/cache/dev/assetic/routing.yml
+OK in app/config/config_dev.yml
+OK in app/config/config_test.yml
+OK in app/config/parameters.yml
+OK in app/config/config_prod.yml
+OK in app/config/config.yml
+OK in app/config/security.yml
+OK in app/config/routing.yml
+OK in app/config/routing_dev.yml
+>(9)[~/dev/labs/se](master *%) app/console  yml:lint foo
+
+  [RuntimeException]
+  File or directory "foo" is not readable
+
+yml:lint [filename]
+
+>(9)[~/dev/labs/se](master *%) app/console  yml:lint README.md
+KO in README.md
+>> Unable to parse at line 1 (near "Symfony Standard Edition").
+```
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-11-30T23:33:10Z
+
+I prefer the official name: yaml:lint
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-01T13:02:00Z
+
+@WouterJ done.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-12-02T21:38:03Z
+
+In case of validating all YAML files in a bundle, getting a OK line for each of them can make the output quite long. I suggest displaying it only in verbose mode, and displaying only the number of valid file in normal mode (I suggest doing the same change in ``twig:lint`` btw).
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-02T21:39:56Z
+
++1 for @stof's suggestion
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-02T23:16:39Z
+
+```
+>(9)[~/dev/labs/se](master %) app/console  yaml:lint src
+KO in src/foobarr.yml
+>> Unable to parse at line 2 (near "    a: a").
+2/3 valid files
+>(9)[~/dev/labs/se](master %) app/console  yaml:lint src -v
+OK in src/Acme/DemoBundle/Resources/config/routing.yml
+KO in src/foobarr.yml
+>> Unable to parse at line 2 (near "    a: a").
+OK in src/foo.yml
+```
+
+??
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-02T23:18:23Z
+
+I guess the change in twig lint command should be done in another PR ? I will open the PR as soon as the message of this PR is validated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T10:23:38Z
+
+That would be even better if we also had a `--format` option...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T15:28:41Z
+
+@lyrixx Will you have time to finish this one?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-29T15:35:46Z
+
+@fabpot ok, I will finish it next week.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-01-02T01:32:03Z
+
+@fabbot I have fixed some typos.
+
+However, I am not sure about `--format`. Because, the current implementation of descriptor rely on object typehinting. And, currently, there is no `YamlErrors` or something like that. Do you want I introduce this kind of object ? IMHO, it's a bit overkill.

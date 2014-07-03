@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-04T16:23:20Z
+
+> I marked this PR as BC
+
+You marked as as BC break, not as bc
+
+---------------------------------------------------------------------------
+
+by deguif at 2013-09-04T16:31:26Z
+
+Edited. Thanks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-06T14:59:03Z
+
+You must revert the symfony->application change as this is a too big BC break. Actually, we cannot break BC for the console, but we can add stuff if needed.

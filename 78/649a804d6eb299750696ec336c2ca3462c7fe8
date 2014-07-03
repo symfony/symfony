@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Ragazzo at 2014-05-24T17:51:37Z
+
+@stof looks like it fixed now, thanks . Also i don see any CHANGELOG line for this issue, you dont include it in CHANGELOG since it is minor version or what ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-24T17:52:35Z
+
+@Ragazzo for bug fixes in minor versions, the changelog is updated automatically by Fabien when doing a release.
+
+---------------------------------------------------------------------------
+
+by Ragazzo at 2014-05-24T17:53:45Z
+
+ok, i see you dont include names of developers who fixed and found those bugs and issue number, can be hard to track it down for changes .
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-24T17:55:17Z
+
+the automatic changelog includes it: https://github.com/symfony/symfony/blob/master/CHANGELOG-2.3.md (well, it includes the github username of the guy fixing the issue, not the name)
+
+---------------------------------------------------------------------------
+
+by Ragazzo at 2014-05-24T17:58:27Z
+
+ah , i see , thank you for clarifying this one . Overall fix is valid , i confirm it .

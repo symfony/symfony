@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-30T12:29:48Z
+
+And this is breaking the tests
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-07-30T12:49:59Z
+
+@stof fixed, thanks :)
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-07-30T17:55:22Z
+
+@pwolanin I replaced each `sha1` and `md5` encryption with `sha256`, except for `XLIFF` id calculation (which uses `sha1` to keep BC) and  security hashes using `sha1` + `md5` concatenation. Is it okay for you?
+
+---------------------------------------------------------------------------
+
+by pwolanin at 2013-07-30T18:25:25Z
+
+Sounds like a good start - let me look at the security hashes part.  That actually sounds liek somehting important to upgrade?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-09T07:24:34Z
+
+ping @jfsimon
+
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-08-31T07:03:16Z
+
+@pwolanin thank you for your help.
+@fabpot sorry for the delay.

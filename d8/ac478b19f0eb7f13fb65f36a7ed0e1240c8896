@@ -1,0 +1,166 @@
+---------------------------------------------------------------------------
+
+by vicb at 2013-03-05T20:39:41Z
+
+No need for FQCN in phpdoc.
+please use "Boolean" rather than bool
+thanks
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-03-05T21:45:12Z
+
+@vicb fixed ;)
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-04-06T11:03:58Z
+
+I add the documentation for this PR
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-04-20T18:29:58Z
+
+@bschussek I created the PropertyAccessorBuilder, tell me if this is what you expected.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-20T23:30:19Z
+
+Looks good apart from the few mentioned issues! Please do also add this to the component's CHANGELOG.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-20T23:30:43Z
+
+And please also squash your commits when you're done.
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-04-21T15:06:55Z
+
+@bschussek naming fixed, commit squashed :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T16:21:45Z
+
+I don't understand why we would need `PropertyAccessorBuilderInterface`. Is it really needed?
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-04-21T16:56:17Z
+
+@fabpot I create the builder like `ValidatorBuilder` was created and it has an interface so I do the same.
+
+@bschussek what is your point of view on this ?
+
+If it's not needed I can remove it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T17:03:06Z
+
+Frankly, I don't understand why we have a `ValidatorBuilderInterface` either. It does not make sense to me.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:16:10Z
+
+@fabpot You don't understand why we have the interface or why we have the builder?
+
+We have the interface so we can type-hint against the builder without type-hinting against the implementation, nothing more.
+
+We have the builder so that users can configure `Validator`/`PropertyAccessor` objects more easily, without depending on the exact argument order and default values of their constructors (see [Builder Pattern](http://en.wikipedia.org/wiki/Builder_pattern)). So basically it's the OO equivalent of
+
+```php
+$validator = new Validator(array(
+    // configuration
+));
+```
+
+only a bit more convenient because your IDE tells you how to configure the builder, while it doesn't tell you which entries you can pass to the array.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:18:38Z
+
+Also, configuration code can be extracted into the builder, as done in [ValidatorBuilder](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/ValidatorBuilder.php) for example.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:19:37Z
+
+:+1: on this PR
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:21:58Z
+
+Please add `PropertyAccess::getPropertyAccessorBuilder()` too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T17:27:27Z
+
+"We have the interface so we can type-hint against the builder without type-hinting against the implementation, nothing more." <- that part does not make sense to me. Why not type-hinting on the implementation for a builder? You will never have any other implementation anyway.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:29:42Z
+
+> You will never have any other implementation anyway.
+
+I thought that so many times in other cases, until it happened :P Just to make sure.
+
+---------------------------------------------------------------------------
+
+by jaugustin at 2013-04-21T17:35:19Z
+
+@bschussek done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T17:37:30Z
+
+> I thought that so many times in other cases, until it happened :P Just to make sure.
+
+Come on. Have a look at the builder, I can't buy that you will have another implementation. And anyway, even if you can come up with something, you can still extend the existing one. But having such a specialized interface for a builder seems overkill to me.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-21T17:44:02Z
+
+> Have a look at the builder, I can't buy that you will have another implementation.
+
+The builder is very simple as of now because important functionalities are still missing, such as the generation and caching of class-specific property accessors, configurable property paths etc. With these things, the builder code will become more complicated as well.
+
+I don't think that we in the core will have another implementation of the interface, but userland projects might well do if they want to add some functionality. I don't see why they should have to extend a class here when we provide interfaces everywhere else. After all, creating an interface doesn't cost us anything.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-23T09:06:15Z
+
+I talked with @fabpot again and both of our sides have valid arguments. Apart from this specific case, it's a general decision for our API design, also in other places of the framework. I created [a poll](https://polldaddy.com/poll/7055812/) to collect feedback from the community.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-23T09:08:20Z
+
+The issue with the interface for the builder is that the BC concern will prevent us adding anything new in the builder as it would be a BC break for other implementations.
+Creating an interface costs something as soon as we look at BC.
+IMO, the builder does not need an interface.
+Thus, will you really inject the builder in your objects ? I think you should inject a PropertyAccessorInterface and use the builder outside your object to configure it
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-23T12:59:17Z
+
+@stof has nailed the argument very well for this particular case.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-04-23T13:59:12Z
+
+The poll ends tomorrow night (April 24 23:55 CET). I'll post the results then.

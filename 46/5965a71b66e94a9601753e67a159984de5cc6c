@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by gnutix at 2013-06-23T13:27:14Z
+
+@Tobion Does it looks better now to you? Does switching the visibility from public to protected "fixes" your comment about API maintenance?
+
+Thanks for your comments guys!
+PS : gist example updated accordingly.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-23T16:26:01Z
+
+@gnutix no it does not fix it. An extension point must still be maintained
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-06-24T05:46:48Z
+
+Okay, got what you mean by API.
+
+But now it's a question of whether it's worth maintaining it? From my needy-user point-of-view, of course. But it may not be my word to say...
+
+Otherwise do you see another way to provide an extension point on these classes with a better code ? I'd be glad to give a shot implementing it.

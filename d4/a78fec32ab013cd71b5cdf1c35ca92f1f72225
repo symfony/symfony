@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-27T07:09:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-27T07:54:46Z
+
+AFAIU, it won't fix the specific issue you mentioned as the job is killed when idle for too long, it won't retry.
+
+---------------------------------------------------------------------------
+
+by lavoiesl at 2014-01-27T08:32:12Z
+
+From their blog:
+
+> #### Retrying Your Own Commands
+If you're doing any custom installation of things from external resources, for instance to install Ubuntu packages, you can use this functionality as well. It's exported as a shell function in the build script.
+
+> Instead of running `sudo apt-get install something`, make it `travis_retry sudo apt-get install something`.
+
+I don’t see how this can be a more precise example.
+
+`travis_retry` will retry with an idle timer lower than the job itself.

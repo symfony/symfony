@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2013-07-02T21:17:40Z
+
+@stloyd Good idea..will update it
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-07-03T05:12:53Z
+
+Travis error for 5.3 is unrelated to this PR: https://travis-ci.org/symfony/symfony/jobs/8678912#L291

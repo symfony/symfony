@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-11T17:28:55Z
+
+What's the goal as all these exceptions are thrown by the framework itself without the need for a previous exception?
+
+---------------------------------------------------------------------------
+
+by hason at 2013-03-13T20:09:53Z
+
+I have implemented custom Container with support for events, that calls parent methods in the try-catch blocks and throws exceptions from Dependency Injection component (eg. ServiceNotFoundException). I want to set a previous exception if exists.

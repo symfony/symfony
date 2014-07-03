@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by denkiryokuhatsuden at 2014-04-17T16:27:10Z
+
+@issei-m
+as fabbot says, you must add the standard Symfony pull request contribution header in the description. see below.
+
+(下記を参考に、pull-requestの説明文にチェックリストを載せないといけないようです)
+
+http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+---------------------------------------------------------------------------
+
+by issei-m at 2014-04-17T16:32:12Z
+
+@denkiryokuhatsuden
+thanks for advice, I have now fixed description.

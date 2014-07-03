@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-11T08:55:51Z
+
+But that makes the whole test suite run much slower.
+
+---------------------------------------------------------------------------
+
+by brikou at 2013-10-11T08:58:02Z
+
+Yes it now takes 1.4s on my vagrant box, but when running 100 times it fails only 4 times.
+
+``` bash
+for i in {1..100}; do
+    echo "Test #${i}"
+    phpunit
+done
+```
+
+I'll give you my stats without the patch...
+
+---------------------------------------------------------------------------
+
+by brikou at 2013-10-11T09:00:26Z
+
+Without the patch, tests failed 89 times out of 100 on my vagrant box, with this patch only 4 times, and it just takes 1 more second.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-10-11T10:34:25Z
+
+do we currently already group slow tests? if not then maybe it might be good todo this.
+
+alternatively .. we could make a sleep time multiplier configurable, we have done something similar for some basic performance tests in the PHPCR/CouchDB ODM test suites:
+https://github.com/doctrine/phpcr-odm/blob/master/tests/phpunit_jackrabbit.xml.dist#L11

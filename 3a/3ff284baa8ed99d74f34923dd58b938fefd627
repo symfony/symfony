@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-03-27T23:46:03Z
+
+This is only implementing half of the support of the ``form`` attribute: when submitting a form, the input elements with a ``form`` attribute referencing it should be part of the submission, even if they are outside the form.
+
+---------------------------------------------------------------------------
+
+by kepten at 2013-03-30T19:22:19Z
+
+@stof you were right, I extended it. is it ok now?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-31T12:30:26Z
+
+@kepten Please split the test in 2 different tests as asked by @jfsimon and use ``@expectedException \LogicException`` to test the exception. Otherwise, it seems good.
+
+---------------------------------------------------------------------------
+
+by kepten at 2013-03-31T19:06:17Z
+
+@stof @jfsimon Done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-01T08:21:46Z
+
+Can you add a note in the component CHANGELOG as this is a new feature?
+
+---------------------------------------------------------------------------
+
+by kepten at 2013-04-01T12:41:25Z
+
+@fabpot Done.

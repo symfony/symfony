@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lavoiesl at 2013-06-19T00:18:21Z
+
+Travis compains it doesn’t build, but it is clearly not related https://travis-ci.org/symfony/symfony/jobs/8215701

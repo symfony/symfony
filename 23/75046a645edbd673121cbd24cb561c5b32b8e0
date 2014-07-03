@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-10-24T13:27:11Z
+
+As `ProcessPipes` have been introduced in 2.2, this PR should be done against branch 2.2
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2013-11-15T15:13:49Z
+
+how about that issue? When it can be merged to 2.3 and released?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-15T15:14:56Z
+
+As mentioned by @romainneutron, this PR must be done on 2.2.

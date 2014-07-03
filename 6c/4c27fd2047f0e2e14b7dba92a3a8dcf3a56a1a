@@ -1,0 +1,268 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-09-02T12:20:21Z
+
+ExpressionEngine is a slightly unfortunate name: http://ellislab.com/expressionengine
+And did you see my reference to the Hateoas lib PR using https://github.com/Kitano/php-expression (which in turn is based on https://github.com/schmittjoh/serializer)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T12:21:45Z
+
+@lsmith77 Well, if you have a look at the implementation of the code you mention, I guess they also got inspiration from Twig but my implementation is more generic and way more powerful.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T12:23:28Z
+
+For the component name, I'm open to any other suggestion.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2013-09-02T12:23:48Z
+
+For the XML syntax, wouldn't the `"` pose a problem ? Maybe use a dedicated `<argument>` tag instead to fill up the value (which would then be interpreted as a Twig expression, as this PR is meant to do so) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T12:25:36Z
+
+@Taluu I mentioned Twig as a reference as the code comes from there, but it's far from being a Twig template, just the expression part of it. Moving the expression as the tag value should indeed be possible:
+
+```xml
+    <service id="foo" class="Foo">
+        <argument type="expression">
+            service("bar").getvalue(parameter("value"))
+        </argument>
+    </service>
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T12:32:05Z
+
+The ``replace`` directive is missing in the main composer.json
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T13:07:37Z
+
+@Taluu I agree that putting the expression in the value can make it easier, but it is already possible to use quotes in the expression when used in the XML attribute. All you need to do to avoid nasty escaping (mixing the XML escaping and the ExpressionEngine one will look ugly quickly) is to use different quotes as both ExpressionEngine and XML allows you to choose between single quotes and double quotes (the same is true for the YAML case btw). I fixed the example to use it.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2013-09-02T13:09:44Z
+
+Still, even if it is possible, I  still think it would be way more readable in the value rather the attribute. Or why not do both (for simple use case, use the attribute, and the body it is complicated) ?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T13:15:33Z
+
+@Taluu I think we should keep a single way to do it for consistency and ease to document it.
+
+I would vote for the tag value. It would indeed be easier to write quotes (but it will require escaping ``<`` in XML) and will be consistent with the way arguments are specified with ``type="string"`` (default) or ``type="constant"``
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T13:51:00Z
+
+@fabpot Just a consideration when implementing the support of expressions for access control rules. You should try to avoid incompatibilities with the expression engine of JMSSecurityExtraBundle to avoid breaking the existing apps. This means choosing a different key than ``expression`` in the ``access_rules`` config in YAML.
+And it would be awesome to allow passing the expression as a simple string to ``is_granted`` instead of passing an object wrapping the expression, to let the expression work directly in any place allowing to configure the role name used for the security check (which is something JMSSecurityExtraBundle failed to achieve, requiring such bundles to explicitly integrate with it).
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T14:02:17Z
+
+For the Yaml format, I hate more and more this prefix-based syntax. Each time we want to add a new feature, we would have to break BC by making the new prefix a reserved character in first position, requiring to escape it for normal use (before 2.3, we forgot this need to escape ``@`` at the beginning of string arguments). Unfortunately, I don't really see a good way to avoid this (we cannot have XML attributes in YAML to distinguish different argument types). Whatever char we choose to identify an expression will be a BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:06:04Z
+
+@stof I do agree. The YAML format is far from being explicit with all kind of possible prefixes like `@`, `@@`, `@!`, and probably more I don't remember right now. Using 2 characters can mitigate the problem though, even if not perfect.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:09:03Z
+
+@stof you mean the Twig `is_granted` function?
+
+---------------------------------------------------------------------------
+
+by benjamindulau at 2013-09-02T14:21:29Z
+
+@fabpot In what way your component is more powerful than the one we extracted from JMSSerializerBundle ? see:  https://github.com/Kitano/php-expression
+
+For a real case usage see our cache-bundle at https://github.com/Kitano/KitanoCacheBundle
+
+As @lsmith77 mentioned, a PR is also open for using it in the @willdurand's HATEOAS lib here:  https://github.com/willdurand/Hateoas/pull/54
+
+We think that @schmittjoh component was powerful enough and that with some improvements, the library we extracted from it could easily be production ready.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T14:25:23Z
+
+@fabpot Both the Twig function and the ``isGranted`` function of the security context actually
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:28:19Z
+
+@benjamindulau The code you are talking about comes from Twig, which I wrote. And then, it was changed and strip-down by various people. The code from Johannes is very specific and licensed under the Apache license. I won't even talk about the other repo as it claims to be MIT but the most of the code is borrowed from Johannes which is not MIT.
+
+For the supported features, I've listed them in the summary of this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T14:31:42Z
+
+@benjamindulau It does not come from the JMSSerializerBundle but from JMSSecurityExtraBundle.
+
+and the big advantage of this engine IMO is the possibility to run in 2 modes: evaluation or compilation. the JMS engine only supports compilation (and then relies on ``eval`` to provide evaluation when you don't cache them).
+thus, the compilation produces a closure, not runnable code, so using an expression would still imply some runtime overhead in the container.
+
+and indeed, your library is a huge mess concerning licensing. You tell in your README that it is MIT licensed but most of your file still contain the Apache2 license of the original library, which means they are not under MIT at all (IIRC, the license mentioned in the file wins over the LICENSE file shipped in the project)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:34:19Z
+
+As @stof said:
+
+* complete implementation of basics operators (with a proven precedence algorithm);
+* no need to use eval;
+* possibility to use the evaluator or the compiler;
+* return a single PHP string that can be easily embedded elsewhere.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T14:44:59Z
+
+@stof Why do you think that it is a problem to pass an object? For the PHP version, I don't see that as a problem and for the Twig tag, we can do something like `is_granted(expression('...'))`. Sounds simple enough, no?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T15:07:11Z
+
+@fabpot It is an issue for bundles like SonataAdminBundle or FOSCommentBundle allowing to change the role being checked through their config. It is not possible to pass an Expression in there from the config file. So these bundles would have to provide a separate way to configure an expression in this case, either through a separate key (the cleaner way) or through a naming convention (inspired by the way the Yaml DI loader works, which is what TwigBundle does for its globals). The Config component works for scalars and arrays in the config, not really for value objects wrapping a scalar (and Yaml does not either).
+For Twig, it could indeed be simple enough (and for PHP too probably if the Expression class does not implement Traversable like the JMS one, thus causing issues with the array casting). Additionnally, in Twig, the expression function could eventually be compiled in an optimized way by doing it when compiling the Twig template (it may require customizing the way variables are compiled in this case though as they will more likely be available in an array than like different PHP variables with the given name)
+
+---------------------------------------------------------------------------
+
+by benjamindulau at 2013-09-02T15:15:27Z
+
+@stof and @fabpot: Right, the licenses are a mess, but that's not a problem without solution ;-)
+
+As for the features, the 2 modes possibility is nice indeed.
+
+The future of this proposal is important for us, because there is no point in maintaining our code if an official symfony-branded component is created. We'd better contributing to it instead of doing exactly the same separately.
+It's just unfortunate that you didn't try to contact us, or even @schmittjoh (maybe you did) in order to mutualise our effort. But hey, such is life!
+
+Concerning the name of the component, if this component really is to be created and officially supported, I will definitely vote for a more "official" name like "Php Expression Language (PEL)" or maybe "Symfony Expression Language (SEL or SfEl)" if it's very specific to Symfony, just like the one for Spring in the java world.
+
+---------------------------------------------------------------------------
+
+by benjamindulau at 2013-09-02T15:22:18Z
+
+@fabpot
+
+> An open question is whether we keep the difference betweens arrays and hashes.
+
+IMO, since this more or less a PHP expression language, the expressions should try to match exactly the PHP syntax everytime it's possible. So I'd vote for no differences.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-02T15:32:25Z
+
+@benjamindulau: I've been discussing this matter with Johannes for quite a few months now, but I did not really had a look at his code; but when I did this week-end, I realized that I don't need to ask anyone to hack my own code, and so I created this new component.
+
+---------------------------------------------------------------------------
+
+by schmittjoh at 2013-09-02T15:38:22Z
+
+While it does not really matter for the component, I'm curious what code
+are you referring to?
+
+The expression code was inspired by the Java Spring code (and we have a lot
+of that in Symfony, haven't we? :) ).
+
+On Mon, Sep 2, 2013 at 5:32 PM, Fabien Potencier
+<notifications@github.com>wrote:
+
+> @benjamindulau <https://github.com/benjamindulau>: I've been discussing
+> this matter with Johannes for quite a few months now, but I did not really
+> had a look at his code; but when I did this week-end, I realized that I
+> don't need to ask anyone to hack my own code, and so I created this new
+> component.
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/8913#issuecomment-23666607>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by benjamindulau at 2013-09-02T15:46:24Z
+
+@fabpot still, there is the code, but also the intention behind it that count. For the code, that's what open source is. Maybe @schmittjoh took inspiration from your Twig library code (and to be honest, i'm not sure that's what he did), then we took @schmittjoh code and changed it a bit again, but that's the exercice of the open source I think.
+
+We didn't have the feeling that we were hacking **your** code, we didn't even realized that.
+
+Now for the intention, meaning why we decided to extract the code and make a standalone library, that's one thing we could have discussed together, without any regard to the quality of the code itself (or even the licenses).
+
+I don't want to start a big debate about all this, I was just trying to make a point.
+
+Above all this, I'm glad such a component is about to be promoted, because it's a very powerful one with many use cases.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-02T15:50:16Z
+
+@benjamindulau in your case, you should have discussed the license matter. Relicensing Apache code to MIT is not allowed by the license (the opposite is) so it requires you to ask the permission of all contributors to the JMSSecurityExtraBundle expression system first. Otherwise, you are violating the license.
+
+---------------------------------------------------------------------------
+
+by schmittjoh at 2013-09-02T15:55:40Z
+
+I'd keep the license out of this because it is to be changed anyway (which
+btw is totally unrelated to what is happening here).
+
+On Mon, Sep 2, 2013 at 5:50 PM, Christophe Coevoet <notifications@github.com
+> wrote:
+
+> @benjamindulau <https://github.com/benjamindulau> in your case, you
+> should have discussed the license matter. Relicensing Apache code to MIT is
+> not allowed by the license (the opposite is) so it requires you to ask the
+> permission of all contributors to the JMSSecurityExtraBundle expression
+> system first. Otherwise, you are violating the license.
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/8913#issuecomment-23667561>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2013-09-02T17:23:12Z
+
+Personally i think this is a very powerful and useful component. I think it is important that we advocate some of the use cases for this. So we don't end up with all a bunch of TypoScript type of libraries.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Crell at 2013-09-02T18:04:27Z
+
+Oh this hurts my brain...  But I can definitely see the benefit for the DIC, which would help Drupal.
+
+As for other uses, the OP mentions access rules as a possibility. I've not worked with the Security component, but if I read this correctly it means one could put complex boolean logic into, say, a route definition to allow access to a route "if these two things are true or if this one other thing is true".  Correct?  (This is another use case that Drupal has right now where we have a simple "any" or "all" toggle, but we've had requests for more complex logic.)
+
+---------------------------------------------------------------------------
+
+by bobdenotter at 2013-09-02T19:07:25Z
+
+> Well, if you have a look at the implementation of the code you mention, I guess they also got inspiration from Twig but my implementation is more generic and way more powerful.
+
+I agree that Expression Engine is a very unfortunate name. The CMS “Expression Engine” has been around since 2002, I think. So, that's way longer than Twig.

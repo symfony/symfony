@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-03T09:15:02Z
+
+Can you explain a bit more the situation when it happens?
+
+---------------------------------------------------------------------------
+
+by lazyhammer at 2013-05-03T11:23:48Z
+
+@fabpot, it happens when you have `Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, '');`. Then `InlineFragmentRenderer` adds `HTTP_` key to `$server`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-06T06:27:40Z
+
+@lazyhammer Of course, I can see that in your code, but why would you set the trusted header name to an empty string?
+
+---------------------------------------------------------------------------
+
+by lazyhammer at 2013-05-06T11:29:00Z
+
+@fabpot I would do that, if I want to trust other proxy headers (f.e. proxy-port), but not the client-ip. And replacing the name with an empty string (or other false value) is the way to accomplish that.

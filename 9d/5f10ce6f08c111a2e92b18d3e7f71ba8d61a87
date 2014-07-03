@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by Koc at 2013-04-11T21:17:55Z
+
+In the context of Code Sprint for Symfony 2.3 I have adopted my PR to recent changes (debug extracted into separate component).
+
+Log example:
+```
+[2013-04-11 23:47:37] event.DEBUG: Notified event "kernel.controller" to listener "Symfony\Component\HttpKernel\DataCollector\RequestDataCollector::onKernelController". [] []
+[2013-04-11 23:47:37] app.EMERGENCY: Call to undefined function Acme\DemoBundle\Controller\aa() {"type":1,"file":"Z:\\home\\dev\\sf2\\src\\Acme\\DemoBundle\\Controller\\WelcomeController.php","line":11} []
+```
+
+**Not solved problem: under prod env with disabled debug this errors not logged.** But should as this is the goal of #2042
+
+/cc @stof @fabpot
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-04-25T21:35:07Z
+
+I've minimized and documented BC breaks. But to be clear I want to say that this PR was opened before 2.2.x goes to beta state. So it shouldn't be any BC breaks earlier.
+
+Also now we can log fatal errors event in production env.
+
+```php
+# app.php
+use Symfony\Component\Debug\Debug;
+
+$loader = require_once __DIR__.'/../app/bootstrap.php.cache';
+Debug::enable(null, false);
+```
+
+And now log contains:
+```
+[2013-04-26 00:22:18] request.ERROR: Uncaught PHP Exception Symfony\Component\HttpKernel\Exception\NotFoundHttpException: "No route found for "GET /"" at Z:\home\dev\sf2\vendor\symfony\symfony\src\Symfony\Component\HttpKernel\EventListener\RouterListener.php line 114 [] []
+[2013-04-26 00:22:19] app.EMERGENCY: Call to undefined function aa() {"type":1,"file":"Z:\\home\\dev\\sf2\\web\\app.php","line":27} []
+```
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-04-25T21:40:22Z
+
+Last commit breaks the tests, I know
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-04-25T21:57:18Z
+
+tests pass

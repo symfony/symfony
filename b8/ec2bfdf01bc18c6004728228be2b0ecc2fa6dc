@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by yguedidi at 2013-10-30T12:48:01Z
+
+Same throught when reading the blog post, so :+1:
+
+---------------------------------------------------------------------------
+
+by imobilis at 2013-10-30T13:17:51Z
+
+Nice one @bschussek! Thank you :)
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2013-10-30T18:02:12Z
+
++1
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-10-30T19:07:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by noetix at 2013-10-31T02:22:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by staabm at 2013-11-06T18:43:39Z
+
+Discussed exactly that in the origin PR with fabpot
+https://github.com/symfony/symfony/pull/8288#discussion_r6643429
+
+---------------------------------------------------------------------------
+
+by noetix at 2013-11-06T22:04:17Z
+
+I was confused by this PR until I realised that I misread the blog example. I thought `flush` sent the buffer and then cleared it, similar to PHP's `ob_flush`.
+
+Both PHP and fabpot's usage of the word is correct, to flush is to send something down a path, typically to cleanse.
+
+So with that ambiguity and PHP precedence, wouldn't it be more concise to go with `clear`?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-11-09T12:01:56Z
+
+ping @fabpot

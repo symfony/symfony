@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-15T16:43:25Z
+
+I think you also need to do that in the other controllers (Router and Exception).
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-05-15T16:51:00Z
+
+done
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-16T18:02:07Z
+
+Thinking about it, the Response class should by default add a Content-Type header with text/html.
+Otherwise all users would be required in 99% of all cases to add this header themselves in the controllers (very verbose). Also the need to do so is nowhere documented. The docs don't add a Content-Type header explicitly either in their example code.
+Currently all code relies on the automatic Content-Type detection in `prepareResponse` which can easily be wrong.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-16T18:09:02Z
+
+Also it would then be possible to comply with RFC that says
+
+> If an Accept header field is present, and if the server cannot send a response which is acceptable according to the combined Accept field value, then the server SHOULD send a 406 (not acceptable) response.
+
+When a Response with a content-type is returned by a controller (default text/html) which is not accepted by the Request, we can simply return a 406. Currently it will for example just send our HTML content as text/plain (the prefered accepted Content-Type).
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-05-16T18:13:16Z
+
+I guess the issue we have is the lack of content type negotiation to properly determine the format to be used in the response. At any rate for now its the responsibility of the controller to determine what format to return and imho therefore its the controllers responsibility to ensure that the Response returns with the appropriate content type.
+
+Now right now it can do so in two ways:
+1) setting a Content-Type in the Response
+2) setting the request format in the Request
+
+To me 2) is the wrong approach conceptually, which is why I chose 1).
+
+Now if we make ``text/html`` the default what does this mean for people who want to respond with something else? For json we have ``JsonResponse``. But it doesn't make sense to have a custom response class for each mime type.
+
+Right now the assumption is that unless a content type was set, the controller will return the content type as defined in the request. I think this is too simplistic. So maybe the proper thing to do is to remove:
+```
+
+$format = $request->getRequestFormat();
+if (null !== $format && $mimeType = $request->getMimeType($format)) {
+    $headers->set('Content-Type', $mimeType);
+}
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-16T18:32:23Z
+
+Yes I agree 1) is the correct approach. People who want to respond with something else than html, can simply override the header. But as most cases return html, they don't need to set html again. As you can see in this PR, things get really verbose otherwise.
+
+The code you want to remove is simplistic, but is only executed when there is no Content-Type set yet. This makes sense, otherwise the response might have not Content-Type at all. Not sure if that is valid.
+
+This is why I proposed to make html the default. So the code above is only executed when somebody explicitly removed the header and wants to rely on the request format. People who respond with html, don't need to do anything. People who respond with something else like css, need to set the content-type explicitly (just as before).
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-05-16T18:36:02Z
+
+right so if one wants to have the content type automatically set one would need to write:
+```
+new Response($content, 200, null);
+```
+
+to me that is more sensible .. but its a BC break :-/
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-16T18:38:35Z
+
+Yep, but to me the only future-proof solution.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-05-16T19:07:31Z
+
+Well, removing the simplistic Content-Type setting based on the request format as you mentioned above might still be a good idea. Because if no Content-Type is sent, the browser does [content-type sniffing](http://www.w3.org/TR/2008/WD-html5-20080610/history.html#content-type-sniffing), which is definitely better than setting a wrong content-type just because it's in the accept headers.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-05-17T17:20:00Z
+
+@Tobion We cannot remove it until 3.0. It is a huge BC break. Using ``_format`` in the route to make Symfony determine the response content-type is used in many places in the doc, so it is likely that many people are using it.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-05-25T08:22:14Z
+
+right .. so what i did in this PR is the best course of action imho.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-06-11T17:16:20Z
+
+@fabpot ping. since we cannot do the "proper" fix at this point, this seems like the safest solution.

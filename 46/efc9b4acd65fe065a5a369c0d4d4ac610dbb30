@@ -1,0 +1,167 @@
+---------------------------------------------------------------------------
+
+by stof at 2012-09-18T15:52:55Z
+
+I think the flag about the sigchild compatibility mode should be extracted and merged into 2.1 as the ``Process::stop`` method is broken currently because of the sigchild layer, so it should be activated only when it is needed.
+@fabpot what do you think about it ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2012-09-18T16:05:04Z
+
+I can easily cherry pick the commit and PR to 2.1
+
+Romain
+
+On 18 sept. 2012, at 17:53, Christophe Coevoet <notifications@github.com>
+wrote:
+
+I think the flag about the sigchild compatibility mode should be extracted
+and merged into 2.1 as the Process::stop method is broken currently because
+of the sigchild layer, so it should be activated only when it is needed.
+@fabpot <https://github.com/fabpot> what do you think about it ?
+
+—
+Reply to this email directly or view it on
+GitHub<https://github.com/symfony/symfony/pull/5476#issuecomment-8659603>.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2012-09-18T16:51:31Z
+
+Wow :) thought my PR was already stoff'ed
+
+except the typo, and the static declaration - that IMHO is more logic here as it would never be used outside the function scope - I've just imitated what already was in the component, moreover in symfony 2
+
+What do you, @stof, think about it ?
+
+---------------------------------------------------------------------------
+
+by marijn at 2012-09-18T16:53:40Z
+
+Nice work. This is should really be merged back into 2.1 as well though. The `stop` method is simply broken for long running background processes without this fix.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-09-18T19:04:11Z
+
+@marijn As I said above, only part of it should go in 2.1 (the bugfix). The new features can only go in 2.2
+
+---------------------------------------------------------------------------
+
+by marijn at 2012-09-18T19:20:16Z
+
+@stof that's great! I was just voicing my content with this PR :smile:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2012-09-18T19:43:22Z
+
+@Tobion I changed what you suggested, except the isser for `getEnhanceSigchildCompatibility` to be consistent with the windows compatibility
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2012-09-18T20:08:30Z
+
+Okay, I fixed everything.
+BTW I fixed the different typo / code / doc in their corresponding commits, so it's perfectly ok to cherry pick any of these
+
+---------------------------------------------------------------------------
+
+by stof at 2012-09-18T20:16:01Z
+
+@romainneutron please send a PR based on 2.1 with the sigchild stuff as it is needed to fix the ``stop`` method for long running processes (so that it only break when using sigchild, not for everyone).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2012-10-04T14:28:26Z
+
+@romainneutron Can you rebase and squash this PR? Thanks.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2012-10-04T14:39:18Z
+
+Hello @fabpot ,
+
+I can squash and rebase but this PR would not work as we removed the exec prefix (see #5030) and this is required to signal and retrieve pid.
+
+I'm about to ask the community what we should do about the process component. We have two option : break BC and add chainable command support or add another class like @schmittjoh proposed.
+
+I would prefer to break BC in 2.2 and re-think the whole thing as going further with the current design will lead to "different classes for each use" which is not very user/developer friendly I think.
+
+I currently do not have so much time to make propositions, but I'll have some more time this week-end or next week.
+
+Are you ok with that ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2012-10-04T14:44:12Z
+
+If we can fix design problems at the cost of slightly breaking BC, that's fine.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-10-04T15:35:54Z
+
+@fabpot The BC break done previously was "stop supporting the chaining of commands". So it was a big BC break (breaking composer for instance). so we would need to find a way to continue supporting them before re-adding exec
+
+---------------------------------------------------------------------------
+
+by fabpot at 2012-10-27T13:41:58Z
+
+Closing in favor of #5759
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-09T07:57:16Z
+
+After thinking about this a bit more, I think we need to merge this PR without the `exec` trick. Instead, we  document the known limitations and the fact that using `exec` is a nice workaround for 90% of the cases.
+
+Implementing #5759 can then be done later without blocking the features of this PR that are useful when you know what your are doing.
+
+What do you think? ping @romainneutron @schmittjoh @Seldaek
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-09T08:06:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-09T14:51:06Z
+
+If everybody's okay, I'll give some love to this PR tonight.
+
+@fabpot I'll also enhance the documentation to give information about the limitations. Should I do it in the Process component doc or should I rather create an entry in the cookbook ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-09T23:43:40Z
+
+The PR has been updated according latest proposal.
+An update has been provided to the `Process::stop` method which now has a `$signal` as second argument. The default value for this optional signal is null because I don't think that the `SIGKILL` constant is defined on windows. (previous behavior was to send a `SIGKILL` signal as the platform is not Windows).
+
+I'm open to your suggestions.
+
+Pending :
+ - [x] Documentation
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-10T06:23:28Z
+
+Looks good to me. Documentation should probably go into the main Process documentation chapter.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-14T16:21:23Z
+
+Ping @fabpot I've added some docs, let me know if anything is missing on this one.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-14T16:24:54Z
+
+Updated PR info : removed fixing bug #5030 as it's not true anymore

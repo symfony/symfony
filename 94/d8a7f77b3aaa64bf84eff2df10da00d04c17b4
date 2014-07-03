@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-01-19T23:21:06Z
+
+:+1: very nice idea
+
+---------------------------------------------------------------------------
+
+by stof at 2014-01-19T23:27:21Z
+
+I see several issues with this command:
+
+- listing all translation of the project is likely to be totally unusable. When you have hundreds of translation strings, finding the 2 missing translations in the middle will be impossible
+- using a table for the display is likely to be a broken output easily, because translations can be long strings (and even multiline ones)
+
+May I point you to https://github.com/Incenteev/IncenteevTranslationCheckerBundle which implement a few commands to check translations (only 2 at the moment, but more are planned) ?
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-01-19T23:29:59Z
+
+@stof you can pass `--only-missing` or `--only-unused` too. Thanks I was not aware of this bundle.
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-01-20T00:15:57Z
+
+As per @stof comment I sanitized and truncated (limited to 40 chars) the messages so they can be previewed without breaking the output (the most important informations being the state and id)

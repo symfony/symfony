@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-24T10:19:01Z
+
+nice, great move decoupling ftw! :+1:
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-24T11:50:20Z
+
+In addition, I've just added tests for the command.
+
+---------------------------------------------------------------------------
+
+by ggam at 2013-12-24T12:22:19Z
+
+I think you should add a note on the changelog about the BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T12:02:57Z
+
+This one cannot be merged before we find a solution for lazy-loading console command as services.
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-28T12:15:54Z
+
+Couldn't this be done by moving it to the bridge as an abstract class with an abstract method ``getTwigEnvironment``? This would mean no change for Symfony2 but make it easier reusable outside of it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T13:36:39Z
+
+Whatever we decide to do here should be done also in #9855
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-28T14:03:51Z
+
+@fabbot I think something did go wrong, you linked to the same PR...
+
+And I think this can be solved by overriding this command in the TwigBundle:
+````php
+namespace Symfony\Bundle\TwigBundle\Command;
+
+use Symfony\Bridge\Twig\Command\LintCommand as BaseLintCommand;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class LintCommand extends BaseLintCommand implements ContainerAwareInterface
+{
+    protected $container;
+
+    public function __construct()
+    {
+        // override constructor to not set the twig environment yet
+        parent::__construct(new \Twig_Environment());
+    }
+
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+        $this->twig = $container->get('twig');
+    }
+}
+````
+
+This requires the twig property to be protected though. Or we can use the `getTwig` method to retrieve the environment and override that.
+
+Then we can investigate more time into lazy loading service commands and after that, we can remove this "hack".
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-30T00:28:57Z
+
+Seeing that using "commands as services" requires initializing a deep dependency tree each time the application is run, I can't find a solution to lazy-inject the `twig` service into the command.
+
+So, I think that's better not using the "commands as a service" feature; even if this is a very brilliant approach. In my last commit, I've followed the suggestions from @realityking and @WouterJ and I've created a class in the bundle that extends the class in the bridge and retrieve the service from the container.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-30T06:32:53Z
+
+... and tests are broken.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-12-30T16:43:14Z
+
+@fabpot everything as been fixed.

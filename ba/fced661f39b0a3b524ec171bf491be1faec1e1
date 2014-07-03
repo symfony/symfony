@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-28T10:15:45Z
+
+Just to make sure, if a user removes an input field from a form manuelly (like firebug), which means the field is not submitted anymore, the field on the model will still be validated, or? Otherwise it would be a security problem.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-28T10:36:17Z
+
+@Tobion what is not validated anymore are constraints attached on the field itself (and only for PATCH)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-28T11:53:00Z
+
+@Tobion Good point. But that means that even for a PATCH request, one would have to specify which fields are submitted, leading the current implementation of PATCH requests (with the `$clearMissing` flag) ad absurdum...
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-28T11:54:02Z
+
+For reference, the test fails are caused by the Process component and are not related to this PR.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-28T11:59:56Z
+
+Probably related: Patching like we do it now is convenient, but bogus according to the HTTP spec ([according to](http://williamdurand.fr/2014/02/14/please-do-not-patch-like-an-idiot/) @willdurand).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-30T07:44:36Z
+
+So, what are we doing here? Close or merge this PR?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-30T13:48:27Z
+
+This change doesn't seem to be for PATCH only but also for other methods?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-30T16:25:51Z
+
+I thought this through again now. This change only applies if the `$clearMissing` flag is set to `false` (i.e. in PATCH requests), because otherwise *all* fields will always be submitted (and consequently validated).
+
+That means, for PATCH requests it is possible to remove fields from the form's HTML. Those fields will neither be submitted nor validated.
+
+@Tobion Sounds OK?
+
+---------------------------------------------------------------------------
+
+by steffenbrem at 2014-03-30T17:00:20Z
+
+Seems to me that this needs to work. Where clearMissing is ```false``` and the field ```something``` is not submitted.
+
+```php
+public function postUsersAction()
+{
+    // processForm is a pseudo function, it will return a form instance
+    $user = new User();
+    if ($this->getUser()) {
+        $user->setSomething($this->getUser()->getSomething());
+    }
+
+    return $this->processForm(new UserType(), $user);
+}
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-30T17:43:27Z
+
+@webmozart I'm ok with it when it's only for PATCH. And according to http://www.w3.org/TR/html5/forms.html#attr-fs-method PATCH cannot be used in forms anyway. So this would be for API style only. And that our definition of PATCH is not what is was supposed to be (a diff approach with change rules), is a different story.
+
+What I wonder in #9998
+> But a side effect of using $clearMissing is that fields witch are not submitted in the request are not validated by the $form->isValid() method.
+
+Does he mean the opposite? Because that seems to be the new behavior and not the old.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-30T18:24:18Z
+
+Judging from the test controller he posted he meant the opposite. :)
+
+> But a side effect of using $clearMissing is that fields witch are not submitted in the request **are** validated by the $form->isValid() method.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-30T22:49:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-31T08:21:09Z
+
+@steffenbrem Although I see that this *could* happen, I'm not sure when your example would make sense. What you're saying is:
+
+* a form has fields A and B
+* whenever A is submitted, setB(something) is called
+* if I PATCH with only field A, errors on B are discarded
+
+*However*, why is B present in your form when you call setB() programmatically anyway? It seems to me that in reality, the implementation would be more like:
+
+* a form has the field A
+* whenever A is submitted, setB(something) is called
+* errors of B are mapped to A
+* if I PATCH with field A, errors of B are displayed on A
+
+This example shows that the PR is flawed in one sense: *All* fields (A and B in this example) should *always* be validated. However, errors mapped to unsubmitted fields should be ignored. I'll change the PR accordingly.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-31T08:32:32Z
+
+@fabpot Updated, ready to merge.

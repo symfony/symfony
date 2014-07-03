@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-01T19:09:45Z
+
+All branches are merged into each other in order they are created (2.2 -> 2.3 -> 2.4 -> master).
+
+---------------------------------------------------------------------------
+
+by craue at 2013-12-01T19:11:13Z
+
+@WouterJ: Yes, but I'm wondering if renaming files can be done that easy as well, while their content changed over time.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-01T19:11:49Z
+
+@craue yes, everything is easy when there are not conflicts :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-01T19:14:59Z
+
+but isn't this a huge BC break for each project using the ua locale now, as it needs to change it to uk?
+
+And 'ua' is the country code (ISO 3166-2) for Ukraine. When using only one element of a locale, I think we are using the country name. When using locale_country we are using uk_UA.
+
+---------------------------------------------------------------------------
+
+by craue at 2013-12-01T19:16:16Z
+
+I should have mentioned that "uk" is also used for the file name in the Validator component. I guess that just noone noticed this inconsistency yet.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-12-01T21:17:37Z
+
+But still this will be a BC break in case you have overwritten some files in your app.
+
+---------------------------------------------------------------------------
+
+by craue at 2013-12-01T21:25:37Z
+
+Good point. How to deal with this issue then? Target 3.0 for the change?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-01T21:55:53Z
+
+Yes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-02T06:37:44Z
+
+I think it's fine to do that in 2.5 as the current way is wrong (don't forget to add a mention in the UPGRADE file).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-02T06:56:27Z
+
+I thoight we would "avoid bc breaks at any cost" for 2.4+?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-02T07:02:50Z
+
+I'd even say that we should fix it in 2.2 as this is just plain wrong and cannot work correctly for anyone.
+
+To avoid any BC break, let's do that in 2.2 by **copying** the file and keeping the old one. The old one will then be removed in 3.0.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-12-02T07:05:37Z
+
+BTW: It is correct in the Country FormType.
+
+But there is some more to consider:
+
+- Translator
+
+The translator is also aware of a locale 'uk' (Proper behaviour)
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Translation/PluralizationRules.php#L148
+
+- Intl
+
+The Intl Component depends on ICU which uses this country codes:
+http://www.iso.org/iso/prods-services/iso3166ma/02iso-3166-code-lists/country_names_and_code_elements
+
+And here the code is 'ua' for Ukraine, but the language is 'uk'.
+
+http://www.localeplanet.com/icu/uk-UA/index.html
+
+I guess now this is a bug and in no case the file with 'ua' will be loaded since the locale will be seen as 'uk'. If it is as I assume it is just a bug which will not even result in a BC break.
+
+Edited: Corrected locales
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-12-02T07:07:16Z
+
+@fabpot If my considerations are right, the file can even be removed. The only edege case would be if someone is modifying the locale manually in a listener. But automatically it should be recognized as 'ua'.
+
+---------------------------------------------------------------------------
+
+by craue at 2013-12-02T12:41:41Z
+
+Do we have a final decision? Shall I keep the original file and add a renamed copy? I only know that "uk" and "uk_UA" are valid locales, whereas "ua" is not. See http://demo.icu-project.org/icu-bin/locexp?d_=en&_=uk .
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2013-12-02T13:43:39Z
+
+I have just corrected my post, I messed up with ua and uk. I think if my assumptions are right, the rename is sufficient and this could go as bugfix into the next release.

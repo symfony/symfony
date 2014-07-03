@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-14T14:51:36Z
+
+I'm not sure if that's what we need, but if we do you'll have to write a test covering this case.
+
+---------------------------------------------------------------------------
+
+by bes89 at 2013-09-14T17:39:50Z
+
+done.
+
+@jakzal that's what we need! suppose you are using the form view transformer which transforms string intput to objects and you want to validate these input by using the comparison validators
+it makes the comparison validator classes more flexible.
+
+my use case was:
+transform string input to a datetime object but if the input isn't valid the validator shows the date in english format. but what about other datetime formats? so, i extended the datetime object and added a setter for format and a tostring method.
+
+---------------------------------------------------------------------------
+
+by bes89 at 2013-09-15T09:20:27Z
+
+@cordoval I did it as it was done here:
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Tests/Constraints/CallbackValidatorTest.php#L18

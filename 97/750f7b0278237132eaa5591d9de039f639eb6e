@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by maryo at 2014-03-12T13:18:09Z
+
+NOTE: Travis failed because of "Pull Request License Headers". I edited the description so it is there but it probably didn't trigger the PR revalidation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-13T05:04:51Z
+
+@maryo Can you add a unit test to cover this change?
+
+---------------------------------------------------------------------------
+
+by maryo at 2014-03-13T14:12:02Z
+
+@fabpot Like this?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-20T15:37:37Z
+
+Hello @maryo, can you describe the use case for this?
+
+---------------------------------------------------------------------------
+
+by maryo at 2014-03-30T09:29:11Z
+
+@romainneutron: Just because i want to display a better message to the user.
+
+'User "John Doe" could not be found.'
+instead of
+'Username could not be found.'
+
+AuthenticationException have getMessageKey() and getMessageData() methods with comment "Message data to be used by the translation component.".
+
+These methods are not used in the framework at all. But in my case i have my own AuthenticationFailureHandler which returns JsonResponse (REST API). I use translator to translate the AuthenticationException there.
+
+```php
+$this->translator->trans($exception->getMessageKey(), $exception->getMessageData(), 'exceptions')
+```
+
+BTW i have these methods on some other exceptions too. That's why the translation domain is set to "exceptions".
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-31T10:45:12Z
+
+Then `getMessageKey` return value should be updated. In the current implementation, there is no placeholder for `{{ username }}` variable in the message key.
+
+---------------------------------------------------------------------------
+
+by maryo at 2014-06-03T10:10:55Z
+
+@romainneutron I can add it but is it a good idea to show the username as a default behavior?... User can easily use the placeholder in translations. That was the point of the PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-03T12:39:56Z
+
+Actually I think that displaying the username by default is not a good practice. I mean, the user know what it enters, and this is probably already displayed in the form.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-03T12:51:49Z
+
+I agree with @fabpot here

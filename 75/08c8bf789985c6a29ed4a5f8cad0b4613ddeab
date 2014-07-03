@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2014-02-18T22:28:12Z
+
+Anyway, this is new feature and it can't go to `2.3` & `2.4` versions.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-02-18T23:01:14Z
+
++1
+
+I’d definitely use it.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-19T10:39:58Z
+
+I like this, thanks for the PR! :)
+
+---------------------------------------------------------------------------
+
+by colinodell at 2014-02-19T23:44:13Z
+
+@webmozart - I've made the changes you suggested and squashed them into the original commit.
+
+@ddebernardy - I added a new constraint option named `strict`. When `true` (default), only UUIDs matching the RFC's format are allowed.  Setting this to `false` will allow those non-standard values which other systems like PostgreSQL accept.  You'll find this change in commit 7c0c462.  **Edit:** The version and variant are only validated in strict mode.
+
+Thank you both for your feedback and suggestions!
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-20T10:40:06Z
+
+Looks good, but I haven't verified the algorithm against the RFC. @ddebernardy (or anyone else with experience in UUID processing) do you have any further comments?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-20T11:27:54Z
+
+:-1: this is too specific and it shouldn't be included in the core. Please move it to a community bundle.
+
+Don't worry. I'm just kidding :smile:  Whenever I propose something new for Symfony people keep telling me that and for once, I wanted to know how it feels to say it.
+
+I like this new validator. Thank you very much @colinodell for adding it.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-20T13:23:36Z
+
+![](http://stream1.gifsoup.com/view/860245/whipped-o.gif)
+
+---------------------------------------------------------------------------
+
+by colinodell at 2014-02-28T20:47:17Z
+
+I've created a PR for the new documentation that accompanies this feature: symfony/symfony-docs#3619
+
+@webmozart, what are the next steps?  Is there anything else you need from me, or are we just waiting on feedback?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-03-06T08:58:17Z
+
+@fabpot What do you think about this (skipping the wrong branch this is opened against =))
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-20T15:15:16Z
+
+@fabpot :+1:

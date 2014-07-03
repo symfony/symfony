@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-08-16T20:32:43Z
+
+Could you add a test? It should fail before applying this fix.
+
+---------------------------------------------------------------------------
+
+by klmatom at 2013-08-16T20:49:58Z
+
+Fixed and commits squashed.  Do you have a suggestion how should I go about writing a test case for this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-17T08:36:02Z
+
+Not sure how this could be tested easily.

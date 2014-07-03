@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-21T11:13:32Z
+
+nice :+1:
+
+btw which are the scenarios that do not require the serializer to implement the normalizer interface?
+
+---------------------------------------------------------------------------
+
+by gquemener at 2014-02-21T11:48:43Z
+
+I dunno, some crazy dude that would like to serialize stuff in a custom serializer without using a normalizer, nor an encoder, for example?
+
+``` php
+class CrazySerializer implements SerializerInterface
+{
+    public function serialize($data, $format, array $context = array())
+    {
+        return serialize($data);
+    }
+
+    public function deserialize($data, $type, $format, array $context = array())
+    {
+        return unserialize($data);
+    }
+}
+```
+
+And he injects this `CrazySerializer` into the `GetSetMethodNormalizer`.

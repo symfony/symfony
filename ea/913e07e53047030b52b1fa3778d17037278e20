@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-05-06T15:42:02Z
+
+@fabpot This PR contains the BC break you asked. I've rebased onto the master branch.
+
+It would not hurt squashing everything ?

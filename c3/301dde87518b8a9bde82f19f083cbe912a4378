@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by bschussek at 2013-08-22T20:20:16Z
+
+Does the `phpize()` method do trimming as well? Could you please add a test case that tests that values are trimmed?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-22T20:35:50Z
+
+@bschussek fixed ;)

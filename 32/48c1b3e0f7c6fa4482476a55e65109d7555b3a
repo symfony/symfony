@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T12:53:26Z
+
+This can only be merged if  doctrine/DoctrineBundle#198 is ever merged.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-08-09T10:01:07Z
+
+:+1: for this.
+
+@Tatsh you should also send PRs to other doctrine bundles to allow using this feature with them.

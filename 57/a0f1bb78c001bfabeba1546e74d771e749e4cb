@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by bgarret at 2013-01-22T16:37:17Z
+
+@stof I updated the pull request following your review, anything else I should do?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T08:26:13Z
+
+Can you add a note in the bundle Changelog as well?

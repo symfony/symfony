@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-20T09:10:42Z
+
+shoudln't this one be closed in favor of #10947 ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-20T12:41:40Z
+
+@stof No, one of the PRs is for 2.4, the other for master. Applying the 2.4 version to master is non-trivial, which is why I created separate PRs.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-05-21T13:19:09Z
+
+Updated, removed the "return null" statement.

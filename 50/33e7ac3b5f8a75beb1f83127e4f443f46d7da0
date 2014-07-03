@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by mayeco at 2014-04-14T20:27:00Z
+
+1. You should add all strings in validators component (73, 74...) and make a PR to 2.4 (see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Resources/translations/validators.en.xlf)
+
+2. Please add PR headers (see http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-15T05:27:24Z
+
+@mayeco This PR was good as 2.3 is still maintained.

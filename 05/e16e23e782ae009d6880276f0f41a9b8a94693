@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-22T13:26:00Z
+
+I would have passed the exception to the `clearToken()` method as the method is called twice and the log should be enabled for both calls. Also, what about changing the visibility of the `clearToken()` to private as this is not used anywhere else.
+
+ping @alcaeus
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-22T13:41:43Z
+
+No problem to pass the Exception as argument of clearToken(), I can do the change.
+
+Change the visibility of the method to private is not a good idea because we need to override this method.
+
+For example, and it's my problem since this change (2.3.3).
+Actually I have a custom provider who need to check at every request the status of the connection on a main server (SSO). If the session on the SSO server is expired, the authenticate method of the Authentication Manager throw an Exception, and the token must be cleared.
+The problem is that if the user is already authenticated, the Token is stored in session and in my case, doesn't extends PreAuthenticatedToken, so the clearToken has no effect on my token and people can't be disconnected if the session expire on SSO server.
+That's a major undocumented change for us of the 2.3.3 version.
+
+Two solution:
+- override the clearToken method
+- my token has to extend PreAuthenticatedToken
+
+I prefer the first choice, but I can't do it if the method clearToken is private.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2013-08-22T13:53:51Z
+
+Whoopsie. I agree with Fabien: pass the exception to the ```clearToken()``` method and have that call the logger. It's a bit weird to pass an exception to a method, but in this case it seems like the best choice.
+
+@xkobal: Every listener only clears the token it sets. So, if a listener sets a PreAuthenticatedToken, it clears a PreAuthenticatedToken and nothing else. If your listener sets a different token, you must handle that. This was the main reason for the pull requests as it is necessary to keep the tokens well separated in order to use multiple authentication listeners at the same time (e.g. X509 authentication with form based login as fallback).
+
+I agree with Fabien in this case as well: clearToken should be either private or final. Since the handle method is final and sets a PreAuthenticatedToken there can't be any other token class present in this listener. There should be no need to override the clearToken method to clear a different token. My bad for not seeing that when actually writing the code.
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-22T14:21:03Z
+
+@alcaeus I'am totally agree with your pull request. But If the clearToken become final, that means override clearToken method need a complete rewrite of the handle() method. I find that very complicated for just a little change. The handle method of the AbstractPreAuthenticatedListener do correctly the job, why force people to rewrite the entire handle method.
+
+Normally, the token is created by the authenticate method of the AuthenticationManagerInterface, it is two different classes.
+In my case, unauthenticated token is different from authenticated token, but maybe I'm wrong on that point.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2013-08-23T06:56:54Z
+
+@xkobal What I don't understand is: The AbstractPreAuthenticatedListener creates an instance of PreAuthenticatedToken, which can't be changed (because it's written in handle() which again is declared final, so it can't be overridden). Why would you need to change the clearToken() method to clear a token of a different class?
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-23T07:32:34Z
+
+@alcaeus You're right. But really this is the return of AuthenticationManager authenticate() method which create/update the token, and you can return whatever token you want, so the return of my method give me a different token.
+```php
+$token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
+```
+
+The reason ? It is because I wan't to check at every request the authentication, so I need to skip this line:
+```php
+if ($token instanceof PreAuthenticatedToken && $token->isAuthenticated() && $token->getUsername() === $user) {
+    return;
+}
+```
+
+But when I read your point of view, I feel I have to rewrite the handle() method of AbstractPreAuthenticatedListener. This was something I wanted to avoid.
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-26T11:44:45Z
+
+Tell me your point of view for the change of clearToken() method visibility.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2013-08-26T11:49:15Z
+
+My opinion: make it private or final. Since handle() is the method that specifies which token is set and it is marked final, I fail to see why clearToken() should be more open than handle(). You'd need to write your own Listener to set a different token anyways, so you're also in charge of clearing the token.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-26T12:15:57Z
+
+private looks good to me.
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-26T14:19:29Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by xkobal at 2013-08-26T14:42:18Z
+
+I have removed blank spaces

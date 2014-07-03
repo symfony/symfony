@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-17T11:29:02Z
+
+screenshot?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-17T11:33:56Z
+
+![capture du 2014-03-17 12 52 52](https://f.cloud.github.com/assets/243674/2435608/bfc17286-adca-11e3-9c22-ee7357a88573.png)
+
+![capture du 2014-03-17 12 32 50](https://f.cloud.github.com/assets/243674/2435482/03a98838-adc8-11e3-93b2-68401645f623.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-03-17T12:12:06Z
+
+@nicolas-grekas in my opinion, it's not OK to silently report that a variable is undefined. What I would find extremely useful is to remove all those ultra-verbose and almost useless *DEBUG - notified event* messages.
+
+Almost every Symfony developer which I've talked to agrees with this:
+
+![03a98838-adc8-11e3-93b2-68401645f623](https://f.cloud.github.com/assets/73419/2435697/1c494ca2-adcd-11e3-9c42-32d77dfa5364.png)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-17T13:42:46Z
+
+@nicolas-grekas when you do a PR you should add a checkbox list of things pending, one of them should be ```- [ ] add tests``` among others that are still pending.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-17T14:48:15Z
+
+@javiereguiluz agree with you, but not related to this PR specifically (plz open an issue so that it can be traced until fixed)
+@cordoval thanks for the note. Test added. Any other idea for a checkbox?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-17T15:00:24Z
+
+what do you mean a checkbox? provide mock ups please

@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-26T21:02:31Z
+
+That's pretty useful. Could we add AddRequestFormatsListener to HttpKernel? It's certainly useful without the DIC.
+
+---------------------------------------------------------------------------
+
+by gquemener at 2013-12-26T23:26:56Z
+
+That sounds like a good idea to me.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-26T23:46:49Z
+
+@fabbot-io still needs some training to get good at analyzing typos in variables and test method names
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T11:52:15Z
+
++1 for moving `AddRequestFormatsListener` to `HttpKernel`
++1 for removing the cookbook as soon as the doc are updated to explain the new way
+
+@gquemener Can you rebase on current master so that we can get rid of the CS fixes that have been fixed since then?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T11:58:18Z
+
+`additional_formats` seems the wrong word as you can also override existing ones with this parameter.
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-28T12:07:23Z
+
+Probably out of scope for this pull request, but I wonder if we could have a way for bundles to add additional formats too. I currently have a bundle that needs to add a couple of formats. I could of course use the listener added here and add it a second time to the event listener but that seems unnecessary.
+
+---------------------------------------------------------------------------
+
+by gquemener at 2013-12-28T20:40:07Z
+
+ @fabpot Problem with `formats` is that it can make people think it'd be the only formats that are known, thus bringing confusion why html and json works whereas it hasn't been defined in the configuration.
+
+But, except for that point which can be solved with good documentation, I'm not against using `formats` instead of `additional_formats`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T21:27:22Z
+
+Note I was not suggesting to use `formats`. What about `mime_types` like used by the REST bundle? or `request_formats`?
+
+---------------------------------------------------------------------------
+
+by gquemener at 2013-12-29T07:39:14Z
+
+The `mime-type` key is already used when configuring through xml.
+
+``` xml
+        <framework:request>
+             <framework:additional-format name="csv">
+                 <framework:mime-type>text/csv</framework:mime-type>
+                 <framework:mime-type>text/plain</framework:mime-type>
+             </framework:additional-format>
+         </framework:request>
+```
+
+This would be a problem if we replace `additional_format` by `mime-type`, wouldn't it?
+
+In the other hand `request_formats` would be repetitive as `request` is used as the parent key.
+
+IMO, just `formats` makes sense.
+
+---------------------------------------------------------------------------
+
+by gquemener at 2013-12-31T10:12:17Z
+
+I've moved the listener to the HttpKernel component and dropped the unneeded DIC parameter
+
+---------------------------------------------------------------------------
+
+by gquemener at 2013-12-31T10:14:37Z
+
+I've also rebased on master, but not sure it went well :-/
+
+Anyway, I'll squash before merge at the end
+
+---------------------------------------------------------------------------
+
+by gquemener at 2014-01-08T17:05:16Z
+
+ping @fabpot @cordoval
+
+---------------------------------------------------------------------------
+
+by gquemener at 2014-01-22T11:06:02Z
+
+Ready to be merge AFAIC @fabpot

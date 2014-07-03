@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-02-28T10:05:23Z
+
+Any benchmark which shows the "drastic" improvements?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2014-03-04T13:02:01Z
+
+My quick test shows (removed container and pressed refresh a few times after it was rebuilt) about 300k lower memory usage (25,2M vs 25,5M) and about 10ms less load time in dev environment.. With this new commit.

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-25T11:55:04Z
+
+your PR lacks a table PR. Are all 40x covered with one exception? or do we miss more than just this one?
+
+---------------------------------------------------------------------------
+
+by steveYeah at 2014-03-25T12:07:28Z
+
+Yep, sorry for the lack PR table. I've implemented this class a few times and found it useful, thought other people might.
+
+---------------------------------------------------------------------------
+
+by steveYeah at 2014-03-25T14:08:34Z
+
+PR table added!

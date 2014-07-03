@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-14T11:02:26Z
+
+This gives a fatal error when there is no request (in the CLI for instance)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-14T11:20:34Z
+
+Indeed, it's now fixed :) Tests added.

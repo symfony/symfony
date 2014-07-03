@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-24T08:53:54Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-24T11:13:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-24T12:03:06Z
+
+Given the [HTML5 spec](http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#extracting-character-encodings-from-meta-elements) that refers to [how to get an encoding](http://www.w3.org/TR/encoding/#encodings), we should allow the colon character `:` (Actually only space ` ` and semicolon `;` could delimit the end of a charset label) and should consider the extracted charset as a label and map this label to the corresponding charset name for this label.
+
+As the charset is used to create `DOMDocument` and given that [encoding in XML spec](http://www.w3.org/TR/REC-xml/#NT-EncName) accepts dots `.` (it actually uses `[A-Za-z] ([A-Za-z0-9._] | '-')*`), I'd suggest to match the dot (if we do not provide support for label <=> charset).
+
+Finally the [how to get an encoding doc](http://www.unicode.org/reports/tr22/tr22-7.html#Charset_Alias_Matching) mentioned above refers to [unicode charset alias matching](http://www.unicode.org/reports/tr22/tr22-7.html#Charset_Alias_Matching), wahou, a new algorithm :)
+
+I'm however :+1: on this one.
+
+Cases that could be impacted are negligible and implementing all these specs would lead us to a huge work. But as I dig the question, I think it's useful to leave these notes here.
+
+---------------------------------------------------------------------------
+
+by 77web at 2014-05-24T12:42:37Z
+
+Thank you for your interests! I updated my first comment just now.
+I have read some links which @romainneutron introduced above, and will gladly add ``:`` and/or ``.`` to the regex if that will do. Should I?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-25T17:16:11Z
+
+I think you can add them. Please add a comment mentioning the links to the XML spec and "how to get an encoding".
+
+---------------------------------------------------------------------------
+
+by 77web at 2014-05-26T02:20:23Z
+
+@romainneutron Thank you for your advice!
+Added ``:`` and ``.`` to the regex, and comments above them.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-26T06:33:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by 77web at 2014-05-26T22:14:14Z
+
+@jakzal I removed mocked tests. Thank you for your help!

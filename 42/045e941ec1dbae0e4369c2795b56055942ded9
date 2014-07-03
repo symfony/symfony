@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-16T17:05:08Z
+
+for 307, we should have the same request, and for a GET, the 2 calls you mention are indeed exactly the same.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-16T17:06:30Z
+
+Does a browser forward the query string when following a 307 on a GET request or does it use only the uri passed in the Location header ?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-16T17:30:12Z
+
+I have updated my patch to never forward the request parameters for GET request, making things consistent between the 2 ways to pass them.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-17T09:50:57Z
+
+@fabpot is the new version OK for you ?

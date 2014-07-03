@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-04T16:06:49Z
+
+@fabpot you agree with it in general?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-04T16:16:09Z
+
+Yes, I do agree that it does not make sense anymore now that we have a PSR for logging. I haven't had a look at this PR in details, but there are no BC breaks, right? Can you add the PR header?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-09-04T20:10:54Z
+
+ready

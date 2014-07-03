@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-17T17:32:51Z
+
+Note the URL in the screenshot. By default, DEBUG log lines are not selected, but a counter is added in the select box to tell the dev that something is behind each choice:
+
+![capture du 2014-03-17 18 31 28](https://f.cloud.github.com/assets/243674/2439164/00c785e8-adfa-11e3-9afa-757727dda451.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-03-17T17:36:07Z
+
+By the way, here is the list of messages sent to a logger by Symfony. If something needs a reclassification, please tell so (eg move a `debug` to `info`):
+
+```
+DbalLogger.php:                          debug($message, $params);
+CacheLoader.php:                         debug(sprintf('Fetching template "%s" from cache', $template->get('name')));
+CacheLoader.php:                         debug(sprintf('Storing template "%s" in cache', $template->get('name')));
+FilesystemLoader.php:                    debug(sprintf('Loaded template file "%s"', $file));
+FilesystemLoader.php:                    debug('Failed loading template file...
+TraceableEventDispatcher.php:            debug(sprintf('Notified event "%s" to listener "%s".', $eventName, $info['pretty']));
+TraceableEventDispatcher.php:            debug(sprintf('Listener "%s" was not called for event "%s".', $info['pretty'], $eventName));
+TraceableEventDispatcher.php:            debug(sprintf('Listener "%s" stopped propagation of the event "%s".', $info['pretty'], $eventName));
+AclVoter.php:                            debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
+AclVoter.php:                            debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable? 'grant access' : 'abstain'));
+AclVoter.php:                            debug('ACL found, permission granted. Voting to grant access');
+AclVoter.php:                            debug('ACL found, permission granted. Voting to grant access');
+AclVoter.php:                            debug('ACL found, insufficient permissions. Voting to deny access.');
+AclVoter.php:                            debug('No ACL found for the object identity. Voting to deny access.');
+AclVoter.php:                            debug('ACL found, no ACE applicable. Voting to deny access.');
+AbstractRememberMeServices.php:          debug('Remember-me cookie detected.');
+AbstractRememberMeServices.php:          debug('Remember-Me authentication failed: '.$invalid->getMessage());
+AbstractRememberMeServices.php:          debug('Remember-me ignores token since it does not contain a UserInterface implementation.');
+AbstractRememberMeServices.php:          debug('Remember-me was not requested.');
+AbstractRememberMeServices.php:          debug('Remember-me was requested; setting cookie.');
+AbstractRememberMeServices.php:          debug(sprintf('Clearing remember-me cookie "%s"', $this->options['name']));
+AbstractRememberMeServices.php:          debug(sprintf('Did not send remember-me cookie (remember-me parameter "%s" was not sent).', $this->options['remember_me_parameter']));
+RememberMeListener.php:                  debug('SecurityContext populated with remember-me token.');
+ContextListener.php:                     debug('Read SecurityContext from the session');
+ContextListener.php:                     debug('Write SecurityContext in the session');
+ContextListener.php:                     debug(sprintf('Reloading user from user provider.'));
+ContextListener.php:                     debug(sprintf('Username "%s" was reloaded from user provider.', $refreshedUser->getUsername()));
+DigestAuthenticationListener.php:        debug(sprintf('Digest Authorization header received from user agent: %s', $header));
+DigestAuthenticationListener.php:        debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
+ExceptionListener.php:                   debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
+ExceptionListener.php:                   debug(sprintf('Access is denied (and user is neither anonymous, nor remember-me) by "%s" at line %s', $exception->getFile(), $exception->getLine()));
+ExceptionListener.php:                   debug('Calling Authentication entry point');
+AbstractPreAuthenticatedListener.php:    debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
+AbstractPreAuthenticatedListener.php:    debug(sprintf('Trying to pre-authenticate user "%s"', $user));
+DefaultAuthenticationFailureHandler.php: debug(sprintf('Forwarding to %s', $this->options['failure_path']));
+DefaultAuthenticationFailureHandler.php: debug(sprintf('Redirecting to %s', $this->options['failure_path']));
+SimpleAuthenticationHandler.php:         debug(sprintf('Using the %s object as authentication success handler', get_class($this->simpleAuthenticator)));
+SimpleAuthenticationHandler.php:         debug('Fallback to the default authentication success handler');
+SimpleAuthenticationHandler.php:         debug(sprintf('Using the %s object as authentication failure handler', get_class($this->simpleAuthenticator)));
+SimpleAuthenticationHandler.php:         debug('Fallback to the default authentication failure handler');
+DigestAuthenticationEntryPoint.php:      debug(sprintf('WWW-Authenticate header sent to user agent: "%s"', $authenticateHeader));
+RouterListener.php:                      info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+AbstractRememberMeServices.php:          info('Remember-me cookie accepted.');
+AbstractRememberMeServices.php:          info('User for remember-me cookie not found.');
+SimplePreAuthenticationListener.php:     info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
+SimplePreAuthenticationListener.php:     info(sprintf('Authentication request failed: %s', $e->getMessage()));
+AnonymousAuthenticationListener.php:     info('Populated SecurityContext with an anonymous Token');
+BasicAuthenticationListener.php:         info(sprintf('Basic Authentication Authorization header found for user "%s"', $username));
+BasicAuthenticationListener.php:         info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
+AbstractAuthenticationListener.php:      info(sprintf('Authentication request failed: %s', $failed->getMessage()));
+AbstractAuthenticationListener.php:      info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
+ChannelListener.php:                     info('Redirecting to HTTPS');
+ChannelListener.php:                     info('Redirecting to HTTP');
+DigestAuthenticationListener.php:        info(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
+DigestAuthenticationListener.php:        info($authException);
+ExceptionListener.php:                   info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
+ExceptionListener.php:                   info(sprintf('Logout exception occurred; wrapping with AccessDeniedHttpException (%s)', $exception->getMessage()));
+SwitchUserListener.php:                  info(sprintf('Attempt to switch to user "%s"', $username));
+AbstractPreAuthenticatedListener.php:    info(sprintf('Authentication success: %s', $token));
+AbstractPreAuthenticatedListener.php:    info(sprintf("Cleared security context due to exception: %s", $exception->getMessage()));
+SecureRandom.php:                        info('OpenSSL did not produce a secure random number.');
+SecureRandom.php:                        notice('It is recommended that you enable the "openssl" extension for random number generation.');
+ControllerResolver.php:                  warning('Unable to look for the controller as the "_controller" parameter is missing');
+Profiler.php:                            warning('Unable to store the profiler information.');
+ErrorHandler.php:                        warning($message, array('type' => self::TYPE_DEPRECATION, 'stack' => $stack));
+AbstractRememberMeServices.php:          warning('User class for remember-me cookie not supported.');
+RememberMeListener.php:                  warning('SecurityContext not populated with remember-me token as...
+ContextListener.php:                     warning(sprintf('Session includes a "%s" where a security token is expected', is_object($token) ? get_class($token) : gettype($token)));
+ContextListener.php:                     warning(sprintf('Username "%s" could not be found.', $notFound->getUsername()));
+```

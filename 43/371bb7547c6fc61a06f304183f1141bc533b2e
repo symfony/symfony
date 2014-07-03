@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by havvg at 2013-11-08T16:17:27Z
+
+The tests pass on my local machine.
+
+```
+ symfony2 git:2.2 ✗ ≠ vendor/bin/phpunit src/Symfony/Bridge/Propel1/                     ~/Web Development/symfony2
+PHPUnit 3.8-gc1fe4b7 by Sebastian Bergmann.
+
+Configuration read from /Users/havvg/Web Development/symfony2/phpunit.xml.dist
+
+................................................................. 65 / 67 ( 97%)
+..
+
+Time: 412 ms, Memory: 10.75Mb
+
+OK (67 tests, 130 assertions)
+```
+
+---------------------------------------------------------------------------
+
+by auss at 2013-11-14T12:08:13Z
+
+:+1: it fixes the issue with many to many form types on symfony 2.3.7

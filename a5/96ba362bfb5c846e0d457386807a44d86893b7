@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by shouze at 2013-08-02T10:09:34Z
+
+good idea, :+1:
+
+---------------------------------------------------------------------------
+
+by tyx at 2013-08-02T10:22:25Z
+
+need ! :+1:
+
+---------------------------------------------------------------------------
+
+by Remy-Luciani at 2013-08-07T07:53:45Z
+
+:+1: nice. :)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-08-08T07:28:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabriceb at 2013-08-08T09:06:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by shouze at 2013-08-08T09:12:24Z
+
+Perhaps it would be useful to also support regular expressions. Your opinion?
+Can be done in another PR.
+
+---------------------------------------------------------------------------
+
+by marekkalnik at 2013-08-08T09:47:58Z
+
+@shouze - actually I start to think that it would be nice to use validation constraints with it. This would couple the two components though. As for regexp - you can use a callback, I don't see much of a gain in direct support.
+
+---------------------------------------------------------------------------
+
+by lfalorni at 2013-08-08T10:33:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by popofr13 at 2013-08-08T10:33:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by shouze at 2013-08-08T11:12:40Z
+
+@marekkalnik you're right.
+
+In fact we've seen your PR few days ago while we were looking for an elegant solution to validate query string params for a REST api (and avoid some cache poisoning).
+
+We know that we could use Form validation but it looked a bit over bloated for a such simple thing.
+We finally adopted a solution based on the treeBuilder because OptionResolver does not support nested options https://github.com/symfony/symfony/issues/4833
+
+BTW OptionsResolver must remain simple.
+
+---------------------------------------------------------------------------
+
+by CharlyP at 2013-08-08T16:00:15Z
+
+Great feature ! :+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-08-09T14:38:32Z
+
+:100: :+1:
+
+Regex and constraints should be possible with the closure, so adding that would over-complicate things.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-22T23:39:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-23T05:23:57Z
+
+the feature has gotten some feedback so i think the docs would be nice :+1:
+
+:baby:
+
+---------------------------------------------------------------------------
+
+by marekkalnik at 2013-12-23T11:30:25Z
+
+Ok, I'll write some by the end of the week.
+
+---------------------------------------------------------------------------
+
+by marekkalnik at 2014-01-06T22:22:02Z
+
+I added the doc, sory that it's late, it wasn't easy with all the family holidays :(
+
+But it made me think - it won't work with the addAllowedValue, so maybe I should write a separate method for specyfying a callback? What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-01-07T08:45:35Z
+
+@marekkalnik Can you fix the CS issues (http://fabbot.io/report/symfony/symfony/8375/8d05642f9a57150f51da56a3a3c7a122375b71ba)?
+
+---------------------------------------------------------------------------
+
+by marekkalnik at 2014-01-07T08:57:57Z
+
+@fabpot I fixed the CS error and changed the message
+
+---------------------------------------------------------------------------
+
+by marekkalnik at 2014-01-07T09:07:29Z
+
+@fabpot it's better now

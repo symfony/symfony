@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by raziel057 at 2013-05-04T22:14:55Z
+
+It´s nice to see that symfony contributors focus on improving performances to have a more powerfull 2.3 LTS release. I also thougth to change the ake by isset + ake in some class of the HttpFoundation or other pretty used components. What do you think about that? I would like to make benchmarks to view if it can be interesting.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-05T08:36:56Z
+
+@raziel057 Don't waste your time, that's not worth it... for at least two reasons:
+
+ * Whenever we are using array_key_exists, there is a reason for it;
+ * The speed difference between isset and array_key_exists won't make any difference on a typical request.
+
+Now, it you can demonstrate that changing some calls to isset do not break something and it makes a typical request significantly faster (more than 1%), then go for it. But trust me, that's a big challenge ;)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-05-05T09:03:46Z
+
+@fabpot I think he meant using `if (isset() || array_key_exists()) { return $val } else { return $default }`, which might be beneficial if most calls end up querying for a value that is present, but that's indeed a long shot.

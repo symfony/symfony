@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-10-29T23:09:39Z
+
+Then you could add dozens of more helper methods. It's just the one that is used most often.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-10-29T23:28:58Z
+
+I agree with @Tobion , we could not add a helper for each HTTP status code.
+
+But is one could avoid big mistake: Lot of people throw an `Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException` and so by-pass the security layer.
+
+We have a rule for this in [SensioLabsInsight](https://insight.sensiolabs.com/) and this violations is quite often triggered.
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2013-10-30T12:14:37Z
+
+Precisely the reason for this PR, @lyrixx. Many people using IDE's usually import the wrong exception. A helper method guarantees the usage of the proper one.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2013-11-04T14:22:14Z
+
+This helper function could be usefull if there is an option to redirect to the configured `form_login` in the firewalls. Now I make use of the following code snippet to redirect to the login form, and return to the current page thereafter:
+
+        if (!$this->get('security.context')->isGranted('ROLE_ADMIN')) {
+
+			// Put the URL in the session
+			$this->container->get('session')->set('_security.main.target_path', $this->generateUrl('product_show',
+				array('id' => $document->getId()),
+				UrlGeneratorInterface::ABSOLUTE_URL
+			));
+
+			// Redirect to the login form
+			return $this->redirect($this->generateUrl('login'));
+		}
+
+Maybe returning the redirect could be generic? Like returning/redirecting to the current active firewall login method?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-11-04T16:23:48Z
+
+if you add this also please add some docu
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T15:24:37Z
+
+@klaussilveira Can you submit a PR on the symfony docs to add documentation for this new feature?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-31T08:02:07Z
+
+Also, can you rebase on current master as some tests were broken at the time you forked master. Thanks.
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2014-01-17T12:45:15Z
+
+Sorry for the delay, rebased and fixed guys.
+
+---------------------------------------------------------------------------
+
+by klaussilveira at 2014-01-17T12:52:16Z
+
+Added docs here: https://github.com/symfony/symfony-docs/pull/3486

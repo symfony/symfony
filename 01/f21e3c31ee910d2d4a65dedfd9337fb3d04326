@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T09:24:13Z
+
+This does not solve the BC break entirely. It is now allowing to call methods which require more arguments than provided.
+I think the proper logic needs to check the required arguments as well (i.e. at least n arguments, and at most n required arguments)
+
+---------------------------------------------------------------------------
+
+by coma at 2014-04-01T09:39:09Z
+
+But the purpose of *isMethodAccessible* is to ensure that the method exists, is public and will accept the number of parameters we will be passing to it right?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T09:43:35Z
+
+yeah, but we will be passing exactly n arguments. If it has more requried arguments than that, calling the method will trigger a fatal error. I don't consider a call triggering a fatal error as an accessible method
+
+---------------------------------------------------------------------------
+
+by coma at 2014-04-01T09:48:07Z
+
+OH I SEE!... wait... thanks...
+
+---------------------------------------------------------------------------
+
+by coma at 2014-04-01T09:55:15Z
+
+Throwing a "InvalidNumberOfArgumentsException" may be more explanatory I think.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T09:56:41Z
+
+no, because we try different ways to access the property. If we throw an exception, we cannot try next ones
+
+---------------------------------------------------------------------------
+
+by coma at 2014-04-01T10:00:38Z
+
+Ok, is it good to go now?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T10:02:54Z
+
+cna you add another test for a method with a requirement argument and an optional argument after that (should still be accepted) and another test for a method with 2 requried arguments (should be rejected) to avoid regressions in the future ?
+
+---------------------------------------------------------------------------
+
+by coma at 2014-04-01T12:42:39Z
+
+Is ok now?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-01T12:43:46Z
+
+looks good to me

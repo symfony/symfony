@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-13T11:03:37Z
+
+Would be nice to cover the new method by tests and [the PR checklist is missing](http://symfony.com/doc/master/contributing/code/patches.html#make-a-pull-request).
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-04-13T15:44:31Z
+
+@jakzal I don't have right experience on writing tests. Could you help to me on this?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-13T18:17:14Z
+
+@grafitus look at the existing ones in the CrawlerTest. If you still need help, I can write tests for you.
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-04-14T10:59:13Z
+
+I've problems with Git. I wrote the first commit on GitHub -- [Editing Files](https://help.github.com/articles/editing). Now, I tried to clone my forked repository into my PC. I couldn't see my 'patch-1' branch, and my changes. :/
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-04-14T11:02:40Z
+
+@grafitus it is there: https://github.com/grafitus/symfony/tree/patch-1
+
+Run:
+```bash
+git pull
+git checout patch-1
+```
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-04-16T21:24:48Z
+
+OMG! I think I made it! :+1:
+
+@jakzal can check my commits please? :)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-04-17T04:16:19Z
+
+you changed permissions on the files not good :baby:
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-04-18T01:12:36Z
+
+@cordoval You got me! :) I'm still new at Unix-like systems. And file permissions makes me nervous. Do you have suggestions for me to cope with permissions?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-04-18T01:14:40Z
+
+there is an option on .git/config to avoid making that mistake, also there are tools to fix cs like php-cs-fixer and if you need help doing a PR check the documentation for how the table PR is defined. You can finally use tools like Gush to send a PR also.
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-05-24T13:46:33Z
+
+@jakzal Everything looks good. Can you check for merging?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-24T13:48:45Z
+
+@beratdogan there is 2 things preventing the merge:
+
+- we are in feature freeze for 2.5, so new features cannot be merged anymore since 1.5 month. It needs to wait until we start the development of 2.6 (very soon as 2.5 is due soon)
+- this PR is not mergeable. It conflicts with the current master branch
+
+---------------------------------------------------------------------------
+
+by beratdogan at 2014-05-24T13:57:13Z
+
+I guess there is no anything I can do, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-24T14:48:29Z
+
+for the first part, no.
+For the second part, you can rebase your branch and fix the conflicts. See http://symfony.com/doc/current/contributing/code/patches.html#rebase-your-patch for the instruction about rebasing (the git doc will also provide more details)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-03T21:00:43Z
+
+Can you rebase this PR on current master?

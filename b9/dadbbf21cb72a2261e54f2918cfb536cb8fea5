@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by igorw at 2013-05-31T13:17:00Z
+
+Thanks for following through with this PR!
+
+* You need to remove leading backslashes in some places to reference the correct exception class
+* Please check the [coding standards](http://symfony.com/doc/master/contributing/code/standards.html)
+
+---------------------------------------------------------------------------
+
+by uuf6429 at 2013-05-31T13:22:50Z
+
+Done and done! :)
+
+---------------------------------------------------------------------------
+
+by igorw at 2013-05-31T13:44:53Z
+
+Looks good.

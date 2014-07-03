@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-10-28T12:40:47Z
+
+Could you also update the encoder and decoder interface with the UnexpectedValueException.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-28T12:43:13Z
+
+@Tobion the Symfony encoder already throws this exception in case of errors. The same exception was already thrown 10 lines after that in the decoder. It was just missing 1 case of failure.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-10-28T12:43:47Z
+
+Yes but the interface does not mention it yet.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-28T13:00:13Z
+
+Well, aI will let the modification of the interface phpdoc to a separate discussion, because the implementations are inconsistent:
+
+- the ChainDecoder throws a ``Symfony\Component\Serializer\Exception\RuntimeException`` when it cannot find a decoder for the format (and then an exception thown by the decoder being used)
+- the XmlEncoder throws a ``Symfony\Component\Serializer\Exception\UnexpectedValueException`` on failure
+- the JsonEncoder fails silently (you get ``null`` as value) and then provides a method to get the json decoding error code, which is not part of the interface (making the method hard to use as we don't have any way to access it when it is used in the serializer)
+- the Serializer just proxies the call to its ChainDecoder so the behavior is the same.
+
+Making the error handling consistent in the whole component should be done separately IMO (and probably in master as it will require changing the behavior of the JsonEncoder)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-28T13:02:25Z
+
+@stof Can you create an issue about the inconsistencies?

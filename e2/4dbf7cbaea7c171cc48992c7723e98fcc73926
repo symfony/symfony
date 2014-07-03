@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-27T06:35:21Z
+
+ping @bschussek
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-27T06:39:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by tweini at 2013-09-27T07:03:28Z
+
+btw isn't the getAttribute/setAttribute obsolete, because meanwhile the options are passed in buildView/finishView. It seems it is an old way of setting custom 'Attributes' before the options and the OptionResolverInterface were introduced, and the options are avaiable for this purpose.

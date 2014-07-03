@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-25T15:06:06Z
+
+looks like this is breaking the tests
+
+---------------------------------------------------------------------------
+
+by bronze1man at 2013-07-28T10:08:47Z
+
+Is it a correct way to pull request on pull request?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-07-28T10:39:25Z
+
+No, you need to create a new pr
+
+---------------------------------------------------------------------------
+
+by bronze1man at 2013-07-28T10:58:31Z
+
+Since @fabpot PR has not merged into mainline, I send on PR on his PR branch.
+If I send another PR on symfony,there will be two PR on same issus with share code
+Here is a example of project doing this kind of stuff:
+https://github.com/php-fig/fig-standards/pull/149

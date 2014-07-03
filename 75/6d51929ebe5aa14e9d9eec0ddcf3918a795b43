@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-23T22:11:24Z
+
+I'd be for the third param ($overwrite = false) for rename if @fabpot accepts that. So we still get the check for success and it might be useful for others too.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-24T06:32:35Z
+
+@fabpot are you fine with adding an optional parameter to ``Filesystem::rename()``? If set to true it would prevent "file already exists" exception.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-24T07:08:04Z
+
+@jakzal adding an opt arg looks good to me.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-24T08:06:12Z
+
+Ok. PR updated.

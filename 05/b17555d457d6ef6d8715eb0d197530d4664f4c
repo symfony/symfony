@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-11-29T13:56:25Z
+
+I would also use ``Doctrine\Common\Util\ClassUtils::getRealClass``, to avoid having a separate cache for the proxy and the real entity if it happens (``$em->getClassMetadata()`` supports getting a proxy class and will reuse the metadata, but it will still require the loop over entity managers)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-29T14:03:57Z
+
+@stof good idea, done.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-29T14:18:35Z
+
+:+1:

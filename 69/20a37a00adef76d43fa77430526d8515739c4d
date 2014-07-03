@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-25T15:59:24Z
+
+There are not much typo in PRs nowadays so I have to report typos in PR titles :) EventDipsatcher -> EventDispatcher
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-25T16:04:44Z
+
+@pborreli LOL :-) Fixed.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-25T19:16:42Z
+
+I find this is close to my recently closed #7792.
+
+If you pass the ```Dispatcher``` and event name as second and third argument, you don't really need the ```Event``` base class anymore as it does not do anything. (Deprecation phase aside, I'm talking about the long run.)
+
+In #7792, it's not two additional arguments, but just one (an ```EventPropagation```), but that carries the same information (even more).
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-26T09:18:50Z
+
+@mpdude - this PR is just following some of the ideas expressed by @kriswallsmith without BC breaks or other complications. @fabpot has clearly stated we are not changing the Dispatcher anytime soon and this PR is trying to solve one small problem (with the injected Dispatcher making `Event`s over complex/heavy to debug).
+
+Personally, I'd prefer name property to be part of the `Event` base class but either way works which is why I made the PR in two separate commits.
+
+In some ways I prefer #7582 because the dispatcher is not injected into the base event anymore, but it is also a BC break.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-26T09:19:42Z
+
+@fabpot - FYI the build has passed, Travis is just segfaulting randomly again.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-26T10:15:44Z
+
+#6686 shows that we need to think about whether we want to pass listeners the ```Dispatcher``` that was initially used to dispatch an event or the ```Dispatcher``` that actually notifies a particular listener. In "composition" style setups, they may be different.
+
+Having said that:
+
+- This PR passes the "final" ```Dispatcher``` as an additional argument to listeners, and possibly also the ```Event```'s name.
+- #7627 aims to pass the "initial" ```Dispatcher``` as an additional argument, but needs support/awareness along all Dispatchers along the "composition chain" to pass that through.
+- #7792 has an ```EventPropagation``` which is the event name and _all_ ```Dispatchers``` involved and passes that to listeners as an additional argument.
+
+Regarding BC, all approaches (currently) suffer from the problem that we cannot simply change what we pass to listeners. Not a problem for listeners that are unaware of the additional argument (and the ```Event``` class still provides the information), but the other way round. There may be alternative ```Dispatcher``` implementations out there and as long as they do _not_ pass the additional arg, you cannot reliably write the listener.
+
+What gets passed is part of the API as well, though it does not manifest itself in an interface or the like (due to the needed flexibility how listeners can be implemented).

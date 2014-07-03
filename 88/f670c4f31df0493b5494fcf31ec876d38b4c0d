@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-15T16:59:38Z
+
+That change does not make any sense. We're not going to remove features or checks because of some platforms.
+
+---------------------------------------------------------------------------
+
+by micheleorselli at 2013-12-15T22:40:51Z
+
+Thank you for the quick response, I'm closing the PR
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-16T01:06:59Z
+
+we have to do this in a thread providing support for read only filesystems
+
+---------------------------------------------------------------------------
+
+by ircmaxell at 2014-03-22T12:21:16Z
+
+Requesting this be re-opened and reconsidered as per discussion in #9945

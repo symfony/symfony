@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-25T10:09:30Z
+
+Can you add a test covering this to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by Flask at 2013-07-25T13:05:49Z
+
+Test added.
+
+I'm not quite sure if this is the proper way to test this use case. Maybe there is a way around getting the factory from the `Forms` class. Feedback highly appreciated.
+
+---------------------------------------------------------------------------
+
+by kelu95 at 2013-07-26T07:40:45Z
+
+this bug is really problematic, how can i configure composer to regress sf version ?
+
+---------------------------------------------------------------------------
+
+by ivan1986 at 2013-07-26T11:41:07Z
+
+@kelu95
+"2.3.2" or "~2.3, <=2.3.2"

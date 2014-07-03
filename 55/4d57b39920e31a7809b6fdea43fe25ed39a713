@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-30T16:20:38Z
+
+Can you please add a test case?
+
+---------------------------------------------------------------------------
+
+by alex88 at 2013-09-30T16:50:24Z
+
+I'm doing a rebase since there are some commits in between
+
+---------------------------------------------------------------------------
+
+by alex88 at 2013-10-01T08:16:12Z
+
+Ok Added that test too and rebased
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-01T08:21:02Z
+
+Awesome, thanks. You can remove the other test. Could you also squash the commits into the first one please?
+
+---------------------------------------------------------------------------
+
+by alex88 at 2013-10-01T08:32:42Z
+
+Rebased and squashed ;)
+
+---------------------------------------------------------------------------
+
+by alex88 at 2013-10-01T08:33:51Z
+
+Are there any guidelines in where to write tests depending on what to test? So next time I write it correctly on first time :)

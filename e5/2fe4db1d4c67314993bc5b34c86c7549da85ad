@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-09T12:13:37Z
+
+Some tests for the newly added method are missing
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-04-09T12:33:50Z
+
+@pborreli Updated !
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-09T12:43:45Z
+
+IMHO, would be better to keep testGetClientIp and make a new one for testGetClientIps probably using a new dataprovider, actual one is already complex enough. what do you think ?
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-04-09T12:45:21Z
+
+I started to implement the tests like this (separate test/data provider for getClientIps), but the code of the test itself would be exactly the same as the one for getClientIp (except for the method call). So I think it's better to use data providers in this case.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-09T12:51:28Z
+
+@gnutix I would keep 2 spearate data provider and extract the common Request building to a private method used in both tests instead.
+Mixing the tests of both methods in the same data provider is not readable
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-04-09T12:57:36Z
+
+@stof Fixed in last commit ! Thanks for your input.
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-04-09T13:02:56Z
+
+Nothing really related to that pull request, but there's a scrutinizer comment about two classes in RequestTest.php. Could I fix it along the way, or should I create a separate pull request ?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2013-04-09T14:06:36Z
+
+@gnutix it should be done in a separate PR, but not sure it is really necessary in that case.
+
+---------------------------------------------------------------------------
+
+by gnutix at 2013-04-10T09:52:41Z
+
+Is there anything else I might do for this PR to get merged ? :)

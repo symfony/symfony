@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by remicollet at 2014-06-25T17:11:12Z
+
+Same modif needed on rc/Symfony/Component/Form/Tests/Extension/Core/Type/FileTypeTest.php
+
+---------------------------------------------------------------------------
+
+by jpauli at 2014-06-26T12:16:13Z
+
+src/Symfony/Component/Form/Tests/Extension/Core/Type/FileTypeTest.php doesn't need to be fixed as the original constructor is called. PHPUnit will issue a "new".
+Don't know why it needs unserialize() otherwise though :p
+
+---------------------------------------------------------------------------
+
+by jpauli at 2014-06-26T12:20:47Z
+
+Q	A
+Bug fix?	yes
+New feature?	no
+BC breaks?	no
+Deprecations?	no
+Tests pass?	yes
+Fixed tickets	n/a
+License	MIT
+Doc PR	n/a
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-26T12:31:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-06-26T13:52:41Z
+
+:+1: (once indentation gets fixed)
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2014-06-26T15:05:33Z
+
+:+1: once little issues are fixed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-26T15:06:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-26T15:10:22Z
+
+rather than creating a FakeFile, why not using a mock but without disabling the constructor, as done when fixing the issue in 2.3 and 2.4 ?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-06-26T15:11:39Z
+
+:+1:

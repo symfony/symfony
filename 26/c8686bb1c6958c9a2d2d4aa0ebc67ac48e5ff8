@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by alexandresalome at 2013-01-04T12:01:51Z
+
+It might be great to add an optional arguments to the command to get a specific value :
+
+    php app/console container:debug-parameters kernel.root_dir
+
+Could be useful in some cases, for bash scripts:
+
+    $CACHE_DIR="`php app/console container:debug-parameter kernel.cache_dir`/custom-folder"
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-04T13:38:12Z
+
+@alexandresalome :+1: I just push a commit which add your feature.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T10:21:37Z
+
+Except the terminal width, is there something else which need to be rework?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T18:15:09Z
+
+I now use `getTerminalWidth` for determining how many chars I can display on a line.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-05T20:42:38Z
+
+As `getTerminalWidth` has been kept protected for BC break reason, I now use the `getTerminalDimensions`. Something else?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-06T13:09:58Z
+
+I just fix the command filename & squash all commits.
+
+---------------------------------------------------------------------------
+
+by alexandresalome at 2013-01-06T13:14:47Z
+
+When I run your code locally, I get an error about ``getTerminalDimensions()`` not being defined.
+
+You need to rebase your work on top of master.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-06T13:25:34Z
+
+@alexandresalome rebase
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-16T14:43:28Z
+
+@fabpot There is something missing before merging?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-01-30T16:39:13Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-02-05T11:42:14Z
+
+ping @fabpot

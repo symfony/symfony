@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-11T17:00:42Z
+
+note : process test-suite must be re-run on Windows once #10419 is merged
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-11T19:56:32Z
+
+The other PR has been merged. Can you rebase your branch so that the testsuite fix is included ? It will make it easier to run the testsuite on Windows
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-11T23:33:30Z
+
+@stof just rebased, tests are okay, you should not have any problem to run them on windows.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T11:11:21Z
+
+For the record, tests on travais are okay, one of the build failed because of a github issue.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-12T11:55:46Z
+
+@romainneutron when running the testsuite of the Process component on Windows, it hangs forever in ``testProcessPipes`` for the size 16.
+and several tests asserting the output are failing because it returns ``null``. So this does not seem to be working properly.
+If it helps, I'm using PHP 5.5.7
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T12:32:21Z
+
+weird, I'm using PHP 5.5.10 TS on windows 7 (from https://github.com/xdissent/ievms) with phpunit 4.0.4, no problem.
+
+```
+C:\symfony\src\Symfony\Component\Process>phpunit.bat
+PHPUnit 4.0.5 by Sebastian Bergmann.
+
+Configuration read from C:\symfony\src\Symfony\Component\Process\phpunit.xml.dis
+t
+
+The Xdebug extension is not loaded. No code coverage will be generated.
+
+SS........................SSSSS........SSSSSS..................  63 / 191 ( 32%)
+
+....S.....S..SSSSSSS....SSSSS....S..................SSS........ 126 / 191 ( 65%)
+
+...S..SSS.SSSSS......SSSS....S..................SS.......SS.S.. 189 / 191 ( 98%)
+
+.S
+
+Time: 33.5 seconds, Memory: 114.25Mb
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 191, Assertions: 355, Skipped: 51.
+
+C:\symfony\src\Symfony\Component\Process>php -v
+PHP 5.5.10 (cli) (built: Mar  5 2014 14:49:07)
+Copyright (c) 1997-2014 The PHP Group
+Zend Engine v2.5.0, Copyright (c) 1998-2014 Zend Technologies
+```
+
+which platform are you using ? Are you sure you're using my branch in a 2.3 context ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T12:57:42Z
+
+I've replayed tests against 5.5.7 / 5.5.10 in TS / NTS, no errors reported. I'm using x86 version, are you using x64 ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-12T13:14:09Z
+
+nope, I'm also on x86. And yes, I am in your branch (I have test failures in the upstream 2.3 branch, but it does not hang forever).
+
+I don't know what the difference could be. Note that I have xDebug though
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T19:48:13Z
+
+@stof I've pushed another branch that use streams instead of file handles. It works as well on my VM, can you give it a try and tell me if it's better ? https://github.com/romainneutron/symfony/tree/fix-windows-stof-edition
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-12T22:30:58Z
+
+not better. The same test is hanging
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-13T09:14:51Z
+
+:( okay, so I've added [a commit](https://github.com/romainneutron/symfony/commit/1b5720dcfad6e507a77dc271c57c2e03ca9a5884) to the branch that revert the pipesCodeProvider for Windows as it was before. If you have a moment and can give it a try ?
+If it's not hanging but still failing, I'd by happy to get you phpunit output
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-14T10:44:44Z
+
+If you want to give feedback, please have a look at this gist https://gist.github.com/romainneutron/9544313
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T14:09:25Z
+
+@fabpot PR is ready

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-08-09T13:29:53Z
+
+This must be tested.
+
+and please add the PR summary according to the contribution guidelines
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2013-08-26T16:15:28Z
+
+I just updated the description of the PR to reference the project of splitting away the ACL component.
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2013-12-12T19:50:43Z
+
+Hey, I finally had time to apply the PR template and write some documentation and tests.
+
+What do you think of it now?
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2013-12-23T14:17:24Z
+
+I just rebased in order to be up-to-date with master. fabbot is complaining a bit, but it's about false positives typo.

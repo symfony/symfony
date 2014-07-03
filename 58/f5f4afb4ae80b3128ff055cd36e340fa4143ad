@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by staabm at 2014-03-25T09:16:45Z
+
+Why is the content already sent over the wire?
+
+The occurred exception in this scenario won't lead to a non http-200 status which is a problem itself, no?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-25T09:24:52Z
+
+@staabm if the header are already sent with a 200 status code, there is simply no way to send a different status code (even without this change). This fix means you will see the error message instead of seeing the PHP warning about headers being sent
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-03-25T09:49:45Z
+
+so should we log a message on warning/debug level which makes the dev aware of this issue...
+already sent content is a error in itself, isn't it`?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2014-03-25T15:42:09Z
+
+@staabm This is done like this in [`Response::sendHeaders()`](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/HttpFoundation/Response.php#L269).
+
+I'm not sure that we need a log for that. The developer need to focus on the actual problem, not on this resulting effect.

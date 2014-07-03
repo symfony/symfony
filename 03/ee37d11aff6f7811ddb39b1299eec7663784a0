@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-31T08:30:14Z
+
+nevermind my previous comment
+
+this PR is :+1: except that it needs the table PR format
+
+---------------------------------------------------------------------------
+
+by infro42 at 2013-12-31T09:02:10Z
+
+@cordoval my bad, I did not check the how to before...
+Now that I am thinking about it, should this be on different branch? Which one?
+Just a simple translation update :)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-31T09:03:29Z
+
+master is fine
+
+just add the PR table template on your Pr description
+http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+and append to your title the beginning [Validator]

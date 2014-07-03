@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by OwlyCode at 2014-06-12T19:37:26Z
+
+I changed the fix so now $suffices will be accessed via ``self::$suffices`` and still be private. Thank you for your feedback !
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-12T19:41:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-12T19:43:31Z
+
+:+1:

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-24T19:31:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-10-25T04:56:09Z
+
+ok .. will look into writing a test case, though I am not sure if this is testable on the CLI ..
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-10-27T16:37:48Z
+
+i tried adding a unit test but as I feared it doesn't seem possible and it seems like we do not really have other tests for this either.
+
+I looked a bit on the web and found:
+http://stackoverflow.com/questions/9745080/test-php-headers-with-phpunit
+http://stackoverflow.com/questions/9127252/phpunit-test-for-expected-headers
+
+but I could not get either of the proposes solutions in the various responses to work and return me all headers.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-10-27T17:25:02Z
+
+@lsmith77 you can add a functional test for php >= 5.4 (with the build-in php server).

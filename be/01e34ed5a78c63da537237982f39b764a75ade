@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-22T16:56:57Z
+
+ping @beberlei @bschussek
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2013-12-04T13:07:36Z
+
+Is there anything I can do to help get this merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-04T13:39:39Z
+
+@DRvanR convince @beberlei to have a look at the change ;)
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-12-04T14:17:33Z
+
+@DRvanR Can you refactor this to remove the array_walk in is_array and have both if conditions use the same looping mechanism? Otherwise this looks ok. I don't know if there are any tests for this though and we can rely on this working without you adding a new test. I would prefer a test
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2013-12-04T14:33:58Z
+
+@beberlei will do, will try to have something by the end of the week (swamped with work atm). Do note however that it is `array_walk_recursive`, with [explicitly commented][1] support for recursive arrays. Seems that removing that might be a potential BC break?
+
+[1]: https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Doctrine/Form/Type/DoctrineType.php#L84
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-12-04T14:52:45Z
+
+@DRvanR oh yes you are right, i didnt notice that. Good question then...

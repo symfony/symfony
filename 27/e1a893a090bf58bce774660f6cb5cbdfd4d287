@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by Koc at 2014-04-17T08:17:52Z
+
+It looks rather than bugfix than new feature). Any chance merge this ti 2.3/2.5?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-17T08:56:00Z
+
+Did it work before: not ideally from a user land pov, but yes => not a bug
+Does it work better now: yes => a new feature
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-17T09:39:39Z
+
+I think this could still go in 2.5 as part of the stabilization phase
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-18T13:39:12Z
+
+Just retagged as bug fix, hopping like you that it can go through 2.5 ;-)
+
+I also pushed an important code update: fatal errors also are now re-injected in the `HttpKernel->handleException` + `HttpKernel::terminate` code path. That means that KernelEvents::EXCEPTION + KernelEvents::RESPONSE + KernelEvents::TERMINATE are triggered even for fatal errors.
+
+As a consequence, the web toolbar and all the other usual sweetness will work again.
+
+The code is resistant to any second fatal error that might happen while doing this re-injection thanks to a pre-buffering technique implemented by HandledErrorException: in the worst case, the response will be the same degraded one as before.
+
+As a corollary, the stack trace is now fixed for fatal errors when xdebug is enabled.
+
+Before:
+
+![capture du 2014-04-18 15 21 01](https://cloud.githubusercontent.com/assets/243674/2742175/a708b2a2-c6fe-11e3-81f4-da2ccbfa8ceb.png)
+
+After:
+
+![capture du 2014-04-18 15 21 27](https://cloud.githubusercontent.com/assets/243674/2742176/ad8110c0-c6fe-11e3-8458-c93a36de064d.png)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-18T13:50:45Z
+
+You should probably update changelogs to mention deprecations
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-18T20:28:53Z
+
+... and tests do not pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-18T21:01:34Z
+
+Hum... fixed!

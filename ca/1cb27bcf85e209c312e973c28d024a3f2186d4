@@ -1,0 +1,263 @@
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T08:54:42Z
+
+ping @bschussek
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-09T09:09:36Z
+
+The "csrf_protection" setting is form specific, while the CSRF services are independent of forms. So your solution only works if you create a second configuration setting.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T09:16:34Z
+
+@stof @bschussek Ok, so what about this:
+
+- always load `security.xml`, no configuration for it, `security-core` is a hard dependency of `FrameworkBundle` so we can do this
+- only load `security_csrf` if the form csrf protection is enabled
+
+I think this makes the most sense for now.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-09T09:21:45Z
+
+@asm89 It does not. The `security_csrf` services are completely independent from the Form component.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T09:23:03Z
+
+@bschussek ``csrf_protection`` in the FrameworkBundle config is not form-specific. Otherwise, it would be nested inside ``form``
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T09:24:14Z
+
+@bschussek Ok, I see what you mean. I was referring too much to the "old" situation.
+
+Any suggestions for naming the new configuration option? I'll add it + tests etc. That will mean that if you enable csrf protection for forms, you will also have to enable the security csrf stuff and session, but that's fine (and default). :)
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T09:26:18Z
+
+@stof Yes, that was what I thought, hence my suggestion above. In the "old" situation I guess "csrf_protection" only had impact on forms, but now you also get access to a token generator etc.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-09T09:26:56Z
+
+What's the benefit of making this configurable?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T09:27:17Z
+
+@asm89 the CSRF token generator was also exposed outside forms previously
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T09:31:41Z
+
+I pushed a new commit, now the secure random generator service is always created, the csrf stuff only if you enable it in the configuration.
+
+@bschussek We don't use it. By always loading `security_csrf.xml` by default you're always forcing me to use sessions which I also don't use. Now it's all configurable.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T09:41:38Z
+
+@bschussek As the CSRF system has a dependency on the session, and the session system can be disabled (if you are building a stateless API for instance), it is important to allow disabling it (otherwise you forbid disabling the session)
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-09T10:08:20Z
+
+That's a good point then. The commit is still missing the changes to the configuration class, as well as a test case. Also, the setting should default to `true` if the form CSRF setting is enabled (for simplicity, and for BC).
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T10:15:37Z
+
+@bschussek which configuration change ? The config already exists as of 2.1 (or maybe even 2.0 but this is too old for me to remember). Your refactoring made it being ignored.
+
+@asm89 in 2.3, there is a LogicException being thrown when enabling the CSRF protection without enabling the session. You should also restore it
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-09T10:30:02Z
+
+@stof Sorry, my bad. I forgot that these two settings are already decoupled. :+1: then
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T11:09:23Z
+
+@stof Ok, so I'll restore the `LogicException`. Anything else this PR needs?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T11:12:54Z
+
+@asm89 Actually, you only need to move the exception. It is still thrown by the configuration of form in case the CSRF protection is enabled. The exception should be thrown by the registration of the CSRF system itself
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T15:04:33Z
+
+@stof @bschussek @fabpot Ok, we have to change the default configuration of the framework bundle. Currently we try to do the following by default:
+
+- csrf *on* / session *off* / form *off*
+
+But since csrf depends on session, this makes no sense. We can do one of the following:
+
+- csrf *off* / session *off* / form *off*
+- csrf *on* / session *on* / form *off*0
+
+For now I'll pushed the version where csrf is off by default. Note that the configuration shipped with symfony standard enables csrf, forms and sessions by default.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T15:23:58Z
+
+I just came up with another option. We can/should introduce a new configuration option under the `form` key to enable CSRF protection for forms, this can be enabled by default if you enable forms. So:
+
+```yaml
+# this will throw an exception that it needs csrf_protection to be enabled
+framework:
+    form: ~
+```
+
+```yaml
+# this will throw an exception that it needs session to be enabled
+framework:
+    csrf_protection: ~
+    form: ~
+```
+
+```yaml
+# this is fine
+framework:
+    csrf_protection: ~
+    form: ~
+    session: ~
+```
+
+```yaml
+# this is also fine
+framework:
+    form:
+        csrf_protection: false
+```
+
+I think by introducing an extra configuration setting `csrf_protection` under form, we can come closest to how it worked before + now you explicitly disable `csrf_protection` under `form`.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T16:04:41Z
+
+@asm89 Please don't change the default value in the Configuration class, keeping the same than in 2.3. Anything else would be a BC break.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-09T16:11:25Z
+
+@stof ok, but then the default configuration will throw a LogicException
+(since csrf is ON by default and session is not)...
+Op 9 okt. 2013 18:05 schreef "Christophe Coevoet" <notifications@github.com>
+het volgende:
+
+> @asm89 <https://github.com/asm89> Please don't change the default value
+> in the Configuration class, keeping the same than in 2.3. Anything else
+> would be a BC break.
+>
+> —
+> Reply to this email directly or view it on GitHub<https://github.com/symfony/symfony/pull/9252#issuecomment-25983794>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-09T16:12:13Z
+
+ah sorry, the default is indeed not working anymore because of csrf_protection being enabled by default but not session. But as 2.3 loads the CSRF only when enabling forms, the default was working previously. We indeed need to change some default even if now fully BC (the only way to be fully BC would be to make the CSRF dependent on form again, which looks like a weird choice)
+
+Your proposal looks good to me. It is technically as small BC break (you have to list ``csrf_protection`` explicitly) but it was already listed explicitly in the [standard edition](https://github.com/symfony/symfony-standard/blob/2.3/app/config/config.yml#L13) since 2.0 so most people should already have it and not be impacted by the BC break.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-10T09:43:24Z
+
+@bschussek @stof @fabpot Ok, this was bigger than expected. I now implemented it as discussed above. I needed to add a new attribute to the xsd in order to make it work.
+
+There is still one thing I think we have to change. Currently you have to configure the `field_name` under the `csrf_protection` key. Since we now have a `csrf_protection` key under `form` I think it belongs there. I think we have two options here:
+
+- add `field_name` under `framework.form.csrf_protection`, remove `framework.csrf_protection.field_name` (BC break?)
+- add `field_name` under `framework.form.csrf_protection`, keep `framework.csrf_protection.field_name`, and support both, remove in 3.0
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-10T10:12:57Z
+
+@asm89 the BC way should be used, but I agree that it is more logical under ``form``
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-10T13:21:38Z
+
+@bschussek @stof I still need to add some tests + actually use the `form.csrf_protection.field_name` field.
+
+The question is, how do we handle that we now have the `field_name` configuration twice? I was thinking of removing the default values from in `Configuration.php`. Then:
+- if `form.csrf_protection.field_name` is not null, it always takes precedence
+- if `csrf_protection.field_name` is set atnd `form.csrf_protection.field_name` is not, we'll take `csrf_protection.field_name`
+- if both are not set I'll set the default `_token` value in the Extension class
+
+What do you think?
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-10T13:52:12Z
+
+@asm89 you could keep the default for ``csrf_protection.field_name``. but the new location should indeed have precedence.
+And you should mention it in the ``info()`` of fields so that the doc mentions it
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-10T13:54:44Z
+
+@stof In that case I have to check in the `Extension` if one if the fields is not the default value `_token` and after that take the precedence in mind. I guess that could work?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-10T14:02:41Z
+
+@asm89 No. I said to keep the default in the second one, which can never take precedence. so the extension would only do 1 check:
+
+- if ``form.csrf_protection.field_name`` is set, use it (there is no default in the configuration so it is always set by the user)
+- otherwise, use ``csrf_protection.field_name`` (which will always be set when reaching the extension as it would default to ``_token``)
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-10T14:04:33Z
+
+:+1: makes sense
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-10T15:31:38Z
+
+@stof I think it's done now. :) Only thing to be done is mentioning the BC break in the changelog I think.
+
+---------------------------------------------------------------------------
+
+by asm89 at 2013-10-26T08:15:32Z
+
+@fabpot I think this one is good to go. Should I mention the change in the changelog + add a note somewhere that the deprecated setting should be removed in 3.0?

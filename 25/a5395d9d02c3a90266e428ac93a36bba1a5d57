@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2013-03-08T10:47:07Z
+
+@Tobion i think routing is your area of expertise:)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-08T11:23:33Z
+
+I would make the query string a first class citizen instead.
+
+---------------------------------------------------------------------------
+
+by lmcnearney at 2013-03-08T18:16:14Z
+
+@fabpot As you requested

@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by ruben-podadera at 2014-03-22T11:56:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-26T07:10:15Z
+
+Tests are broken.
+
+---------------------------------------------------------------------------
+
+by cedriclombardot at 2014-03-26T13:11:36Z
+
+@fabbot-io, @fabpot I've fixed propel bridge test but for others i don't understand why its broken can you help me.
+
+If i run tests on master on my VM i have sames failures
+
+````
+
+Time: 28.96 seconds, Memory: 202.75Mb
+
+There was 1 failure:
+
+1) Symfony\Bridge\Twig\Tests\Extension\FormExtensionDivLayoutTest::testTextarea
+Failed asserting that
+
+/textarea
+    [@name="name"]
+    [not(@pattern)]
+    [.="foo&bar"]
+    [@id="my&id"]
+    [@class="my&class"]
+
+matches exactly once. Matches 0 times in
+
+<textarea id="my&amp;id" name="name" required="required" pattern="foo" class="my&amp;class">foo&amp;bar</textarea>
+
+/home/vagrant/symfony/src/Symfony/Component/Form/Tests/AbstractLayoutTest.php:83
+/home/vagrant/symfony/src/Symfony/Component/Form/Tests/AbstractLayoutTest.php:99
+/home/vagrant/symfony/src/Symfony/Component/Form/Tests/AbstractLayoutTest.php:1503
+
+````
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-03-26T13:30:45Z
+
+@cedriclombardot Mentioned test was fixed in #10535.
+
+---------------------------------------------------------------------------
+
+by cedriclombardot at 2014-03-26T14:10:10Z
+
+@stloyd thanks, i have yet one bug
+
+````
+There was 1 failure:
+1) Symfony\Component\Process\Tests\SigchildDisabledProcessTest::testMustRun
+Failed asserting that exception message 'This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.' contains 'his PHP has been compiled with --enable-sigchild. Term signal can not be retrieved.'.
+FAILURES!
+Tests: 300, Assertions: 670, Failures: 1, Skipped: 11.
+````
+
+Any idea for this one ?

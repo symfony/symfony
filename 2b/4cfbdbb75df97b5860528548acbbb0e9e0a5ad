@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by bamarni at 2013-02-27T17:11:29Z
+
+it failed on 2/4 travis builds (under php 5.4), do you think it's because of me?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T07:58:19Z
+
+Looks good to me. Can you rebase and squash your commits? Thanks.
+
+---------------------------------------------------------------------------
+
+by bamarni at 2013-03-23T09:58:03Z
+
+I've just squashed them.

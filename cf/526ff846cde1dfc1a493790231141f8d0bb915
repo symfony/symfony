@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by thewholelifetolearn at 2013-01-13T12:04:53Z
+
+@stloyd : Thank you for your remarks. I have taken them to account. But I don't like the new architecture of the validator. Too many nested if/elseif/else.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T08:34:05Z
+
+Does it belongs to Symfony core (I mean, that's not a validator that is really often needed)? So, for me, that's out of scope. What do you think @bschussek?
+
+---------------------------------------------------------------------------
+
+by thewholelifetolearn at 2013-03-26T08:54:23Z
+
+I do not know if it is often needed/used as I don't know all projects done with Symfony2 but it gives a choice more for developers. Plus, I don't see myself creating a new bundle just for this validator and it would be sad to have different validators for the same purpose.
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-04-08T17:32:52Z
+
+I refactored this validator and added it to [SprainValidatorBundle](https://github.com/sprain/SprainValidatorBundle). My idea is to make this a growing repo of validators which are not part of the Symfony2 core. Is this considered a good idea?
+
+---------------------------------------------------------------------------
+
+by thewholelifetolearn at 2013-04-08T21:24:45Z
+
+It can be a good idea to have an "unofficial" validator bundle but what are the characteristics for official validator?
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-04-08T21:38:57Z
+
+Good question … Any answers out there, @fabpot? What are the criterias whether something (like a new validator) should be included in the Symfony2 core?

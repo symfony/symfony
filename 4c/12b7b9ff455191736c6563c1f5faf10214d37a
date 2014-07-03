@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by ErichHartmann at 2014-01-16T19:17:05Z
+
+If any, could you please describe risks or security implications that might result from the ability to set the ACL directly from the command line?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-01-16T19:55:27Z
+
+@ErichHartmann I think there is no specific security risk or implication for this command. If an attacker get a shell on your server, it's over. Even without this command.
+
+He can access to database's credentials through `app/config/parameters.yml`, run any SQL query (including an ACL related one) with `doctrine:query:sql`, run arbitrary PHP code with `php -a` and do even worse with the shell itself (`rm -Rf /`).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-02-11T09:49:59Z
+
+Is this PR ready to be merged? Can I start working on the PR in the doc?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-03T17:38:15Z
+
+@dunglas There is no need to document the command in the docs, but the help message should be expanded instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-04T21:08:52Z
+
+the ``isEnabled`` method should be overwritten so that the command is available only when the ACL system is enabled. See the ``router:debug`` command for an example of usage
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-03-04T22:35:18Z
+
+@fabpot @stof thanks for the review. I'll be very busy next week but I'll make needed changes when I'll be back.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-03-19T20:40:11Z
+
+@fabpot @stof Fixed reported issues and added the ability to use `/` as a namespace delimiter. Added a more precise (but still rude) help message.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-04-09T22:18:23Z
+
+Fixed options types.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-04-21T12:33:08Z
+
+@fabpot use arguments when required. Simplified and enhanced CLI.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-22T07:26:25Z
+
+Looks good to me for 2.6. Thanks.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-04-25T16:43:58Z
+
+Renamed weird variable.

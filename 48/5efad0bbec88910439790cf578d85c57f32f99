@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by Bendihossan at 2014-02-14T15:07:28Z
+
++1
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2014-02-20T13:54:42Z
+
+Anyone? Should just be fixing a simple regression... @webmozart @fabpot
+
+---------------------------------------------------------------------------
+
+by craigmarvelley at 2014-02-26T10:12:29Z
+
+I'd really appreciate someone taking a look at this - we aren't able to work around it and upgrading to 2.4 is not feasible at the moment.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2014-02-26T10:13:14Z
+
+ping @cordoval @jakzal
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-27T00:06:43Z
+
+We have to come up with a tool that notifies or verifies the authors of the PRs merged when these type of ripple forward merging of 2.2 or 2.3 is done into the upstream branches. So that perhaps we can verify that @fabpot has not skipped anything since usually is the case that the PR author can say yes or no if things have been rightly merged also. But that is just an idea.
+
+In any case, I believe the problem is twofold. We merged a test which is not a regression test because it does not fail when this change was not imported. This is our current situation. The test did not tell us that this was missing when it should have. This is a critical requirement to add even perhaps a note on the notes for contributors, especially for bugfixes.  @jenkoian could you please fix the regression test?
+
+The second part, I forgot :baby:
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2014-02-27T18:27:21Z
+
+Thanks for the reply @cordoval!
+
+I've updated the test so that it fails without my change. Let me know if there's anything else you need.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-27T18:58:13Z
+
+this should be green, what it would be beautiful is if you add two commits, one with the failing test and travis fails and the next one making it green :baby:, that way we give it a second chance to the stopwatch and signal failing tests which are unrelated.
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2014-02-27T23:05:50Z
+
+OK @cordoval have pushed just the failing test for now - when travis reports back I'll commit the fix - hope that's what you meant...
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2014-03-03T09:17:12Z
+
+ping @cordoval

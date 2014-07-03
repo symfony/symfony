@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2013-11-05T15:04:03Z
+
+I've amended few changes:
+  - changed names (prevSlot/currSlot => prevPeriod/currPeriod)
+  - added a unit test which show the wrong behaviour of the previous version
+  - always redraw when completed
+
+...and rebased to upstream/2.3.
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2013-11-05T15:15:56Z
+
+@stof Thanks, I didn't noticed it.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-05T15:26:29Z
+
+@fabpot What about removing code duplication by rewriting ``advance()`` to reuse ``setCurrent`` ?
+
+```php
+public function advance($step = 1, $redraw = false)
+{
+    $this->setCurrent($this->current + $step, $redraw);
+}
+```
+
+the only change would be that advancing from a negative step would be forbidden. But I don't think it works properly currently anyway (IIRC, this is the reason why ``setCurrent`` has a check on the new value).
+And it does not make sense to have the progress advance from a negative step anyway

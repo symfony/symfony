@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-16T19:56:40Z
+
+I'd prefer to keep the default values in the constructor.
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-17T01:34:18Z
+
+@fabpot I restored the default values.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-17T07:22:01Z
+
+Can you add a note in the UPGRADE_3.0 file about this change and also a note into the CHANGELOG files for the two components?
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-17T20:39:19Z
+
+@fabpot Done and done.
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-18T14:03:45Z
+
+@cordoval Both done.
+
+---------------------------------------------------------------------------
+
+by realityking at 2013-12-18T17:17:39Z
+
+@fabpot Fixed and rebased to master.

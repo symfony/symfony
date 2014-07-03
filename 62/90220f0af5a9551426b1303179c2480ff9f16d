@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-04-06T19:52:48Z
+
+@romainneutron your code above looks wrong to me. A ProcessBuilder is not meant to be reused several times. It is a stateful object to build a Process.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-06T20:16:58Z
+
+The way I use it most of the time is as a `Process` factory with defined parameters as I wrote in my example.
+
+I'm not shocked that it has a state. The workaround for the moment is to write the following code that does not so much more but consuming much more memory has a `ProcessBuilder` is created for each process :
+
+```php
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\ProcessBuilder;
+
+class PhpDriver
+{
+    private $pbf;
+
+    public function __construct(ProcessBuilderFactory $pb)
+    {
+        $this->pbf = $pbf;
+    }
+
+    public function getInfos()
+    {
+        return $this->execute('-i');
+    }
+
+    public function getVersion()
+    {
+        return $this->execute('-v');
+    }
+
+    private function execute(array $arguments)
+    {
+        return $this
+            ->pbf
+            ->createBuilder()
+            ->setArguments($arguments)
+            ->createProcess()
+            ->run()
+            ->getOutput();
+    }
+}
+
+class ProcessBuilderFactory
+{
+    private $prefix;
+
+    public function __construct($prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    public function createBuilder()
+    {
+        return new ProcessBuilder(array($this->prefix));
+    }
+}
+
+$finder = new ExecutableFinder();
+
+$pbf = new ProcessBuilderFactory($finder->find('php'));
+
+$driver = new PhpDriver($pbf);
+$driver->getVersion();
+$driver->getInfos();
+```
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2013-04-06T20:18:56Z
+
+Actually, I got the feeling of writing a factory of a factory in this second case

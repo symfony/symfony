@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by lsmith77 at 2013-08-22T17:27:54Z
+
+how about adding something into the bootstrap files?
+https://github.com/symfony-cmf/Routing/blob/master/Tests/bootstrap.php#L3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-22T18:13:49Z
+
+We don't have a bootstrap file and it would have to be duplicated for all components/bundles/bridges. I think it's not worth it.

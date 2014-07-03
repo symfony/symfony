@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by drak at 2013-04-15T16:33:02Z
+
+@MidnightLightning - could you please add a CHANGELOG.md entry for this (it's in the HttpfFoundation component root.
+
+---------------------------------------------------------------------------
+
+by drak at 2013-04-20T16:49:06Z
+
+@fabpot - this PR seems ok to merge IMO

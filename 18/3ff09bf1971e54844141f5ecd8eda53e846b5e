@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-07-10T07:26:19Z
+
+Bug report is for version `2.2`, shouldn't this go against `2.2` too?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-07-10T07:29:59Z
+
+nice, when someone says something like what @stloyd said, what is the approach? open 2 or 3 PRs with the changeset for each branch? or the maintainer would cherry-pick in case it is a clean merge? :baby:
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2013-07-10T07:32:23Z
+
+@cordoval open one for 2.2 and fabien will merge it into 2.3 i think :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-10T07:34:21Z
+
+nope, always open a PR on the oldest branch and I will then merge it to the newest one. By the way, this is documented.

@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-24T10:42:43Z
+
+ping @bamarni @lsmith77
+
+---------------------------------------------------------------------------
+
+by danielcsgomes at 2013-03-24T10:49:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Swop at 2013-03-24T10:53:22Z
+
+Yeah it would be awesome! :+1:
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-03-24T10:55:30Z
+
+Will services tagged as "cache warmer" replaced with listeners for cache:clear command?
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-03-24T10:56:19Z
+
+best way to introduce this feature by a longshot without changing existing code, +1 from me.
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-03-24T11:01:54Z
+
+@Koc that doesn't make sense imho, Cache Warming should work independent of console listeners.
+
+---------------------------------------------------------------------------
+
+by Koc at 2013-03-24T11:05:08Z
+
+@fabpot can we get all output as a string in terminate event?
+
+---------------------------------------------------------------------------
+
+by XWB at 2013-03-24T11:06:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by marcqualie at 2013-03-24T11:07:17Z
+
+:+1: I've been working with a few Symfony Console apps lately and this functionality would be awesome!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-24T11:07:43Z
+
+@Koc: you can wrap/change the output instance in the command event, so that you can then get what was displayed in the terminate event. This PR gives you the flexibility, it's then up to you to use it the way you want.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-03-24T11:37:30Z
+
+(I repost my comment, github hide it for now)
+
+It could be useful to be able to not throw the exception in `Application::doRunCommand` ; like in the `HttpKernel`.
+
+Use case : you have a long running process like a rabbitmq consumer. With this feature, we could delegate the exception process into a dedicated event listener and make the "raw" command cleaner.
+
+---------------------------------------------------------------------------
+
+by bamarni at 2013-03-24T11:40:44Z
+
+good to see this moving forward :+1:
+
+@stof had previously spotted a bug with this feature and the cache:clear command, see (https://github.com/symfony/symfony/pull/3889#issuecomment-8085393 for the beginning of the discussion), basically we came out to the conclusion that the cache:clear command shouldn't have this event dispatching capability, otherwise it would require some dirty hacks, do you think it will be easily doable when integrating this to the framework (as I can see this PR is only about the component part)?
+
+---------------------------------------------------------------------------
+
+by bamarni at 2013-03-24T11:58:11Z
+
+I'd also have a remark about the ability to change the command to be executed through the pre-event, do you have any use case in mind? Imo this doesn't make so much sense.
+
+I can see it'd use the same input object, It means that the changed command should have the same arguments / options than the first one, or basically that it should be able to work with the same input, it looks like a pretty restricting condition.
+
+It is also not always so easy to instantiate a command object, for example when using this feature with the framework, one would always need to have the container so that it can passes it to the command (as usually they are container aware), it looks like all this would be kind of a "sub-application".
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-24T13:39:04Z
+
+@fabpot Would you use the same listener than for the kernel when integrating it in a Sf2 project ? Because in this case, we would face the bug I reported in the previous PR: if you deleted a subscriber class and the kernel is in non-debug mode, creating the event dispatcher object will break (in debug mode, the container would be refreshed without the subscriber). But the ``cache:clear`` command should be able to be used even when you have an outdated cache as its goal is to clear it.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-24T13:40:12Z
+
+otherwise, :+1: for this implementation.
+
+Should the listener flushing the swiftmailer memory spool be added in the bridge in this PR or in a subsequent one ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T07:57:18Z
+
+@bamarni You're right. I've removed the possibility to change the command in a console.command listener.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T07:58:40Z
+
+@lyrixx not sure how to implement that. Let's do that in another PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T07:59:37Z
+
+@stof @bamarni I'm aware of the possible problems with `cache:clear`. But we already have such issues today. When upgrading Symfony where a new parameter in the DIC is required without default value, you have the same problem. So, I propose to deal with that in another PR.
+
+see #6519 for instance
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T08:10:58Z
+
+@stof The Swiftmailer listener should be done in another PR, especially because it is not that easy (the best would be do be able to move the listener from the bundle to the bridge).

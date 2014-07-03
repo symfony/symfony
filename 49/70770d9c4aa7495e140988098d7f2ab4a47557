@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2013-07-18T07:33:55Z
+
+I've submitted this PR to 2.2, but it will not merge well into 2.3 as the method name is generated in many more places.
+
+Should I resubmit the PR on 2.3 or master ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-18T13:11:17Z
+
+If there are significant changes, submitting a PR for 2.3 too makes sense. Thanks.

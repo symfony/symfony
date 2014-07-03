@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-07-27T02:49:15Z
+
+This should be tested
+
+---------------------------------------------------------------------------
+
+by TerjeBr at 2013-07-27T10:09:22Z
+
+It would be great if someone else would step up and do some testing of this.
+
+---------------------------------------------------------------------------
+
+by quietkillah at 2013-08-08T13:44:20Z
+
+This doesn't seem to fix the issue. After testing this i recieved:
+The Symfony\Component\Intl\NumberFormatter\NumberFormatter::parse() method's argument $position behavior is not implemented. Please install the "intl" extension for full localization capabilities.
+
+---------------------------------------------------------------------------
+
+by TerjeBr at 2013-08-08T17:33:56Z
+
+@quietkillah I do not know when what you mentioned here https://github.com/symfony/symfony/pull/8588#issuecomment-22324215 happend, but at least this PR is an improvement.

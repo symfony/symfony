@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-09-05T13:19:10Z
+
+:+1:
+
+This is exactly how it's solved in the [StreamOutput](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Output/StreamOutput.php#L104).

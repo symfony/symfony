@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-29T20:14:20Z
+
+ping @willdurand
+
+---------------------------------------------------------------------------
+
+by willdurand at 2013-08-29T23:12:57Z
+
+What is the use case?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-07T06:47:06Z
+
+@K-Phoen Can you tell us more about your use case?
+
+---------------------------------------------------------------------------
+
+by willdurand at 2013-09-11T21:22:02Z
+
+Ok, so I checked the use case with @K-Phoen and it makes sense.
+
+Basically, Propel identifies a column either by "table name" or "php name". Until now, columns can only be retrieved by "table name", this PR allows to retrieve columns by "php name".
+
+:+1:

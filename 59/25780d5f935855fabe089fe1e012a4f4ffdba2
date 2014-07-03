@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-04-09T14:21:09Z
+
+@stloyd thanks for this *pull request*. I really like it!  The only thing that I'm not sure about is the date placeholders. You propose to use the following:
+
+```jinja
+<input type="text" name="start" id="start" value="{{ start }}"
+       placeholder="i.e. {{ '-2days'|date('d.m.Y') }}">
+
+{# ... #}
+
+<input type="text" name="end" id="end" value="{{ end }}"
+       placeholder="i.e. {{ 'now'|date('d.m.Y') }}">
+```
+
+In my opinion, using dynamic dates is **handy** but not always **helpful**. The problem with dates is that you never know if the first number is the day or the month. Take for example your screenshot: `07.04` is the 7th of April or the 4th of July?
+
+I'm not sure about this but, do you think it could be better to replace the dynamic dates for *date format placeholderes* such as `dd.mm.YYYY`?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-04-09T15:25:07Z
+
+@javiereguiluz Really good point, and I must say that I was not sure what to put there, so I choose most common format I know =)
+
+But taking your point I think that this version: `9th April 2014`, looks better than `dd-mm-YYYY` (or `dd.mm.YYYY`):
+![form](https://cloud.githubusercontent.com/assets/67402/2657293/de08df4e-bffa-11e3-95be-9f364ea84747.png)
+![form2](https://cloud.githubusercontent.com/assets/67402/2657294/de0b1afc-bffa-11e3-9c6f-e9a1293ad0d7.png)
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-04-09T18:29:04Z
+
+A placeholder like `9th April 2014` could make people think they have to type the whole month-names into the field... I like the format placeholder
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-09T22:25:41Z
+
+`e.g. 9th April 2014` is correct whereas `e.g. dd-mm-YYYY` is not correct (dd-mm-YYYY is a format, not an example)
+
+As Javier proposed, I'm much more in favor of using `dd-mm-yyyy` as a placeholder as developers understand it, and they would write a date using the correct format.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-04-09T22:37:41Z
+
+instead of placeholders for date inputs I would use input="date" in order to benefit the features offered by browsers and html5
+![inputdate](https://cloud.githubusercontent.com/assets/77759/2662124/82298588-c037-11e3-8c0c-c5727da5f1a7.png)
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2014-04-10T14:53:07Z
+
+:+1: for date input
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-15T20:39:01Z
+
+Using a date input as suggested by @pborreli makes a lot of sense as all browsers used by developers probably support this anyway.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-03T21:12:11Z
+
+@stloyd Can you update this PR?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-06-04T09:13:19Z
+
+@fabpot Done, unfortunately we can't use only `date` type, it's not supported by IE & FF, so I have left those placeholders there with suggestion from @javiereguiluz (`dd.mm.YYYY`), also added usage of `url`, as it's support is much wider than that `date` type.

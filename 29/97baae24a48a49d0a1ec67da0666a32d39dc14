@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by egeloen at 2013-11-04T21:32:02Z
+
+I can't find a way to fix failing tests after applying this patch. Can you explain the use case of the failing tests which result of this PR?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-11-09T12:10:31Z
+
+The failing tests in AbstractLayoutTest were intended to test the output escaping of the values. Now that you added strict validation of the values, you can change the test to pass numbers instead of strings.
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-11-09T12:42:15Z
+
+@bschussek Okay thx for your feedback!
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-11-12T21:06:07Z
+
+IMO, the PR is ready!
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-11-19T19:13:20Z
+
+@bschussek @fabpot Something else needs to be done?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2013-12-01T14:25:35Z
+
+ping someone :baby: :)

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-12T08:54:18Z
+
+should this be available in the ProcessBuilder as well ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T09:06:56Z
+
+indeed, I've to add the feature in the process builder, cool idea
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-12T11:04:02Z
+
+`ProcessBuilder` methods have been added

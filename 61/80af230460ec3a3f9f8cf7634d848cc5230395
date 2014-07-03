@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-10-01T15:01:05Z
+
+MinCount and MaxCount are only deprecated in 2.2. the removal should be done in 2.3 only.
+So this PR should only add Count for 2.2
+
+---------------------------------------------------------------------------
+
+by franek at 2013-10-01T15:11:19Z
+
+Except errors, MinCount and MaxCount are not present in 2.2.
+See https://github.com/symfony/symfony/tree/2.2/src/Symfony/Component/Validator/Constraints
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-01T15:15:28Z
+
+ah indeed. MinCount and MaxCount were not implemented in 2.0. They have been added during the 2.1 development before being replaced by Count before the release, so they have been removed totally, not deprecated

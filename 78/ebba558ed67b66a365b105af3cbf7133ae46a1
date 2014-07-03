@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by lizjulien at 2013-03-20T15:18:45Z
+
+This seems indeed useless.
+Related #7106, can you confirm @Seldaek ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-20T15:23:32Z
+
+I'm pretty sure we need to keep the null condition. If not, there is no way to override the cwd.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-03-20T18:52:33Z
+
+Sure the null check needs to say, it should be like this IMO: `if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || defined('PHP_WINDOWS_VERSION_BUILD'))) { ... }`
+
+---------------------------------------------------------------------------
+
+by lizjulien at 2013-03-20T19:40:37Z
+
+Ok i'll fix

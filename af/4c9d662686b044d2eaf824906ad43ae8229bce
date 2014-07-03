@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by tucksaun at 2013-05-06T16:00:46Z
+
+This eases reusability and extensibility
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-05-07T10:05:47Z
+
+What about injecting the `translationNodeVisitor` instance in the constructor (as an optional argument of course)?
+
+---------------------------------------------------------------------------
+
+by tucksaun at 2013-05-07T10:50:40Z
+
+Yeah I also think about this option (and want your opinion about that).
+The purpose is to be able to override the translationNodeVisitor without must rewrite everything so it's +1 for me.
+
+I make the change accordingly.

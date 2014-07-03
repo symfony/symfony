@@ -1,0 +1,162 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T14:39:12Z
+
+```php
+interface NodeTraverserInterface
+{
+    public function addVisitor(NodeVisitorInterface $visitor);
+    public function removeVisitor(NodeVisitorInterface $visitor);
+    public function traverse(array $nodes);
+}
+
+interface NodeVisitorInterface
+{
+    public function beforeTraversal(array $nodes);
+    public function afterTraversal(array $nodes);
+    public function enterNode(Node $node);
+    public function leaveNode(Node $node);
+}
+```
+
+You type hinted some methods with `array`. It's preferable to not type hint to allow a refactoring to give a `Traversable` objectinstead. I'm not why someone would like to change it, but...
+
+I know @fabpot avoid type hinting `array` as much as possible.
+
+---------------------------------------------------------------------------
+
+by yahuarkuntur at 2014-02-18T14:43:49Z
+
+CS = Computer Science? because this looks amazing! :smile:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-18T15:34:17Z
+
+> CS = Computer Science?
+
+Coding Style
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-19T17:27:49Z
+
+The PR is pretty far now. #6138, #7146, #7432 and #8617 are fixed. The Validator component will come with three different implementations:
+
+* legacy: the implementation we had before 2.5 (untouched)
+* legacy compatible: the new implementation with a compatibility layer for <2.5 (will be the default)
+* 2.5+: the new implementation, without the compatibility layer
+
+I stumbled upon a problem though: PHP < 5.3.9 does not like classes that implement two interfaces which each contain the same method. That's a problem, because the legacy compatibility layer implements both the old and the new interfaces, for obvious reasons.
+
+I don't know how to deal with this yet.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-19T17:40:40Z
+
+@webmozart is it only PHP < 5.3.9 ? I thought newer implementation are forbidding it as well (5.3.9 fixed the redeclaration of an abstract method in a child, but I don't think it fixed something related to 2 separate interfaces)
+
+And your tests has a fatal error on PHP 5.3
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-02-19T17:52:25Z
+
+@stof @webmozart it works between 5.3.9 and current:
+
+http://3v4l.org/D4c1I
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-19T19:27:40Z
+
+@stof Yes, it works with 5.3.9+.
+
+Btw. I added new feature descriptions above:
+
+* "Constraint validation as first-class citizen"
+* "Aggregate violations"
+
+I also updated the description of "Control the context of nested validations".
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2014-02-20T07:42:44Z
+
+Does the 5.3.3 really present huge problem?
+IMO The users with that old version are usually huge corporations and those should really use the 2.3 LTS. And By the time next LTS comes around most of the distributions will be on 5.4.x (Yeah go and complain to Redhat they [publicly said](http://marc.info/?l=php-internals&m=138720265110700&w=2) that their next version will use 5.4 and not 5.5, by the time they'll release the redHat 7 the 5.4 will be unsupported)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-20T19:55:02Z
+
+I found a way to fix the tests for PHP < 5.3.9 now. The new implementation cannot be used on those PHP versions. The old implementation, however, continues to work fine in that case (without the new features, obviously).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-20T20:25:06Z
+
+I also enabled the new API on PHP < 5.3.9 now. The compatibility layer, that supports both the old and the new API at the same time, continues to be broken under PHP < 5.3.9 though.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-21T17:52:49Z
+
+Except for the open todos mentioned in the description, this PR is complete now. Feedback welcome. :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-21T18:07:17Z
+
+@webmozart I suggest you remove the unused use statement reported by fabbot (it provides a patch) so that the PR is green
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-11T14:12:44Z
+
+I rebased onto master now, optimized some code parts and did performance comparisons. I used the following simple benchmark: https://gist.github.com/webmozart/9486236
+
+With the benchmark, I get the following results:
+
+API Version | Duration (ms) | Relative Duration (%)
+--- | --- | ---
+2.4 | ~7.8ms | -
+2.5 (recursive implementation) | ~11.8ms | +51%
+2.5 (traverser implementation) | ~14.7ms | +88%
+
+The recursive 2.5 implementation is very similar to the 2.4 implementation, except that the features and bug fixes mentioned above are supported. I'm still trying to improve this to reduce the performance loss.
+
+The traverser 2.5 implementation is identical to the recursive one, only that it uses a NodeTraverser/NodeVisitor architecture to be more extensible. The question is whether we really need this flexibility and whether it warrants the performance loss compared to the recursive implementation.
+
+Any opinions?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-17T19:42:58Z
+
+I did some performance improvements and measurements with a [new benchmark](https://gist.github.com/webmozart/9606689) which doesn't penalize the validator initialization as much as the previous benchmark:
+
+API Version | Duration (ms) | Relative Duration (%)
+--- | --- | ---
+2.4 | ~25.5ms | -
+2.5 (recursive implementation) | ~26.5ms | +4%
+2.5 (traverser implementation) | ~36.9ms | +45%
+
+The numbers with the [previous benchmark](https://gist.github.com/webmozart/9486236) are:
+
+API Version | Duration (ms) | Relative Duration (%)
+--- | --- | ---
+2.4 | ~8ms | -
+2.5 (recursive implementation) | ~10.3ms | +29%
+2.5 (traverser implementation) | ~13.6ms | +70%
+
+The performance of the recursive implementation is much better now (at the expense of code readability in some parts) and probably good enough, given that we also added new functionality. I think we need to discard the traverser implementation though.
+
+Feedback is welcome.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-30T18:19:22Z
+
+Apart from updating the manual, this PR should be ready to merge now.

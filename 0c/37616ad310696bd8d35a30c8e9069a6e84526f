@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-28T19:47:17Z
+
+-1 The profiler uses the html 5 doctype, why should we want to support xHTML?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-28T19:55:34Z
+
+@WouterJ I guess the issue reveals itself if you use the toolbar with an xhtml site, since the toolbar is injected into your website's html.
+
+---------------------------------------------------------------------------
+
+by rafalwrzeszcz at 2013-12-28T20:19:56Z
+
+@WouterJ Like I noted in the message - it's not about whole profiler page, but a toolbar that gets inserted into page, like @jakzal noted. And also HTML5 doctype is same as XHTML5 doctype btw ;).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-28T20:46:31Z
+
+@rafalwrzeszcz sorry, I always forget that the toolbar isn't loaded in an iframe. And no, xHTML5 does not exists, not even xHTML2 :wink:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T21:26:30Z
+
+To be precise, the toolbar is loaded via an Ajax call into the current document.
+
+---------------------------------------------------------------------------
+
+by rafalwrzeszcz at 2013-12-28T21:48:55Z
+
+Yes, but it's then inserted directly into document tree with `innerHTML` (of containing `<div>`) and browser parses it accordingly to current document type, which, in case of XHTML, is XML and bum... we have a syntax error :(.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-12-29T04:32:18Z
+
+:+1: but you should make all pages xhtml compatible. Its missing in Profiler views: admin.html.twig, base.html.twig, header.html.twig, layout.html.twig, search.html.twig. And also some Collector views.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T07:56:33Z
+
+@rafalwrzeszcz  Can you add a space before the `/`?
+@Tobion No, we don't want to make the profiler itself XHTML compatible, just the toolbar that can be embedded into a non-HTML5 page.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-12-29T18:54:42Z
+
+XHTML5 is just a more strict version of HTML5 (xml compatible). I didn't say to return the xhtml mime type. We should just try to make the syntax of the profiler also xhtml compatible for consistency. Otherwise we could also remove many end tags from the profiler because
+
+```
+<ul>
+<li>Foo
+<li>Bar
+</ul>
+```
+
+is also valid HTML5.
+
+---------------------------------------------------------------------------
+
+by rafalwrzeszcz at 2014-01-05T21:39:44Z
+
+@Tobion Yes, but (1) I think it's out of scope of this PR (it's just about bugix) and (2) it would produce excessive diff without any real benefit.

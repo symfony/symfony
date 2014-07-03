@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-27T10:08:59Z
+
+what is your use case ? We don't change the visibility from private to protected without a valid use case for this, as it means we would now have to maintain BC on this extension point until 3.0
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2014-04-27T12:02:27Z
+
+We have a specialized UserProvider interface, where we pass the user + the token and not just the user to `refreshUser()` in order to check for `ROLE_PREVIOUS_ADMIN` in case of previous user switch. That role is obviously not present in the user and if certain checks should not be executed on `refreshUser()` in the `UserProvider` implementation there is no way to check for `ROLE_PREVIOUS_ADMIN`.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2014-04-29T21:10:20Z
+
+@fabpot anything we need to do before this can be merged?

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-02-07T22:30:55Z
+
+Adding new methods in an interface is a BC break, so it cannot be done until 3.0
+
+---------------------------------------------------------------------------
+
+by stof at 2014-02-07T22:31:57Z
+
+ah sorry, I commented based on the PR description without looking at the diff. I thought you were doing the code change
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-07T23:34:00Z
+
+No problem. I wanted to add a note in the upgrade file in order to not forget it ;)

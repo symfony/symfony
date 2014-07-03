@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-04-12T14:54:49Z
+
+You mentioned wrong issue in  description, should be #7644.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-04-12T14:57:11Z
+
+i fixed it thanks, damage has been done @stloyd  though
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-12T14:59:19Z
+
+But this is only a test, so it cannot be fixed, right?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-04-12T15:06:57Z
+
+@fabpot exactly it is a missusage, the test clarifies the way to achieve this
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-12T16:15:44Z
+
+I don't get it. It he wants his attribute to be '1,2,3,4', it seems legitimate to me and it is clearly not a number.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-04-12T16:18:52Z
+
+@fabpot  he does not want a `1,2,3,4` which is a string humanly noticeable
+he wants to imitate the `123,456` notation which pertains to numbers units, thousands, millions, billions, etc.
+That notation is reserved to numbers only, therefore he must use a workaround with spaces. There is no harm on spaces he can later just use php ability to just parse it.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-04-12T17:18:52Z
+
+@fabpot  solved :+1:
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-04-12T17:29:05Z
+
+Seems fine, although it is madness that we allow "," as thousand separator in there at all IMO. I'd rather see this fixed, but I am not sure what this code is used for and what the impact would be.
+
+How about you do an integer list and depending on the integers you have, they're either parsed as a string (integer list) or a float (thousand separators)? Sounds inconsistent and very error prone.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-04-13T20:26:05Z
+
+@fabpot @Seldaek after reading this http://stackoverflow.com/questions/13553933/define-symfony-2-tag-attribute-as-an-array-in-xml-configuration now i understand what needs to happen, everything with `,` should be rendered as a string.

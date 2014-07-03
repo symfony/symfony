@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T14:21:31Z
+
+Updated PR headers
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-03-18T21:45:45Z
+
+I've moved the discussion under #10486 so this PR can be merged and fix windows escaping (no BC break, still the same strategy)

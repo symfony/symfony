@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T11:32:48Z
+
+I'm against these changes because it's going to make merging between tests so much complicated.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-02-07T12:05:04Z
+
+@fabpot that's true, I was actually thinking of this as well.
+
+However, many of those tests are hard to follow. I could put additional effort to back-porting it to the other branches if needed. If that's not the way to go, please close this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-02-07T12:10:14Z
+
+I'm not sure this is worth the effort. But if you want, doing that in the 2.1 branch would be, indeed, better (and cross your fingers for the merge into 2.2 ;)).
+
+---------------------------------------------------------------------------
+
+by vicb at 2013-02-07T14:36:01Z
+
+:+1: tests should be considered as part of the documentation.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-02-07T16:16:04Z
+
+:+1: for the same reasons as @vicb I use tests a lot to discover how to use features that aren't documented yet in the documentation.

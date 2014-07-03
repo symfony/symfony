@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-05-24T09:27:38Z
+
+@fabpot Is metadata the right place to store `notes` ?
+
+I didn't found documentation about purpose of messageCatalogue's metadata, I wonder, if I should store only scalar values (as implemented: array of hash) or if I can store XliffNoteCollection containing XliffNote objects ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T09:39:31Z
+
+Looks good to me :+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T00:22:38Z
+
+:+1:

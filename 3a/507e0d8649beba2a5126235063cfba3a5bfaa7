@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2013-01-10T16:20:36Z
+
+First of... please fix [Coding Standards](http://symfony.com/doc/current/contributing/code/standards.html) to match Symfony2. =)
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-01-10T16:40:02Z
+
+Thanks for your feedback. I updated the code and hope things are ok now.
+
+---------------------------------------------------------------------------
+
+by alexandresalome at 2013-01-10T22:22:33Z
+
+In french (fr_FR) it's "Le numéro IBAN saisi n'est pas valide (International Bank Account Number)."
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-01-11T06:45:39Z
+
+Updated!
+Any ideas why PHPStorm keeps messing with my indentation levels after saving a file?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-01-11T10:52:08Z
+
+@sprain You can use in PHPStrom: `Edit -> Convert Indents -> To Spaces` if it won't help you should change settings: `File -> Settings -> Code Style -> General (or PHP)` and turn of "Use tab character".
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-02-21T15:04:27Z
+
+Thank you for this implementation! Could you please add tests for the null and empty string cases? (see the other validator tests)
+
+Also, as was said, please fix the indentation.
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-02-21T21:31:11Z
+
+Thanks for the feedback.
+Will do when I am back from vacation, in 10 days or so.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T08:32:52Z
+
+@sprain What's the status of this PR? Can you take the comments into account?
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-03-26T09:05:58Z
+
+Thanks for the reminder! I just pushed an update. Hope things are fine now.
+
+---------------------------------------------------------------------------
+
+by AAtticus at 2013-04-12T13:04:29Z
+
+Exactly what I needed.
+Now waiting for merge!
+
+---------------------------------------------------------------------------
+
+by sprain at 2013-04-12T13:13:23Z
+
+Until merged:
+https://github.com/sprain/SprainValidatorBundle
+
+---------------------------------------------------------------------------
+
+by kimausloos at 2013-04-17T10:38:01Z
+
+Hi, any updates on this one? Adding these would be quite usefull for a couple of projects...  Thanks!
+
+---------------------------------------------------------------------------
+
+by AAtticus at 2013-04-17T10:42:33Z
+
+@kimausloos You can use the SprainValidator has a seperate extension until then
+
+https://github.com/sprain/SprainValidatorBundle
+
+---------------------------------------------------------------------------
+
+by kimausloos at 2013-04-17T10:48:57Z
+
+@AAtticus Thanks, that's the plan but it would be nice if I wouldn't have to add an extra bundle as they impact speed and memory usage :)

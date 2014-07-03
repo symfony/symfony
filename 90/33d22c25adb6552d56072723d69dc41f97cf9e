@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by ChristianGaertner at 2013-12-03T20:50:06Z
+
+NOTE: The build failed in the StopWatch Component. Not the Form component.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-03T20:53:25Z
+
+yes @ChristianGaertner it has been happening often, please go to travis and relaunch your run from there so it can be green and all good
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-03T20:56:14Z
+
+@cordoval only contributor access people can relaunch the run afaik, so you have to do this
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-03T20:57:43Z
+
+no @WouterJ is his fork
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-03T20:58:16Z
+
+but in any case i jsut relaunched it :baby:
+
+---------------------------------------------------------------------------
+
+by ChristianGaertner at 2013-12-03T21:06:45Z
+
+Thanks for triggering the rebuild!
+
+This time a failure in the Process component. Anyone a clue?! I mean it's for sure not caused by this commit (as the previous build passed with the PHP version which just errored...)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-12-03T21:09:31Z
+
+don't worry about the build failure, @fabpot will discover it's not caused by this PR.

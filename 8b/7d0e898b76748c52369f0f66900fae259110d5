@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-12-07T13:03:15Z
+
+I'm not sure encouraging using integers as node names is a good idea: it will forbid using XML config files (tag names and attributes names cannot be numbers)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-07T13:06:27Z
+
+@stof this is a very well defined edge case to port legacy systems. Is not a BC and we can add a note on the documentation for this to avoid doing this for new systems.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-12-07T14:07:50Z
+
+yeah, and it is true that ``5`` will cause the same issue with XML than ``0``

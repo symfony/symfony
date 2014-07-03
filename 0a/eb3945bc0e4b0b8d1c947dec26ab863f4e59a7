@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-17T08:10:54Z
+
+@johnkary Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by johnkary at 2013-12-21T21:02:19Z
+
+@stof Do my most recent changes fix your previous comment?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-12-24T15:20:46Z
+
+@johnkary What I would like to see is a method allowing to access the current kernel (creating it and booting it if necessary). Currently, you need to check whether ``self::$kernel`` is null and call ``bootKernel`` in this case, or to boot a new kernel each time you use it

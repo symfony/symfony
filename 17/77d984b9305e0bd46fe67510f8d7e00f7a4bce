@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T08:00:20Z
+
+The implementation looks good to me. Can you add some unit tests as well?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-26T08:02:03Z
+
+Also, you need to add a note in the component CAHNGELOG file and submit a PR on the documentation to document this new feature. Thanks.
+
+---------------------------------------------------------------------------
+
+by danfinnie at 2013-03-31T18:12:34Z
+
+@fabpot I am working on the tests and documentation right now.  For the change log, I did not see a `CHANGELOG-2.3.md` file in the root of the project -- where would you like me to document this change?
+
+---------------------------------------------------------------------------
+
+by danfinnie at 2013-03-31T19:44:00Z
+
+I created [pull request #2442 against the symfony-docs repo](https://github.com/symfony/symfony-docs/pull/2442) to update the symfony book.  Still working on the tests!
+
+---------------------------------------------------------------------------
+
+by danfinnie at 2013-04-01T01:05:49Z
+
+I've added the tests and submitted the documentation PR, let me know if either of these are not up to snuff!
+
+---------------------------------------------------------------------------
+
+by danfinnie at 2013-04-02T03:25:57Z
+
+@stof I've fixed the issues you pointed out, thanks!  I also rebased against master.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-02T04:06:33Z
+
+@danfinnie you should add it in the changelog of the bundle

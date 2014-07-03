@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-21T12:56:07Z
+
+Cannot be merged into 2.3
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-06-21T12:58:29Z
+
+Ok, I wondered about that - I guess it is a new feature.  Do I need to re-submit?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-21T16:33:24Z
+
+This should indeed go into master.
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-06-21T16:39:54Z
+
+Ok, is it difficult for a merger to merge this into master or should I open a new PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-21T16:40:51Z
+
+I think it can be moved automatically without conflict. This can has not changed in later releases IIRC
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-21T17:29:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-21T21:58:01Z
+
+Please add a test for this, then I'm :+1: for merge into master
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-06-21T22:38:03Z
+
+OK. Will add.
+
+It looks like there are no tests for this class. Or am I missing something?
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-06-22T02:03:16Z
+
+I added tests for `Symfony/Bundle/FrameworkBundle/Controller/ControllerResolver` - should cover this and all existing scenarios.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-22T18:34:50Z
+
+:+1: for a merge in master

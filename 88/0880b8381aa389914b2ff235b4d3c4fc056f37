@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-28T12:42:36Z
+
+Doesn't this require a change in the FormType to avoid trying to instantiate an interface ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-28T14:06:11Z
+
+@stof See the discussion in #9181. Currently, it *is* possible to pass the name of an abstract class or the name of a class with a constructor with mandatory arguments. Both cases result in fatal errors. We can either:
+
+1. maintain the same behavior (fatal errors) for interfaces
+2. check classes and interfaces for instantiability
+
+However, for solution 2 we need reflection to check
+
+* whether the class is instantiable
+* whether the class has either no constructor or a constructor with no mandatory arguments
+
+This check would be done every time a form is created. Since reflection is slow, I'd prefer going with solution 1 instead.
+
+---------------------------------------------------------------------------
+
+by mattjanssen at 2014-03-28T14:08:11Z
+
+@stof It is the same behavior as if you had passed in an abstract class. You will get the same error upon any instantiation either way. But we allow abstracts.
+
+I believe it should be OK to treat interfaces the same way as abstracts here. Either allow them both, or deny them both. Allowing them both does not introduce a BC but would fix complex issues I'm having with form types that need to accept an interface, but never need to instantiate.
+
+On the other hand denying abstracts would introduce a BC. I say we allow interfaces.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-28T16:59:12Z
+
+I don't agree here. Explicitly allowing interfaces to pass is something different than "allowing" abstract classes just because it's not feaseble to check whether the class can be instantiated.
+So IMHO this should not be introduced and just leave it as-is. Otherwise you would also need to allow traits with `trait_exists` and other possibly stupid stuff.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-29T08:22:54Z
+
+@Tobion You are arguing from an implementation perspective. But from the user perspective, an abstract class and an interface are very similar things.
+
+Traits can't be type hinted or checked with `instanceof`, so they're out of question.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-03-29T18:04:41Z
+
+@webmozart Do you have a use case in mind for abstract and/or interface to "bind" to a form?
+
+---------------------------------------------------------------------------
+
+by mattjanssen at 2014-03-29T19:11:55Z
+
+@saro0h For example, I have six polymorphic classes that all implement an interface, but they cannot extend the same abstract. I have a form that deals with the properties of this interface. My use case does not require the form to ever instantiate; otherwise empty_data would required.
+
+Form types still serve a purpose even if the data_class cannot be instantiated. We need not artificially limit their use cases.
+
+What I do now is either copy and paste my form type six times, or every time I use the form type I need to specify a concrete data_class. This is exceedingly tedious with the polymorphic nature of these six entities. It involves event listeners on data binding, etc.
+
+My current, and easiest solution is to fork Symfony and add ` && !interface_exists($dataClass)` into FormConfigBuilder.
+
+By the way, we are already relying on passing in abstract classes as data_class. The reason for this PR is to extend that same treatment to interfaces.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-03-29T21:44:42Z
+
+@mattjanssen okay I see! Thanks a lot for the explanation :)

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by saem at 2013-06-07T22:20:07Z
+
+To be clear this is a show stopper for us, we cannot use Symfony 2.3 at all, as we integrate with a legacy application doing its own session handling.

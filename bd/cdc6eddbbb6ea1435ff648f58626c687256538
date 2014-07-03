@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-09-30T08:48:53Z
+
+@fabpot you are still integrating the change of the event dispatcher here. I think you messed your rebasing
+
+---------------------------------------------------------------------------
+
+by stof at 2013-09-30T08:49:33Z
+
+As said in the other PR, the logger collector should be a late one too, to avoid missing some log messages
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-30T08:55:06Z
+
+@stof fixed the rebasing and updated the logger data collector.

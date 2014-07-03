@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-20T17:53:50Z
+
+This is just a quick start to begin the discussion.
+
+---------------------------------------------------------------------------
+
+by stof at 2013-03-20T18:36:24Z
+
+Apart from my comments,, this looks good to me.
+
+and it is great to have the deprecation handling standalone. It means it is possible to trigger E_USER_DEPRECATED in libraries when deprecating something and users can get the handling without having to use HttpKernel. :+1:
+
+---------------------------------------------------------------------------
+
+by bamarni at 2013-03-21T09:07:58Z
+
+@fabpot : your last commits are awesome, I have no objection anymore :)

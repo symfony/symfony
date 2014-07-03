@@ -1,0 +1,163 @@
+---------------------------------------------------------------------------
+
+by dlsniper at 2012-11-19T22:13:04Z
+
+:+1: for this, the security component is indeed too much to handle by new people as well as it takes some time to get it right :)
+
+---------------------------------------------------------------------------
+
+by althaus at 2012-11-20T09:07:20Z
+
+Nice idea. The security component is the one part I try to avoid to dug into by using FOSUserBundle. It is quite complex and the regarding doc pages haven't been at the required level of helpfullness to understand easily what is working in which way (at lest the last time I checked).
+
+So big :thumbsup: for the RFC!
+
+---------------------------------------------------------------------------
+
+by barelon at 2012-11-20T09:20:14Z
+
+When I started using Symfony one and a half years ago, the security component is the one that gave me more headaches. I soon was very proficient in everything but security still seemed a bit of a monster. I still have to go back to the book and reread it carefully when I need to do security stuff. It is great to have all these security options but I am sure that the needs of 90% of the people are pretty basic and we could certainly use a class that provided a simple implementation for those 90% of cases. So, I´d say to go ahead
+
+---------------------------------------------------------------------------
+
+by MasterB at 2012-11-20T09:46:58Z
+
+Yes. But in practice I use only the Form based authentication.
+
+---------------------------------------------------------------------------
+
+by stof at 2012-11-20T10:47:08Z
+
+how would your authenticator looks like ?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2012-11-20T11:19:42Z
+
+Here is the sample authenticator + user provider I used for building this, it can only authenticate one hardcoded user but obviously you could hook in anything: https://gist.github.com/4117358
+
+---------------------------------------------------------------------------
+
+by frosas at 2012-11-21T12:29:21Z
+
+@Seldaek this gist looks nice. Maybe an abstract class implementing these interfaces with some sane default methods would be interesting too.
+
+Anyway the hardest thing to me about the Security component is to understand how it works in the details. Do I need to use a user provider? ("security.providers" section being required in the configuration suggests so). Do I have to implement the UserInterface in my user class? What if I can't `loadUserByUsername()` because I also need a password to load it? Is it okay to return a made-up user instance in these cases or I shouldn't because then I break the interface as I can't know when to throw a UsernameNotFoundException? Do I have to create and register a Factory if the setup is so specific I'll hardly ever reuse it?
+
+Reading the code helps to figure out these things but it is complex (as it is the problem it solves) and is hard to know if one understands and uses it correctly (which is not fun, specially talking about security).
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2012-11-22T08:46:22Z
+
+@Seldaek :+1: for the RFC and that gist is much closer to how a lot of devs want to use it, nice and simple and clear what is going on.
+
+I agree with @frosas in that it's not just knowing what you need to do to get something working, but you want to know the inner details of what parts do what, and what the actual flow of each part is, when is refreshUser called, what effect does it have etc.
+
+I've only got familiar with this sort of thing by speaking in person with Johannes and working through some actual implementations of some more advanced usage. But I can imagine a lot of people wouldn't persevere, they would simply use something else which would be a real shame, so I applaud your efforts and work here.
+
+---------------------------------------------------------------------------
+
+by atrauzzi at 2012-11-26T03:40:45Z
+
+:+1:!
+
+This approach looks a lot more inviting on the surface already.  I won't be 100% certain until I get a chance to play with it, but I'd like to see the dust settle first before making an attempt to use it.
+
+I just finished implementing my authentication requirements in a Rails project using Warden.  ( https://gist.github.com/0748686eadcf6de51b64 ) The nicest thing it did for me was set up a simple situation where I'm being given all the information, and creating a user and returning it if everything checks out.
+
+Obviously Rails is a lot more willy-nilly than Symfony - but this feels more like that arrangement with the added benefit of the specific authentication data being nicely encapsulated in a token.
+
+So long as registering the custom authentication providers isn't too difficult, this will do nicely!
+
+---------------------------------------------------------------------------
+
+by evillemez at 2012-11-26T16:55:14Z
+
+Anything that makes the Security Component seem like less of a mess is good.  I say +1 to this this so people can start using a more understandable API with a clearer extension point.  Eventually, if we get solid APIs that are generally well-received, Security could (maybe) be refactored to make the underlying implementation less complicated, if possible.  Maybe the underlying implementation is already perfect, but the documentation needs to be much better at explaining why it does what it does, and how to use/extend it effectively.
+
+If your needs for a security implementation are fairly basic, right now I think it's hard to justify the complexity of the Security Component when implementing your own simple system might be less work than learning how to effectively extend the current component, and ends up being far less complicated.
+
+Security is one of those pieces you *need* to understand thoroughly, regardless of implementation.  So anything to help on that front is a worthy effort.
+
+This seems to address #5933
+
+---------------------------------------------------------------------------
+
+by atrauzzi at 2012-11-26T17:02:13Z
+
+@evillemez Agreed!  I've maintained throughout this that the security system in Symfony 2 is well conceived.  It's just the implementation and documentation that I think set people up for some hurt.
+
+The best anecdote/lesson here is that I picked up RoR and brought my project up to speed in less time than the time I lost trying to work with Symfonys security component.  That includes getting my authentication requirements implemented.
+
+While I tend to prefer the designs found in Symfony, there's obviously something to be said about ease of use.  ;)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-04-12T11:55:46Z
+
+Pushed an update to this PR:
+
+- added a simple_token firewall/factory/whole-shebang for API-key and other usages that don't fit well with user/password forms. You just get a Request in this case and decide what to do with it.
+- renamed a few methods to try and make more sense.
+
+You can check a demo implementation of it in my symfony-standard fork, simplesecurity branch. Here is the diff: https://github.com/Seldaek/symfony-standard/compare/4f7a61c...simplesecurity
+
+This allows you to access the secured area like:
+
+- http://localhost/sfsecurity/web/app_dev.php/demo/secured/hello/World?apikey=41393af0d87e64a9581f7eeac6b73dcb769b0889 => you're logged in as alice since that's the api key defined for alice in app/config/apikeys.txt
+- http://localhost/sfsecurity/web/app_dev.php/demo/secured/hello/World => login with foo/bar and you get logged in as foo via form, according to passwords defined in app/config/users.txt
+
+Next step I want to do is add success_handler & failure_handler support to both, called by default on the authenticator service, and perhaps allow them to be configured to some other service like the form_login currently allows. After that I think we have a solid base and it should be documented, but I'm obviously open to any feedback regarding naming or anything else.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-04-12T18:44:12Z
+
+I updated the PR. Things are looking good now, success and failure handlers are supported without configuration (if you implement it it gets called). There is one issue left however, something I must have messed up prevents the two from being used together (if you do, the form login stops working). No time to finish this tonight, but I'll try to get back to it soon, and if anyone has an idea what might cause this please say so.
+
+---------------------------------------------------------------------------
+
+by althaus at 2013-04-13T14:03:56Z
+
+Looks great so far. I've got one question, cause I had my issues to implement it with the standard form_login: Would it be easy to extend the form itself? Like adding extra fields and use them easily for authentication.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-04-15T10:14:45Z
+
+@althaus you get the Request in the createToken() method, so you should store all information needed from the request into a custom token class, and then use that information authenticateToken() to verify the user. It should indeed be possible this way, and I would be happy if you'd try it and give feedback.
+
+---------------------------------------------------------------------------
+
+by patwcummins at 2013-04-24T13:54:04Z
+
+I miss the simple security setup from Symfony 1.  Users, permissions and roles with YML to indicate the security per action.
+
+The new features in Symfony 2 are powerful, but too complicated for rapid prototyping.
+
+---------------------------------------------------------------------------
+
+by bnewton at 2013-05-01T17:30:40Z
+
+I agree with patwcummins security features within Symfony 2 are powerful, much too complicated for rapid prototyping. In my opinion authenticating against a web service should be a lot easier.
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2013-05-01T21:34:47Z
+
+I don't think it's that complicated to actually do, it's just getting your head around it all so you know what to do.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2013-05-06T08:24:57Z
+
+@catchamonkey yeah but that's the thing, the factory, authentication provider and authentication listener are regrouped into one zero-configuration thing with this PR. This reduces the cognitive overhead quite a bit, and doesn't restrict you so much. I think most things can still be achieved this way.
+
+That said, it's not gonna be as easy as sf1 i guess.
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2013-05-06T09:07:32Z
+
+@Seldaek yeah I get that, and definitely think this is a great inclusion, it would have certainly helped when I started, and it's good to have for the quick POC apps too.

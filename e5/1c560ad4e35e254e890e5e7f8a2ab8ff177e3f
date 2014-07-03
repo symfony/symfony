@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by acasademont at 2013-04-15T17:37:20Z
+
+For the moment tests are failing as the ```value``` attribute is being checked. Does anyone know if this is really nedeed? As I pointed out in the description, we alredy have a disabled option with no value that works fine. @bschussek Thanks!
+
+---------------------------------------------------------------------------
+
+by acasademont at 2013-04-17T12:32:23Z
+
+Read the whole RFC and the value="" attribute is never going to be sent if the disabled attribute is set so we can safely delete it from the tests
+
+---------------------------------------------------------------------------
+
+by stof at 2013-04-17T12:41:10Z
+
+This should be updated in the PHP template as well (btw, I find it weird that the tests are passing for the PHP rendering here)
+
+---------------------------------------------------------------------------
+
+by acasademont at 2013-04-17T14:16:03Z
+
+@stof you're right. However, the XPath in the tests removed the check for the "value" attribute. Even though there is a "value" attribute (which is the case right now until I fix the PHP templates), XPath won't complain unless I explicitly set a [not(@value)] rule, which I am going to do to prevent this bug from appearing again.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2013-04-17T14:18:56Z
+
+```
+./option[not(@value)][not(@selected)][@disabled][.="[trans]Test&Me[/trans]"]
+```
+
+Now the ```FormHelperDivLayoutTest::testSingleChoiceRequiredWithEmptyValue``` test is failing
+
+---------------------------------------------------------------------------
+
+by acasademont at 2013-04-17T14:22:11Z
+
+Fixed!

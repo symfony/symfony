@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by everzet at 2013-06-06T11:26:03Z
+
+I don't see any connection between exception and console application failure exit codes. First **could be anything** and second **should be integer between 1 and 254**. You can't just draw connection between two and hope that all your userland exceptions would have integer code in between 1 and 254. And if you can't - this functionality (exiting with exception code) is simply unreliable and doesn't make any sense whatsoever.
+
+If there's no exception - user controls exit code, if there IS uncaught exception - app should exit with `1`. That's it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-06T12:18:48Z
+
+@everzet this is a bug fix PR. You are proposing to break bc that should be discussed elsewhere.
+
+---------------------------------------------------------------------------
+
+by everzet at 2013-06-06T12:44:43Z
+
+@Tobion then I don't see how this bugfix fixes the issue of not getting `404` exception code as console exit code. If "exiting with exception code" is a defined functionality you're aiming for, of course.
+
+In my opinion this whole behaviour of exiting with exception code **is a bug**. It never worked properly, it never will. Simply because initial assumption is wrong - those two codes are not the same thing.
+
+@fabpot @stof ideas?
+
+---------------------------------------------------------------------------
+
+by stof at 2013-06-06T12:54:36Z
+
+@everzet you will never get a 404 exit code because of this:
+
+```php
+if ($statusCode > 254) {
+    $statusCode = 254;
+}
+```
+
+---------------------------------------------------------------------------
+
+by everzet at 2013-06-06T12:55:58Z
+
+@stof exactly. And based on the initial behaviour (app exit code = exception code) - **I should**. Hence I assume either initial behaviour is wrong or this bugfix doesn't really fix anything :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-06T13:23:51Z
+
+@everzet could you please open another issue for whatever you want. So this PR does not get polluted with unrelated things.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-06-06T13:35:34Z
+
+@Tobion I actually think this is the right place to discuss this issue, 'cause if we decide to change the approach your PR would need to be updated. I agree with @everzet, exception codes have nothing to do with console exit codes. Passing them only in some cases (when it happen they with within the 0-244 range), while changing in others (when they're non integers or out of range) isn't intuitive.
+
+About your PR: those nested IFs look ugly. I'm pretty sure it could be simplified. I also think it'd be great to add a test case.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-06T14:04:31Z
+
+1. this pr is for 2.1 wihout bc break
+2. the changes discussed by @everzet break bc and thus are definitely not for 2.1! so unrelated to this PR.
+3. I'm sure the nested `ifs` cannot be simplified. Convince me otherwise.
+4. Tests for these things are nearly impossible as it depends on internal php/pdo behavior that cannot be easily created by tests (see previous PR about this).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-06-06T14:15:43Z
+
+Sorry, I thought it was a recent change. If it was always like that, I agree we shouldn't be changing the behaviour now.
+
+---------------------------------------------------------------------------
+
+by everzet at 2013-06-06T14:27:51Z
+
+@Tobion if it always was like that, then ok. I completely forgot that we always had those crazy `234` exit codes.
+
+As of
+
+> _3. I'm sure the nested ifs cannot be simplified. Convince me otherwise.
+
+```php
+$statusCode = max(1, min(254, intval($e->getCode())));
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-06T14:56:17Z
+
+No offense, you guys should research a little more before making suggestions out of nothing.
+@everzet the code snipped is totally useless. Where do you want to place it? Just another silly time waster.
+If you want to prove that the same behavior can be achieved with less instructions, then make a real proposal.
+
+---------------------------------------------------------------------------
+
+by everzet at 2013-06-06T15:21:38Z
+
+@Tobion please, stop being defensively offensive in community built around collaboration.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-09T13:02:03Z
+
+@fabpot please merge this. Also please merge 2.1 in upstream branches. Because #8183 is only merged in 2.1 yet so 2.2 and 2.3 is still wrong.

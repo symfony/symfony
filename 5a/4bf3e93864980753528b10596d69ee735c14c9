@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-16T13:04:35Z
+
+you should be using the RequestStack instead
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-05-16T13:21:48Z
+
+Yup I was considering it. But in this case, on which request should we test the value? The last one, or on the master request?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-16T13:29:35Z
+
+the current one IMO
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-05-16T13:32:26Z
+
+Hum, I think this would break, as currently, forms can not be passed in the subrequest.
+
+Take an ESI, for example. The post data is not transmitted in the sub-request in this case.
+
+So let's go with the master request. :)
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-05-16T13:38:18Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-16T13:38:23Z
+
+@csarrazi well, the data bound on the form are not coming from the master request either
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-05-16T13:58:15Z
+
+Ok. Let's go for the current request.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-05-16T14:45:21Z
+
+Done

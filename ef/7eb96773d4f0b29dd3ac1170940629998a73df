@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-06-25T08:00:14Z
+
+keeping both ``ip`` and ``ips`` looks weird to me
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-06-25T11:52:24Z
+
+ It is weird, but otherwise we get a BC break... (or can we also use `ip` when using yaml configuration if we correct set up the xml config?)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-06-25T20:59:57Z
+
+It turns out we can, will fix that
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-08T13:24:57Z
+
+@WouterJ Any news on this PR?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-07-08T16:17:50Z
+
+@fabpot sorry, it kind of felt of my radar the last weeks. It's ready to merge now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-08T20:32:01Z
+
+Can you add a note in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-07-08T20:35:28Z
+
+@fabpot done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-08T20:37:54Z
+
+I don't see it. You forgot to push?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2013-07-08T20:39:51Z
+
+no, wrong branch... It should be ready now.

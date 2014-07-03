@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-19T16:29:09Z
+
+@bschussek Can you add some screenshots here?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-19T16:35:56Z
+
+Here you go :)
+
+Toolbar:
+![form-debugger-1](https://f.cloud.github.com/assets/176399/1174559/7744f0fe-2149-11e3-91f7-adee63d63ae7.png)
+
+Profiler:
+![form-debugger-2](https://f.cloud.github.com/assets/176399/1174558/6fd58d88-2149-11e3-9257-1e898ce92ae3.png)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2013-09-19T16:43:06Z
+
+Killer feature! Thanks for this!
+
+---------------------------------------------------------------------------
+
+by ifournierf at 2013-09-19T16:47:58Z
+
+OMG! +1000 ;)
+
+---------------------------------------------------------------------------
+
+by digitalkaoz at 2013-09-19T19:06:20Z
+
+I dont See the need for a formdatacollectorinterface. But the Rest looks great. I like the idea of the proxy type :) +1 from me
+
+...*ihatewritingonphones*
+
+---------------------------------------------------------------------------
+
+by hacfi at 2013-09-19T20:22:09Z
+
+@digitalkaoz Thanks for the hard work..I love it ;)
+
+---------------------------------------------------------------------------
+
+by Swop at 2013-09-19T21:29:48Z
+
+Thanks @bschussek & @digitalkaoz for this feature. It will definitely be very useful.
+
+Is there a way to somehow display constraints linked to fields in the profiler? And highlight the invalid fields which doesn't match the constraints?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2013-09-19T21:54:51Z
+
+Sounds Great !!! Available for 2.4 I hope ? :)
+
+---------------------------------------------------------------------------
+
+by leevigraham at 2013-09-20T04:05:41Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2013-09-20T07:05:59Z
+
+@bschussek What would you like to achieve UX/UI-wise?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-25T08:48:20Z
+
+@pbowyer I'll open a new ticket for that.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-25T09:00:17Z
+
+@pbowyer see #9123
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-09-25T15:52:58Z
+
+The inheritdoc issue is fixed.

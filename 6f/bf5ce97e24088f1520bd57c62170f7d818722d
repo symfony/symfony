@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-05-02T21:06:05Z
+
+are the dots consistent with other validators?
+just curious what if the values are dots, would it create confusion? :baby:
+
+---------------------------------------------------------------------------
+
+by stloyd at 2013-05-02T21:14:32Z
+
+You could check before asking :tongue:
+
+> This value should be less than '.'.
+
+Thats because there is used `var_export()`.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-05-02T21:30:55Z
+
+:baby: ready in that case

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-14T13:42:04Z
+
+do you think we need tests @Exelenz ? like to avoid regression?
+
+---------------------------------------------------------------------------
+
+by Exelenz at 2013-12-14T13:57:38Z
+
+@cordoval, existing tests covering almost all, but still could be improved. I'll add it in next commit, OK?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-14T13:58:30Z
+
+:+1: you rock
+
+:baby:

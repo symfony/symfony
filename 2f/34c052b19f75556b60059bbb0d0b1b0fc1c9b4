@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-06-05T17:21:56Z
+
+I'm -1 for such changes. First, some of these changes breaks BC as the methods signature are not the same anymore. Then, and as seen previoulsy on such changes, it might change the behavior in subtle ways. And finally, it does not fix anything.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-05T18:01:24Z
+
+@fabpot It does not break bc in any way. The methods are either private or final. It only makes it more explicit and much easier to understand.
+Also there are several phpdoc fixes in it which describe wrong param types etc.
+If you don't agree with a particular change I'd appreciate if you comment on the line.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2013-06-05T18:07:06Z
+
+Also I think this is in accordance to your blog post: We should now focus more on code quality (wrong phpdocs) & performance (unneeded casts).

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-12-27T08:36:03Z
+
+Can you also handle the case of array values to avoid a notice on PHP 5.4+ ?

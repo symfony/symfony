@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-08T13:56:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-13T05:09:16Z
+
+Looks like a very specific use case but I think it does not hurt to support it. Can you submit a doc PR before merging?
+
+---------------------------------------------------------------------------
+
+by danez at 2014-03-14T09:35:07Z
+
+I'm just preparing a PR for the docs. Will you merge this change to 2.4.x or 2.5?
+I prepare it right now as if 2.5, because I think it was like "new features go to next minor version".
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-14T09:37:08Z
+
+as this is a new feature it should land in master i believe, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-14T11:06:56Z
+
+@cordoval right
+
+---------------------------------------------------------------------------
+
+by danez at 2014-03-14T11:27:08Z
+
+I added a PR for the docs.

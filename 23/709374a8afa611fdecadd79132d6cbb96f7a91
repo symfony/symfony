@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-02T23:16:18Z
+
+Travis is failing (glitch) on PHP 5.3 on one test:
+
+```
+1) Symfony\Component\Stopwatch\Tests\StopwatchTest::testLap
+Failed asserting that 249.0 matches expected 200.
+```

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-18T16:45:32Z
+
+Looks like a BC break to me as devs might rely on fact that we indeed clear all current styles; not sure if this is a big deal or not.
+
+---------------------------------------------------------------------------
+
+by Badkill at 2014-03-18T17:40:11Z
+
+I think it's strange that someone rely on fact that we indeed clear all current styles but you never known... so I changed BC break to yes...

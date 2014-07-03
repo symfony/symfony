@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2013-11-06T09:52:38Z
+
+@bschussek  Is there a way to enables the use of "__call" by the ProperyAccessor in form ??
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-06T09:54:00Z
+
+@aitboudad the form component allows passing a PropertyAccessor. When using the full-stack framework, this is done through the ``property_accessor`` service.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2013-11-06T09:59:44Z
+
+@stof ahh ok :), but it's not possible to activate only for a specific form
+
+---------------------------------------------------------------------------
+
+by stof at 2013-11-06T10:00:09Z
+
+no

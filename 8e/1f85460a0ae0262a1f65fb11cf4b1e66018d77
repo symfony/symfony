@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2013-12-16T10:55:22Z
+
+@fabpot  fixed.
+
+But IMHO, we need to sort `ErrorHandler::getFatalErrorHandlers`:
+
+1. missing use
+1. bad method call
+1. bad function call
+
+But I guess it should be done in another PR.

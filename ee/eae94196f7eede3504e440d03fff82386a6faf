@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-20T15:54:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-20T16:20:50Z
+
+:+1: but this will only fix the issue partially (but 2.3 is not affected by the other parts)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-06-20T16:29:00Z
+
+@stof I know. I think the best is to merge this first in the 2.3 branch and fix the rest in a new pull request.
+
+https://github.com/xabbuh/symfony/commit/03d73373f7705274ddb0a76ef5ca0d71f365155a was my first attempt to solve the JSON issue. Unfortunately, that way you can't check for the pretty printing. So, I'm not sure if that's the preferred way to go.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-20T16:30:41Z
+
+@xabbuh I agree about merging this in 2.3 first. But the issue should be kept opened instead of being closed as a fixed ticket
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-06-20T16:42:52Z
+
+@stof Agreed. Updated the description.

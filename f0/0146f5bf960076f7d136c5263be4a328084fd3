@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-11-21T19:03:17Z
+
+This seems legitimate.
+The drawback is that it computes variables several times if you have several attributes in the matching. But to be honest, I neevr saw any piece of code passing several attributes to the authorization manager (and it is even less likely to pass several expressions). So I don't think it is an issue.
+
+However, Travis tells me that the functional tests of the SecurityBundle are broken.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-21T21:31:17Z
+
+@stof: it now computes the variables only once.

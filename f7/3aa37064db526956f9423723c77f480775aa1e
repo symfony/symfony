@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by bronze1man at 2013-09-19T08:12:31Z
+
+Should I guess charset from \Symfony\Component\DomCrawler\Crawler::addHtmlContent ?
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DomCrawler/Crawler.php#L133
+
+Is it good to use Chinese in test ?

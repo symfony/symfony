@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T07:38:01Z
+
+Travis exited with a segfault on PHP 5.3.3 only...?!?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2013-04-21T07:53:14Z
+
+@mpdude yes, it's not your fault though. The problem exist for some time now (see #7754).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T07:59:09Z
+
+Thanks for working on smaller PRs. That's much appreciated, and it definitely makes things easier.
+
+Unfortunately, this one cannot be merged as it would introduce a hard dependency between HttpKernel and Config for instance, which we must avoid as some projects using Symfony do not want to depend on Config (like Drupal for instance).
+
+As a rule of thumb, code duplication in Symfony exists for a reason, so refactoring like this one will almost always be rejected.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T09:18:41Z
+
+I was aware of that need of f. e. Drupal, but somehow failed to see the new dep here. Sorry.
+
+Better now?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T09:26:33Z
+
+What about moving `CacheFileUtils::dumpInFile()` to the Filsystem component class instead? And remove the other two methods that are not used anyway.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T10:28:36Z
+
+Regarding the Filesystem component: Good idea and better place, but would be a change dependency-wise? Component/Config then would need Component/Filesystem. Bundle/FrameworkBundle/* probably don't care...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T10:33:05Z
+
+Adding the Filesystem component as a dep to Config is not a problem.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T10:34:14Z
+
+For the method name in Filesystem, we should probably come up with a better name than `dumpInFile`. `dumpFile` or `storeFile` should be enough, no?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T10:41:32Z
+
+Great, yes, will do.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T13:21:04Z
+
+Except for the getMetaFile method, everything else looks good to me. Can you also add a note in the Filesystem CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T13:42:29Z
+
+Adding the getMetaFile() was a reflex action as the meta file name is built in two different methods, though I forgot one of the places when picking from #7230. Shall I make it private?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2013-04-21T14:10:51Z
+
+Just to be sure, don't we have to do anything about the new Config -> Filesystem dep? Add it to the Config component composer.json maybe?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-21T14:28:11Z
+
+You are right, you need to add the filesystem component as a required dep for the config component.

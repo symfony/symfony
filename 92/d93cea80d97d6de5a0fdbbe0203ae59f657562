@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by kevinvergauwen at 2014-05-23T09:28:00Z
+
+@stof I was wondering why the application instance can't be injected in the Command constructor as an optional argument. In that case, the configure method, which is called by the constructor, can access the container. This is useful if input arguments depend on parameters of a bundle. There are no BC breaks as far as I can see by doing this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T07:33:42Z
+
+Besides the error message text, I'm :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T07:39:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by kevinvergauwen at 2014-06-16T07:48:25Z
+
+Shall I do new PR with the suggested error message?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T07:50:54Z
+
+@kevinvergauwen You can just update this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T07:51:12Z
+
+@kevinvergauwen just update the existing PR. No need to create a new one
+
+---------------------------------------------------------------------------
+
+by kevinvergauwen at 2014-06-16T08:01:05Z
+
+@fabpot @stof Done!

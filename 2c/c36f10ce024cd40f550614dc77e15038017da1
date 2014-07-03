@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by lmammino at 2013-07-14T20:24:09Z
+
+Obviously, I am available to update the documentation properly if these changes are considered good to merge!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-15T12:20:47Z
+
+I don't see a wide usage of these new features (like the "Square images are not allowed" for instance). So, I'm -1 on this PR
+
+---------------------------------------------------------------------------
+
+by lmammino at 2013-07-15T12:32:13Z
+
+Hi Fabien, probably you're right. These validators are not for every day use if you don't develop "image-centric" applications.
+Anyway It happened to me to work for several fashion sites in which users needed to upload only images that respects several size constraints (e.g. only "portrait-oriented" image with an aspect ration between 1/2 and 1/3). Furthermore I often needed to let people upload only square images (e.g. avatars).
+I solved these cases with ease using a custom image validator.
+Just recently I discovered  that an Image validator has been added to the symfony validator component so I decide to propose these additions to make it more powerful and customizable.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-07-21T19:49:27Z
+
+@lmammino Fair enough. Can you add some notes in the component CHANGELOG file?
+
+---------------------------------------------------------------------------
+
+by lmammino at 2013-07-21T21:47:08Z
+
+Sure @fabpot , I'll also write the related documentation and submit a pull request
+
+---------------------------------------------------------------------------
+
+by lmammino at 2013-07-21T21:53:19Z
+
+@fabpot Which version should I use in the changelog?

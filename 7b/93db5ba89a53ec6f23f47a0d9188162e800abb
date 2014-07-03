@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-13T14:01:06Z
+
+This actually fails on PHP 5.6. I'll have to investigate further before it can be merged.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-13T17:09:54Z
+
+PHP < 5.6
+```
+✗ php -r 'var_dump(mb_strwidth("コマンドの実行中にエラーが発生しました。"));'
+int(60)
+```
+
+PHP 5.6
+
+```
+✗ php -r 'var_dump(mb_strwidth("コマンドの実行中にエラーが発生しました。"));'
+int(40)
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-13T17:54:13Z
+
+so the next question is who is right ? PHP 5.5 or 5.6 ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-13T20:16:56Z
+
+It's more like 5.3, 5.4 and 5.5 vs 5.6 :)
+
+---------------------------------------------------------------------------
+
+by stloyd at 2014-05-13T20:23:10Z
+
+It looks like 5.6 have broken multibyte support, there are some fixes comming in `alpha-3`, but also there are bugs not yet fixed for that version.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-13T21:29:52Z
+
+hhvm behaves exactly the same as 5.6
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-13T21:43:33Z
+
+I traced it back to the original commit and the problematic console test was never passing. I assume the behavior is correct on stable PHP releases (5.3, 5.4, 5.5) since 5.6/hhvm are most likely to contain this kind of bugs.
+
+For 5.6 there's also another [test failing](https://travis-ci.org/jakzal/symfony/jobs/25069749#L482) in the Form component. I propose to disable 5.6 until it stabilises.
+
+Let's merge this PR to bring the green builds back.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-05-13T21:48:59Z
+
+@nicolas-grekas any clue?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-14T00:31:57Z
+
+@jakzal don't disable it entirely but move it to ``allow_failures``.
+
+the Form failure is probably related to the broken array handling in 5.6beta1 and beta2 (fixed for beta3)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-14T06:42:47Z
+
+@stof yeah, that's what I meant and did ;)

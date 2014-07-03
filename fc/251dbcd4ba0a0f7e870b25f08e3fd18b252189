@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-03-10T17:45:06Z
+
+For the ArrayCollection issue, it is not tied to being an ArrayCollection but to the fact that it uses ``IteratorAggregate`` to implement ``Traversable``: if you delete an element from the iterator, it is not deleted from the collection
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-10T19:16:24Z
+
+> For the ArrayCollection issue, it is not tied to being an ArrayCollection but to the fact that it uses IteratorAggregate to implement Traversable: if you delete an element from the iterator, it is not deleted from the collection
+
+Isn't that what [this test](https://github.com/norzechowicz/symfony/commit/462b7af9b18a4449ae0d038c2ed8369c625f0e27) was supposed to prove? Because it doesn't. The data is unset, and the test passes.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-10T20:01:27Z
+
+hmm, actually yes. I forgot what this test was covering. And as you can see on Travis, your change is indeed wrong.
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-10T20:30:04Z
+
+Yes, I see that. I'm not sure why the tests pass on my machine. I'll investigate...
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-11T01:02:08Z
+
+The tests were passing because my PHPUnit was an older version with a bug. Now that's updated, I saw the test fail.
+
+Well, this is a tough one for sure. I believe the tests will now pass, but I'm not really happy with what needed to be done to accomplish it.
+
+The difficulty is in determining if the IteratorAggregate $data is backed by an array or an object. Given the abstract nature of how ResizeFormListener::onSubmit works with collections, I cannot make any assumptions as to what $data is.
+
+To compound the problem, not only can I not make assumptions, I also cannot directly observe the contents of $data. The only way I can determine what is backing $data is by trying to modify it via an Iterator: If calling unset on the iterator affects $data, I know I have an array, otherwise I have an object.
+
+Since I can only determine what I am working with *after* I modify it, then I have to do the rather inefficient thing of using the Iterator first, then checking the iterators contents agains $data, and if they don't match, falling back to the foreach method of direct manipulation.
+
+I really cannot think of any better way to resolve this bug. I'd love some suggestions.
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-17T16:14:51Z
+
+I'm going to assume since there's been no responses, that no one has any suggestions on how to improve this fix.
+
+What do I need to do to get this merged?
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-19T15:12:54Z
+
+I've been working on this some more and according the the PHP docs, [IteratorAggregate](http://www.php.net/manual/en/class.iteratoraggregate.php) returns [Traversible](http://www.php.net/manual/en/class.iterator.php), which does not have any methods for modifying the collection it is iterating over.
+
+The specific example I have cited: [ArrayObject](http://www.php.net/manual/en/class.arrayobject.php) (which is an IteratorAggregate), returns an [ArrayIterator](http://www.php.net/manual/en/class.arrayiterator.php) (which is a Traversible) that *does* implement methods for modifying the underlying data, but it's certainly a possibility that another IteratorAggregate may be encountered that does not.
+
+I'm going to close this pull request for now and refactor it to deal with this scenario.
+
+---------------------------------------------------------------------------
+
+by Chekote at 2014-03-19T15:49:15Z
+
+The branch has been updated with a *much* cleaner solution, that works with any kind of IteratorAggregate. I am much happier with this fix. Please review.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-19T15:51:37Z
+
+this looks good to me
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-19T15:59:09Z
+
++1 seems reasonable. only stofs CS fix missing

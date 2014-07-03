@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-23T14:40:35Z
+
+Can you also add a test covering the bug to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by artursvonda at 2014-05-23T15:33:22Z
+
+@stof Added a test for that. I did need to refactor Kernel a bit to do that.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-26T14:47:09Z
+
+Just for reference, this issue has been introduced in #10894

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-11-18T09:17:27Z
+
+@fabpot I'd be happy to merge this soon so I don't have to rebase often.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-11-22T17:41:44Z
+
+@Tobion Thanks for the work. To avoid any "regressions" in the future, can you also make a PR on the doc to document the way new features must be implemented (probably in the coding standard section.): like always use `()` when instantiating an object, ...

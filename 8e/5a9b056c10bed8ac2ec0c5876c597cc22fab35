@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-09-12T15:33:56Z
+
+There is one caveat (not related to this fix): As the parent is dynamic, we should not cache the resource as two calls might lead to a different parent. That said, and in real-life situation, that should never occur.

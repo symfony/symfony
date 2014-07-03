@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-08-02T13:57:24Z
+
+What about setting the validation flag on the form itself instead? That way, it would apply on all form fields.
+
+---------------------------------------------------------------------------
+
+by pylebecq at 2013-08-02T14:07:37Z
+
+I don't know what is the best.
+
+Choice | Pros | Cons
+--- | --- | ---
+Field | Can be controlled on a per field basis | Tedious to disable validation on a whole form
+Form | Can disable validation of all fields with 1 method call | Cannot disable validation for only one field
+Both | Can disable validation of all fields with 1 method call or on a per field basis | None
+
+For the last option, my proposed implementation is to keep validation flag on the fields and having a method on the Form class to toggle the flag on all the fields.
+
+---------------------------------------------------------------------------
+
+by pylebecq at 2013-08-02T14:48:48Z
+
+I made an attempt to implement the "Both" solution of my previous post.
+
+@fabpot What do you think ? Does it fits what you had in mind ? If so, do you think we should introduce an Interface for form fields having validation capabilities, and for the Form class itself ? I did not because only the ChoiceFormField has such capabilities yet.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-06-04T06:06:13Z
+
+@fabpot this PR is finally completed. Could you please check various output formats? They can be found in tests fixtures: https://github.com/jfsimon/symfony/tree/feat-framework-descriptors/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor.
+
+---------------------------------------------------------------------------
+
+by deguif at 2013-09-26T12:57:24Z
+
+Will this be available in 2.4 ?

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-10-15T17:00:57Z
+
+Can you give a usage example?
+
+---------------------------------------------------------------------------
+
+by pscheit at 2013-10-15T22:46:26Z
+
+mhh. Everytime the new Argument() is wrapped into a function?
+
+```php
+public function configure() {
+  $this->addArgument('name')->setDefault('xyz');
+```
+
+```php
+$createCommand(
+  array(
+    $arg('location')->setDefault('.')
+    $opt('dry-run')
+  ),
+  function ($input, $output) {
+  },
+  ' copy the whole dir into the woods'
+);
+```

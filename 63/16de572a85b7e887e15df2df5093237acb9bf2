@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2013-10-04T08:06:25Z
+
+How come the memory is freed when using array instead of SplObjectStorage?
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-04T08:13:31Z
+
+PHP couldn't GC the Form instances referenced by the SplObjectStorage. Storing their hashes instead solves this problem.
+
+---------------------------------------------------------------------------
+
+by tecbot at 2013-10-04T08:16:50Z
+
+This PR don't fix the problem at all. At long running php processes the array will never cleared. IMHO you should also register a listener for "kernel.response" or "kernel.terminate" to clear the array or you make it possible to clear the array from the outside.
+
+---------------------------------------------------------------------------
+
+by tecbot at 2013-10-04T08:23:39Z
+
+Btw:  The ```spl_object_hash``` is not the best solution, because PHP doesn't guaranteed that the hash is unique. We have seen such problem in the doctrine layer and the only workaround is to clear the unit of work. The best thing is to create a intern instance counter.
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-10-04T14:40:41Z
+
+@tecbot Can you clarify how you would implement such a counter without keeping references to the Form instances?
+
+---------------------------------------------------------------------------
+
+by tecbot at 2013-10-04T15:00:09Z
+
+@bschussek it's not possible to implement this without a change of the FormInterface API.
+You need a getter and setter for a unique id which you can set from the outside if empty, like this:
+```
+if (empty($form->getId())) {
+    $form->setId($this->idCounter++);
+}
+```
+I know it's not nice, but it is the only possible solution to guarantee the uniqueness of a instance id (expect users change the id by hand)
+
+---------------------------------------------------------------------------
+
+by staabm at 2013-10-14T19:59:25Z
+
+Thissounds like the use case of WeakRef or WeakMap
+
+http://php.net/manual/en/class.weakref.php
+http://php.net/manual/en/class.weakmap.php
+
+---------------------------------------------------------------------------
+
+by stof at 2013-10-15T07:47:43Z
+
+@staabm but we cannot rely on it as it is a Pecl extension which is not available everywhere
+
+---------------------------------------------------------------------------
+
+by bschussek at 2013-11-09T18:29:39Z
+
+I updated the PR again, this issue should be fixed now.
+
+---------------------------------------------------------------------------
+
+by sstok at 2013-11-10T10:58:37Z
+
+Nice :+1:

@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-29T08:33:26Z
+
+TODO before merging this, I'll see whether the `$value` argument can be removed from `isWritable()` for forward compatibility.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-30T16:20:57Z
+
+I removed the `$value` argument now. An `InvalidArgumentException` is thrown when an invalid property path is given.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-30T17:20:29Z
+
+InvalidPropertyPathException should extend InvalidArgumentException (which is a tiny bc break). But otherwise we would need to add InvalidPropertyPathException too all phpdoc because InvalidPropertyPathException would not be convered since it extends a RuntimeException.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-31T08:38:09Z
+
+> But otherwise we would need to add InvalidPropertyPathException too all phpdoc because InvalidPropertyPathException would not be convered since it extends a RuntimeException.
+
+Since strings can be constructed at runtime, it is indeed a RuntimeException. As such, I think it's fine not to document it.
+
+This should be ready to merge now.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-31T09:55:41Z
+
+Huh, why not document it?
+Everything could be constructed at runtime. The point is, that property path have a well-defined grammar, and errors could theoretically be detected at compile time. This is why I would say it's a logic exception.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-03-31T10:20:37Z
+
+You're right, but
+
+> errors could theoretically be detected at compile time
+
+is not true:
+
+```
+new PropertyPath('path.'.$someDynamicValue);
+```
+
+The caller can't enforce that a property path (string) is correct (except by passing a PropertyPath instance), so this case is different than, for example, type errors, that can be prevented by using type checks or casting.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-03-31T10:54:25Z
+
+One can see it both ways. But it still needs to be documented.

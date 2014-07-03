@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by csarrazi at 2014-06-03T10:54:57Z
+
+Hum, we just need to change parseXmlValue to check whether the value contains an array with the ```#cdata-section``` key :)
+
+Something like https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Serializer/Encoder/XmlEncoder.php#L308, where we check whether the node is a ```XML_TEXT_NODE```. We could check whether the node is a ```XML_CDATA_SECTION_NODE``` or not, and return the node value instead :)
+
+---------------------------------------------------------------------------
+
+by fieg at 2014-06-03T11:10:52Z
+
+Great, works like a charm!

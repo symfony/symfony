@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-04-08T16:30:29Z
+
+I cant wait to see this merged!
+
+---------------------------------------------------------------------------
+
+by dbu at 2013-04-11T13:41:11Z
+
+i fixed the cs issues and did some more cleanup.
+
+@fabpot: may i interpret your feedback as confirmation this is going in the right direction?
+
+to support the annotation and staticphp drivers, we need different buildDriver methods and slightly different parameters. what is the preferred aproach for this? have a BaseRegisterMappingsPass class and 3 extending classes here in the bridge, and then in each of the bundles? or just have the bundles use this as a base class, passing in empty values for mappings and extensions and overwriting the buildDriver method?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-04-11T15:42:24Z
+
+@dbu I'm ok with the feature, but I did not had a look at the implementation. @beberlei is probably the one who need to validate the design.
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-04-13T15:58:06Z
+
++1 from me
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-04-13T16:04:09Z
+
+Discussing ways to refactor with @dbu now, regarding the annotations driver
+
+---------------------------------------------------------------------------
+
+by beberlei at 2013-04-13T16:22:06Z
+
+Found a way with @dbu to refactor the code. Idea: The constructor will accept a fully configured ``Definition`` instance and the children of this compiler pass will provide static factory methods to create compiler passes for the different mapping drivers such as Xml, Yaml, Annotations, etc...
+
+---------------------------------------------------------------------------
+
+by dbu at 2013-04-15T18:29:52Z
+
+i updated the PR according to the discussion with @beberlei. i think the only open question is whether to keep this in the `CompilerPass` namespace or move it to `Compiler`.
+
+---------------------------------------------------------------------------
+
+by dbu at 2013-04-17T21:17:03Z
+
+i just added a PR on mongodb, the implementation for this PR did not need to change so i guess its good.
+
+should i move this class to the `Compiler` namespace even though we have an existing `CompilerPass` namespace? that is, shall we keep inconsistency with the rest of the framework or be inconsistent inside this component?
+
+anything else i should do before we can merge?

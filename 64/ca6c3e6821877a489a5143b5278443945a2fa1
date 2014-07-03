@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-11T16:53:51Z
+
+Yes: the handler returns '' so both are equivalent in this case
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-11T17:14:43Z
+
+OK. The code is pretty hard to understand. `$this->caughtOutput` is sometimes int, sometimes string, sometimes false. I think the variable does not need to change type so often.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-11T17:48:33Z
+
+Patch updated, should be easier to understand
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-11T20:28:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-12T09:57:03Z
+
+:+1:

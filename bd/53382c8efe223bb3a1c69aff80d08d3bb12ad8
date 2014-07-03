@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by jfsimon at 2013-03-04T08:52:07Z
+
+You're right, the response status code change is a BC break.
+Therefor this PR should be based on master.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-23T13:59:28Z
+
+Can you update the CHANGELOG before I merge this PR? Thanks.
+
+---------------------------------------------------------------------------
+
+by gunnarlium at 2013-03-23T14:12:38Z
+
+@fabpot Done.

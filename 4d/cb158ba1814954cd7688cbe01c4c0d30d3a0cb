@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alcaeus at 2014-04-20T12:00:38Z
+
+Thanks for catching that, the listener now uses the same regular expression as the validator.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2014-04-21T13:47:21Z
+
+I made the changes above - please let me know if everything is in order so I can squash the commits before merging.

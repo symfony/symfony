@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-30T12:24:34Z
+
+Forget what I said, `Symfony\Component\Form\Tests\Extension\Core\EventListener\TrimListenerTest` is still failing
+
+This implementation does not seem to work, anyway
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:39:16Z
+
+Reopening as waiting for the PHPUnit release was necessary for ``phpunit --self-update`` to give us a fixed version
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T12:49:08Z
+
+arf, PHP 5.3.3 does not have openssl on Travis :disappointed:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-30T13:59:17Z
+
+@romainneutron an alternative could be to download ``https://phar.phpunit.de/phpunit.phar`` with wget and replacing the existing phar with it, instead of asking PHPUnit to perform the download. This would fix the openssl issue on 5.3.3
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-30T14:00:35Z
+
+yep that's the only solution, I'm gonna give a try to this proposition

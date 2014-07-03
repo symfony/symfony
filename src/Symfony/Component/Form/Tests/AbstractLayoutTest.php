@@ -1987,4 +1987,16 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $this->assertContains('>  </textarea>', $html);
     }
+
+    public function testWidgetContainerAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('form', 'form', null, array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
+        // no foo
+        $this->assertNotContains('foo="', $html);
+    }
 }

@@ -404,6 +404,16 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDebugFormatWithoutMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('debug');
+        $bar->start();
+
+        rewind($output->getStream());
+        $this->assertNotEmpty(stream_get_contents($output->getStream()));
+    }
+
     protected function getOutputStream($decorated = true)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);

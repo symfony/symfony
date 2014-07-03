@@ -1929,8 +1929,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderWidget($form->createView());
 
-        // no foo
-        $this->assertSame('<input type="text" id="text" name="text" required="required" value="value" />', $html);
+        $this->assertNotContains('foo="', $html);
     }
 
     public function testButtonAttributes()
@@ -1966,8 +1965,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderWidget($form->createView());
 
-        // no foo
-        $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
+        $this->assertNotContains('foo="', $html);
     }
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValue()

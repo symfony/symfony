@@ -135,6 +135,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('auto_reload')->end()
                 ->scalarNode('optimizations')->end()
                 ->arrayNode('paths')
+                    ->useAttributeAsKey('name')
                     ->normalizeKeys(false)
                     ->beforeNormalization()
                         ->always()

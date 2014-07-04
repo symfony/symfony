@@ -312,6 +312,29 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeIgnoreWhiteSpace()
+    {
+        $source = <<<XML
+<?xml version="1.0"?>
+<people>
+    <person>
+        <firstname>Benjamin</firstname>
+        <lastname>Alexandre</lastname>
+    </person>
+    <person>
+        <firstname>Damien</firstname>
+        <lastname>Clay</lastname>
+    </person>
+</people>
+XML;
+        $expected = array('person' => array(
+            array('firstname' => 'Benjamin', 'lastname' => 'Alexandre'),
+            array('firstname' => 'Damien', 'lastname' => 'Clay')
+        ));
+
+        $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
+    }
+
     public function testDecodeWithoutItemHash()
     {
         $obj = new ScalarDummy();

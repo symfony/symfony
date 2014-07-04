@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-26T06:01:03Z
+
+This should probably be done in the branch where the BC was introduced.
+
+Edited: looks like it's only in master.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-26T09:31:26Z
+
+The commit 466a3d70b7972dbac20264c254351ca31ee5c476 was **reverting** a BC break
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-26T09:48:30Z
+
+so I'm -1 for this pR, at least in its current form. It implements a new feature, but reintroduces the previous BC break by default
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-06-26T15:29:38Z
+
+I missed the fact that https://github.com/symfony/symfony/commit/466a3d70b7972dbac20264c254351ca31ee5c476 reverted a BC break. Whitespaces were previously ignored so it works as intended.
+
+I've kept the test because none of them contains whitespaces despite the Cdata one (which was part of the confusion).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-03T21:59:36Z
+
+:+1: now that it only adds an extra test
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-04T06:12:52Z
+
+:+1:

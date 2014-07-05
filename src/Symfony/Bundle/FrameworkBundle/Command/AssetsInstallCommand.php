@@ -95,7 +95,6 @@ EOT
         $autoSymlinkFailed = false;
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $hardCopy = false;
                 $targetDir  = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
@@ -112,26 +111,39 @@ EOT
                     try {
                         $filesystem->symlink($relativeOriginDir, $targetDir);
                     } catch (IOException $e) {
-                        if ($input->getOption('auto')) {
-                            $hardCopy = true;
+                        if (!$input->getOption('auto')) {
+                            $this->hardCopy($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
                             $autoSymlinkFailed = true;
                         } else {
                             throw $e;
                         }
                     }
                 } else {
-                    $hardCopy = true;
+                    $this->hardCopy($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
                 }
 
-                if ($hardCopy) {
-                    $filesystem->mkdir($targetDir, 0777);
-                    // We use a custom iterator to ignore VCS files
-                    $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
-                }
             }
         }
+
         if ($input->getOption('auto')) {
-            $output->writeln(sprintf('Assets were installed as <comment>%s</comment>.', $autoSymlinkFailed?'hard copies':'symbolic links'));
+            if ($autoSymlinkFailed) {
+                $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+            } else {
+                $output->writeln('The assets were installed using symbolic links.');
+            }
         }
     }
+
+    /**
+     * Create hardcopy for targetDir
+     */
+    private function hardCopy($originDir, $targetDir, \Traversable $iterator = null)
+    {
+        $filesystem = $this->getContainer()->get('filesystem');
+
+        $filesystem->mkdir($targetDir, 0777);
+        // We use a custom iterator to ignore VCS files
+        $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+    }
+
 }

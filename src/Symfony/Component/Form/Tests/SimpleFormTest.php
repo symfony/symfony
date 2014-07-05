@@ -75,7 +75,7 @@ class SimpleFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException        Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedException        \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage Unable to transform value for property path "name": No mapping for value "arg"
      */
     public function testDataTransformationFailure()

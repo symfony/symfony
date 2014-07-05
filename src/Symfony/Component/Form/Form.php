@@ -1089,7 +1089,7 @@ class Form implements \IteratorAggregate, FormInterface
             }
         } catch (TransformationFailedException $exception) {
             throw new TransformationFailedException(
-                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                'Unable to reverse value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
                 $exception->getCode(),
                 $exception
             );
@@ -1102,6 +1102,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Transforms the value if a value transformer is set.
      *
      * @param mixed $value The value to transform
+     *
+     * @throws TransformationFailedException If the value cannot be transformed to "view" format
      *
      * @return mixed
      */
@@ -1116,8 +1118,16 @@ class Form implements \IteratorAggregate, FormInterface
             return null === $value || is_scalar($value) ? (string) $value : $value;
         }
 
-        foreach ($this->config->getViewTransformers() as $transformer) {
-            $value = $transformer->transform($value);
+        try {
+            foreach ($this->config->getViewTransformers() as $transformer) {
+                $value = $transformer->transform($value);
+            }
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
         }
 
         return $value;
@@ -1127,6 +1137,8 @@ class Form implements \IteratorAggregate, FormInterface
      * Reverse transforms a value if a value transformer is set.
      *
      * @param string $value The value to reverse transform
+     *
+     * @throws TransformationFailedException If the value cannot be transformed to "normalized" format
      *
      * @return mixed
      */
@@ -1138,8 +1150,16 @@ class Form implements \IteratorAggregate, FormInterface
             return '' === $value ? null : $value;
         }
 
-        for ($i = count($transformers) - 1; $i >= 0; --$i) {
-            $value = $transformers[$i]->reverseTransform($value);
+        try {
+            for ($i = count($transformers) - 1; $i >= 0; --$i) {
+                $value = $transformers[$i]->reverseTransform($value);
+            }
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to reverse value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
         }
 
         return $value;

@@ -47,6 +47,8 @@
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
 
         <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
+
+        <parameter key="security.authentication_utils.class">Symfony\Component\Security\Http\Authentication\AuthenticationUtils</parameter>
     </parameters>
 
     <services>
@@ -83,6 +85,10 @@
         <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 
         <service id="security.expression_language" class="%security.expression_language.class%" public="false" />
+
+        <service id="security.authentication_utils" class="%security.authentication_utils.class%">
+            <argument type="service" id="request_stack" />
+        </service>
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">

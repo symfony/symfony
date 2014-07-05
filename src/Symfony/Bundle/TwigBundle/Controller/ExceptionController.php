@@ -51,8 +51,14 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
+        // allow the developer to see the real template with ?_real_template=1
+        $debug = $this->debug;
+        if ($debug && $request->query->get('_real_template')) {
+            $debug = false;
+        }
+
         return new Response($this->twig->render(
-            $this->findTemplate($request, $_format, $code, $this->debug),
+            $this->findTemplate($request, $_format, $code, $debug),
             array(
                 'status_code'    => $code,
                 'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',

@@ -11,3 +11,9 @@
 {% block body %}
     {% include 'TwigBundle:Exception:exception.html.twig' %}
 {% endblock %}
+
+{% block header_right %}
+    <span class="sf-reset">
+        <a href="?_real_template=1" title="Render the true error page that your end users will see">Render True Error Page</a>
+    </span>
+{% endblock %}

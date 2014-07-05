@@ -19,7 +19,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Chris BECKER <goabonga@gmail.com>
  */
-class FormError implements \Serializable, \JsonSerializable
+class FormError implements \Serializable
 {
     /**
      * @var string
@@ -185,14 +185,11 @@ class FormError implements \Serializable, \JsonSerializable
     }
 
     /**
-     * (PHP 5 &gt;= 5.4.0)<br/>
-     * Specify data which should be serialized to JSON
+     * Map error as associative array.
      *
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     *       which is a value of any type other than a resource.
+     * @return array
      */
-    public function jsonSerialize()
+    public function getAsArray()
     {
         return array(
             'message'=>$this->message,
@@ -202,6 +199,4 @@ class FormError implements \Serializable, \JsonSerializable
             'cause'=>$this->cause
         );
     }
-
-
 }

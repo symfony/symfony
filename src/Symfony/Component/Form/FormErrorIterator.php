@@ -31,7 +31,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  *
  * @since 2.5
  */
-class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable, \JsonSerializable
+class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
 {
     /**
      * The prefix used for indenting nested error messages.
@@ -281,17 +281,16 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     }
 
     /**
-     * (PHP 5 &gt;= 5.4.0)<br/>
-     * Specify data which should be serialized to JSON
+     * Get errors as associative array
      *
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     *       which is a value of any type other than a resource.
+     * @return array the errors as associative array
      */
-    public function jsonSerialize()
+    public function getAsArray()
     {
-        return $this->errors;
+        $errors = array();
+        foreach($this->errors as $error){
+            $errors[] = $error->getAsArray();
+        }
+        return $errors;
     }
-
-
 }

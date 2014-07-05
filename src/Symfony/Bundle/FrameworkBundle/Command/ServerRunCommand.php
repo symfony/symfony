@@ -22,20 +22,8 @@ use Symfony\Component\Process\ProcessBuilder;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ContainerAwareCommand
+class ServerRunCommand extends ServerCommand
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        if (version_compare(phpversion(), '5.4.0', '<') || defined('HHVM_VERSION')) {
-            return false;
-        }
-
-        return parent::isEnabled();
-    }
-
     /**
      * {@inheritdoc}
      */

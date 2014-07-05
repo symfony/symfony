@@ -17,8 +17,9 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * Wraps errors in forms
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Chris BECKER <goabonga@gmail.com>
  */
-class FormError implements \Serializable
+class FormError implements \Serializable, \JsonSerializable
 {
     /**
      * @var string
@@ -182,4 +183,25 @@ class FormError implements \Serializable
     {
         list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized);
     }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     *
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     *       which is a value of any type other than a resource.
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'message'=>$this->message,
+            'messageTemplate'=>$this->messageTemplate,
+            'messageParameters'=>$this->messageParameters,
+            'messagePluralization'=>$this->messagePluralization,
+            'cause'=>$this->cause
+        );
+    }
+
+
 }

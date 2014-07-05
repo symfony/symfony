@@ -27,10 +27,11 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * flatten the recursive structure into a flat list of errors.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Chris BECKER <goabonga@gmail.com>
  *
  * @since 2.5
  */
-class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable
+class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \ArrayAccess, \Countable, \JsonSerializable
 {
     /**
      * The prefix used for indenting nested error messages.
@@ -278,4 +279,19 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     {
         return rtrim(self::INDENTATION.str_replace("\n", "\n".self::INDENTATION, $string), ' ');
     }
+
+    /**
+     * (PHP 5 &gt;= 5.4.0)<br/>
+     * Specify data which should be serialized to JSON
+     *
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     *       which is a value of any type other than a resource.
+     */
+    public function jsonSerialize()
+    {
+        return $this->errors;
+    }
+
+
 }

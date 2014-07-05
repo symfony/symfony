@@ -338,8 +338,25 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Synchronize representations - must not change the content!
-        $normData = $this->modelToNorm($modelData);
-        $viewData = $this->normToView($normData);
+        try {
+            $normData = $this->modelToNorm($modelData);
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
+        }
+
+        try {
+            $viewData = $this->normToView($normData);
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to reverse value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
+        }
 
         // Validate if view data matches data class (unless empty)
         if (!FormUtil::isEmpty($viewData)) {

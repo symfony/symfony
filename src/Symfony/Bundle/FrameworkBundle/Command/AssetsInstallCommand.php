@@ -80,10 +80,6 @@ EOT
             throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
         }
 
-        if (!function_exists('symlink') && $input->getOption('symlink')) {
-            throw new \InvalidArgumentException('The symlink() function is not available on your system. You need to install the assets without the --symlink option.');
-        }
-
         $filesystem = $this->getContainer()->get('filesystem');
 
         // Create the bundles directory otherwise symlink will fail.

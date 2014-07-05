@@ -268,7 +268,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if (!function_exists('symlink') && $copyOnWindows) {
+        if ($copyOnWindows) {
             $this->mirror($originDir, $targetDir);
 
             return;
@@ -377,7 +377,7 @@ class Filesystem
         }
 
         $copyOnWindows = false;
-        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
+        if (isset($options['copy_on_windows'])) {
             $copyOnWindows = $options['copy_on_windows'];
         }
 

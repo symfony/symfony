@@ -96,7 +96,6 @@ class SimpleFormTest extends AbstractFormTest
         $form->getData();
     }
 
-
     // https://github.com/symfony/symfony/commit/d4f4038f6daf7cf88ca7c7ab089473cce5ebf7d8#commitcomment-1632879
     public function testDataIsInitializedFromSubmit()
     {

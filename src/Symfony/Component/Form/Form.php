@@ -338,25 +338,8 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         // Synchronize representations - must not change the content!
-        try {
-            $normData = $this->modelToNorm($modelData);
-        } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
-        }
-
-        try {
-            $viewData = $this->normToView($normData);
-        } catch (TransformationFailedException $exception) {
-            throw new TransformationFailedException(
-                'Unable to reverse value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
-        }
+        $normData = $this->modelToNorm($modelData);
+        $viewData = $this->normToView($normData);
 
         // Validate if view data matches data class (unless empty)
         if (!FormUtil::isEmpty($viewData)) {
@@ -1066,12 +1049,22 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param mixed $value The value to transform
      *
+     * @throws TransformationFailedException If the value cannot be transformed to "normalized" format
+     *
      * @return mixed
      */
     private function modelToNorm($value)
     {
-        foreach ($this->config->getModelTransformers() as $transformer) {
-            $value = $transformer->transform($value);
+        try {
+            foreach ($this->config->getModelTransformers() as $transformer) {
+                $value = $transformer->transform($value);
+            }
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
         }
 
         return $value;
@@ -1082,14 +1075,24 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @param string $value The value to reverse transform
      *
+     * @throws TransformationFailedException If the value cannot be transformed to "model" format
+     *
      * @return mixed
      */
     private function normToModel($value)
     {
-        $transformers = $this->config->getModelTransformers();
+        try {
+            $transformers = $this->config->getModelTransformers();
 
-        for ($i = count($transformers) - 1; $i >= 0; --$i) {
-            $value = $transformers[$i]->reverseTransform($value);
+            for ($i = count($transformers) - 1; $i >= 0; --$i) {
+                $value = $transformers[$i]->reverseTransform($value);
+            }
+        } catch (TransformationFailedException $exception) {
+            throw new TransformationFailedException(
+                'Unable to transform value for property path "' . $this->getPropertyPath() . '": ' . $exception->getMessage(),
+                $exception->getCode(),
+                $exception
+            );
         }
 
         return $value;

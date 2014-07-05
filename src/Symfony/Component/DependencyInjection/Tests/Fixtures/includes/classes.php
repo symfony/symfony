@@ -59,3 +59,15 @@ class BarUserClass
         $this->bar = $bar;
     }
 }
+
+class Baz
+{
+}
+
+class Request
+{
+}
+
+class ConfClass
+{
+}

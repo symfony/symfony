@@ -47,6 +47,8 @@
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
 
         <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
+
+        <parameter key="security.login_manager.class">Symfony\Component\Security\Http\Login\LoginManager</parameter>
     </parameters>
 
     <services>
@@ -150,6 +152,15 @@
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.encoder_factory" />
+        </service>
+
+        <!-- Login Manager -->
+        <service id="security.login_manager" class="%security.login_manager.class%">
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.user_checker" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="security.authentication.session_strategy" />
+            <argument type="service" id="security.rememberme.resolver" />
         </service>
     </services>
 </container>

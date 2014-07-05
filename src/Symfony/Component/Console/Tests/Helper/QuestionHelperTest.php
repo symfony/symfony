@@ -21,8 +21,79 @@ use Symfony\Component\Console\Question\Question;
 
 class QuestionHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function testAskSingleChoiceStty()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to run this test');
+        }
+
+        $questionHelper = new QuestionHelper();
+        $heroes = array('Superman', 'a' => 'Batman', 'Spiderman');
+
+        // Default value
+        $questionHelper->setInputStream($this->getInputStream("\n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, 'a');
+        $this->assertEquals('Batman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Batman: <Up arrow> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[A\n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $this->assertEquals('Batman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Spiderman: <Up arrow> <Up arrow> <Up arrow> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[A\033[A\033[A\n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $this->assertEquals('Spiderman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Superman: <Down arrow> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[B\n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $this->assertEquals('Superman', $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskMultiChoiceStty()
+    {
+        if (!$this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to run this test');
+        }
+
+        $questionHelper = new QuestionHelper();
+        $heroes = array('Superman', 'a' => 'Batman', 'Spiderman');
+
+        // Default value
+        $questionHelper->setInputStream($this->getInputStream("\n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '0,a');
+        $question->setMultiselect(true);
+        $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Superman
+        // <Down Arrow> <Spacebar> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[B \n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $question->setMultiselect(true);
+        $this->assertEquals(array('Superman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Batman, deselect it and select Spiderman
+        // <Up Arrow> <Spacebar> <Spacebar> <Down arrow> <Spacebar> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[A  \033[B \n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $question->setMultiselect(true);
+        $this->assertEquals(array('Spiderman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        // Select Batman, deselect it and select Superman and Spiderman
+        // <Up Arrow> <Spacebar> <Spacebar> <Up arrow> <Spacebar> <Up arrow> <Spacebar> <Enter>
+        $questionHelper->setInputStream($this->getInputStream("\033[A  \033[A \033[A \n"));
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes);
+        $question->setMultiselect(true);
+        $this->assertEquals(array('Superman', 'Spiderman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
     public function testAskChoice()
     {
+        if ($this->hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` must be disabled to run this test');
+        }
+
         $questionHelper = new QuestionHelper();
 
         $helperSet = new HelperSet(array(new FormatterHelper()));

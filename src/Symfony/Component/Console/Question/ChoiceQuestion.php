@@ -22,12 +22,23 @@ class ChoiceQuestion extends Question
     private $multiselect = false;
     private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
+    private $options;
 
-    public function __construct($question, array $choices, $default = null)
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $options Currently the following options are supported:
+     *                       - focused_choice_template:    Used to display a focused choice when asking the question
+     *                       - unfocused_choice_template:  Used to display an unfocused choice when asking the question
+     *                       - selected_choice_template:   Used to display a selected choice when asking the question (multiselect only)
+     *                       - deselected_choice_template: Used to display a deselected choice when asking the question (multiselect only)
+     */
+    public function __construct($question, array $choices, $default = null, array $options = array())
     {
         parent::__construct($question, $default);
 
         $this->choices = $choices;
+        $this->options = $options;
         $this->setValidator($this->getDefaultValidator());
         $this->setAutocompleterValues(array_keys($choices));
     }
@@ -57,6 +68,16 @@ class ChoiceQuestion extends Question
         $this->setValidator($this->getDefaultValidator());
 
         return $this;
+    }
+
+    /**
+     * Tells if the question is multi select.
+     *
+     * @return bool
+     */
+    public function isMultiselect()
+    {
+        return $this->multiselect;
     }
 
     /**
@@ -98,6 +119,23 @@ class ChoiceQuestion extends Question
         $this->setValidator($this->getDefaultValidator());
 
         return $this;
+    }
+
+    /**
+     * Gets an option.
+     *
+     * @param string $name    The name of the option
+     * @param mixed  $default The default value to return when not found
+     *
+     * @return mixed The option value
+     */
+    public function getOption($name, $default = null)
+    {
+        if (isset($this->options[$name])) {
+            return $this->options[$name];
+        }
+
+        return $default;
     }
 
     private function getDefaultValidator()

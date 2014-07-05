@@ -15,5 +15,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 interface LoginManagerInterface
 {
+    /**
+     * @param $firewallName
+     * @param UserInterface $user
+     */
     public function loginUser($firewallName, UserInterface $user);
 }

@@ -47,6 +47,6 @@ class RememberMeServicesResolver implements RememberMeServicesResolverInterface
             return $rememberMeServices;
         }
 
-        return null;
+        return;
     }
 }

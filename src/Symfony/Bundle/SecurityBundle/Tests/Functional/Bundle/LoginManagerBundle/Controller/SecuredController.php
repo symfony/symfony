@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\LoginManagerBund
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\Security\Core\User\User;
 
 class SecuredController extends ContainerAware
 {

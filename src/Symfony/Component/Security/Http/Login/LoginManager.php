@@ -78,13 +78,13 @@ class LoginManager implements LoginManagerInterface
         $token = $this->createToken($firewallName, $user);
 
         $request = $this->requestStack->getMasterRequest();
-        if (!is_null($request)) {
+        if (null !== $request) {
             $this->sessionAuthenticationStrategy->onAuthentication($request, $token);
 
-            if (!is_null($response)) {
+            if (null !== $response) {
                 $rememberMeServices = $this->rememberMeServicesResolver->resolve($firewallName);
 
-                if (!is_null($rememberMeServices)) {
+                if (null !== $rememberMeServices) {
                     $rememberMeServices->loginSuccess($request, $response, $token);
                 }
             }

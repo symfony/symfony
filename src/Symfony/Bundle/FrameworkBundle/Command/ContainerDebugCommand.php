@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * A console command for retrieving information about services.
@@ -106,6 +107,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
+            $name = $this->findProperServiceName($input, $output, $object, $name);
             $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();
@@ -116,6 +118,10 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $helper->describe($output, $object, $options);
+
+        if (!$input->getArgument('name') && $input->isInteractive()) {
+            $output->writeln('To search for a service, re-run this command with a search term. <comment>container:debug log</comment>');
+        }
     }
 
     /**
@@ -167,5 +173,32 @@ EOF
         $loader->load($cachedFile);
 
         return $container;
+    }
+
+    private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)
+    {
+        if ($builder->has($name) || !$input->isInteractive()) {
+            return $name;
+        }
+
+        $question = new ChoiceQuestion('Choose a number for more information on the service', $this->findServiceIdsContaining($builder, $name));
+        $question->setErrorMessage('Service %s is invalid.');
+
+        return $this->getHelper('question')->ask($input, $output, $question);
+    }
+
+    private function findServiceIdsContaining(ContainerBuilder $builder, $name)
+    {
+        $serviceIds = $builder->getServiceIds();
+        $foundServiceIds = array();
+        $name = strtolower($name);
+        foreach ($serviceIds as $serviceId) {
+            if (false === strpos($serviceId, $name)) {
+                continue;
+            }
+            $foundServiceIds[] = $serviceId;
+        }
+
+        return $foundServiceIds;
     }
 }

@@ -11,8 +11,15 @@ php:
 matrix:
     allow_failures:
         - php: hhvm-nightly
+    include:
+        - php: 5.5
+          env: components=yes
 
 services: mongodb
+
+env:
+    global:
+        - components=no
 
 before_install:
     - travis_retry sudo apt-get install parallel
@@ -25,8 +32,9 @@ before_install:
 #    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;'
 
 install:
-    - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source install
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install"; fi;'
 
 script:
-    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};'
-    - echo "Running tests requiring tty"; phpunit --group tty
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "ls -d src/Symfony/*/* | parallel --gnu --keep-order '\''echo \"Running {} tests\"; phpunit --exclude-group tty,benchmark {};'\''"; fi;'
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "echo "\""Running tests requiring tty"\""; phpunit --group tty"; fi;'
+    - sh -c 'if [ "$components" = "yes" ]; then sh -c "find src/Symfony -mindepth 3 -type f -name '\''phpunit.xml.dist'\'' | sed '\''s#\(.*\)/.*#\1#'\'' | parallel --gnu --keep-order '\''echo \"Running {} tests\"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; phpunit --exclude-group tty,benchmark;'\''"; fi;'

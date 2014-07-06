@@ -145,6 +145,17 @@ class ProcessBuilder
         return $this;
     }
 
+    /**
+     * Adds a set of environment variables.
+     *
+     * Already existing environment variables with the same name will be
+     * overridden by the new values passed to this method. Pass `null` to unset
+     * a variable.
+     *
+     * @param array $variables The variables
+     *
+     * @return ProcessBuilder
+     */
     public function addEnvironmentVariables(array $variables)
     {
         $this->env = array_replace($this->env, $variables);

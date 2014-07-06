@@ -219,7 +219,7 @@ class ProcessBuilder
     /**
      * Disables fetching output and error output from the underlying process.
      *
-     * @return Process
+     * @return ProcessBuilder
      */
     public function disableOutput()
     {
@@ -231,7 +231,7 @@ class ProcessBuilder
     /**
      * Enables fetching output and error output from the underlying process.
      *
-     * @return Process
+     * @return ProcessBuilder
      */
     public function enableOutput()
     {

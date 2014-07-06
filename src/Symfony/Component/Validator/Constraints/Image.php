@@ -26,6 +26,7 @@ class Image extends File
     public $minHeight;
     public $maxRatio;
     public $minRatio;
+    public $ratioPrecision;
     public $allowSquare = true;
     public $allowLandscape = true;
     public $allowPortrait = true;

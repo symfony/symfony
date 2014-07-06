@@ -13,6 +13,7 @@ namespace Symfony\Component\Process;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Process builder.
@@ -30,6 +31,12 @@ class ProcessBuilder
     private $inheritEnv = true;
     private $prefix = array();
     private $outputDisabled = false;
+    private $shellWrapperEnabled = false;
+
+    /**
+     * @var bool
+     */
+    private static $sigchild;
 
     /**
      * Constructor
@@ -252,6 +259,40 @@ class ProcessBuilder
     }
 
     /**
+     * Do not enable the shell wrapper (i.e. do not prepend the executed command with "exec").
+     *
+     * @return ProcessBuilder
+     */
+    public function disableShellWrapper()
+    {
+        $this->shellWrapperEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable the shell wrapper (i.e. prepend the executed command with "exec").
+     *
+     * @return ProcessBuilder
+     *
+     * @throws RuntimeException if the OS is Windows or if PHP was built with --enable-sigchild
+     */
+    public function enableShellWrapper()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            throw new RuntimeException('The shell wrapper is not supported on Windows platforms.');
+        }
+
+        if ($this->isSigchildEnabled()) {
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. The shell wrapper cannot be enabled.');
+        }
+
+        $this->shellWrapperEnabled = true;
+
+        return $this;
+    }
+
+    /**
      * Creates a Process instance and returns it.
      *
      * @return Process
@@ -269,6 +310,10 @@ class ProcessBuilder
         $arguments = array_merge($this->prefix, $this->arguments);
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
+        if ($this->shellWrapperEnabled) {
+            $script = 'exec '.$script;
+        }
+
         if ($this->inheritEnv) {
             // include $_ENV for BC purposes
             $env = array_replace($_ENV, $_SERVER, $this->env);
@@ -283,5 +328,26 @@ class ProcessBuilder
         }
 
         return $process;
+    }
+
+    /**
+     * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
+     *
+     * @return bool
+     */
+    private function isSigchildEnabled()
+    {
+        if (null !== self::$sigchild) {
+            return self::$sigchild;
+        }
+
+        if (!function_exists('phpinfo')) {
+            return self::$sigchild = false;
+        }
+
+        ob_start();
+        phpinfo(INFO_GENERAL);
+
+        return self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }
 }

@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Process\Tests;
 
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    private static $sigchild;
+
     public function testInheritEnvironmentVars()
     {
         $_ENV['MY_VAR_1'] = 'foo';
@@ -221,5 +224,85 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = ProcessBuilder::create();
         $builder->setInput(array());
+    }
+
+    public function testShouldNotPrependCommandLineWithExecByDefault()
+    {
+        $process = ProcessBuilder::create()
+            ->add('foo')
+            ->getProcess();
+
+        $this->assertNotRegExp('/^exec /', $process->getCommandLine());
+    }
+
+    public function testShouldPrependCommandLineWithExec()
+    {
+        if ($this->isSigchildEnabled()) {
+            $this->markTestSkipped('->enableShellWrapper() is not supported in sigchild environment');
+        }
+
+        $process = ProcessBuilder::create()
+            ->add('foo')
+            ->enableShellWrapper()
+            ->getProcess();
+
+        $this->assertRegExp('/^exec /', $process->getCommandLine());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage The shell wrapper is not supported on Windows platforms.
+     */
+    public function testEnableShellWrapperOnWindowsThrowsException()
+    {
+        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->markTestSkipped('->enableShellWrapper() is not supported on Windows');
+        }
+
+        ProcessBuilder::create()->enableShellWrapper();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. The shell wrapper cannot be enabled.
+     */
+    public function testEnableShellWrapperInSigchildEnvironmentThrowsException()
+    {
+        if (!$this->isSigchildEnabled()) {
+            $this->markTestSkipped('->enableShellWrapper() is not supported in sigchild environment');
+        }
+
+        ProcessBuilder::create()->enableShellWrapper();
+    }
+
+    public function testShouldNotPrependCommandLineWithExec()
+    {
+        $process = ProcessBuilder::create()
+            ->add('foo')
+            ->disableShellWrapper()
+            ->getProcess();
+
+        $this->assertNotRegExp('/^exec /', $process->getCommandLine());
+    }
+
+    /**
+     * Returns whether PHP has been compiled with the '--enable-sigchild' option or not.
+     *
+     * @return bool
+     */
+    private function isSigchildEnabled()
+    {
+        if (null !== self::$sigchild) {
+            return self::$sigchild;
+        }
+
+        if (!function_exists('phpinfo')) {
+            return self::$sigchild = false;
+        }
+
+        ob_start();
+        phpinfo(INFO_GENERAL);
+
+        return self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
     }
 }

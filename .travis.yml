@@ -11,8 +11,6 @@ php:
 matrix:
     allow_failures:
         - php: hhvm-nightly
-    exclude:
-        - env: components=yes
     include:
         - php: 5.5
           env: components=yes
@@ -20,8 +18,8 @@ matrix:
 services: mongodb
 
 env:
-    - components=yes
-    - components=no
+    global:
+        - components=no
 
 before_install:
     - travis_retry sudo apt-get install parallel

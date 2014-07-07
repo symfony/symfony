@@ -71,7 +71,7 @@ class UsernameNotFoundException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageData()
     {

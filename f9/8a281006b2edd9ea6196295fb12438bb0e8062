@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-07T09:42:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-07T09:51:42Z
+
+@fabpot What about simplifying the phpunit config by avoiding to repeat the defaults ? The ``<phpunit>`` tag would then need only the ``bootstrap`` and ``colors`` parameters.
+
+Otherwise, :+1: for adding the XSD
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-07T09:56:51Z
+
+@stof I like being explicit, but as this file does not change that much over time, we can also remove the defaults. Can be done in another PR though.

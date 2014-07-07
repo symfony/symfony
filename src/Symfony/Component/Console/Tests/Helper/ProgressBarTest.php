@@ -71,6 +71,22 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAdvanceOverMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar->setCurrent(9);
+        $bar->advance();
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('  9/10 [=========================>--]  90%').
+            $this->generateOutput(' 10/10 [============================] 100%').
+            $this->generateOutput(' 11/11 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testCustomizations()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 10);

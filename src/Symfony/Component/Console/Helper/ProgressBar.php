@@ -52,17 +52,14 @@ class ProgressBar
      *
      * @param OutputInterface $output An OutputInterface instance
      * @param int             $max    Maximum steps (0 if unknown)
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
-        if (!is_integer($max) || $max < 0) {
-            throw new \InvalidArgumentException('Max steps should be a positive integer, 0 or null. Got "%s".', $max);
-        }
-
         // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
         $this->output = $output->isDecorated() ? $output : new NullOutput();
-        $this->max = (int) $max;
-        $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
+        $this->setMaxSteps($max);
 
         if (!self::$formatters) {
             self::$formatters = self::initPlaceholderFormatters();
@@ -165,6 +162,25 @@ class ProgressBar
     public function getStartTime()
     {
         return $this->startTime;
+    }
+
+    /**
+     * Sets the progress bar maximal steps.
+     *
+     * @param int     The progress bar max steps
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setMaxSteps($max)
+    {
+        $max = (int) $max;
+
+        if ($max < 0) {
+            throw new \InvalidArgumentException('Max steps should be a positive integer, 0 or null. Got "%s".', $max);
+        }
+
+        $this->max = $max;
+        $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
     }
 
     /**
@@ -338,8 +354,7 @@ class ProgressBar
     public function start($max = 0)
     {
         if (0 !== $max) {
-            $this->max = $max;
-            $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
+            $this->setMaxSteps($max);
         }
 
         if (!$this->max) {
@@ -377,7 +392,7 @@ class ProgressBar
         }
 
         if ($this->max > 0 && $step > $this->max) {
-            throw new \LogicException('You can\'t advance the progress bar past the max value.');
+            $this->max = $step;
         }
 
         $prevPeriod = intval($this->step / $this->redrawFreq);

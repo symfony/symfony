@@ -569,6 +569,48 @@ EOF
         $this->assertEquals(1, $crawler->selectButton('FooBarName')->count(), '->selectButton() selects buttons with form attribute too');
     }
 
+    public function testSelectButtonWithSingleQuotesInNameAttribute()
+    {
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div id="action">
+        <a href="/index.php?r=site/login">Login</a>
+    </div>
+    <form id="login-form" action="/index.php?r=site/login" method="post">
+        <button type="submit" name="Click 'Here'">Submit</button>
+    </form>
+</body>
+</html>
+HTML;
+
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->selectButton('Click \'Here\''));
+    }
+
+    public function testSelectButtonWithDoubleQuotesInNameAttribute()
+    {
+        $html = <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div id="action">
+        <a href="/index.php?r=site/login">Login</a>
+    </div>
+    <form id="login-form" action="/index.php?r=site/login" method="post">
+        <button type="submit" name='Click "Here"'>Submit</button>
+    </form>
+</body>
+</html>
+HTML;
+
+        $crawler = new Crawler($html);
+
+        $this->assertCount(1, $crawler->selectButton('Click "Here"'));
+    }
+
     public function testLink()
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');

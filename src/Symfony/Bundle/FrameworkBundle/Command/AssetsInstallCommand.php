@@ -111,7 +111,7 @@ EOT
                     try {
                         $filesystem->symlink($relativeOriginDir, $targetDir);
                     } catch (IOException $e) {
-                        if (!$input->getOption('auto')) {
+                        if ($input->getOption('auto')) {
                             $this->hardCopy($originDir, $targetDir);
                             $autoSymlinkFailed = true;
                         } else {

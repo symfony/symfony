@@ -112,14 +112,14 @@ EOT
                         $filesystem->symlink($relativeOriginDir, $targetDir);
                     } catch (IOException $e) {
                         if (!$input->getOption('auto')) {
-                            $this->hardCopy($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+                            $this->hardCopy($originDir, $targetDir);
                             $autoSymlinkFailed = true;
                         } else {
                             throw $e;
                         }
                     }
                 } else {
-                    $this->hardCopy($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+                    $this->hardCopy($originDir, $targetDir);
                 }
 
             }
@@ -135,9 +135,10 @@ EOT
     }
 
     /**
-     * Create hardcopy for targetDir
+     * @param string $originDir
+     * @param string $targetDir
      */
-    private function hardCopy($originDir, $targetDir, \Traversable $iterator = null)
+    private function hardCopy($originDir, $targetDir)
     {
         $filesystem = $this->getContainer()->get('filesystem');
 

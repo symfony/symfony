@@ -55,6 +55,10 @@ class ProgressBar
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
+        if (!is_integer($max) || $max < 0) {
+            throw new \InvalidArgumentException('Max steps should be a positive integer, 0 or null. Got "%s".', $max);
+        }
+
         // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
         $this->output = $output->isDecorated() ? $output : new NullOutput();
         $this->max = (int) $max;
@@ -69,6 +73,12 @@ class ProgressBar
         }
 
         $this->setFormat($this->determineBestFormat());
+
+        $this->startTime = time();
+        $this->step = 0;
+        $this->percent = 0;
+        $this->lastMessagesLength = 0;
+        $this->barCharOriginal = '';
     }
 
     /**
@@ -170,15 +180,29 @@ class ProgressBar
     /**
      * Gets the progress bar step.
      *
+     * @deprecated since 2.6, to be removed in 3.0. Use {@link getCurrent()} instead.
+     *
      * @return int     The progress bar step
      */
     public function getStep()
+    {
+        return $this->getCurrent();
+    }
+
+    /**
+     * Gets the progress bar step.
+     *
+     * @return int The progress bar step
+     */
+    public function getCurrent()
     {
         return $this->step;
     }
 
     /**
      * Gets the progress bar step width.
+     *
+     * @deprecated since 2.6, it will be marked private from 3.0.
      *
      * @return int     The progress bar step width
      */
@@ -308,14 +332,15 @@ class ProgressBar
 
     /**
      * Starts the progress output.
+     *
+     * @param int    $max Maximum Step (0 if unknown)
      */
-    public function start()
+    public function start($max = 0)
     {
-        $this->startTime = time();
-        $this->step = 0;
-        $this->percent = 0;
-        $this->lastMessagesLength = 0;
-        $this->barCharOriginal = '';
+        if (0 !== $max) {
+            $this->max = $max;
+            $this->stepWidth = $this->max > 0 ? Helper::strlen($this->max) : 4;
+        }
 
         if (!$this->max) {
             $this->barCharOriginal = $this->barChar;
@@ -346,10 +371,6 @@ class ProgressBar
      */
     public function setCurrent($step)
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling setCurrent().');
-        }
-
         $step = (int) $step;
         if ($step < $this->step) {
             throw new \LogicException('You can\'t regress the progress bar.');
@@ -373,10 +394,6 @@ class ProgressBar
      */
     public function finish()
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling finish().');
-        }
-
         if (!$this->max) {
             $this->barChar = $this->barCharOriginal;
             $this->max = $this->step;
@@ -397,8 +414,8 @@ class ProgressBar
      */
     public function display()
     {
-        if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling display().');
+        if (OutputInterface::VERBOSITY_QUIET === $this->output->getVerbosity()) {
+            return;
         }
 
         // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.

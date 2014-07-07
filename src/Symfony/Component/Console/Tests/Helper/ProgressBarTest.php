@@ -19,6 +19,14 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 {
     protected $lastMessagesLength;
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInitializeWithNegativeMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), -1);
+    }
+
     public function testAdvance()
     {
         $bar = new ProgressBar($output = $this->getOutputStream());
@@ -82,6 +90,42 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDisplayWithoutStart()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar->display();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput('  0/50 [>---------------------------]   0%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testDisplayWithQuietVerbosity()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(true, StreamOutput::VERBOSITY_QUIET), 50);
+        $bar->display();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '',
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testFinishWithoutStart()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(' 50/50 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testPercent()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 50);
@@ -122,6 +166,23 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStartWithMax()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->setFormat('%current%/%max% [%bar%]');
+        $bar->start(50);
+        $bar->display();
+        $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            $this->generateOutput(' 0/50 [>---------------------------]').
+            $this->generateOutput(' 0/50 [>---------------------------]').
+            $this->generateOutput(' 1/50 [>---------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testSetCurrentProgress()
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 50);
@@ -143,13 +204,12 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage You must start the progress bar
      */
     public function testSetCurrentBeforeStarting()
     {
         $bar = new ProgressBar($this->getOutputStream());
         $bar->setCurrent(15);
+        $this->assertNotNull($bar->getStartTime());
     }
 
     /**
@@ -302,7 +362,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     public function testAddingPlaceholderFormatter()
     {
         ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', function (ProgressBar $bar) {
-            return $bar->getMaxSteps() - $bar->getStep();
+            return $bar->getMaxSteps() - $bar->getCurrent();
         });
         $bar = new ProgressBar($output = $this->getOutputStream(), 3);
         $bar->setFormat(' %remaining_steps% [%bar%]');
@@ -432,9 +492,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getOutputStream($decorated = true)
+    protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);
+        return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, $decorated);
     }
 
     protected function generateOutput($expected)

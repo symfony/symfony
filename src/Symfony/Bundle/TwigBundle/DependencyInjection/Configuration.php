@@ -39,6 +39,7 @@ class Configuration implements ConfigurationInterface
         ;
 
         $this->addFormSection($rootNode);
+        $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
 
@@ -48,8 +49,19 @@ class Configuration implements ConfigurationInterface
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            ->validate()
+                ->ifTrue(function ($v) {
+                    return count($v['form']['resources']) > 0;
+                })
+                ->then(function ($v) {
+                    $v['form_themes'] = array_unique(array_merge($v['form']['resources'], $v['form_themes']));
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->arrayNode('form')
+                    ->info('Deprecated since 2.6, to be removed in 3.0. Use twig.form_themes instead')
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()
@@ -64,6 +76,26 @@ class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                         ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addFormThemesSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->fixXmlConfig('form_theme')
+            ->children()
+                ->arrayNode('form_themes')
+                    ->addDefaultChildrenIfNoneSet()
+                    ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
+                    ->example(array('MyBundle::form.html.twig'))
+                    ->validate()
+                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                        ->then(function ($v) {
+                            return array_merge(array('form_div_layout.html.twig'), $v);
+                        })
                     ->end()
                 ->end()
             ->end()

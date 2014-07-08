@@ -268,9 +268,10 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if ($copyOnWindows) {
-            $this->mirror($originDir, $targetDir);
+        $onWindows = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN';
 
+        if ($onWindows && $copyOnWindows) {
+            $this->mirror($originDir, $targetDir);
             return;
         }
 
@@ -286,14 +287,21 @@ class Filesystem
         }
 
         if (!$ok) {
-            if (true !== @symlink($originDir, $targetDir)) {
-                $report = error_get_last();
-                if (is_array($report)) {
-                    if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
-                        throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
-                    }
+            if ($onWindows) {
+                exec("mklink /d {$targetDir} {$originDir}", $output, $return_var);
+                if ($return_var != 0) {
+                    throw new IOException(sprintf('Failed to create symbolic link on Windows from "%s" to "%s" with error(s): "%s".', $originDir, $targetDir, implode('; ', $output)), 0, null, $targetDir);
                 }
-                throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
+            } else {
+                if (true !== @symlink($originDir, $targetDir)) {
+                    $report = error_get_last();
+                    if (is_array($report)) {
+                        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
+                            throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
+                        }
+                    }
+                    throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
+                }
             }
 
             if (!file_exists($targetDir)) {

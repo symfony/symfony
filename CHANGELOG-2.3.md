@@ -7,6 +7,28 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.17 (2014-07-07)
+
+ * bug #11238 [Translation] Added unescaping of ids in PoFileLoader (JustBlackBird)
+ * bug #11194 [DomCrawler] Remove the query string and the anchor of the uri of a link (benja-M-1)
+ * bug #11272 [Console] Make sure formatter is the same. (akimsko)
+ * bug #11259 [Config] Fixed failed config schema loads due to libxml_disable_entity_loader usage (ccorliss)
+ * bug #11234 [ClassLoader] fixed PHP warning on PHP 5.3 (fabpot)
+ * bug #11179 [Process] Fix ExecutableFinder with open basedir (cs278)
+ * bug #11242 [CssSelector] Refactored the CssSelector to remove the circular object graph (stof)
+ * bug #11219 [DomCrawler] properly handle buttons with single and double quotes insid... (xabbuh)
+ * bug #11220 [Components][Serializer] optional constructor arguments can be omitted during the denormalization process (xabbuh)
+ * bug #11186 Added missing `break` statement (apfelbox)
+ * bug #11169 [Console] Fixed notice in DialogHelper (florianv)
+ * bug #11144 [HttpFoundation] Fixed Request::getPort returns incorrect value under IPv6 (kicken)
+ * bug #10966 PHP Fatal error when getContainer method of ContainerAwareCommand has be... (kevinvergauwen)
+ * bug #10981 [HttpFoundation] Fixed isSecure() check to be compliant with the docs (Jannik Zschiesche)
+ * bug #11092 [HttpFoundation] Fix basic authentication in url with PHP-FPM (Kdecherf)
+ * bug #10808 [DomCrawler] Empty select with attribute name="foo[]" bug fix (darles)
+ * bug #11063 [HttpFoundation] fix switch statement (Tobion)
+ * bug #11009 [HttpFoundation] smaller fixes for PdoSessionHandler (Tobion)
+ * bug #11041 Remove undefined variable $e (skydiablo)
+
 * 2.3.16 (2014-05-31)
 
  * bug #11014 [Validator] Remove property and method targets from the optional and required constraints (jakzal)

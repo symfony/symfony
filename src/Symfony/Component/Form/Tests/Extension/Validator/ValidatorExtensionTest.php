@@ -22,7 +22,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $classMetaData = $this->createClassMetaDataMock();
 
-        // Mock of ValidatorInterface since 2.5
+        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $validator
@@ -49,7 +49,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($classMetaData))
         ;
 
-        // Mock of ValidatorInterface until 2.4
+        // Mock of ValidatorInterface until apiVersion 2.4
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
 
         $validator

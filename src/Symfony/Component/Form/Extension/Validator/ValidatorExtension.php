@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -28,27 +27,26 @@ class ValidatorExtension extends AbstractExtension
     private $validator;
 
     /**
-     * @param  ValidatorInterface                                         $validator The validator requires an instance of ValidatorInterface
-     *                                                                               since 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
-     *                                                                               until 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
-     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @param ValidatorInterface|LegacyValidatorInterface $validator The validator requires an instance of ValidatorInterface
+     *                                                               since validator apiVersion 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
+     *                                                               until validator apiVersion 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
      */
     public function __construct($validator)
     {
-        // ValidatorInterface since 2.5
+        // since validator apiVersion 2.5
         if ($validator instanceof ValidatorInterface) {
             $this->validator = $validator;
 
             /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
             $metadata = $this->validator->getMetadataFor('Symfony\Component\Form\Form');
-        // ValidatorInterface until 2.4
+        // until validator apiVersion 2.4
         } elseif ($validator instanceof LegacyValidatorInterface) {
             $this->validator = $validator;
 
             /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
             $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
         } else {
-            throw new InvalidArgumentException(sprintf('Validator must be instance of ValidatorInterface.'));
+            throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
         }
 
         // Register the form constraints in the validator programmatically.

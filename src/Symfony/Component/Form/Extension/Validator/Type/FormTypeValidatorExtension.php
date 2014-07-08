@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
@@ -36,21 +35,17 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     private $violationMapper;
 
     /**
-     * @param  ValidatorInterface                                         $validator The validator requires an instance of ValidatorInterface
-     *                                                                               since 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
-     *                                                                               until 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
-     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @param ValidatorInterface|LegacyValidatorInterface $validator The validator requires an instance of ValidatorInterface
+     *                                                               since validator apiVersion 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
+     *                                                               until validator apiVersion 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
      */
     public function __construct($validator)
     {
-        if ($validator instanceof ValidatorInterface
-            || $validator instanceof LegacyValidatorInterface
-        ) {
-            $this->validator = $validator;
-        } else {
-            throw new InvalidArgumentException(sprintf('Validator must be instance of ValidatorInterface.'));
+        if (!$validator instanceof ValidatorInterface || !$validator instanceof LegacyValidatorInterface) {
+            throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
         }
 
+        $this->validator = $validator;
         $this->violationMapper = new ViolationMapper();
     }
 

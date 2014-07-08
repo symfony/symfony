@@ -26,15 +26,16 @@ class ProcessHelper extends Helper
     /**
      * Runs an external process.
      *
-     * @param OutputInterface      $output   An OutputInterface instance
-     * @param string|array|Process $cmd      An instance of Process or an array of arguments to escape and run or a command to run
-     * @param string|null          $error    An error message that must be displayed if something went wrong
-     * @param callable|null        $callback A PHP callback to run whenever there is some
-     *                                       output available on STDOUT or STDERR
+     * @param OutputInterface      $output    An OutputInterface instance
+     * @param string|array|Process $cmd       An instance of Process or an array of arguments to escape and run or a command to run
+     * @param string|null          $error     An error message that must be displayed if something went wrong
+     * @param callable|null        $callback  A PHP callback to run whenever there is some
+     *                                        output available on STDOUT or STDERR
+     * @param int                  $verbosity The threshold for verbosity
      *
      * @return Process The process that ran
      */
-    public function run(OutputInterface $output, $cmd, $error = null, $callback = null)
+    public function run(OutputInterface $output, $cmd, $error = null, $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
@@ -46,7 +47,7 @@ class ProcessHelper extends Helper
             $process = new Process($cmd);
         }
 
-        if ($output->isVeryVerbose()) {
+        if ($verbosity <= $output->getVerbosity()) {
             $output->write($formatter->start(spl_object_hash($process), $process->getCommandLine()));
         }
 
@@ -56,7 +57,7 @@ class ProcessHelper extends Helper
 
         $process->run($callback);
 
-        if ($output->isVeryVerbose()) {
+        if ($verbosity <= $output->getVerbosity()) {
             $message = $process->isSuccessful() ? 'Command ran successfully' : sprintf('%s Command did not run successfully', $process->getExitCode());
             $output->write($formatter->stop(spl_object_hash($process), $message, $process->isSuccessful()));
         }

@@ -27,9 +27,7 @@ class ValidatorExtension extends AbstractExtension
     private $validator;
 
     /**
-     * @param ValidatorInterface|LegacyValidatorInterface $validator The validator requires an instance of ValidatorInterface
-     *                                                               since validator apiVersion 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
-     *                                                               until validator apiVersion 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
+     * @param ValidatorInterface|LegacyValidatorInterface $validator
      */
     public function __construct($validator)
     {

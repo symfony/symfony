@@ -41,6 +41,7 @@ class LoginManager implements LoginManagerInterface
      * @var SessionAuthenticationStrategyInterface
      */
     private $sessionAuthenticationStrategy;
+
     /**
      * @var RememberMeServicesResolverInterface
      */

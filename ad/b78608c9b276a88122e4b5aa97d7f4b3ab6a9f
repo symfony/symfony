@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-17T05:30:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-17T07:20:01Z
+
+-1 for making the helper stateful. this creates issues when you have several usages of the helper
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-17T07:25:46Z
+
+btw, once #11122 is merged, you won't need the setter anymore
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T09:01:08Z
+
+@stof You're right, I've updated the PR
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-17T09:11:47Z
+
+this is not equivalent anymore as it now requires running in debug verbosity to see the output of the process. Do we consider it as fine, or should we add a new argument in ``ProcessHelper::run()`` to configure the threshold ?
+I think it may be fine to change the verbosity level used by the command here
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T10:15:41Z
+
+@stof I've updated the PR according your comment. I think we got it now :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-03T22:53:48Z
+
+@romainneutron can you rebase this PR ? It conflicts
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-06T11:07:58Z
+
+@stof I've updated the PR
+
+Here's a screenshot of the output:
+
+![screen shot 2014-07-06 at 13 01 43](https://cloud.githubusercontent.com/assets/137574/3488698/fbd91e2a-04fc-11e4-9450-b37bd300fc85.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-08T13:23:39Z
+
+:+1:

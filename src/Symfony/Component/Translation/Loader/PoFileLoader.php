@@ -157,7 +157,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
     private function addMessage(array &$messages, array $item)
     {
         if (is_array($item['translated'])) {
-            $messages[$item['ids']['singular']] = stripcslashes($item['translated'][0]);
+            $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated'][0]);
             if (isset($item['ids']['plural'])) {
                 $plurals = $item['translated'];
                 // PO are by definition indexed so sort by index.
@@ -169,10 +169,10 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 $empties = array_fill(0, $count+1, '-');
                 $plurals += $empties;
                 ksort($plurals);
-                $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
+                $messages[stripcslashes($item['ids']['plural'])] = stripcslashes(implode('|', $plurals));
             }
         } elseif (!empty($item['ids']['singular'])) {
-              $messages[$item['ids']['singular']] = stripcslashes($item['translated']);
+              $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated']);
         }
     }
 }

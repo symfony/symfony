@@ -41,7 +41,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
      */
     public function __construct($validator)
     {
-        if (!$validator instanceof ValidatorInterface || !$validator instanceof LegacyValidatorInterface) {
+        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
             throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
         }
 

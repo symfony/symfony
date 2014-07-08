@@ -56,7 +56,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testInvalidValidatorInterface()
     {

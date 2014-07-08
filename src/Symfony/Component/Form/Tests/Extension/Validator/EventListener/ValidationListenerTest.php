@@ -178,7 +178,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testInvalidValidatorInterface()
     {

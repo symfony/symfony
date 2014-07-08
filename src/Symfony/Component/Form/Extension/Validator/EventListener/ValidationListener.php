@@ -44,7 +44,7 @@ class ValidationListener implements EventSubscriberInterface
      */
     public function __construct($validator, ViolationMapperInterface $violationMapper)
     {
-        if (!$validator instanceof ValidatorInterface || !$validator instanceof LegacyValidatorInterface) {
+        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
             throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
         }
 

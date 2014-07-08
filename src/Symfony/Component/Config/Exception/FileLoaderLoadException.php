@@ -28,14 +28,14 @@ class FileLoaderLoadException extends \Exception
     {
         $message = '';
         if ($previous) {
-            // include the previous exception, to help the user see what might be the underlying cause
+            // Include the previous exception, to help the user see what might be the underlying cause
 
-            //Trim the trailing period of the previous message. We only want 1 period remove so no rtrim...
+            // Trim the trailing period of the previous message. We only want 1 period remove so no rtrim...
             if ('.' === substr($previous->getMessage(), -1)) {
                 $trimmedMessage = substr($previous->getMessage(), 0, -1);
-                $message .= ' ' . sprintf('%s', $trimmedMessage) . ' in ';
+                $message .= sprintf('%s', $trimmedMessage) . ' in ';
             } else {
-                $message .= ' ' . sprintf('%s', $previous->getMessage()) . ' in ';
+                $message .= sprintf('%s', $previous->getMessage()) . ' in ';
             }
             $message .= $resource . ' ';
 

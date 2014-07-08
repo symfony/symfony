@@ -1023,7 +1023,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     public function pipesCodeProvider()
     {
         $variations = array(
-            'fwrite(STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(STDERR, $in);',
+            'fwrite(\STDOUT, $in = file_get_contents(\'php://stdin\')); fwrite(\STDERR, $in);',
             'include \''.__DIR__.'/PipeStdinInStdoutStdErrStreamSelect.php\';',
         );
 

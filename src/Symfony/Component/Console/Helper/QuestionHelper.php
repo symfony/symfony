@@ -109,7 +109,7 @@ class QuestionHelper extends Helper
      */
     public function doAsk(OutputInterface $output, Question $question)
     {
-        $inputStream = $this->inputStream ?: STDIN;
+        $inputStream = $this->inputStream ?: \STDIN;
 
         $message = $question->getQuestion();
         if ($question instanceof ChoiceQuestion) {

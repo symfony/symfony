@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-24T08:08:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-27T06:56:45Z
+
+@weaverryan Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-06-27T08:00:37Z
+
+I think this exception is caused by 2 common errors: (a) Forgetting to register the bundle or (b) a typo in the name.
+
+(b) is covered by the new exception, (a) was covered by the old exception. Isn't there a way we can do both? E.g. when there are no good alternatives found, give the suggestion about registering. Or always give the suggestion about registering and only add the alternatives suggestion when one is found.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T15:44:16Z
+
+I've just made all the suggested changes.
+
+@WouterJ I altered the wording slightly to help with your situation (it was good thinking!). I do think that this situation is much less common, since devs usually generate a bundle (or are advanced enough to debug this easily if they create a bundle by hand) and so will always have the AppKernel entry. And this error will never happen with a 3rd party bundle, because the routing import will fail first.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-08T19:33:26Z
+
+:+1:

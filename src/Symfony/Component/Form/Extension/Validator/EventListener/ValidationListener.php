@@ -12,8 +12,10 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
@@ -35,9 +37,23 @@ class ValidationListener implements EventSubscriberInterface
         return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
-    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
+    /**
+     * @param  ValidatorInterface                                         $validator       The validator requires an instance of ValidatorInterface
+     *                                                                                     since 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
+     *                                                                                     until 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
+     * @param  ViolationMapperInterface                                   $violationMapper The ViolationMapper
+     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function __construct($validator, ViolationMapperInterface $violationMapper)
     {
-        $this->validator = $validator;
+        if ($validator instanceof ValidatorInterface
+            || $validator instanceof LegacyValidatorInterface
+        ) {
+            $this->validator = $validator;
+        } else {
+            throw new InvalidArgumentException(sprintf('Validator must be instance of ValidatorInterface.'));
+        }
+
         $this->violationMapper = $violationMapper;
     }
 

@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -33,9 +35,22 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
      */
     private $violationMapper;
 
-    public function __construct(ValidatorInterface $validator)
+    /**
+     * @param  ValidatorInterface                                         $validator The validator requires an instance of ValidatorInterface
+     *                                                                               since 2.5 instance of {@link Symfony\Component\Validator\Validator\ValidatorInterface}
+     *                                                                               until 2.4 instance of {@link Symfony\Component\Validator\ValidatorInterface}
+     * @throws \Symfony\Component\Form\Exception\InvalidArgumentException
+     */
+    public function __construct($validator)
     {
-        $this->validator = $validator;
+        if ($validator instanceof ValidatorInterface
+            || $validator instanceof LegacyValidatorInterface
+        ) {
+            $this->validator = $validator;
+        } else {
+            throw new InvalidArgumentException(sprintf('Validator must be instance of ValidatorInterface.'));
+        }
+
         $this->violationMapper = new ViolationMapper();
     }
 

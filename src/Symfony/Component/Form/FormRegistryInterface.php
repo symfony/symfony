@@ -37,7 +37,7 @@ interface FormRegistryInterface
      *
      * @param string $name The name of the type
      *
-     * @return bool    Whether the type is supported
+     * @return bool Whether the type is supported
      */
     public function hasType($name);
 

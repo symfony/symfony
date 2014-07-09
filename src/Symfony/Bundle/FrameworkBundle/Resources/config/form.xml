@@ -146,6 +146,10 @@
         <service id="form.type.currency" class="Symfony\Component\Form\Extension\Core\Type\CurrencyType">
             <tag name="form.type" alias="currency" />
         </service>
+        <service id="form.type.tel" class="Symfony\Component\Form\Extension\Core\Type\TelType">
+            <tag name="form.type" alias="tel" />
+        </service>
+
 
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">

@@ -199,6 +199,13 @@
     {% endspaceless %}
 {% endblock tel_widget %}
 
+{% block tel_widget %}
+    {% spaceless %}
+        {% set type = type|default('tel') %}
+        {{ block('form_widget_simple') }}
+    {% endspaceless %}
+{% endblock tel_widget %}
+
 {# Labels #}
 
 {% block form_label -%}

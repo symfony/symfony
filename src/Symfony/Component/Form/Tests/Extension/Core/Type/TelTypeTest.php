@@ -11,11 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-/**
- * Class TelTypeTest
- *
- * @package Symfony\Component\Form\Tests\Extension\Core\Type
- */
 class TelTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testIntl()
@@ -34,24 +29,5 @@ class TelTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('0289009098', $view->vars['value']);
     }
-
-    public function testOption()
-    {
-        $form = $this->factory->create('tel', null, array(
-                'placeholder' => 'Enter your phone number',
-                'size' => 10,
-                'required' => true,
-                'readonly' => '',
-                'pattern' => '^0',
-                'maxlength' => 10,
-                'autofocus' => 'autofocus',
-                'autocomplete' => 'on'
-            )
-        );
-        $form->submit('0289009098');
-        $view = $form->createView();
-
-        $this->assertSame('0289009098', $view->vars['value']);
-    }
-
 }
+

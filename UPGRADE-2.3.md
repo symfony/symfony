@@ -110,9 +110,9 @@ Form
    }
    ```
 
- * The *_SET_DATA events are now guaranteed to be fired *after* the children
+ * The `*_SET_DATA` events are now guaranteed to be fired *after* the children
    were added by the FormBuilder (unless setData() is called manually). Before,
-   the *_SET_DATA events were sometimes thrown before adding child forms,
+   the `*_SET_DATA` events were sometimes thrown before adding child forms,
    which made it impossible to remove child forms dynamically.
 
    A consequence of this change is that you need to set the "auto_initialize"

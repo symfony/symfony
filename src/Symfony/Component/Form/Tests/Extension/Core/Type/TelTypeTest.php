@@ -30,4 +30,3 @@ class TelTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('0289009098', $view->vars['value']);
     }
 }
-

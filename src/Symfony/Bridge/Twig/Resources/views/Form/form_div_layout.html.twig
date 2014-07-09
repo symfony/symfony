@@ -194,9 +194,10 @@
 
 {% block tel_widget %}
     {% spaceless %}
-        <input type="tel" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %} />
+        {% set type = type|default('tel') %}
+        {{ block('form_widget_simple') }}
     {% endspaceless %}
-{% endblock textarea_widget %}
+{% endblock tel_widget %}
 
 {# Labels #}
 

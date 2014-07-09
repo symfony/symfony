@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by WybrenKoelmans at 2014-06-24T16:25:25Z
+
+I have made the necessary changes and added a pull request for the documentation.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-24T16:27:40Z
+
+I fixed the doc PR reference to make it point to the doc repo, not to a different PR on the code. the reference should be fixed in the doc PR as well (but I cannot do it as I'm not part of the doc team and I'm not the PR author)
+
+---------------------------------------------------------------------------
+
+by WybrenKoelmans at 2014-06-24T16:31:41Z
+
+Thank you, I have updated the reference in the symfony-docs PR.
+
+---------------------------------------------------------------------------
+
+by WybrenKoelmans at 2014-07-04T08:28:44Z
+
+Added @return in PHPDoc and added PHPUnit test.
+
+Should be OK to merge.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-04T08:31:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-04T08:42:33Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WybrenKoelmans at 2014-07-06T18:31:24Z
+
+Variable initialization moved from constructor to field declaration.
+
+I think the Travis build failure did not have anything to do with my code.
+
+    PHP Fatal error:  Class 'Psr\Log\LogLevel' not found in /home/travis/build/symfony/symfony/src/Symfony/Component/Debug/ErrorHandler.php on line 522
+
+https://github.com/symfony/symfony/pull/11332
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-09T08:19:47Z
+
+:+1:

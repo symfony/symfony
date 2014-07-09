@@ -24,22 +24,22 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     private $resolvedTypeFactory;
 
     /**
-     * @var array
+     * @var FormExtensionInterface[]
      */
     private $extensions = array();
 
     /**
-     * @var array
+     * @var FormTypeInterface[]
      */
     private $types = array();
 
     /**
-     * @var array
+     * @var FormTypeExtensionInterface[]
      */
     private $typeExtensions = array();
 
     /**
-     * @var array
+     * @var FormTypeGuesserInterface[]
      */
     private $typeGuessers = array();
 

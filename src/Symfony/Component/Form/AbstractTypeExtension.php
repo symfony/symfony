@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractTypeExtension implements FormTypeExtensionInterface
+abstract class AbstractTypeExtension implements FormTypeExtensionInterface, FormTypeExtensionMultiInterface
 {
     /**
      * {@inheritdoc}
@@ -44,5 +44,15 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedTypes()
+    {
+        return array(
+            $this->getExtendedType()
+        );
     }
 }

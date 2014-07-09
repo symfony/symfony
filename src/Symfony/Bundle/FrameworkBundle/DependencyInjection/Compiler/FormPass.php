@@ -51,7 +51,10 @@ class FormPass implements CompilerPassInterface
                 ? $tag[0]['alias']
                 : $serviceId;
 
-            $typeExtensions[$alias][] = $serviceId;
+            $aliasArray = explode(',', $alias);
+            foreach ($aliasArray as $typeName) {
+                $typeExtensions[$typeName][] = $serviceId;
+            }
         }
 
         $definition->replaceArgument(2, $typeExtensions);

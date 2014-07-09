@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-06-27T08:15:16Z
+
+The following is taken from the spec regarding `Content-Length`
+
+```
+1.Any response message which "MUST NOT" include a message-body (such as the 1xx, 204, and 304 responses and any response to a HEAD request) is always terminated by the first empty line after the header fields, regardless of the entity-header fields present in the message.
+```
+
+---------------------------------------------------------------------------
+
+by SimonSimCity at 2014-06-27T09:58:12Z
+
+@stof, thanks for your feedback. I've updated the code-styling to the symfony2 standards.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-04T06:20:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-09T08:13:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T08:16:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-07-09T08:21:54Z
+
+I think that Content-Length should not be present for theese responses.
+
+---------------------------------------------------------------------------
+
+by SimonSimCity at 2014-07-09T08:57:54Z
+
+@henrikbjorn, that's how I've implemented it.
+
+You wrote earlier, that all content-related headers are ignored on 1xx, 204, and 304 responses and any response to a HEAD request.
+
+We have `content-length` set for HEAD requests because of RFC2616 14.13 - so what about `content-type` there? Currently a HEAD request returns every header, the GET request would return.

@@ -247,35 +247,29 @@
     {{ form_end(form) }}
 {%- endblock form %}
 
-{% block form_start %}
-{% spaceless %}
+{% block form_start -%}
     {% set method = method|upper %}
-    {% if method in ["GET", "POST"] %}
+    {%- if method in ["GET", "POST"] -%}
         {% set form_method = method %}
-    {% else %}
+    {%- else -%}
         {% set form_method = "POST" %}
-    {% endif %}
+    {%- endif -%}
     <form name="{{ form.vars.name }}" method="{{ form_method|lower }}" action="{{ action }}"{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
-    {% if form_method != method %}
+    {%- if form_method != method -%}
         <input type="hidden" name="_method" value="{{ method }}" />
-    {% endif %}
-{% endspaceless %}
-{% endblock form_start %}
+    {%- endif -%}
+{%- endblock form_start %}
 
-{% block form_end %}
-{% spaceless %}
+{% block form_end -%}
     {% if not render_rest is defined or render_rest %}
-        {{ form_rest(form) }}
-    {% endif %}
+        {{- form_rest(form) -}}
+    {% endif -%}
     </form>
-{% endspaceless %}
-{% endblock form_end %}
+{%- endblock form_end %}
 
-{% block form_enctype %}
-{% spaceless %}
+{% block form_enctype -%}
     {% if multipart %}enctype="multipart/form-data"{% endif %}
-{% endspaceless %}
-{% endblock form_enctype %}
+{%- endblock form_enctype %}
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}

@@ -22,7 +22,7 @@ $container->loadFromExtension('twig', array(
      'paths'               => array(
          'path1',
          'path2',
-         'namespaced_path1' => 'namespace',
-         'namespaced_path2' => 'namespace',
+         'namespaced_path1' => 'namespace1',
+         'namespaced_path2' => 'namespace2',
       ),
 ));

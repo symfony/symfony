@@ -38,7 +38,9 @@ class DataCollectorTypeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetExtendedTypes()
     {
         $types = $this->extension->getExtendedTypes();
-        $this->assertEquals(true, is_array($types));
+
+        $this->assertInternalType('array', $types);
+        $this->assertArrayHasKey(0, $types);
         $this->assertEquals($this->extension->getExtendedType(), $types[0]);
     }
 

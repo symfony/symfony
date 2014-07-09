@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 /**
  * @author Andrei Liutec <andrei@liutec.ro>
  */
@@ -21,7 +19,7 @@ interface FormTypeExtensionMultiInterface
     /**
      * Returns an array with the names of the types being extended.
      *
-     * @return array The names of the types being extended
+     * @return array The names of the types being extended.
      */
     public function getExtendedTypes();
 }

@@ -51,9 +51,8 @@ class FormPass implements CompilerPassInterface
                 ? $tag[0]['alias']
                 : $serviceId;
 
-            $aliasArray = explode(',', $alias);
-            foreach ($aliasArray as $typeName) {
-                $typeExtensions[$typeName][] = $serviceId;
+            foreach (explode(',', $alias) as $extendedType) {
+                $typeExtensions[$extendedType][] = $serviceId;
             }
         }
 

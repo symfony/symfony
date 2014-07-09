@@ -51,8 +51,6 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface, Form
      */
     public function getExtendedTypes()
     {
-        return array(
-            $this->getExtendedType()
-        );
+        return array($this->getExtendedType());
     }
 }

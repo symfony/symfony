@@ -46,13 +46,9 @@ class TestExtension implements FormExtensionInterface
 
     public function addTypeExtension(FormTypeExtensionInterface $extension)
     {
-        if ($extension instanceof FormTypeExtensionMultiInterface) {
-            $extendedTypes = $extension->getExtendedTypes();
-        } else {
-            $extendedTypes = array(
-                $extension->getExtendedType()
-            );
-        }
+        $extendedTypes = $extension instanceof FormTypeExtensionMultiInterface
+            ? $extension->getExtendedTypes()
+            : array($extension->getExtendedType());
 
         foreach ($extendedTypes as $extendedType) {
             $this->extensions[$extendedType][] = $extension;

@@ -1,0 +1,122 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-06T22:08:44Z
+
+@stof if you have suggestions besides the name of the keys would be great
+
+other than that this fixes the other issue  so ready to merge @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-17T07:28:30Z
+
+Could you also add a test to cover the fix?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T07:18:49Z
+
+let's :shipit: chief
+
+:baby:
+
+of course after travis is green @fabpot
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-22T07:28:36Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-26T18:50:22Z
+
+@fabpot fixing things related, would be great if you display the branch name on the fabbot related pages so to make them handy
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-26T19:01:32Z
+
+@fabpot all good here, WCM, even though @fabbot complains about some grammar issues which is nonsense :baby:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-31T07:36:30Z
+
+bump @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-31T07:39:43Z
+
+@cordoval Can you rebase on current master? Also, what about addressing the comment from @stof?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2013-12-31T07:44:53Z
+
+@fabpot rebased
+
+@stof could you please clarify your comment https://github.com/symfony/symfony/pull/9719#discussion_r8175753?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T08:03:21Z
+
+Any news on this one?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T13:50:00Z
+
+:+1: The ``useAttributeAsKey`` argument is weird, but it is indeed not used for XML either because of the custom normalization done in the tree.
+
+---------------------------------------------------------------------------
+
+by mdavis1982 at 2014-07-09T14:11:26Z
+
+@stof I'm still not sure why this works, to be honest - as I mentioned before, you can set the `paths` text to anything you like to and it fixes the issue parsing the configuration.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T14:19:16Z
+
+@mdavis1982 this is because ``useAttributeAsKey`` does 2 things:
+
+- it tells the processor that the array in the node is a hash, not a list, and so it should preserve keys when merging several arrays together
+- it tells the processor which attribute contains the key for formats which are not able to have the key as a real key (XML being the format needing this).
+
+Because of the custom normalization done on this node, the second behavior is not necessary. But the first behavior (triggered for any non-``null`` values) is still needed
+
+---------------------------------------------------------------------------
+
+by mdavis1982 at 2014-07-09T14:25:47Z
+
+@stof Thanks for the clarification - I think I understand now. Is this PR good to go then?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T14:28:02Z
+
+@mdavis1982 from my PoV, yes. but the rules are that 2 deciders need to vote on it, and currently, there is only me in https://github.com/symfony/symfony/pull/9719#issuecomment-48471690
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-09T14:42:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by makasim at 2014-07-09T19:24:57Z
+
+is this going to be merged to master? which means that the fix will be available only for symfony 2.6?
+
+I am [using prepend extension](https://github.com/Payum/PayumBundle/pull/144/files#diff-b208fffb7f27b0f669a8f018a01fa29aR59) feature to make twig aware of some templates that comes with a library. And it would be good to have it fixed in 2.3 too.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-10T08:50:14Z
+
+@makasim nope. As it is a bugfix, it will go in 2.3

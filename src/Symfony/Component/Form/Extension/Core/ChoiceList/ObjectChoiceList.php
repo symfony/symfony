@@ -72,7 +72,7 @@ class ObjectChoiceList extends ChoiceList
      *                                                    be a \Traversable.
      * @param string                   $labelPath         A property path pointing to the property used
      *                                                    for the choice labels. The value is obtained
-             *                                            by calling the getter on the object. If the
+     *                                                    by calling the getter on the object. If the
      *                                                    path is NULL, the object's __toString() method
      *                                                    is used instead.
      * @param array                    $preferredChoices  A flat array of choices that should be
@@ -105,7 +105,7 @@ class ObjectChoiceList extends ChoiceList
      * @param array              $preferredChoices The choices to display with priority.
      *
      * @throws InvalidArgumentException When passing a hierarchy of choices and using
-     *                                   the "groupPath" option at the same time.
+     *                                  the "groupPath" option at the same time.
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {
@@ -157,7 +157,7 @@ class ObjectChoiceList extends ChoiceList
      *
      * @param mixed $choice The choice to create a value for
      *
-     * @return int|string     A unique value without character limitations.
+     * @return int|string A unique value without character limitations.
      */
     protected function createValue($choice)
     {

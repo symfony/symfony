@@ -21,7 +21,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransformer
 {
-
     private $divisor;
 
     public function __construct($precision = null, $grouping = null, $roundingMode = null, $divisor = null)
@@ -46,7 +45,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
     /**
      * Transforms a normalized format into a localized money string.
      *
-     * @param number $value Normalized number
+     * @param int|float $value Normalized number
      *
      * @return string Localized money string.
      *
@@ -71,7 +70,7 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @param string $value Localized money string
      *
-     * @return number Normalized number
+     * @return int|float Normalized number
      *
      * @throws TransformationFailedException If the given value is not a string
      *                                       or if the value can not be transformed.

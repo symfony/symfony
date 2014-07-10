@@ -70,6 +70,41 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new Reference('security.authentication.success_handler.foo.abstract_factory'), $arguments['index_5']);
     }
 
+    public function testSetOptionAsPath()
+    {
+        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());
+
+        $reflection = new \ReflectionClass($factory);
+        $pathOptions = $reflection->getProperty('pathOptions');
+        $pathOptions->setAccessible(true);
+
+        $this->assertNotContains('foo', $pathOptions->getValue($factory));
+        $factory->addOption('foo', '/bar');
+        $factory->setOptionAsPath('foo');
+        $this->assertContains('foo', $pathOptions->getValue($factory));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage "foo" key is not defined as an option
+     */
+    public function testSetOptionAsPathWithInvalidOption()
+    {
+        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());
+
+        $factory->setOptionAsPath('foo');
+    }
+
+    public function testGetPathOptions()
+    {
+        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());
+
+        $this->assertNotContains('foo', $factory->getPathOptions());
+        $factory->addOption('foo', '/bar');
+        $factory->setOptionAsPath('foo');
+        $this->assertContains('foo', $factory->getPathOptions());
+    }
+
     protected function callFactory($id, $config, $userProviderId, $defaultEntryPointId)
     {
         $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());

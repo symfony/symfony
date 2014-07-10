@@ -32,6 +32,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'require_previous_session'       => true,
     );
 
+    protected $pathOptions = array('check_path');
+
     protected $defaultSuccessHandlerOptions = array(
         'always_use_default_target_path' => false,
         'default_target_path'            => '/',
@@ -92,6 +94,20 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     final public function addOption($name, $default = null)
     {
         $this->options[$name] = $default;
+    }
+
+    final public function setOptionAsPath($name)
+    {
+        if (!isset($this->options[$name])) {
+            throw new \InvalidArgumentException(sprintf('"%s" key is not defined as an option', $name));
+        }
+
+        $this->pathOptions[] = $name;
+    }
+
+    public function getPathOptions()
+    {
+        return array_unique($this->pathOptions);
     }
 
     /**

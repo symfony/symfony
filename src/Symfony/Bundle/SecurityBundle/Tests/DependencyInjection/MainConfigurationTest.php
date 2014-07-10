@@ -112,4 +112,39 @@ class MainConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new MainConfiguration(array(), array());
         $processedConfig = $processor->processConfiguration($configuration, array($config));
     }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The baz_path "/baz" for login method "abstract_factory" is not matched by the firewall pattern "^/test"
+     */
+    public function testInvalidPathOptionCausesException()
+    {
+        $factory = $this->getMockForAbstractClass('Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory', array());
+
+        $factory
+            ->expects($this->any())
+            ->method('getKey')
+            ->will($this->returnValue('abstract_factory'))
+        ;
+
+        $factory->addOption('baz_path', '/');
+        $factory->setOptionAsPath('baz_path');
+
+        $config = array(
+            'firewalls' => array(
+                'stub' => array(
+                    'pattern' => '^/test',
+                    'abstract_factory' => array(
+                        'check_path'  => '/test/check',
+                        'baz_path'  => '/baz',
+                    ),
+                ),
+            ),
+        );
+        $config = array_merge(static::$minimalConfig, $config);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration(array(array($factory)), array());
+        $processedConfig = $processor->processConfiguration($configuration, array($config));
+    }
 }

@@ -40,7 +40,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     public function __construct($validator)
     {
         if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
+            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or deprecated Symfony\Component\Validator\ValidatorInterface');
         }
 
         $this->validator = $validator;

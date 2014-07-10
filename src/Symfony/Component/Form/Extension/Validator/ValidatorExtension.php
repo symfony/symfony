@@ -44,7 +44,7 @@ class ValidatorExtension extends AbstractExtension
             /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
             $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
         } else {
-            throw new \InvalidArgumentException('Validator must be instance of ValidatorInterface.');
+            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or deprecated Symfony\Component\Validator\ValidatorInterface');
         }
 
         // Register the form constraints in the validator programmatically.

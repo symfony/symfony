@@ -14,7 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\DefaultConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheInterface;
 
 /**
  * Translator.
@@ -29,6 +31,11 @@ class Translator extends BaseTranslator
         'debug'     => false,
     );
     protected $loaderIds;
+
+    /**
+     * @var ConfigCacheFactoryInterface|null
+     */
+    private $configCacheFactory;
 
     /**
      * Constructor.
@@ -61,6 +68,16 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * Sets the ConfigCache factory to use.
+     *
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     */
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    {
+        $this->configCacheFactory = $configCacheFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getLocale()
@@ -87,18 +104,30 @@ class Translator extends BaseTranslator
             return parent::loadCatalogue($locale);
         }
 
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
-        if (!$cache->isFresh()) {
-            $this->initialize();
+        $self = $this;
+        $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', function ($cache) use ($self, $locale) {
+            $self->fillCache($cache, $locale);
+        });
 
-            parent::loadCatalogue($locale);
+        if (!isset($this->catalogues[$locale])) {
+            $this->catalogues[$locale] = include $cache;
+        }
 
-            $fallbackContent = '';
-            $current = '';
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackSuffix = ucfirst(str_replace('-', '_', $fallback));
+    }
 
-                $fallbackContent .= sprintf(<<<EOF
+    /* This method is only public to allow it to be called from a callback (prior PHP 5.4?) */
+    public function fillCache(ConfigCacheInterface $cache, $locale)
+    {
+        $this->initialize();
+
+        parent::loadCatalogue($locale);
+
+        $fallbackContent = '';
+        $current = '';
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            $fallbackSuffix = ucfirst(str_replace('-', '_', $fallback));
+
+            $fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
 \$catalogue%s->addFallbackCatalogue(\$catalogue%s);
 
@@ -114,7 +143,7 @@ EOF
                 $current = $fallback;
             }
 
-            $content = sprintf(<<<EOF
+        $content = sprintf(<<<EOF
 <?php
 
 use Symfony\Component\Translation\MessageCatalogue;
@@ -125,18 +154,13 @@ use Symfony\Component\Translation\MessageCatalogue;
 return \$catalogue;
 
 EOF
-                ,
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
-            );
+            ,
+            $locale,
+            var_export($this->catalogues[$locale]->all(), true),
+            $fallbackContent
+        );
 
-            $cache->write($content, $this->catalogues[$locale]->getResources());
-
-            return;
-        }
-
-        $this->catalogues[$locale] = include $cache;
+        $cache->write($content, $this->catalogues[$locale]->getResources());
     }
 
     protected function initialize()
@@ -147,4 +171,20 @@ EOF
             }
         }
     }
+
+    /**
+     * Provides the ConfigCache factory implementation, falling back to a
+     * default implementation if necessary.
+     *
+     * @return ConfigCacheFactoryInterface $configCacheFactory
+     */
+    private function getConfigCacheFactory()
+    {
+        if (!$this->configCacheFactory) {
+            $this->configCacheFactory = new DefaultConfigCacheFactory($this->options['debug']);
+        }
+
+        return $this->configCacheFactory;
+    }
+
 }

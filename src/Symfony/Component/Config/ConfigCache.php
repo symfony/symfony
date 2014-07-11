@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigCache
+class ConfigCache implements ConfigCacheInterface
 {
     private $debug;
     private $file;

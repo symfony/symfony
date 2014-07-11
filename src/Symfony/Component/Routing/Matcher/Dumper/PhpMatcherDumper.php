@@ -286,31 +286,6 @@ EOF;
             }
         }
 
-        if ($hasTrailingSlash) {
-            $code .= <<<EOF
-            if (substr(\$pathinfo, -1) !== '/') {
-                return \$this->redirect(\$pathinfo.'/', '$name');
-            }
-
-
-EOF;
-        }
-
-        if ($schemes = $route->getSchemes()) {
-            if (!$supportsRedirections) {
-                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
-            }
-            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
-            $code .= <<<EOF
-            \$requiredSchemes = $schemes;
-            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
-                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
-            }
-
-
-EOF;
-        }
-
         // optimize parameters array
         if ($matches || $hostMatches) {
             $vars = array();
@@ -323,15 +298,44 @@ EOF;
             $vars[] = "array('_route' => '$name')";
 
             $code .= sprintf(
-                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
+                "            \$ret = \$this->mergeDefaults(array_replace(%s), %s);\n",
                 implode(', ', $vars),
                 str_replace("\n", '', var_export($route->getDefaults(), true))
             );
         } elseif ($route->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
+            $code .= sprintf("            \$ret = %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {
-            $code .= sprintf("            return array('_route' => '%s');\n", $name);
+            $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
         }
+
+        if ($hasTrailingSlash) {
+            $code .= <<<EOF
+            if (substr(\$pathinfo, -1) !== '/') {
+                return array_replace(\$ret, \$this->redirect(\$pathinfo.'/', '$name'));
+            }
+
+
+EOF;
+        }
+
+        if ($schemes = $route->getSchemes()) {
+            if (!$supportsRedirections) {
+                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+            }
+
+            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
+            $code .= <<<EOF
+
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+                return array_replace(\$ret, \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes)));
+            }
+
+
+EOF;
+        }
+
+        $code .= "            return \$ret;\n";
         $code .= "        }\n";
 
         if ($methods) {

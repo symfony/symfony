@@ -1762,16 +1762,33 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testCollectionPrototype()
     {
         $form = $this->factory->createNamedBuilder('name', 'form', array('items' => array('one', 'two', 'three')))
-            ->add('items', 'collection', array('allow_add' => true))
+            ->add('items', 'collection', array(
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'prototype_name' => '__item__'
+                ))
             ->getForm()
             ->createView();
 
         $html = $this->renderWidget($form);
 
         $this->assertMatchesXpath($html,
-            '//div[@id="name_items"][@data-prototype]
+            '//div
+                [@id="name_items"]
+                [@data-form-widget="collection"]
+                [@data-prototype]
+                [@data-prototype-name="__item__"]
+                [@data-prototype-allow-add="data-collection-allow-add"]
+                [@data-prototype-allow-add="data-collection-allow-delete"]
             |
-            //table[@id="name_items"][@data-prototype]'
+            //table
+                [@id="name_items"]
+                [@data-form-widget="collection"]
+                [@data-prototype]
+                [@data-prototype-name="__item__"]
+                [@data-prototype-allow-add="data-collection-allow-add"]
+                [@data-prototype-allow-add="data-collection-allow-delete"]
+            '
         );
     }
 

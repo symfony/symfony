@@ -54,7 +54,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -63,14 +63,16 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
     public function testTransWithCaching()
     {
         // prime the cache
-        $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($this->getLoader(), $this->tmpDir);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -79,12 +81,14 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
+        $translator = $this->getTranslator($loader, $this->tmpDir);
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -93,6 +97,36 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('no translation', $translator->trans('no translation'));
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
+        $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+    }
+
+    public function testTransWithCachingWithInvalidLocale()
+    {
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $translator = $this->getTranslator($loader, $this->tmpDir, 'Symfony\Component\Translation\Tests\TranslatorWithInvalidLocale');
+
+        $translator->setLocale('invalid locale');
+
+        try {
+            $translator->trans('foo');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertFalse(file_exists($this->tmpDir.'/catalogue.invalid locale.php'));
+        }
+    }
+
+    public function testLoadCatalogueWithCachingWithInvalidLocale()
+    {
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $translator = $this->getTranslator($loader, $this->tmpDir, 'Symfony\Component\Translation\Tests\TranslatorWithInvalidLocale');
+
+        try {
+            $translator->proxyLoadCatalogue('invalid locale');
+            $this->fail();
+        } catch (\InvalidArgumentException $e) {
+            $this->assertFalse(file_exists($this->tmpDir.'/catalogue.invalid locale.php'));
+        }
     }
 
     protected function getCatalogue($locale, $messages)
@@ -145,17 +179,27 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
                 'other choice' => '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
             ))))
         ;
+        $loader
+            ->expects($this->at(5))
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr.UTF-8', array(
+                'foobarbaz' => 'foobarbaz (fr.UTF-8)',
+            ))))
+        ;
+        $loader
+            ->expects($this->at(6))
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('sr@latin', array(
+                'foobarbax' => 'foobarbax (sr@latin)',
+            ))))
+        ;
 
         return $loader;
     }
 
-    public function getTranslator($loader, $options = array())
+    public function getTranslator($loader, $cacheDir = null, $translatorClass = '\Symfony\Component\Translation\Translator')
     {
-        $translator = new Translator(
-            $loader,
-            new MessageSelector(),
-            $options
-        );
+        $translator = new $translatorClass('fr', new MessageSelector(), $cacheDir);
 
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'foo', 'fr');
@@ -163,7 +207,25 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'es');
         $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
         $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+        $translator->addResource('loader', 'foo', 'fr.UTF-8');
+        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
 
         return $translator;
+    }
+}
+
+class TranslatorWithInvalidLocale extends Translator
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function proxyLoadCatalogue($locale)
+    {
+        $this->loadCatalogue($locale);
     }
 }

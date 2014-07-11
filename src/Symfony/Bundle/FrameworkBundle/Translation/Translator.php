@@ -25,6 +25,11 @@ class Translator extends BaseTranslator
     protected $container;
     protected $loaderIds;
 
+    protected $options = array(
+        'cache_dir' => null,
+        'debug'     => false,
+    );
+
     /**
      * Constructor.
      *
@@ -45,7 +50,14 @@ class Translator extends BaseTranslator
         $this->container = $container;
         $this->loaderIds = $loaderIds;
 
-        parent::__construct(null, $selector, $options);
+        // check option names
+        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
+            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+        }
+
+        $this->options = array_merge($this->options, $options);
+
+        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

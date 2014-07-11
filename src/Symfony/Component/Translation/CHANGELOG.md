@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0
 -----
+
  * added possibility to cache catalogues
 
 2.5.0

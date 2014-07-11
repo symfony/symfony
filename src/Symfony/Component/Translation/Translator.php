@@ -37,14 +37,6 @@ class Translator implements TranslatorInterface
     /**
      * @var array
      */
-    protected $options = array(
-        'cache_dir' => null,
-        'debug' => false,
-    );
-
-    /**
-     * @var array
-     */
     private $fallbackLocales = array();
 
     /**
@@ -63,27 +55,33 @@ class Translator implements TranslatorInterface
     private $selector;
 
     /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
      * Constructor.
      *
      * @param string               $locale   The locale
      * @param MessageSelector|null $selector The message selector for pluralization
-     * @param array                $options  An array of options
+     * @param string|null          $cacheDir The directory to use for the cache
+     * @param bool                 $debug    Use cache in debug mode ?
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null, array $options = array())
+    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
     {
         $this->setLocale($locale);
         $this->selector = $selector ?: new MessageSelector();
-
-        // check option names
-        if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
-        }
-
-        $this->options = array_merge($this->options, $options);
+        $this->cacheDir = $cacheDir;
+        $this->debug = $debug;
     }
 
     /**
@@ -304,7 +302,7 @@ class Translator implements TranslatorInterface
      */
     protected function loadCatalogue($locale)
     {
-        if (null === $this->options['cache_dir']) {
+        if (null === $this->cacheDir) {
             $this->initializeCatalogue($locale);
         } else {
             $this->initializeCacheCatalogue($locale);
@@ -316,6 +314,8 @@ class Translator implements TranslatorInterface
      */
     protected function initializeCatalogue($locale)
     {
+        $this->assertValidLocale($locale);
+
         try {
             $this->doLoadCatalogue($locale);
         } catch (NotFoundResourceException $e) {
@@ -331,21 +331,21 @@ class Translator implements TranslatorInterface
      */
     private function initializeCacheCatalogue($locale)
     {
+
         if (isset($this->catalogues[$locale])) {
             return;
         }
 
-        if (null === $this->options['cache_dir']) {
+        if (null === $this->cacheDir) {
             $this->initialize();
 
-            return parent::loadCatalogue($locale);
+            return $this->loadCatalogue($locale);
         }
 
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
+        $this->assertValidLocale($locale);
+        $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
         if (!$cache->isFresh()) {
-            $this->initialize();
-
-            parent::loadCatalogue($locale);
+            $this->initializeCatalogue($locale);
 
             $fallbackContent = '';
             $current = '';

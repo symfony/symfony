@@ -46,6 +46,9 @@ class Request
     const METHOD_TRACE = 'TRACE';
     const METHOD_CONNECT = 'CONNECT';
 
+    /**
+     * @var string[]
+     */
     protected static $trustedProxies = array();
 
     /**
@@ -823,30 +826,34 @@ class Request
      */
     public function getClientIps()
     {
+        $clientIps = null;
         $ip = $this->server->get('REMOTE_ADDR');
 
         if (!self::$trustedProxies) {
             return array($ip);
         }
 
-        if (!self::$trustedHeaders[self::HEADER_CLIENT_IP] || !$this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            return array($ip);
+        if ($this->headers->has('Forwarded')) {
+            $forwardedHeader = $this->headers->get('Forwarded');
+            preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
+            $clientIps = $matches[3];
+        } elseif ($this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+            $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         }
 
-        $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
+        if ($clientIps) {
+            $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
+            $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
 
-        $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
-
-        // Eliminate all IPs from the forwarded IP chain which are trusted proxies
-        foreach ($clientIps as $key => $clientIp) {
-            // Remove port on IPv4 address (unfortunately, it does happen)
-            if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
-                $clientIps[$key] = $clientIp = $match[1];
-            }
-
-            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
-                unset($clientIps[$key]);
+            // Eliminate all IPs from the forwarded IP chain which are trusted proxies
+            foreach ($clientIps as $key => $clientIp) {
+                // Remove port on IPv4 address (unfortunately, it does happen)
+                if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
+                    $clientIps[$key] = $clientIp = $match[1];
+                }
+                if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
+                    unset($clientIps[$key]);
+                }
             }
         }
 

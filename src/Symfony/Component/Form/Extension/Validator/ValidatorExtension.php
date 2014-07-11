@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
@@ -35,16 +36,16 @@ class ValidatorExtension extends AbstractExtension
         if ($validator instanceof ValidatorInterface) {
             $this->validator = $validator;
 
-            /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
+            /** @var $metadata ClassMetadata */
             $metadata = $this->validator->getMetadataFor('Symfony\Component\Form\Form');
         // until validator apiVersion 2.4
         } elseif ($validator instanceof LegacyValidatorInterface) {
             $this->validator = $validator;
 
-            /** @var \Symfony\Component\Validator\Mapping\ClassMetadata $metadata */
+            /** @var $metadata ClassMetadata */
             $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
         } else {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or deprecated Symfony\Component\Validator\ValidatorInterface');
+            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
         }
 
         // Register the form constraints in the validator programmatically.

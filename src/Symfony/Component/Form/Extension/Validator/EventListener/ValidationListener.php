@@ -43,7 +43,7 @@ class ValidationListener implements EventSubscriberInterface
     public function __construct($validator, ViolationMapperInterface $violationMapper)
     {
         if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or deprecated Symfony\Component\Validator\ValidatorInterface');
+            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
         }
 
         $this->validator = $validator;

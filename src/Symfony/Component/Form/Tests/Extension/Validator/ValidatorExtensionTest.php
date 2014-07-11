@@ -13,9 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Validator;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
-/**
- * @author sebastian blum <sb@sblum.de>
- */
 class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidatorInterfaceSinceSymfony25()

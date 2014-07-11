@@ -35,15 +35,7 @@ class CodeExtension extends \Twig_Extension
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
-        if (empty($fileLinkFormat)) {
-            $fileLinkFormat = ini_get('xdebug.file_link_format');
-
-            if (empty($fileLinkFormat)) {
-                $fileLinkFormat = get_cfg_var('xdebug.file_link_format');
-            }
-        }
-
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('\\', '/', dirname($rootDir)).'/';
         $this->charset = $charset;
     }

@@ -349,7 +349,7 @@ EOF;
         $path = self::utf8Htmlize($path);
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
-        if ($linkFormat = ini_get('xdebug.file_link_format')) {
+        if (($linkFormat = ini_get('xdebug.file_link_format')) || ($linkFormat = get_cfg_var('xdebug.file_link_format'))) {
             $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
 
             return sprintf(' <a href="%s" title="Go to source">in %s line %d</a>', $link, $file, $line);

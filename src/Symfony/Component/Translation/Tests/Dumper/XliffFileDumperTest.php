@@ -18,15 +18,15 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
-        $catalogue = new MessageCatalogue('en');
+        $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array('foo' => 'bar', 'key' => ''));
 
         $tempDir = sys_get_temp_dir();
         $dumper = new XliffFileDumper();
-        $dumper->dump($catalogue, array('path' => $tempDir, 'default_locale' => 'fr'));
+        $dumper->dump($catalogue, array('path' => $tempDir, 'default_locale' => 'fr_FR'));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources-clean.xlf'), file_get_contents($tempDir.'/messages.en.xlf'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources-clean.xlf'), file_get_contents($tempDir.'/messages.en_US.xlf'));
 
-        unlink($tempDir.'/messages.en.xlf');
+        unlink($tempDir.'/messages.en_US.xlf');
     }
 }

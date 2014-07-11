@@ -64,35 +64,36 @@ class ObjectChoiceList extends ChoiceList
     /**
      * Creates a new object choice list.
      *
-     * @param array|\Traversable       $choices           The array of choices. Choices may also be given
+     * @param array|\Traversable        $choices          The array of choices. Choices may also be given
      *                                                    as hierarchy of unlimited depth by creating nested
      *                                                    arrays. The title of the sub-hierarchy can be
      *                                                    stored in the array key pointing to the nested
      *                                                    array. The topmost level of the hierarchy may also
      *                                                    be a \Traversable.
-     * @param string                   $labelPath         A property path pointing to the property used
+     * @param string                    $labelPath        A property path pointing to the property used
      *                                                    for the choice labels. The value is obtained
-             *                                            by calling the getter on the object. If the
+     *                                                    by calling the getter on the object. If the
      *                                                    path is NULL, the object's __toString() method
      *                                                    is used instead.
-     * @param array                    $preferredChoices  A flat array of choices that should be
+     * @param array                     $preferredChoices A flat array of choices that should be
      *                                                    presented to the user with priority.
-     * @param string                   $groupPath         A property path pointing to the property used
+     * @param string                    $groupPath        A property path pointing to the property used
      *                                                    to group the choices. Only allowed if
      *                                                    the choices are given as flat array.
-     * @param string                   $valuePath         A property path pointing to the property used
+     * @param string                    $valuePath        A property path pointing to the property used
      *                                                    for the choice values. If not given, integers
      *                                                    are generated instead.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     * @param array                     $attributes       The choices' attributes.
      */
-    public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null, array $attributes = array())
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
         $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
 
-        parent::__construct($choices, array(), $preferredChoices);
+        parent::__construct($choices, array(), $preferredChoices, $attributes);
     }
 
     /**
@@ -103,11 +104,12 @@ class ObjectChoiceList extends ChoiceList
      * @param array|\Traversable $choices          The choices to write into the list.
      * @param array              $labels           Ignored.
      * @param array              $preferredChoices The choices to display with priority.
+     * @param array              $attributes       The choices' attributes.
      *
      * @throws InvalidArgumentException When passing a hierarchy of choices and using
      *                                   the "groupPath" option at the same time.
      */
-    protected function initialize($choices, array $labels, array $preferredChoices)
+    protected function initialize($choices, array $labels, array $preferredChoices, array $attributes = array())
     {
         if (null !== $this->groupPath) {
             $groupedChoices = array();
@@ -145,7 +147,7 @@ class ObjectChoiceList extends ChoiceList
 
         $this->extractLabels($choices, $labels);
 
-        parent::initialize($choices, $labels, $preferredChoices);
+        parent::initialize($choices, $labels, $preferredChoices, $attributes);
     }
 
     /**

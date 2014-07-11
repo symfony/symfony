@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -43,6 +45,12 @@ class ChoiceType extends AbstractType
     {
         if (!$options['choice_list'] && !is_array($options['choices']) && !$options['choices'] instanceof \Traversable) {
             throw new LogicException('Either the option "choices" or "choice_list" must be set.');
+        }
+
+        if (!empty($options['choices_attr']) && empty($options['choices'])) {
+            throw new InvalidConfigurationException('The option "choices_attr" cannot be specified when "choice_list" is set.
+                Pass the choices attributes when creating the choice list instead.'
+            );
         }
 
         if ($options['expanded']) {
@@ -169,7 +177,33 @@ class ChoiceType extends AbstractType
             $hash = hash('sha256', serialize(array($choices, $options['preferred_choices'])));
 
             if (!isset($choiceListCache[$hash])) {
-                $choiceListCache[$hash] = new SimpleChoiceList($choices, $options['preferred_choices']);
+                $attributes = $options['choices_attr'];
+
+                // Execute the callable with the choice as parameter
+                if (is_callable($attributes)) {
+                    $callable = $attributes;
+                    $attributes = array();
+
+                    foreach ($choices as $group => $choice) {
+                        if (is_array($choice)) {
+                            foreach ($choice as $key => $value) {
+                                if (!is_array($result = call_user_func($callable, $value))) {
+                                    throw new RuntimeException('The callable for "choices_attr" must return an array.');
+                                }
+
+                                $attributes[$group][$key] = $result;
+                            }
+                        } else {
+                            if (!is_array($result = call_user_func($callable, $choice))) {
+                                throw new RuntimeException('The callable for "choices_attr" must return an array.');
+                            }
+
+                            $attributes[$group] = $result;
+                        }
+                    }
+                }
+
+                $choiceListCache[$hash] = new SimpleChoiceList($choices, $options['preferred_choices'], $attributes);
             }
 
             return $choiceListCache[$hash];
@@ -221,6 +255,7 @@ class ChoiceType extends AbstractType
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class'        => null,
+            'choices_attr'      => array(),
         ));
 
         $resolver->setNormalizers(array(
@@ -229,6 +264,7 @@ class ChoiceType extends AbstractType
 
         $resolver->setAllowedTypes(array(
             'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
+            'choices_attr' => array('array', 'callable'),
         ));
     }
 
@@ -257,6 +293,7 @@ class ChoiceType extends AbstractType
                 $choiceOpts = array(
                     'value' => $choiceView->value,
                     'label' => $choiceView->label,
+                    'attr' => $choiceView->attributes,
                     'translation_domain' => $options['translation_domain'],
                 );
 

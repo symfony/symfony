@@ -96,7 +96,8 @@
                 {{ block('choice_widget_options') }}
             </optgroup>
         {% else %}
-            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            {% set attr = choice.attributes %}
+            <option {% if attr is not empty %}{{ block('option_attributes') }} {% endif %}value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
         {% endif %}
     {% endfor %}
 {% endspaceless %}
@@ -421,3 +422,16 @@
     {%- endfor -%}
 {% endspaceless %}
 {% endblock button_attributes %}
+
+{% block option_attributes %}
+{% spaceless %}
+    {%- for attrname, attrvalue in attr -%}
+        {{- " " -}}
+        {% if attrvalue is sameas(true) -%}
+            {{- attrname }}="{{ attrname }}"
+        {%- elseif attrvalue is not sameas(false) -%}
+            {{- attrname }}="{{ attrvalue }}"
+        {%- endif -%}
+    {%- endfor -%}
+{% endspaceless %}
+{% endblock option_attributes %}

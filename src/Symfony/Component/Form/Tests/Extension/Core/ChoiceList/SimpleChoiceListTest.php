@@ -27,6 +27,23 @@ class SimpleChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
 
+    public function testInitAttributes()
+    {
+        $list = new SimpleChoiceList(
+            array('a' => 'A', 'b' => 'B', 'c' => 'C'),
+            array(),
+            array('a' => array('foo' => 'bar1'), 'c' => array('foo' => 'bar3'))
+        );
+
+        $this->assertEquals(array(
+                new ChoiceView('a', 'a', 'A', array('foo' => 'bar1')),
+                new ChoiceView('b', 'b', 'B'),
+                new ChoiceView('c', 'c', 'C', array('foo' => 'bar3'))
+            ),
+            $list->getRemainingViews()
+        );
+    }
+
     public function testInitNestedArray()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getChoices());
@@ -39,6 +56,34 @@ class SimpleChoiceListTest extends AbstractChoiceListTest
             'Group 1' => array(0 => new ChoiceView('a', 'a', 'A')),
             'Group 2' => array(3 => new ChoiceView('d', 'd', 'D'))
         ), $this->list->getRemainingViews());
+    }
+
+    public function testInitNestedAttributes()
+    {
+        $list = new SimpleChoiceList(
+            array(
+                'Group 1' => array('a' => 'A', 'b' => 'B'),
+                'Group 2' => array('c' => 'C', 'd' => 'D'),
+            ),
+            array(),
+            array(
+                'Group 1' => array('a' => array('foo' => 'bar1'), 'b' => array('foo' => 'bar2')),
+                'Group 2' => array('c' => array(), 'd' => array('foo' => 'bar4'))
+            )
+        );
+
+        $this->assertEquals(array(
+                'Group 1' => array(
+                    new ChoiceView('a', 'a', 'A', array('foo' => 'bar1')),
+                    new ChoiceView('b', 'b', 'B', array('foo' => 'bar2'))
+                ),
+                'Group 2' => array(
+                    2 => new ChoiceView('c', 'c', 'C'),
+                    3 => new ChoiceView('d', 'd', 'D', array('foo' => 'bar4'))
+                )
+            ),
+            $list->getRemainingViews()
+        );
     }
 
     /**

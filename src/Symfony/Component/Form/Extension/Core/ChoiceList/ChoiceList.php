@@ -69,26 +69,27 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Creates a new choice list.
      *
-     * @param array|\Traversable $choices The array of choices. Choices may also be given
-     *                                    as hierarchy of unlimited depth. Hierarchies are
-     *                                    created by creating nested arrays. The title of
-     *                                    the sub-hierarchy can be stored in the array
-     *                                    key pointing to the nested array. The topmost
-     *                                    level of the hierarchy may also be a \Traversable.
-     * @param array $labels The array of labels. The structure of this array
-     *                      should match the structure of $choices.
-     * @param array $preferredChoices A flat array of choices that should be
-     *                                presented to the user with priority.
+     * @param array|\Traversable $choices          The array of choices. Choices may also be given
+     *                                             as hierarchy of unlimited depth. Hierarchies are
+     *                                             created by creating nested arrays. The title of
+     *                                             the sub-hierarchy can be stored in the array
+     *                                             key pointing to the nested array. The topmost
+     *                                             level of the hierarchy may also be a \Traversable.
+     * @param array              $labels           The array of labels. The structure of this array
+     *                                             should match the structure of $choices.
+     * @param array              $preferredChoices A flat array of choices that should be presented to the user with priority.
+     * @param array              $attributes       A multidimensionnal array of attributes. The structure of this
+     *                                             array should match the structure of $choices.
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */
-    public function __construct($choices, array $labels, array $preferredChoices = array())
+    public function __construct($choices, array $labels, array $preferredChoices = array(), array $attributes = array())
     {
         if (!is_array($choices) && !$choices instanceof \Traversable) {
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
         }
 
-        $this->initialize($choices, $labels, $preferredChoices);
+        $this->initialize($choices, $labels, $preferredChoices, $attributes);
     }
 
     /**
@@ -99,8 +100,9 @@ class ChoiceList implements ChoiceListInterface
      * @param array|\Traversable $choices          The choices to write into the list.
      * @param array              $labels           The labels belonging to the choices.
      * @param array              $preferredChoices The choices to display with priority.
+     * @param array              $attributes       The choices' attributes.
      */
-    protected function initialize($choices, array $labels, array $preferredChoices)
+    protected function initialize($choices, array $labels, array $preferredChoices, array $attributes = array())
     {
         $this->choices = array();
         $this->values = array();
@@ -112,7 +114,8 @@ class ChoiceList implements ChoiceListInterface
             $this->remainingViews,
             $choices,
             $labels,
-            $preferredChoices
+            $preferredChoices,
+            $attributes
         );
     }
 
@@ -258,17 +261,20 @@ class ChoiceList implements ChoiceListInterface
      * @param array|\Traversable $choices            The list of choices.
      * @param array              $labels             The labels corresponding to the choices.
      * @param array              $preferredChoices   The preferred choices.
+     * @param array              $attributes         The choices' attributes.
      *
      * @throws InvalidArgumentException     If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices, array $attributes = array())
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {
             if (!array_key_exists($group, $labels)) {
                 throw new InvalidArgumentException('The structures of the choices and labels array do not match.');
             }
+
+            $attribute = isset($attributes[$group]) ? $attributes[$group] : array();
 
             if (is_array($choice)) {
                 // Don't do the work if the array is empty
@@ -279,7 +285,8 @@ class ChoiceList implements ChoiceListInterface
                         $bucketForRemaining,
                         $choice,
                         $labels[$group],
-                        $preferredChoices
+                        $preferredChoices,
+                        $attribute
                     );
                 }
             } else {
@@ -288,7 +295,8 @@ class ChoiceList implements ChoiceListInterface
                     $bucketForRemaining,
                     $choice,
                     $labels[$group],
-                    $preferredChoices
+                    $preferredChoices,
+                    $attribute
                 );
             }
         }
@@ -305,10 +313,11 @@ class ChoiceList implements ChoiceListInterface
      * @param array  $choices            The list of choices in the group.
      * @param array  $labels             The labels corresponding to the choices in the group.
      * @param array  $preferredChoices   The preferred choices.
+     * @param array  $attributes         The choices' attributes.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoiceGroup($group, array &$bucketForPreferred, array &$bucketForRemaining, array $choices, array $labels, array $preferredChoices)
+    protected function addChoiceGroup($group, array &$bucketForPreferred, array &$bucketForRemaining, array $choices, array $labels, array $preferredChoices, array $attributes = array())
     {
         // If this is a choice group, create a new level in the choice
         // key hierarchy
@@ -320,7 +329,8 @@ class ChoiceList implements ChoiceListInterface
             $bucketForRemaining[$group],
             $choices,
             $labels,
-            $preferredChoices
+            $preferredChoices,
+            $attributes
         );
 
         // Remove child levels if empty
@@ -342,10 +352,11 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed  $choice             The choice to add.
      * @param string $label              The label for the choice.
      * @param array  $preferredChoices   The preferred choices.
+     * @param array  $attributes         The choices' attributes.
      *
      * @throws InvalidConfigurationException If no valid value or index could be created.
      */
-    protected function addChoice(array &$bucketForPreferred, array &$bucketForRemaining, $choice, $label, array $preferredChoices)
+    protected function addChoice(array &$bucketForPreferred, array &$bucketForRemaining, $choice, $label, array $preferredChoices, array $attributes = array())
     {
         $index = $this->createIndex($choice);
 
@@ -359,7 +370,7 @@ class ChoiceList implements ChoiceListInterface
             throw new InvalidConfigurationException(sprintf('The value created by the choice list is of type "%s", but should be a string.', gettype($value)));
         }
 
-        $view = new ChoiceView($choice, $value, $label);
+        $view = new ChoiceView($choice, $value, $label, $attributes);
 
         $this->choices[$index] = $this->fixChoice($choice);
         $this->values[$index] = $value;

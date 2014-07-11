@@ -65,8 +65,22 @@ class RedirectableUrlMatcherTest extends TestCase
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
         $matcher
             ->expects($this->never())
-            ->method('redirect')
-        ;
+            ->method('redirect');
         $matcher->match('/foo');
+    }
+
+    public function testRedirectWithParams()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{bar}', array(), array(), array(), '', array('https')));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo/baz', 'foo', 'https')
+            ->will($this->returnValue(array('_route' => 'foo')))
+        ;
+        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
     }
 }

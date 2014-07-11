@@ -286,10 +286,32 @@ EOF;
             }
         }
 
+        // optimize parameters array
+        if ($matches || $hostMatches) {
+            $vars = array();
+            if ($hostMatches) {
+                $vars[] = '$hostMatches';
+            }
+            if ($matches) {
+                $vars[] = '$matches';
+            }
+            $vars[] = "array('_route' => '$name')";
+
+            $code .= sprintf(
+                "            \$ret = \$this->mergeDefaults(array_replace(%s), %s);\n",
+                implode(', ', $vars),
+                str_replace("\n", '', var_export($route->getDefaults(), true))
+            );
+        } elseif ($route->getDefaults()) {
+            $code .= sprintf("            \$ret = %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
+        } else {
+            $code .= sprintf("            \$ret = array('_route' => '%s');\n", $name);
+        }
+
         if ($hasTrailingSlash) {
             $code .= <<<EOF
             if (substr(\$pathinfo, -1) !== '/') {
-                return \$this->redirect(\$pathinfo.'/', '$name');
+                return array_replace(\$ret, \$this->redirect(\$pathinfo.'/', '$name'));
             }
 
 
@@ -304,34 +326,14 @@ EOF;
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
-                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
+                return array_replace(\$ret, \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes)));
             }
 
 
 EOF;
         }
 
-        // optimize parameters array
-        if ($matches || $hostMatches) {
-            $vars = array();
-            if ($hostMatches) {
-                $vars[] = '$hostMatches';
-            }
-            if ($matches) {
-                $vars[] = '$matches';
-            }
-            $vars[] = "array('_route' => '$name')";
-
-            $code .= sprintf(
-                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
-                implode(', ', $vars),
-                str_replace("\n", '', var_export($route->getDefaults(), true))
-            );
-        } elseif ($route->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
-        } else {
-            $code .= sprintf("            return array('_route' => '%s');\n", $name);
-        }
+        $code .= "            return \$ret;\n";
         $code .= "        }\n";
 
         if ($methods) {

@@ -129,6 +129,26 @@ class JsonResponse extends Response
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function prepare(Request $request)
+    {
+        if ('application/json' !== $this->headers->get('Content-Type')) {
+            return parent::prepare($request);
+        }
+        $userAgent = $request->server->get('HTTP_USER_AGENT', '');
+
+        // IE (7 to 10) doesn't support the content type "application/json"
+        $isInternetExplorer = preg_match('/(?i)msie [1-9]/', $userAgent);
+        $isOpera = (false !== strpos($userAgent, 'Opera'));
+        if ($isInternetExplorer && !$isOpera) {
+            $this->headers->set('Content-Type', 'text/json');
+        }
+
+        return parent::prepare($request);
+    }
+
+    /**
      * Updates the content and headers according to the json data and callback.
      *
      * @return JsonResponse
@@ -144,15 +164,9 @@ class JsonResponse extends Response
 
         // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
         // in order to not overwrite a custom definition.
-        if ($this->headers->has('Content-Type') && 'text/javascript' !== $this->headers->get('Content-Type')) {
-            return $this->setContent($this->data);
+        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
+            $this->headers->set('Content-Type', 'application/json');
         }
-
-        // IE (7 to 10) doesn't support application/json
-        $isInternetExplorer = isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/(?i)msie [1-9]/', $_SERVER['HTTP_USER_AGENT']);
-        $isOpera = isset($_SERVER['HTTP_USER_AGENT']) && false !== strpos($_SERVER['HTTP_USER_AGENT'], 'Opera');
-        $contentType = ($isInternetExplorer && !$isOpera) ? 'text/json' : 'application/json';
-        $this->headers->set('Content-Type', $contentType);
 
         return $this->setContent($this->data);
     }

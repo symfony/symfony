@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class JsonResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -207,11 +208,13 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidInternetExplorerUserAgent($validIeUserAgent)
     {
-        $_SERVER['HTTP_USER_AGENT'] = $validIeUserAgent;
+        $server['HTTP_USER_AGENT'] = $validIeUserAgent;
+        $request = Request::create('/', 'GET', array(), array(), array(), $server);
 
         $response = new JsonResponse(array());
+        $response->prepare($request);
 
-        $this->assertSame('text/json', $response->headers->get('Content-Type'));
+        $this->assertSame('text/json; charset=UTF-8', $response->headers->get('Content-Type'));
     }
 
     /**
@@ -219,9 +222,11 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidInternetExplorerUserAgent($invalidIeUserAgent)
     {
-        $_SERVER['HTTP_USER_AGENT'] = $invalidIeUserAgent;
+        $server['HTTP_USER_AGENT'] = $invalidIeUserAgent;
+        $request = Request::create('/', 'GET', array(), array(), array(), $server);
 
         $response = new JsonResponse(array());
+        $response->prepare($request);
 
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }

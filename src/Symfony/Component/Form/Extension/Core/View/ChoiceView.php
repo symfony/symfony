@@ -40,16 +40,25 @@ class ChoiceView
     public $label;
 
     /**
+     * Is choice disabled.
+     *
+     * @var Boolean
+     */
+    public $disabled;
+
+    /**
      * Creates a new ChoiceView.
      *
      * @param mixed  $data  The original choice.
      * @param string $value The view representation of the choice.
      * @param string $label The label displayed to humans.
+     * @param string $disabled Is choice disabled.
      */
-    public function __construct($data, $value, $label)
+    public function __construct($data, $value, $label, $disabled = false)
     {
         $this->data = $data;
         $this->value = $value;
         $this->label = $label;
+        $this->disabled = $disabled;
     }
 }

@@ -287,8 +287,15 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testZeroAsOutput(){
-        $p = $this->getProcess('printf 0');
+    public function testZeroAsOutput()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // see http://stackoverflow.com/questions/7105433/windows-batch-echo-without-new-line
+            $p = $this->getProcess('echo | set /p dummyName=0');
+        } else {
+            $p = $this->getProcess('printf 0');
+        }
+
         $p->run();
         $this->assertSame('0', $p->getOutput());
     }

@@ -175,7 +175,7 @@
                 <target>D'Héicht vum Bild ass ze kleng ({{ height }}px). Déi minimal Héicht ass {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Dëse Wäert sollt dem aktuelle Benotzerpasswuert entspriechen.</target>
             </trans-unit>
             <trans-unit id="48">

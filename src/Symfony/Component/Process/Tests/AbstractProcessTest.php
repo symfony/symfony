@@ -306,6 +306,12 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($p->getOutput());
     }
 
+    public function testZeroAsOutput(){
+        $p = $this->getProcess('printf 0');
+        $p->run();
+        $this->assertSame('0', $p->getOutput());
+    }
+
     public function testExitCodeCommandFailed()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {

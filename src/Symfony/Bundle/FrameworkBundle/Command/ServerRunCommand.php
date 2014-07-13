@@ -98,10 +98,20 @@ EOF
         if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
             $process->disableOutput();
         }
-        
+
         $this
             ->getHelper('process')
             ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
+
+        if (!$process->isSuccessful()) {
+            $output->writeln('<error>Built-in server terminated unexpectedly</error>');
+
+            if ($process->isOutputDisabled()) {
+                $output->writeln('<error>Run the command again with -v option for more details</error>');
+            }
+        }
+
+        return $process->getExitCode();
     }
 
     private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)

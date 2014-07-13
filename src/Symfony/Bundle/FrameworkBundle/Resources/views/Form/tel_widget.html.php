@@ -1,4 +1,1 @@
-<input type="tel"
-    <?php echo $view['form']->block($form, 'widget_attributes') ?>
-       value="<?php echo $view->escape($value) ?>"
-    />
+<?php echo $view['form']->block($form, 'form_widget_simple',  array('type' => isset($type) ? $type : "tel")) ?>

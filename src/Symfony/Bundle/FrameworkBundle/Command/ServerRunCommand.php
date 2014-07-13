@@ -106,10 +106,21 @@ EOF
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
+        $process = $builder->getProcess();
+        $process->run(function ($type, $buffer) use ($output) {
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->write($buffer);
             }
         });
+
+        if (!$process->isSuccessful()) {
+            $output->writeln('<error>Built-in server terminated unexpectedly</error>');
+
+            if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+                $output->writeln('<error>Run the command again with -v option for more details</error>');
+            }
+        }
+
+        return $process->getExitCode();
     }
 }

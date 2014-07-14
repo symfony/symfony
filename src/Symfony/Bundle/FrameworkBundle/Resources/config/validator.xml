@@ -13,6 +13,7 @@
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
         <parameter key="validator.expression.class">Symfony\Component\Validator\Constraints\ExpressionValidator</parameter>
         <parameter key="validator.email.class">Symfony\Component\Validator\Constraints\EmailValidator</parameter>
+        <parameter key="validator.phone_number.class">Symfony\Component\Validator\Constraints\PhoneNumberValidator</parameter>
     </parameters>
 
     <services>
@@ -49,6 +50,10 @@
         <service id="validator.email" class="%validator.email.class%">
             <argument></argument>
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
+        </service>
+
+        <service id="validator.phone_number" class="%validator.phone_number.class%">
+            <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\PhoneNumberValidator" />
         </service>
     </services>
 </container>

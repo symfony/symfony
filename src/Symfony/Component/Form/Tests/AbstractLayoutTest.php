@@ -1931,8 +1931,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderWidget($form->createView());
 
-        // no foo
-        $this->assertSame('<input type="text" id="text" name="text" required="required" value="value" />', $html);
+        $this->assertNotContains('foo="', $html);
     }
 
     public function testButtonAttributes()
@@ -1968,7 +1967,38 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $html = $this->renderWidget($form->createView());
 
+        $this->assertNotContains('foo="', $html);
+    }
+
+    public function testTextareaWithWhitespaceOnlyContentRetainsValue()
+    {
+        $form = $this->factory->createNamed('textarea', 'textarea', '  ');
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertContains('>  </textarea>', $html);
+    }
+
+    public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
+    {
+        $form = $this->factory->createBuilder('form', array('textarea' => '  '))
+            ->add('textarea', 'textarea')
+            ->getForm();
+
+        $html = $this->renderForm($form->createView());
+
+        $this->assertContains('>  </textarea>', $html);
+    }
+
+    public function testWidgetContainerAttributeHiddenIfFalse()
+    {
+        $form = $this->factory->createNamed('form', 'form', null, array(
+            'attr' => array('foo' => false),
+        ));
+
+        $html = $this->renderWidget($form->createView());
+
         // no foo
-        $this->assertSame('<button type="button" id="button" name="button">[trans]Button[/trans]</button>', $html);
+        $this->assertNotContains('foo="', $html);
     }
 }

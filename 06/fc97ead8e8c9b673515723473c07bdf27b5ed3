@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by FineWolf at 2014-07-10T13:42:06Z
+
+@fabpot @stof
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-10T13:50:30Z
+
+@FineWolf I suggest you read http://symfony.com/security for the way to report security issues for the next time. Sending a PR with the fix is a public disclosure
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-10T13:58:05Z
+
+however, :+1:
+
+---------------------------------------------------------------------------
+
+by FineWolf at 2014-07-10T14:01:23Z
+
+That issue (on a general basis) has already received public disclosure anyway thru various news organizations and blogs since July 8. Public disclosure of the issue _with symfony_ at this point (even before the merge) is the best course of action so that people who are affected can manually merge (I am aware of the security mailing list). This isn't a symfony specific issue.
+
+However this patch mitigates future attacks on the same vector.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-10T17:28:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by willdurand at 2014-07-11T07:19:03Z
+
+> A mitigation is to make endpoints return the HTTP header Content-Disposition: attachment; filename=f.txt, forcing a file download. This is enough for instructing Flash Player not to run the SWF starting from Adobe Flash 10.2.
+
+> [...]
+
+> Furthermore, to hinder this attack vector in Chrome and Opera you can also return the HTTP header X-Content-Type-Options: nosniff.
+
+From: http://miki.it/blog/2014/7/8/abusing-jsonp-with-rosetta-flash/.
+
+I think setting such headers would be nice too.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-11T07:45:56Z
+
+> I think setting such headers would be nice too.
+
+See https://github.com/nelmio/NelmioSecurityBundle#content-type-sniffing
+
+---------------------------------------------------------------------------
+
+by willdurand at 2014-07-11T07:50:49Z
+
+@stof it is not part of the framework AFAIK..
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-11T07:57:20Z
+
+@willdurand adding a way to configure the CSP headers in FrameworkBundle has already been rejected in favor of using this bundle which implements things properly: https://github.com/symfony/symfony/pull/8515#issuecomment-21555092
+
+---------------------------------------------------------------------------
+
+by willdurand at 2014-07-11T07:59:13Z
+
+@stof ok forgot about this issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-15T13:15:50Z
+
+Not sure if we need a CVE for Symfony as it's not really a Symfony security issue per se. I'm going to merge this now as we will release a security issue for Symfony shortly anyway.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-15T13:17:49Z
+
+@fabpot I think we can reference the original CVE saying we added the server-side mitigation for it.

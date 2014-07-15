@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by bburnichon at 2014-07-03T17:13:13Z
+
+Following @Tobion comment, I saw that percent was used in verbose, very_verbose and debug
+
+Should very_verbose mode include %estimated field?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-03T18:12:19Z
+
+Yes I agree very_verbose should include estimated. And verbose should use `remaining` instead of elapsed which is more informative because that is what users want to know.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2014-07-03T18:30:18Z
+
+Not sure ```remaining``` should be used only in verbose. ```elapsed``` is more informative in some cases. ```remaining``` can be computed from ```max``` and ```current```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-03T21:26:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-03T21:45:26Z
+
+@bburnichon How about showing `remaining` in normal, instead of `percent` (because percent is also visualized via the bar). And then show `%elapsed:6s%/%estimated:-6s%` in `very_verbose` (so there is a different between verbose and very verbose).
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2014-07-03T21:57:52Z
+
+I personally don't care about the ```remaining``` as I already have everything I need to compute it if needed. I also like to have a normalized view like ```percent```. I already added the ```estimated``` in ```very_verbose``` format.
+
+I guess than decision to include ```remaining``` is just going to be voted. But to have a majority, we need 3 people... @stof What do you prefer? ```remaining``` or ```percent```?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-03T22:47:14Z
+
+You cannot compute `remaining` in your head in `normal` verbosity because you don't see the elapsed time. So it definitely makes sense to display it instead of percent.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2014-07-03T22:57:40Z
+
+@Tobion Sorry, I misunderstood ```remaining```. I thought it was number of steps remaining, not time to completion.
+
+So, :+1: for indicating ```remaining``` time instead of ```elapsed``` time in all modes where available, but this implies different data between normal and *_nomax modes.
+
+---------------------------------------------------------------------------
+
+by bburnichon at 2014-07-14T16:22:15Z
+
+ping @stof @Tobion
+Can you please merge as is? I don't feel confortable with displaying different data between ```normal``` and ```nomax``` modes. The way it currently is at least fix crashes when max is nul.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-14T17:28:14Z
+
+:+1: as is. We can think about different format in a possible other pr.

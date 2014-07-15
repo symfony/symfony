@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Added support for `boolean`, `integer`, `float`, `string`, `list` and `map` defaults.
+  
 2.8.0
 -----
 

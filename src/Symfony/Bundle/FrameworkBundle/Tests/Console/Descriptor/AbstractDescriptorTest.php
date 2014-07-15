@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -102,6 +103,28 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
 
+    /** @dataProvider getDescribeEventDispatcherTestData */
+    public function testDescribeEventDispatcher(EventDispatcher $eventDispatcher, $expectedDescription, array $options)
+    {
+        $this->assertDescription($expectedDescription, $eventDispatcher, $options);
+    }
+
+    public function getDescribeEventDispatcherTestData()
+    {
+        return $this->getEventDispatcherDescriptionTestData(ObjectsProvider::getEventDispatchers());
+    }
+
+    /** @dataProvider getDescribeCallableTestData */
+    public function testDescribeCallable($callable, $expectedDescription)
+    {
+        $this->assertDescription($expectedDescription, $callable);
+    }
+
+    public function getDescribeCallableTestData()
+    {
+        return $this->getDescriptionTestData(ObjectsProvider::getCallables());
+    }
+
     abstract protected function getDescriptor();
     abstract protected function getFormat();
 
@@ -136,6 +159,24 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
             'public'   => array('show_private' => false),
             'tag1'     => array('show_private' => true, 'tag' => 'tag1'),
             'tags'     => array('group_by' => 'tags', 'show_private' => true)
+        );
+
+        $data = array();
+        foreach ($objects as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $description = file_get_contents(sprintf('%s/../../Fixtures/Descriptor/%s_%s.%s', __DIR__, $name, $suffix, $this->getFormat()));
+                $data[] = array($object, $description, $options);
+            }
+        }
+
+        return $data;
+    }
+
+    private function getEventDispatcherDescriptionTestData(array $objects)
+    {
+        $variations = array(
+            'events'    => array(),
+            'event1'    => array('event' => 'event1'),
         );
 
         $data = array();

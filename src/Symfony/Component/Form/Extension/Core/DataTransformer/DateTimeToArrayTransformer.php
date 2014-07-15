@@ -29,10 +29,10 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Constructor.
      *
-     * @param string  $inputTimezone  The input timezone
-     * @param string  $outputTimezone The output timezone
-     * @param array   $fields         The date fields
-     * @param bool    $pad            Whether to use padding
+     * @param string $inputTimezone  The input timezone
+     * @param string $outputTimezone The output timezone
+     * @param array  $fields         The date fields
+     * @param bool   $pad            Whether to use padding
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */

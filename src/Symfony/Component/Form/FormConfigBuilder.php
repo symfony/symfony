@@ -186,7 +186,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * @param array                    $options    The form options
      *
      * @throws InvalidArgumentException If the data class is not a valid class or if
-     *                                   the name contains invalid characters.
+     *                                  the name contains invalid characters.
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
@@ -713,7 +713,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Alias of {@link setInheritData()}.
      *
-     * @param bool    $inheritData Whether the form should inherit its parent's data.
+     * @param bool $inheritData Whether the form should inherit its parent's data.
      *
      * @return FormConfigBuilder The configuration object.
      *
@@ -879,9 +879,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|int     $name The tested form name.
+     * @param string|int $name The tested form name.
      *
-     * @throws UnexpectedTypeException   If the name is not a string or an integer.
+     * @throws UnexpectedTypeException  If the name is not a string or an integer.
      * @throws InvalidArgumentException If the name contains invalid characters.
      */
     public static function validateName($name)
@@ -910,7 +910,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string $name The tested form name.
      *
-     * @return bool    Whether the name is valid.
+     * @return bool Whether the name is valid.
      */
     public static function isValidName($name)
     {

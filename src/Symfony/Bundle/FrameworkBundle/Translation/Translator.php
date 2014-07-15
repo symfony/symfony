@@ -95,8 +95,10 @@ class Translator extends BaseTranslator
 
             $fallbackContent = '';
             $current = '';
+            $replacementPattern = '/[^a-z0-9_]/i';
             foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackSuffix = ucfirst(str_replace('-', '_', $fallback));
+                $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
+                $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
 
                 $fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
@@ -108,7 +110,7 @@ EOF
                     $fallbackSuffix,
                     $fallback,
                     var_export($this->catalogues[$fallback]->all(), true),
-                    ucfirst(str_replace('-', '_', $current)),
+                    $currentSuffix,
                     $fallbackSuffix
                 );
                 $current = $fallback;

@@ -75,10 +75,10 @@ class ChoiceList implements ChoiceListInterface
      *                                    the sub-hierarchy can be stored in the array
      *                                    key pointing to the nested array. The topmost
      *                                    level of the hierarchy may also be a \Traversable.
-     * @param array $labels The array of labels. The structure of this array
-     *                      should match the structure of $choices.
-     * @param array $preferredChoices A flat array of choices that should be
-     *                                presented to the user with priority.
+     * @param array $labels               The array of labels. The structure of this array
+     *                                    should match the structure of $choices.
+     * @param array $preferredChoices     A flat array of choices that should be
+     *                                    presented to the user with priority.
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */
@@ -259,7 +259,7 @@ class ChoiceList implements ChoiceListInterface
      * @param array              $labels             The labels corresponding to the choices.
      * @param array              $preferredChoices   The preferred choices.
      *
-     * @throws InvalidArgumentException     If the structures of the choices and labels array do not match.
+     * @throws InvalidArgumentException      If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
     protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
@@ -381,7 +381,7 @@ class ChoiceList implements ChoiceListInterface
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      *
-     * @return bool    Whether the choice is preferred.
+     * @return bool Whether the choice is preferred.
      */
     protected function isPreferred($choice, array $preferredChoices)
     {
@@ -395,8 +395,8 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param mixed $choice The choice to create an index for
      *
-     * @return int|string     A unique index containing only ASCII letters,
-     *                        digits and underscores.
+     * @return int|string A unique index containing only ASCII letters,
+     *                    digits and underscores.
      */
     protected function createIndex($choice)
     {
@@ -455,7 +455,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @param mixed $index The choice index.
      *
-     * @return int|string     The index as PHP array key.
+     * @return int|string The index as PHP array key.
      */
     protected function fixIndex($index)
     {

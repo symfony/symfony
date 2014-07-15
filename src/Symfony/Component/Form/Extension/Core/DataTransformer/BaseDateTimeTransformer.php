@@ -35,7 +35,7 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
      * @param string $inputTimezone  The name of the input timezone
      * @param string $outputTimezone The name of the output timezone
      *
-     * @throws UnexpectedTypeException if a timezone is not a string
+     * @throws UnexpectedTypeException  if a timezone is not a string
      * @throws InvalidArgumentException if a timezone is not valid
      */
     public function __construct($inputTimezone = null, $outputTimezone = null)

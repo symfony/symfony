@@ -40,8 +40,8 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @see self::$types for a list of supported types
      *
-     * @param int     $precision The precision
-     * @param string  $type      One of the supported types
+     * @param int    $precision The precision
+     * @param string $type      One of the supported types
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
@@ -66,9 +66,9 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
-     * @param number $value Normalized value
+     * @param int|float $value Normalized value
      *
-     * @return number Percentage value
+     * @return string Percentage value
      *
      * @throws TransformationFailedException If the given value is not numeric or
      *                                       if the value could not be transformed.
@@ -101,9 +101,9 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
      *
-     * @param number $value Percentage value.
+     * @param string $value Percentage value.
      *
-     * @return number Normalized value.
+     * @return int|float Normalized value.
      *
      * @throws TransformationFailedException If the given value is not a string or
      *                                       if the value could not be transformed.

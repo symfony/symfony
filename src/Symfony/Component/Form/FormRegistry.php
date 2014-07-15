@@ -30,7 +30,7 @@ class FormRegistry implements FormRegistryInterface
     private $extensions = array();
 
     /**
-     * @var array
+     * @var FormTypeInterface[]
      */
     private $types = array();
 
@@ -74,11 +74,9 @@ class FormRegistry implements FormRegistryInterface
         }
 
         if (!isset($this->types[$name])) {
-            /** @var FormTypeInterface $type */
             $type = null;
 
             foreach ($this->extensions as $extension) {
-                /* @var FormExtensionInterface $extension */
                 if ($extension->hasType($name)) {
                     $type = $extension->getType($name);
                     break;
@@ -115,7 +113,6 @@ class FormRegistry implements FormRegistryInterface
         $typeExtensions = array();
 
         foreach ($this->extensions as $extension) {
-            /* @var FormExtensionInterface $extension */
             $typeExtensions = array_merge(
                 $typeExtensions,
                 $extension->getTypeExtensions($type->getName())
@@ -156,7 +153,6 @@ class FormRegistry implements FormRegistryInterface
             $guessers = array();
 
             foreach ($this->extensions as $extension) {
-                /* @var FormExtensionInterface $extension */
                 $guesser = $extension->getTypeGuesser();
 
                 if ($guesser) {

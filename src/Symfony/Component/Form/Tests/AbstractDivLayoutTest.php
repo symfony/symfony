@@ -756,16 +756,4 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         // foo="foo"
         $this->assertContains('<div id="form" foo="foo">', $html);
     }
-
-    public function testWidgetContainerAttributeHiddenIfFalse()
-    {
-        $form = $this->factory->createNamed('form', 'form', null, array(
-            'attr' => array('foo' => false),
-        ));
-
-        $html = $this->renderWidget($form->createView());
-
-        // no foo
-        $this->assertContains('<div id="form">', $html);
-    }
 }

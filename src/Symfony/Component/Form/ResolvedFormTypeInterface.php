@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 /**
  * A wrapper for a form type and its extensions.
  *
@@ -60,8 +62,8 @@ interface ResolvedFormTypeInterface
     /**
      * Creates a new form view for a form of this type.
      *
-     * @param FormInterface     $form   The form to create a view for.
-     * @param FormView $parent The parent view or null.
+     * @param FormInterface $form   The form to create a view for.
+     * @param FormView      $parent The parent view or null.
      *
      * @return FormView The created form view.
      */
@@ -100,7 +102,7 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the configured options resolver used for this type.
      *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     * @return OptionsResolverInterface The options resolver.
      */
     public function getOptionsResolver();
 }

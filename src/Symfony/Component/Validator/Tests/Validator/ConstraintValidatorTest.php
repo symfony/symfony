@@ -37,7 +37,6 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidConstraintValidator()
     {
         $constraintvalidator = new ConstraintAValidator();
-        $constraintvalidator->initialize(NULL);
+        $constraintvalidator->initialize(null);
     }
 }
- 

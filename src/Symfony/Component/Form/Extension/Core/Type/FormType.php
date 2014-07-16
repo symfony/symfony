@@ -84,7 +84,6 @@ class FormType extends BaseType
             if (!$readOnly && (isset($view->parent->vars['attr']['readonly']) && in_array($view->parent->vars['attr']['readonly'], array('readonly', true)))) {
                 $view->vars['attr']['readonly'] = 'readonly';
             }
-
         }
 
         $view->vars = array_replace($view->vars, array(
@@ -183,10 +182,7 @@ class FormType extends BaseType
             if (null !== $options['pattern']) {
                 $attributes['pattern'] = $options['pattern'];
             }
-
-            if (false !== $options['read_only']) {
-                $attributes['readonly'] = $options['read_only'];
-            }
+            $attributes['readonly'] = $options['read_only'];
 
             return $attributes;
         };

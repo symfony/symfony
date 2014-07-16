@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface as NewExecutionContextInterface;
+
 /**
  * Base class for constraint validators
  *
@@ -21,15 +23,18 @@ namespace Symfony\Component\Validator;
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @var ExecutionContextInterface
+     * @var ExecutionContextInterface|NewExecutionContextInterface
      */
     protected $context;
 
     /**
      * {@inheritdoc}
      */
-    public function initialize(ExecutionContextInterface $context)
+    public function initialize($context)
     {
+        if (!$context instanceof NewExecutionContextInterface && !$context instanceof ExecutionContextInterface) {
+            throw new \InvalidArgumentException('Context must be instance of Symfony\Component\Validator\Context\ExecutionContextInterface or Symfony\Component\Validator\ExecutionContextInterface');
+        }
         $this->context = $context;
     }
 }

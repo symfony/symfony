@@ -7,6 +7,14 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.18 (2014-07-15)
+
+ * [Security] Forced validate of locales passed to the translator
+ * feature #11367 [HttpFoundation] Fix to prevent magic bytes injection in JSONP responses... (CVE-2014-4671) (Andrew Moore)
+ * bug #11386 Remove Spaceless Blocks from Twig Form Templates (chrisguitarguy)
+ * bug #9719 [TwigBundle] fix configuration tree for paths (mdavis1982, cordoval)
+ * bug #11244 [HttpFoundation] Remove body-related headers when sending the response, if body is empty (SimonSimCity)
+
 * 2.3.17 (2014-07-07)
 
  * bug #11238 [Translation] Added unescaping of ids in PoFileLoader (JustBlackBird)

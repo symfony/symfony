@@ -1232,6 +1232,7 @@ class Response
     public function isRedirect($location = null)
     {
         $redirectStatusCodes = array(self::HTTP_CREATED, self::HTTP_MOVED_PERMANENTLY, self::HTTP_FOUND, self::HTTP_SEE_OTHER, self::HTTP_TEMPORARY_REDIRECT, self::HTTP_PERMANENTLY_REDIRECT);
+
         return in_array($this->statusCode, $redirectStatusCodes) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 

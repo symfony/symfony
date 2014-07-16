@@ -72,7 +72,8 @@ class FormType extends BaseType
         parent::buildView($view, $form, $options);
 
         $name = $form->getName();
-        $readOnly = $options['read_only'];
+
+        $readOnly =  isset($view->vars['attr']['readonly']) && in_array($view->vars['attr']['readonly'], array('readonly', true));
 
         if ($view->parent) {
             if ('' === $name) {
@@ -80,13 +81,12 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly) {
-                $readOnly = $view->parent->vars['read_only'];
+            if (!$readOnly && (isset($view->parent->vars['attr']['readonly']) && in_array($view->parent->vars['attr']['readonly'], array('readonly', true)))) {
+                $view->vars['attr']['readonly'] = 'readonly';
             }
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only'  => $readOnly,
             'errors'     => $form->getErrors(),
             'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),
@@ -170,7 +170,7 @@ class FormType extends BaseType
             'data',
         ));
 
-        // BC clause for the "max_length" and "pattern" option
+        // BC clause for the "max_length", "pattern" and "read_only" option
         // Add these values to the "attr" option instead
         $defaultAttr = function (Options $options) {
             $attributes = array();
@@ -183,6 +183,8 @@ class FormType extends BaseType
                 $attributes['pattern'] = $options['pattern'];
             }
 
+            $attributes['readonly'] = $options['read_only'];
+
             return $attributes;
         };
 
@@ -191,7 +193,7 @@ class FormType extends BaseType
             'empty_data'         => $emptyData,
             'trim'               => true,
             'required'           => true,
-            'read_only'          => false,
+            'read_only'          => false, //Deprecated use attr['readonly'] instead
             'max_length'         => null,
             'pattern'            => null,
             'property_path'      => null,

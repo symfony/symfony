@@ -335,11 +335,11 @@ class ProcessPipes
             $type = array_search($pipe, $this->pipes);
 
             $data = '';
-            while ($dataread = fread($pipe, self::CHUNK_SIZE)) {
+            while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
                 $data .= $dataread;
             }
 
-            if ($data) {
+            if ('' !== $data) {
                 $read[$type] = $data;
             }
 

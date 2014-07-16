@@ -103,7 +103,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar (fr)', $translator->trans('bar'));
     }
 
-
     /**
      * @dataProvider      getInvalidLocalesTests
      * @expectedException \InvalidArgumentException
@@ -328,7 +327,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->transChoice('foo', 1, array(), '', $locale);
         // no assertion. this method just asserts that no exception is thrown
     }
-
 
     public function getTransFileTests()
     {

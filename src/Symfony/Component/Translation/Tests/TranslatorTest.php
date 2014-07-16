@@ -429,6 +429,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('fr_FR'),
             array('fr.FR'),
             array('fr-FR.UTF8'),
+            array('sr@latin'),
         );
     }
 

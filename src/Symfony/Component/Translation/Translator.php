@@ -308,7 +308,7 @@ class Translator implements TranslatorInterface
      */
     private function assertValidLocale($locale)
     {
-        if (0 !== preg_match('/[^a-z0-9_\\.\\-]+/i', $locale, $match)) {
+        if (0 !== preg_match('/[^a-z0-9@_\\.\\-]+/i', $locale, $match)) {
             throw new \InvalidArgumentException(sprintf('Invalid locale: %s.', $locale));
         }
     }

@@ -20,25 +20,28 @@ class ChoiceQuestion extends Question
 {
     private $choices;
     private $multiselect = false;
-    private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
-    private $options;
+    private $displayOptions = array('prompt' => ' > ');
 
     /**
      * {@inheritdoc}
      *
-     * @param array $options Currently the following options are supported:
-     *                       - focused_choice_template:    Used to display a focused choice when asking the question
-     *                       - unfocused_choice_template:  Used to display an unfocused choice when asking the question
-     *                       - selected_choice_template:   Used to display a selected choice when asking the question (multiselect only)
-     *                       - deselected_choice_template: Used to display a deselected choice when asking the question (multiselect only)
+     * @param array $displayOptions
+     *
+     * Currently the following display options are supported:
+     *
+     * - focused_choice_template:    Used to display a focused choice when asking the question
+     * - unfocused_choice_template:  Used to display an unfocused choice when asking the question
+     * - selected_choice_template:   Used to display a selected choice when asking the question (multiselect only)
+     * - deselected_choice_template: Used to display a deselected choice when asking the question (multiselect only)
+     * - prompt:                     Used as prompt when asking the question (when stty is not available)
      */
-    public function __construct($question, array $choices, $default = null, array $options = array())
+    public function __construct($question, array $choices, $default = null, array $displayOptions = array())
     {
         parent::__construct($question, $default);
 
         $this->choices = $choices;
-        $this->options = $options;
+        $this->displayOptions = array_merge($this->displayOptions, $displayOptions);
         $this->setValidator($this->getDefaultValidator());
         $this->setAutocompleterValues(array_keys($choices));
     }
@@ -87,7 +90,7 @@ class ChoiceQuestion extends Question
      */
     public function getPrompt()
     {
-        return $this->prompt;
+        return $this->displayOptions['prompt'];
     }
 
     /**
@@ -99,7 +102,7 @@ class ChoiceQuestion extends Question
      */
     public function setPrompt($prompt)
     {
-        $this->prompt = $prompt;
+        $this->displayOptions['prompt'] = $prompt;
 
         return $this;
     }
@@ -122,17 +125,17 @@ class ChoiceQuestion extends Question
     }
 
     /**
-     * Gets an option.
+     * Gets a display option.
      *
      * @param string $name    The name of the option
      * @param mixed  $default The default value to return when not found
      *
      * @return mixed The option value
      */
-    public function getOption($name, $default = null)
+    public function getDisplayOption($name, $default = null)
     {
-        if (isset($this->options[$name])) {
-            return $this->options[$name];
+        if (isset($this->displayOptions[$name])) {
+            return $this->displayOptions[$name];
         }
 
         return $default;

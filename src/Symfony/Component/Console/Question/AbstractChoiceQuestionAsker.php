@@ -32,11 +32,11 @@ abstract class AbstractChoiceQuestionAsker implements QuestionAskerInterface
         $this->question = $question;
         $this->choicesMap = new ChoicesMap($question->getChoices());
 
-        if (null !== $focusedChoiceTemplate = $question->getOption('focused_choice_template')) {
+        if (null !== $focusedChoiceTemplate = $question->getDisplayOption('focused_choice_template')) {
             $this->focusedChoiceTemplate = $focusedChoiceTemplate;
         }
 
-        if (null !== $unfocusedChoiceTemplate = $question->getOption('unfocused_choice_template')) {
+        if (null !== $unfocusedChoiceTemplate = $question->getDisplayOption('unfocused_choice_template')) {
             $this->unfocusedChoiceTemplate = $unfocusedChoiceTemplate;
         }
     }

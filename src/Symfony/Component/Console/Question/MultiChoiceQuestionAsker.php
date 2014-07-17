@@ -29,11 +29,11 @@ final class MultiChoiceQuestionAsker extends AbstractChoiceQuestionAsker
     {
         parent::__construct($question);
 
-        if (null !== $selectedChoiceTemplate = $question->getOption('selected_choice_template')) {
+        if (null !== $selectedChoiceTemplate = $question->getDisplayOption('selected_choice_template')) {
             $this->selectedChoiceTemplate = $selectedChoiceTemplate;
         }
 
-        if (null !== $deselectedChoiceTemplate = $question->getOption('deselected_choice_template')) {
+        if (null !== $deselectedChoiceTemplate = $question->getDisplayOption('deselected_choice_template')) {
             $this->deselectedChoiceTemplate = $deselectedChoiceTemplate;
         }
     }

@@ -149,7 +149,6 @@ class ResponseTest extends ResponseTestCase
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();
-        $response->headers->set('Last-Modified', $modified);
 
         $response->headers->set('Last-Modified', $modified);
         $this->assertTrue($response->isNotModified($request));
@@ -208,6 +207,24 @@ class ResponseTest extends ResponseTestCase
         $response->headers->set('ETag', $etag);
         $response->headers->set('Last-Modified', $modified);
         $this->assertTrue($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedIfModifiedSinceAndEtagWithoutLastModified()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+        $etag     = 'randomly_generated_etag';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', 'non-existent-etag');
+        $this->assertFalse($response->isNotModified($request));
     }
 
     public function testIsValidateable()

@@ -120,8 +120,19 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context->validate($value->reference, 'subpath');
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
@@ -167,8 +178,19 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context->validate(array('key' => $value->reference), 'subpath');
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {

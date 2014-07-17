@@ -124,7 +124,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setNode($value, $object, MetadataInterface $metadata, $propertyPath);
+    public function setNode($value, $object, MetadataInterface $metadata = null, $propertyPath);
 
     /**
      * Sets the currently validated group.

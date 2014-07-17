@@ -88,11 +88,11 @@ class Specificity
         if ($this->a !== $specificity->a) {
             return $this->a > $specificity->a ? 1 : -1;
         }
-        
+
         if ($this->b !== $specificity->b) {
             return $this->b > $specificity->b ? 1 : -1;
         }
-        
+
         if ($this->c !== $specificity->c) {
             return $this->c > $specificity->c ? 1 : -1;
         }

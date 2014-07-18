@@ -82,7 +82,6 @@ class SimplePreAuthenticationListener implements ListenerInterface
                 $token = $this->authenticationManager->authenticate($token);
                 $this->securityContext->setToken($token);
             }
-            
             $this->securityContext->setToken(null);
 
             return;

@@ -39,9 +39,9 @@ class SpecificityTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @dataProvider getCompareTestData */
-    public function testCompare(Specificity $a, Specificity $b, $result)
+    public function testCompareTo(Specificity $a, Specificity $b, $result)
     {
-        $this->assertEquals($result, $a->compare($b));
+        $this->assertEquals($result, $a->compareTo($b));
     }
 
     public function getCompareTestData()

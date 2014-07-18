@@ -83,7 +83,7 @@ class Specificity
      * @param Specificity $specificity
      * @return int
      */
-    public function compare(Specificity $specificity)
+    public function compareTo(Specificity $specificity)
     {
         if ($this->a !== $specificity->a) {
             return $this->a > $specificity->a ? 1 : -1;

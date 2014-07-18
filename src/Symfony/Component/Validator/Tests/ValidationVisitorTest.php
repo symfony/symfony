@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Tests\Fixtures\FakeMetadataFactory;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
@@ -560,5 +562,51 @@ class ValidationVisitorTest extends \PHPUnit_Framework_TestCase
         $this->metadata->addPropertyConstraint('reference', new Valid());
 
         $this->visitor->validate($entity, 'Default', '');
+    }
+
+    public function testInitializeObjectsOnFirstValidation()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->initialized = false;
+
+        // prepare initializers that set "initialized" to true
+        $initializer1 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
+        $initializer2 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
+
+        $initializer1->expects($this->once())
+            ->method('initialize')
+            ->with($entity)
+            ->will($this->returnCallback(function ($object) {
+                $object->initialized = true;
+            }));
+
+        $initializer2->expects($this->once())
+            ->method('initialize')
+            ->with($entity);
+
+        $this->visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator(), null, array(
+            $initializer1,
+            $initializer2
+        ));
+
+        // prepare constraint which
+        // * checks that "initialized" is set to true
+        // * validates the object again
+        $callback = function ($object, ExecutionContextInterface $context) use ($test) {
+            $test->assertTrue($object->initialized);
+
+            // validate again in same group
+            $context->validate($object);
+
+            // validate again in other group
+            $context->validate($object, '', 'SomeGroup');
+        };
+
+        $this->metadata->addConstraint(new Callback(array($callback)));
+
+        $this->visitor->validate($entity, 'Default', '');
+
+        $this->assertTrue($entity->initialized);
     }
 }

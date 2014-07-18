@@ -219,7 +219,7 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 }
 
 if (interface_exists('JsonSerializable')) {
-    class JsonSerializableObject implements JsonSerializable
+    class JsonSerializableObject implements \JsonSerializable
     {
         public function jsonSerialize()
         {

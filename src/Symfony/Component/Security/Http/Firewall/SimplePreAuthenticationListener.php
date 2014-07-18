@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * SimplePreAuthenticationListener implements simple proxying to an authenticator.
@@ -76,6 +77,11 @@ class SimplePreAuthenticationListener implements ListenerInterface
 
         try {
             $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
+            
+            if (! $token instanceof TokenInterface) {
+                return;
+            }
+            
             $token = $this->authenticationManager->authenticate($token);
             $this->securityContext->setToken($token);
         } catch (AuthenticationException $e) {

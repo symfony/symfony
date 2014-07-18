@@ -358,6 +358,18 @@ EOF
         $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
     }
 
+    public function testNodeName()
+    {
+        $this->assertEquals('li', $this->createTestCrawler()->filterXPath('//li')->nodeName(), '->nodeName() returns the node name of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->nodeName();
+            $this->fail('->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
     public function testText()
     {
         $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');

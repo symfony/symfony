@@ -106,9 +106,15 @@ class JsonResponse extends Response
             }
         });
 
-        $this->data = json_encode($data, $this->encodingOptions);
+        try {
+            $this->data = json_encode($data, $this->encodingOptions);
 
-        restore_error_handler();
+            restore_error_handler();
+        } catch (\Exception $exception) {
+            restore_error_handler();
+
+            throw $exception;
+        }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \InvalidArgumentException($this->transformJsonError());

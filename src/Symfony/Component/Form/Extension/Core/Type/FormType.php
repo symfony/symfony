@@ -73,7 +73,7 @@ class FormType extends BaseType
 
         $name = $form->getName();
 
-        $readOnly =  isset($view->vars['attr']['readonly']) && in_array($view->vars['attr']['readonly'], array('readonly', true));
+        $readOnly = isset($view->vars['attr']['readonly']) && false !== $view->vars['attr']['readonly'];
 
         if ($view->parent) {
             if ('' === $name) {
@@ -81,7 +81,7 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly && (isset($view->parent->vars['attr']['readonly']) && in_array($view->parent->vars['attr']['readonly'], array('readonly', true)))) {
+            if (!$readOnly && (isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly'])) {
                 $view->vars['attr']['readonly'] = 'readonly';
             }
         }

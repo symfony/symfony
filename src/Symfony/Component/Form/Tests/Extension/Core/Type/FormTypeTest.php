@@ -127,7 +127,7 @@ class FormTypeTest extends BaseTypeTest
                 ->getForm()
                 ->createView();
 
-        $this->assertArrayNotHasKey('readonly', $view['child']->vars['attr']);
+        $this->assertEquals(false, $view['child']->vars['attr']['readonly']);
     }
 
     public function testPassMaxLengthToView()

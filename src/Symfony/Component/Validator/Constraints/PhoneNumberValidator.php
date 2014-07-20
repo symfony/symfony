@@ -23,7 +23,7 @@ class PhoneNumberValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (null !== $value) {
-            $phoneNumber = PhoneNumberUtil::getInstance()->parse($value, $constraint->format);
+            $phoneNumber = PhoneNumberUtil::getInstance()->parse($value, $constraint->region);
             if (!PhoneNumberUtil::getInstance()->isValidNumber($phoneNumber)) {
                 $this->context->addViolation($constraint->message);
             }

@@ -37,7 +37,7 @@ class PhoneNumberValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value)
     {
-        $constraint = new PhoneNumber(array("format" => "FR"));
+        $constraint = new PhoneNumber(array("region" => "FR"));
 
         $this->context->expects($this->never())
             ->method('addViolation');

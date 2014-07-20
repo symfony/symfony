@@ -20,5 +20,5 @@ use Symfony\Component\Validator\Constraint;
 class PhoneNumber extends Constraint
 {
     public $message = 'Invalid format';
-    public $format;
+    public $region = null;
 }

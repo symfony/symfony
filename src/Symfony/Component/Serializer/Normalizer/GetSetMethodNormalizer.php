@@ -114,6 +114,18 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
+            $normalizedData = $data;
+        } elseif (is_object($data)) {
+            $normalizedData = array();
+
+            foreach ($data as $attribute => $value) {
+                $normalizedData[$attribute] = $value;
+            }
+        } else {
+            $normalizedData = array();
+        }
+
         $reflectionClass = new \ReflectionClass($class);
         $constructor = $reflectionClass->getConstructor();
 
@@ -124,10 +136,10 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
 
-                if (isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
+                if (isset($normalizedData[$paramName])) {
+                    $params[] = $normalizedData[$paramName];
                     // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
+                    unset($normalizedData[$paramName]);
                 } elseif ($constructorParameter->isOptional()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {
@@ -144,7 +156,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             $object = new $class;
         }
 
-        foreach ($data as $attribute => $value) {
+        foreach ($normalizedData as $attribute => $value) {
             $setter = 'set'.$this->formatAttribute($attribute);
 
             if (method_exists($object, $setter)) {

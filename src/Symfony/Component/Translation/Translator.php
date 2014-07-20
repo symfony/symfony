@@ -22,7 +22,7 @@ use Symfony\Component\Config\ConfigCache;
  *
  * @api
  */
-class Translator implements TranslatorInterface
+class Translator implements TranslatorInterface, TranslatorBagInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -257,11 +257,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Gets the catalogue by locale.
-     *
-     * @param string|null $locale The locale or null to use the default
-     *
-     * @return MessageCatalogueInterface
+     * {@inheritdoc}
      */
     public function getCatalogue($locale = null)
     {

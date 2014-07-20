@@ -28,12 +28,12 @@ class LoggableTranslator implements TranslatorInterface
      */
     private $logger;
 
-    /**
-     * @param Translator      $translator The translator
-     * @param LoggerInterface $logger     A logger instance
-     */
-    public function __construct(Translator $translator, LoggerInterface $logger)
+    public function __construct($translator, LoggerInterface $logger)
     {
+        if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implements TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        }
+
         $this->translator = $translator;
         $this->logger = $logger;
     }

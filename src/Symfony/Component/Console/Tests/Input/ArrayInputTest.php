@@ -45,24 +45,15 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
     public function testGetParameterOption()
     {
         $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
+        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
         $this->assertFalse($input->getParameterOption('--bar'), '->getParameterOption() returns the default if an option is not present in the passed parameters');
 
-        $input = new ArrayInput(array('--foo', '--bar'));
-        $this->assertTrue($input->getParameterOption('--foo'), '->getParameterOption() returns true if an option is present in the passed parameters but has no value');
+        $input = new ArrayInput(array('Fabien', '--foo' => 'bar'));
+        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
 
         $input = new ArrayInput(array('--foo', '--', '--bar' => 'woop'));
         $this->assertEquals('woop', $input->getParameterOption('--bar'), '->getParameterOption() returns the correct value if an option is present in the passed parameters');
         $this->assertFalse($input->getParameterOption('--bar', false, true), '->getParameterOption() returns false if an option is present in the passed parameters after an end of options signal');
-    }
-
-    public function testGetParameterOption()
-    {
-        $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
-
-        $input = new ArrayInput(array('Fabien', '--foo' => 'bar'));
-        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
     }
 
     public function testParseArguments()

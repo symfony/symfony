@@ -193,10 +193,8 @@
 {%- endblock reset_widget %}
 
 {% block tel_widget %}
-    {% spaceless %}
-        {% set type = type|default('tel') %}
-        {{ block('form_widget_simple') }}
-    {% endspaceless %}
+    {% set type = type|default('tel') %}
+    {{ block('form_widget_simple') }}
 {% endblock tel_widget %}
 
 {# Labels #}

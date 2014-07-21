@@ -120,12 +120,12 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Requires the PHP_BINARY constant');
         }
 
-        $execPath = __DIR__.DIRECTORY_SEPARATOR.'SignalListener.php';
+        $execPath = __DIR__.'/SignalListener.php';
 
         $this->setPath('');
         ini_set('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
 
-        $finder = new ExecutableFinder;
+        $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);
 
         $this->assertSamePath(PHP_BINARY, $result);

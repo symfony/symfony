@@ -135,6 +135,9 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated This is not used as of MonologBundle 2.6.1, but is kept for BC.
+     *             Any new event should however be registered in the bundle configuration.
      */
     public static function getSubscribedEvents()
     {

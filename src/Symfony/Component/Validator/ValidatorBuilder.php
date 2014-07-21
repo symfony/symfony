@@ -411,9 +411,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory);
+            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
         }
 
-        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory);
+        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }
 }

@@ -18,6 +18,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
@@ -112,6 +113,13 @@ class ExecutionContext implements ExecutionContextInterface
      * @var array
      */
     private $validatedConstraints = array();
+
+    /**
+     * Stores which objects have been initialized.
+     *
+     * @var array
+     */
+    private $initializedObjects;
 
     /**
      * Creates a new execution context.
@@ -359,5 +367,37 @@ class ExecutionContext implements ExecutionContextInterface
     public function isConstraintValidated($cacheKey, $constraintHash)
     {
         return isset($this->validatedConstraints[$cacheKey.':'.$constraintHash]);
+    }
+
+    /**
+     * Marks that an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function markObjectAsInitialized($cacheKey)
+    {
+        $this->initializedObjects[$cacheKey] = true;
+    }
+
+    /**
+     * Returns whether an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @return bool Whether the object was already initialized
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function isObjectInitialized($cacheKey)
+    {
+        return isset($this->initializedObjects[$cacheKey]);
     }
 }

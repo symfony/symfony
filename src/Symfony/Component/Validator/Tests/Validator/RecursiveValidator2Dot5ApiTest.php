@@ -19,10 +19,10 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class RecursiveValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
 {
-    protected function createValidator(MetadataFactoryInterface $metadataFactory)
+    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {
         $contextFactory = new ExecutionContextFactory(new DefaultTranslator());
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory());
+        return new RecursiveValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory(), $objectInitializers);
     }
 }

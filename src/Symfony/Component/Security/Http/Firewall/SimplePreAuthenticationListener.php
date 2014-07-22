@@ -76,9 +76,9 @@ class SimplePreAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
             $this->securityContext->setToken(null);
-
+            $token = $this->simpleAuthenticator->createToken($request, $this->providerKey);
+            
             if ($token instanceof TokenInterface) {
                 $token = $this->authenticationManager->authenticate($token);
                 $this->securityContext->setToken($token);

@@ -54,13 +54,8 @@ class LoginManager implements LoginManagerInterface
      * @param SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy
      * @param RememberMeServicesResolverInterface $rememberMeServicesResolver
      */
-    public function __construct(
-        SecurityContextInterface $securityContext,
-        UserCheckerInterface $userChecker,
-        RequestStack $requestStack,
-        SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy,
-        RememberMeServicesResolverInterface $rememberMeServicesResolver
-    ) {
+    public function __construct(SecurityContextInterface $securityContext, UserCheckerInterface $userChecker, RequestStack $requestStack, SessionAuthenticationStrategyInterface $sessionAuthenticationStrategy, RememberMeServicesResolverInterface $rememberMeServicesResolver)
+    {
         $this->securityContext = $securityContext;
         $this->userChecker = $userChecker;
         $this->requestStack = $requestStack;

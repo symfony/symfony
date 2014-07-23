@@ -26,7 +26,14 @@ class LoggableTranslatorPass implements CompilerPassInterface
         }
 
         if ($container->getParameter('translator.logging')) {
-            $container->getDefinition('translator.loggable')->setDecoratedService('translator');
+            $translatorAlias = $container->getAlias('translator');
+            $definition = $container->getDefinition((string) $translatorAlias);
+            $class = $container->getParameterBag()->resolveValue($definition->getClass());
+
+            $refClass = new \ReflectionClass($class);
+            if ($refClass->implementsInterface('Symfony\Component\Translation\TranslatorInterface') && $refClass->implementsInterface('Symfony\Component\Translation\TranslatorBagInterface')) {
+                $container->getDefinition('translator.loggable')->setDecoratedService('translator');
+            }
         }
     }
 }

@@ -100,14 +100,17 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
      */
     protected static function getKernelClass()
     {
-        $dir = $phpUnitDir = static::getPhpUnitXmlDir();
-
         if (isset($_SERVER['KERNEL_DIR'])) {
             $dir = $_SERVER['KERNEL_DIR'];
 
-            if (!is_dir($dir) && is_dir("$phpUnitDir/$dir")) {
-                $dir = "$phpUnitDir/$dir";
+            if (!is_dir($dir)) {
+                $phpUnitDir = static::getPhpUnitXmlDir();
+                if (is_dir("$phpUnitDir/$dir")) {
+                    $dir = "$phpUnitDir/$dir";
+                }
             }
+        } else {
+            $dir = static::getPhpUnitXmlDir();
         }
 
         $finder = new Finder();

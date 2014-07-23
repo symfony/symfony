@@ -78,6 +78,9 @@ EOT;
 EOT;
 
         $errorMessage = 'An error occurred';
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $successOutputProcessDebug = str_replace("'", '"', $successOutputProcessDebug);
+        }
 
         return array(
             array('', 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERBOSE, null),

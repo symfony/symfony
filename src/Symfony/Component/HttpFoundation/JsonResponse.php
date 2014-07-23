@@ -129,7 +129,27 @@ class JsonResponse extends Response
     }
 
     /**
-     * Updates the content and headers according to the JSON data and callback.
+     * {@inheritdoc}
+     */
+    public function prepare(Request $request)
+    {
+        if ('application/json' !== $this->headers->get('Content-Type')) {
+            return parent::prepare($request);
+        }
+        $userAgent = $request->server->get('HTTP_USER_AGENT', '');
+
+        // IE (7 to 10) doesn't support the content type "application/json"
+        $isInternetExplorer = preg_match('/(?i)msie [1-9]/', $userAgent);
+        $isOpera = (false !== strpos($userAgent, 'Opera'));
+        if ($isInternetExplorer && !$isOpera) {
+            $this->headers->set('Content-Type', 'text/json');
+        }
+
+        return parent::prepare($request);
+    }
+
+    /**
+     * Updates the content and headers according to the json data and callback.
      *
      * @return JsonResponse
      */

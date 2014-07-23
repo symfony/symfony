@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class JsonResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -200,5 +201,50 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     public function testSetContent()
     {
         JsonResponse::create("\xB1\x31");
+    }
+
+    /**
+     * @dataProvider validIeUserAgentsProvider
+     */
+    public function testValidInternetExplorerUserAgent($validIeUserAgent)
+    {
+        $server['HTTP_USER_AGENT'] = $validIeUserAgent;
+        $request = Request::create('/', 'GET', array(), array(), array(), $server);
+
+        $response = new JsonResponse(array());
+        $response->prepare($request);
+
+        $this->assertSame('text/json; charset=UTF-8', $response->headers->get('Content-Type'));
+    }
+
+    /**
+     * @dataProvider invalidIeUserAgentsProvider
+     */
+    public function testInvalidInternetExplorerUserAgent($invalidIeUserAgent)
+    {
+        $server['HTTP_USER_AGENT'] = $invalidIeUserAgent;
+        $request = Request::create('/', 'GET', array(), array(), array(), $server);
+
+        $response = new JsonResponse(array());
+        $response->prepare($request);
+
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+    }
+
+    public function validIeUserAgentsProvider()
+    {
+        return array(
+            array('Mozilla/5.0 (compatible; MSIE 7.0; Windows NT 6.0; en-US)'),
+            array('Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; SLCC1; .NET CLR 1.1.4322)'),
+            array('Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US))'),
+            array('Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)'),
+        );
+    }
+
+    public function invalidIeUserAgentsProvider()
+    {
+        return array(
+            array('Mozilla/4.0 (compatible; MSIE 6.0; X11; Linux i686; en) Opera 9.51'),
+        );
     }
 }

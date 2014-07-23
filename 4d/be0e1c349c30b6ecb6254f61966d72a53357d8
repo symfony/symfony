@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-14T12:58:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-14T13:00:02Z
+
+I've broken the test, please do not merge it, I need time to test this on windows
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T13:07:22Z
+
+@romainneutron is there any news here ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-09T13:12:59Z
+
+ I just restored my windows VM for this one :) I'll update this very soon
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-16T09:47:46Z
+
+PR has been updated and now ready for final review

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-07-05T14:41:58Z
+
+I've checked the Symfony documentation and there are no listings for the output of the `container:debug` command, so it's not necessary a doc PR to complement this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-05T14:49:08Z
+
+@javiereguiluz Thanks for checking the docs.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-08T13:01:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-08T18:08:22Z
+
+I updated the pull request to remove the scope information only in the list of services when the text format is used.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:39:38Z
+
+:+1:

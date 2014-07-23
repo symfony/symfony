@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesResolverInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
-class LoginManager implements LoginManagerInterface
+class LoginManager
 {
     /**
      * @var SecurityContextInterface

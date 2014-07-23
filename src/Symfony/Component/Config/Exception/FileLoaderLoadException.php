@@ -33,9 +33,9 @@ class FileLoaderLoadException extends \Exception
             // Trim the trailing period of the previous message. We only want 1 period remove so no rtrim...
             if ('.' === substr($previous->getMessage(), -1)) {
                 $trimmedMessage = substr($previous->getMessage(), 0, -1);
-                $message .= sprintf('%s', $trimmedMessage) . ' in ';
+                $message .= sprintf('%s', $trimmedMessage).' in ';
             } else {
-                $message .= sprintf('%s', $previous->getMessage()) . ' in ';
+                $message .= sprintf('%s', $previous->getMessage()).' in ';
             }
             $message .= $resource . ' ';
 
@@ -43,10 +43,7 @@ class FileLoaderLoadException extends \Exception
             if (null === $sourceResource) {
                 $message .= sprintf('(which is loaded in resource "%s")', $this->varToString($resource));
             } else {
-                $message .= sprintf(
-                    '(which is being imported from "%s")',
-                    $this->varToString($sourceResource)
-                );
+                $message .= sprintf('(which is being imported from "%s")',$this->varToString($sourceResource));
             }
             $message .= '.';
 
@@ -61,7 +58,7 @@ class FileLoaderLoadException extends \Exception
         if ('@' === $resource[0]) {
             $parts = explode(DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
-            $message .= ' ' . sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.',$bundle);
+            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.',$bundle);
         }
 
         parent::__construct($message, $code, $previous);

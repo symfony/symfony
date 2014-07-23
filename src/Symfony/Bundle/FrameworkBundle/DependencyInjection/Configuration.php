@@ -120,7 +120,7 @@ class Configuration implements ConfigurationInterface
                     ->info('form configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('auto_label')->defaultNull()->end()
+                        ->scalarNode('auto_label')->end()
                         ->arrayNode('csrf_protection')
                             ->treatFalseLike(array('enabled' => false))
                             ->treatTrueLike(array('enabled' => true))

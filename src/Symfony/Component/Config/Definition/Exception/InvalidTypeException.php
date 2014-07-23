@@ -25,6 +25,7 @@ class InvalidTypeException extends InvalidConfigurationException
     {
         if (!$this->containsHints) {
             $this->message .= "\nHint: ".$hint;
+            $this->containsHints = true;
         } else {
             $this->message .= ', '.$hint;
         }

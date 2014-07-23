@@ -59,19 +59,30 @@ class AutoLabelTypeExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['auto_label'] !== null && $options['label'] === null) {
-            $fullname = $form->getName();
-            $parent   = $form->getParent();
+        if ($options['label'] === null) {
+            $autoLabel = $options['auto_label'];
+            $parent    = $form->getParent();
+            $fullname  = $form->getName();
+
             while ($parent) {
+                if ($autoLabel === null) {
+                    $autoLabel = $parent->getConfig()->getOption('auto_label');
+                }
                 $fullname = $parent->getName().'_'.$fullname;
                 $parent   = $parent->getParent();
             }
 
-            $view->vars['label'] = strtr($options['auto_label'], array(
-                '%name%'     => $form->getName(),
-                '%fullname%' => $fullname,
-                '%type%'     => $form->getConfig()->getType()->getName(),
-            ));
+            if ($autoLabel === null) {
+                $autoLabel = $this->autoLabel;
+            }
+
+            if ($autoLabel !== null) {
+                $view->vars['label'] = strtr($autoLabel, array(
+                    '%name%'     => $form->getName(),
+                    '%fullname%' => $fullname,
+                    '%type%'     => $form->getConfig()->getType()->getName(),
+                ));
+            }
         }
     }
 
@@ -81,7 +92,7 @@ class AutoLabelTypeExtension extends AbstractTypeExtension
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'auto_label' => $this->autoLabel
+            'auto_label' => null
         ));
     }
 }

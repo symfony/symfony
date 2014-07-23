@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-07-12T22:46:28Z
+
+You should update translations in the same PR. `symfony/validator` is only a mirror repository.
+
+Also, you need to update the message source in all the translation files (not just English).
+
+---------------------------------------------------------------------------
+
+by redstar504 at 2014-07-13T01:02:35Z
+
+@jakzal How's that?
+
+---------------------------------------------------------------------------
+
+by redstar504 at 2014-07-13T04:58:18Z
+
+Hmm, I don't know why these translation fixes would cause the build to fail so extensively.
+
+Are quotes not allowed in the xlf files?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-13T08:39:30Z
+
+The problems are not related to your changes, so no worries.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-13T09:40:54Z
+
+changing the source of the translation is a bC break: if a project redefines the translation message or adds another locale, it will not be used anymore after this change. The safe way would be to change it only in the English translation message (this is an advantage of not using the English string as source btw)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-13T21:57:41Z
+
+@redstar504 Stof is right - I think we will need to change *only* the english translation. I'm not sure if we can/should break BC, even though I'd *love* to have the default message be the correct English.
+
+Can someone else back this up to be sure? I don't want to keep making @redstar504 change his PR if we *are* able to break this translation key BC.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-14T05:08:35Z
+
+IMO, we should only change the English translation in 2.3 and change the key in master.
+
+---------------------------------------------------------------------------
+
+by redstar504 at 2014-07-14T05:21:15Z
+
+Okay in that case this PR is :+1:, and I will send separate PR for 2.3?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-14T05:22:52Z
+
+@redstar504 yes, please.
+
+---------------------------------------------------------------------------
+
+by redstar504 at 2014-07-14T06:03:25Z
+
+Okay done in #11387.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-07-18T08:35:15Z
+
+If I'm not mistaken this can be merged now?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-18T09:13:32Z
+
+@redstar504 Can you add a note about this "BC break" in the Validator changelog?
+
+---------------------------------------------------------------------------
+
+by redstar504 at 2014-07-22T19:03:22Z
+
+Done.  @fabpot

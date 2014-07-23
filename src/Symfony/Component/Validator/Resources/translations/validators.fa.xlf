@@ -175,7 +175,7 @@
                 <target>ارتفاع تصویر بسیار کوچک است ({{ height }}px). کمینه ارتفاع موردنظر {{ min_height }}px است.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>این مقدار می بایست کلمه عبور کنونی کاربر باشد.</target>
             </trans-unit>
             <trans-unit id="48">

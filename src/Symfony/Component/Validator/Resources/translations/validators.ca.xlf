@@ -175,7 +175,7 @@
                 <target>L'altura de la imatge és massa petita ({{ height }}px). L'altura mínima requerida són {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Aquest valor hauria de ser la contrasenya actual de l'usuari.</target>
             </trans-unit>
             <trans-unit id="48">

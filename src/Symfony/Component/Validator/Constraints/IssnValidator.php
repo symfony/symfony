@@ -46,7 +46,7 @@ class IssnValidator extends ConstraintValidator
 
         if (!preg_match($pattern, $value)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;
@@ -64,7 +64,7 @@ class IssnValidator extends ConstraintValidator
 
         if (0 !== $checkSum % 11) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

@@ -40,7 +40,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return string
      */
-    protected function valueToType($value)
+    protected function formatTypeOf($value)
     {
         return is_object($value) ? get_class($value) : gettype($value);
     }
@@ -49,13 +49,13 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Returns a string representation of the value.
      *
      * @param mixed $value
-     * @param bool  $formatDates
+     * @param bool  $prettyDateTime
      *
      * @return string
      */
-    protected function valueToString($value, $formatDates = false)
+    protected function formatValue($value, $prettyDateTime = false)
     {
-        if ($formatDates && $value instanceof \DateTime) {
+        if ($prettyDateTime && $value instanceof \DateTime) {
             if (class_exists('IntlDateFormatter')) {
                 $locale = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
@@ -101,14 +101,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Returns a string representation of a list of values.
      *
      * @param array $values
-     * @param bool  $formatDates
+     * @param bool  $prettyDateTime
      *
      * @return string
      */
-    protected function valuesToString(array $values, $formatDates = false)
+    protected function formatValues(array $values, $prettyDateTime = false)
     {
         foreach ($values as $key => $value) {
-            $values[$key] = $this->valueToString($value, $formatDates);
+            $values[$key] = $this->formatValue($value, $prettyDateTime);
         }
 
         return implode(', ', $values);

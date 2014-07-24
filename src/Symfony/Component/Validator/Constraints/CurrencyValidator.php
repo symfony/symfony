@@ -43,7 +43,7 @@ class CurrencyValidator extends ConstraintValidator
 
         if (!isset($currencies[$value])) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

@@ -91,7 +91,7 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $value,
+                '{{ value }}' => '"'.$value.'"',
             ));
 
         $this->validator->validate($value, $constraint);

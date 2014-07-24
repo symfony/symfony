@@ -51,7 +51,7 @@ class EmailValidator extends ConstraintValidator
 
         if (!$valid) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

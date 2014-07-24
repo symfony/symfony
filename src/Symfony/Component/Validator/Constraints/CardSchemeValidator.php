@@ -109,7 +109,7 @@ class CardSchemeValidator extends ConstraintValidator
 
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->valueToString($value),
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;
@@ -127,7 +127,7 @@ class CardSchemeValidator extends ConstraintValidator
         }
 
         $this->context->addViolation($constraint->message, array(
-            '{{ value }}' => $value,
+            '{{ value }}' => $this->formatValue($value),
         ));
     }
 }

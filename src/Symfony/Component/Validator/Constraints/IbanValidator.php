@@ -36,12 +36,14 @@ class IbanValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
+        $value = (string) $value;
+
         // Remove spaces
         $canonicalized = str_replace(' ', '', $value);
 
         if (strlen($canonicalized) < 4) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;
@@ -52,7 +54,7 @@ class IbanValidator extends ConstraintValidator
         if (strlen($canonicalized) < 4 || !ctype_upper($canonicalized{0})
             || !ctype_upper($canonicalized{1}) || !ctype_alnum($canonicalized)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;
@@ -72,7 +74,7 @@ class IbanValidator extends ConstraintValidator
 
         if (false === $checkSum) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;
@@ -83,7 +85,7 @@ class IbanValidator extends ConstraintValidator
         // modulo step-wisely instead
         if (1 !== $this->bigModulo97($checkSum)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;

@@ -164,7 +164,7 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $iban,
+                '{{ value }}' => '"'.$iban.'"',
             ));
 
         $this->validator->validate($iban, $constraint);

@@ -41,7 +41,7 @@ class TimeValidator extends ConstraintValidator
 
         if (!preg_match(static::PATTERN, $value)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

@@ -28,7 +28,7 @@ class NotBlankValidator extends ConstraintValidator
     {
         if (false === $value || (empty($value) && '0' != $value)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->valueToString($value),
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

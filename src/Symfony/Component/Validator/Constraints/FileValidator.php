@@ -96,13 +96,17 @@ class FileValidator extends ConstraintValidator
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
         if (!is_file($path)) {
-            $this->context->addViolation($constraint->notFoundMessage, array('{{ file }}' => $path));
+            $this->context->addViolation($constraint->notFoundMessage, array(
+                '{{ file }}' => $this->formatValue($path)
+            ));
 
             return;
         }
 
         if (!is_readable($path)) {
-            $this->context->addViolation($constraint->notReadableMessage, array('{{ file }}' => $path));
+            $this->context->addViolation($constraint->notReadableMessage, array(
+                '{{ file }}' => $this->formatValue($path)
+            ));
 
             return;
         }
@@ -129,7 +133,7 @@ class FileValidator extends ConstraintValidator
                     '{{ size }}' => $size,
                     '{{ limit }}' => $limit,
                     '{{ suffix }}' => $suffix,
-                    '{{ file }}' => $path,
+                    '{{ file }}' => $this->formatValue($path),
                 ));
 
                 return;
@@ -161,9 +165,9 @@ class FileValidator extends ConstraintValidator
 
             if (false === $valid) {
                 $this->context->addViolation($constraint->mimeTypesMessage, array(
-                    '{{ type }}' => $this->valueToString($mime),
-                    '{{ types }}' => $this->valuesToString($mimeTypes),
-                    '{{ file }}' => $path,
+                    '{{ type }}' => $this->formatValue($mime),
+                    '{{ types }}' => $this->formatValues($mimeTypes),
+                    '{{ file }}' => $this->formatValue($path),
                 ));
             }
         }

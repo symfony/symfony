@@ -28,7 +28,7 @@ class NullValidator extends ConstraintValidator
     {
         if (null !== $value) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->valueToString($value),
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

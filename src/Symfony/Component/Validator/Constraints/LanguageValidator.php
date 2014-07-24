@@ -43,7 +43,7 @@ class LanguageValidator extends ConstraintValidator
 
         if (!isset($languages[$value])) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

@@ -43,7 +43,7 @@ class CountryValidator extends ConstraintValidator
 
         if (!isset($countries[$value])) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

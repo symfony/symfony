@@ -30,7 +30,7 @@ class RangeValidator extends ConstraintValidator
 
         if (!is_numeric($value)) {
             $this->context->addViolation($constraint->invalidMessage, array(
-                '{{ value }}' => $this->valueToString($value),
+                '{{ value }}' => $this->formatValue($value),
             ));
 
             return;

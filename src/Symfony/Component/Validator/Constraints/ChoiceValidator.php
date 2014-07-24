@@ -60,7 +60,7 @@ class ChoiceValidator extends ConstraintValidator
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, $constraint->strict)) {
                     $this->context->addViolation($constraint->multipleMessage, array(
-                        '{{ value }}' => $this->valueToString($_value),
+                        '{{ value }}' => $this->formatValue($_value),
                     ));
                 }
             }
@@ -84,7 +84,7 @@ class ChoiceValidator extends ConstraintValidator
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->valueToString($value)
+                '{{ value }}' => $this->formatValue($value)
             ));
         }
     }

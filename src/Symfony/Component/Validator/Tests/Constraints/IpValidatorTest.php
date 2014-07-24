@@ -162,7 +162,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -196,7 +196,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -224,7 +224,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -252,7 +252,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -276,7 +276,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -314,7 +314,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -342,7 +342,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -369,7 +369,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -393,7 +393,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -417,7 +417,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -441,7 +441,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);
@@ -465,7 +465,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $ip,
+                '{{ value }}' => '"'.$ip.'"',
             ));
 
         $this->validator->validate($ip, $constraint);

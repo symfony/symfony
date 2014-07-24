@@ -51,15 +51,15 @@ class IsbnValidator extends ConstraintValidator
 
         if ($constraint->isbn10 && $constraint->isbn13) {
             $this->context->addViolation($constraint->bothIsbnMessage, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         } elseif ($constraint->isbn10) {
             $this->context->addViolation($constraint->isbn10Message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         } else {
             $this->context->addViolation($constraint->isbn13Message, array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

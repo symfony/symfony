@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Resources\stubs;
+namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use Symfony\Component\HttpFoundation\File\File as OrigFile;
 

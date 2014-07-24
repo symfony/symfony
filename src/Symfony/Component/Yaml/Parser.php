@@ -29,6 +29,30 @@ class Parser
     private $refs           = array();
 
     /**
+     * Getter for anchors
+     *
+     * @return array Parsed anchors
+     */
+    public function getRefs()
+    {
+        return $this->refs;
+    }
+
+    /**
+     * Setter for anchors
+     *
+     * @param $refs
+     *
+     * @return self
+     */
+    public function setRefs($refs)
+    {
+        $this->refs = $refs;
+
+        return $this;
+    }
+
+    /**
      * Constructor
      *
      * @param int     $offset The offset of YAML document (used for line numbers in error messages)

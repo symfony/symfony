@@ -1,0 +1,140 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-07-07T12:20:18Z
+
+Passing the route name to the controller resolver does not make sense IMO. It is not part of the responsibility of the controller resolver to know about routes (and the route name is not even used consistently in exception messages in this PR).
+
+I would rather display the original ``_controller`` in the exception message, which can be searched again in your project just like the route name, without requiring to change the controller resolver API.
+
+and on a side note, the web debug toolbar will already show you the route name if you don't like searching by the original controller string.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-10T03:01:36Z
+
+Ha, sorry @stof I missed your comment :) - you knew I wanted your thoughts!
+
+And +1 for your suggestion. I think it's a *better* solution than we have now, and while not as perfect as including the route name, it's quite good and doesn't cause any pain at all.
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-07-10T04:23:24Z
+
+@weaverryan my suggested approach does not include the `_route` to be passed as originally mentioned. I think @stof commented on PR's approach and not on my suggestion. Please review again. =)
+
+Also, we could also benefit from original controller name. If we do that, we could even reduce the API to:
+
+```php
+public function parse(Request $request)
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-11T14:22:05Z
+
+@guilhermeblanco you're totally right - I was in a rush yesterday morning, thanks for catching me :).
+
+Here's what I'm thinking:
+
+A) I don't think we should reduce the API to simply `parse(Request $request)` - I don't think it's the `ControllerNameParser`'s responsibility to know where to find the `_controller` key in the request (this is done by the `ControllerResolver` (the HttpKernel version). I like that it's a simple input: string, output: different string
+
+B) But of course, I like the idea in general that if we give the `ControllerNameParser` the Request object, then it'll be able to grab the `_route` key itself (the class lives in `FrameworkBundle`, so that's proper). This would remove that "muddying" of the `ControllerResolver`.
+
+To do this, we could have:
+
+```php
+parse($controller, Request $request)
+```
+
+*or* we could access the `$request` already in `ControllerNameParser` via:
+
+```php
+$this->kernel->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_route');
+```
+
+So we have 3 options:
+
+A) `->parse($controller, Request $request)`
+
+B) Keep everything the same, but access the `_route` (just for the error message) via the long and kind of hacky looking (but functional) `$this->kernel->getContainer()->get('request_stack')->getCurrentRequest()->attributes->get('_route');`
+
+C) Do nothing and don't include the route name in the exception.
+
+I'm for (B), but only if people don't hate it (it's ugly to me). Otherwise, I like (C) because (A) would be a slight BC break in both `parse` and `createController` (both would now need a new `$request` argument). I also don't love that we have to do so much work to pass the `$request` around *just* to get the route eventually later.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-07-11T14:39:33Z
+
+@weaverryan I'm more (A) than (B), but we should use:
+```php
+parse(Request $request, $controller)
+```
+The reason is due to higher type enforced argument to a lesser one. It also respects the convention adopted by all methods in the class (Request first).
+
+The tiny problem I see with (B) is spurious dependency that can't be easily detected. We should always avoid the usage of Container if you have another way (cleaner) to pass objects, which in this case we do.
+
+Lastly, `parse()` is a public method and in case of a customization override, and if developer requires access to `Request`, he'd have to do same trick we're discussing now.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-11T16:53:26Z
+
+I'm for C. Using the original controller string (i.e. the argument received in ``parse()``) in the exception message is enough to be able to find the place where we wrote it IMO.
+
+B is too ugly IMO.
+
+A is out of question as it requires changing the signature of methods, and so is not BC and we would not be able to make it happen before 3.0 (which defeats the point of trying to improve DX now)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-11T17:14:23Z
+
+Since you guys don't like (B) (I agree) and A is a BC break, then I think we should do C: not include the route name. If you look at #11304, my original suggestion didn't include the route name and it's still a big improvement over the old error message.
+
+@jskvara Can you update your PR to *not* include the route name in the exception? You did very nice work to include it, but I don't think it's really possible (at least right now).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-07-11T19:10:46Z
+
+@stof why is (A) out of question?
+The `parse()` method is not an @api method, so we are ok to change it: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Controller/ControllerNameParser.php#L37
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-11T22:50:27Z
+
+@guilhermeblanco the fact that it is not tagged as ``@api`` does not mean we can do what we want. It means that we are less strict about the BC we maintain. And the A changes don't fit these rules either
+
+---------------------------------------------------------------------------
+
+by jskvara at 2014-07-13T20:33:38Z
+
+Thank you all for this discussion.
+
+I will update this PR and remove the route name from the exception message.
+
+---------------------------------------------------------------------------
+
+by jskvara at 2014-07-22T21:33:55Z
+
+I updated this PR. Sorry for delay, I had busy week.
+
+I removed route name from ControllerNameParser and this PR changes just the text of error message.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T08:45:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-23T22:01:59Z
+
+:+1:

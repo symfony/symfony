@@ -407,6 +407,59 @@ class Parser
     }
 
     /**
+     * Substitute from alias where is used a <<
+     *
+     * @param mixed $values Parsed YAML in which aliases are not substituted
+     *
+     * @return mixed YAML with substituted aliases
+     *
+     * @throws Exception\ParseException When indentation problem are detected
+     */
+    private function substituteAliases($values)
+    {
+        if (is_array($values)) {
+            $keys = array();
+            foreach ($values as $key => $value) {
+                if ($key ==='<<' && preg_grep('/^\*.+/', (array) $value) === array_values((array) $value)) {
+                    $values[$key] = array();
+                    foreach ((array) $value as $ref) {
+                        $refName = substr($ref, 1);
+                        if (!array_key_exists($refName, $this->refs)) {
+                            throw new ParseException(
+                                sprintf('Reference "%s" does not exist.', $refName),
+                                $this->getRealCurrentLineNb() + 1,
+                                $this->currentLine
+                            );
+                        }
+
+                        $keys = array_merge(
+                            $keys,
+                            array_diff(array_keys($this->refs[$refName]), $keys)
+                        );
+                        $values[$key] = array_replace($this->refs[$refName], $values[$key]);
+                    }
+                } elseif (!isset($result[$key]) || is_array($result[$key])) {
+                    $keys[] = $key;
+                    $values[$key] = $this->substituteAliases($value);
+                }
+            }
+
+            if (isset($values['<<'])) {
+                $values = array_replace($values['<<'], $values);
+                unset($values['<<']);
+                uksort(
+                    $values,
+                    function ($a, $b) use ($keys) {
+                        return array_search($a, $keys, true) - array_search($b, $keys, true);
+                    }
+                );
+            }
+        }
+
+        return $values;
+    }
+
+    /**
      * Parses a YAML value.
      *
      * @param string $value                  A YAML value
@@ -441,7 +494,9 @@ class Parser
         }
 
         try {
-            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+            $result = $this->substituteAliases(Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap));
+
+            return $result;
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);

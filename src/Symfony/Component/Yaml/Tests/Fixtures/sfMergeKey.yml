@@ -20,6 +20,7 @@ yaml: |
             foo: bar
             foo: ignore
             bar: foo
+    bar_inline: {a: before, d: other, <<: *foo, b: new, x: Oren, c: { foo: bar, foo: ignore, bar: foo}}
     duplicate:
         foo: bar
         foo: ignore
@@ -33,13 +34,18 @@ yaml: |
         isit: tested
     head:
         <<: [ *foo , *dong , *foo2 ]
+    head_inline: &head_inline { <<: [ *foo , *dong , *foo2 ] }
+    recursive_inline: { <<: *head_inline, c: { <<: *foo2 } }
 php: |
     array(
         'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'),
         'bar' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
+        'bar_inline' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
         'duplicate' => array('foo' => 'bar'),
         'foo2' => array('a' => 'Ballmer'),
         'ding' => array('fi', 'fei', 'fo', 'fam'),
         'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'),
-        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam')
+        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'),
+        'head_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'),
+        'recursive_inline' => array('a' => 'Steve', 'b' => 'Clark', 'c' => array('a' => 'Ballmer'), 'fi', 'fei', 'fo', 'fam')
     )

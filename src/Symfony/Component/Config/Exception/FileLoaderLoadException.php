@@ -37,7 +37,7 @@ class FileLoaderLoadException extends \Exception
             } else {
                 $message .= sprintf('%s', $previous->getMessage()).' in ';
             }
-            $message .= $resource . ' ';
+            $message .= $resource.' ';
 
             // show tweaked trace to complete the human readable sentence
             if (null === $sourceResource) {

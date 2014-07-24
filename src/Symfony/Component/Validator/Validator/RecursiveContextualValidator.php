@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 /**
@@ -53,22 +54,29 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private $validatorFactory;
 
     /**
+     * @var ObjectInitializerInterface[]
+     */
+    private $objectInitializers;
+
+    /**
      * Creates a validator for the given context.
      *
-     * @param ExecutionContextInterface           $context          The execution context
-     * @param MetadataFactoryInterface            $metadataFactory  The factory for
-     *                                                              fetching the metadata
-     *                                                              of validated objects
-     * @param ConstraintValidatorFactoryInterface $validatorFactory The factory for creating
-     *                                                              constraint validators
+     * @param ExecutionContextInterface           $context            The execution context
+     * @param MetadataFactoryInterface            $metadataFactory    The factory for
+     *                                                                fetching the metadata
+     *                                                                of validated objects
+     * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating
+     *                                                                constraint validators
+     * @param ObjectInitializerInterface[]        $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory)
+    public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = array())
     {
         $this->context = $context;
         $this->defaultPropertyPath = $context->getPropertyPath();
         $this->defaultGroups = array($context->getGroup() ?: Constraint::DEFAULT_GROUP);
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->objectInitializers = $objectInitializers;
     }
 
     /**
@@ -431,6 +439,14 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
         $context->setNode($object, $object, $metadata, $propertyPath);
+
+        if (!$context->isObjectInitialized($cacheKey)) {
+            foreach ($this->objectInitializers as $initializer) {
+                $initializer->initialize($object);
+            }
+
+            $context->markObjectAsInitialized($cacheKey);
+        }
 
         foreach ($groups as $key => $group) {
             // If the "Default" group is replaced by a group sequence, remember

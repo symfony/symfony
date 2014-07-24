@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Validator as LegacyValidator;
 
 class ValidatorTest extends AbstractLegacyApiTest
 {
-    protected function createValidator(MetadataFactoryInterface $metadataFactory)
+    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {
-        return new LegacyValidator($metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator());
+        return new LegacyValidator($metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator(), 'validators', $objectInitializers);
     }
 
     /**

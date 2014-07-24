@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
@@ -367,20 +366,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
             if ($this->annotationReader) {
                 $loaders[] = new AnnotationLoader($this->annotationReader);
-
-                AnnotationRegistry::registerLoader(function ($class) {
-                    if (0 === strpos($class, __NAMESPACE__.'\\Constraints\\')) {
-                        $file = str_replace(__NAMESPACE__.'\\Constraints\\', __DIR__.'/Constraints/', $class).'.php';
-
-                        if (is_file($file)) {
-                            require_once $file;
-
-                            return true;
-                        }
-                    }
-
-                    return false;
-                });
             }
 
             $loader = null;
@@ -411,9 +396,9 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory);
+            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
         }
 
-        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory);
+        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }
 }

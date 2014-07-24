@@ -46,7 +46,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -56,6 +56,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
     public function testTransWithCaching()
@@ -63,7 +64,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // prime the cache
         $translator = $this->getTranslator($this->getLoader(), array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -73,12 +74,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
-        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8'));
+        $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
 
         $this->assertEquals('foo (FR)', $translator->trans('foo'));
         $this->assertEquals('bar (EN)', $translator->trans('bar'));
@@ -88,6 +90,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarfoo (PT-PT)', $translator->trans('foobarfoo'));
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
+        $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
     /**
@@ -189,6 +192,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 'foobarbaz' => 'foobarbaz (fr.UTF-8)',
             ))))
         ;
+        $loader
+            ->expects($this->at(6))
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('sr@latin', array(
+                'foobarbax' => 'foobarbax (sr@latin)',
+            ))))
+        ;
 
         return $loader;
     }
@@ -220,6 +230,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
         $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
         $translator->addResource('loader', 'foo', 'fr.UTF-8');
+        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
 
         return $translator;
     }

@@ -274,4 +274,28 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
+
+    public function testOptionsClosure()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'           => 'text',
+            'allow_add'      => true,
+            'prototype'      => true,
+            'prototype_name' => '__test__',
+            'options'        => function ($data) {
+                    return array(
+                        'disabled'  => $data === 'disabled',
+                    );
+                }
+        ));
+
+        $form->setData(array('disabled', 'enabled'));
+        $form->submit(array('disabled', 'some testing data'));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertTrue($form->has('1'));
+
+        $this->assertTrue($form->get('0')->isDisabled());
+        $this->assertFalse($form->get('1')->isDisabled());
+    }
 }

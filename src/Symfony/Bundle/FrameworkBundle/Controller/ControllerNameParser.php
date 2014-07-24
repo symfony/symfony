@@ -79,7 +79,7 @@ class ControllerNameParser
             }
 
             $bundles[] = $b->getName();
-            $msg = sprintf('Unable to find controller "%s:%s" - class "%s" does not exist.', $bundle, $controller, $try);
+            $msg = sprintf('The _controller value "%s:%s:%s" maps to a "%s" class, but this class was not found. Create this class or check the spelling of the class and its namespace.', $bundle, $controller, $action, $try);
         }
 
         if (count($bundles) > 1) {

@@ -30,7 +30,8 @@ class ViolationPathTest extends \PHPUnit_Framework_TestCase
             )),
             array('children[address][street]', array(
                 array('address', true, true),
-            ), 'children[address]'),
+                array('street', true, true),
+            ), 'children[address].children[street]'),
             array('children[address].data', array(
                 array('address', true, true),
             ), 'children[address]'),

@@ -17,8 +17,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5.3, to be removed in 3.0.
  */
-class LengthValidator extends ConstraintValidator
+class LegacyLengthValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
@@ -48,34 +50,28 @@ class LengthValidator extends ConstraintValidator
         }
 
         if ($constraint->min == $constraint->max && $length != $constraint->min) {
-            $this->context->buildViolation($constraint->exactMessage)
-                ->setParameter('{{ value }}', $stringValue)
-                ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
-                ->setPlural((int) $constraint->min)
-                ->addViolation();
+            $this->context->addViolation($constraint->exactMessage, array(
+                '{{ value }}' => $stringValue,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
 
             return;
         }
 
         if (null !== $constraint->max && $length > $constraint->max) {
-            $this->context->buildViolation($constraint->maxMessage)
-                ->setParameter('{{ value }}', $stringValue)
-                ->setParameter('{{ limit }}', $constraint->max)
-                ->setValue($value)
-                ->setPlural((int) $constraint->max)
-                ->addViolation();
+            $this->context->addViolation($constraint->maxMessage, array(
+                '{{ value }}' => $stringValue,
+                '{{ limit }}' => $constraint->max,
+            ), $value, (int) $constraint->max);
 
             return;
         }
 
         if (null !== $constraint->min && $length < $constraint->min) {
-            $this->context->buildViolation($constraint->minMessage)
-                ->setParameter('{{ value }}', $stringValue)
-                ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
-                ->setPlural((int) $constraint->min)
-                ->addViolation();
+            $this->context->addViolation($constraint->minMessage, array(
+                '{{ value }}' => $stringValue,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
         }
     }
 }

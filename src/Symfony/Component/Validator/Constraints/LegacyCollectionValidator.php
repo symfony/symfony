@@ -18,9 +18,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @api
+ * @deprecated Deprecated since version 2.5.3, to be removed in 3.0.
  */
-class CollectionValidator extends ConstraintValidator
+class LegacyCollectionValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
@@ -50,7 +50,6 @@ class CollectionValidator extends ConstraintValidator
         // to validate() instead.
         $context = $this->context;
         $group = $context->getGroup();
-        $validator = $context->getValidator()->inContext($context);
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             if (
@@ -59,23 +58,21 @@ class CollectionValidator extends ConstraintValidator
                 ($value instanceof \ArrayAccess && $value->offsetExists($field))
             ) {
                 foreach ($fieldConstraint->constraints as $constr) {
-                    $validator->atPath('['.$field.']')->validate($value[$field], $constr, $group);
+                    $context->validateValue($value[$field], $constr, '['.$field.']', $group);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $context->buildViolation($constraint->missingFieldsMessage)
-                    ->atPath('['.$field.']')
-                    ->setParameter('{{ field }}', $field)
-                    ->addViolation();
+                $context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
+                    '{{ field }}' => $field
+                ), null);
             }
         }
 
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $context->buildViolation($constraint->extraFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $field)
-                        ->addViolation();
+                    $context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
+                        '{{ field }}' => $field
+                    ), $fieldValue);
                 }
             }
         }

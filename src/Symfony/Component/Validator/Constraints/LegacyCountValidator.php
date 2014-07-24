@@ -17,8 +17,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5.3, to be removed in 3.0.
  */
-class CountValidator extends ConstraintValidator
+class LegacyCountValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
@@ -36,34 +38,28 @@ class CountValidator extends ConstraintValidator
         $count = count($value);
 
         if ($constraint->min == $constraint->max && $count != $constraint->min) {
-            $this->context->buildViolation($constraint->exactMessage)
-                ->setParameter('{{ count }}', $count)
-                ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
-                ->setPlural((int) $constraint->min)
-                ->addViolation();
+            $this->context->addViolation($constraint->exactMessage, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
 
             return;
         }
 
         if (null !== $constraint->max && $count > $constraint->max) {
-            $this->context->buildViolation($constraint->maxMessage)
-                ->setParameter('{{ count }}', $count)
-                ->setParameter('{{ limit }}', $constraint->max)
-                ->setValue($value)
-                ->setPlural((int) $constraint->max)
-                ->addViolation();
+            $this->context->addViolation($constraint->maxMessage, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->max,
+            ), $value, (int) $constraint->max);
 
             return;
         }
 
         if (null !== $constraint->min && $count < $constraint->min) {
-            $this->context->buildViolation($constraint->minMessage)
-                ->setParameter('{{ count }}', $count)
-                ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
-                ->setPlural((int) $constraint->min)
-                ->addViolation();
+            $this->context->addViolation($constraint->minMessage, array(
+                '{{ count }}' => $count,
+                '{{ limit }}' => $constraint->min,
+            ), $value, (int) $constraint->min);
         }
     }
 }

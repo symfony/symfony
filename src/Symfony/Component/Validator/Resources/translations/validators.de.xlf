@@ -175,7 +175,7 @@
                 <target>Die Bildhöhe ist zu gering ({{ height }}px). Die erwartete Mindesthöhe beträgt {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Dieser Wert sollte dem aktuellen Benutzerpasswort entsprechen.</target>
             </trans-unit>
             <trans-unit id="48">

@@ -147,11 +147,11 @@ class UnixPipes extends AbstractPipes
             // lose key association, we have to find back the key
             $type = (false !== $found = array_search($pipe, $this->pipes)) ? $found : 'input';
             $data = '';
-            while ($dataread = fread($pipe, self::CHUNK_SIZE)) {
+            while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
                 $data .= $dataread;
             }
 
-            if ($data) {
+            if ('' !== $data) {
                 if ($type === 'input') {
                     $this->inputBuffer .= $data;
                 } else {

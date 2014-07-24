@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * [BC BREAK] `FileValidator` disallow empty files
+ * [BC BREAK] `UserPasswordValidator` source message change
 
 2.5.0
 -----

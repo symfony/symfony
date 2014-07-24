@@ -175,7 +175,7 @@
                 <target>Obrázek je příliš nízký ({{ height }}px). Minimální výška obrázku musí být {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Tato hodnota musí být aktuální heslo uživatele.</target>
             </trans-unit>
             <trans-unit id="48">

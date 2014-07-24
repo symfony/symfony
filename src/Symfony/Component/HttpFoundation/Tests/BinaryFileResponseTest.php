@@ -193,6 +193,24 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
     }
 
+    public function testDeleteFileAfterSend()
+    {
+        $request = Request::create('/');
+
+        $path = __DIR__.'/File/Fixtures/to_delete';
+        touch($path);
+        $realPath = realpath($path);
+        $this->assertFileExists($realPath);
+
+        $response = new BinaryFileResponse($realPath);
+        $response->deleteFileAfterSend(true);
+
+        $response->prepare($request);
+        $response->sendContent();
+
+        $this->assertFileNotExists($path);
+    }
+
     public function getSampleXAccelMappings()
     {
         return array(
@@ -204,5 +222,13 @@ class BinaryFileResponseTest extends ResponseTestCase
     protected function provideResponse()
     {
         return new BinaryFileResponse(__DIR__ . '/../README.md');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        $path = __DIR__.'/../Fixtures/to_delete';
+        if (file_exists($path)) {
+            @unlink($path);
+        }
     }
 }

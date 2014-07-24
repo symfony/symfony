@@ -175,7 +175,7 @@
                 <target>A kép magassága túl kicsi ({{ height }}px). Az elvárt legkisebb magasság {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Ez az érték a felhasználó jelenlegi jelszavával kell megegyezzen.</target>
             </trans-unit>
             <trans-unit id="48">

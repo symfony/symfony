@@ -124,7 +124,7 @@ class SimpleChoiceList extends ChoiceList
      * @param mixed $choice           The choice to test.
      * @param array $preferredChoices An array of preferred choices.
      *
-     * @return bool    Whether the choice is preferred.
+     * @return bool Whether the choice is preferred.
      */
     protected function isPreferred($choice, array $preferredChoices)
     {

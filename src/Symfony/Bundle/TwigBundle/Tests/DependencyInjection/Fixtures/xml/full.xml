@@ -15,7 +15,7 @@
         <twig:global key="pi">3.14</twig:global>
         <twig:path>path1</twig:path>
         <twig:path>path2</twig:path>
-        <twig:path namespace="namespace">namespaced_path1</twig:path>
-        <twig:path namespace="namespace">namespaced_path2</twig:path>
+        <twig:path namespace="namespace1">namespaced_path1</twig:path>
+        <twig:path namespace="namespace2">namespaced_path2</twig:path>
     </twig:config>
 </container>

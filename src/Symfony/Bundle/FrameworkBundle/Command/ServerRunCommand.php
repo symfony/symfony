@@ -95,16 +95,13 @@ EOF
         $builder->setTimeout(null);
         $process = $builder->getProcess();
 
-        if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-            $callback = function ($type, $buffer) use ($output) {
-                $output->write($buffer);
-            };
-        } else {
-            $callback = null;
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
             $process->disableOutput();
         }
-
-        $process->run($callback);
+        
+        $this
+            ->getHelper('process')
+            ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
     }
 
     private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)

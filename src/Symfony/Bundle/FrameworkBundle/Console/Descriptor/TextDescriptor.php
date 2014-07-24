@@ -202,7 +202,7 @@ class TextDescriptor extends Descriptor
 
         $table = new TableHelper();
         $table->setLayout(TableHelper::LAYOUT_COMPACT);
-        $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Scope', 'Class name')));
+        $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
@@ -214,20 +214,20 @@ class TextDescriptor extends Descriptor
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
                         }
                         if (0 === $key) {
-                            $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getScope(), $definition->getClass())));
+                            $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getClass())));
                         } else {
-                            $table->addRow(array_merge(array('  "'), $tagValues, array('', '')));
+                            $table->addRow(array_merge(array('  "'), $tagValues, array('')));
                         }
                     }
                 } else {
-                    $table->addRow(array($serviceId, $definition->getScope(), $definition->getClass()));
+                    $table->addRow(array($serviceId, $definition->getClass()));
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $table->addRow(array_merge(array($serviceId, 'n/a', sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
             } else {
                 // we have no information (happens with "service_container")
-                $table->addRow(array_merge(array($serviceId, '', get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
             }
         }
 

@@ -12,10 +12,38 @@
 namespace Symfony\Component\Translation\Tests;
 
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConstructorInvalidLocale($locale)
+    {
+        $translator = new Translator($locale, new MessageSelector());
+    }
+
+    /**
+     * @dataProvider getValidLocalesTests
+     */
+    public function testConstructorValidLocale($locale)
+    {
+        $translator = new Translator($locale, new MessageSelector());
+
+        $this->assertEquals($locale, $translator->getLocale());
+    }
+
+    public function testConstructorWithoutLocale()
+    {
+        $translator = new Translator(null, new MessageSelector());
+
+        $this->assertNull($translator->getLocale());
+    }
+
     public function testSetGetLocale()
     {
         $translator = new Translator('en');
@@ -24,6 +52,27 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator->setLocale('fr');
         $this->assertEquals('fr', $translator->getLocale());
+    }
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetInvalidLocale($locale)
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->setLocale($locale);
+    }
+
+    /**
+     * @dataProvider getValidLocalesTests
+     */
+    public function testSetValidLocale($locale)
+    {
+        $translator = new Translator($locale, new MessageSelector());
+        $translator->setLocale($locale);
+
+        $this->assertEquals($locale, $translator->getLocale());
     }
 
     public function testSetFallbackLocales()
@@ -54,6 +103,27 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar (fr)', $translator->trans('bar'));
     }
 
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetFallbackInvalidLocales($locale)
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->setFallbackLocales(array('fr', $locale));
+    }
+
+    /**
+     * @dataProvider getValidLocalesTests
+     */
+    public function testSetFallbackValidLocales($locale)
+    {
+        $translator = new Translator($locale, new MessageSelector());
+        $translator->setFallbackLocales(array('fr', $locale));
+        // no assertion. this method just asserts that no exception is thrown
+    }
+
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR');
@@ -64,6 +134,26 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setFallbackLocales(array('en'));
 
         $this->assertEquals('foobar', $translator->trans('bar'));
+    }
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddResourceInvalidLocales($locale)
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->addResource('array', array('foo' => 'foofoo'), $locale);
+    }
+
+    /**
+     * @dataProvider getValidLocalesTests
+     */
+    public function testAddResourceValidLocales($locale)
+    {
+        $translator = new Translator('fr', new MessageSelector());
+        $translator->addResource('array', array('foo' => 'foofoo'), $locale);
+        // no assertion. this method just asserts that no exception is thrown
     }
 
     public function testAddResourceAfterTrans()
@@ -164,6 +254,32 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTransInvalidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->trans('foo', array(), '', $locale);
+    }
+
+    /**
+     * @dataProvider      getValidLocalesTests
+     */
+    public function testTransValidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->trans('foo', array(), '', $locale);
+        // no assertion. this method just asserts that no exception is thrown
+    }
+
+    /**
      * @dataProvider getFlattenedTransTests
      */
     public function testFlattenedTrans($expected, $messages, $id)
@@ -186,6 +302,33 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $translator->transChoice($id, $number, $parameters, $domain, $locale));
     }
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTransChoiceInvalidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->transChoice('foo', 1, array(), '', $locale);
+    }
+
+    /**
+     * @dataProvider      getValidLocalesTests
+     */
+    public function testTransChoiceValidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->transChoice('foo', 1, array(), '', $locale);
+        // no assertion. this method just asserts that no exception is thrown
+    }
+
 
     public function getTransFileTests()
     {
@@ -254,6 +397,39 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Il y a 10 pommes', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array('%count%' => 10), 'fr', ''),
 
             array('Il y a 0 pomme', new String('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array('%count%' => 0), 'fr', ''),
+        );
+    }
+
+    public function getInvalidLocalesTests()
+    {
+        return array(
+            array('fr FR'),
+            array('français'),
+            array('fr+en'),
+            array('utf#8'),
+            array('fr&en'),
+            array('fr~FR'),
+            array(' fr'),
+            array('fr '),
+            array('fr*'),
+            array('fr/FR'),
+            array('fr\\FR'),
+        );
+    }
+
+    public function getValidLocalesTests()
+    {
+        return array(
+            array(''),
+            array(null),
+            array('fr'),
+            array('francais'),
+            array('FR'),
+            array('frFR'),
+            array('fr-FR'),
+            array('fr_FR'),
+            array('fr.FR'),
+            array('fr-FR.UTF8'),
         );
     }
 

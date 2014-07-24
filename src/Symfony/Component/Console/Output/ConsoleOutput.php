@@ -50,7 +50,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
         parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
 
-        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $formatter);
+        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $this->getFormatter());
     }
 
     /**

@@ -652,7 +652,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
         $duration = microtime(true) - $start;
 
-        $this->assertLessThan($timeout + Process::TIMEOUT_PRECISION, $duration);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // Windows is a bit slower as it read file handles, then allow twice the precision
+            $maxDuration = $timeout + 2 * Process::TIMEOUT_PRECISION;
+        } else {
+            $maxDuration = $timeout + Process::TIMEOUT_PRECISION;
+        }
+
+        $this->assertLessThan($maxDuration, $duration);
     }
 
     public function testCheckTimeoutOnNonStartedProcess()

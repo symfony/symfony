@@ -78,6 +78,14 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 array(new Token('operator', '..', 1)),
                 '..',
             ),
+            array(
+                array(new Token('string', '#foo', 1)),
+                "'#foo'",
+            ),
+            array(
+                array(new Token('string', '#foo', 1)),
+                '"#foo"',
+            ),
         );
     }
 }

@@ -306,6 +306,8 @@ class ProcessPipes
     private function readStreams($blocking, $close = false)
     {
         if (empty($this->pipes)) {
+            usleep(Process::TIMEOUT_PRECISION * 1E4);
+
             return array();
         }
 

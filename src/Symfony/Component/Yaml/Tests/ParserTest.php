@@ -414,7 +414,7 @@ EOF;
     public function testObjectSupportEnabled()
     {
         $input = <<<EOF
-foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:7:"foo,bar";}
 bar: 1
 EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
@@ -435,7 +435,7 @@ EOF;
      */
     public function testObjectsSupportDisabledWithExceptions()
     {
-        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}', true, false);
+        $this->parser->parse('foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:7:"foo,bar";}', true, false);
     }
 
     public function testNonUtf8Exception()
@@ -609,5 +609,5 @@ EOF
 
 class B
 {
-    public $b = 'foo';
+    public $b = 'foo,bar';
 }

@@ -204,16 +204,23 @@ class Inline
                 }
             }
         } else {
+            $scalarWithoutKey = substr($scalar, $i);
+            $match = array();
             // "normal" string
             if (!$delimiters) {
-                $output = substr($scalar, $i);
+                $output = $scalarWithoutKey;
                 $i += strlen($output);
 
                 // remove comments
                 if (false !== $strpos = strpos($output, ' #')) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
-            } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
+            // special treatment of php/object as it contains , and } unescaped
+            } elseif (0 === strpos($scalarWithoutKey, '!!php/object:')) {
+                $endOfObject = self::findEndOfPhpObject($scalarWithoutKey);
+                $output = substr($scalarWithoutKey, 0, $endOfObject+1);
+                $i += strlen($output);
+            } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', $scalarWithoutKey, $match)) {
                 $output = $match[1];
                 $i += strlen($output);
             } else {
@@ -240,6 +247,8 @@ class Inline
      */
     private static function parseQuotedScalar($scalar, &$i)
     {
+        $match = array();
+
         if (!preg_match('/'.self::REGEX_QUOTED_STRING.'/Au', substr($scalar, $i), $match)) {
             throw new ParseException(sprintf('Malformed inline YAML string (%s).', substr($scalar, $i)));
         }
@@ -451,7 +460,7 @@ class Inline
      */
     private static function getTimestampRegex()
     {
-        return <<<EOF
+        return <<<'EOF'
         ~^
         (?P<year>[0-9][0-9][0-9][0-9])
         -(?P<month>[0-9][0-9]?)
@@ -465,5 +474,32 @@ class Inline
         (?::(?P<tz_minute>[0-9][0-9]))?))?)?
         $~x
 EOF;
+    }
+
+    /**
+     * When the value in inline notation contains serialized php object it has
+     * not escaped commas and curly brackets. We need to know
+     * where this serialized object ends. Searching } and , as delimiters
+     * was corrupting yaml structure.
+     *
+     * @param string $scalar
+     * @return integer Position where php/object ends
+     * @throws ParseException
+     */
+    private static function findEndOfPhpObject($scalar)
+    {
+        $countOfBrackets = 0;
+        for ($pos = 0, $length = strlen($scalar); $pos < $length; $pos++) {
+            if ('{' == $scalar[$pos]) {
+                $countOfBrackets++;
+            } elseif ('}' == $scalar[$pos]) {
+                $countOfBrackets--;
+
+                if (0 === $countOfBrackets) {
+                    return $pos;
+                }
+            }
+        }
+        throw new ParseException('php/object value malformed');
     }
 }

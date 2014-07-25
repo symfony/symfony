@@ -211,6 +211,11 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
         $this->markTestSkipped('Signal is not supported in sigchild environment');
     }
 
+    public function testRunProcessWithTimeout()
+    {
+        $this->markTestSkipped('Signal (required for timeout) is not supported in sigchild environment');
+    }
+
     /**
      * {@inheritdoc}
      */

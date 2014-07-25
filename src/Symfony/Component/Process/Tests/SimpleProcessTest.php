@@ -191,6 +191,13 @@ class SimpleProcessTest extends AbstractProcessTest
         }
     }
 
+    public function testStopWithTimeoutIsActuallyWorking()
+    {
+        $this->skipIfPHPSigchild();
+
+        parent::testStopWithTimeoutIsActuallyWorking();
+    }
+
     /**
      * {@inheritdoc}
      */

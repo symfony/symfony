@@ -28,6 +28,8 @@ interface TranslatorInterface
      * @param string $domain     The domain for the message
      * @param string $locale     The locale
      *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
      * @return string The translated string
      *
      * @api
@@ -43,6 +45,8 @@ interface TranslatorInterface
      * @param string  $domain     The domain for the message
      * @param string  $locale     The locale
      *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
      * @return string The translated string
      *
      * @api
@@ -53,6 +57,8 @@ interface TranslatorInterface
      * Sets the current locale.
      *
      * @param string $locale The locale
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
      *
      * @api
      */

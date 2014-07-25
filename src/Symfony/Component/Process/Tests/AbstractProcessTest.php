@@ -287,6 +287,19 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testZeroAsOutput()
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // see http://stackoverflow.com/questions/7105433/windows-batch-echo-without-new-line
+            $p = $this->getProcess('echo | set /p dummyName=0');
+        } else {
+            $p = $this->getProcess('printf 0');
+        }
+
+        $p->run();
+        $this->assertSame('0', $p->getOutput());
+    }
+
     public function testExitCodeCommandFailed()
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -583,7 +596,14 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
         $duration = microtime(true) - $start;
 
-        $this->assertLessThan($timeout + Process::TIMEOUT_PRECISION, $duration);
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            // Windows is a bit slower as it read file handles, then allow twice the precision
+            $maxDuration = $timeout + 2 * Process::TIMEOUT_PRECISION;
+        } else {
+            $maxDuration = $timeout + Process::TIMEOUT_PRECISION;
+        }
+
+        $this->assertLessThan($maxDuration, $duration);
     }
 
     public function testCheckTimeoutOnNonStartedProcess()

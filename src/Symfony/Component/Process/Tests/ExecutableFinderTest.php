@@ -47,9 +47,9 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $this->setPath(dirname(PHP_BINARY));
 
         $finder = new ExecutableFinder;
-        $result = $finder->find(basename(PHP_BINARY));
+        $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertEquals($result, PHP_BINARY);
+        $this->assertSamePath(PHP_BINARY, $result);
     }
 
     public function testFindWithDefault()
@@ -83,9 +83,9 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $extraDirs = array(dirname(PHP_BINARY));
 
         $finder = new ExecutableFinder;
-        $result = $finder->find(basename(PHP_BINARY), null, $extraDirs);
+        $result = $finder->find($this->getPhpBinaryName(), null, $extraDirs);
 
-        $this->assertEquals(PHP_BINARY, $result);
+        $this->assertSamePath(PHP_BINARY, $result);
     }
 
     public function testFindWithOpenBaseDir()
@@ -105,8 +105,43 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         ini_set('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder;
-        $result = $finder->find(basename(PHP_BINARY));
+        $result = $finder->find($this->getPhpBinaryName());
 
-        $this->assertEquals(PHP_BINARY, $result);
+        $this->assertSamePath(PHP_BINARY, $result);
+    }
+
+    public function testFindProcessInOpenBasedir()
+    {
+        if (ini_get('open_basedir')) {
+            $this->markTestSkipped('Cannot test when open_basedir is set');
+        }
+
+        if (!defined('PHP_BINARY')) {
+            $this->markTestSkipped('Requires the PHP_BINARY constant');
+        }
+
+        $execPath = __DIR__.'/SignalListener.php';
+
+        $this->setPath('');
+        ini_set('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($this->getPhpBinaryName(), false);
+
+        $this->assertSamePath(PHP_BINARY, $result);
+    }
+
+    private function assertSamePath($expected, $tested)
+    {
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $this->assertEquals(strtolower($expected), strtolower($tested));
+        } else {
+            $this->assertEquals($expected, $tested);
+        }
+    }
+
+    private function getPhpBinaryName()
+    {
+        return basename(PHP_BINARY, defined('PHP_WINDOWS_VERSION_BUILD') ? '.exe' : '');
     }
 }

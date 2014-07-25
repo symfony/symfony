@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Scope;
 
 /**
  * GraphvizDumper dumps a service container as a graphviz file.
@@ -193,8 +194,8 @@ class GraphvizDumper extends Dumper
         $container->setDefinitions($this->container->getDefinitions());
         $container->setAliases($this->container->getAliases());
         $container->setResources($this->container->getResources());
-        foreach ($this->container->getScopes() as $scope) {
-            $container->addScope($scope);
+        foreach ($this->container->getScopes() as $scope => $parentScope) {
+            $container->addScope(new Scope($scope, $parentScope));
         }
         foreach ($this->container->getExtensions() as $extension) {
             $container->registerExtension($extension);

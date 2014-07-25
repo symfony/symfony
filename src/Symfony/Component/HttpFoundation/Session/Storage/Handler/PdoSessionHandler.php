@@ -29,27 +29,27 @@ class PdoSessionHandler implements \SessionHandlerInterface
     /**
      * @var \PDO PDO instance
      */
-    private $pdo;
+    protected $pdo;
 
     /**
      * @var string Table name
      */
-    private $table;
+    protected $table;
 
     /**
      * @var string Column for session id
      */
-    private $idCol;
+    protected $idCol;
 
     /**
      * @var string Column for session data
      */
-    private $dataCol;
+    protected $dataCol;
 
     /**
      * @var string Column for timestamp
      */
-    private $timeCol;
+    protected $timeCol;
 
     /**
      * Constructor.
@@ -229,7 +229,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *
      * @return string|null The SQL string or null when not supported
      */
-    private function getMergeSql()
+    protected function getMergeSql()
     {
         $driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
 

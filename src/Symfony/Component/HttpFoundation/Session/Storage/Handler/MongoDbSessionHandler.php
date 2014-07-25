@@ -21,17 +21,17 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * @var \Mongo
      */
-    private $mongo;
+    protected $mongo;
 
     /**
      * @var \MongoCollection
      */
-    private $collection;
+    protected $collection;
 
     /**
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * Constructor.
@@ -152,7 +152,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      *
      * @return \MongoCollection
      */
-    private function getCollection()
+    protected function getCollection()
     {
         if (null === $this->collection) {
             $this->collection = $this->mongo->selectCollection($this->options['database'], $this->options['collection']);

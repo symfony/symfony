@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2014-07-05T10:05:00Z
+
+So you don't think that this comment https://github.com/symfony/symfony/issues/11299#issuecomment-48082554 is a great idea ? (just not repeat "password")
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T10:17:59Z
+
+@jakzal I've update your comments. Please review it and tell me if I have to change anything else.
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T10:28:33Z
+
+@javiereguiluz we could have both methods, one for validate user password as you mention before and another to validate a password, due to could be a password not stored in the user object.
+
+```php
+public function isPasswordValid(UserInterface $user, $encoded, $raw);
+
+public function isUserPasswordValid(UserInterface $user, $raw);
+```
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-07-05T10:29:22Z
+
+:+1: for @javiereguiluz comment, password is redundant.
+
+@Nek- I think `security.password_encoder` is a name that reflects the serivce's purpose bettern than `security.encoder` (what kind of an encoder?). Then, the method names (`encodePassword`, `isPasswordValid`) are inline with the encoder factory, so probably what most users would expect.
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T10:33:58Z
+
+I forgot to implements the PasswordEncoderServiceInterface.
+
+@jakzal I added the Service prefix in order to prevent collision with PasswordEncoderInterface in the same namespace.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-07-05T10:36:08Z
+
+Do we need an interface here? It's a helper class and is unlikely to be overriden.
+
+How about calling the class `UserPasswordEncoder`?
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T10:38:16Z
+
+@jakzal :+1: to the class name `UserPasswordEncoder`
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T10:56:22Z
+
+@jakzal changes made, and also passed the php-cs-fixer hope everything it's ok now
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T12:38:40Z
+
+I like this implementation. @aferrandini we should also get a PR (or at least an issue) on `symfony/symfony-docs` for the changes (which will shorten things!). Can you create one of those?
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T13:21:27Z
+
+@waverryan of course :+1:
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-05T14:49:13Z
+
+@weaverryan I added a PR to the symfony/symfony-docs repo with documentation.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T15:08:33Z
+
+@aferrandini you're on fire!
+
+---------------------------------------------------------------------------
+
+by ggam at 2014-07-05T15:17:42Z
+
+@aferrandini docs link point to the current repository (symfony/symfony). I think you should enter the full url `https://github.com/symfony/symfony-docs/pull/3995`
+
+---------------------------------------------------------------------------
+
+by aferrandini at 2014-07-06T11:50:23Z
+
+@ggam updated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:58:16Z
+
+:+1:

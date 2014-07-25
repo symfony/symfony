@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-14T01:51:06Z
+
+Please implement the featur ein a BC way, otherwise it means it cannot be merged until we move to 3.0
+
+---------------------------------------------------------------------------
+
+by KingCrunch at 2014-04-14T11:06:26Z
+
+Fixed. Did I miss something?
+
+Also do you have an idea about how to solve this? The `FrameworkBundle:HttpCache\HttpCache`-class is hard-wired to the `Esi` class and additionally it also pushes this into the DIC. I've added a method `getName()` to `Esi` and `Ssi`, so when somebody overwrites `createSurrogate()` it works as at least I'd expect it, but I'm not totally happy with that.
+
+So in my opinion it is fine for now, but maybe somebody has an idea?
+
+---------------------------------------------------------------------------
+
+by murnieza at 2014-04-14T14:31:29Z
+
+Really looking forward to see this functionality in Symfony :+1:
+
+---------------------------------------------------------------------------
+
+by KingCrunch at 2014-04-14T19:27:33Z
+
+So, updated once more. Sorry for the inconvenience with the BC
+
+I've mentioned in the source, that the components are deprecated since 2.5, but actually I don't really know. It's too late for 2.5, isn't?
+
+Are there any other concerns?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-15T13:46:28Z
+
+@KingCrunch yes it is. 2.5 is already feature-frozen. It will come in 2.6 now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-06T03:46:26Z
+
+@KingCrunch Looks good to me. Can you fix the minor issues I've mentioned in the comments? Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-18T08:10:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-18T08:11:37Z
+
+@KingCrunch Thanks for that. Can you fix the fabbot errors (mainly about using `bool` instead of `Boolean`?)
+
+---------------------------------------------------------------------------
+
+by KingCrunch at 2014-06-20T08:20:23Z
+
+Rebase and pushed. Actually some days ago already, but I don't know, if it's fine to "ping" after every commit :X
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-20T08:32:03Z
+
+@KingCrunch Pinging is fine, but we now need 2 +1 from the core team before being able to merge this PR. http://symfony.com/doc/current/contributing/code/core_team.html#code-development-rules
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-26T09:59:07Z
+
+ping @stof @romainneutron @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by KingCrunch at 2014-07-23T21:28:09Z
+
+*cough* ping @stof @romainneutron @nicolas-grekas

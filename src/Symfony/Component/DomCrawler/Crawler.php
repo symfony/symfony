@@ -525,6 +525,22 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Returns the node name of the first node of the list.
+     *
+     * @return string The node name
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function nodeName()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        return $this->getNode(0)->nodeName;
+    }
+
+    /**
      * Returns the node value of the first node of the list.
      *
      * @return string The node value

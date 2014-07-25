@@ -99,7 +99,22 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         // todo: throw an exception if the root node name is not correctly configured (bc)
 
         if ($rootNode->hasChildNodes()) {
-            return $this->parseXml($rootNode);
+
+            $xpath = new \DOMXPath($dom);
+            $data = array();
+            foreach ($xpath->query('namespace::*', $dom->documentElement) as $nsNode) {
+                $data['@'.$nsNode->nodeName] = $nsNode->nodeValue;
+            }
+
+            if (isset($data['@xmlns:xml'])) {
+                unset($data['@xmlns:xml']);
+            }
+
+            if (empty($data)) {
+                return $this->parseXml($rootNode);
+            }
+
+            return array_merge($data, (array) $this->parseXml($rootNode));
         }
 
         if (!$rootNode->hasAttributes()) {
@@ -227,7 +242,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     {
         return $name &&
             false === strpos($name, ' ') &&
-            preg_match('#^[\pL_][\pL0-9._-]*$#ui', $name);
+            preg_match('#^[\pL_][\pL0-9._:-]*$#ui', $name);
     }
 
     /**
@@ -281,11 +296,11 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         $data = array();
 
-        foreach ($node->attributes as $attrkey => $attr) {
+        foreach ($node->attributes as $attr) {
             if (ctype_digit($attr->nodeValue)) {
-                $data['@'.$attrkey] = (int) $attr->nodeValue;
+                $data['@'.$attr->nodeName] = (int) $attr->nodeValue;
             } else {
-                $data['@'.$attrkey] = $attr->nodeValue;
+                $data['@'.$attr->nodeName] = $attr->nodeValue;
             }
         }
 

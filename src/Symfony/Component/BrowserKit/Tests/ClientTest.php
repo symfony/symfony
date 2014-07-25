@@ -214,18 +214,18 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new TestClient();
 
-        $server = array('HTTP_HOST' => 'www.example.com:8000');
+        $server = array('HTTP_HOST' => 'www.exampl+e.com:8000');
         $parameters = array();
         $files = array();
 
-        $client->request('GET', 'http://example.com', $parameters, $files, $server);
-        $this->assertEquals('http://www.example.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to add port');
+        $client->request('GET', 'http://exampl+e.com', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to add port');
 
-        $client->request('GET', 'http://example.com:8888', $parameters, $files, $server);
-        $this->assertEquals('http://www.example.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to modify existing port');
+        $client->request('GET', 'http://exampl+e.com:8888', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to modify existing port');
 
-        $client->request('GET', 'http://example.com:8000', $parameters, $files, $server);
-        $this->assertEquals('http://www.example.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST respects correct set port');
+        $client->request('GET', 'http://exampl+e.com:8000', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST respects correct set port');
     }
 
     public function testRequestReferer()

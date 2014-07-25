@@ -273,7 +273,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        $this->writeText(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
+        $this->writeText(sprintf("This service is an alias for the service <info>%s</info>\n", (string) $alias), $options);
     }
 
     /**

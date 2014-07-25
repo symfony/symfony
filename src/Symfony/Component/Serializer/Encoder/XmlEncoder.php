@@ -106,9 +106,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 $data['@'.$nsNode->nodeName] = $nsNode->nodeValue;
             }
 
-            if (isset($data['@xmlns:xml'])) {
-                unset($data['@xmlns:xml']);
-            }
+            unset($data['@xmlns:xml']);
 
             if (empty($data)) {
                 return $this->parseXml($rootNode);

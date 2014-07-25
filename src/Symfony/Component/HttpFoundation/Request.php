@@ -1359,6 +1359,16 @@ class Request
     }
 
     /**
+     * Get the default locale.
+     *
+     * @return string
+     */
+    public function getDefaultLocale()
+    {
+        return $this->defaultLocale;
+    }
+
+    /**
      * Sets the locale.
      *
      * @param string $locale

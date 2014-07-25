@@ -104,17 +104,22 @@ EOF
         $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $foundBundle->getName()));
 
         // load any messages from templates
-        $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
+        $extractedCatalogue = new MessageCatalogue(null);
         $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
         $extractor->extract($foundBundle->getPath().'/Resources/views/', $extractedCatalogue);
 
         // load any existing messages from the translation files
-        $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
+
+        $fallbackCatalogue = new MessageCatalogue(null);
+        $loader->loadMessages($bundleTransPath, $fallbackCatalogue);
+
+        $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $loader->loadMessages($bundleTransPath, $currentCatalogue);
+        $currentCatalogue->addFallbackCatalogue($fallbackCatalogue);
 
         // process catalogues
         $operation = $input->getOption('clean')

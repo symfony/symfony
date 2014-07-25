@@ -150,6 +150,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function add($messages, $domain = 'messages')
     {
+        if ($this->locale === null) {
+            $messages = array_fill_keys(array_keys($messages), null);
+        }
+
         if (!isset($this->messages[$domain])) {
             $this->messages[$domain] = $messages;
         } else {
@@ -164,7 +168,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue)
     {
-        if ($catalogue->getLocale() !== $this->locale) {
+        if ($this->locale !== null && $catalogue->getLocale() !== $this->locale) {
             throw new \LogicException(sprintf('Cannot add a catalogue for locale "%s" as the current locale for this catalogue is "%s"', $catalogue->getLocale(), $this->locale));
         }
 

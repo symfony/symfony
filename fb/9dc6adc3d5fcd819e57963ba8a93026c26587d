@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-04-27T10:11:07Z
+
+what is the use case for this ?
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2014-04-27T10:17:13Z
+
+For example we want to display a special error page depending on the status of a user. To manage that in the EntryPoint, the exception needs to bubble to the ExceptionListener.
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2014-04-29T21:10:24Z
+
+@fabpot anything we need to do before this can be merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-04-30T06:09:38Z
+
+@lstrojny We are in the stabilisation phase of Symfony 2.5, so I'm not looking at new features at the moment, only bug fixes (master is still 2.5, not 2.6@dev yet).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-15T08:40:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2014-07-23T22:04:40Z
+
+Alright, added configuration handling and tests for it. Squashed the commits, hope it’s fine for a merge now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-24T10:09:21Z
+
+Besides the small comment I've just made, everything else looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-24T14:34:52Z
+
+looks good to me. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-07-24T14:37:00Z
+
+looks good to me too

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-24T15:24:26Z
+
+I'm not sure about it. the message is not a sentence anyway.
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-06-24T19:36:41Z
+
+What about this message (https://github.com/symfony/symfony/blob/339c0c809953097d5927e7adb30a65219a269b7a/src/Symfony/Component/Security/Core/Exception/BadCredentialsException.php#L27) then? And would it make sense to maybe replace "Bad credentials" with "Invalid credentials."?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T15:07:31Z
+
+We do have dots on all error messages, so I think it makes sense. :+1:

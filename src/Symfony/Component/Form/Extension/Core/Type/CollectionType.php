@@ -81,6 +81,7 @@ class CollectionType extends AbstractType
                 return function ($data) use ($value) {
                     $options = $value($data);
                     $options['block_name'] = 'entry';
+
                     return $options;
                 };
             } else {
@@ -116,7 +117,7 @@ class CollectionType extends AbstractType
     /**
      * This is a utility method used specifically by this class and its ResizeFormListener for getting dynamic options
      * for each child in this collection based off of the data provided.
-     * 
+     *
      * @param array|\Closure $options
      * @param $data
      * @return mixed

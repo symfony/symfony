@@ -304,7 +304,11 @@ abstract class Client
         $uri = $this->getAbsoluteUri($uri);
 
         if (isset($server['HTTP_HOST'])) {
-            $uri = preg_replace('{^(https?\://)'.parse_url($uri, PHP_URL_HOST).'}', '${1}'.$server['HTTP_HOST'], $uri);
+            if ($port = parse_url($uri, PHP_URL_PORT)) {
+                $port = ':'.$port;
+            }
+
+            $uri = preg_replace('{^(https?\://)'.parse_url($uri, PHP_URL_HOST).$port.'}', '${1}'.$server['HTTP_HOST'], $uri);
         }
 
         if (isset($server['HTTPS'])) {

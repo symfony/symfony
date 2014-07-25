@@ -11,116 +11,105 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
-use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
-class EsiTest extends \PHPUnit_Framework_TestCase
+class SsiTest extends \PHPUnit_Framework_TestCase
 {
     public function testHasSurrogateEsiCapability()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
-        $request->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
-        $this->assertTrue($esi->hasSurrogateCapability($request));
+        $request->headers->set('Surrogate-Capability', 'abc="SSI/1.0"');
+        $this->assertTrue($ssi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
         $request->headers->set('Surrogate-Capability', 'foobar');
-        $this->assertFalse($esi->hasSurrogateCapability($request));
+        $this->assertFalse($ssi->hasSurrogateCapability($request));
 
         $request = Request::create('/');
-        $this->assertFalse($esi->hasSurrogateCapability($request));
+        $this->assertFalse($ssi->hasSurrogateCapability($request));
     }
 
     public function testAddSurrogateEsiCapability()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
-        $esi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $ssi->addSurrogateCapability($request);
+        $this->assertEquals('symfony2="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
 
-        $esi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0", symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $ssi->addSurrogateCapability($request);
+        $this->assertEquals('symfony2="SSI/1.0", symfony2="SSI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
     public function testAddSurrogateControl()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
-        $response = new Response('foo <esi:include src="" />');
-        $esi->addSurrogateControl($response);
-        $this->assertEquals('content="ESI/1.0"', $response->headers->get('Surrogate-Control'));
+        $response = new Response('foo <!--#include virtual="" -->');
+        $ssi->addSurrogateControl($response);
+        $this->assertEquals('content="SSI/1.0"', $response->headers->get('Surrogate-Control'));
 
         $response = new Response('foo');
-        $esi->addSurrogateControl($response);
+        $ssi->addSurrogateControl($response);
         $this->assertEquals('', $response->headers->get('Surrogate-Control'));
     }
 
     public function testNeedsEsiParsing()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $response = new Response();
-        $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
-        $this->assertTrue($esi->needsParsing($response));
+        $response->headers->set('Surrogate-Control', 'content="SSI/1.0"');
+        $this->assertTrue($ssi->needsParsing($response));
 
         $response = new Response();
-        $this->assertFalse($esi->needsParsing($response));
+        $this->assertFalse($ssi->needsParsing($response));
     }
 
     public function testRenderIncludeTag()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
-        $this->assertEquals('<esi:include src="/" onerror="continue" alt="/alt" />', $esi->renderIncludeTag('/', '/alt', true));
-        $this->assertEquals('<esi:include src="/" alt="/alt" />', $esi->renderIncludeTag('/', '/alt', false));
-        $this->assertEquals('<esi:include src="/" onerror="continue" />', $esi->renderIncludeTag('/'));
-        $this->assertEquals('<esi:comment text="some comment" />'."\n".'<esi:include src="/" onerror="continue" alt="/alt" />', $esi->renderIncludeTag('/', '/alt', true, 'some comment'));
+        $this->assertEquals('<!--#include virtual="/" -->', $ssi->renderIncludeTag('/', '/alt', true));
+        $this->assertEquals('<!--#include virtual="/" -->', $ssi->renderIncludeTag('/', '/alt', false));
+        $this->assertEquals('<!--#include virtual="/" -->', $ssi->renderIncludeTag('/'));
     }
 
     public function testProcessDoesNothingIfContentTypeIsNotHtml()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
         $response = new Response();
         $response->headers->set('Content-Type', 'text/plain');
-        $esi->process($request, $response);
+        $ssi->process($request, $response);
 
         $this->assertFalse($response->headers->has('x-body-eval'));
     }
 
     public function testProcess()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
-        $response = new Response('foo <esi:comment text="some comment" /><esi:include src="..." alt="alt" onerror="continue" />');
-        $esi->process($request, $response);
-
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'alt\', true) ?>'."\n", $response->getContent());
-        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
-
-        $response = new Response('foo <esi:include src="..." />');
-        $esi->process($request, $response);
+        $response = new Response('foo <!--#include virtual="..." -->');
+        $ssi->process($request, $response);
 
         $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
-
-        $response = new Response('foo <esi:include src="..."></esi:include>');
-        $esi->process($request, $response);
-
-        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
+        $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
     }
 
     public function testProcessEscapesPhpTags()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
         $response = new Response('foo <?php die("foo"); ?><%= "lala" %>');
-        $esi->process($request, $response);
+        $ssi->process($request, $response);
 
         $this->assertEquals('foo <?php echo "<?"; ?>php die("foo"); ?><?php echo "<%"; ?>= "lala" %>', $response->getContent());
     }
@@ -130,39 +119,39 @@ class EsiTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessWhenNoSrcInAnEsi()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
-        $response = new Response('foo <esi:include />');
-        $esi->process($request, $response);
+        $response = new Response('foo <!--#include -->');
+        $ssi->process($request, $response);
     }
 
     public function testProcessRemoveSurrogateControlHeader()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
 
         $request = Request::create('/');
-        $response = new Response('foo <esi:include src="..." />');
-        $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
-        $esi->process($request, $response);
-        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+        $response = new Response('foo <!--#include virtual="..." -->');
+        $response->headers->set('Surrogate-Control', 'content="SSI/1.0"');
+        $ssi->process($request, $response);
+        $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
 
-        $response->headers->set('Surrogate-Control', 'no-store, content="ESI/1.0"');
-        $esi->process($request, $response);
-        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+        $response->headers->set('Surrogate-Control', 'no-store, content="SSI/1.0"');
+        $ssi->process($request, $response);
+        $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
         $this->assertEquals('no-store', $response->headers->get('surrogate-control'));
 
-        $response->headers->set('Surrogate-Control', 'content="ESI/1.0", no-store');
-        $esi->process($request, $response);
-        $this->assertEquals('ESI', $response->headers->get('x-body-eval'));
+        $response->headers->set('Surrogate-Control', 'content="SSI/1.0", no-store');
+        $ssi->process($request, $response);
+        $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
         $this->assertEquals('no-store', $response->headers->get('surrogate-control'));
     }
 
     public function testHandle()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
         $cache = $this->getCache(Request::create('/'), new Response('foo'));
-        $this->assertEquals('foo', $esi->handle($cache, '/', '/alt', true));
+        $this->assertEquals('foo', $ssi->handle($cache, '/', '/alt', true));
     }
 
     /**
@@ -170,30 +159,30 @@ class EsiTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleWhenResponseIsNot200()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
         $response = new Response('foo');
         $response->setStatusCode(404);
         $cache = $this->getCache(Request::create('/'), $response);
-        $esi->handle($cache, '/', '/alt', false);
+        $ssi->handle($cache, '/', '/alt', false);
     }
 
     public function testHandleWhenResponseIsNot200AndErrorsAreIgnored()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
         $response = new Response('foo');
         $response->setStatusCode(404);
         $cache = $this->getCache(Request::create('/'), $response);
-        $this->assertEquals('', $esi->handle($cache, '/', '/alt', true));
+        $this->assertEquals('', $ssi->handle($cache, '/', '/alt', true));
     }
 
     public function testHandleWhenResponseIsNot200AndAltIsPresent()
     {
-        $esi = new Esi();
+        $ssi = new Ssi();
         $response1 = new Response('foo');
         $response1->setStatusCode(404);
         $response2 = new Response('bar');
         $cache = $this->getCache(Request::create('/'), array($response1, $response2));
-        $this->assertEquals('bar', $esi->handle($cache, '/', '/alt', false));
+        $this->assertEquals('bar', $ssi->handle($cache, '/', '/alt', false));
     }
 
     protected function getCache($request, $response)

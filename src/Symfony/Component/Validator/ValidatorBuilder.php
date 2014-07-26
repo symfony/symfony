@@ -397,7 +397,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
+            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
             $validatorFactory = $validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
 
             return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);

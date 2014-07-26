@@ -13,7 +13,6 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\StringUtil;
 
 class PropertyAccessorCollectionTest_Car
 {

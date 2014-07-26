@@ -311,7 +311,6 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'missingFieldsMessage' => 'myMessage',
         )));
 
-
         $this->assertViolation('myMessage', array(
             '{{ field }}' => 'foo'
         ), 'property.path[foo]', null);

@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\BlankValidator;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validation;
 
 class BlankValidatorTest extends AbstractConstraintValidatorTest

@@ -182,7 +182,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
             ->end()
             ->end()
             ->buildTree()
-            ->finalize($config === null ? array('key'=>'value') : $config)
+            ->finalize(null === $config ? array('key'=>'value') : $config)
         ;
     }
 

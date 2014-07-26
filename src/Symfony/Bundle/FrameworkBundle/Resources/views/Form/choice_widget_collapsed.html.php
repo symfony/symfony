@@ -1,5 +1,5 @@
 <select
-    <?php if ($required && $empty_value === null && $empty_value_in_choices === false && $multiple === false):
+    <?php if ($required && null === $empty_value && $empty_value_in_choices === false && $multiple === false):
         $required = false;
     endif; ?>
     <?php echo $view['form']->block($form, 'widget_attributes', array(

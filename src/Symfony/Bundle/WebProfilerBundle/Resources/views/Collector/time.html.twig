@@ -370,7 +370,7 @@
             this.getThreshold = function() {
                 var threshold = Sfjs.getPreference(_storagePrefix + 'threshold');
 
-                if (threshold === null) {
+                if (null === threshold) {
                     return _threshold;
                 }
 

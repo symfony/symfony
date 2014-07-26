@@ -213,6 +213,29 @@ class Inline
                 if (false !== $strpos = strpos($output, ' #')) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
+            } elseif (self::$objectSupport && '!!php/object:' === substr($scalar, $i, 13)) {
+                $openingBraces = 0;
+                $output = '';
+
+                // special handling for serialized PHP objects: use the first
+                // delimiter after all opening braces inside the serialized
+                // PHP object have been closed
+                for ($pos = $i + 12; $pos < strlen($scalar); $pos++) {
+                    if (0 === $openingBraces && in_array($scalar[$pos], $delimiters)) {
+                        $output = substr($scalar, $i, $pos - $i);
+                        $i += strlen($output);
+                        break;
+                    }
+
+                    switch ($scalar[$pos]) {
+                        case '{':
+                            $openingBraces++;
+                            break;
+                        case '}':
+                            $openingBraces--;
+                            break;
+                    }
+                }
             } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
                 $i += strlen($output);

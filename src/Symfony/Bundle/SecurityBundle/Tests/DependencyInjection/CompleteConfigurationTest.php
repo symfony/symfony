@@ -223,7 +223,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testRememberMeThrowExceptionsDefault()
     {
         $container = $this->getContainer('container1');
-        $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(4));
+        $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
     }
 
     public function testRememberMeThrowExceptions()
@@ -231,7 +231,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $container = $this->getContainer('remember_me_options');
         $service = $container->getDefinition('security.authentication.listener.rememberme.main');
         $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
-        $this->assertFalse($service->getArgument(4));
+        $this->assertFalse($service->getArgument(5));
     }
 
     protected function getContainer($file)

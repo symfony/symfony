@@ -421,8 +421,17 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
             {{ name }}
-            {% if data.errors is defined and data.errors|length > 0 %}
-            <div class="badge-error">{{ data.errors|length }}</div>
+
+            {% set errorsCount = 0 %}
+            {% if data.errors is defined %}
+                {% set errorsCount = errorsCount + data.errors|length %}
+            {% endif %}
+            {% if data.synchronization_failure_cause is defined %}
+                {% set errorsCount = errorsCount + 1 %}
+            {% endif %}
+
+            {% if errorsCount > 0 %}
+            <div class="badge-error">{{ errorsCount }}</div>
             {% endif %}
         </div>
 
@@ -485,6 +494,26 @@
                 </tr>
                 {% endfor %}
             </table>
+        </div>
+        {% endif %}
+
+        {% if data.synchronization_failure_cause is defined %}
+        <div class="errors">
+            <h3>
+                <a class="toggle-button" data-toggle-target-id="{{ data.id }}-synchronized" href="#">
+                    Synchronization failure
+                    <span class="toggle-icon"></span>
+                </a>
+            </h3>
+
+            <div id="{{ data.id }}-synchronized">
+                <table>
+                    <tr>
+                        <th width="180">Cause</th>
+                        <td>{{ data.synchronization_failure_cause }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
         {% endif %}
 

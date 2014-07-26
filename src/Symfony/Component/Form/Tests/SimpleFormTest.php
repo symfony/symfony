@@ -618,6 +618,10 @@ class SimpleFormTest extends AbstractFormTest
         $form->submit('foobar');
 
         $this->assertFalse($form->isSynchronized());
+        $this->assertInstanceOf(
+            'Symfony\\Component\\Form\\Exception\\TransformationFailedException',
+            $form->getSynchronizationFailureCause()
+        );
     }
 
     public function testNotSynchronizedIfModelReverseTransformationFailed()

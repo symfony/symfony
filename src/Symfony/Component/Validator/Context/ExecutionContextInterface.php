@@ -186,4 +186,30 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      *           code.
      */
     public function isConstraintValidated($cacheKey, $constraintHash);
+
+    /**
+     * Marks that an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function markObjectAsInitialized($cacheKey);
+
+    /**
+     * Returns whether an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @return bool Whether the object was already initialized
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function isObjectInitialized($cacheKey);
 }

@@ -18,7 +18,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
-use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Util\PropertyPath;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
@@ -370,14 +369,7 @@ class ExecutionContext implements ExecutionContextInterface
     }
 
     /**
-     * Marks that an object was initialized.
-     *
-     * @param string $cacheKey The hash of the object
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     *
-     * @see ObjectInitializerInterface
+     * {@inheritdoc}
      */
     public function markObjectAsInitialized($cacheKey)
     {
@@ -385,16 +377,7 @@ class ExecutionContext implements ExecutionContextInterface
     }
 
     /**
-     * Returns whether an object was initialized.
-     *
-     * @param string $cacheKey The hash of the object
-     *
-     * @return bool Whether the object was already initialized
-     *
-     * @internal Used by the validator engine. Should not be called by user
-     *           code.
-     *
-     * @see ObjectInitializerInterface
+     * {@inheritdoc}
      */
     public function isObjectInitialized($cacheKey)
     {

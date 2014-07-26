@@ -22,7 +22,8 @@ class RecursiveValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {
         $contextFactory = new ExecutionContextFactory(new DefaultTranslator());
+        $validatorFactory = new ConstraintValidatorFactory();
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory(), $objectInitializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers);
     }
 }

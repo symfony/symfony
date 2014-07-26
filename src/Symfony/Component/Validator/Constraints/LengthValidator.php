@@ -51,7 +51,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->exactMessage)
                 ->setParameter('{{ value }}', $stringValue)
                 ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->min)
                 ->addViolation();
 
@@ -62,7 +62,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->maxMessage)
                 ->setParameter('{{ value }}', $stringValue)
                 ->setParameter('{{ limit }}', $constraint->max)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->max)
                 ->addViolation();
 
@@ -73,7 +73,7 @@ class LengthValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->minMessage)
                 ->setParameter('{{ value }}', $stringValue)
                 ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->min)
                 ->addViolation();
         }

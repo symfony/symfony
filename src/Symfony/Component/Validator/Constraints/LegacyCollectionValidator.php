@@ -52,13 +52,13 @@ class LegacyCollectionValidator extends ConstraintValidator
         $group = $context->getGroup();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
-            if (
-                // bug fix issue #2779
-                (is_array($value) && array_key_exists($field, $value)) ||
-                ($value instanceof \ArrayAccess && $value->offsetExists($field))
-            ) {
-                foreach ($fieldConstraint->constraints as $constr) {
-                    $context->validateValue($value[$field], $constr, '['.$field.']', $group);
+            // bug fix issue #2779
+            $existsInArray = is_array($value) && array_key_exists($field, $value);
+            $existsInArrayAccess = $value instanceof \ArrayAccess && $value->offsetExists($field);
+
+            if ($existsInArray || $existsInArrayAccess) {
+                if (count($fieldConstraint->constraints) > 0) {
+                    $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']', $group);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(

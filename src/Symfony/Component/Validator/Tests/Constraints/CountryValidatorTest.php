@@ -14,41 +14,39 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\CountryValidator;
+use Symfony\Component\Validator\Validation;
 
-class CountryValidatorTest extends \PHPUnit_Framework_TestCase
+class CountryValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
     protected function setUp()
     {
         IntlTestHelper::requireFullIntl($this);
 
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new CountryValidator();
-        $this->validator->initialize($this->context);
+        parent::setUp();
     }
 
-    protected function tearDown()
+    protected function getApiVersion()
     {
-        $this->context = null;
-        $this->validator = null;
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new CountryValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Country());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Country());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -64,10 +62,9 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCountries($country)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($country, new Country());
+
+        $this->assertNoViolation();
     }
 
     public function getValidCountries()
@@ -88,13 +85,11 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $country,
-            ));
-
         $this->validator->validate($country, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $country,
+        ));
     }
 
     public function getInvalidCountries()
@@ -113,9 +108,9 @@ class CountryValidatorTest extends \PHPUnit_Framework_TestCase
         \Locale::setDefault('en_GB');
 
         $existingCountry = 'GB';
-        $this->context->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate($existingCountry, new Country());
+
+        $this->assertNoViolation();
     }
 }

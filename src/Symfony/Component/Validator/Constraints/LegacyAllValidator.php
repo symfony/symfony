@@ -43,9 +43,7 @@ class LegacyAllValidator extends ConstraintValidator
         $group = $context->getGroup();
 
         foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $context->validateValue($element, $constr, '['.$key.']', $group);
-            }
+            $context->validateValue($element, $constraint->constraints, '['.$key.']', $group);
         }
     }
 }

@@ -13,42 +13,35 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Uuid;
 use Symfony\Component\Validator\Constraints\UuidValidator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Colin O'Dell <colinodell@gmail.com>
  */
-class UuidValidatorTest extends \PHPUnit_Framework_TestCase
+class UuidValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new UuidValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new UuidValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Uuid());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Uuid());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -64,10 +57,9 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidStrictUuids($uuid)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($uuid, new Uuid());
+
+        $this->assertNoViolation();
     }
 
     public function getValidStrictUuids()
@@ -89,13 +81,11 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'testMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('testMessage', array(
-                '{{ value }}' => $uuid,
-            ));
-
         $this->validator->validate($uuid, $constraint);
+
+        $this->assertViolation('testMessage', array(
+            '{{ value }}' => $uuid,
+        ));
     }
 
     public function getInvalidStrictUuids()
@@ -119,14 +109,13 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testVersionConstraintIsValid($uuid)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Uuid(array(
             'versions' => array(Uuid::V1_MAC, Uuid::V4_RANDOM)
         ));
 
         $this->validator->validate($uuid, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -135,13 +124,15 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
     public function testVersionConstraintIsInvalid($uuid)
     {
         $constraint = new Uuid(array(
-            'versions' => array(Uuid::V2_DCE, Uuid::V3_MD5)
+            'versions' => array(Uuid::V2_DCE, Uuid::V3_MD5),
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation');
-
         $this->validator->validate($uuid, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $uuid,
+        ));
     }
 
     /**
@@ -153,10 +144,9 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
             'strict' => false
         ));
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($uuid, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function getValidNonStrictUuids()
@@ -181,13 +171,15 @@ class UuidValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidNonStrictUuids($uuid)
     {
         $constraint = new Uuid(array(
-            'strict' => false
+            'strict' => false,
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation');
-
         $this->validator->validate($uuid, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $uuid,
+        ));
     }
 
     public function getInvalidNonStrictUuids()

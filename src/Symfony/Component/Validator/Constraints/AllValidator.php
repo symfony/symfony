@@ -44,9 +44,7 @@ class AllValidator extends ConstraintValidator
         $validator = $context->getValidator()->inContext($context);
 
         foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $validator->atPath('['.$key.']')->validate($element, $constr, $group);
-            }
+            $validator->atPath('['.$key.']')->validate($element, $constraint->constraints, $group);
         }
     }
 }

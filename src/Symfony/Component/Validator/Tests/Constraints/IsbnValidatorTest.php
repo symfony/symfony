@@ -13,20 +13,21 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
  */
-class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
+class IsbnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    public function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new IsbnValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new IsbnValidator();
     }
 
     public function getValidIsbn10()
@@ -116,21 +117,19 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testNullIsValid()
     {
         $constraint = new Isbn(true);
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
         $constraint = new Isbn(true);
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate('', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -139,6 +138,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testExpectsStringCompatibleType()
     {
         $constraint = new Isbn(true);
+
         $this->validator->validate(new \stdClass(), $constraint);
     }
 
@@ -147,12 +147,13 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIsbn10($isbn)
     {
-        $constraint = new Isbn(array('type' => 'isbn10'));
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
+        $constraint = new Isbn(array(
+            'type' => 'isbn10'
+        ));
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -160,13 +161,14 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn10($isbn)
     {
-        $constraint = new Isbn(array('type' => 'isbn10'));
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->isbn10Message);
+        $constraint = new Isbn(array(
+            'type' => 'isbn10',
+            'isbn10Message' => 'myMessage',
+        ));
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     /**
@@ -175,11 +177,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidIsbn13($isbn)
     {
         $constraint = new Isbn(array('type' => 'isbn13'));
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -187,13 +188,14 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn13($isbn)
     {
-        $constraint = new Isbn(array('type' => 'isbn13'));
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->isbn13Message);
+        $constraint = new Isbn(array(
+            'type' => 'isbn13',
+            'isbn13Message' => 'myMessage',
+        ));
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     /**
@@ -202,11 +204,10 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidIsbn($isbn)
     {
         $constraint = new Isbn();
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -214,12 +215,12 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn($isbn)
     {
-        $constraint = new Isbn();
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->bothIsbnMessage);
+        $constraint = new Isbn(array(
+            'bothIsbnMessage' => 'myMessage',
+        ));
 
         $this->validator->validate($isbn, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 }

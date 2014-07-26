@@ -39,7 +39,7 @@ class CountValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->exactMessage)
                 ->setParameter('{{ count }}', $count)
                 ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->min)
                 ->addViolation();
 
@@ -50,7 +50,7 @@ class CountValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->maxMessage)
                 ->setParameter('{{ count }}', $count)
                 ->setParameter('{{ limit }}', $constraint->max)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->max)
                 ->addViolation();
 
@@ -61,7 +61,7 @@ class CountValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->minMessage)
                 ->setParameter('{{ count }}', $count)
                 ->setParameter('{{ limit }}', $constraint->min)
-                ->setValue($value)
+                ->setInvalidValue($value)
                 ->setPlural((int) $constraint->min)
                 ->addViolation();
         }

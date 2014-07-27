@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('trusted_proxies')
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) { return !is_array($v) && !is_null($v); })
+                        ->ifTrue(function ($v) { return !is_array($v) && null !== $v; })
                         ->then(function ($v) { return is_bool($v) ? array() : preg_split('/\s*,\s*/', $v); })
                     ->end()
                     ->prototype('scalar')

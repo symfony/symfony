@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T14:26:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mlindenb at 2014-07-25T14:32:57Z
+
+Please note that by moving the array_filter() from my proposed solution in the return value of getListeners() to hasListeners() still makes getListeners() return empty arrays...
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-07-25T15:01:28Z
+
+:+1:

@@ -120,6 +120,21 @@ class SigchildEnabledProcessTest extends AbstractProcessTest
         parent::testStartAfterATimeout();
     }
 
+    public function testStopWithTimeoutIsActuallyWorking()
+    {
+        $this->markTestSkipped('Stopping with signal is not supported in sigchild environment');
+    }
+
+    public function testRunProcessWithTimeout()
+    {
+        $this->markTestSkipped('Signal (required for timeout) is not supported in sigchild environment');
+    }
+
+    public function testCheckTimeoutOnStartedProcess()
+    {
+        $this->markTestSkipped('Signal (required for timeout) is not supported in sigchild environment');
+    }
+
     /**
      * {@inheritdoc}
      */

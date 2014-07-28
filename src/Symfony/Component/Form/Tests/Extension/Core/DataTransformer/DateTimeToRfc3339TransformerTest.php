@@ -32,7 +32,7 @@ class DateTimeToRfc3339TransformerTest extends DateTimeTestCase
         $this->dateTimeWithoutSeconds = null;
     }
 
-    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = FALSE, $ignoreCase = FALSE)
+    public static function assertEquals($expected, $actual, $message = '', $delta = 0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
     {
         if ($expected instanceof \DateTime && $actual instanceof \DateTime) {
             $expected = $expected->format('c');

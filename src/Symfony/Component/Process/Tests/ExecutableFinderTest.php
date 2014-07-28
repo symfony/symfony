@@ -110,6 +110,27 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $this->assertSamePath(PHP_BINARY, $result);
     }
 
+    public function testFindProcessInOpenBasedir()
+    {
+        if (ini_get('open_basedir')) {
+            $this->markTestSkipped('Cannot test when open_basedir is set');
+        }
+
+        if (!defined('PHP_BINARY')) {
+            $this->markTestSkipped('Requires the PHP_BINARY constant');
+        }
+
+        $execPath = __DIR__.'/SignalListener.php';
+
+        $this->setPath('');
+        ini_set('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
+
+        $finder = new ExecutableFinder();
+        $result = $finder->find($this->getPhpBinaryName(), false);
+
+        $this->assertSamePath(PHP_BINARY, $result);
+    }
+
     private function assertSamePath($expected, $tested)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {

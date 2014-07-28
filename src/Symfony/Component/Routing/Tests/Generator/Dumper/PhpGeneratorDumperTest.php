@@ -60,7 +60,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('Test2', new Route('/testing2'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
-        include ($this->testTmpFilepath);
+        include $this->testTmpFilepath;
 
         $projectUrlGenerator = new \ProjectUrlGenerator(new RequestContext('/app.php'));
 
@@ -81,7 +81,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
     public function testDumpWithoutRoutes()
     {
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'WithoutRoutesUrlGenerator')));
-        include ($this->testTmpFilepath);
+        include $this->testTmpFilepath;
 
         $projectUrlGenerator = new \WithoutRoutesUrlGenerator(new RequestContext('/app.php'));
 
@@ -96,7 +96,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('Test', new Route('/test'));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'NonExistingRoutesUrlGenerator')));
-        include ($this->testTmpFilepath);
+        include $this->testTmpFilepath;
 
         $projectUrlGenerator = new \NonExistingRoutesUrlGenerator(new RequestContext());
         $url = $projectUrlGenerator->generate('NonExisting', array());
@@ -107,7 +107,7 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
         $this->routeCollection->add('Test', new Route('/testing/{foo}', array('foo' => 'bar')));
 
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump(array('class' => 'DefaultRoutesUrlGenerator')));
-        include ($this->testTmpFilepath);
+        include $this->testTmpFilepath;
 
         $projectUrlGenerator = new \DefaultRoutesUrlGenerator(new RequestContext());
         $url = $projectUrlGenerator->generate('Test', array());

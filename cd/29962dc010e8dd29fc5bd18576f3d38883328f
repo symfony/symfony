@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-07-24T20:45:01Z
+
+May this PR introduce a BC if someone had overrided `getValue` or `getPropertyPath` ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-24T21:00:45Z
+
+IMO such thing is not convered by our BC promise when not extra designed to be extended. Otherwise we would need to always use the public getter within each class, which we almost never do. Even here in this case, there is also a `getRoot` method that is not used.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-07-28T14:49:57Z
+
+:+1:

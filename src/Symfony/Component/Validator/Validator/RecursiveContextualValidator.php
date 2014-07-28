@@ -96,6 +96,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     {
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
+        $previousValue = $this->context->getValue();
+        $previousObject = $this->context->getObject();
+        $previousMetadata = $this->context->getMetadata();
+        $previousPath = $this->context->getPropertyPath();
+        $previousGroup = $this->context->getGroup();
+
         // If explicit constraints are passed, validate the value against
         // those constraints
         if (null !== $constraints) {
@@ -120,6 +126,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->context
             );
 
+            $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
+            $this->context->setGroup($previousGroup);
+
             return $this;
         }
 
@@ -134,6 +143,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->context
             );
 
+            $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
+            $this->context->setGroup($previousGroup);
+
             return $this;
         }
 
@@ -147,6 +159,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 true,
                 $this->context
             );
+
+            $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
+            $this->context->setGroup($previousGroup);
 
             return $this;
         }
@@ -180,6 +195,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = spl_object_hash($object);
 
+        $previousValue = $this->context->getValue();
+        $previousObject = $this->context->getObject();
+        $previousMetadata = $this->context->getMetadata();
+        $previousPath = $this->context->getPropertyPath();
+        $previousGroup = $this->context->getGroup();
+
         foreach ($propertyMetadatas as $propertyMetadata) {
             $propertyValue = $propertyMetadata->getPropertyValue($object);
 
@@ -195,6 +216,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->context
             );
         }
+
+        $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
+        $this->context->setGroup($previousGroup);
 
         return $this;
     }
@@ -221,6 +245,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = spl_object_hash($object);
 
+        $previousValue = $this->context->getValue();
+        $previousObject = $this->context->getObject();
+        $previousMetadata = $this->context->getMetadata();
+        $previousPath = $this->context->getPropertyPath();
+        $previousGroup = $this->context->getGroup();
+
         foreach ($propertyMetadatas as $propertyMetadata) {
             $this->validateGenericNode(
                 $value,
@@ -234,6 +264,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->context
             );
         }
+
+        $this->context->setNode($previousValue, $previousObject, $previousMetadata, $previousPath);
+        $this->context->setGroup($previousGroup);
 
         return $this;
     }

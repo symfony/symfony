@@ -230,8 +230,8 @@ class OptionsResolver implements OptionsResolverInterface
         // Resolve options
         $resolvedOptions = $combinedOptions->all();
 
-        $this->validateOptionValues($resolvedOptions);
         $this->validateOptionTypes($resolvedOptions);
+        $this->validateOptionValues($resolvedOptions);
 
         return $resolvedOptions;
     }

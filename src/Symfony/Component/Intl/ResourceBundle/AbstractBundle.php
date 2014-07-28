@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReaderInterface;
 
 /**

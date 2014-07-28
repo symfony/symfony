@@ -11,7 +11,6 @@
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Icu\IcuData;
-use Symfony\Component\Intl\Intl;
 
 require_once __DIR__ . '/common.php';
 require_once __DIR__ . '/autoload.php';

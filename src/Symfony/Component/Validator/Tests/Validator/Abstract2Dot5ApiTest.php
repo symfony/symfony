@@ -193,13 +193,26 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousObject = $context->getObject();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context
                 ->getValidator()
                 ->inContext($context)
                 ->atPath('subpath')
                 ->validate($value->reference)
             ;
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousObject, $context->getObject());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
@@ -244,13 +257,26 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousObject = $context->getObject();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context
                 ->getValidator()
                 ->inContext($context)
                 ->atPath('subpath')
                 ->validate(array('key' => $value->reference))
             ;
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousObject, $context->getObject());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {

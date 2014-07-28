@@ -529,7 +529,7 @@ class FormTypeTest extends BaseTypeTest
     public function testPropertyPath()
     {
         $form = $this->factory->create('form', null, array(
-            'property_path' => 'foo',
+            'map_to' => 'foo',
         ));
 
         $this->assertEquals(new PropertyPath('foo'), $form->getPropertyPath());
@@ -539,7 +539,7 @@ class FormTypeTest extends BaseTypeTest
     public function testPropertyPathNullImpliesDefault()
     {
         $form = $this->factory->createNamed('name', 'form', null, array(
-            'property_path' => null,
+            'map_to' => null,
         ));
 
         $this->assertEquals(new PropertyPath('name'), $form->getPropertyPath());
@@ -549,7 +549,7 @@ class FormTypeTest extends BaseTypeTest
     public function testNotMapped()
     {
         $form = $this->factory->create('form', null, array(
-            'property_path' => 'foo',
+            'map_to' => 'foo',
             'mapped' => false,
         ));
 

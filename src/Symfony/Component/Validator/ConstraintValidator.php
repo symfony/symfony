@@ -67,11 +67,11 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (is_object($value)) {
-            return 'Object('.get_class($value).')';
+            return 'object';
         }
 
         if (is_array($value)) {
-            return 'Array';
+            return 'array';
         }
 
         if (is_string($value)) {
@@ -79,7 +79,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (is_resource($value)) {
-            return sprintf('Resource(%s#%d)', get_resource_type($value), $value);
+            return 'resource';
         }
 
         if (null === $value) {

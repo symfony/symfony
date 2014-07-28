@@ -66,9 +66,9 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
             array(true, 'true'),
             array('', '""'),
             array('foo bar', '"foo bar"'),
-            array(new \DateTime(), 'Object(DateTime)'),
-            array(new \stdClass(), 'Object(stdClass)'),
-            array(array(), 'Array'),
+            array(new \DateTime(), 'object'),
+            array(new \stdClass(), 'object'),
+            array(array(), 'array'),
         );
     }
 }

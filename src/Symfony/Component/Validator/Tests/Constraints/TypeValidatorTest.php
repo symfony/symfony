@@ -132,7 +132,6 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
         $file = $this->createFile();
-        $fileAsString = 'Resource(stream#'.intval($file).')';
 
         return array(
             array('foobar', 'numeric', '"foobar"'),
@@ -140,18 +139,18 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             array('0', 'integer', '"0"'),
             array('1.5', 'float', '"1.5"'),
             array(12345, 'string', '12345'),
-            array($object, 'boolean', 'Object(stdClass)'),
-            array($object, 'numeric', 'Object(stdClass)'),
-            array($object, 'integer', 'Object(stdClass)'),
-            array($object, 'float', 'Object(stdClass)'),
-            array($object, 'string', 'Object(stdClass)'),
-            array($object, 'resource', 'Object(stdClass)'),
-            array($file, 'boolean', $fileAsString),
-            array($file, 'numeric', $fileAsString),
-            array($file, 'integer', $fileAsString),
-            array($file, 'float', $fileAsString),
-            array($file, 'string', $fileAsString),
-            array($file, 'object', $fileAsString),
+            array($object, 'boolean', 'object'),
+            array($object, 'numeric', 'object'),
+            array($object, 'integer', 'object'),
+            array($object, 'float', 'object'),
+            array($object, 'string', 'object'),
+            array($object, 'resource', 'object'),
+            array($file, 'boolean', 'resource'),
+            array($file, 'numeric', 'resource'),
+            array($file, 'integer', 'resource'),
+            array($file, 'float', 'resource'),
+            array($file, 'string', 'resource'),
+            array($file, 'object', 'resource'),
             array('12a34', 'digit', '"12a34"'),
             array('1a#23', 'alnum', '"1a#23"'),
             array('abcd1', 'alpha', '"abcd1"'),

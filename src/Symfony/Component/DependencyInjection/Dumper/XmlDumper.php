@@ -138,6 +138,13 @@ class XmlDumper extends Dumper
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
+        if (null !== $decorated = $definition->getDecoratedService()) {
+            list ($decorated, $renamedId) = $decorated;
+            $service->setAttribute('decorates', $decorated);
+            if (null !== $renamedId) {
+                $service->setAttribute('decoration-inner-name', $renamedId);
+            }
+        }
 
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {

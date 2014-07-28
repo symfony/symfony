@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -19,4 +22,28 @@ namespace Symfony\Component\Validator\Constraints;
 class DateTimeValidator extends DateValidator
 {
     const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($value, Constraint $constraint)
+    {
+        if (!$constraint instanceof DateTime) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTime');
+        }
+
+        if (null === $value || '' === $value || $value instanceof \DateTime) {
+            return;
+        }
+
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+            throw new UnexpectedTypeException($value, 'string');
+        }
+
+        $value = (string) $value;
+
+        if (!preg_match(static::PATTERN, $value, $matches) || !checkdate($matches[2], $matches[3], $matches[1])) {
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+        }
+    }
 }

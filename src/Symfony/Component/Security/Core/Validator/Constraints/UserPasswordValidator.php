@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UserPasswordValidator extends ConstraintValidator
 {
@@ -34,6 +35,10 @@ class UserPasswordValidator extends ConstraintValidator
      */
     public function validate($password, Constraint $constraint)
     {
+        if (!$constraint instanceof UserPassword) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');
+        }
+
         $user = $this->securityContext->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {

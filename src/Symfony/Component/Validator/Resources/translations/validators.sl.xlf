@@ -175,7 +175,7 @@
                 <target>Višina slike je premajhna ({{ height }}px). Najmanjša predvidena višina je {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Ta vrednost bi morala biti trenutno uporabnikovo geslo.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,7 +297,11 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>Slika je pokončno usmerjena ({{ width }}x{{ height }}px). Pokončno usmerjene slike niso dovoljene.</target>
-           </trans-unit>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Prazna datoteka ni dovoljena.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

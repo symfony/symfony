@@ -87,7 +87,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('_exit'));
         $this->request->expects($this->any())->method('getUri')->will($this->returnValue('/'));
-        $this->request->query->expects($this->once())->method('remove','_switch_user');
+        $this->request->query->expects($this->once())->method('remove', '_switch_user');
         $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array()));
         $this->request->server->expects($this->once())->method('set')->with('QUERY_STRING', '');
 
@@ -103,7 +103,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
-    public function testSwitchUserIsDissallowed()
+    public function testSwitchUserIsDisallowed()
     {
         $token = $this->getToken(array($this->getMock('Symfony\Component\Security\Core\Role\RoleInterface')));
 
@@ -126,7 +126,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
-        $this->request->query->expects($this->once())->method('remove','_switch_user');
+        $this->request->query->expects($this->once())->method('remove', '_switch_user');
         $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array()));
 
         $this->request->expects($this->any())->method('getUri')->will($this->returnValue('/'));
@@ -156,7 +156,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
-        $this->request->query->expects($this->once())->method('remove','_switch_user');
+        $this->request->query->expects($this->once())->method('remove', '_switch_user');
         $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array('page'=>3,'section'=>2)));
         $this->request->expects($this->any())->method('getUri')->will($this->returnValue('/'));
         $this->request->server->expects($this->once())->method('set')->with('QUERY_STRING', 'page=3&section=2');

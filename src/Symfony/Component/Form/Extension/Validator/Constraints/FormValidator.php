@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -42,6 +43,10 @@ class FormValidator extends ConstraintValidator
      */
     public function validate($form, Constraint $constraint)
     {
+        if (!$constraint instanceof Form) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Form');
+        }
+
         if (!$form instanceof FormInterface) {
             return;
         }
@@ -106,7 +111,7 @@ class FormValidator extends ConstraintValidator
         }
 
         // Mark the form with an error if it contains extra fields
-        if (count($form->getExtraData()) > 0) {
+        if (!$config->getOption('allow_extra_fields') && count($form->getExtraData()) > 0) {
             $this->context->addViolation(
                 $config->getOption('extra_fields_message'),
                 array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),

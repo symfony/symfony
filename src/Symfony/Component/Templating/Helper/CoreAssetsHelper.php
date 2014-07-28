@@ -105,14 +105,15 @@ class CoreAssetsHelper extends Helper implements PackageInterface
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
-     * @param string $path        A public path
-     * @param string $packageName The name of the asset package to use
+     * @param string              $path        A public path
+     * @param string              $packageName The name of the asset package to use
+     * @param string|bool|null    $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */
-    public function getUrl($path, $packageName = null)
+    public function getUrl($path, $packageName = null, $version = null)
     {
-        return $this->getPackage($packageName)->getUrl($path);
+        return $this->getPackage($packageName)->getUrl($path, $version);
     }
 
     /**

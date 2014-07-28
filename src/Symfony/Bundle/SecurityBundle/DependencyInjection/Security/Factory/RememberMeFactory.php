@@ -102,6 +102,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
+        $listener->replaceArgument(5, $config['catch_exceptions']);
 
         return array($authProviderId, $listenerId, $defaultEntryPoint);
     }
@@ -130,6 +131,7 @@ class RememberMeFactory implements SecurityFactoryInterface
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
+            ->scalarNode('catch_exceptions')->defaultTrue()->end()
         ;
 
         foreach ($this->options as $name => $value) {

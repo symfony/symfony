@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 /**
  * Encodes JSON data
  *
@@ -27,9 +29,11 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * Returns the last encoding error (if any)
+     * Returns the last encoding error (if any).
      *
      * @return int
+     *
+     * @deprecated since 2.5, encode() throws an exception if error found, will be removed in 3.0
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */
@@ -48,7 +52,10 @@ class JsonEncode implements EncoderInterface
         $context = $this->resolveContext($context);
 
         $encodedJson = json_encode($data, $context['json_encode_options']);
-        $this->lastError = json_last_error();
+
+        if (JSON_ERROR_NONE !== $this->lastError = json_last_error()) {
+            throw new UnexpectedValueException(JsonEncoder::getLastErrorMessage());
+        }
 
         return $encodedJson;
     }

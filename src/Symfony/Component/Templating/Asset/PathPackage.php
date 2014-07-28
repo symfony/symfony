@@ -42,13 +42,16 @@ class PathPackage extends Package
         }
     }
 
-    public function getUrl($path)
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrl($path, $version = null)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
 
-        $url = $this->applyVersion($path);
+        $url = $this->applyVersion($path, $version);
 
         // apply the base path
         if ('/' !== substr($url, 0, 1)) {

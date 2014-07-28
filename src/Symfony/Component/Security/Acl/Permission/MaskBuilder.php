@@ -96,13 +96,7 @@ class MaskBuilder
      */
     public function add($mask)
     {
-        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask |= $mask;
+        $this->mask |= $this->getMask($mask);
 
         return $this;
     }
@@ -152,13 +146,7 @@ class MaskBuilder
      */
     public function remove($mask)
     {
-        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask &= ~$mask;
+        $this->mask &= ~$this->getMask($mask);
 
         return $this;
     }
@@ -191,19 +179,43 @@ class MaskBuilder
 
         $reflection = new \ReflectionClass(get_called_class());
         foreach ($reflection->getConstants() as $name => $cMask) {
-            if (0 !== strpos($name, 'MASK_')) {
+            if (0 !== strpos($name, 'MASK_') || $mask !== $cMask) {
                 continue;
             }
 
-            if ($mask === $cMask) {
-                if (!defined($cName = 'static::CODE_'.substr($name, 5))) {
-                    throw new \RuntimeException('There was no code defined for this mask.');
-                }
-
-                return constant($cName);
+            if (!defined($cName = 'static::CODE_'.substr($name, 5))) {
+                throw new \RuntimeException('There was no code defined for this mask.');
             }
+
+            return constant($cName);
         }
 
         throw new \InvalidArgumentException(sprintf('The mask "%d" is not supported.', $mask));
+    }
+
+    /**
+     * Returns the mask for the passed code
+     *
+     * @param mixed $code
+     *
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function getMask($code)
+    {
+        if (is_string($code)) {
+            if (!defined($name = sprintf('static::MASK_%s', strtoupper($code)))) {
+                throw new \InvalidArgumentException(sprintf('The code "%s" is not supported', $code));
+            }
+
+            return constant($name);
+        }
+
+        if (!is_int($code)) {
+            throw new \InvalidArgumentException('$code must be an integer.');
+        }
+
+        return $code;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace Bar;
+
 class FooClass
 {
     public $foo, $moo;

@@ -14,7 +14,7 @@ namespace Symfony\Component\DomCrawler;
 use Symfony\Component\CssSelector\CssSelector;
 
 /**
- * Crawler eases navigation of a list of \DOMNode objects.
+ * Crawler eases navigation of a list of \DOMElement objects.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
@@ -342,6 +342,19 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Slices the list of nodes by $offset and $length.
+     *
+     * @param int $offset
+     * @param int $length
+     *
+     * @return Crawler A Crawler instance with the sliced nodes
+     */
+    public function slice($offset = 0, $length = -1)
+    {
+        return new static(iterator_to_array(new \LimitIterator($this, $offset, $length)), $this->uri);
+    }
+
+    /**
      * Reduces the list of nodes by calling an anonymous function.
      *
      * To remove a node from the list, the anonymous function must return false.
@@ -512,6 +525,22 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Returns the node name of the first node of the list.
+     *
+     * @return string The node name
+     *
+     * @throws \InvalidArgumentException When current node is empty
+     */
+    public function nodeName()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        return $this->getNode(0)->nodeName;
+    }
+
+    /**
      * Returns the node value of the first node of the list.
      *
      * @return string The node value
@@ -637,9 +666,7 @@ class Crawler extends \SplObjectStorage
     public function filter($selector)
     {
         if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
-            // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to filter with a CSS selector as the Symfony CssSelector is not installed (you can use filterXPath instead).');
-            // @codeCoverageIgnoreEnd
         }
 
         // The CssSelector already prefixes the selector with descendant-or-self::
@@ -911,9 +938,7 @@ class Crawler extends \SplObjectStorage
             if ($i == $position) {
                 return $node;
             }
-        // @codeCoverageIgnoreStart
         }
-        // @codeCoverageIgnoreEnd
     }
 
     /**

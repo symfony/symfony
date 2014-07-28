@@ -192,9 +192,19 @@ class ProgressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->generateOutput('   0/200 [>---------------------------]   0%').$this->generateOutput(' 199/200 [===========================>]  99%').$this->generateOutput(' 200/200 [============================] 100%'), stream_get_contents($output->getStream()));
     }
 
-    protected function getOutputStream()
+    public function testNonDecoratedOutput()
     {
-        return new StreamOutput(fopen('php://memory', 'r+', false));
+        $progress = new ProgressHelper();
+        $progress->start($output = $this->getOutputStream(false));
+        $progress->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals('', stream_get_contents($output->getStream()));
+    }
+
+    protected function getOutputStream($decorated = true)
+    {
+        return new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, $decorated);
     }
 
     protected $lastMessagesLength;

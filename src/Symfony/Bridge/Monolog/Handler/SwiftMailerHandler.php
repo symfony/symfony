@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\SwiftMailerHandler as BaseSwiftMailerHandler;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 
 /**
@@ -39,6 +40,16 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
      * @param PostResponseEvent $event
      */
     public function onKernelTerminate(PostResponseEvent $event)
+    {
+        $this->instantFlush = true;
+    }
+
+    /**
+     * After the CLI application has been terminated we will always flush messages
+     *
+     * @param ConsoleTerminateEvent $event
+     */
+    public function onCliTerminate(ConsoleTerminateEvent $event)
     {
         $this->instantFlush = true;
     }

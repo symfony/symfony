@@ -67,4 +67,20 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($collection, $path));
     }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsReadable($collection, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsWritable($collection, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
+    }
 }

@@ -175,7 +175,7 @@
                 <target>De afbeelding is niet hoog genoeg ({{ height }}px). De minimaal verwachte hoogte is {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Deze waarde moet het huidige wachtwoord van de gebruiker zijn.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,6 +297,10 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>De afbeelding is staand ({{ width }}x{{ height }}px). Staande afbeeldingen zijn niet toegestaan.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Lege bestanden zijn niet toegestaan.</target>
             </trans-unit>
         </body>
     </file>

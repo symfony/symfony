@@ -13,8 +13,8 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validator for Callback constraint
@@ -30,8 +30,8 @@ class CallbackValidator extends ConstraintValidator
      */
     public function validate($object, Constraint $constraint)
     {
-        if (null === $object) {
-            return;
+        if (!$constraint instanceof Callback) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Callback');
         }
 
         if (null !== $constraint->callback && null !== $constraint->methods) {
@@ -56,18 +56,24 @@ class CallbackValidator extends ConstraintValidator
                 }
 
                 call_user_func($method, $object, $this->context);
+
+                continue;
+            }
+
+            if (null === $object) {
+                continue;
+            }
+
+            if (!method_exists($object, $method)) {
+                throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
+            }
+
+            $reflMethod = new \ReflectionMethod($object, $method);
+
+            if ($reflMethod->isStatic()) {
+                $reflMethod->invoke(null, $object, $this->context);
             } else {
-                if (!method_exists($object, $method)) {
-                    throw new ConstraintDefinitionException(sprintf('Method "%s" targeted by Callback constraint does not exist', $method));
-                }
-
-                $reflMethod = new \ReflectionMethod($object, $method);
-
-                if ($reflMethod->isStatic()) {
-                    $reflMethod->invoke(null, $object, $this->context);
-                } else {
-                    $reflMethod->invoke($object, $this->context);
-                }
+                $reflMethod->invoke($object, $this->context);
             }
         }
     }

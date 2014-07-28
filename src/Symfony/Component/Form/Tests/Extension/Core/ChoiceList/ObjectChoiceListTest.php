@@ -185,6 +185,119 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         );
     }
 
+    public function testGetIndicesForChoicesWithValuePath()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        // Compare by value, not by identity
+        $choices = array(clone $this->obj1, clone $this->obj2);
+        $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetIndicesForChoicesWithValuePathPreservesKeys()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(5 => clone $this->obj1, 8 => clone $this->obj2);
+        $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetIndicesForChoicesWithValuePathPreservesOrder()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(clone $this->obj2, clone $this->obj1);
+        $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetIndicesForChoicesWithValuePathIgnoresNonExistingChoices()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(clone $this->obj1, clone $this->obj2, 'foobar');
+        $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesWithValuePath()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(clone $this->obj1, clone $this->obj2);
+        $this->assertSame(array('A', 'B'), $this->list->getValuesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesWithValuePathPreservesKeys()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(5 => clone $this->obj1, 8 => clone $this->obj2);
+        $this->assertSame(array(5 => 'A', 8 => 'B'), $this->list->getValuesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesWithValuePathPreservesOrder()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(clone $this->obj2, clone $this->obj1);
+        $this->assertSame(array('B', 'A'), $this->list->getValuesForChoices($choices));
+    }
+
+    public function testGetValuesForChoicesWithValuePathIgnoresNonExistingChoices()
+    {
+        $this->list = new ObjectChoiceList(
+            array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
+            'name',
+            array(),
+            null,
+            'name'
+        );
+
+        $choices = array(clone $this->obj1, clone $this->obj2, 'foobar');
+        $this->assertSame(array('A', 'B'), $this->list->getValuesForChoices($choices));
+    }
+
     /**
      * @return \Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
      */

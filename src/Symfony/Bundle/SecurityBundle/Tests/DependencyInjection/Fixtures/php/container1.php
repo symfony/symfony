@@ -70,10 +70,12 @@ $container->loadFromExtension('security', array(
             'switch_user' => true,
             'x509' => true,
             'logout' => true,
+            'remember_me' => array('key' => 'TheKey')
         ),
         'host' => array(
             'pattern' => '/test',
             'host' => 'foo\\.example\\.org',
+            'methods' => array('GET', 'POST'),
             'anonymous' => true,
             'http_basic' => true,
         ),

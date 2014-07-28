@@ -44,6 +44,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('0321812700'),
             array('0-45122-5244'),
             array('0-4712-92311'),
+            array('0-9752298-0-X')
         );
     }
 
@@ -58,6 +59,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
             array('0-4X19-92611'),
             array('0_45122_5244'),
             array('2870#971#648'),
+            array('0-9752298-0-x')
         );
     }
 
@@ -145,7 +147,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIsbn10($isbn)
     {
-        $constraint = new Isbn(array('isbn10' => true));
+        $constraint = new Isbn(array('type' => 'isbn10'));
         $this->context
             ->expects($this->never())
             ->method('addViolation');
@@ -158,7 +160,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn10($isbn)
     {
-        $constraint = new Isbn(array('isbn10' => true));
+        $constraint = new Isbn(array('type' => 'isbn10'));
         $this->context
             ->expects($this->once())
             ->method('addViolation')
@@ -172,7 +174,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIsbn13($isbn)
     {
-        $constraint = new Isbn(array('isbn13' => true));
+        $constraint = new Isbn(array('type' => 'isbn13'));
         $this->context
             ->expects($this->never())
             ->method('addViolation');
@@ -185,7 +187,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn13($isbn)
     {
-        $constraint = new Isbn(array('isbn13' => true));
+        $constraint = new Isbn(array('type' => 'isbn13'));
         $this->context
             ->expects($this->once())
             ->method('addViolation')
@@ -199,7 +201,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIsbn($isbn)
     {
-        $constraint = new Isbn(array('isbn10' => true, 'isbn13' => true));
+        $constraint = new Isbn();
         $this->context
             ->expects($this->never())
             ->method('addViolation');
@@ -212,7 +214,7 @@ class IsbnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIsbn($isbn)
     {
-        $constraint = new Isbn(array('isbn10' => true, 'isbn13' => true));
+        $constraint = new Isbn();
         $this->context
             ->expects($this->once())
             ->method('addViolation')

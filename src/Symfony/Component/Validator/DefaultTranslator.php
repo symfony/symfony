@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\BadMethodCallException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Simple translator implementation that simply replaces the parameters in

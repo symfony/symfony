@@ -25,12 +25,5 @@
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="debug.stopwatch" />
         </service>
-
-        <service id="debug.deprecation_logger_listener" class="%debug.errors_logger_listener.class%">
-            <tag name="kernel.event_subscriber" />
-            <tag name="monolog.logger" channel="deprecation" />
-            <argument>deprecation</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-        </service>
     </services>
 </container>

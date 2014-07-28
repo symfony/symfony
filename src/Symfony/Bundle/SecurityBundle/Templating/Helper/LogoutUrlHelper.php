@@ -106,7 +106,7 @@ class LogoutUrlHelper extends Helper
         $parameters = null !== $csrfTokenManager ? array($csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)) : array();
 
         if ('/' === $logoutPath[0]) {
-            $request = $this->container->get('request');
+            $request = $this->container->get('request_stack')->getCurrentRequest();
 
             $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBasePath().$logoutPath;
 

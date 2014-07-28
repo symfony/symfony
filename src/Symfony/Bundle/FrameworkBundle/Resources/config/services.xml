@@ -43,6 +43,8 @@
             YourRequestClass to the Kernel.
             This service definition only defines the scope of the request.
             It is used to check references scope.
+
+            This service is deprecated, you should use the request_stack service instead.
         -->
         <service id="request" scope="request" synthetic="true" synchronized="true" />
 

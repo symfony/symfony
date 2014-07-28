@@ -30,6 +30,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $object = new \stdClass();
         $obj->setFoo('foo');
         $obj->setBar('bar');
+        $obj->setBaz(true);
         $obj->setCamelCase('camelcase');
         $obj->setObject($object);
 
@@ -44,6 +45,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => 'foo',
                 'bar' => 'bar',
+                'baz' => true,
                 'fooBar' => 'foobar',
                 'camelCase' => 'camelcase',
                 'object' => 'string_object',
@@ -55,12 +57,13 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalize()
     {
         $obj = $this->normalizer->denormalize(
-            array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
+            array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
             __NAMESPACE__.'\GetSetDummy',
             'any'
         );
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+        $this->assertTrue($obj->isBaz());
     }
 
     public function testDenormalizeOnCamelCaseFormat()
@@ -99,10 +102,11 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testConstructorDenormalize()
     {
         $obj = $this->normalizer->denormalize(
-            array('foo' => 'foo', 'bar' => 'bar', 'fooBar' => 'foobar'),
+            array('foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'),
             __NAMESPACE__.'\GetConstructorDummy', 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+        $this->assertTrue($obj->isBaz());
     }
 
     public function testConstructorDenormalizeWithMissingOptionalArgument()
@@ -122,7 +126,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->normalizer->setCallbacks($callbacks);
 
-        $obj = new GetConstructorDummy('', $value);
+        $obj = new GetConstructorDummy('', $value, true);
 
         $this->assertEquals(
             $result,
@@ -138,18 +142,19 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->normalizer->setCallbacks(array('bar' => null));
 
-        $obj = new GetConstructorDummy('baz', 'quux');
+        $obj = new GetConstructorDummy('baz', 'quux', true);
 
         $this->normalizer->normalize($obj, 'any');
     }
 
     public function testIgnoredAttributes()
     {
-        $this->normalizer->setIgnoredAttributes(array('foo', 'bar', 'camelCase', 'object'));
+        $this->normalizer->setIgnoredAttributes(array('foo', 'bar', 'baz', 'camelCase', 'object'));
 
         $obj = new GetSetDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
+        $obj->setBaz(true);
 
         $this->assertEquals(
             array('fooBar' => 'foobar'),
@@ -167,7 +172,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                     },
                 ),
                 'baz',
-                array('foo' => '', 'bar' => 'baz'),
+                array('foo' => '', 'bar' => 'baz', 'baz' => true),
                 'Change a string',
             ),
             array(
@@ -177,7 +182,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                     },
                 ),
                 'baz',
-                array('foo' => '', 'bar' => null),
+                array('foo' => '', 'bar' => null, 'baz' => true),
                 'Null an item'
             ),
             array(
@@ -187,7 +192,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                     },
                 ),
                 new \DateTime('2011-09-10 06:30:00'),
-                array('foo' => '', 'bar' => '10-09-2011 06:30:00'),
+                array('foo' => '', 'bar' => '10-09-2011 06:30:00', 'baz' => true),
                 'Format a date',
             ),
             array(
@@ -201,8 +206,8 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                         return $foos;
                     },
                 ),
-                array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
-                array('foo' => '', 'bar' => 'bazquux'),
+                array(new GetConstructorDummy('baz', '', false), new GetConstructorDummy('quux', '', false)),
+                array('foo' => '', 'bar' => 'bazquux', 'baz' => true),
                 'Collect a property',
             ),
             array(
@@ -211,8 +216,8 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
                         return count($bars);
                     },
                 ),
-                array(new GetConstructorDummy('baz', ''), new GetConstructorDummy('quux', '')),
-                array('foo' => '', 'bar' => 2),
+                array(new GetConstructorDummy('baz', '', false), new GetConstructorDummy('quux', '', false)),
+                array('foo' => '', 'bar' => 2, 'baz' => true),
                 'Count a property',
             ),
         );
@@ -239,6 +244,7 @@ class GetSetDummy
 {
     protected $foo;
     private $bar;
+    private $baz;
     protected $camelCase;
     protected $object;
 
@@ -260,6 +266,16 @@ class GetSetDummy
     public function setBar($bar)
     {
         $this->bar = $bar;
+    }
+
+    public function isBaz()
+    {
+        return $this->baz;
+    }
+
+    public function setBaz($baz)
+    {
+        $this->baz = $baz;
     }
 
     public function getFooBar()
@@ -297,11 +313,13 @@ class GetConstructorDummy
 {
     protected $foo;
     private $bar;
+    private $baz;
 
-    public function __construct($foo, $bar)
+    public function __construct($foo, $bar, $baz)
     {
         $this->foo = $foo;
         $this->bar = $bar;
+        $this->baz = $baz;
     }
 
     public function getFoo()
@@ -312,6 +330,11 @@ class GetConstructorDummy
     public function getBar()
     {
         return $this->bar;
+    }
+
+    public function isBaz()
+    {
+        return $this->baz;
     }
 
     public function otherMethod()

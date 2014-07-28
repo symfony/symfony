@@ -23,7 +23,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
 class Form extends Link implements \ArrayAccess
 {
     /**
-     * @var \DOMNode
+     * @var \DOMElement
      */
     private $button;
 
@@ -35,15 +35,15 @@ class Form extends Link implements \ArrayAccess
     /**
      * Constructor.
      *
-     * @param \DOMNode $node       A \DOMNode instance
-     * @param string   $currentUri The URI of the page where the form is embedded
-     * @param string   $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param \DOMElement $node       A \DOMElement instance
+     * @param string      $currentUri The URI of the page where the form is embedded
+     * @param string      $method     The method to use for the link (if null, it defaults to the method defined by the form)
      *
      * @throws \LogicException if the node is not a button inside a form tag
      *
      * @api
      */
-    public function __construct(\DOMNode $node, $currentUri, $method = null)
+    public function __construct(\DOMElement $node, $currentUri, $method = null)
     {
         parent::__construct($node, $currentUri, $method);
 
@@ -53,7 +53,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the form node associated with this form.
      *
-     * @return \DOMNode A \DOMNode instance
+     * @return \DOMElement A \DOMElement instance
      */
     public function getFormNode()
     {
@@ -363,13 +363,13 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets the node for the form.
      *
-     * Expects a 'submit' button \DOMNode and finds the corresponding form element.
+     * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
      *
-     * @param \DOMNode $node A \DOMNode instance
+     * @param \DOMElement $node A \DOMElement instance
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMNode $node)
+    protected function setNode(\DOMElement $node)
     {
         $this->button = $node;
         if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
@@ -450,7 +450,7 @@ class Form extends Link implements \ArrayAccess
         }
     }
 
-    private function addField(\DOMNode $node)
+    private function addField(\DOMElement $node)
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;

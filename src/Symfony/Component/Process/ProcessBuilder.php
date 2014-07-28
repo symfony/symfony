@@ -24,11 +24,12 @@ class ProcessBuilder
     private $arguments;
     private $cwd;
     private $env = array();
-    private $stdin;
+    private $input;
     private $timeout = 60;
     private $options = array();
     private $inheritEnv = true;
     private $prefix = array();
+    private $outputDisabled = false;
 
     /**
      * Constructor
@@ -166,15 +167,17 @@ class ProcessBuilder
     /**
      * Sets the input of the process.
      *
-     * @param string|null $stdin The input as a string
+     * Deprecation: As of Symfony 2.5, this method only accepts string values.
+     *
+     * @param string|null $input The input as a string
      *
      * @return ProcessBuilder
      *
      * @throws InvalidArgumentException In case the argument is invalid
      */
-    public function setInput($stdin)
+    public function setInput($input)
     {
-        $this->stdin = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $stdin);
+        $this->input = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $input);
 
         return $this;
     }
@@ -225,6 +228,30 @@ class ProcessBuilder
     }
 
     /**
+     * Disables fetching output and error output from the underlying process.
+     *
+     * @return ProcessBuilder
+     */
+    public function disableOutput()
+    {
+        $this->outputDisabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Enables fetching output and error output from the underlying process.
+     *
+     * @return ProcessBuilder
+     */
+    public function enableOutput()
+    {
+        $this->outputDisabled = false;
+
+        return $this;
+    }
+
+    /**
      * Creates a Process instance and returns it.
      *
      * @return Process
@@ -249,6 +276,12 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        return new Process($script, $this->cwd, $env, $this->stdin, $this->timeout, $options);
+        $process = new Process($script, $this->cwd, $env, $this->input, $this->timeout, $options);
+
+        if ($this->outputDisabled) {
+            $process->disableOutput();
+        }
+
+        return $process;
     }
 }

@@ -93,9 +93,7 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
             }
 
             // let's clean up the output buffers that were created by the sub-request
-            while (ob_get_level() > $level) {
-                ob_get_clean();
-            }
+            Response::closeOutputBuffers($level, false);
 
             if (isset($options['alt'])) {
                 $alt = $options['alt'];

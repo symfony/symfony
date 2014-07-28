@@ -41,14 +41,14 @@ class ChoiceList implements ChoiceListInterface
      *
      * @var array
      */
-    private $choices = array();
+    protected $choices = array();
 
     /**
      * The choice values with the indices of the matching choices as keys.
      *
      * @var array
      */
-    private $values = array();
+    protected $values = array();
 
     /**
      * The preferred view objects as hierarchy containing also the choice groups

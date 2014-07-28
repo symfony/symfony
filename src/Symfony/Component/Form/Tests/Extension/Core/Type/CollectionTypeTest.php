@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Tests\Fixtures\Author;
+use Symfony\Component\Form\Tests\Fixtures\AuthorType;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
@@ -29,7 +31,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $form = $this->factory->create('collection', null, array(
             'type' => 'text',
             'options' => array(
-                'max_length' => 20,
+                'attr' => array('maxlength' => 20),
             ),
         ));
         $form->setData(array('foo@foo.com', 'foo@bar.com'));
@@ -39,15 +41,18 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertCount(2, $form);
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals('foo@bar.com', $form[1]->getData());
-        $this->assertEquals(20, $form[0]->getConfig()->getOption('max_length'));
-        $this->assertEquals(20, $form[1]->getConfig()->getOption('max_length'));
+        $formAttrs0 = $form[0]->getConfig()->getOption('attr');
+        $formAttrs1 = $form[1]->getConfig()->getOption('attr');
+        $this->assertEquals(20, $formAttrs0['maxlength']);
+        $this->assertEquals(20, $formAttrs1['maxlength']);
 
         $form->setData(array('foo@baz.com'));
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form[0]);
         $this->assertFalse(isset($form[1]));
         $this->assertCount(1, $form);
         $this->assertEquals('foo@baz.com', $form[0]->getData());
-        $this->assertEquals(20, $form[0]->getConfig()->getOption('max_length'));
+        $formAttrs0 = $form[0]->getConfig()->getOption('attr');
+        $this->assertEquals(20, $formAttrs0['maxlength']);
     }
 
     public function testThrowsExceptionIfObjectIsNotTraversable()
@@ -86,6 +91,78 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertFalse($form->has('1'));
         $this->assertEquals('foo@foo.com', $form[0]->getData());
         $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testResizedDownIfSubmittedWithEmptyDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_delete' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com', 'bar@bar.com'));
+        $form->submit(array('foo@foo.com', ''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testDontAddEmptyDataIfDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_add' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com'));
+        $form->submit(array('foo@foo.com', ''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals('foo@foo.com', $form[0]->getData());
+        $this->assertEquals(array('foo@foo.com'), $form->getData());
+    }
+
+    public function testNoDeleteEmptyIfDeleteNotAllowed()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => 'text',
+            'allow_delete' => false,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array('foo@foo.com'));
+        $form->submit(array(''));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertEquals('', $form[0]->getData());
+    }
+
+    public function testResizedDownIfSubmittedWithCompoundEmptyDataAndDeleteEmpty()
+    {
+        $form = $this->factory->create('collection', null, array(
+            'type' => new AuthorType(),
+            // If the field is not required, no new Author will be created if the
+            // form is completely empty
+            'options' => array('required' => false),
+            'allow_add' => true,
+            'delete_empty' => true,
+        ));
+
+        $form->setData(array(new Author('first', 'last')));
+        $form->submit(array(
+            array('firstName' => 's_first', 'lastName' => 's_last'),
+            array('firstName' => '', 'lastName' => ''),
+        ));
+
+        $this->assertTrue($form->has('0'));
+        $this->assertFalse($form->has('1'));
+        $this->assertEquals(new Author('s_first', 's_last'), $form[0]->getData());
+        $this->assertEquals(array(new Author('s_first', 's_last')), $form->getData());
     }
 
     public function testNotResizedIfSubmittedWithExtraData()

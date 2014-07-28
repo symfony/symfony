@@ -51,29 +51,23 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedClassName, '\\')) {
                 $className = substr($fullyQualifiedClassName, $namespaceSeparatorIndex + 1);
                 $namespacePrefix = substr($fullyQualifiedClassName, 0, $namespaceSeparatorIndex);
-                $message = sprintf(
-                    'Attempted to load %s "%s" from namespace "%s" in %s line %d. Do you need to "use" it from another namespace?',
-                    $typeName,
-                    $className,
-                    $namespacePrefix,
-                    $error['file'],
-                    $error['line']
-                );
+                $message = sprintf('Attempted to load %s "%s" from namespace "%s".', $typeName, $className, $namespacePrefix);
+                $tail = ' for another namespace?';
             } else {
                 $className = $fullyQualifiedClassName;
-                $message = sprintf(
-                    'Attempted to load %s "%s" from the global namespace in %s line %d. Did you forget a use statement for this %s?',
-                    $typeName,
-                    $className,
-                    $error['file'],
-                    $error['line'],
-                    $typeName
-                );
+                $message = sprintf('Attempted to load %s "%s" from the global namespace.', $typeName, $className);
+                $tail = '?';
             }
 
-            if ($classes = $this->getClassCandidates($className)) {
-                $message .= sprintf(' Perhaps you need to add a use statement for one of the following: %s.', implode(', ', $classes));
+            if ($candidates = $this->getClassCandidates($className)) {
+                $tail = array_pop($candidates).'"?';
+                if ($candidates) {
+                    $tail = ' for e.g. "'.implode('", "', $candidates).'" or "'.$tail;
+                } else {
+                    $tail = ' for "'.$tail;
+                }
             }
+            $message .= ' Did you forget a "use" statement'.$tail;
 
             return new ClassNotFoundException($message, $exception);
         }
@@ -103,8 +97,17 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             }
 
             // get class loaders wrapped by DebugClassLoader
-            if ($function[0] instanceof DebugClassLoader && method_exists($function[0], 'getClassLoader')) {
-                $function[0] = $function[0]->getClassLoader();
+            if ($function[0] instanceof DebugClassLoader) {
+                $function = $function[0]->getClassLoader();
+
+                // Since 2.5, returning an object from DebugClassLoader::getClassLoader() is @deprecated
+                if (is_object($function)) {
+                    $function = array($function);
+                }
+
+                if (!is_array($function)) {
+                    continue;
+                }
             }
 
             if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader) {

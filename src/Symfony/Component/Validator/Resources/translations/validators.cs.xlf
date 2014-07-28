@@ -92,11 +92,11 @@
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Tato hodnota nesmí být prázdná.</target>
+                <target>Tato hodnota nesmí být null.</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Tato hodnota musí být prázdná.</target>
+                <target>Tato hodnota musí být null.</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
@@ -175,7 +175,7 @@
                 <target>Obrázek je příliš nízký ({{ height }}px). Minimální výška obrázku musí být {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Tato hodnota musí být aktuální heslo uživatele.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,6 +297,10 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>Obrázek je orientovaný na výšku ({{ width }}x{{ height }}px). Obrázky orientované na výšku nejsou povolené.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Soubor nesmí být prázdný.</target>
             </trans-unit>
         </body>
     </file>

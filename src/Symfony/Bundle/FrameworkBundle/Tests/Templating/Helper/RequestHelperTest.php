@@ -12,26 +12,24 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper;
 
 class RequestHelperTest extends \PHPUnit_Framework_TestCase
 {
-    protected $request;
+    protected $requestStack;
 
     protected function setUp()
     {
-        $this->request = new Request();
-        $this->request->initialize(array('foobar' => 'bar'));
-    }
-
-    protected function tearDown()
-    {
-        $this->request = null;
+        $this->requestStack = new RequestStack();
+        $request = new Request();
+        $request->initialize(array('foobar' => 'bar'));
+        $this->requestStack->push($request);
     }
 
     public function testGetParameter()
     {
-        $helper = new RequestHelper($this->request);
+        $helper = new RequestHelper($this->requestStack);
 
         $this->assertEquals('bar', $helper->getParameter('foobar'));
         $this->assertEquals('foo', $helper->getParameter('bar', 'foo'));
@@ -41,14 +39,14 @@ class RequestHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLocale()
     {
-        $helper = new RequestHelper($this->request);
+        $helper = new RequestHelper($this->requestStack);
 
         $this->assertEquals('en', $helper->getLocale());
     }
 
     public function testGetName()
     {
-        $helper = new RequestHelper($this->request);
+        $helper = new RequestHelper($this->requestStack);
 
         $this->assertEquals('request', $helper->getName());
     }

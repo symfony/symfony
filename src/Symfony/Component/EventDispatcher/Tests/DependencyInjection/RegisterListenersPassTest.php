@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
+namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +67,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
-            ->will($this->returnValue('Symfony\Component\HttpKernel\Tests\DependencyInjection\SubscriberService'));
+            ->will($this->returnValue('Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService'));
 
         $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $builder->expects($this->any())

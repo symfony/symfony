@@ -33,34 +33,42 @@ class Package implements PackageInterface
         $this->format = $format ?: '%s?%s';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getVersion()
     {
         return $this->version;
     }
 
-    public function getUrl($path)
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrl($path, $version = null)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
 
-        return $this->applyVersion($path);
+        return $this->applyVersion($path, $version);
     }
 
     /**
      * Applies version to the supplied path.
      *
-     * @param string $path A path
+     * @param string              $path    A path
+     * @param string|bool|null    $version A specific version
      *
      * @return string The versionized path
      */
-    protected function applyVersion($path)
+    protected function applyVersion($path, $version = null)
     {
-        if (null === $this->version) {
+        $version = null !== $version ? $version : $this->version;
+        if (null === $version || false === $version) {
             return $path;
         }
 
-        $versionized = sprintf($this->format, ltrim($path, '/'), $this->version);
+        $versionized = sprintf($this->format, ltrim($path, '/'), $version);
 
         if ($path && '/' == $path[0]) {
             $versionized = '/'.$versionized;

@@ -105,6 +105,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'field_name' => '_token',
             ),
             'esi'                 => array('enabled' => false),
+            'ssi'                 => array('enabled' => false),
             'fragments'           => array(
                 'enabled' => false,
                 'path'    => '/_fragment',
@@ -126,7 +127,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'validation'          => array(
                 'enabled'            => false,
                 'enable_annotations' => false,
+                'static_method'      => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
+                'strict_email'       => false,
+                'api'                => 'auto',
             ),
             'annotations'         => array(
                 'cache'          => 'file',

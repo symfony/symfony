@@ -32,6 +32,9 @@ class MergeOperation extends AbstractOperation
         foreach ($this->source->all($domain) as $id => $message) {
             $this->messages[$domain]['all'][$id] = $message;
             $this->result->add(array($id => $message), $domain);
+            if (null !== $keyMetadata = $this->source->getMetadata($id, $domain)) {
+                $this->result->setMetadata($id, $keyMetadata, $domain);
+            }
         }
 
         foreach ($this->target->all($domain) as $id => $message) {
@@ -39,6 +42,9 @@ class MergeOperation extends AbstractOperation
                 $this->messages[$domain]['all'][$id] = $message;
                 $this->messages[$domain]['new'][$id] = $message;
                 $this->result->add(array($id => $message), $domain);
+                if (null !== $keyMetadata = $this->target->getMetadata($id, $domain)) {
+                    $this->result->setMetadata($id, $keyMetadata, $domain);
+                }
             }
         }
     }

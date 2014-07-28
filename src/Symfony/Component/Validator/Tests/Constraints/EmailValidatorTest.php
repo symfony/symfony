@@ -22,7 +22,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new EmailValidator();
+        $this->validator = new EmailValidator(false);
         $this->validator->initialize($this->context);
     }
 
@@ -100,7 +100,14 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
             array('example'),
             array('example@'),
             array('example@localhost'),
-            array('example@example.com@example.com'),
         );
+    }
+
+    public function testStrict()
+    {
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate('example@localhost', new Email(array('strict' => true)));
     }
 }

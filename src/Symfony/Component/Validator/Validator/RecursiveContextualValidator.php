@@ -194,6 +194,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = spl_object_hash($object);
+        $propertyPath = PropertyPath::append($this->defaultPropertyPath, $propertyName);
 
         $previousValue = $this->context->getValue();
         $previousObject = $this->context->getObject();
@@ -209,7 +210,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $object,
                 $cacheKey.':'.$propertyName,
                 $propertyMetadata,
-                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $propertyPath,
                 $groups,
                 null,
                 TraversalStrategy::IMPLICIT,
@@ -226,9 +227,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null)
     {
-        $classMetadata = $this->metadataFactory->getMetadataFor($object);
+        $classMetadata = $this->metadataFactory->getMetadataFor($objectOrClass);
 
         if (!$classMetadata instanceof ClassMetadataInterface) {
             // Cannot be UnsupportedMetadataException because of BC with
@@ -243,7 +244,17 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-        $cacheKey = spl_object_hash($object);
+
+        if (is_object($objectOrClass)) {
+            $object = $objectOrClass;
+            $cacheKey = spl_object_hash($objectOrClass);
+            $propertyPath = PropertyPath::append($this->defaultPropertyPath, $propertyName);
+        } else {
+            // $objectOrClass contains a class name
+            $object = null;
+            $cacheKey = null;
+            $propertyPath = $this->defaultPropertyPath;
+        }
 
         $previousValue = $this->context->getValue();
         $previousObject = $this->context->getObject();
@@ -257,7 +268,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $object,
                 $cacheKey.':'.$propertyName,
                 $propertyMetadata,
-                PropertyPath::append($this->defaultPropertyPath, $propertyName),
+                $propertyPath,
                 $groups,
                 null,
                 TraversalStrategy::IMPLICIT,

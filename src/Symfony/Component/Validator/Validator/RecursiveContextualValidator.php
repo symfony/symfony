@@ -243,7 +243,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
-        $cacheKey = spl_object_hash($object);
+        $cacheKey = spl_object_hash($classMetadata);
 
         $previousValue = $this->context->getValue();
         $previousObject = $this->context->getObject();

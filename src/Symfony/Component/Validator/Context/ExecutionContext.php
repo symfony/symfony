@@ -183,8 +183,8 @@ class ExecutionContext implements ExecutionContextInterface
             $message,
             $parameters,
             $this->root,
-            $this->getPropertyPath(),
-            $this->getValue(),
+            $this->propertyPath,
+            $this->value,
             null,
             null
         ));
@@ -200,8 +200,8 @@ class ExecutionContext implements ExecutionContextInterface
             $message,
             $parameters,
             $this->root,
-            $this->getPropertyPath(),
-            $this->getValue(),
+            $this->propertyPath,
+            $this->value,
             $this->translator,
             $this->translationDomain
         );

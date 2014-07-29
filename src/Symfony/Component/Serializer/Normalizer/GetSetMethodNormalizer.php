@@ -141,7 +141,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
             $object = $reflectionClass->newInstanceArgs($params);
         } else {
-            $object = new $class;
+            $object = new $class();
         }
 
         foreach ($data as $attribute => $value) {

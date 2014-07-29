@@ -189,7 +189,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeSerializerXmlRootNodeNameOption()
     {
         $options = array('xml_root_node_name' => 'test');
-        $this->encoder = new XmlEncoder;
+        $this->encoder = new XmlEncoder();
         $serializer = new Serializer(array(), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
@@ -272,7 +272,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testDecodeWithoutItemHash()
     {
-        $obj = new ScalarDummy;
+        $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => array(
                 '@key' => "value",

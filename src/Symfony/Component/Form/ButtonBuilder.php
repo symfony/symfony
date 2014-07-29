@@ -355,6 +355,20 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
+     * @param null $propertyPath
+     *
+     * @throws BadMethodCallException
+     */
+    public function setMapTo($propertyPath)
+    {
+        throw new BadMethodCallException('Buttons do not support map to.');
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * This method should not be invoked.
+     *
      * @param bool $mapped
      *
      * @throws BadMethodCallException

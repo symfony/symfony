@@ -10,6 +10,10 @@
         <source>key</source>
         <target></target>
       </trans-unit>
+      <trans-unit id="18e6a493872558d949b4c16ea1fa6ab6" resname="key.with.cdata">
+        <source>key.with.cdata</source>
+        <target><![CDATA[<source> & <target>]]></target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -47,13 +47,41 @@ class XliffFileDumper extends FileDumper
             $s = $translation->appendChild($dom->createElement('source'));
             $s->appendChild($dom->createTextNode($source));
 
+            $text = $this->needsCDATA($target)
+                    ? $dom->createCDATASection($target)
+                    : $dom->createTextNode($target);
+
             $t = $translation->appendChild($dom->createElement('target'));
-            $t->appendChild($dom->createTextNode($target));
+            $t->appendChild($text);
 
             $xliffBody->appendChild($translation);
         }
 
         return $dom->saveXML();
+    }
+
+    /**
+     * Returns whether or not the data require a CDATA section
+     * in the XLIFF file.
+     *
+     * @param string $data The string data that may require a CDATA section
+     * @return bool
+     */
+    private function needsCDATA($data)
+    {
+        if (false !== strpos($data, '&')) {
+            return true;
+        }
+
+        if (false !== strpos($data, '<')) {
+            return true;
+        }
+
+        if (false !== strpos($data, '>')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -137,7 +137,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $fields[$this->options['expiry_field']] = $expiry;
 
             $this->getCollection()->createIndex(
-                [$this->options['time_field'] => 1],
+                [$this->options['expiry_field'] => 1],
                 ['expireAfterSeconds' => 0]
             );
         }

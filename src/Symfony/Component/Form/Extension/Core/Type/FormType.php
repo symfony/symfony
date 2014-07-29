@@ -47,7 +47,7 @@ class FormType extends BaseType
             ->setRequired($options['required'])
             ->setErrorBubbling($options['error_bubbling'])
             ->setEmptyData($options['empty_data'])
-            ->setPropertyPath($options['map_to'])
+            ->setMapTo($options['map_to'])
             ->setMapped($options['mapped'])
             ->setByReference($options['by_reference'])
             ->setInheritData($options['inherit_data'])
@@ -194,13 +194,8 @@ class FormType extends BaseType
             'read_only'          => false,
             'max_length'         => null,
             'pattern'            => null,
-            'map_to'             => function (Options $options) {
-                if (isset($options['property_path'])) {
-                    return $options['property_path'];
-                }
-
-                return null;
-            },
+            'map_to'             => null,
+            'property_path'      => null,
             'mapped'             => true,
             'by_reference'       => true,
             'error_bubbling'     => $errorBubbling,

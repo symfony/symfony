@@ -13,6 +13,7 @@ CHANGELOG
  * deprecated the dialog helper (use the question helper instead)
  * deprecated TableHelper in favor of Table
  * deprecated ProgressHelper in favor of ProgressBar
+ * added ConsoleLogger
  * added a question helper
  * added a way to set the process name of a command
  * added a way to set a default command instead of `ListCommand`

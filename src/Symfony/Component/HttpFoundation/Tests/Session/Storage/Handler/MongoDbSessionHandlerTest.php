@@ -134,7 +134,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $collection->expects($this->once())
             ->method('createIndex')
-            ->with([$this->options['time_field'] => 1], ['expireAfterSeconds' => 0])
+            ->with([$this->options['expiry_field'] => 1], ['expireAfterSeconds' => 0])
             ->willReturn(true);
 
         $this->assertTrue($this->storage->write('foo', 'bar'));

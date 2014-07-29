@@ -62,9 +62,10 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
         $this->mongo = $mongo;
 
         $this->options = array_merge(array(
-            'id_field'   => '_id',
-            'data_field' => 'data',
-            'time_field' => 'time',
+            'id_field'     => '_id',
+            'data_field'   => 'data',
+            'time_field'   => 'time',
+            'expiry_field' => false,
         ), $options);
     }
 
@@ -109,11 +110,14 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
          *
          * See: http://docs.mongodb.org/manual/tutorial/expire-data/
          */
-        $time = new \MongoDate(time() - $maxlifetime);
+        if ($this->options['expiry_field'] == false) {
+            $time = new \MongoDate(time() - $maxlifetime);
 
-        $this->getCollection()->remove(array(
-            $this->options['time_field'] => array('$lt' => $time),
-        ));
+            $this->getCollection()->remove(array(
+                $this->options['time_field'] => array('$lt' => $time),
+            ));
+
+        }
 
         return true;
     }
@@ -123,12 +127,24 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
+        $fields = array(
+            $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
+            $this->options['time_field'] => new \MongoDate(),
+        );
+
+        if ($this->options['expiry_field'] != false) {
+            $expiry = new \MongoDate(time() + (int) ini_get('session.gc_maxlifetime'));
+            $fields[$this->options['expiry_field']] = $expiry;
+
+            $this->getCollection()->createIndex(
+                [$this->options['time_field'] => 1],
+                ['expireAfterSeconds' => 0]
+            );
+        }
+
         $this->getCollection()->update(
             array($this->options['id_field'] => $sessionId),
-            array('$set' => array(
-                $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
-                $this->options['time_field'] => new \MongoDate(),
-            )),
+            array('$set' => $fields),
             array('upsert' => true, 'multiple' => false)
         );
 

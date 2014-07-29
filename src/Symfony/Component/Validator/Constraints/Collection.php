@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  *
  * @api
  */
-class Collection extends Constraint
+class Collection extends Composite
 {
     public $fields = array();
     public $allowExtraFields = false;
@@ -42,6 +42,14 @@ class Collection extends Constraint
         }
 
         parent::__construct($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeNestedConstraints()
+    {
+        parent::initializeNestedConstraints();
 
         if (!is_array($this->fields)) {
             throw new ConstraintDefinitionException(sprintf('The option "fields" is expected to be an array in constraint %s', __CLASS__));
@@ -57,25 +65,16 @@ class Collection extends Constraint
             if (!$field instanceof Optional && !$field instanceof Required) {
                 $this->fields[$fieldName] = $field = new Required($field);
             }
-
-            if (!is_array($field->constraints)) {
-                $field->constraints = array($field->constraints);
-            }
-
-            foreach ($field->constraints as $constraint) {
-                if (!$constraint instanceof Constraint) {
-                    throw new ConstraintDefinitionException(sprintf('The value %s of the field %s is not an instance of Constraint in constraint %s', $constraint, $fieldName, __CLASS__));
-                }
-
-                if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException(sprintf('The constraint Valid cannot be nested inside constraint %s. You can only declare the Valid constraint directly on a field or method.', __CLASS__));
-                }
-            }
         }
     }
 
     public function getRequiredOptions()
     {
         return array('fields');
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'fields';
     }
 }

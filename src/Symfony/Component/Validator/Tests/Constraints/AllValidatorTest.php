@@ -54,7 +54,7 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint), 'MyGroup');
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint));
         }
 
         $this->validator->validate($array, new All($constraint));
@@ -75,7 +75,7 @@ class AllValidatorTest extends AbstractConstraintValidatorTest
         $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint1, $constraint2), 'MyGroup');
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint1, $constraint2));
         }
 
         $this->validator->validate($array, new All($constraints));

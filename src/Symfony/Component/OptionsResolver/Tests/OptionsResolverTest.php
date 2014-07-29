@@ -717,4 +717,54 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'three' => '3',
         ), $clone->resolve());
     }
+
+    public function testNestedResolversForRequiredOption()
+    {
+        $this->resolver->setRequired(array('db'));
+        $this->resolver->setNestedOptionsResolver(array(
+            'db' => $this->getNestedResolver(),
+        ));
+
+        $this->assertEquals(array(
+            'db' => array(
+                'dsn' => 'sqlite:app.sqlite',
+                'user' => 'root',
+                'password' => '',
+                'port' => 3306,
+            ),
+        ), $this->resolver->resolve(array(
+            'db' => array(
+                'dsn' => 'sqlite:app.sqlite',
+            ),
+        )));
+    }
+
+    /**
+     * @expectedException Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     *
+     * Nested options resolvers will always be executed, eventhough the option
+     * is missing. See {@link https://github.com/symfony/symfony/issues/9174}
+     */
+    public function testNestedResolversForOptionalOption()
+    {
+        $this->resolver->setOptional(array('db'));
+        $this->resolver->setNestedOptionsResolver(array(
+            'db' => $this->getNestedResolver(),
+        ));
+
+        $this->assertEquals(array(), $this->resolver->resolve(array()));
+    }
+
+    private function getNestedResolver()
+    {
+        $nestedResolver = new OptionsResolver();
+        $nestedResolver->setDefaults(array(
+            'user' => 'root',
+            'password' => '',
+            'port' => 3306,
+        ));
+        $nestedResolver->setRequired(array('dsn'));
+
+        return $nestedResolver;
+    }
 }

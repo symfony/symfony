@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class OptionsResolver implements OptionsResolverInterface
+class OptionsResolver implements NestableOptionsResolverInterface
 {
     /**
      * The default option values.
@@ -52,6 +52,12 @@ class OptionsResolver implements OptionsResolverInterface
      * @var array
      */
     private $allowedTypes = array();
+
+    /**
+     * A list of the nested option resolvers.
+     * @var array
+     */
+    private $optionResolvers = array();
 
     /**
      * Creates a new instance.
@@ -179,6 +185,37 @@ class OptionsResolver implements OptionsResolverInterface
         $this->allowedTypes = array_merge_recursive($this->allowedTypes, $allowedTypes);
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setNestedOptionsResolver(array $options)
+    {
+        $this->validateOptionsExistence($options);
+
+        foreach ($options as $option => $resolver) {
+            if (!$resolver instanceof OptionsResolverInterface) {
+                throw new \InvalidArgumentException('Nested option resolvers have to implement OptionsResolverInterface.');
+            }
+            $this->optionResolvers[$option] = $resolver;
+            $this->setNormalizers(array($option => array($this, 'nestedNormalizer')));
+        }
+
+        return $this;
+    }
+
+    /**
+     * This normalizer will be called when an option has a nested options
+     * resolver.
+     *
+     * @param Options    $options
+     * @param null|array $value
+     * @param string     $option
+     */
+    public function nestedNormalizer(Options $options, $value, $option)
+    {
+        return $this->optionResolvers[$option]->resolve($value ?: array());
     }
 
     /**

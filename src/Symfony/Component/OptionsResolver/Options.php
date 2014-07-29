@@ -97,10 +97,10 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     /**
      * Sets the normalizer for a given option.
      *
-     * Normalizers should be closures with the following signature:
+     * Normalizers should be valid callables with the following signature:
      *
      * <code>
-     * function (Options $options, $value)
+     * function (Options $options, $value, $option)
      * </code>
      *
      * This closure will be evaluated once the option is read using
@@ -108,14 +108,18 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * other options through the passed {@link Options} instance.
      *
      * @param string   $option     The name of the option.
-     * @param \Closure $normalizer The normalizer.
+     * @param callable $normalizer The normalizer.
      *
      * @throws OptionDefinitionException If options have already been read.
      *                                   Once options are read, the container
      *                                   becomes immutable.
      */
-    public function setNormalizer($option, \Closure $normalizer)
+    public function setNormalizer($option, $normalizer)
     {
+        if (!is_callable($normalizer)) {
+            throw new \InvalidArgumentException('Normalizers should be a valid callable.');
+        }
+
         if ($this->reading) {
             throw new OptionDefinitionException('Normalizers cannot be added anymore once options have been read.');
         }
@@ -500,11 +504,11 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException(sprintf('The options "%s" have a cyclic dependency.', implode('", "', $conflicts)));
         }
 
-        /** @var \Closure $normalizer */
+        /** @var callable $normalizer */
         $normalizer = $this->normalizers[$option];
 
         $this->lock[$option] = true;
-        $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
+        $this->options[$option] = call_user_func($normalizer, $this, array_key_exists($option, $this->options) ? $this->options[$option] : null, $option);
         unset($this->lock[$option]);
 
         // The option is now normalized

@@ -51,7 +51,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value)
+    public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Blank(array(
             'message' => 'myMessage'
@@ -60,7 +60,7 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $value,
+                '{{ value }}' => $valueAsString,
             ));
 
         $this->validator->validate($value, $constraint);
@@ -69,10 +69,10 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
     public function getInvalidValues()
     {
         return array(
-            array('foobar'),
-            array(0),
-            array(false),
-            array(1234),
+            array('foobar', '"foobar"'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(1234, '1234'),
         );
     }
 }

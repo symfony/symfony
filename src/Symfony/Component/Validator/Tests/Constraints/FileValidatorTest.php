@@ -101,7 +101,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}'   => '10',
                 '{{ size }}'    => '11',
                 '{{ suffix }}'  => 'bytes',
-                '{{ file }}'    => $this->path,
+                '{{ file }}'    => '"'.$this->path.'"',
             ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
@@ -122,7 +122,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}'   => '1',
                 '{{ size }}'    => '1.4',
                 '{{ suffix }}'  => 'kB',
-                '{{ file }}'    => $this->path,
+                '{{ file }}'    => '"'.$this->path.'"',
             ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
@@ -143,7 +143,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
                 '{{ limit }}'   => '1',
                 '{{ size }}'    => '1.4',
                 '{{ suffix }}'  => 'MB',
-                '{{ file }}'    => $this->path,
+                '{{ file }}'    => '"'.$this->path.'"',
             ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
@@ -245,7 +245,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ type }}'    => '"application/pdf"',
                 '{{ types }}'   => '"image/png", "image/jpg"',
-                '{{ file }}'    => $this->path,
+                '{{ file }}'    => '"'.$this->path.'"',
             ));
 
         $this->validator->validate($file, $constraint);
@@ -279,7 +279,7 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->with('myMessage', array(
                 '{{ type }}'    => '"application/pdf"',
                 '{{ types }}'   => '"image/*", "image/jpg"',
-                '{{ file }}'    => $this->path,
+                '{{ file }}'    => '"'.$this->path.'"',
             ));
 
         $this->validator->validate($file, $constraint);

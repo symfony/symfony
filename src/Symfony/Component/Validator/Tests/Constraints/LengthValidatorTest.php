@@ -167,7 +167,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
+                '{{ value }}' => '"'.$value.'"',
                 '{{ limit }}' => 4,
             )), $this->identicalTo($value), 4);
 
@@ -191,7 +191,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
+                '{{ value }}' => '"'.$value.'"',
                 '{{ limit }}' => 4,
             )), $this->identicalTo($value), 4);
 
@@ -216,7 +216,7 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
+                '{{ value }}' => '"'.$value.'"',
                 '{{ limit }}' => 4,
             )), $this->identicalTo($value), 4);
 

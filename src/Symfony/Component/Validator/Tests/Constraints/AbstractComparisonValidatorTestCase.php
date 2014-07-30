@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AbstractComparisonValidator;
 
@@ -29,6 +30,8 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
             ->disableOriginalConstructor()
             ->getMock();
         $this->validator->initialize($this->context);
+
+        \Locale::setDefault('en');
     }
 
     /**
@@ -71,12 +74,19 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
     /**
      * @dataProvider provideInvalidComparisons
      * @param mixed  $dirtyValue
+     * @param mixed  $dirtyValueAsString
      * @param mixed  $comparedValue
      * @param mixed  $comparedValueString
      * @param string $comparedValueType
      */
-    public function testInvalidComparisonToValue($dirtyValue, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
     {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        if ($dirtyValue instanceof \DateTime) {
+            IntlTestHelper::requireIntl($this);
+        }
+
         $constraint = $this->createConstraint(array('value' => $comparedValue));
         $constraint->message = 'Constraint Message';
 
@@ -87,7 +97,7 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('Constraint Message', array(
-                '{{ value }}' => $comparedValueString,
+                '{{ value }}' => $dirtyValueAsString,
                 '{{ compared_value }}' => $comparedValueString,
                 '{{ compared_value_type }}' => $comparedValueType
             ));

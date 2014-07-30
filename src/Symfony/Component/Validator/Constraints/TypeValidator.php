@@ -44,7 +44,7 @@ class TypeValidator extends ConstraintValidator
         }
 
         $this->context->addViolation($constraint->message, array(
-            '{{ value }}' => is_object($value) ? get_class($value) : (is_array($value) ? 'Array' : (string) $value),
+            '{{ value }}' => $this->formatValue($value),
             '{{ type }}'  => $constraint->type,
         ));
     }

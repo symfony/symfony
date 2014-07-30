@@ -37,26 +37,35 @@ class IssnValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
+        $value = (string) $value;
+
         // Compose regex pattern
         $digitsPattern = $constraint->requireHyphen ? '\d{4}-\d{3}' : '\d{4}-?\d{3}';
-        $checksumPattern = $constraint->caseSensitive ? '[\d|X]' : '[\d|X|x]';
-        $pattern = "/^".$digitsPattern.$checksumPattern."$/";
+        $checkSumPattern = $constraint->caseSensitive ? '[\d|X]' : '[\d|X|x]';
+        $pattern = "/^".$digitsPattern.$checkSumPattern."$/";
 
         if (!preg_match($pattern, $value)) {
-            $this->context->addViolation($constraint->message);
-        } else {
-            $digits = str_split(strtoupper(str_replace('-', '', $value)));
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
 
-            $sum = 0;
-            for ($i = 8; $i > 1; $i--) {
-                $sum += $i * (int) array_shift($digits);
-            }
+            return;
+        }
 
-            $checksum = 'X' == reset($digits) ? 10 : (int) reset($digits);
+        $canonical = strtoupper(str_replace('-', '', $value));
 
-            if (0 != ($sum + $checksum) % 11) {
-                $this->context->addViolation($constraint->message);
-            }
+        // Calculate a checksum. "X" equals 10.
+        $checkSum = 'X' === $canonical{7} ? 10 : $canonical{7};
+
+        for ($i = 0; $i < 7; ++$i) {
+            // Multiply the first digit by 8, the second by 7, etc.
+            $checkSum += (8-$i) * $canonical{$i};
+        }
+
+        if (0 !== $checkSum % 11) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         }
     }
 }

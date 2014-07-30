@@ -29,7 +29,7 @@ class FileValidatorPathTest extends FileValidatorTest
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ file }}' => 'foobar',
+                '{{ file }}' => '"foobar"',
             ));
 
         $this->validator->validate('foobar', $constraint);

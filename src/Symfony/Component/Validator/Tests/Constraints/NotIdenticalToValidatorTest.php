@@ -52,9 +52,9 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         $date = new \DateTime('2000-01-01');
 
         return array(
-            array(3, 3, '3', 'integer'),
-            array('a', 'a', "'a'", 'string'),
-            array($date, $date, '2000-01-01 00:00:00', 'DateTime')
+            array(3, '3', 3, '3', 'integer'),
+            array('a', '"a"', 'a', '"a"', 'string'),
+            array($date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime')
         );
     }
 }

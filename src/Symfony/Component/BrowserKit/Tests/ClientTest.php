@@ -452,7 +452,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $headers = array(
             'HTTP_HOST'       => 'www.example.com:8080',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
-            'HTTPS'           => false
+            'HTTPS'           => false,
+            'HTTP_REFERER'    => 'http://www.example.com:8080/'
         );
 
         $client = new TestClient();

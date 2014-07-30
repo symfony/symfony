@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Tests\Util\DataCollector;
+namespace Symfony\Component\HttpKernel\Tests\DataCollector\Util;
 
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 

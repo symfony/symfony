@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Security\Tests\Core\Exception;
+namespace Symfony\Component\Security\Core\Tests\Exception;
 
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 

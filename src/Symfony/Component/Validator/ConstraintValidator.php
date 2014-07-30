@@ -36,9 +36,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of the type of the value.
      *
-     * @param  mixed $value
+     * This method should be used if you pass the type of a value as
+     * message parameter to a constraint violation. Note that such
+     * parameters should usually not be included in messages aimed at
+     * non-technical people.
      *
-     * @return string
+     * @param mixed $value The value to return the type of
+     *
+     * @return string The type of the value
      */
     protected function formatTypeOf($value)
     {
@@ -48,10 +53,24 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of the value.
      *
-     * @param mixed $value
-     * @param bool  $prettyDateTime
+     * This method returns the equivalent PHP tokens for most scalar types
+     * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
+     * in double quotes ("). Objects, arrays and resources are formatted as
+     * "object", "array" and "resource". If the parameter $prettyDateTime
+     * is set to true, {@link \DateTime} objects will be formatted as
+     * RFC-3339 dates ("Y-m-d H:i:s").
      *
-     * @return string
+     * Be careful when passing message parameters to a constraint violation
+     * that (may) contain objects, arrays or resources. These parameters
+     * should only be displayed for technical users. Non-technical users
+     * won't know what an "object", "array" or "resource" is and will be
+     * confused by the violation message.
+     *
+     * @param mixed $value          The value to format as string
+     * @param bool  $prettyDateTime Whether to format {@link \DateTime}
+     *                              objects as RFC-3339 dates ("Y-m-d H:i:s")
+     *
+     * @return string The string representation of the passed value
      */
     protected function formatValue($value, $prettyDateTime = false)
     {
@@ -100,10 +119,16 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     /**
      * Returns a string representation of a list of values.
      *
-     * @param array $values
-     * @param bool  $prettyDateTime
+     * Each of the values is converted to a string using
+     * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @return string
+     * @param array $values         A list of values
+     * @param bool  $prettyDateTime Whether to format {@link \DateTime}
+     *                              objects as RFC-3339 dates ("Y-m-d H:i:s")
+     *
+     * @return string The string representation of the value list
+     *
+     * @see formatValue()
      */
     protected function formatValues(array $values, $prettyDateTime = false)
     {

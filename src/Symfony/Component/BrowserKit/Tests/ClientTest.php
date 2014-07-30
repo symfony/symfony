@@ -456,7 +456,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         );
 
         $client = new TestClient();
-        $client->followRedirects(false);
         $client->setNextResponse(new Response('', 302, array(
             'Location'    => 'http://www.example.com:8080/redirected',
         )));

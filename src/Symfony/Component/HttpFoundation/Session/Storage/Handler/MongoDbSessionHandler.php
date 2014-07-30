@@ -110,7 +110,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
          *
          * See: http://docs.mongodb.org/manual/tutorial/expire-data/
          */
-        if ($this->options['expiry_field'] === false) {
+        if (false === $this->options['expiry_field']) {
             $time = new \MongoDate(time() - $maxlifetime);
 
             $this->getCollection()->remove(array(
@@ -132,7 +132,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $this->options['time_field'] => new \MongoDate(),
         );
 
-        if ($this->options['expiry_field'] !== false) {
+        if (false !== $this->options['expiry_field']) {
             $expiry = new \MongoDate(time() + (int) ini_get('session.gc_maxlifetime'));
             $fields[$this->options['expiry_field']] = $expiry;
 

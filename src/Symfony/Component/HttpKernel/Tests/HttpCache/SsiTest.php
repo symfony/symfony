@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
 class SsiTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHasSurrogateEsiCapability()
+    public function testHasSurrogateSsiCapability()
     {
         $ssi = new Ssi();
 
@@ -33,7 +33,7 @@ class SsiTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($ssi->hasSurrogateCapability($request));
     }
 
-    public function testAddSurrogateEsiCapability()
+    public function testAddSurrogateSsiCapability()
     {
         $ssi = new Ssi();
 
@@ -58,7 +58,7 @@ class SsiTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $response->headers->get('Surrogate-Control'));
     }
 
-    public function testNeedsEsiParsing()
+    public function testNeedsSsiParsing()
     {
         $ssi = new Ssi();
 
@@ -117,7 +117,7 @@ class SsiTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testProcessWhenNoSrcInAnEsi()
+    public function testProcessWhenNoSrcInAnSsi()
     {
         $ssi = new Ssi();
 

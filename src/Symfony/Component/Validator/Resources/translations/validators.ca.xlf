@@ -278,6 +278,10 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Aquest valor no hauria de idèntic a {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>No està permès un fixter buit.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

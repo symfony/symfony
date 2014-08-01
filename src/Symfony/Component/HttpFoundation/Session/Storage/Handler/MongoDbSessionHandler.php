@@ -110,14 +110,14 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
          *
          * See: http://docs.mongodb.org/manual/tutorial/expire-data/
          */
-        if (false === $this->options['expiry_field']) {
-            $time = new \MongoDate(time() - $maxlifetime);
-
-            $this->getCollection()->remove(array(
-                $this->options['time_field'] => array('$lt' => $time),
-            ));
-
+        if (false !== $this->options['expiry_field']) {
+            return true;
         }
+        $time = new \MongoDate(time() - $maxlifetime);
+
+        $this->getCollection()->remove(array(
+            $this->options['time_field'] => array('$lt' => $time),
+        ));
 
         return true;
     }

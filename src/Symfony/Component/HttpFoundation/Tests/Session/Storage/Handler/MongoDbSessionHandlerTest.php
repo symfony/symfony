@@ -198,10 +198,10 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('remove')
             ->will($this->returnCallback(function ($criteria) use ($that) {
                 $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
+                $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['time_field']]['$lt']->sec);
             }));
 
-        $this->assertTrue($this->storage->gc(-1));
+        $this->assertTrue($this->storage->gc(1));
     }
 
     public function testGcWhenUsingExpiresField()
@@ -230,10 +230,10 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('remove')
             ->will($this->returnCallback(function ($criteria) use ($that) {
                 $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - -1, $criteria[$that->options['time_field']]['$lt']->sec);
+                $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['time_field']]['$lt']->sec);
             }));
 
-        $this->assertTrue($this->storage->gc(-1));
+        $this->assertTrue($this->storage->gc(1));
     }
 
     private function createMongoCollectionMock()

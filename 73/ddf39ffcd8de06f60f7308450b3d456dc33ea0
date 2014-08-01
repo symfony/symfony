@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T04:53:57Z
+
+ping @Seldaek
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-07-25T12:42:05Z
+
+So this treats null as array() and also adds support for objects without array access but with public properties. I guess :+1: but I haven't looked at this code in a very long time.. :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-31T06:10:18Z
+
+ping @Seldaek :)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-07-31T22:09:40Z
+
+@xabbuh it's still looking fine to me, not sure why ping me again?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-01T05:14:56Z
+
+@Seldaek Sorry, then I didn't understand you correctly.I thought you wanted to have a deeper look at it before your final decision.

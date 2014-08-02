@@ -80,6 +80,7 @@ class Response
     const HTTP_LOOP_DETECTED = 508;                                               // RFC5842
     const HTTP_NOT_EXTENDED = 510;                                                // RFC2774
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
+    const HTTP_NETWORK_CONNECT_TIMEOUT = 599;
 
     /**
      * @var \Symfony\Component\HttpFoundation\ResponseHeaderBag
@@ -112,6 +113,31 @@ class Response
     protected $charset;
 
     /**
+     * @var array
+     */
+    protected $cacheableStatuses = array(
+        self::HTTP_OK,
+        self::HTTP_NON_AUTHORITATIVE_INFORMATION,
+        self::HTTP_MULTIPLE_CHOICES,
+        self::HTTP_MOVED_PERMANENTLY,
+        self::HTTP_FOUND,
+        self::HTTP_NOT_FOUND,
+        self::HTTP_GONE
+    );
+
+    /**
+     * @var array
+     */
+    private $redirectionStatuses = array(
+        self::HTTP_CREATED,
+        self::HTTP_MOVED_PERMANENTLY,
+        self::HTTP_FOUND,
+        self::HTTP_SEE_OTHER,
+        self::HTTP_TEMPORARY_REDIRECT,
+        self::HTTP_PERMANENTLY_REDIRECT
+    );
+
+    /**
      * Status codes translation table.
      *
      * The list of codes is complete according to the
@@ -123,66 +149,68 @@ class Response
      * @var array
      */
     public static $statusTexts = array(
-        100 => 'Continue',
-        101 => 'Switching Protocols',
-        102 => 'Processing',            // RFC2518
-        200 => 'OK',
-        201 => 'Created',
-        202 => 'Accepted',
-        203 => 'Non-Authoritative Information',
-        204 => 'No Content',
-        205 => 'Reset Content',
-        206 => 'Partial Content',
-        207 => 'Multi-Status',          // RFC4918
-        208 => 'Already Reported',      // RFC5842
-        226 => 'IM Used',               // RFC3229
-        300 => 'Multiple Choices',
-        301 => 'Moved Permanently',
-        302 => 'Found',
-        303 => 'See Other',
-        304 => 'Not Modified',
-        305 => 'Use Proxy',
-        306 => 'Reserved',
-        307 => 'Temporary Redirect',
-        308 => 'Permanent Redirect',    // RFC7238
-        400 => 'Bad Request',
-        401 => 'Unauthorized',
-        402 => 'Payment Required',
-        403 => 'Forbidden',
-        404 => 'Not Found',
-        405 => 'Method Not Allowed',
-        406 => 'Not Acceptable',
-        407 => 'Proxy Authentication Required',
-        408 => 'Request Timeout',
-        409 => 'Conflict',
-        410 => 'Gone',
-        411 => 'Length Required',
-        412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
-        415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
-        417 => 'Expectation Failed',
-        418 => 'I\'m a teapot',                                               // RFC2324
-        422 => 'Unprocessable Entity',                                        // RFC4918
-        423 => 'Locked',                                                      // RFC4918
-        424 => 'Failed Dependency',                                           // RFC4918
-        425 => 'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
-        426 => 'Upgrade Required',                                            // RFC2817
-        428 => 'Precondition Required',                                       // RFC6585
-        429 => 'Too Many Requests',                                           // RFC6585
-        431 => 'Request Header Fields Too Large',                             // RFC6585
-        500 => 'Internal Server Error',
-        501 => 'Not Implemented',
-        502 => 'Bad Gateway',
-        503 => 'Service Unavailable',
-        504 => 'Gateway Timeout',
-        505 => 'HTTP Version Not Supported',
-        506 => 'Variant Also Negotiates (Experimental)',                      // RFC2295
-        507 => 'Insufficient Storage',                                        // RFC4918
-        508 => 'Loop Detected',                                               // RFC5842
-        510 => 'Not Extended',                                                // RFC2774
-        511 => 'Network Authentication Required',                             // RFC6585
+        self::HTTP_CONTINUE => 'Continue',
+        self::HTTP_SWITCHING_PROTOCOLS => 'Switching Protocols',
+        self::HTTP_PROCESSING => 'Processing',                      // RFC2518
+        self::HTTP_OK => 'OK',
+        self::HTTP_CREATED => 'Created',
+        self::HTTP_ACCEPTED => 'Accepted',
+        self::HTTP_NON_AUTHORITATIVE_INFORMATION => 'Non-Authoritative Information',
+        self::HTTP_NO_CONTENT => 'No Content',
+        self::HTTP_RESET_CONTENT => 'Reset Content',
+        self::HTTP_PARTIAL_CONTENT => 'Partial Content',
+        self::HTTP_MULTI_STATUS => 'Multi-Status',                  // RFC4918
+        self::HTTP_ALREADY_REPORTED => 'Already Reported',          // RFC5842
+        self::HTTP_IM_USED => 'IM Used',                            // RFC3229
+        self::HTTP_MULTIPLE_CHOICES => 'Multiple Choices',
+        self::HTTP_MOVED_PERMANENTLY => 'Moved Permanently',
+        self::HTTP_FOUND => 'Found',
+        self::HTTP_SEE_OTHER => 'See Other',
+        self::HTTP_NOT_MODIFIED => 'Not Modified',
+        self::HTTP_USE_PROXY => 'Use Proxy',
+        self::HTTP_RESERVED => 'Reserved',
+        self::HTTP_TEMPORARY_REDIRECT => 'Temporary Redirect',
+        self::HTTP_PERMANENTLY_REDIRECT => 'Permanent Redirect',    // RFC7238
+        self::HTTP_BAD_REQUEST => 'Bad Request',
+        self::HTTP_UNAUTHORIZED => 'Unauthorized',
+        self::HTTP_PAYMENT_REQUIRED => 'Payment Required',
+        self::HTTP_FORBIDDEN => 'Forbidden',
+        self::HTTP_NOT_FOUND => 'Not Found',
+        self::HTTP_METHOD_NOT_ALLOWED => 'Method Not Allowed',
+        self::HTTP_NOT_ACCEPTABLE => 'Not Acceptable',
+        self::HTTP_PROXY_AUTHENTICATION_REQUIRED => 'Proxy Authentication Required',
+        self::HTTP_REQUEST_TIMEOUT => 'Request Timeout',
+        self::HTTP_CONFLICT => 'Conflict',
+        self::HTTP_GONE => 'Gone',
+        self::HTTP_LENGTH_REQUIRED => 'Length Required',
+        self::HTTP_PRECONDITION_FAILED => 'Precondition Failed',
+        self::HTTP_PRECONDITION_FAILED => 'Request Entity Too Large',
+        self::HTTP_REQUEST_URI_TOO_LONG => 'Request-URI Too Long',
+        self::HTTP_UNSUPPORTED_MEDIA_TYPE => 'Unsupported Media Type',
+        self::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE => 'Requested Range Not Satisfiable',
+        self::HTTP_EXPECTATION_FAILED => 'Expectation Failed',
+        self::HTTP_I_AM_A_TEAPOT => 'I\'m a teapot',                                                  // RFC2324
+        self::HTTP_UNPROCESSABLE_ENTITY => 'Unprocessable Entity',                                    // RFC4918
+        self::HTTP_LOCKED => 'Locked',                                                                // RFC4918
+        self::HTTP_FAILED_DEPENDENCY => 'Failed Dependency',                                          // RFC4918
+        self::HTTP_RESERVED_FOR_WEBDAV_ADVANCED_COLLECTIONS_EXPIRED_PROPOSAL =>
+            'Reserved for WebDAV advanced collections expired proposal',   // RFC2817
+        self::HTTP_UPGRADE_REQUIRED => 'Upgrade Required',                                            // RFC2817
+        self::HTTP_PRECONDITION_REQUIRED => 'Precondition Required',                                  // RFC6585
+        self::HTTP_TOO_MANY_REQUESTS => 'Too Many Requests',                                          // RFC6585
+        self::HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE => 'Request Header Fields Too Large',              // RFC6585
+        self::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
+        self::HTTP_NOT_IMPLEMENTED => 'Not Implemented',
+        self::HTTP_BAD_GATEWAY => 'Bad Gateway',
+        self::HTTP_SERVICE_UNAVAILABLE => 'Service Unavailable',
+        self::HTTP_SERVICE_UNAVAILABLE => 'Gateway Timeout',
+        self::HTTP_SERVICE_UNAVAILABLE => 'HTTP Version Not Supported',
+        self::HTTP_VARIANT_ALSO_NEGOTIATES_EXPERIMENTAL => 'Variant Also Negotiates (Experimental)',  // RFC2295
+        self::HTTP_INSUFFICIENT_STORAGE => 'Insufficient Storage',                                    // RFC4918
+        self::HTTP_LOOP_DETECTED => 'Loop Detected',                                                  // RFC5842
+        self::HTTP_NOT_EXTENDED => 'Not Extended',                                                    // RFC2774
+        self::HTTP_NETWORK_AUTHENTICATION_REQUIRED => 'Network Authentication Required',              // RFC6585
+        self::HTTP_NETWORK_CONNECT_TIMEOUT => 'Network Connect Timeout'
     );
 
     /**
@@ -196,7 +224,7 @@ class Response
      *
      * @api
      */
-    public function __construct($content = '', $status = 200, $headers = array())
+    public function __construct($content = '', $status = self::HTTP_OK, $headers = array())
     {
         $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);
@@ -212,7 +240,7 @@ class Response
      *
      * Example:
      *
-     *     return Response::create($body, 200)
+     *     return Response::create($body, self::HTTP_OK)
      *         ->setSharedMaxAge(300);
      *
      * @param mixed   $content The response content, see setContent()
@@ -221,7 +249,7 @@ class Response
      *
      * @return Response
      */
-    public static function create($content = '', $status = 200, $headers = array())
+    public static function create($content = '', $status = self::HTTP_OK, $headers = array())
     {
         return new static($content, $status, $headers);
     }
@@ -268,7 +296,7 @@ class Response
     {
         $headers = $this->headers;
 
-        if ($this->isInformational() || in_array($this->statusCode, array(204, 304))) {
+        if ($this->isInformational() || $this->isEmpty()) {
             $this->setContent(null);
             $headers->remove('Content-Type');
             $headers->remove('Content-Length');
@@ -543,7 +571,7 @@ class Response
      */
     public function isCacheable()
     {
-        if (!in_array($this->statusCode, array(200, 203, 300, 301, 302, 404, 410))) {
+        if (!in_array($this->statusCode, $this->cacheableStatuses)) {
             return false;
         }
 
@@ -984,10 +1012,10 @@ class Response
     }
 
     /**
-     * Modifies the response so that it conforms to the rules defined for a 304 status code.
+     * Modifies the response so that it conforms to the rules defined for a HTTP_NOT_MODIFIED status code.
      *
      * This sets the status, removes the body, and discards any headers
-     * that MUST NOT be included in 304 responses.
+     * that MUST NOT be included in HTTP_NOT_MODIFIED responses.
      *
      * @return Response
      *
@@ -997,10 +1025,10 @@ class Response
      */
     public function setNotModified()
     {
-        $this->setStatusCode(304);
+        $this->setStatusCode(self::HTTP_NOT_MODIFIED);
         $this->setContent(null);
 
-        // remove headers that MUST NOT be included with 304 Not Modified responses
+        // remove headers that MUST NOT be included with HTTP_NOT_MODIFIED Not Modified responses
         foreach (array('Allow', 'Content-Encoding', 'Content-Language', 'Content-Length', 'Content-MD5', 'Content-Type', 'Last-Modified') as $header) {
             $this->headers->remove($header);
         }
@@ -1062,7 +1090,7 @@ class Response
      * Determines if the Response validators (ETag, Last-Modified) match
      * a conditional value specified in the Request.
      *
-     * If the Response is not modified, it sets the status code to 304 and
+     * If the Response is not modified, it sets the status code to HTTP_NOT_MODIFIED and
      * removes the actual content by calling the setNotModified() method.
      *
      * @param Request $request A Request instance
@@ -1102,7 +1130,7 @@ class Response
      */
     public function isInvalid()
     {
-        return $this->statusCode < 100 || $this->statusCode >= 600;
+        return $this->statusCode < self::HTTP_CONTINUE || $this->statusCode > self::HTTP_NETWORK_CONNECT_TIMEOUT;
     }
 
     /**
@@ -1114,7 +1142,7 @@ class Response
      */
     public function isInformational()
     {
-        return $this->statusCode >= 100 && $this->statusCode < 200;
+        return $this->statusCode >= self::HTTP_CONTINUE && $this->statusCode < self::HTTP_OK;
     }
 
     /**
@@ -1126,7 +1154,7 @@ class Response
      */
     public function isSuccessful()
     {
-        return $this->statusCode >= 200 && $this->statusCode < 300;
+        return $this->statusCode >= self::HTTP_OK && $this->statusCode < self::HTTP_MULTIPLE_CHOICES;
     }
 
     /**
@@ -1138,7 +1166,7 @@ class Response
      */
     public function isRedirection()
     {
-        return $this->statusCode >= 300 && $this->statusCode < 400;
+        return $this->statusCode >= self::HTTP_MULTIPLE_CHOICES && $this->statusCode < self::HTTP_BAD_REQUEST;
     }
 
     /**
@@ -1150,7 +1178,7 @@ class Response
      */
     public function isClientError()
     {
-        return $this->statusCode >= 400 && $this->statusCode < 500;
+        return $this->statusCode >= self::HTTP_BAD_REQUEST && $this->statusCode < self::HTTP_INTERNAL_SERVER_ERROR;
     }
 
     /**
@@ -1162,7 +1190,8 @@ class Response
      */
     public function isServerError()
     {
-        return $this->statusCode >= 500 && $this->statusCode < 600;
+        return $this->statusCode >= self::HTTP_INTERNAL_SERVER_ERROR &&
+               $this->statusCode < self::HTTP_NETWORK_CONNECT_TIMEOUT;
     }
 
     /**
@@ -1174,7 +1203,7 @@ class Response
      */
     public function isOk()
     {
-        return 200 === $this->statusCode;
+        return self::HTTP_OK === $this->statusCode;
     }
 
     /**
@@ -1186,7 +1215,7 @@ class Response
      */
     public function isForbidden()
     {
-        return 403 === $this->statusCode;
+        return self::HTTP_FORBIDDEN === $this->statusCode;
     }
 
     /**
@@ -1198,7 +1227,7 @@ class Response
      */
     public function isNotFound()
     {
-        return 404 === $this->statusCode;
+        return self::HTTP_NOT_FOUND === $this->statusCode;
     }
 
     /**
@@ -1212,7 +1241,7 @@ class Response
      */
     public function isRedirect($location = null)
     {
-        return in_array($this->statusCode, array(201, 301, 302, 303, 307, 308)) && (null === $location ?: $location == $this->headers->get('Location'));
+        return in_array($this->statusCode, $this->redirectionStatuses) && (null === $location ?: $location == $this->headers->get('Location'));
     }
 
     /**
@@ -1224,7 +1253,7 @@ class Response
      */
     public function isEmpty()
     {
-        return in_array($this->statusCode, array(204, 304));
+        return in_array($this->statusCode, array(self::HTTP_NO_CONTENT, self::HTTP_NOT_MODIFIED));
     }
 
     /**

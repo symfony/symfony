@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by sun at 2014-07-19T19:34:28Z
+
+FWIW, `PhpDumper` uses similar shortcuts for `service_container` → `$this` already, but `PhpDumper::addFrozenConstructor()` still contains the following:
+```php
+        $code .= <<<EOF
+…
+        \$this->set('service_container', \$this);
+```
+I'm not sure whether it is safe to also remove that call from the dumped constructor.  It is a no-op for `Container::set()`, but not necessarily for custom implementations.
+
+---------------------------------------------------------------------------
+
+by sun at 2014-07-19T20:20:47Z
+
+Travis test failure (only on 5.5) is not related to this PR.  The second to last Travis build succeeded.
+
+---------------------------------------------------------------------------
+
+by sun at 2014-07-24T17:52:18Z
+
+Hm, I thought this would be a straightforward improvement/quick fix… :wink:  Curious, did someone look at this already?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T14:56:54Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T15:01:44Z
+
+This could be merged in 2.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-02T06:04:32Z
+
+:+1:

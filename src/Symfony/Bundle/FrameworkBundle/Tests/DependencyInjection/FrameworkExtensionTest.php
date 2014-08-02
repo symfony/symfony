@@ -402,6 +402,25 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('_custom_form', $container->getParameter('form.type_extension.csrf.field_name'));
     }
 
+    public function testStopwatchEnabledWithDebugModeEnabled()
+    {
+        $container = $this->createContainerFromFile('default_config', array(
+            'kernel.container_class' => 'foo',
+            'kernel.debug' => true,
+        ));
+
+        $this->assertTrue($container->has('debug.stopwatch'));
+    }
+
+    public function testStopwatchEnabledWithDebugModeDisabled()
+    {
+        $container = $this->createContainerFromFile('default_config', array(
+            'kernel.container_class' => 'foo',
+        ));
+
+        $this->assertTrue($container->has('debug.stopwatch'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

@@ -48,9 +48,11 @@ class DescriptorHelper extends Helper
      *
      * @param OutputInterface $output
      * @param object          $object
-     * @param string          $format
+     * @param string|null     $format
      * @param bool            $raw
-     * @param string          $namespace
+     * @param string|null     $namespace
+     *
+     * @throws \InvalidArgumentException when the given format is not supported
      */
     public function describe(OutputInterface $output, $object, $format = null, $raw = false, $namespace = null)
     {

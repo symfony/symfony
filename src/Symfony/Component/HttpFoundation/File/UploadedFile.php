@@ -286,7 +286,7 @@ class UploadedFile extends File
     /**
      * Returns an informative upload error message.
      *
-     * @param int $code The error code returned by an upload attempt
+     * @param int $errorCode The error code returned by an upload attempt
      *
      * @return string The error message regarding the specified error code
      */

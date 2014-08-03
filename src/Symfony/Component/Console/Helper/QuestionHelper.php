@@ -354,7 +354,7 @@ class QuestionHelper extends Helper
         $attempts = $question->getMaxAttempts();
         while (null === $attempts || $attempts--) {
             if (null !== $error) {
-                $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+                $output->writeln($output->getFormatter()->format('<error>' . $error->getMessage() . '</error>'));
             }
 
             try {

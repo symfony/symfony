@@ -296,7 +296,7 @@ abstract class Client
 
         $uri = $this->getAbsoluteUri($uri);
 
-        if (isset($server['HTTP_HOST'])) {
+        if (!empty($server['HTTP_HOST'])) {
             $uri = preg_replace('{^(https?\://)'.preg_quote($this->extractHost($uri)).'}', '${1}'.$server['HTTP_HOST'], $uri);
         }
 

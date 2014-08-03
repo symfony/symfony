@@ -367,6 +367,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFollowRelativeRedirect()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => '/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => '/redirected:1234')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected:1234', $client->getRequest()->getUri(), '->followRedirect() follows relative urls');
+    }
+
     public function testFollowRedirectWithMaxRedirects()
     {
         $client = new TestClient();

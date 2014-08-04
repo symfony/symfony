@@ -15,6 +15,21 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AbstractComparisonValidator;
 
+class ComparisonTest_Class
+{
+    protected $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
+}
+
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */

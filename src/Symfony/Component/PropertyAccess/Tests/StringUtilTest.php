@@ -22,6 +22,8 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
         return array(
             array('accesses', 'access'),
             array('addresses', 'address'),
+            array('agendas', 'agenda'),
+            array('alumnae', 'alumna'),
             array('alumni', 'alumnus'),
             array('analyses', array('analys', 'analyse', 'analysis')),
             array('antennae', 'antenna'),
@@ -57,6 +59,8 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('data', array('daton', 'datum')),
             array('days', 'day'),
             array('discos', 'disco'),
+            array('drives', 'drive'),
+            array('drivers', 'driver'),
             array('dwarves', array('dwarf', 'dwarve', 'dwarff')),
             array('echoes', array('echo', 'echoe')),
             array('elves', array('elf', 'elve', 'elff')),
@@ -65,6 +69,8 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('feet', 'foot'),
             array('foci', 'focus'),
             array('focuses', array('focus', 'focuse', 'focusis')),
+            array('formulae', 'formula'),
+            array('formulas', 'formula'),
             array('fungi', 'fungus'),
             array('funguses', array('fungus', 'funguse', 'fungusis')),
             array('garages', array('garag', 'garage')),
@@ -72,6 +78,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('halves', array('half', 'halve', 'halff')),
             array('hats', 'hat'),
             array('heroes', array('hero', 'heroe')),
+            array('hippopotamuses', array('hippopotamus', 'hippopotamuse', 'hippopotamusis')), //hippopotami
             array('hoaxes', 'hoax'),
             array('hooves', array('hoof', 'hoove', 'hooff')),
             array('houses', array('hous', 'house', 'housis')),
@@ -82,6 +89,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('kisses', 'kiss'),
             array('knives', 'knife'),
             array('lamps', 'lamp'),
+            array('leaves', array('leaf', 'leave', 'leaff')),
             array('lice', 'louse'),
             array('lives', 'life'),
             array('matrices', array('matrex', 'matrix', 'matrice')),
@@ -94,6 +102,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('oases', array('oas', 'oase', 'oasis')),
             array('objectives', 'objective'),
             array('oxen', 'ox'),
+            array('parties', 'party'),
             array('phenomena', array('phenomenon', 'phenomenum')),
             array('photos', 'photo'),
             array('pianos', 'piano'),
@@ -106,6 +115,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('roses', array('ros', 'rose', 'rosis')),
             array('sandwiches', array('sandwich', 'sandwiche')),
             array('scarves', array('scarf', 'scarve', 'scarff')),
+            array('schemas', 'schema'), //schemata
             array('sheriffs', 'sheriff'),
             array('shoes', array('sho', 'shoe')),
             array('spies', 'spy'),
@@ -114,16 +124,23 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('strata', array('straton', 'stratum')),
             array('suitcases', array('suitcas', 'suitcase', 'suitcasis')),
             array('syllabi', 'syllabus'),
+            array('tags', 'tag'),
             array('teeth', 'tooth'),
             array('theses', array('thes', 'these', 'thesis')),
             array('thieves', array('thief', 'thieve', 'thieff')),
             array('trees', array('tre', 'tree')),
-
+            array('waltzes', array('waltz', 'waltze')),
+            array('wives', 'wife'),
 
             // test casing: if the first letter was uppercase, it should remain so
             array('Men', 'Man'),
             array('GrandChildren', 'GrandChild'),
             array('SubTrees', array('SubTre', 'SubTree')),
+
+            // Known issues
+            //array('insignia', 'insigne'),
+            //array('insignias', 'insigne'),
+            //array('rattles', 'rattle'),
         );
     }
 
@@ -132,6 +149,12 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testSingularify($plural, $singular)
     {
-        $this->assertEquals($singular, StringUtil::singularify($plural));
+        $single = StringUtil::singularify($plural);
+        if (is_string($singular) && is_array($single)){
+            $this->fail("--- Expected\n`string`: " . $singular . "\n+++ Actual\n`array`: " . implode(', ', $single));
+        } elseif (is_array($singular) && is_string($single)){
+            $this->fail("--- Expected\n`array`: " . implode(', ', $singular) . "\n+++ Actual\n`string`: " . $single);
+        }
+        $this->assertEquals($singular, $single);
     }
 }

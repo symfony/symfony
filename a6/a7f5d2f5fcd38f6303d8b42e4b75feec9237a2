@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-07-28T10:00:50Z
+
+Ping @fabpot, @stof, @Tobion: A review would be great :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-04T07:52:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-04T11:34:56Z
+
+I think the duplicated validation code for some new and legacy validators is not good. The validation code is the critical part. So it might make more sense to put that in an internal abstract class and then just change the implementation of adding a violation in the concrete class, i.e. `addViolationAt` vs. `buildViolation`.
+But apart from that the PR looks good.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-04T12:17:37Z
+
+@Tobion I was thinking about that, but then again I think this over-complicates the code (lots of new abstraction and classes). I think that the code - although duplicated - will be easy to maintain for two reasons:
+
+* the tests are not duplicated, so whenever we change/add a test, the tests fail for both implementations;
+* the validators are very stable and rarely change.
+
+For these reasons I would prefer to keep the duplicated code until we really *need to* combine it into a more complex abstraction.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-04T14:21:37Z
+
+OK :+1:

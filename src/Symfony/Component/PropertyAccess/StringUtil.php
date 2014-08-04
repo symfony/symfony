@@ -75,6 +75,9 @@ class StringUtil
         // objectives (objective), alternative (alternatives)
         array('sevit', 5, true, true, 'tive'),
 
+        // drives (drive)
+        array('sevird', 6, false, true, 'drive'),
+
         // lives (life), wives (wife)
         array('sevi', 4, false, true, 'ife'),
 

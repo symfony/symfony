@@ -62,18 +62,18 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * Validates a value against the constraints specified for an object's
      * property.
      *
-     * @param object     $object       The object
-     * @param string     $propertyName The name of the property
-     * @param mixed      $value        The value to validate against the
-     *                                 property's constraints
-     * @param array|null $groups       The validation groups to validate. If
-     *                                 none is given, "Default" is assumed
+     * @param object|string $objectOrClass The object or its class name
+     * @param string        $propertyName  The name of the property
+     * @param mixed         $value         The value to validate against the
+     *                                     property's constraints
+     * @param array|null    $groups        The validation groups to validate. If
+     *                                     none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations.
      *                                          If the list is empty, validation
      *                                          succeeded
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null);
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
 
     /**
      * Starts a new validation context and returns a validator for that context.

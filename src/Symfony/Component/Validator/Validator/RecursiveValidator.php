@@ -130,10 +130,11 @@ class RecursiveValidator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null)
     {
-        return $this->startContext($object)
-            ->validatePropertyValue($object, $propertyName, $value, $groups)
+        // If a class name is passed, take $value as root
+        return $this->startContext(is_object($objectOrClass) ? $objectOrClass : $value)
+            ->validatePropertyValue($objectOrClass, $propertyName, $value, $groups)
             ->getViolations();
     }
 }

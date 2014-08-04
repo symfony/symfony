@@ -194,4 +194,60 @@ class ExpressionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate('2', $constraint);
     }
+
+    /**
+     * When validatePropertyValue() is called with a class name
+     * https://github.com/symfony/symfony/pull/11498
+     */
+    public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
+    {
+        $constraint = new Expression('value == "1"');
+
+        $this->context->expects($this->any())
+            ->method('getPropertyName')
+            ->will($this->returnValue('property'));
+
+        $this->context->expects($this->any())
+            ->method('getPropertyPath')
+            ->will($this->returnValue(''));
+
+        $this->context->expects($this->any())
+            ->method('getRoot')
+            ->will($this->returnValue('1'));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate('1', $constraint);
+    }
+
+    /**
+     * When validatePropertyValue() is called with a class name
+     * https://github.com/symfony/symfony/pull/11498
+     */
+    public function testFailingExpressionAtPropertyLevelWithoutRoot()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'value == "1"',
+            'message' => 'myMessage',
+        ));
+
+        $this->context->expects($this->any())
+            ->method('getPropertyName')
+            ->will($this->returnValue('property'));
+
+        $this->context->expects($this->any())
+            ->method('getPropertyPath')
+            ->will($this->returnValue(''));
+
+        $this->context->expects($this->any())
+            ->method('getRoot')
+            ->will($this->returnValue('2'));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage');
+
+        $this->validator->validate('2', $constraint);
+    }
 }

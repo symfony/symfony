@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-04T07:53:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-04T10:25:12Z
+
+https://github.com/webmozart/symfony/blob/issue11139/src/Symfony/Component/Validator/ValidatorInterface.php#L71 should be updated as well
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-04T12:12:22Z
+
+Thanks @Tobion. I changed RecursiveContextualValidator::validatePropertyValue() not to pass the class name to the private methods, this way we can leave the other methods unchanged.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-04T14:21:16Z
+
+:+1:

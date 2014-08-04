@@ -134,12 +134,11 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
 
         /* Note: As discussed in the gc method of this class. You can utilise
          * TTL collections in MongoDB 2.2+
-         * We are setting the "expiry_field as part of the write operation here
+         * We are setting the "expiry_field" as part of the write operation here
          * You will need to create the index on your collection that expires documents
          * at that time
          * e.g.
          * db.MySessionCollection.ensureIndex( { "expireAt": 1 }, { expireAfterSeconds: 0 } )
-         *
          */
         if (false !== $this->options['expiry_field']) {
             $expiry = new \MongoDate(time() + (int) ini_get('session.gc_maxlifetime'));

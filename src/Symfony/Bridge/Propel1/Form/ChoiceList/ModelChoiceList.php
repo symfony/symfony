@@ -80,6 +80,9 @@ class ModelChoiceList extends ObjectChoiceList
      *                                                    Either an array if $choices is given,
      *                                                    or a ModelCriteria to be merged with the $queryObject.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     *
+     * @throws MissingOptionsException when no model class is given
+     * @throws InvalidOptionsException when the model class cannot be found
      */
     public function __construct($class, $labelPath = null, $choices = null, $queryObject = null, $groupPath = null, $preferred = array(), PropertyAccessorInterface $propertyAccessor = null)
     {

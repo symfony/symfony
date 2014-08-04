@@ -428,7 +428,10 @@ class PhpDumper extends Dumper
      *
      * @param string     $id
      * @param Definition $definition
+     *
      * @return string
+     *
+     * @throws ServiceCircularReferenceException when the container contains a circular reference
      */
     private function addServiceInlinedDefinitionsSetup($id, $definition)
     {
@@ -632,6 +635,8 @@ EOF;
      *
      * @param string     $id         A service identifier
      * @param Definition $definition A Definition instance
+     *
+     * @return string|null
      */
     private function addServiceSynchronizer($id, Definition $definition)
     {

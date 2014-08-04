@@ -495,6 +495,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param bool $initialize
      *
+     * @return ButtonBuilder
+     *
      * @throws BadMethodCallException
      */
     public function setAutoInitialize($initialize)

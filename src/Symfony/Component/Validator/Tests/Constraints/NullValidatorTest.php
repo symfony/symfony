@@ -43,7 +43,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $readableValue)
+    public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Null(array(
             'message' => 'myMessage'
@@ -52,7 +52,7 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $readableValue,
+                '{{ value }}' => $valueAsString,
             ));
 
         $this->validator->validate($value, $constraint);
@@ -61,13 +61,14 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
     public function getInvalidValues()
     {
         return array(
-            array(0, 0),
-            array(false, false),
-            array(true, true),
-            array('', ''),
-            array('foo bar', 'foo bar'),
-            array(new \DateTime(), 'DateTime'),
-            array(array(), 'Array'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(true, 'true'),
+            array('', '""'),
+            array('foo bar', '"foo bar"'),
+            array(new \DateTime(), 'object'),
+            array(new \stdClass(), 'object'),
+            array(array(), 'array'),
         );
     }
 }

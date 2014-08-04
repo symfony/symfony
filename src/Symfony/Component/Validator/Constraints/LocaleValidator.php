@@ -42,7 +42,9 @@ class LocaleValidator extends ConstraintValidator
         $locales = Intl::getLocaleBundle()->getLocaleNames();
 
         if (!isset($locales[$value])) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         }
     }
 }

@@ -96,7 +96,7 @@ class TimeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => $time,
+                '{{ value }}' => '"'.$time.'"',
             ));
 
         $this->validator->validate($time, $constraint);

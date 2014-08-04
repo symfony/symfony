@@ -24,14 +24,17 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class LuhnValidator extends ConstraintValidator
 {
     /**
-     * Validates a creditcard number with the Luhn algorithm.
+     * Validates a credit card number with the Luhn algorithm.
      *
      * @param mixed      $value
      * @param Constraint $constraint
+     *
+     * @throws UnexpectedTypeException when the given credit card number is no string
      */
     public function validate($value, Constraint $constraint)
     {
@@ -39,28 +42,48 @@ class LuhnValidator extends ConstraintValidator
             return;
         }
 
-        /**
-         * need to work with strings only because long numbers are treated as floats and don't work with strlen
-         */
-        if (!is_string($value)) {
+        // Work with strings only, because long numbers are represented as floats
+        // internally and don't work with strlen()
+        if (!is_string($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->message);
+        $value = (string) $value;
+
+        if (!ctype_digit($value)) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
 
             return;
         }
 
+        $checkSum = 0;
         $length = strlen($value);
-        $oddLength = $length % 2;
-        for ($sum = 0, $i = $length - 1; $i >= 0; $i--) {
-            $digit = (int) $value[$i];
-            $sum += (($i % 2) === $oddLength) ? array_sum(str_split($digit * 2)) : $digit;
+
+        // Starting with the last digit and walking left, add every second
+        // digit to the check sum
+        // e.g. 7  9  9  2  7  3  9  8  7  1  3
+        //      ^     ^     ^     ^     ^     ^
+        //    = 7  +  9  +  7  +  9  +  7  +  3
+        for ($i = $length - 1; $i >= 0; $i -= 2) {
+            $checkSum += $value{$i};
         }
 
-        if ($sum === 0 || ($sum % 10) !== 0) {
-            $this->context->addViolation($constraint->message);
+        // Starting with the second last digit and walking left, double every
+        // second digit and add it to the check sum
+        // For doubles greater than 9, sum the individual digits
+        // e.g. 7  9  9  2  7  3  9  8  7  1  3
+        //         ^     ^     ^     ^     ^
+        //    =    1+8 + 4  +  6  +  1+6 + 2
+        for ($i = $length - 2; $i >= 0; $i -= 2) {
+            $checkSum += array_sum(str_split($value{$i} * 2));
+        }
+
+        if (0 === $checkSum || 0 !== $checkSum % 10) {
+            $this->context->addViolation($constraint->message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         }
     }
 }

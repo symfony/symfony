@@ -234,4 +234,19 @@ class RangeValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->validator->validate(21, $constraint);
     }
+
+    public function testNonNumeric()
+    {
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ value }}' => '"abcd"',
+            ));
+
+        $this->validator->validate('abcd', new Range(array(
+            'min' => 10,
+            'max' => 20,
+            'invalidMessage' => 'myMessage',
+        )));
+    }
 }

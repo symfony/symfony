@@ -472,6 +472,74 @@ EOF
         $this->assertSame('Music', $crawler->text());
     }
 
+    public function testFilterXPathWithAncestorAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//form');
+
+        $this->assertCount(2, $crawler->filterXPath('ancestor::*'));
+    }
+
+    public function testFilterXPathWithAncestorOrSelfAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//form');
+
+        $this->assertCount(3, $crawler->filterXPath('ancestor-or-self::*'));
+    }
+
+    public function testFilterXPathWithAttributeAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//form');
+
+        $this->assertCount(2, $crawler->filterXPath('attribute::*'));
+    }
+
+    public function testFilterXPathWithChildAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//body');
+
+        $this->assertCount(2, $crawler->filterXPath('child::input'));
+    }
+
+    public function testFilterXPathWithFollowingAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//a');
+
+        $this->assertCount(3, $crawler->filterXPath('following::div'));
+    }
+
+    public function testFilterXPathWithFollowingSiblingAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//a');
+
+        $this->assertCount(2, $crawler->filterXPath('following-sibling::div'));
+    }
+
+    public function testFilterXPathWithParentAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//button');
+
+        $this->assertEquals('foo', $crawler->filterXPath('parent::*')->attr('action'));
+    }
+
+    public function testFilterXPathWithPrecedingAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//form');
+
+        $this->assertCount(13, $crawler->filterXPath('preceding::*'));
+    }
+
+    public function testFilterXPathWithPrecedingSiblingAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//form');
+
+        $this->assertCount(9, $crawler->filterXPath('preceding-sibling::*'));
+    }
+
+    public function testFilterXPathWithSelfAxes()
+    {
+        $this->assertCount(1, $this->createTestCrawler()->filterXPath('self::*'));
+    }
+
     /**
      * @covers Symfony\Component\DomCrawler\Crawler::filter
      */

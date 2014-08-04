@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether the value is a valid ISBN-10 or ISBN-13.
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see https://en.wikipedia.org/wiki/Isbn
  */
@@ -37,53 +38,71 @@ class IsbnValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if (!is_numeric($value)) {
-            $value = str_replace('-', '', $value);
+        $value = (string) $value;
+        $canonical = strtoupper(str_replace('-', '', $value));
+
+        if ($constraint->isbn10 && $this->isValidIsbn10($canonical)) {
+            return;
         }
 
-        $validation = 0;
-        $value = strtoupper($value);
-        $valueLength = strlen($value);
+        if ($constraint->isbn13 && $this->isValidIsbn13($canonical)) {
+            return;
+        }
 
-        if (10 === $valueLength && null !== $constraint->isbn10) {
-            for ($i = 0; $i < 10; $i++) {
-                if ($value[$i] == 'X') {
-                    $validation += 10 * intval(10 - $i);
-                } else {
-                    $validation += intval($value[$i]) * intval(10 - $i);
-                }
-            }
-
-            if ($validation % 11 != 0) {
-                if (null !== $constraint->isbn13) {
-                    $this->context->addViolation($constraint->bothIsbnMessage);
-                } else {
-                    $this->context->addViolation($constraint->isbn10Message);
-                }
-            }
-        } elseif (13 === $valueLength && null !== $constraint->isbn13) {
-            for ($i = 0; $i < 13; $i += 2) {
-                $validation += intval($value[$i]);
-            }
-            for ($i = 1; $i < 12; $i += 2) {
-                $validation += intval($value[$i]) * 3;
-            }
-
-            if ($validation % 10 != 0) {
-                if (null !== $constraint->isbn10) {
-                    $this->context->addViolation($constraint->bothIsbnMessage);
-                } else {
-                    $this->context->addViolation($constraint->isbn13Message);
-                }
-            }
+        if ($constraint->isbn10 && $constraint->isbn13) {
+            $this->context->addViolation($constraint->bothIsbnMessage, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
+        } elseif ($constraint->isbn10) {
+            $this->context->addViolation($constraint->isbn10Message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         } else {
-            if (null !== $constraint->isbn10 && null !== $constraint->isbn13) {
-                $this->context->addViolation($constraint->bothIsbnMessage);
-            } elseif (null !== $constraint->isbn10) {
-                $this->context->addViolation($constraint->isbn10Message);
-            } else {
-                $this->context->addViolation($constraint->isbn13Message);
-            }
+            $this->context->addViolation($constraint->isbn13Message, array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         }
+    }
+
+    private function isValidIsbn10($isbn)
+    {
+        if (10 !== strlen($isbn)) {
+            return false;
+        }
+
+        $checkSum = 0;
+
+        for ($i = 0; $i < 10; ++$i) {
+            if ('X' === $isbn{$i}) {
+                $digit = 10;
+            } elseif (ctype_digit($isbn{$i})) {
+                $digit = $isbn{$i};
+            } else {
+                return false;
+            }
+
+            $checkSum += $digit * intval(10 - $i);
+        }
+
+        return 0 === $checkSum % 11;
+    }
+
+    private function isValidIsbn13($isbn)
+    {
+        if (13 !== strlen($isbn) || !ctype_digit($isbn)) {
+            return false;
+        }
+
+        $checkSum = 0;
+
+        for ($i = 0; $i < 13; $i += 2) {
+            $checkSum += $isbn{$i};
+        }
+
+        for ($i = 1; $i < 12; $i += 2) {
+            $checkSum += $isbn{$i} * 3;
+        }
+
+        return 0 === $checkSum % 10;
     }
 }

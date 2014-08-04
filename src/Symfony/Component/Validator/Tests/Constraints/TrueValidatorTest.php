@@ -57,6 +57,7 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
+                '{{ value }}' => 'false',
             ));
 
         $this->validator->validate(false, $constraint);

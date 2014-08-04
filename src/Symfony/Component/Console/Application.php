@@ -872,6 +872,8 @@ class Application
      * @param OutputInterface $output  An Output instance
      *
      * @return int 0 if everything went fine, or an error code
+     *
+     * @throws \Exception when the command being run threw an exception
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {

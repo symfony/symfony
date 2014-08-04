@@ -158,7 +158,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => 'baz',
+                '{{ value }}' => '"baz"',
             ), null, null);
 
         $this->validator->validate('baz', $constraint);
@@ -175,7 +175,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => 'baz',
+                '{{ value }}' => '"baz"',
             ));
 
         $this->validator->validate(array('foo', 'baz'), $constraint);
@@ -255,7 +255,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => '2',
+                '{{ value }}' => '"2"',
             ));
 
         $this->validator->validate('2', $constraint);
@@ -287,7 +287,7 @@ class ChoiceValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with('myMessage', array(
-                '{{ value }}' => '3',
+                '{{ value }}' => '"3"',
             ));
 
         $this->validator->validate(array(2, '3'), $constraint);

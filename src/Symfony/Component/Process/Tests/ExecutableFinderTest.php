@@ -46,7 +46,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
         $this->setPath(dirname(PHP_BINARY));
 
-        $finder = new ExecutableFinder;
+        $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
 
         $this->assertSamePath(PHP_BINARY, $result);
@@ -62,7 +62,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
         $this->setPath('');
 
-        $finder = new ExecutableFinder;
+        $finder = new ExecutableFinder();
         $result = $finder->find('foo', $expected);
 
         $this->assertEquals($expected, $result);
@@ -82,7 +82,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
         $extraDirs = array(dirname(PHP_BINARY));
 
-        $finder = new ExecutableFinder;
+        $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), null, $extraDirs);
 
         $this->assertSamePath(PHP_BINARY, $result);
@@ -104,7 +104,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
         ini_set('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
 
-        $finder = new ExecutableFinder;
+        $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
 
         $this->assertSamePath(PHP_BINARY, $result);

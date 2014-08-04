@@ -801,12 +801,12 @@ QUERY;
     }
 
     /**
-     * This process old entries changes on an ACE related property (classFieldAces, or objectFieldAces).
+     * This processes old entries changes on an ACE related property (classFieldAces, or objectFieldAces).
      *
      * @param string $name
-     * @param array $changes
+     * @param array  $changes
      */
-    private function updateOldFieldAceProperty($ane, array $changes)
+    private function updateOldFieldAceProperty($name, array $changes)
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {

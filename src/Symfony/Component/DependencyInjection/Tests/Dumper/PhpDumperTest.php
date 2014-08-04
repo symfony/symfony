@@ -140,7 +140,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Aliases')));
 
         $container = new \Symfony_DI_PhpDumper_Test_Aliases();
-        $container->set('foo', $foo = new \stdClass);
+        $container->set('foo', $foo = new \stdClass());
         $this->assertSame($foo, $container->get('foo'));
         $this->assertSame($foo, $container->get('alias_for_foo'));
         $this->assertSame($foo, $container->get('alias_for_alias'));

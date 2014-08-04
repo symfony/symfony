@@ -13,23 +13,18 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
+use Symfony\Component\Validator\Validation;
 
-class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
+class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new NotBlankValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new NotBlankValidator();
     }
 
     /**
@@ -37,10 +32,9 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($value, new NotBlank());
+
+        $this->assertNoViolation();
     }
 
     public function getValidValues()
@@ -60,11 +54,9 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
-
         $this->validator->validate(null, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     public function testBlankIsInvalid()
@@ -73,11 +65,9 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
-
         $this->validator->validate('', $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     public function testFalseIsInvalid()
@@ -86,11 +76,9 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
-
         $this->validator->validate(false, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     public function testEmptyArrayIsInvalid()
@@ -99,10 +87,8 @@ class NotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
-
         $this->validator->validate(array(), $constraint);
+
+        $this->assertViolation('myMessage');
     }
 }

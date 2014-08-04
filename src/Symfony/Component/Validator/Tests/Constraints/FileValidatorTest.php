@@ -14,25 +14,36 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
+use Symfony\Component\Validator\Validation;
 
-abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
     protected $path;
+
     protected $file;
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new FileValidator();
+    }
 
     protected function setUp()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new FileValidator();
-        $this->validator->initialize($this->context);
+        parent::setUp();
+
         $this->path = sys_get_temp_dir().DIRECTORY_SEPARATOR.'FileValidatorTest';
         $this->file = fopen($this->path, 'w');
     }
 
     protected function tearDown()
     {
+        parent::tearDown();
+
         if (is_resource($this->file)) {
             fclose($this->file);
         }
@@ -41,26 +52,22 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             unlink($this->path);
         }
 
-        $this->context = null;
-        $this->validator = null;
         $this->path = null;
         $this->file = null;
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new File());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new File());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -73,19 +80,17 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidFile()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($this->path, new File());
+
+        $this->assertNoViolation();
     }
 
     public function testValidUploadedfile()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $file = new UploadedFile($this->path, 'originalName', null, null, null, true);
         $this->validator->validate($file, new File());
+
+        $this->assertNoViolation();
     }
 
     public function provideMaxSizeExceededTests()
@@ -137,16 +142,14 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ limit }}'   => $limitAsString,
-                '{{ size }}'    => $sizeAsString,
-                '{{ suffix }}'  => $suffix,
-                '{{ file }}'    => $this->path,
-            ));
-
         $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ limit }}'   => $limitAsString,
+            '{{ size }}'    => $sizeAsString,
+            '{{ suffix }}'  => $suffix,
+            '{{ file }}'    => $this->path,
+        ));
     }
 
     public function provideMaxSizeNotExceededTests()
@@ -177,10 +180,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSizeMessage'    => 'myMessage',
         ));
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -213,14 +215,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('image/jpg'))
         ;
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new File(array(
             'mimeTypes' => array('image/png', 'image/jpg'),
         ));
 
         $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidWildcardMimeType()
@@ -241,14 +242,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('image/jpg'))
         ;
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new File(array(
             'mimeTypes' => array('image/*'),
         ));
 
         $this->validator->validate($file, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testInvalidMimeType()
@@ -274,15 +274,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypesMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ type }}'    => '"application/pdf"',
-                '{{ types }}'   => '"image/png", "image/jpg"',
-                '{{ file }}'    => $this->path,
-            ));
-
         $this->validator->validate($file, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ type }}'    => '"application/pdf"',
+            '{{ types }}'   => '"image/png", "image/jpg"',
+            '{{ file }}'    => $this->path,
+        ));
     }
 
     public function testInvalidWildcardMimeType()
@@ -308,15 +306,13 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'mimeTypesMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ type }}'    => '"application/pdf"',
-                '{{ types }}'   => '"image/*", "image/jpg"',
-                '{{ file }}'    => $this->path,
-            ));
-
         $this->validator->validate($file, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ type }}'    => '"application/pdf"',
+            '{{ types }}'   => '"image/*", "image/jpg"',
+            '{{ file }}'    => $this->path,
+        ));
     }
 
     /**
@@ -331,11 +327,9 @@ abstract class FileValidatorTest extends \PHPUnit_Framework_TestCase
             'maxSize' => $maxSize
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $params);
-
         $this->validator->validate($file, $constraint);
+
+        $this->assertViolation('myMessage', $params);
 
     }
 

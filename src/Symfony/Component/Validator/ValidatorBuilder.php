@@ -17,6 +17,7 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -379,7 +380,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
         }
 
-        $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
+        $validatorFactory = $this->validatorFactory;
         $translator = $this->translator ?: new DefaultTranslator();
         $apiVersion = $this->apiVersion;
 
@@ -390,14 +391,20 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         if (Validation::API_VERSION_2_4 === $apiVersion) {
+            $validatorFactory = $validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
+
             return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
         }
 
-        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
-
         if (Validation::API_VERSION_2_5 === $apiVersion) {
+            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
+            $validatorFactory = $validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
+
             return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
         }
+
+        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
+        $validatorFactory = $validatorFactory ?: new LegacyConstraintValidatorFactory($this->propertyAccessor);
 
         return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }

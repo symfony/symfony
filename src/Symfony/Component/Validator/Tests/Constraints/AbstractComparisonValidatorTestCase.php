@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\AbstractComparisonValidator;
 
 class ComparisonTest_Class
 {
@@ -32,30 +31,15 @@ class ComparisonTest_Class
 /**
  * @author Daniel Holmes <daniel@danielholmes.org>
  */
-abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintValidatorTest
 {
-    private $validator;
-    private $context;
-
-    protected function setUp()
-    {
-        $this->validator = $this->createValidator();
-        $this->context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->validator->initialize($this->context);
-    }
-
     /**
-     * @return AbstractComparisonValidator
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    abstract protected function createValidator();
-
     public function testThrowsConstraintExceptionIfNoValueOrProperty()
     {
-        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-
         $comparison = $this->createConstraint(array());
+
         $this->validator->validate('some value', $comparison);
     }
 
@@ -66,16 +50,11 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
      */
     public function testValidComparisonToValue($dirtyValue, $comparisonValue)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = $this->createConstraint(array('value' => $comparisonValue));
 
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('property1'));
-
         $this->validator->validate($dirtyValue, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -95,19 +74,13 @@ abstract class AbstractComparisonValidatorTestCase extends \PHPUnit_Framework_Te
         $constraint = $this->createConstraint(array('value' => $comparedValue));
         $constraint->message = 'Constraint Message';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('property1'));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('Constraint Message', array(
-                '{{ value }}' => $comparedValueString,
-                '{{ compared_value }}' => $comparedValueString,
-                '{{ compared_value_type }}' => $comparedValueType
-            ));
-
         $this->validator->validate($dirtyValue, $constraint);
+
+        $this->assertViolation('Constraint Message', array(
+            '{{ value }}' => $comparedValueString,
+            '{{ compared_value }}' => $comparedValueString,
+            '{{ compared_value_type }}' => $comparedValueType
+        ));
     }
 
     /**

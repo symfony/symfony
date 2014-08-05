@@ -51,6 +51,7 @@ class ExpressionValidator extends ConstraintValidator
         $variables = array();
 
         if (null === $this->context->getPropertyName()) {
+            $variables['value'] = $value;
             $variables['this'] = $value;
         } else {
             // Extract the object that the property belongs to from the object

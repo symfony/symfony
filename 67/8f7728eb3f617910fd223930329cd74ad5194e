@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by pkruithof at 2014-07-30T19:34:52Z
+
+The failing test is not because of this change:
+
+```
+1) Symfony\Component\Finder\Tests\FinderTest::testNonSeekableStream
+InvalidArgumentException: The "ftp://ftp.mozilla.org/" directory does not exist.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Finder/Finder.php:667
+/home/travis/build/symfony/symfony/src/Symfony/Component/Finder/Tests/FinderTest.php:842
+
+FAILURES!
+Tests: 251, Assertions: 457, Errors: 1, Skipped: 2.
+```
+
+@fabpot good to go :shipit:?

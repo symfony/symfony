@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
+    const HEADER_FORWARDED = 'forwarded';
     const HEADER_CLIENT_IP = 'client_ip';
     const HEADER_CLIENT_HOST = 'client_host';
     const HEADER_CLIENT_PROTO = 'client_proto';
@@ -65,10 +66,13 @@ class Request
      * Names for headers that can be trusted when
      * using trusted proxies.
      *
-     * The default names are non-standard, but widely used
+     * The FORWARDED header is the standard as of rfc7239.
+     *
+     * The other headers are non-standard, but widely used
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
      */
     protected static $trustedHeaders = array(
+        self::HEADER_FORWARDED => 'FORWARDED',
         self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
         self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
         self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
@@ -833,11 +837,11 @@ class Request
             return array($ip);
         }
 
-        if ($this->headers->has('Forwarded')) {
+        if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
             $forwardedHeader = $this->headers->get('Forwarded');
             preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
             $clientIps = $matches[3];
-        } elseif ($this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+        } elseif (self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
             $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         }
 

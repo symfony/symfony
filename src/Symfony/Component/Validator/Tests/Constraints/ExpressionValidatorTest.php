@@ -158,22 +158,13 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Expression('value == "1"');
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue(''));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue('1'));
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->setRoot('1');
+        $this->setPropertyPath('');
+        $this->setProperty(null, 'property');
 
         $this->validator->validate('1', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -187,22 +178,12 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue(''));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue('2'));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
+        $this->setRoot('2');
+        $this->setPropertyPath('');
+        $this->setProperty(null, 'property');
 
         $this->validator->validate('2', $constraint);
+
+        $this->assertViolation('myMessage', array(), '');
     }
 }

@@ -60,7 +60,11 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
             array('0-4X19-92611'),
             array('0_45122_5244'),
             array('2870#971#648'),
-            array('0-9752298-0-x')
+            array('0-9752298-0-x'),
+            array('1A34567890'),
+            // chr(1) evaluates to 0
+            // 2070546810 is valid
+            array('2'.chr(1).'70546810'),
         );
     }
 
@@ -95,6 +99,10 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
             array('980-0474292319'),
             array('978_0451225245'),
             array('978#0471292319'),
+            array('978-272C442282'),
+            // chr(1) evaluates to 0
+            // 978-2070546817 is valid
+            array('978-2'.chr(1).'70546817'),
         );
     }
 
@@ -168,7 +176,9 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$isbn.'"',
+        ));
     }
 
     /**
@@ -195,7 +205,9 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$isbn.'"',
+        ));
     }
 
     /**
@@ -221,6 +233,8 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$isbn.'"',
+        ));
     }
 }

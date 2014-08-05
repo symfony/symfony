@@ -49,6 +49,8 @@ class FalseValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(true, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => 'true'
+        ));
     }
 }

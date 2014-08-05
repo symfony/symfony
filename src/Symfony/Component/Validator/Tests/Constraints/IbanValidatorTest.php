@@ -55,6 +55,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
     {
         return array(
             array('CH9300762011623852957'), // Switzerland without spaces
+            array('CH93  0076 2011 6238 5295 7'), // Switzerland with multiple spaces
 
             //Country list
             //http://www.rbs.co.uk/corporate/international/g0/guide-to-international-business/regulatory-information/iban/iban-example.ashx
@@ -164,7 +165,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($iban, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $iban,
+            '{{ value }}' => '"'.$iban.'"',
         ));
     }
 
@@ -181,6 +182,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
             array('foo'),
             array('123'),
             array('0750447346'),
+            array('CH930076201162385295]'),
 
             //Ibans with lower case values are invalid
             array('Ae260211000000230064016'),

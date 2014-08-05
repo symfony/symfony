@@ -37,7 +37,7 @@ class NullValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $readableValue)
+    public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Null(array(
             'message' => 'myMessage'
@@ -46,20 +46,21 @@ class NullValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $readableValue,
+            '{{ value }}' => $valueAsString,
         ));
     }
 
     public function getInvalidValues()
     {
         return array(
-            array(0, 0),
-            array(false, false),
-            array(true, true),
-            array('', ''),
-            array('foo bar', 'foo bar'),
-            array(new \DateTime(), 'DateTime'),
-            array(array(), 'Array'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(true, 'true'),
+            array('', '""'),
+            array('foo bar', '"foo bar"'),
+            array(new \DateTime(), 'object'),
+            array(new \stdClass(), 'object'),
+            array(array(), 'array'),
         );
     }
 }

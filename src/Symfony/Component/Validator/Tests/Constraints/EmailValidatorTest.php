@@ -80,7 +80,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($email, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $email,
+            '{{ value }}' => '"'.$email.'"',
         ));
     }
 

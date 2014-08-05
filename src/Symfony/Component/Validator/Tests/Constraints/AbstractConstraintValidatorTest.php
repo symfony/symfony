@@ -60,6 +60,8 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $this->context = $this->createContext();
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
+
+        \Locale::setDefault('en');
     }
 
     protected function createContext()

@@ -123,7 +123,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($url, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $url,
+            '{{ value }}' => '"'.$url.'"',
         ));
     }
 

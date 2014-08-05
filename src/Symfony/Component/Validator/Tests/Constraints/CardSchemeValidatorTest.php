@@ -63,7 +63,9 @@ class CardSchemeValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($number, $constraint);
 
-        $this->assertViolation('myMessage', array());
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => is_string($number) ? '"'.$number.'"' : $number,
+        ));
     }
 
     public function getValidNumbers()

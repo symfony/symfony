@@ -781,7 +781,7 @@ class ResponseTest extends ResponseTestCase
     public function invalidContentProvider()
     {
         return array(
-            'obj'   => array(new \stdClass),
+            'obj'   => array(new \stdClass()),
             'array' => array(array()),
             'bool'   => array(true, '1'),
         );

@@ -44,7 +44,7 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value)
+    public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Blank(array(
             'message' => 'myMessage'
@@ -54,17 +54,17 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertViolation(
             'myMessage',
-            array('{{ value }}' => $value)
+            array('{{ value }}' => $valueAsString)
         );
     }
 
     public function getInvalidValues()
     {
         return array(
-            array('foobar'),
-            array(0),
-            array(false),
-            array(1234),
+            array('foobar', '"foobar"'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(1234, '1234'),
         );
     }
 }

@@ -51,7 +51,7 @@ class LegacyLengthValidator extends ConstraintValidator
 
         if ($constraint->min == $constraint->max && $length != $constraint->min) {
             $this->context->addViolation($constraint->exactMessage, array(
-                '{{ value }}' => $stringValue,
+                '{{ value }}' => $this->formatValue($stringValue),
                 '{{ limit }}' => $constraint->min,
             ), $value, (int) $constraint->min);
 
@@ -60,7 +60,7 @@ class LegacyLengthValidator extends ConstraintValidator
 
         if (null !== $constraint->max && $length > $constraint->max) {
             $this->context->addViolation($constraint->maxMessage, array(
-                '{{ value }}' => $stringValue,
+                '{{ value }}' => $this->formatValue($stringValue),
                 '{{ limit }}' => $constraint->max,
             ), $value, (int) $constraint->max);
 
@@ -69,7 +69,7 @@ class LegacyLengthValidator extends ConstraintValidator
 
         if (null !== $constraint->min && $length < $constraint->min) {
             $this->context->addViolation($constraint->minMessage, array(
-                '{{ value }}' => $stringValue,
+                '{{ value }}' => $this->formatValue($stringValue),
                 '{{ limit }}' => $constraint->min,
             ), $value, (int) $constraint->min);
         }

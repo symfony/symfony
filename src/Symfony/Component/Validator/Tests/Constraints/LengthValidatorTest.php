@@ -157,7 +157,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => (string) $value,
+            '{{ value }}' => '"'.$value.'"',
             '{{ limit }}' => 4,
         ), 'property.path', $value, 4);
     }
@@ -179,7 +179,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => (string) $value,
+            '{{ value }}' => '"'.$value.'"',
             '{{ limit }}' => 4,
         ), 'property.path', $value, 4);
     }
@@ -202,7 +202,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => (string) $value,
+            '{{ value }}' => '"'.$value.'"',
             '{{ limit }}' => 4,
         ), 'property.path', $value, 4);
     }

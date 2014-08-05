@@ -152,7 +152,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -184,7 +184,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -210,7 +210,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -236,7 +236,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -258,7 +258,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -294,7 +294,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -320,7 +320,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -345,7 +345,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -367,7 +367,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -389,7 +389,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -411,7 +411,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 
@@ -433,7 +433,7 @@ class IpValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($ip, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $ip,
+            '{{ value }}' => '"'.$ip.'"',
         ));
     }
 

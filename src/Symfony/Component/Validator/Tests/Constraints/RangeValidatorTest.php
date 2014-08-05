@@ -219,4 +219,17 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
             '{{ limit }}' => 20,
         ));
     }
+
+    public function testNonNumeric()
+    {
+        $this->validator->validate('abcd', new Range(array(
+            'min' => 10,
+            'max' => 20,
+            'invalidMessage' => 'myMessage',
+        )));
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"abcd"',
+        ));
+    }
 }

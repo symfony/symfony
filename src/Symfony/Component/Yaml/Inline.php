@@ -402,6 +402,8 @@ class Inline
      * @param string $scalar
      *
      * @return string A YAML string
+     *
+     * @throws ParseException when object parsing support was disabled and the parser detected a PHP object
      */
     private static function evaluateScalar($scalar)
     {

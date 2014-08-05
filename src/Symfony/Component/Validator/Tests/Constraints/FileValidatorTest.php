@@ -148,7 +148,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             '{{ limit }}'   => $limitAsString,
             '{{ size }}'    => $sizeAsString,
             '{{ suffix }}'  => $suffix,
-            '{{ file }}'    => $this->path,
+            '{{ file }}'    => '"'.$this->path.'"',
         ));
     }
 
@@ -279,7 +279,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $this->assertViolation('myMessage', array(
             '{{ type }}'    => '"application/pdf"',
             '{{ types }}'   => '"image/png", "image/jpg"',
-            '{{ file }}'    => $this->path,
+            '{{ file }}'    => '"'.$this->path.'"',
         ));
     }
 
@@ -311,7 +311,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $this->assertViolation('myMessage', array(
             '{{ type }}'    => '"application/pdf"',
             '{{ types }}'   => '"image/*", "image/jpg"',
-            '{{ file }}'    => $this->path,
+            '{{ file }}'    => '"'.$this->path.'"',
         ));
     }
 

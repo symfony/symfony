@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraint;
 
 class ComparisonTest_Class
@@ -65,19 +66,26 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
     /**
      * @dataProvider provideInvalidComparisons
      * @param mixed  $dirtyValue
+     * @param mixed  $dirtyValueAsString
      * @param mixed  $comparedValue
      * @param mixed  $comparedValueString
      * @param string $comparedValueType
      */
-    public function testInvalidComparisonToValue($dirtyValue, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
     {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        if ($dirtyValue instanceof \DateTime) {
+            IntlTestHelper::requireIntl($this);
+        }
+
         $constraint = $this->createConstraint(array('value' => $comparedValue));
         $constraint->message = 'Constraint Message';
 
         $this->validator->validate($dirtyValue, $constraint);
 
         $this->assertViolation('Constraint Message', array(
-            '{{ value }}' => $comparedValueString,
+            '{{ value }}' => $dirtyValueAsString,
             '{{ compared_value }}' => $comparedValueString,
             '{{ compared_value_type }}' => $comparedValueType
         ));

@@ -143,7 +143,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => 'baz'
+            '{{ field }}' => '"baz"'
         ), 'property.path[baz]', 6);
     }
 
@@ -202,7 +202,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => 'foo'
+            '{{ field }}' => '"foo"'
         ), 'property.path[foo]', null);
     }
 
@@ -312,7 +312,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => 'foo'
+            '{{ field }}' => '"foo"'
         ), 'property.path[foo]', null);
     }
 

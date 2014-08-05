@@ -87,7 +87,7 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($date, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $date,
+            '{{ value }}' => '"'.$date.'"',
         ));
     }
 

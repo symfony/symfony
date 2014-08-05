@@ -147,7 +147,9 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($issn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -162,7 +164,9 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($issn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -188,7 +192,9 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($issn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -202,7 +208,9 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($issn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -216,6 +224,8 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($issn, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 }

@@ -145,7 +145,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('baz', $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => 'baz',
+            '{{ value }}' => '"baz"',
         ));
     }
 
@@ -160,7 +160,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate(array('foo', 'baz'), $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => 'baz',
+            '{{ value }}' => '"baz"',
         ));
     }
 
@@ -240,7 +240,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => '2',
+            '{{ value }}' => '"2"',
         ));
     }
 
@@ -269,7 +269,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate(array(2, '3'), $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => '3',
+            '{{ value }}' => '"3"',
         ));
     }
 }

@@ -741,6 +741,7 @@ class FrameworkExtension extends Extension
             switch ($config['api']) {
                 case '2.4':
                     $api = Validation::API_VERSION_2_4;
+                    $container->setParameter('validator.validator_factory.class', $container->getParameter('validator.legacy_validator_factory.class'));
                     break;
                 case '2.5':
                     $api = Validation::API_VERSION_2_5;

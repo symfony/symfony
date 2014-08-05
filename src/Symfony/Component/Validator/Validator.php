@@ -142,7 +142,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null)
     {
-        $visitor = $this->createVisitor($containingValue);
+        $visitor = $this->createVisitor(is_object($containingValue) ? $containingValue : $value);
         $metadata = $this->metadataFactory->getMetadataFor($containingValue);
 
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
@@ -153,13 +153,17 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
             throw new ValidatorException(sprintf('The metadata for '.$valueAsString.' does not support properties.'));
         }
 
+        // If $containingValue is passed as class name, take $value as root
+        // and start the traversal with an empty property path
+        $propertyPath = is_object($containingValue) ? $property : '';
+
         foreach ($this->resolveGroups($groups) as $group) {
             if (!$metadata->hasPropertyMetadata($property)) {
                 continue;
             }
 
             foreach ($metadata->getPropertyMetadata($property) as $propMeta) {
-                $propMeta->accept($visitor, $value, $group, $property);
+                $propMeta->accept($visitor, $value, $group, $propertyPath);
             }
         }
 

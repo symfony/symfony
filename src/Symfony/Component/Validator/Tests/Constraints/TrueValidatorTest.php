@@ -13,39 +13,32 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\True;
 use Symfony\Component\Validator\Constraints\TrueValidator;
+use Symfony\Component\Validator\Validation;
 
-class TrueValidatorTest extends \PHPUnit_Framework_TestCase
+class TrueValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new TrueValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new TrueValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new True());
+
+        $this->assertNoViolation();
     }
 
     public function testTrueIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(true, new True());
+
+        $this->assertNoViolation();
     }
 
     public function testFalseIsInvalid()
@@ -54,11 +47,10 @@ class TrueValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-            ));
-
         $this->validator->validate(false, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => 'false',
+        ));
     }
 }

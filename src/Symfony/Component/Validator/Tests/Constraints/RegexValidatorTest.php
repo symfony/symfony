@@ -13,39 +13,32 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
+use Symfony\Component\Validator\Validation;
 
-class RegexValidatorTest extends \PHPUnit_Framework_TestCase
+class RegexValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new RegexValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new RegexValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Regex(array('pattern' => '/^[0-9]+$/')));
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Regex(array('pattern' => '/^[0-9]+$/')));
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -61,11 +54,10 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Regex(array('pattern' => '/^[0-9]+$/'));
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function getValidValues()
@@ -88,13 +80,11 @@ class RegexValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $value,
-            ));
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$value.'"',
+        ));
     }
 
     public function getInvalidValues()

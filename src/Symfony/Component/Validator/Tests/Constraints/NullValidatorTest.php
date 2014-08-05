@@ -13,61 +13,54 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Null;
 use Symfony\Component\Validator\Constraints\NullValidator;
+use Symfony\Component\Validator\Validation;
 
-class NullValidatorTest extends \PHPUnit_Framework_TestCase
+class NullValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new NullValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new NullValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Null());
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider getInvalidValues
      */
-    public function testInvalidValues($value, $readableValue)
+    public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Null(array(
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $readableValue,
-            ));
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $valueAsString,
+        ));
     }
 
     public function getInvalidValues()
     {
         return array(
-            array(0, 0),
-            array(false, false),
-            array(true, true),
-            array('', ''),
-            array('foo bar', 'foo bar'),
-            array(new \DateTime(), 'DateTime'),
-            array(array(), 'Array'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(true, 'true'),
+            array('', '""'),
+            array('foo bar', '"foo bar"'),
+            array(new \DateTime(), 'object'),
+            array(new \stdClass(), 'object'),
+            array(array(), 'array'),
         );
     }
 }

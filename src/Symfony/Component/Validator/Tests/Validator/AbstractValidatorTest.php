@@ -904,6 +904,57 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($violations[0]->getCode());
     }
 
+    public function testValidatePropertyValueWithClassName()
+    {
+        $test = $this;
+
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $propertyMetadatas = $test->metadata->getPropertyMetadata('firstName');
+
+            $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
+            $test->assertSame('firstName', $context->getPropertyName());
+            $test->assertSame('', $context->getPropertyPath());
+            $test->assertSame('Group', $context->getGroup());
+            $test->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $test->assertSame('Bernhard', $context->getRoot());
+            $test->assertSame('Bernhard', $context->getValue());
+            $test->assertSame('Bernhard', $value);
+
+            $context->addViolation('Message %param%', array('%param%' => 'value'));
+        };
+
+        $callback2 = function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Other violation');
+        };
+
+        $this->metadata->addPropertyConstraint('firstName', new Callback(array(
+            'callback' => $callback1,
+            'groups' => 'Group',
+        )));
+        $this->metadata->addPropertyConstraint('lastName', new Callback(array(
+            'callback' => $callback2,
+            'groups' => 'Group',
+        )));
+
+        $violations = $this->validatePropertyValue(
+            self::ENTITY_CLASS,
+            'firstName',
+            'Bernhard',
+            'Group'
+        );
+
+        /** @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Message value', $violations[0]->getMessage());
+        $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame('', $violations[0]->getPropertyPath());
+        $this->assertSame('Bernhard', $violations[0]->getRoot());
+        $this->assertSame('Bernhard', $violations[0]->getInvalidValue());
+        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getCode());
+    }
+
     /**
      * Cannot be UnsupportedMetadataException for BC with Symfony < 2.5.
      *

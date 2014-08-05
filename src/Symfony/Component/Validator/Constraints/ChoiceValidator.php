@@ -63,25 +63,35 @@ class ChoiceValidator extends ConstraintValidator
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, $constraint->strict)) {
-                    $this->context->addViolation($constraint->multipleMessage, array('{{ value }}' => $_value));
+                    $this->context->buildViolation($constraint->multipleMessage)
+                        ->setParameter('{{ value }}', $this->formatValue($_value))
+                        ->addViolation();
                 }
             }
 
             $count = count($value);
 
             if ($constraint->min !== null && $count < $constraint->min) {
-                $this->context->addViolation($constraint->minMessage, array('{{ limit }}' => $constraint->min), null, (int) $constraint->min);
+                $this->context->buildViolation($constraint->minMessage)
+                    ->setParameter('{{ limit }}', $constraint->min)
+                    ->setPlural((int) $constraint->min)
+                    ->addViolation();
 
                 return;
             }
 
             if ($constraint->max !== null && $count > $constraint->max) {
-                $this->context->addViolation($constraint->maxMessage, array('{{ limit }}' => $constraint->max), null, (int) $constraint->max);
+                $this->context->buildViolation($constraint->maxMessage)
+                    ->setParameter('{{ limit }}', $constraint->max)
+                    ->setPlural((int) $constraint->max)
+                    ->addViolation();
 
                 return;
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
         }
     }
 }

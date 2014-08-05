@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
  * @author Manuel Reinhard <manu@sprain.ch>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @see https://en.wikipedia.org/wiki/Isbn
  */
 class IsbnValidator extends ConstraintValidator
@@ -41,89 +43,75 @@ class IsbnValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        if (!is_numeric($value)) {
-            $value = str_replace('-', '', $value);
-        }
+        $value = (string) $value;
+        $canonical = str_replace('-', '', $value);
 
         if (null == $constraint->type) {
             if ($constraint->isbn10 && !$constraint->isbn13) {
                 $constraint->type = 'isbn10';
-                $value = strtoupper($value);
             } elseif ($constraint->isbn13 && !$constraint->isbn10) {
                 $constraint->type = 'isbn13';
-                $value = strtoupper($value);
             }
         }
 
-        if ('isbn10' === $constraint->type) {
-            if (!$this->validateIsbn10($value)) {
-                $this->context->addViolation($this->getMessage($constraint, 'isbn10'));
-
-                return;
-            }
-        } elseif ('isbn13' === $constraint->type) {
-            if (!$this->validateIsbn13($value)) {
-                $this->context->addViolation($this->getMessage($constraint, 'isbn13'));
-
-                return;
-            }
-        } else {
-            if (!$this->validateIsbn10($value) && !$this->validateIsbn13($value)) {
-                $this->context->addViolation($this->getMessage($constraint));
-
-                return;
-            }
+        if ('isbn10' === $constraint->type && !$this->validateIsbn10($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint, 'isbn10'), array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
+        } elseif ('isbn13' === $constraint->type && !$this->validateIsbn13($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint, 'isbn13'), array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
+        } elseif (!$this->validateIsbn10($canonical) && !$this->validateIsbn13($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint), array(
+                '{{ value }}' => $this->formatValue($value),
+            ));
         }
     }
 
-    protected function validateIsbn10($value)
+    protected function validateIsbn10($isbn)
     {
-        $validation  = 0;
-        $valueLength = strlen($value);
-
-        if (10 === $valueLength) {
-            for ($i = 0; $i < 10; $i++) {
-                if ($value[$i] == 'X') {
-                    $validation += 10 * intval(10 - $i);
-                } else {
-                    $validation += intval($value[$i]) * intval(10 - $i);
-                }
-            }
-
-            if ($validation % 11 != 0) {
-                return false;
-            } else {
-                return true;
-            }
+        if (10 !== strlen($isbn)) {
+            return false;
         }
 
-        return false;
+        $checkSum = 0;
+
+        for ($i = 0; $i < 10; ++$i) {
+            if ('X' === $isbn{$i}) {
+                $digit = 10;
+            } elseif (ctype_digit($isbn{$i})) {
+                $digit = $isbn{$i};
+            } else {
+                return false;
+            }
+
+            $checkSum += $digit * intval(10 - $i);
+        }
+
+        return 0 === $checkSum % 11;
     }
 
-    protected function validateIsbn13($value)
+    protected function validateIsbn13($isbn)
     {
-        $validation  = 0;
-        $valueLength = strlen($value);
-
-        if (13 === $valueLength) {
-            for ($i = 0; $i < 13; $i += 2) {
-                $validation += intval($value[$i]);
-            }
-            for ($i = 1; $i < 12; $i += 2) {
-                $validation += intval($value[$i]) * 3;
-            }
-
-            if ($validation % 10 != 0) {
-                return false;
-            } else {
-                return true;
-            }
+        if (13 !== strlen($isbn) || !ctype_digit($isbn)) {
+            return false;
         }
 
-        return false;
+        $checkSum = 0;
+
+        for ($i = 0; $i < 13; $i += 2) {
+            $checkSum += $isbn{$i};
+        }
+
+        for ($i = 1; $i < 12; $i += 2) {
+            $checkSum += $isbn{$i} * 3;
+        }
+
+        return 0 === $checkSum % 10;
     }
 
-    protected function getMessage($constraint, $type=null)
+    protected function getMessage($constraint, $type = null)
     {
         if (null !== $constraint->message) {
             return $constraint->message;
@@ -131,8 +119,8 @@ class IsbnValidator extends ConstraintValidator
             return $constraint->isbn10Message;
         } elseif ($type == 'isbn13') {
             return $constraint->isbn13Message;
-        } else {
-            return $constraint->bothIsbnMessage;
         }
+
+        return $constraint->bothIsbnMessage;
     }
 }

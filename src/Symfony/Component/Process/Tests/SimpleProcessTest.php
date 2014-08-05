@@ -167,7 +167,7 @@ class SimpleProcessTest extends AbstractProcessTest
             $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
-                    $process->signal(SIGKILL);
+                    $process->signal(defined('SIGKILL') ? SIGKILL : 9);
                 }
             });
         } catch (RuntimeException $e) {
@@ -183,7 +183,7 @@ class SimpleProcessTest extends AbstractProcessTest
             $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
             $process->run(function () use ($process) {
                 if ($process->isRunning()) {
-                    $process->signal(SIGTERM);
+                    $process->signal(defined('SIGTERM') ? SIGTERM : 15);
                 }
             });
         } catch (RuntimeException $e) {

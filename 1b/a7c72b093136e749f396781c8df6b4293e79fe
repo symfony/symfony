@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-03T15:26:27Z
+
+I don't see where the extra spaces come from in the old version?
+
+---------------------------------------------------------------------------
+
+by craue at 2014-08-04T06:44:47Z
+
+4 of them are those before the `{% for`, but only replacing it by `{%- for` made [some tests fail](https://travis-ci.org/symfony/symfony/jobs/31494379), thus the other changes.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-04T09:46:58Z
+
+:+1:

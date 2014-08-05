@@ -49,7 +49,6 @@ class LegacyCollectionValidator extends ConstraintValidator
         // remove the initialize() method and pass the context as last argument
         // to validate() instead.
         $context = $this->context;
-        $group = $context->getGroup();
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
             // bug fix issue #2779
@@ -58,7 +57,7 @@ class LegacyCollectionValidator extends ConstraintValidator
 
             if ($existsInArray || $existsInArrayAccess) {
                 if (count($fieldConstraint->constraints) > 0) {
-                    $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']', $group);
+                    $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']');
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(

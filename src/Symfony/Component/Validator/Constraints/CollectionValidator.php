@@ -49,7 +49,6 @@ class CollectionValidator extends ConstraintValidator
         // remove the initialize() method and pass the context as last argument
         // to validate() instead.
         $context = $this->context;
-        $group = $context->getGroup();
         $validator = $context->getValidator()->inContext($context);
 
         foreach ($constraint->fields as $field => $fieldConstraint) {
@@ -60,7 +59,7 @@ class CollectionValidator extends ConstraintValidator
             if ($existsInArray || $existsInArrayAccess) {
                 if (count($fieldConstraint->constraints) > 0) {
                     $validator->atPath('['.$field.']')
-                        ->validate($value[$field], $fieldConstraint->constraints, $group);
+                        ->validate($value[$field], $fieldConstraint->constraints);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
                 $context->buildViolation($constraint->missingFieldsMessage)

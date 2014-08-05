@@ -154,4 +154,35 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('property', 'class'), $constraint->getTargets());
     }
+
+    public function testSerialize()
+    {
+        $constraint = new ConstraintA(array(
+            'property1' => 'foo',
+            'property2' => 'bar',
+        ));
+
+        $restoredConstraint = unserialize(serialize($constraint));
+
+        $this->assertEquals($constraint, $restoredConstraint);
+    }
+
+    public function testSerializeInitializesGroupsOption()
+    {
+        $constraintWithExplicitGroup = new ConstraintA(array(
+            'property1' => 'foo',
+            'property2' => 'bar',
+            'groups' => 'Default',
+        ));
+
+        $constraintWithoutExplicitGroup = new ConstraintA(array(
+            'property1' => 'foo',
+            'property2' => 'bar',
+        ));
+
+        $constraintWithExplicitGroup = unserialize(serialize($constraintWithExplicitGroup));
+        $constraintWithoutExplicitGroup = unserialize(serialize($constraintWithoutExplicitGroup));
+
+        $this->assertEquals($constraintWithExplicitGroup, $constraintWithoutExplicitGroup);
+    }
 }

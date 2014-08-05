@@ -246,7 +246,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         }
     }
 
-    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group)
+    protected function expectValidateValueAt($i, $propertyPath, $value, $constraints, $group = null)
     {
         switch ($this->getApiVersion()) {
             case Validation::API_VERSION_2_4:

@@ -224,6 +224,26 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         }
     }
 
+    protected function expectNoValidate()
+    {
+        switch ($this->getApiVersion()) {
+            case Validation::API_VERSION_2_4:
+                $this->context->expects($this->never())
+                    ->method('validate');
+                $this->context->expects($this->never())
+                    ->method('validateValue');
+                break;
+            case Validation::API_VERSION_2_5:
+            case Validation::API_VERSION_2_5_BC:
+                $validator = $this->context->getValidator()->inContext($this->context);
+                $validator->expects($this->never())
+                    ->method('atPath');
+                $validator->expects($this->never())
+                    ->method('validate');
+                break;
+        }
+    }
+
     protected function expectValidateAt($i, $propertyPath, $value, $group)
     {
         switch ($this->getApiVersion()) {
@@ -241,7 +261,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
                     ->will($this->returnValue($validator));
                 $validator->expects($this->at(2 * $i + 1))
                     ->method('validate')
-                    ->with($value, array(), $group);
+                    ->with($value, $this->logicalOr(null, array()), $group);
                 break;
         }
     }

@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Cas Leentfaar <info@casleentfaar.com>
- *
- * @api
  */
 class AnyValidator extends ConstraintValidator
 {
@@ -38,7 +36,8 @@ class AnyValidator extends ConstraintValidator
         $atLeastOneValid = false;
         $context         = $this->context;
         $group           = $context->getGroup();
-
+        $validator = $context->getValidator()->inContext();
+        
         foreach ($constraint->constraints as $subConstraint) {
             $context->validateValue($value, $subConstraint, '', $group);
             $violations = $context->getViolations();

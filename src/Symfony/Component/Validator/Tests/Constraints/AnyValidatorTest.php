@@ -14,49 +14,18 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Any;
 use Symfony\Component\Validator\Constraints\AnyValidator;
 use Symfony\Component\Validator\Constraints\Isbn;
-use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\ConstraintViolationList;
-use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Cas Leentfaar <info@casleentfaar.com>
  */
-class AnyValidatorTest extends \PHPUnit_Framework_TestCase
+class AnyValidatorTest extends AbstractConstraintValidatorTest
 {
-    /**
-     * @var ExecutionContext
-     */
-    protected $context;
-
-    /**
-     * @var AnyValidator
-     */
-    protected $validator;
-
-    protected function setUp()
-    {
-        $this->context   = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new AnyValidator();
-        $this->validator->initialize($this->context);
-
-        $this->context->expects($this->any())
-            ->method('getGroup')
-            ->will($this->returnValue('MyGroup'));
-    }
-
-    protected function tearDown()
-    {
-        $this->validator = null;
-        $this->context   = null;
-    }
-
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Any(new Range(array('min' => 4))));
+        $this->assertNoViolation();
     }
 
     /**
@@ -64,18 +33,8 @@ class AnyValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkSingleConstraint($value)
     {
-        $constraint = new Range(array('min' => 4));
-
-        $this->context->expects($this->once())
-            ->method('validateValue')
-            ->with($value, $constraint, '', 'MyGroup');
-        $this->context->expects($this->any())
-            ->method('getViolations')
-            ->willReturn(new ConstraintViolationList());
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
-        $this->validator->validate($value, new Any($constraint));
+        $this->validator->validate($value, new Any(new Range(array('min' => 4))));
+        $this->assertNoViolation();
     }
 
     /**
@@ -83,48 +42,21 @@ class AnyValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testWalkMultipleConstraints($value)
     {
-        $constraint1 = new Range(array('min' => 4));
-        $constraint2 = new NotNull();
-
-        $constraints = array($constraint1, $constraint2);
-        $i           = 1;
-
-        foreach ($constraints as $constraint) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint, '', 'MyGroup');
-            $this->context->expects($this->at($i++))
-                ->method('getViolations')
-                ->willReturn(new ConstraintViolationList());
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
-        $this->validator->validate($value, new Any($constraints));
+        $this->validator->validate($value, new Any(array(
+            new Range(array('min' => 4)),
+            new Isbn(),
+        )));
+        $this->assertNoViolation();
     }
 
     public function testNoConstraintValidated()
     {
-        $constraint1 = new Range(array('min' => 2));
-        $constraint2 = new Isbn();
-        $value       = 'foo';
-
-        $constraints = array($constraint1, $constraint2);
-
-        $i = 1;
-        foreach ($constraints as $constraint) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint, '', 'MyGroup');
-            $this->context->expects($this->at($i++))
-                ->method('getViolations');
-        }
-
-        $this->context->expects($this->once())
-            ->method('addViolation');
-
-        $this->validator->validate($value, new Any($constraints));
+        $any = new Any(array(
+            new Range(array('min' => 4)),
+            new Isbn(),
+        ));
+        $this->validator->validate(1, $any);
+        $this->assertViolation($any->message);
     }
 
     /**
@@ -137,5 +69,21 @@ class AnyValidatorTest extends \PHPUnit_Framework_TestCase
             array(6),
             array(7),
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createValidator()
+    {
+        return new AnyValidator();
     }
 }

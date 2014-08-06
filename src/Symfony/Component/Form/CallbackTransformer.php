@@ -18,24 +18,33 @@ class CallbackTransformer implements DataTransformerInterface
 {
     /**
      * The callback used for forward transform
-     * @var \Closure
+     * @var callable
      */
     private $transform;
 
     /**
      * The callback used for reverse transform
-     * @var \Closure
+     * @var callable
      */
     private $reverseTransform;
 
     /**
      * Constructor.
      *
-     * @param \Closure $transform        The forward transform callback
-     * @param \Closure $reverseTransform The reverse transform callback
+     * @param callable $transform        The forward transform callback
+     * @param callable $reverseTransform The reverse transform callback
+     *
+     * @throws \InvalidArgumentException when the given callbacks is invalid
      */
-    public function __construct(\Closure $transform, \Closure $reverseTransform)
+    public function __construct($transform, $reverseTransform)
     {
+        if (!is_callable($transform)) {
+            throw new \InvalidArgumentException('Argument 1 should be a callable');
+        }
+        if (!is_callable($reverseTransform)) {
+            throw new \InvalidArgumentException('Argument 2 should be a callable');
+        }
+
         $this->transform = $transform;
         $this->reverseTransform = $reverseTransform;
     }
@@ -47,7 +56,7 @@ class CallbackTransformer implements DataTransformerInterface
      *
      * @return mixed The value in the transformed representation
      *
-     * @throws UnexpectedTypeException       when the argument is not a string
+     * @throws UnexpectedTypeException       when the argument is not of the expected type
      * @throws TransformationFailedException when the transformation fails
      */
     public function transform($data)

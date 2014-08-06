@@ -13,6 +13,8 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -33,31 +35,44 @@ class AnyValidator extends ConstraintValidator
             return;
         }
 
-        $atLeastOneValid = false;
-        $context         = $this->context;
-        $group           = $context->getGroup();
-        $validator = $context->getValidator()->inContext();
-        
+        $context = $this->context;
+        $group = $context->getGroup();
+
+        if (!$context instanceof ExecutionContext) {
+            throw new \LogicException('Don\'t know how to deal with this when we need to create separate contexts later');
+        }
+
         foreach ($constraint->constraints as $subConstraint) {
-            $context->validateValue($value, $subConstraint, '', $group);
-            $violations = $context->getViolations();
+            $subContext = new ExecutionContext(
+                $context->getValidator(),
+                $context->getRoot(),
+                $context->getTranslator(),
+                $context->getTranslationDomain()
+            );
+            if ($context instanceof ExecutionContextInterface) {
+                $subContext->getValidator()->validate($value, $subConstraint);
+            } else {
+                // 2.4 API
+                $subContext->validateValue($value, $subConstraint);
+            }
+            $violations = $subContext->getViolations();
             if ($violations && $violations->count() === 0) {
-                $atLeastOneValid = true;
+                return;
             }
         }
 
-        if (true === $atLeastOneValid) {
-            if ($context->getViolations()) {
-                foreach ($context->getViolations() as $offset => $violation) {
-                    $context->getViolations()->remove($offset);
-                }
-            }
-
-            return;
+        if ($this->context instanceof ExecutionContextInterface) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $value)
+                ->setInvalidValue($value)
+                ->addViolation();
+        } else {
+            // 2.4 API
+            $this->context->addViolation(
+                $constraint->message,
+                array('{{ value }}' => $value),
+                $value
+            );
         }
-
-        $context->addViolation($constraint->message, array(
-            '{{ value }}' => $value
-        ));
     }
 }

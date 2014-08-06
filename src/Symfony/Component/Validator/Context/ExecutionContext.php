@@ -226,6 +226,22 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslationDomain()
+    {
+        return $this->translationDomain;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRoot()
     {
         return $this->root;

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-05T07:10:34Z
+
+Is it something specific to master? Or like your other PR, should it be merged into 2.3?
+
+---------------------------------------------------------------------------
+
+by eiannone at 2014-08-05T21:50:59Z
+
+Yes, it's specific to master. These bugs are not present in 2.3 version, with the exception of the one at line 57, fixed with my other PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-06T05:56:21Z
+
+Thank you @eiannone.

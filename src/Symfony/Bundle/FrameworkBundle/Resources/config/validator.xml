@@ -11,7 +11,6 @@
         <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
         <parameter key="validator.mapping.cache.prefix" />
         <parameter key="validator.validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\ConstraintValidatorFactory</parameter>
-        <parameter key="validator.legacy_validator_factory.class">Symfony\Bundle\FrameworkBundle\Validator\LegacyConstraintValidatorFactory</parameter>
         <parameter key="validator.expression.class">Symfony\Component\Validator\Constraints\ExpressionValidator</parameter>
         <parameter key="validator.email.class">Symfony\Component\Validator\Constraints\EmailValidator</parameter>
     </parameters>

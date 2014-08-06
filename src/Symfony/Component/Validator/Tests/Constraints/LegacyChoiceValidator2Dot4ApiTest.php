@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\LegacyChoiceValidator;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -23,10 +22,5 @@ class LegacyChoiceValidator2Dot4ApiTest extends ChoiceValidatorTest
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_4;
-    }
-
-    protected function createValidator()
-    {
-        return new LegacyChoiceValidator();
     }
 }

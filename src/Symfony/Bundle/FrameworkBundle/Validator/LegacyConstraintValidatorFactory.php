@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class LegacyConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     const BASE_NAMESPACE = 'Symfony\\Component\\Validator\\Constraints';
+    const FORM_BASE_NAMESPACE = 'Symfony\\Component\\Form\\Extension\\Validator\\Constraints';
 
     protected $container;
     protected $validators;
@@ -74,6 +75,9 @@ class LegacyConstraintValidatorFactory implements ConstraintValidatorFactoryInte
                     break;
                 case self::BASE_NAMESPACE.'\\Length':
                     $name = self::BASE_NAMESPACE.'\\LegacyLengthValidator';
+                    break;
+                case self::FORM_BASE_NAMESPACE.'\\Form':
+                    $name = self::FORM_BASE_NAMESPACE.'\\LegacyFormValidator';
                     break;
             }
 

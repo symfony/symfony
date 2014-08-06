@@ -108,7 +108,7 @@ class AnyValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint1 = new Range(array('min' => 2));
         $constraint2 = new Isbn();
-        $value = 'bla';
+        $value       = 'foo';
 
         $constraints = array($constraint1, $constraint2);
 

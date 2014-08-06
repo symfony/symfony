@@ -6,7 +6,7 @@
     <parameter key="foo">bar</parameter>
   </parameters>
   <services>
-    <service id="foo" class="Bar\FooClass" factory-method="getInstance">
+    <service id="foo" class="Bar\FooClass" factory-method="getInstance" factory-class="Bar\FooClass">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar"/>
       <argument>foo</argument>
@@ -35,7 +35,7 @@
       <argument>%foo_bar%</argument>
       <configurator service="foo.baz" method="configure"/>
     </service>
-    <service id="foo.baz" class="%baz_class%" factory-method="getInstance">
+    <service id="foo.baz" class="%baz_class%" factory-method="getInstance" factory-class="%baz_class%">
       <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="foo_bar" class="%foo_class%" scope="prototype"/>

@@ -6,6 +6,10 @@ CHANGELOG
 
  * Added `Controller::isCsrfTokenValid` helper
  * Added configuration for the PropertyAccess component
+ * Added `Controller::redirectToRoute` helper
+ * Added `Controller::addFlash` helper
+ * Added `Controller::isGranted` helper
+ * Added `Controller::denyAccessUnlessGranted` helper
 
 2.5.0
 -----

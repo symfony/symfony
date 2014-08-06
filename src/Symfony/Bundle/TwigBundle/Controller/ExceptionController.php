@@ -51,16 +51,29 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
-        return new Response($this->twig->render(
-            $this->findTemplate($request, $_format, $code, $this->debug),
-            array(
-                'status_code'    => $code,
-                'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception'      => $exception,
-                'logger'         => $logger,
-                'currentContent' => $currentContent,
-            )
-        ));
+        try {
+            $responseContent = $this->twig->render(
+                $this->findTemplate($request, $_format, $code, $this->debug),
+                array(
+                    'status_code'    => $code,
+                    'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'exception'      => $exception,
+                    'logger'         => $logger,
+                    'currentContent' => $currentContent,
+                )
+            );
+        } catch (\Exception $e) {
+            // If an exception occurred during twig rendering, fallback on our own html
+            $responseContent = strtr(
+                file_get_contents(__DIR__.'/../Resources/views/Exception/error_fallback.html'),
+                array(
+                    '{{ status_code }}' => $code,
+                    '{{ status_text }}' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                )
+            );
+        }
+
+        return new Response($responseContent);
     }
 
     /**

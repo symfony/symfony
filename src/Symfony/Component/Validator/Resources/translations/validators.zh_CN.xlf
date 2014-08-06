@@ -278,6 +278,26 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>该值不应与 {{ compared_value_type }} {{ compared_value }} 相同。</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>图片比例太大 ({{ ratio }})。允许的最大比例为 {{ max_ratio }}</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>图片比例太小 ({{ ratio }})。 最小的比例应为 {{ min_ratio }}。</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>图片是正方形的 ({{ width }}x{{ height }}px)。 不允许正方形图片。</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>图片是横向的 ({{ width }}x{{ height }}px)。 不允许横向图片。</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>图片是纵向的 ({{ width }}x{{ height }}px). 不允许纵向图片</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

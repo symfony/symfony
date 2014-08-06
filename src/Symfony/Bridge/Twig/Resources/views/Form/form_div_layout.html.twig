@@ -54,7 +54,7 @@
 {% block choice_widget_collapsed -%}
     {% if required and empty_value is none and not empty_value_in_choices and not multiple -%}
         {% set required = false %}
-    {% endif %}
+    {%- endif -%}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if empty_value is not none -%}
             <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
@@ -95,14 +95,14 @@
 {% block datetime_widget -%}
     {% if widget == 'single_text' %}
         {{- block('form_widget_simple') -}}
-    {% else %}
+    {% else -%}
         <div {{ block('widget_container_attributes') }}>
             {{- form_errors(form.date) -}}
             {{- form_errors(form.time) -}}
             {{- form_widget(form.date) -}}
             {{- form_widget(form.time) -}}
         </div>
-    {% endif %}
+    {%- endif %}
 {%- endblock datetime_widget %}
 
 {% block date_widget -%}
@@ -132,7 +132,7 @@
 
 {% block number_widget -%}
     {# type="number" doesn't work with floats #}
-    {% set type = type|default('text') %}
+    {%- set type = type|default('text') %}
     {{- block('form_widget_simple') -}}
 {%- endblock number_widget %}
 

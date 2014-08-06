@@ -298,7 +298,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $violations = $this->context->getViolations();
 
         $this->assertCount(1, $violations);
-        $this->assertEquals($this->createViolation($message, $parameters, $propertyPath, $invalidValue, $plural, $code), $violations[0]);
+        $this->assertEquals($this->createViolation($message, $parameters, $propertyPath, $invalidValue, $plural, $code), current(iterator_to_array($violations)));
     }
 
     protected function assertViolations(array $expected)

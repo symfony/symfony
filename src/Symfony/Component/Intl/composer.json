@@ -24,14 +24,14 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/icu": "~1.0-RC"
+        "php": ">=5.3.3"
     },
     "require-dev": {
         "symfony/filesystem": ">=2.1"
     },
     "suggest": {
-        "ext-intl": "to use the component with locales other than \"en\""
+        "ext-intl": "to use the component with locales other than \"en\"",
+        "symfony/intl-data": "to use the component with locales other than \"en\""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Intl\\": "" },

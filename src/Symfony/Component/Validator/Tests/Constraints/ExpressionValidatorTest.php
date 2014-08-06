@@ -29,20 +29,6 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testNullIsValid()
-    {
-        $this->validator->validate(null, new Expression('value == 1'));
-
-        $this->assertNoViolation();
-    }
-
-    public function testEmptyStringIsValid()
-    {
-        $this->validator->validate('', new Expression('value == 1'));
-
-        $this->assertNoViolation();
-    }
-
     public function testSucceedingExpressionAtObjectLevel()
     {
         $constraint = new Expression('this.data == 1');

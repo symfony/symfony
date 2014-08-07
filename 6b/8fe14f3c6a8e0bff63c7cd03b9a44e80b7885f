@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-06T13:46:34Z
+
+:+1: this is easier to maintain, and it shows how bundle would have to do to support both APIs too (they cannot register their own constraints in the legacy factory)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-07T13:09:24Z
+
+:+1:

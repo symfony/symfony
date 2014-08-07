@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
-use Symfony\Component\Form\Extension\Validator\Constraints\LegacyFormValidator;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -23,10 +22,5 @@ class LegacyFormValidator2Dot4ApiTest extends FormValidatorTest
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_4;
-    }
-
-    protected function createValidator()
-    {
-        return new LegacyFormValidator($this->serverParams);
     }
 }

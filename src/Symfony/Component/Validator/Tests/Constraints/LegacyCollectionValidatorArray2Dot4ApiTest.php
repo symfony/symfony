@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\LegacyCollectionValidator;
 use Symfony\Component\Validator\Validation;
 
 class LegacyCollectionValidatorArray2Dot4ApiTest extends CollectionValidatorArrayTest
@@ -19,10 +18,5 @@ class LegacyCollectionValidatorArray2Dot4ApiTest extends CollectionValidatorArra
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_4;
-    }
-
-    protected function createValidator()
-    {
-        return new LegacyCollectionValidator();
     }
 }

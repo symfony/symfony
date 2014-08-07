@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -63,35 +64,63 @@ class ChoiceValidator extends ConstraintValidator
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, $constraint->strict)) {
-                    $this->context->buildViolation($constraint->multipleMessage)
-                        ->setParameter('{{ value }}', $this->formatValue($_value))
-                        ->addViolation();
+                    if ($this->context instanceof ExecutionContextInterface) {
+                        $this->context->buildViolation($constraint->multipleMessage)
+                            ->setParameter('{{ value }}', $this->formatValue($_value))
+                            ->addViolation();
+                    } else {
+                        // 2.4 API
+                        $this->context->addViolation($constraint->multipleMessage, array(
+                            '{{ value }}' => $this->formatValue($_value),
+                        ));
+                    }
                 }
             }
 
             $count = count($value);
 
             if ($constraint->min !== null && $count < $constraint->min) {
-                $this->context->buildViolation($constraint->minMessage)
-                    ->setParameter('{{ limit }}', $constraint->min)
-                    ->setPlural((int) $constraint->min)
-                    ->addViolation();
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($constraint->minMessage)
+                        ->setParameter('{{ limit }}', $constraint->min)
+                        ->setPlural((int) $constraint->min)
+                        ->addViolation();
+                } else {
+                    // 2.4 API
+                    $this->context->addViolation($constraint->minMessage, array(
+                        '{{ limit }}' => $constraint->min
+                    ), $value, (int) $constraint->min);
+                }
 
                 return;
             }
 
             if ($constraint->max !== null && $count > $constraint->max) {
-                $this->context->buildViolation($constraint->maxMessage)
-                    ->setParameter('{{ limit }}', $constraint->max)
-                    ->setPlural((int) $constraint->max)
-                    ->addViolation();
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($constraint->maxMessage)
+                        ->setParameter('{{ limit }}', $constraint->max)
+                        ->setPlural((int) $constraint->max)
+                        ->addViolation();
+                } else {
+                    // 2.4 API
+                    $this->context->addViolation($constraint->maxMessage, array(
+                        '{{ limit }}' => $constraint->max
+                    ), $value, (int) $constraint->max);
+                }
 
                 return;
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+            } else {
+                // 2.4 API
+                $this->context->addViolation($constraint->message, array(
+                    '{{ value }}' => $this->formatValue($value),
+                ));
+            }
         }
     }
 }

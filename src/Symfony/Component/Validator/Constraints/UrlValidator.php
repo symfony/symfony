@@ -24,6 +24,7 @@ class UrlValidator extends ConstraintValidator
 {
     const PATTERN = '~^
             (%s)://                                 # protocol
+            (([\pL\pN-]+:)?([\pL\pN-]+)@)?          # basic auth
             (
                 ([\pL\pN\pS-\.])+(\.?([\pL]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
                     |                                              # or

@@ -55,14 +55,14 @@ class Shell
         }
 
         // todo: find a better way (command could not be available)
-        $testCommand = 'command -v ';
+        $testCommand = 'which ';
         if (self::TYPE_WINDOWS === $this->type) {
             $testCommand = 'where ';
         }
 
         $command = escapeshellcmd($command);
 
-        exec($testCommand . $command, $output, $code);
+        exec($testCommand.$command, $output, $code);
 
         return 0 === $code && count($output) > 0;
     }

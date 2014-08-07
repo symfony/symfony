@@ -59,6 +59,8 @@ class Shell
             return false;
         }
 
+        $command = escapeshellcmd($command);
+
         // todo: find a better way (command could not be available)
         exec('command -v '.$command, $output, $code);
 

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * Added `Controller::isCsrfTokenValid` helper
+
 2.5.0
 -----
 

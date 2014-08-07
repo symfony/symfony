@@ -310,7 +310,7 @@ class ProfilerController
     }
 
     /**
-     * Search results.
+     * Renders the search results.
      *
      * @param Request $request The current HTTP Request
      * @param string  $token   The token
@@ -351,7 +351,7 @@ class ProfilerController
     }
 
     /**
-     * Narrow the search bar.
+     * Narrows the search bar.
      *
      * @param Request $request The current HTTP Request
      *

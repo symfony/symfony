@@ -48,7 +48,7 @@ class ProcessHelper extends Helper
         }
 
         if ($verbosity <= $output->getVerbosity()) {
-            $output->write($formatter->start(spl_object_hash($process), $process->getCommandLine()));
+            $output->write($formatter->start(spl_object_hash($process), $this->escapeString($process->getCommandLine())));
         }
 
         if ($output->isDebug()) {
@@ -63,7 +63,7 @@ class ProcessHelper extends Helper
         }
 
         if (!$process->isSuccessful() && null !== $error) {
-            $output->writeln(sprintf('<error>%s</error>', $error));
+            $output->writeln(sprintf('<error>%s</error>', $this->escapeString($error)));
         }
 
         return $process;
@@ -111,13 +111,24 @@ class ProcessHelper extends Helper
     {
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
-            $output->write($formatter->progress(spl_object_hash($process), $buffer, Process::ERR === $type));
+        $that = $this;
+        return function ($type, $buffer) use ($output, $process, $callback, $formatter, $that) {
+            $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
                 call_user_func($callback, $type, $buffer);
             }
         };
+    }
+
+    /**
+     * This method is public for PHP 5.3 compatibility, it should be private.
+     *
+     * @internal
+     */
+    public function escapeString($str)
+    {
+        return str_replace('<', '\\<', $str);
     }
 
     /**

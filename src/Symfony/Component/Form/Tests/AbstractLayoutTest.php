@@ -1400,10 +1400,10 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-    public function testPasswordSubmittedWithNotAlwaysEmpty()
+    public function testPasswordSubmittedWithNotResetOnSubmit()
     {
         $form = $this->factory->createNamed('name', 'password', null, array(
-            'always_empty' => false,
+            'reset_on_submit' => false,
         ));
         $form->submit('foo&bar');
 

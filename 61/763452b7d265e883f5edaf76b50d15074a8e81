@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T08:41:43Z
+
+This change should be done in the built-in web server directly, not in the Kernel class.
+
+---------------------------------------------------------------------------
+
+by mauchede at 2014-08-08T11:54:28Z
+
+The changes have been moved into the files `router_dev.php` and `router_prod.php`.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-08T12:10:09Z
+
+btw, this should probably be reported to PHP as it looks like a bug in the builtin webserver
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-08T15:41:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-08T15:48:59Z
+
+:+1: but please report the issue to PHP as well.

@@ -59,24 +59,25 @@ class AutoLabelTypeExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['label'] === null) {
+        if (null === $options['label']) {
             $autoLabel = $options['auto_label'];
             $parent    = $form->getParent();
             $fullname  = $form->getName();
 
             while ($parent) {
-                if ($autoLabel === null) {
+                if (null === $autoLabel) {
                     $autoLabel = $parent->getConfig()->getOption('auto_label');
                 }
                 $fullname = $parent->getName().'_'.$fullname;
                 $parent   = $parent->getParent();
             }
 
-            if ($autoLabel === null) {
+            if (null === $autoLabel) {
                 $autoLabel = $this->autoLabel;
             }
 
-            if ($autoLabel !== null) {
+
+            if (null !== $autoLabel) {
                 $view->vars['label'] = strtr($autoLabel, array(
                     '%name%'     => $form->getName(),
                     '%fullname%' => $fullname,

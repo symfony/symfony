@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Extension\AutoLabel\AutoLabelExtension;
 
-class FormTypeAutoLabelExtensionTest_ChildType extends AbstractType
+class AutoLabelTypeExtensionTest_ChildType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -29,7 +29,7 @@ class FormTypeAutoLabelExtensionTest_ChildType extends AbstractType
     }
 }
 
-class FormTypeAutoLabelExtensionTest extends TypeTestCase
+class AutoLabelTypeExtensionTest extends TypeTestCase
 {
     protected function getExtensions()
     {
@@ -70,11 +70,11 @@ class FormTypeAutoLabelExtensionTest extends TypeTestCase
 
     public function testInheritedOption()
     {
-        $builder = $this->factory->createNamedBuilder('firstname', 'form', array(
+        $builder = $this->factory->createNamedBuilder('user', 'form', null, array(
             'auto_label' => '%type%.%fullname%'
         ));
 
         $view = $builder->add('firstname', 'text')->getForm()->createView();
-        $this->assertEquals('form.firstname', $view['firstname']->vars['label']);
+        $this->assertEquals('text.user_firstname', $view['firstname']->vars['label']);
     }
 }

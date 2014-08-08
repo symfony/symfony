@@ -13,31 +13,27 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\IbanValidator;
+use Symfony\Component\Validator\Validation;
 
-class IbanValidatorTest extends \PHPUnit_Framework_TestCase
+class IbanValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new IbanValidator();
-        $this->validator->initialize($this->context);
+        return new IbanValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate(null, new Iban());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate('', new Iban());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -45,9 +41,9 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIbans($iban)
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate($iban, new Iban());
+
+        $this->assertNoViolation();
     }
 
     public function getValidIbans()
@@ -161,13 +157,11 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => '"'.$iban.'"',
-            ));
-
         $this->validator->validate($iban, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$iban.'"',
+        ));
     }
 
     public function getInvalidIbans()

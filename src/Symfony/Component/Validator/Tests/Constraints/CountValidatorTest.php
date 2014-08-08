@@ -17,32 +17,20 @@ use Symfony\Component\Validator\Constraints\CountValidator;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class CountValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new CountValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new CountValidator();
     }
 
     abstract protected function createCollection(array $content);
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Count(6));
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -93,11 +81,10 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValuesMax($value)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Count(array('max' => 3));
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -105,11 +92,10 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValuesMin($value)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Count(array('min' => 5));
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -117,11 +103,10 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValuesExact($value)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Count(4);
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -134,14 +119,12 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             'maxMessage' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
-                '{{ count }}' => count($value),
-                '{{ limit }}' => 4,
-            )), $value, 4);
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ count }}' => count($value),
+            '{{ limit }}' => 4,
+        ), 'property.path', $value, 4);
     }
 
     /**
@@ -154,14 +137,12 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             'minMessage' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
-                '{{ count }}' => count($value),
-                '{{ limit }}' => 4,
-            )), $value, 4);
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ count }}' => count($value),
+            '{{ limit }}' => 4,
+        ), 'property.path', $value, 4);
     }
 
     /**
@@ -175,14 +156,12 @@ abstract class CountValidatorTest extends \PHPUnit_Framework_TestCase
             'exactMessage' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
+        $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
             '{{ count }}' => count($value),
             '{{ limit }}' => 4,
-        )), $value, 4);
-
-        $this->validator->validate($value, $constraint);
+        ), 'property.path', $value, 4);
     }
 
     public function testDefaultOption()

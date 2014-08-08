@@ -260,13 +260,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalErrorOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { usleep(100000); file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+        // use a lock file to toggle between writing ("W") and reading ("R") the
+        // error stream
+        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
+        file_put_contents($lock, 'W');
+
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
         while ($p->isRunning()) {
-            $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalErrorOutput(), $matches));
-            usleep(20000);
+            if ('R' === file_get_contents($lock)) {
+                $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalErrorOutput(), $matches));
+                file_put_contents($lock, 'W');
+            }
+            usleep(100);
         }
+
+        unlink($lock);
     }
 
     public function testFlushErrorOutput()
@@ -280,7 +290,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++; usleep(500); }')));
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }')));
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
@@ -288,13 +298,23 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIncrementalOutput()
     {
-        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n=0;while ($n<3) { echo \' foo \'; usleep(50000); $n++; }')));
+        // use a lock file to toggle between writing ("W") and reading ("R") the
+        // output stream
+        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
+        file_put_contents($lock, 'W');
+
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
 
         $p->start();
         while ($p->isRunning()) {
-            $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
-            usleep(20000);
+            if ('R' === file_get_contents($lock)) {
+                $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
+                file_put_contents($lock, 'W');
+            }
+            usleep(100);
         }
+
+        unlink($lock);
     }
 
     public function testFlushOutput()

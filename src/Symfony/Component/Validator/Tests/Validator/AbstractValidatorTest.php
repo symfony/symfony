@@ -851,6 +851,17 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validateProperty('VALUE', 'someProperty');
     }
 
+    /**
+     * https://github.com/symfony/symfony/issues/11604
+     */
+    public function testValidatePropertyWithoutConstraints()
+    {
+        $entity = new Entity();
+        $violations = $this->validateProperty($entity, 'lastName');
+
+        $this->assertCount(0, $violations, '->validateProperty() returns no violations if no constraints have been configured for the property being validated');
+    }
+
     public function testValidatePropertyValue()
     {
         $test = $this;
@@ -968,6 +979,17 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory->addMetadataForValue('VALUE', $metadata);
 
         $this->validatePropertyValue('VALUE', 'someProperty', 'someValue');
+    }
+
+    /**
+     * https://github.com/symfony/symfony/issues/11604
+     */
+    public function testValidatePropertyValueWithoutConstraints()
+    {
+        $entity = new Entity();
+        $violations = $this->validatePropertyValue($entity, 'lastName', 'foo');
+
+        $this->assertCount(0, $violations, '->validatePropertyValue() returns no violations if no constraints have been configured for the property being validated');
     }
 
     public function testValidateObjectOnlyOncePerGroup()

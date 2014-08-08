@@ -298,6 +298,10 @@
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>Bilden är porträttsorienterad ({{ width }}x{{ height }}px). Porträttsorienterade bilder tillåts inte.</target>
             </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>En tom fil är inte tillåten.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

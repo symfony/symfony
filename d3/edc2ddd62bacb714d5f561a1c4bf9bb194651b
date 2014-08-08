@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by dbu at 2014-05-04T18:29:32Z
+
+i think the test failure is not related to what i did.
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-05-04T18:58:54Z
+
+Nope, it's not you, take a look https://github.com/symfony/symfony/pull/10826, all test failed from 5.5
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-05-11T16:15:02Z
+
+ping @beberlei @stof any inputs on this?
+
+---------------------------------------------------------------------------
+
+by ClementGautier at 2014-07-11T14:15:24Z
+
+looks good to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-21T05:05:50Z
+
+I would indeed deprecate the current one and create just one pass to switch to.
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-07-25T11:52:22Z
+
+had a go at cleaning this up and realized that we can keep BC and just add more constructor arguments. this will be a lot more convenient for consumers - they can just pass additional parameters that are ignored on older symfony versions and don't get namespace alias but do get the rest.
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-07-25T12:49:19Z
+
+Once we agree on this, i will update https://github.com/symfony/symfony-docs/blob/master/cookbook/doctrine/mapping_model_classes.rst and update the orm and mongo, couch bundles. phpcr-odm is being updated already: https://github.com/doctrine/DoctrinePHPCRBundle/pull/158
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-07-28T06:55:01Z
+
+@fabpot what do you think about this? ok like this? the parameter order in the constructor is not awesome, but is BC compatible, simplifying the live of doctrine bundles that build on top of this a lot.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-28T09:39:50Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-07-29T22:11:35Z
+
+did pull requests for the orm and phpcr-odm bundles, and the symfony-docs (links in issue description). how do we proceed? @beberlei can you give some feedback on the doctrine bundle PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-30T05:33:18Z
+
+@dbu Let me know whenever @beberlei is ready to merge the changes in DoctrineBundle.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-05T15:45:17Z
+
+This also needs to be rebased to fix conflicts
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-08-05T18:46:44Z
+
+thanks for the feedback stof, agreeing and updated all points you noted.
+
+no idea where that conflict came from. but i rebased on upstream/master and seems good now.
+
+---------------------------------------------------------------------------
+
+by kimhemsoe at 2014-08-06T14:21:31Z
+
+We are ready to merge https://github.com/doctrine/DoctrineBundle/pull/316 whenever you are.
+
+We have a DoctrineBundle 1.3 release, that we are planning to do this week. Do you want us to post prone until this PR gets merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-06T14:47:39Z
+
+@dbu Do you have time  to finish this PR so that it can be merged fast?
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-08-06T15:10:55Z
+
+adjusted to the feedback of @stloyd
+
+would be great if this can make it into DoctrineBundle 1.3. @kimhemsoe there is no problem merging the DoctrineBundle PR for older symfony versions, as its just extra parameters to the constructor that php will ignore.
+
+---------------------------------------------------------------------------
+
+by kimhemsoe at 2014-08-08T09:52:10Z
+
+What is the status of this ?
+
+I know it it will not break anything, but we rather wait on this PR to merge before merging DoctrineBundle one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-08T09:58:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dbu at 2014-08-08T10:53:20Z
+
+@kimhemsoe here we wait for input from the doctrine orm maintainers :-)
+
+beberlei [said](https://twitter.com/beberlei/status/497020807298973696) that @kimhemsoe is release manager of the doctrine bundle. so i think the comment above is an approval from doctrine and we can merge this, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-08T11:16:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by kimhemsoe at 2014-08-08T11:44:35Z
+
+:+1:

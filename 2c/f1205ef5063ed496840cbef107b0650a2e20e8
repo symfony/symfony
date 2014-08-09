@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-09T06:54:17Z
+
+I'm mixed about this one. I think there is no value in those suggestions. I would be more happy to remove them all. They are of no help. I ranted about this on the Composer repository a while ago and nothing really changed. When was the last time you actually used those suggestions for one of your projects... probably never. They are displayed at the wrong time.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-09T08:27:54Z
+
+I agree with you that you probably won't look at the suggestions when installing new packages. Though it might be helpful when you run into problems with a missing class. I don't know how often people then look into the suggested packages first. But I don't really mind if you decide to remove them. It's just that the list should be consistent (either show all packages you might need or remove them completely).
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-09T08:58:30Z
+
+I actually discovered some useful feature in the past reading composer suggestions. I think it's nice to suggest soft dependencies, the way they're currently presented should be improved but I'd rather be in favor to maintain these

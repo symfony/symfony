@@ -116,6 +116,8 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('http://xn--espaa-rta.xn--ca-ol-fsay5a/'),
             array('http://xn--d1abbgf6aiiy.xn--p1ai/'),
             array('http://☎.com/'),
+            array('http://username:password@symfony.com'),
+            array('http://user-name@symfony.com'),
         );
     }
 
@@ -155,6 +157,10 @@ class UrlValidatorTest extends \PHPUnit_Framework_TestCase
             array('ftp://[::1]/'),
             array('http://[::1'),
             array('http://hello.☎/'),
+            array('http://:password@symfony.com'),
+            array('http://:password@@symfony.com'),
+            array('http://username:passwordsymfony.com'),
+            array('http://usern@me:password@symfony.com'),
         );
     }
 

@@ -38,7 +38,10 @@ class ContainerDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('container:debug')
+            ->setName('debug:container')
+            ->setAliases(array(
+                'container:debug',
+            ))
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),

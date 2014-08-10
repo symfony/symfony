@@ -105,6 +105,7 @@
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+        <xsd:attribute name="hinclude-default-template" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form-resources">

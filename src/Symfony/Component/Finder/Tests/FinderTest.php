@@ -741,15 +741,27 @@ class FinderTest extends Iterator\RealIteratorTestCase
         // make 'foo' directory non-readable
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
 
-        try {
-            $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
-            $this->fail('Finder should throw an exception when opening a non-readable directory.');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\\Component\\Finder\\Exception\\AccessDeniedException', $e);
+        if (false == ($could_read = is_readable(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp'))) {
+
+            try {
+                $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+                $this->fail('Finder should throw an exception when opening a non-readable directory.');
+            } catch (\Exception $e) {
+                $expectedExceptionClass = 'Symfony\\Component\\Finder\\Exception\\AccessDeniedException';
+                if ($e instanceof \PHPUnit_Framework_ExpectationFailedException) {
+                    $this->fail(sprintf("Expected exception:\n%s\nGot:\n%s\nWith comparison failure:\n%s", $expectedExceptionClass, 'PHPUnit_Framework_ExpectationFailedException', $e->getComparisonFailure()->getExpectedAsString()));
+                }
+
+                $this->assertInstanceOf($expectedExceptionClass, $e);
+            }
         }
 
         // restore original permissions
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+
+        if ($could_read) {
+            $this->markTestSkipped('could read test files while test requires unreadable');
+        }
     }
 
     /**
@@ -767,10 +779,16 @@ class FinderTest extends Iterator\RealIteratorTestCase
         // make 'foo' directory non-readable
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
 
-        $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+        if (false == ($could_read = is_readable(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp'))) {
+            $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
+        }
 
         // restore original permissions
         chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+
+        if ($could_read) {
+            $this->markTestSkipped('could read test files while test requires unreadable');
+        }
     }
 
     private function buildTestData(array $tests)

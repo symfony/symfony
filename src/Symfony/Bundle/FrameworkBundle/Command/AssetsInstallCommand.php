@@ -32,7 +32,7 @@ class AssetsInstallCommand extends ContainerAwareCommand
         $this
             ->setName('assets:install')
             ->setDefinition(array(
-                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', 'web'),
+                new InputArgument('target', InputArgument::OPTIONAL, 'The target directory (Can be defined globaly in configuration), default value is web', null),
             ))
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
@@ -68,14 +68,16 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Checking if there is a property telling where all this assets should be installed.
-        $targetArg = rtrim($input->getArgument('target'), '/');
+        $targetArg = $input->getArgument('target');
 
-        if (!$targetArg) {
-            $targetArg = $this->container->getParameter('templating.assets.write_to');
+        if ($targetArg == null) {
+            $targetArg = $this->getContainer()->getParameter('templating.assets.write_to');
         }
 
+        $targetArg = rtrim($targetArg, '/');
+
         if (!is_dir($targetArg)) {
-            throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));
+            throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $targetArg));
         }
 
         if (!function_exists('symlink') && $input->getOption('symlink')) {

@@ -67,7 +67,12 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Checking if there is a property telling where all this assets should be installed.
         $targetArg = rtrim($input->getArgument('target'), '/');
+
+        if (!$targetArg) {
+            $targetArg = $this->container->getParameter('templating.assets.write_to');
+        }
 
         if (!is_dir($targetArg)) {
             throw new \InvalidArgumentException(sprintf('The target directory "%s" does not exist.', $input->getArgument('target')));

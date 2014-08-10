@@ -346,6 +346,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                    ->scalarNode('write_to')->defaultNull()->end()
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')

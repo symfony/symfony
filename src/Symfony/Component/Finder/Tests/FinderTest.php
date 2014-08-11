@@ -742,7 +742,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
         chmod($testDir, 0333);
 
-        if (false == ($couldRead = is_readable($testDir))) {
+        if (false === ($couldRead = is_readable($testDir))) {
 
             try {
                 $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
@@ -782,7 +782,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
         chmod($testDir, 0333);
 
-        if (false == ($couldRead = is_readable($testDir))) {
+        if (false === ($couldRead = is_readable($testDir))) {
             $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
         }
 

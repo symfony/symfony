@@ -51,11 +51,50 @@ class CheckCircularReferencesPassTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
+    public function testProcessWithFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', 'stdClass')
+            ->setFactoryService('b')
+            ->setFactoryMethod('getInstance');
+
+        $container
+            ->register('b', 'stdClass')
+            ->setFactoryService('a')
+            ->setFactoryMethod('getInstance');
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
     public function testProcessDetectsIndirectCircularReference()
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
         $container->register('b')->addArgument(new Reference('c'));
+        $container->register('c')->addArgument(new Reference('a'));
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
+    public function testProcessDetectsIndirectCircularReferenceWithFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a')->addArgument(new Reference('b'));
+
+        $container
+            ->register('b', 'stdClass')
+            ->setFactoryService('c')
+            ->setFactoryMethod('getInstance');
+
         $container->register('c')->addArgument(new Reference('a'));
 
         $this->process($container);

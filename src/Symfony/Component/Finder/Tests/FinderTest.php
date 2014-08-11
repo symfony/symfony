@@ -739,9 +739,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->files()->in(self::$tmpDir);
 
         // make 'foo' directory non-readable
-        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+        $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
+        chmod($testDir, 0333);
 
-        if (false == ($couldRead = is_readable(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp'))) {
+        if (false == ($couldRead = is_readable($testDir))) {
 
             try {
                 $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
@@ -757,7 +758,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
 
         // restore original permissions
-        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+        chmod($testDir, 0777);
+        clearstatcache($testDir);
 
         if ($couldRead) {
             $this->markTestSkipped('could read test files while test requires unreadable');
@@ -777,14 +779,16 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->files()->ignoreUnreadableDirs()->in(self::$tmpDir);
 
         // make 'foo' directory non-readable
-        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0333);
+        $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
+        chmod($testDir, 0333);
 
-        if (false == ($couldRead = is_readable(self::$tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp'))) {
+        if (false == ($couldRead = is_readable($testDir))) {
             $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
         }
 
         // restore original permissions
-        chmod(self::$tmpDir.DIRECTORY_SEPARATOR.'foo', 0777);
+        chmod($testDir, 0777);
+        clearstatcache($testDir);
 
         if ($couldRead) {
             $this->markTestSkipped('could read test files while test requires unreadable');

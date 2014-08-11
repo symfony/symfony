@@ -667,9 +667,6 @@ class Request
     /**
      * Enables support for the _method request parameter to determine the intended HTTP method.
      *
-     * Be warned that enabling this feature might lead to CSRF issues in your code.
-     * Check that you are using CSRF tokens when required.
-     *
      * The HTTP method can only be overridden when the real HTTP method is POST.
      */
     public static function enableHttpMethodParameterOverride()

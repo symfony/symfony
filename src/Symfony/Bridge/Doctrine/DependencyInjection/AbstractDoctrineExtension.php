@@ -40,17 +40,43 @@ abstract class AbstractDoctrineExtension extends Extension
     protected $drivers = array();
 
     /**
+     * @param array $objectManagerConfig
+     *
+     * @return array
+     *
+     * @throws \LogicException
+     */
+    protected function determineMappedBundles($objectManagerConfig)
+    {
+        $autoMappedEntityManager = $mappedBundles = array();
+        foreach ($objectManagerConfig as $name => $objectManager) {
+            if ($objectManager['auto_mapping']) {
+                $autoMappedEntityManager[] = $name;
+            }
+
+            $mappedBundles += $objectManager['mappings'];
+        }
+
+        if (count($autoMappedEntityManager) > 1) {
+            throw new \LogicException("You cannot enable 'auto_mapping' for more than one object manager. Setting is enabled for: ".implode(',', $autoMappedEntityManager));
+        }
+
+        return $mappedBundles;
+    }
+
+    /**
      * @param array            $objectManager A configured object manager.
      * @param ContainerBuilder $container     A ContainerBuilder instance
+     * @param array            $mappedBundles A list of explicitly mapped Bundles
      *
      * @throws \InvalidArgumentException
      */
-    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container)
+    protected function loadMappingInformation(array $objectManager, ContainerBuilder $container, array $mappedBundles = array())
     {
         if ($objectManager['auto_mapping']) {
             // automatically register bundle mappings
             foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
-                if (!isset($objectManager['mappings'][$bundle])) {
+                if (!isset($mappedBundles[$bundle]) && !isset($objectManager['mappings'][$bundle])) {
                     $objectManager['mappings'][$bundle] = array(
                         'mapping'   => true,
                         'is_bundle' => true,

@@ -215,18 +215,12 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $collection = $this->createMongoCollectionMock();
 
         $this->mongo->expects($this->never())
-            ->method('selectCollection')
-            ->with($this->options['database'], $this->options['collection'])
-            ->will($this->returnValue($collection));
+            ->method('selectCollection');
 
         $that = $this;
 
         $collection->expects($this->never())
-            ->method('remove')
-            ->will($this->returnCallback(function ($criteria) use ($that) {
-                $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['time_field']]['$lt']->sec);
-            }));
+            ->method('remove');
 
         $this->assertTrue($this->storage->gc(1));
     }

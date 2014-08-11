@@ -1594,6 +1594,45 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         // reset request for following tests
         Request::setTrustedHosts(array());
     }
+
+    public function testVeryLongHost()
+    {
+        $host = 'a'.str_repeat('.a', 40000);
+        $start = microtime(true);
+
+        $request = Request::create('/');
+        $request->headers->set('host', $host);
+        $this->assertEquals($host, $request->getHost());
+        $this->assertLessThan(1, microtime(true) - $start);
+    }
+
+    /**
+     * @dataProvider getHostValidities
+     */
+    public function testHostValidity($host, $isValid)
+    {
+        $request = Request::create('/');
+        $request->headers->set('host', $host);
+
+        if ($isValid) {
+            $this->assertSame($host, $request->getHost());
+            }
+        } else {
+            $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            $request->getHost();
+        }
+    }
+
+    public function getHostValidities()
+    {
+        return array(
+            array('.a', false),
+            array('a..', false),
+            array('a.', true),
+            array("\xE9", false),
+            array('[::1]', true),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

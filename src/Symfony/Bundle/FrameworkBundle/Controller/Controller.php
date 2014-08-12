@@ -88,7 +88,6 @@ class Controller extends ContainerAware
         $this->templating      = $this->container->get('templating',       ContainerInterface::NULL_ON_INVALID_REFERENCE);
     }
 
-
     /**
      * Generates a URL from the given parameters.
      *

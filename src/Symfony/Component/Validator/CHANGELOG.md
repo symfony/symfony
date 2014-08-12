@@ -6,6 +6,8 @@ CHANGELOG
 
  * [BC BREAK] `FileValidator` disallow empty files
  * [BC BREAK] `UserPasswordValidator` source message change
+ * [BC BREAK] added internal `ExecutionContextInterface::setConstraint()`
+ * added `ConstraintViolation::getConstraint()`
 
 2.5.0
 -----

@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\FailingConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\FakeClassMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -751,5 +752,14 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->validate($entity);
 
         $this->assertTrue($entity->initialized);
+    }
+
+    public function testPassConstraintToViolation()
+    {
+        $constraint = new FailingConstraint();
+        $violations = $this->validate('Foobar', $constraint);
+
+        $this->assertCount(1, $violations);
+        $this->assertSame($constraint, $violations[0]->getConstraint());
     }
 }

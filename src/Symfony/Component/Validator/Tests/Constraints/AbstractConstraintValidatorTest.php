@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -49,6 +50,8 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected $propertyPath;
 
+    protected $constraint;
+
     protected function setUp()
     {
         $this->group = 'MyGroup';
@@ -57,6 +60,15 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $this->value = 'InvalidValue';
         $this->root = 'root';
         $this->propertyPath = 'property.path';
+
+        // Initialize the context with some constraint so that we can
+        // successfully build a violation.
+        // The 2.4 API does not keep a reference to the current
+        // constraint yet. There the violation stores null.
+        $this->constraint = Validation::API_VERSION_2_4 === $this->getApiVersion()
+            ? null
+            : new NotNull();
+
         $this->context = $this->createContext();
         $this->validator = $this->createValidator();
         $this->validator->initialize($this->context);
@@ -108,6 +120,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
         $context->setGroup($this->group);
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
+        $context->setConstraint($this->constraint);
 
         $validator->expects($this->any())
             ->method('inContext')
@@ -127,7 +140,8 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
             $propertyPath,
             $invalidValue,
             $plural,
-            $code
+            $code,
+            $this->constraint
         );
     }
 

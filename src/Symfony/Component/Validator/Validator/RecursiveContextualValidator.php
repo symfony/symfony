@@ -856,6 +856,8 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $context->markConstraintAsValidated($cacheKey, $constraintHash);
             }
 
+            $context->setConstraint($constraint);
+
             $validator = $this->validatorFactory->getInstance($constraint);
             $validator->initialize($context);
             $validator->validate($value, $constraint);

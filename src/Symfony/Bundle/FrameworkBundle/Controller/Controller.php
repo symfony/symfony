@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,7 +24,6 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -34,6 +34,60 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  */
 class Controller extends ContainerAware
 {
+    /**
+     * @var \Symfony\Bridge\Doctrine\RegistryInterface
+     */
+    public $doctrine;
+
+    /**
+     * @var \Symfony\Component\Form\FormFactoryInterface
+     */
+    public $formFactory;
+
+    /**
+     * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+     */
+    public $httpKernel;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\RequestStack
+     */
+    public $requestStack;
+
+    /**
+     * @var \Symfony\Component\Routing\RouterInterface
+     */
+    public $router;
+
+    /**
+     * @var \Symfony\Component\Security\Core\SecurityContextInterface
+     */
+    public $securityContext;
+
+    /**
+     * @var \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface
+     */
+    public $templating;
+
+    /**
+     * Inject services from the container until Symfony 3.0 cleans all
+     * of that and stop injectig the service container into controllers
+     *
+     * @param ContainerInterface $container
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+        $this->doctrine        = $this->container->get('doctrine',         ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->formFactory     = $this->container->get('form.factory',     ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->httpKernel      = $this->container->get('http_kernel',      ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->requestStack    = $this->container->get('request_stack',    ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->router          = $this->container->get('router',           ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->securityContext = $this->container->get('security.context', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $this->templating      = $this->container->get('templating',       ContainerInterface::NULL_ON_INVALID_REFERENCE);
+    }
+
+
     /**
      * Generates a URL from the given parameters.
      *
@@ -47,7 +101,7 @@ class Controller extends ContainerAware
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->container->get('router')->generate($route, $parameters, $referenceType);
+        return $this->router->generate($route, $parameters, $referenceType);
     }
 
     /**
@@ -62,9 +116,9 @@ class Controller extends ContainerAware
     public function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
-        $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
+        $subRequest = $this->requestStack->getCurrentRequest()->duplicate($query, null, $path);
 
-        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        return $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
@@ -90,7 +144,7 @@ class Controller extends ContainerAware
      */
     public function renderView($view, array $parameters = array())
     {
-        return $this->container->get('templating')->render($view, $parameters);
+        return $this->templating->render($view, $parameters);
     }
 
     /**
@@ -104,7 +158,7 @@ class Controller extends ContainerAware
      */
     public function render($view, array $parameters = array(), Response $response = null)
     {
-        return $this->container->get('templating')->renderResponse($view, $parameters, $response);
+        return $this->templating->renderResponse($view, $parameters, $response);
     }
 
     /**
@@ -118,7 +172,7 @@ class Controller extends ContainerAware
      */
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
-        $templating = $this->container->get('templating');
+        $templating = $this->templating;
 
         $callback = function () use ($templating, $view, $parameters) {
             $templating->stream($view, $parameters);
@@ -178,7 +232,7 @@ class Controller extends ContainerAware
      */
     public function createForm($type, $data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->create($type, $data, $options);
+        return $this->formFactory->create($type, $data, $options);
     }
 
     /**
@@ -191,7 +245,7 @@ class Controller extends ContainerAware
      */
     public function createFormBuilder($data = null, array $options = array())
     {
-        return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+        return $this->formFactory->createBuilder('form', $data, $options);
     }
 
     /**
@@ -205,7 +259,7 @@ class Controller extends ContainerAware
      */
     public function getRequest()
     {
-        return $this->container->get('request_stack')->getCurrentRequest();
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -217,11 +271,11 @@ class Controller extends ContainerAware
      */
     public function getDoctrine()
     {
-        if (!$this->container->has('doctrine')) {
+        if (!isset($this->doctrine)) {
             throw new \LogicException('The DoctrineBundle is not registered in your application.');
         }
 
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     /**
@@ -235,11 +289,11 @@ class Controller extends ContainerAware
      */
     public function getUser()
     {
-        if (!$this->container->has('security.context')) {
+        if (!isset($this->securityContext)) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        if (null === $token = $this->container->get('security.context')->getToken()) {
+        if (null === $token = $this->securityContext->getToken()) {
             return;
         }
 
@@ -256,6 +310,11 @@ class Controller extends ContainerAware
      * @param string $id The service id
      *
      * @return bool    true if the service id is defined, false otherwise
+     *
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Ask
+     *             Symfony to inject the correct service into your controller
+     *             instead of injectig the whole service container which is a
+     *             really bad practice
      */
     public function has($id)
     {
@@ -268,6 +327,11 @@ class Controller extends ContainerAware
      * @param string $id The service id
      *
      * @return object The service
+     *
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Ask
+     *             Symfony to inject the correct service into your controller
+     *             instead of injectig the whole service container which is a
+     *             really bad practice
      */
     public function get($id)
     {

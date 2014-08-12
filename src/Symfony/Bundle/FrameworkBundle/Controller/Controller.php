@@ -338,4 +338,60 @@ class Controller extends ContainerAware
     {
         return $this->container->get($id);
     }
+
+    /**
+     * @param \Symfony\Bridge\Doctrine\RegistryInterface $doctrine
+     */
+    public function setDoctrine($doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
+    /**
+     * @param \Symfony\Component\Form\FormFactoryInterface $formFactory
+     */
+    public function setFormFactory($formFactory)
+    {
+        $this->formFactory = $formFactory;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+     */
+    public function setHttpKernel($httpKernel)
+    {
+        $this->httpKernel = $httpKernel;
+    }
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+     */
+    public function setRequestStack($requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @param \Symfony\Component\Routing\RouterInterface $router
+     */
+    public function setRouter($router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
+     */
+    public function setSecurityContext($securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
+
+    /**
+     * @param \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface $templating
+     */
+    public function setTemplating($templating)
+    {
+        $this->templating = $templating;
+    }
 }

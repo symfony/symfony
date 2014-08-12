@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -265,7 +266,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return Registry
+     * @return RegistryInterface
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

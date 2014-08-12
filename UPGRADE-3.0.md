@@ -357,6 +357,10 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+ * The `has` and `get` methods of the base `Controller` class have been deprecated
+   since Symfony 2.6 and must be therefore removed in 3.0. Developers should use
+   proper service injection and not rely on the whole service container.
+
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in

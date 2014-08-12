@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,9 +35,10 @@ class ControllerTest extends TestCase
             return new Response($request->getRequestFormat().'--'.$request->getLocale());
         }));
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->at(0))->method('get')->will($this->returnValue($requestStack));
-        $container->expects($this->at(1))->method('get')->will($this->returnValue($kernel));
+        $container = new Container(new ParameterBag([
+            "request_stack" => $requestStack,
+            "http_kernel"   => $kernel
+        ]));
 
         $controller = new Controller();
         $controller->setContainer($container);

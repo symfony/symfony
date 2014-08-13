@@ -1009,6 +1009,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey('HTTP_X_FORWARDED_PROTO', $_SERVER);
 
+        $request->initialize(array('foo' => 'bar', 'baz' => 'foo'));
+        $request->query->remove('baz');
+
+        $request->overrideGlobals();
+
+        $this->assertEquals(array('foo' => 'bar'), $_GET);
+        $this->assertEquals('foo=bar', $_SERVER['QUERY_STRING']);
+        $this->assertEquals('foo=bar', $request->server->get('QUERY_STRING'));
+
         // restore initial $_SERVER array
         $_SERVER = $server;
     }

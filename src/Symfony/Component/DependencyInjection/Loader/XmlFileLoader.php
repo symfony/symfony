@@ -279,8 +279,10 @@ class XmlFileLoader extends FileLoader
         krsort($definitions);
         foreach ($definitions as $id => $def) {
             list($domElement, $file, $wild) = $def;
+
             // anonymous services are always private
-            $domElement->setAttribute('public', false);
+            // we could not use the constant false here, because of XML parsing
+            $domElement->setAttribute('public', 'false');
 
             $this->parseDefinition($id, $domElement, $file);
 

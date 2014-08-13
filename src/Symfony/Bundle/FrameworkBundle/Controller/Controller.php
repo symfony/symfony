@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -272,5 +273,22 @@ class Controller extends ContainerAware
     public function get($id)
     {
         return $this->container->get($id);
+    }
+
+    /**
+     * Checks the validity of a CSRF token
+     *
+     * @param string $id    The id used when generating the token
+     * @param string $token The actual token sent with the request that should be validated
+     *
+     * @return bool
+     */
+    protected function isCsrfTokenValid($id, $token)
+    {
+        if (!$this->container->has('security.csrf.token_manager')) {
+            throw new \LogicException('CSRF protection is not enabled in your application.');
+        }
+
+        return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
 }

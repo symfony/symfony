@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-29T15:14:18Z
+
+Do you know how to implement locking in Mongo to prevent race conditions? See #4976
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2014-07-29T15:23:13Z
+
+MongoDB has DB level locking itself.
+Are we really talking about read your own writes here?
+If so, then updating the docs to specify a read preference may be enough without forcing it here.
+
+Either way, that is an issue currently right, not created by this PR?
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2014-07-31T13:22:01Z
+
+Hi, What needs to be done so this can be merged?
+
+---------------------------------------------------------------------------
+
+by catchamonkey at 2014-08-11T10:14:44Z
+
+Any further comments here?
+
+---------------------------------------------------------------------------
+
+by jmikola at 2014-08-11T19:20:11Z
+
+I have no further input. I think @stof can give this a final look, or some of the [core team voters](http://symfony.com/doc/2.3/contributing/code/core_team.html) can chime in.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-11T19:48:04Z
+
+except for the small cleanup in tests, :+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-12T18:03:30Z
+
+:+1:

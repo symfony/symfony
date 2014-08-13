@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-12T17:54:26Z
+
+Could you paste a screenshot before/after ?
+
+---------------------------------------------------------------------------
+
+by blaugueux at 2014-08-12T18:18:50Z
+
+Before:
+![image](https://cloud.githubusercontent.com/assets/767963/3895330/f950d590-224c-11e4-9ceb-7e3c4fdb5d7b.png)
+
+After:
+![image](https://cloud.githubusercontent.com/assets/767963/3895331/09a6486c-224d-11e4-840a-cfa05dd0a71f.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-13T09:31:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by blaugueux at 2014-08-13T13:49:15Z
+
+thx @stof
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-13T18:51:27Z
+
+Could you please rebase this PR on branch 2.3? :+1: from me.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-13T18:58:57Z
+
+@nicolas-grekas why not just doing it with the GH tool when merging ? If @blaugueux does the rebase, it will also require recreating another PR to change the target.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-13T19:21:34Z
+
+Right! I'll do that

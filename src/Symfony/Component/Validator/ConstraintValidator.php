@@ -21,6 +21,21 @@ namespace Symfony\Component\Validator;
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
     /**
+     * Whether to format {@link \DateTime} objects as RFC-3339 dates
+     * ("Y-m-d H:i:s").
+     *
+     * @var integer
+     */
+    const PRETTY_DATE = 1;
+
+    /**
+     * Whether to cast objects with a "__toString()" method to strings.
+     *
+     * @var integer
+     */
+    const OBJECT_TO_STRING = 2;
+
+    /**
      * @var ExecutionContextInterface
      */
     protected $context;
@@ -66,15 +81,15 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param mixed $value          The value to format as string
-     * @param bool  $prettyDateTime Whether to format {@link \DateTime}
-     *                              objects as RFC-3339 dates ("Y-m-d H:i:s")
+     * @param mixed   $value  The value to format as string
+     * @param integer $format A bitwise combination of the format
+     *                        constants in this class
      *
      * @return string The string representation of the passed value
      */
-    protected function formatValue($value, $prettyDateTime = false)
+    protected function formatValue($value, $format = 0)
     {
-        if ($prettyDateTime && $value instanceof \DateTime) {
+        if (($format & self::PRETTY_DATE) && $value instanceof \DateTime) {
             if (class_exists('IntlDateFormatter')) {
                 $locale = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
@@ -86,6 +101,10 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (is_object($value)) {
+            if ($format & self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+                return $value->__toString();
+            }
+
             return 'object';
         }
 
@@ -122,18 +141,18 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array $values         A list of values
-     * @param bool  $prettyDateTime Whether to format {@link \DateTime}
-     *                              objects as RFC-3339 dates ("Y-m-d H:i:s")
+     * @param array   $values A list of values
+     * @param integer $format A bitwise combination of the format
+     *                        constants in this class
      *
      * @return string The string representation of the value list
      *
      * @see formatValue()
      */
-    protected function formatValues(array $values, $prettyDateTime = false)
+    protected function formatValues(array $values, $format = 0)
     {
         foreach ($values as $key => $value) {
-            $values[$key] = $this->formatValue($value, $prettyDateTime);
+            $values[$key] = $this->formatValue($value, $format);
         }
 
         return implode(', ', $values);

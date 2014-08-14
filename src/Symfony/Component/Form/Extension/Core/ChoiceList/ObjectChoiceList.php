@@ -88,7 +88,15 @@ class ObjectChoiceList extends ChoiceList
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $this->labelPath = null !== $labelPath ? new PropertyPath($labelPath) : null;
+        if($labelPath !== null){
+            if($labelPath instanceof \Closure){
+                $this->labelPath = $labelPath;
+            }else{
+                $this->labelPath = new PropertyPath($labelPath);
+            }
+        }else{
+            $this->labelPath = null;
+        }
         $this->groupPath = null !== $groupPath ? new PropertyPath($groupPath) : null;
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
 
@@ -248,7 +256,10 @@ class ObjectChoiceList extends ChoiceList
             if (is_array($choice)) {
                 $labels[$i] = array();
                 $this->extractLabels($choice, $labels[$i]);
-            } elseif ($this->labelPath) {
+            } elseif ($this->labelPath instanceof \Closure) {
+                $clousure = $this->labelPath;
+                $labels[$i] = $clousure($choice);
+            }elseif ($this->labelPath) {
                 $labels[$i] = $this->propertyAccessor->getValue($choice, $this->labelPath);
             } elseif (method_exists($choice, '__toString')) {
                 $labels[$i] = (string) $choice;

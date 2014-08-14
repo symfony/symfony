@@ -1404,12 +1404,22 @@ class Request
     /**
      * Checks if the request method is of specified type.
      *
-     * @param string $method Uppercase request method (GET, POST etc).
+     * @param string|string[] $method Uppercase request method (GET, POST etc).
      *
      * @return bool
      */
     public function isMethod($method)
     {
+        if (is_array($method)) {
+            foreach ($method as $m) {
+                if ($this->getMethod() === strtoupper($m)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         return $this->getMethod() === strtoupper($method);
     }
 

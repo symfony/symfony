@@ -1296,6 +1296,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->isMethod('get'));
         $this->assertFalse($request->isMethod('POST'));
         $this->assertFalse($request->isMethod('post'));
+
+        $request->setMethod('PATCH');
+        $this->assertTrue($request->isMethod(array('GET', 'post', 'PatCH')));
+        $this->assertTrue($request->isMethod(array('post', 'PATCH')));
+        $this->assertFalse($request->isMethod(array('GET', 'POST')));
+        $this->assertFalse($request->isMethod(array('GET')));
     }
 
     /**

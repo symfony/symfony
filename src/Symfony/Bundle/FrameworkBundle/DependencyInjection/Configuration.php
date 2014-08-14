@@ -154,7 +154,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
-                        ->scalarNode('lifetime')->defaultValue(86400)->end()
+                        ->integerNode('lifetime')->defaultValue(86400)->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()
                             ->performNoDeepMerging()

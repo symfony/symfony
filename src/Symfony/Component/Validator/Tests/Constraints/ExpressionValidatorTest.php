@@ -14,184 +14,170 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
+use Symfony\Component\Validator\Tests\Fixtures\Entity;
 
-class ExpressionValidatorTest extends \PHPUnit_Framework_TestCase
+class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new ExpressionValidator(PropertyAccess::createPropertyAccessor());
-        $this->validator->initialize($this->context);
-
-        $this->context->expects($this->any())
-            ->method('getClassName')
-            ->will($this->returnValue(__CLASS__));
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Expression('value == 1'));
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Expression('value == 1'));
+
+        $this->assertNoViolation();
     }
 
     public function testSucceedingExpressionAtObjectLevel()
     {
-        $constraint = new Expression('this.property == 1');
+        $constraint = new Expression('this.data == 1');
 
-        $object = (object) array('property' => '1');
+        $object = new Entity();
+        $object->data = '1';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue(null));
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->setObject($object);
 
         $this->validator->validate($object, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testFailingExpressionAtObjectLevel()
     {
         $constraint = new Expression(array(
-            'expression' => 'this.property == 1',
+            'expression' => 'this.data == 1',
             'message' => 'myMessage',
         ));
 
-        $object = (object) array('property' => '2');
+        $object = new Entity();
+        $object->data = '2';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue(null));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
+        $this->setObject($object);
 
         $this->validator->validate($object, $constraint);
+
+        $this->assertViolation('myMessage');
     }
 
     public function testSucceedingExpressionAtPropertyLevel()
     {
-        $constraint = new Expression('value == this.expected');
+        $constraint = new Expression('value == this.data');
 
-        $object = (object) array('expected' => '1');
+        $object = new Entity();
+        $object->data = '1';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue($object));
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->setRoot($object);
+        $this->setPropertyPath('data');
+        $this->setProperty($object, 'data');
 
         $this->validator->validate('1', $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testFailingExpressionAtPropertyLevel()
     {
         $constraint = new Expression(array(
-            'expression' => 'value == this.expected',
+            'expression' => 'value == this.data',
             'message' => 'myMessage',
         ));
 
-        $object = (object) array('expected' => '1');
+        $object = new Entity();
+        $object->data = '1';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('property'));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue($object));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
+        $this->setRoot($object);
+        $this->setPropertyPath('data');
+        $this->setProperty($object, 'data');
 
         $this->validator->validate('2', $constraint);
+
+        $this->assertViolation('myMessage', array(), 'data');
     }
 
     public function testSucceedingExpressionAtNestedPropertyLevel()
     {
-        $constraint = new Expression('value == this.expected');
+        $constraint = new Expression('value == this.data');
 
-        $object = (object) array('expected' => '1');
-        $root = (object) array('nested' => $object);
+        $object = new Entity();
+        $object->data = '1';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
+        $root = new Entity();
+        $root->reference = $object;
 
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('nested.property'));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue($root));
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->setRoot($root);
+        $this->setPropertyPath('reference.data');
+        $this->setProperty($object, 'data');
 
         $this->validator->validate('1', $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testFailingExpressionAtNestedPropertyLevel()
     {
         $constraint = new Expression(array(
-            'expression' => 'value == this.expected',
+            'expression' => 'value == this.data',
             'message' => 'myMessage',
         ));
 
-        $object = (object) array('expected' => '1');
-        $root = (object) array('nested' => $object);
+        $object = new Entity();
+        $object->data = '1';
 
-        $this->context->expects($this->any())
-            ->method('getPropertyName')
-            ->will($this->returnValue('property'));
+        $root = new Entity();
+        $root->reference = $object;
 
-        $this->context->expects($this->any())
-            ->method('getPropertyPath')
-            ->will($this->returnValue('nested.property'));
-
-        $this->context->expects($this->any())
-            ->method('getRoot')
-            ->will($this->returnValue($root));
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage');
+        $this->setRoot($root);
+        $this->setPropertyPath('reference.data');
+        $this->setProperty($object, 'data');
 
         $this->validator->validate('2', $constraint);
+
+        $this->assertViolation('myMessage', array(), 'reference.data');
+    }
+
+    /**
+     * When validatePropertyValue() is called with a class name
+     * https://github.com/symfony/symfony/pull/11498
+     */
+    public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
+    {
+        $constraint = new Expression('value == "1"');
+
+        $this->setRoot('1');
+        $this->setPropertyPath('');
+        $this->setProperty(null, 'property');
+
+        $this->validator->validate('1', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * When validatePropertyValue() is called with a class name
+     * https://github.com/symfony/symfony/pull/11498
+     */
+    public function testFailingExpressionAtPropertyLevelWithoutRoot()
+    {
+        $constraint = new Expression(array(
+            'expression' => 'value == "1"',
+            'message' => 'myMessage',
+        ));
+
+        $this->setRoot('2');
+        $this->setPropertyPath('');
+        $this->setProperty(null, 'property');
+
+        $this->validator->validate('2', $constraint);
+
+        $this->assertViolation('myMessage', array(), '');
     }
 }

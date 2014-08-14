@@ -63,7 +63,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array('22', '"22"', '333', '"333"', 'string'),
             array(new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', 'DateTime'),
             array(new \DateTime('2001-01-01'), 'Jan 1, 2001, 12:00 AM', new \DateTime('1999-01-01'), 'Jan 1, 1999, 12:00 AM', 'DateTime'),
-            array(new ComparisonTest_Class(4), 'object', new ComparisonTest_Class(5), 'object', __NAMESPACE__.'\ComparisonTest_Class'),
+            array(new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
         );
     }
 }

@@ -80,19 +80,6 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
-    public function testLap()
-    {
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('foo', 'cat');
-        usleep(100000);
-        $event = $stopwatch->lap('foo');
-        usleep(100000);
-        $stopwatch->stop('foo');
-
-        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
-    }
-
     /**
      * @expectedException \LogicException
      */

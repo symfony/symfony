@@ -56,6 +56,7 @@ $container->loadFromExtension('framework', array(
         'form'              => array(
             'resources'     => array('theme1', 'theme2')
         ),
+        'hinclude_default_template' => 'global_hinclude_template',
     ),
     'translator' => array(
         'enabled'  => true,

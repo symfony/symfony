@@ -45,6 +45,24 @@ class TimeTypeTest extends TypeTestCase
         $this->assertEquals($input, $form->getViewData());
     }
 
+    public function testSubmitDateTimeWithUnspecifiedToOriginSetToFalse()
+    {
+        $form = $this->factory->create('time', new \DateTime('2000-01-01 20:00:20'), [
+            'unspecified_to_origin' => false,
+        ]);
+
+        $input = array(
+            'hour' => '3',
+            'minute' => '4'
+        );
+
+        $form->submit($input);
+
+        $dateTime = new \DateTime('2000-01-01 03:04:20');
+
+        $this->assertEquals($dateTime, $form->getData());
+    }
+
     public function testSubmitString()
     {
         $form = $this->factory->create('time', null, array(

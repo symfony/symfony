@@ -38,9 +38,7 @@ class AllValidator extends ConstraintValidator
         $group = $this->context->getGroup();
 
         foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
-            }
+            $this->context->validateValue($element, $constraint->constraints, '['.$key.']', $group);
         }
     }
 }

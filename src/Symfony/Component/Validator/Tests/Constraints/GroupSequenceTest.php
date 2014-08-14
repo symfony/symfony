@@ -11,15 +11,17 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Tests\Fixtures\Countable;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CountValidatorCountableTest extends CountValidatorTest
+class GroupSequenceTest extends \PHPUnit_Framework_TestCase
 {
-    protected function createCollection(array $content)
+    public function testCreateDoctrineStyle()
     {
-        return new Countable($content);
+        $sequence = new GroupSequence(array('value' => array('Group 1', 'Group 2')));
+
+        $this->assertSame(array('Group 1', 'Group 2'), $sequence->groups);
     }
 }

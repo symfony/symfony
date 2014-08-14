@@ -13,49 +13,48 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
+use Symfony\Component\Validator\Validation;
 
-class TypeValidatorTest extends \PHPUnit_Framework_TestCase
+class TypeValidatorTest extends AbstractConstraintValidatorTest
 {
     protected static $file;
 
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new TypeValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new TypeValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new Type(array('type' => 'integer'));
 
-        $this->validator->validate(null, new Type(array('type' => 'integer')));
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyIsValidIfString()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new Type(array('type' => 'string'));
 
-        $this->validator->validate('', new Type(array('type' => 'string')));
+        $this->validator->validate('', $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyIsInvalidIfNoString()
     {
-        $this->context->expects($this->once())
-            ->method('addViolation');
+        $constraint = new Type(array(
+            'type' => 'integer',
+            'message' => 'myMessage',
+        ));
 
-        $this->validator->validate('', new Type(array('type' => 'integer')));
+        $this->validator->validate('', $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '""',
+            '{{ type }}' => 'integer',
+        ));
     }
 
     /**
@@ -63,12 +62,11 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidValues($value, $type)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Type(array('type' => $type));
 
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function getValidValues()
@@ -118,14 +116,12 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $valueAsString,
-                '{{ type }}' => $type,
-            ));
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $valueAsString,
+            '{{ type }}' => $type,
+        ));
     }
 
     public function getInvalidValues()
@@ -167,17 +163,18 @@ class TypeValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function createFile()
     {
-        if (!self::$file) {
-            self::$file = fopen(__FILE__, 'r');
+        if (!static::$file) {
+            static::$file = fopen(__FILE__, 'r');
         }
 
-        return self::$file;
+        return static::$file;
     }
 
     public static function tearDownAfterClass()
     {
-        if (self::$file) {
-            fclose(self::$file);
+        if (static::$file) {
+            fclose(static::$file);
+            static::$file = null;
         }
     }
 }

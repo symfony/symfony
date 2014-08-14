@@ -14,38 +14,25 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\BlankValidator;
 
-class BlankValidatorTest extends \PHPUnit_Framework_TestCase
+class BlankValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new BlankValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new BlankValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Blank());
+
+        $this->assertNoViolation();
     }
 
     public function testBlankIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Blank());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -57,13 +44,12 @@ class BlankValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $valueAsString,
-            ));
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation(
+            'myMessage',
+            array('{{ value }}' => $valueAsString)
+        );
     }
 
     public function getInvalidValues()

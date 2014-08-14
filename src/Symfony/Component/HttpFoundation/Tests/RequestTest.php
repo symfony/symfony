@@ -1012,9 +1012,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request->headers->set('CONTENT_TYPE', 'multipart/form-data');
         $request->headers->set('CONTENT_LENGTH', 12345);
+
         $request->overrideGlobals();
+
         $this->assertArrayHasKey('CONTENT_TYPE', $_SERVER);
         $this->assertArrayHasKey('CONTENT_LENGTH', $_SERVER);
+
+        $request->initialize(array('foo' => 'bar', 'baz' => 'foo'));
+        $request->query->remove('baz');
+
+        $request->overrideGlobals();
+
+        $this->assertEquals(array('foo' => 'bar'), $_GET);
+        $this->assertEquals('foo=bar', $_SERVER['QUERY_STRING']);
+        $this->assertEquals('foo=bar', $request->server->get('QUERY_STRING'));
 
         // restore initial $_SERVER array
         $_SERVER = $server;

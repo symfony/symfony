@@ -13,31 +13,20 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Null;
 use Symfony\Component\Validator\Constraints\NullValidator;
+use Symfony\Component\Validator\Validation;
 
-class NullValidatorTest extends \PHPUnit_Framework_TestCase
+class NullValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new NullValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new NullValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Null());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -49,13 +38,11 @@ class NullValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage'
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $valueAsString,
-            ));
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $valueAsString,
+        ));
     }
 
     public function getInvalidValues()

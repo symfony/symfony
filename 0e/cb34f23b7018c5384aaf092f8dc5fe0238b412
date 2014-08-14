@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-12T13:04:12Z
+
+ping @stof @Tobion
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-12T13:23:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-13T18:34:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-13T19:14:49Z
+
+@webmozart can you rebase please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-13T19:42:40Z
+
+After the rebase, are you ok @symfony/deciders to let me merge this PR, then merge 2.3 into 2.4 to allow @webmozart to finish his https://github.com/symfony/symfony/pull/11647 PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-13T19:51:11Z
+
+@nicolas-grekas yeah, IMO it is fine (anyway, once it is rebased, @webmozart is allowed to merge the PR as he is merger for the component and 2 other deciders have validated it)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-13T19:54:39Z
+
+:+1:

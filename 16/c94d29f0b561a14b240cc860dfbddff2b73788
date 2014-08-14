@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-11T13:09:23Z
+
+wouldn't this be covered by #11646 after merging 2.3 into 2.4 ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-11T13:33:44Z
+
+@stof The tests for 2.3 and 2.4 are not identical because some 2.4 features don't exist in the 2.3 branch.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-12T13:04:16Z
+
+ping @stof @Tobion
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-12T13:25:00Z
+
+:+1: for me, but it would be good to wait for the PR to 2.3 to be merged and propagated to 2.4 first, so that the diff for this commit would contain only the difference between the 2.3 and 2.4 tests rather than all files again
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-12T14:06:07Z
+
+@stof Ok, let's do that.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-14T14:58:01Z
+
+I merged #11646 now and merged 2.3 into 2.4. As you can see, the resulting diff is quite small (I don't know why the updated UserPasswordValidatorTest wasn't merged forward correctly from 2.3).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-14T15:16:24Z
+
+:+1:
+could you please merge 2.4 into 2.5 and then 2.5 into master after wise?

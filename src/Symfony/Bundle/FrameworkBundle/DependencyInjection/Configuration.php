@@ -33,6 +33,8 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            ->fixXmlConfig('trusted_proxies', 'trusted_proxy')
+            ->fixXmlConfig('trusted_hosts')
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')

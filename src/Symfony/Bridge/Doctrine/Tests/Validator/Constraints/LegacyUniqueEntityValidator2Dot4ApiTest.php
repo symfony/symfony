@@ -9,11 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Constraints;
+namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 
 use Symfony\Component\Validator\Validation;
 
-class LegacyCollectionValidatorArrayObject2Dot4ApiTest extends CollectionValidatorArrayObjectTest
+/**
+ * @since  2.5.4
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class LegacyUniqueEntityValidator2Dot4ApiTest extends UniqueEntityValidatorTest
 {
     protected function getApiVersion()
     {

@@ -9,14 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Constraints;
+namespace Symfony\Component\Security\Core\Tests\Validator\Constraints;
 
 use Symfony\Component\Validator\Validation;
 
-class LegacyCollectionValidatorArrayObject2Dot4ApiTest extends CollectionValidatorArrayObjectTest
+/**
+ * @since  2.5.4
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class LegacyUserPasswordValidatorLegacyApiTest extends UserPasswordValidatorTest
 {
     protected function getApiVersion()
     {
-        return Validation::API_VERSION_2_4;
+        return Validation::API_VERSION_2_5_BC;
     }
 }

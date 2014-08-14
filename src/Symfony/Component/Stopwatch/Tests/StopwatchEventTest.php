@@ -149,25 +149,6 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $event->getStartTime(), null, self::DELTA);
     }
 
-    public function testEndTime()
-    {
-        $event = new StopwatchEvent(microtime(true) * 1000);
-        $this->assertEquals(0, $event->getEndTime());
-
-        $event = new StopwatchEvent(microtime(true) * 1000);
-        $event->start();
-        $this->assertEquals(0, $event->getEndTime());
-
-        $event = new StopwatchEvent(microtime(true) * 1000);
-        $event->start();
-        usleep(100000);
-        $event->stop();
-        $event->start();
-        usleep(100000);
-        $event->stop();
-        $this->assertEquals(200, $event->getEndTime(), null, self::DELTA);
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */

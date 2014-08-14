@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\LegacyCountValidator;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -23,10 +22,5 @@ class LegacyCountValidatorArray2Dot4ApiTest extends CountValidatorArrayTest
     protected function getApiVersion()
     {
         return Validation::API_VERSION_2_4;
-    }
-
-    protected function createValidator()
-    {
-        return new LegacyCountValidator();
     }
 }

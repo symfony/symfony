@@ -151,7 +151,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = new OutputFormatter(true);
 
-        $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> styled <p>single-char tag</p></info>'));
+        $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m \033[39m\033[32m<setting=value>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
     }
 
     public function testFormatLongString()

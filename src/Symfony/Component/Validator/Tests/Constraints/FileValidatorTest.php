@@ -96,45 +96,67 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
     public function provideMaxSizeExceededTests()
     {
+        // We have various interesting limit - size combinations to test.
+        // Assume a limit of 1000 bytes (1 kB). Then the following table
+        // lists the violation messages for different file sizes:
+        // -----------+--------------------------------------------------------
+        // Size       | Violation Message
+        // -----------+--------------------------------------------------------
+        // 1000 bytes | No violation
+        // 1001 bytes | "Size of 1001 bytes exceeded limit of 1000 bytes"
+        // 1004 bytes | "Size of 1004 bytes exceeded limit of 1000 bytes"
+        //            | NOT: "Size of 1 kB exceeded limit of 1 kB"
+        // 1005 bytes | "Size of 1.01 kB exceeded limit of 1 kB"
+        // -----------+--------------------------------------------------------
+
+        // As you see, we have two interesting borders:
+
+        // 1000/1001 - The border as of which a violation occurs
+        // 1004/1005 - The border as of which the message can be rounded to kB
+
+        // Analogous for kB/MB.
+
+        // Prior to Symfony 2.5, violation messages are always displayed in the
+        // same unit used to specify the limit.
+
+        // As of Symfony 2.5, the above logic is implemented.
         return array(
-            array(11, 10, '11', '10', 'bytes'),
+            // limit in bytes
+            array(1001, 1000, '1001', '1000', 'bytes'),
+            array(1004, 1000, '1004', '1000', 'bytes'),
+            array(1005, 1000, '1.01', '1', 'kB'),
 
-            array(ceil(1.005*1000), ceil(1.005*1000) - 1, '1005', '1004', 'bytes'),
-            array(ceil(1.005*1000*1000), ceil(1.005*1000*1000) - 1, '1005000', '1004999', 'bytes'),
+            array(1000001, 1000000, '1000001', '1000000', 'bytes'),
+            array(1004999, 1000000, '1005', '1000', 'kB'),
+            array(1005000, 1000000, '1.01', '1', 'MB'),
 
-            // round(size) == 1.01kB, limit == 1kB
-            array(ceil(1.005*1000), 1000, '1.01', '1', 'kB'),
-            array(ceil(1.005*1000), '1k', '1.01', '1', 'kB'),
-            array(ceil(1.005*1024), '1Ki', '1.01', '1', 'KiB'),
+            // limit in kB
+            array(1001, '1k', '1001', '1000', 'bytes'),
+            array(1004, '1k', '1004', '1000', 'bytes'),
+            array(1005, '1k', '1.01', '1', 'kB'),
 
-            // round(size) == 1kB, limit == 1kB -> use bytes
-            array(ceil(1.004*1000), 1000, '1004', '1000', 'bytes'),
-            array(ceil(1.004*1000), '1k', '1004', '1000', 'bytes'),
-            array(ceil(1.004*1024), '1Ki', '1029', '1024', 'bytes'),
+            array(1000001, '1000k', '1000001', '1000000', 'bytes'),
+            array(1004999, '1000k', '1005', '1000', 'kB'),
+            array(1005000, '1000k', '1.01', '1', 'MB'),
 
-            array(1000 + 1, 1000, '1001', '1000', 'bytes'),
-            array(1000 + 1, '1k', '1001', '1000', 'bytes'),
-            array(1024 + 1, '1Ki', '1025', '1024', 'bytes'),
+            // limit in MB
+            array(1000001, '1M', '1000001', '1000000', 'bytes'),
+            array(1004999, '1M', '1005', '1000', 'kB'),
+            array(1005000, '1M', '1.01', '1', 'MB'),
 
-            // round(size) == 1.01MB, limit == 1MB
-            array(ceil(1.005*1000*1000), 1000*1000, '1.01', '1', 'MB'),
-            array(ceil(1.005*1000*1000), '1000k', '1.01', '1', 'MB'),
-            array(ceil(1.005*1000*1000), '1M', '1.01', '1', 'MB'),
-            array(ceil(1.005*1024*1024), '1024Ki', '1.01', '1', 'MiB'),
-            array(ceil(1.005*1024*1024), '1Mi', '1.01', '1', 'MiB'),
+            // limit in KiB
+            array(1025, '1Ki', '1025', '1024', 'bytes'),
+            array(1029, '1Ki', '1029', '1024', 'bytes'),
+            array(1030, '1Ki', '1.01', '1', 'KiB'),
 
-            // round(size) == 1MB, limit == 1MB -> use kB
-            array(ceil(1.004*1000*1000), 1000*1000, '1004', '1000', 'kB'),
-            array(ceil(1.004*1000*1000), '1000k', '1004', '1000', 'kB'),
-            array(ceil(1.004*1000*1000), '1M', '1004', '1000', 'kB'),
-            array(ceil(1.004*1024*1024), '1024Ki', '1028.1', '1024', 'KiB'),
-            array(ceil(1.004*1024*1024), '1Mi', '1028.1', '1024', 'KiB'),
+            array(1048577, '1024Ki', '1048577', '1048576', 'bytes'),
+            array(1053818, '1024Ki', '1029.12', '1024', 'KiB'),
+            array(1053819, '1024Ki', '1.01', '1', 'MiB'),
 
-            array(1000*1000 + 1, 1000*1000, '1000001', '1000000', 'bytes'),
-            array(1000*1000 + 1, '1000k', '1000001', '1000000', 'bytes'),
-            array(1000*1000 + 1, '1M', '1000001', '1000000', 'bytes'),
-            array(1024*1024 + 1, '1024Ki', '1048577', '1048576', 'bytes'),
-            array(1024*1024 + 1, '1Mi', '1048577', '1048576', 'bytes'),
+            // limit in MiB
+            array(1048577, '1Mi', '1048577', '1048576', 'bytes'),
+            array(1053818, '1Mi', '1029.12', '1024', 'KiB'),
+            array(1053819, '1Mi', '1.01', '1', 'MiB'),
         );
     }
 
@@ -165,18 +187,23 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
     public function provideMaxSizeNotExceededTests()
     {
         return array(
-            array(10, 10),
-            array(9, 10),
+            // limit in bytes
+            array(1000, 1000),
+            array(1000000, 1000000),
 
+            // limit in kB
             array(1000, '1k'),
-            array(1000 - 1, '1k'),
-            array(1024, '1Ki'),
-            array(1024 - 1, '1Ki'),
+            array(1000000, '1000k'),
 
-            array(1000*1000, '1M'),
-            array(1000*1000 - 1, '1M'),
-            array(1024*1024, '1Mi'),
-            array(1024*1024 - 1, '1Mi'),
+            // limit in MB
+            array(1000000, '1M'),
+
+            // limit in KiB
+            array(1024, '1Ki'),
+            array(1048576, '1024Ki'),
+
+            // limit in MiB
+            array(1048576, '1Mi'),
         );
     }
 

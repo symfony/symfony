@@ -7,6 +7,36 @@ in 2.5 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.5.0...v2.5.1
 
+* 2.5.3 (2014-08-06)
+
+ * bug #11571 [Form] Fixed FormValidator compatibility with the non-BC 2.5 Validation API (webmozart)
+ * bug #11499 [BrowserKit] Fixed relative redirects for ambiguous paths (pkruithof)
+ * bug #11516 [BrowserKit] Fix browser kit redirect with ports (dakota)
+ * bug #11545 [Bundle][FrameworkBundle] built-in server: exit when docroot does not exist (xabbuh)
+ * bug #11560 Plural fix (1emming)
+ * bug #11558 [DependencyInjection] Fixed missing 'factory-class' attribute in XmlDumper output (kerdany)
+ * bug #11498 [Validator] Made it possible (again) to pass a class name to validatePropertyValue() (webmozart)
+ * bug #11548 [Component][DomCrawler] fix axes handling in Crawler::filterXPath() (xabbuh)
+ * bug #11422 [DependencyInjection] Self-referenced 'service_container' service breaks garbage collection (sun)
+ * bug #11428 [Serializer] properly handle null data when denormalizing (xabbuh)
+ * bug #10687 [Validator] Fixed string conversion in constraint violations (eagleoneraptor, webmozart)
+ * bug #11412 [Validator] Made sure that context changes don't leak out of (Contextual)ValidatorInterface (webmozart)
+ * bug #11475 [EventDispatcher] don't count empty listeners (xabbuh)
+ * bug #11436 fix signal handling in wait() on calls to stop() (xabbuh, romainneutron)
+ * bug #11469  [BrowserKit] Fixed server HTTP_HOST port uri conversion (bcremer, fabpot)
+ * bug #11425 Fix issue described in #11421 (Ben, ben-rosio)
+ * bug #11423 Pass a Scope instance instead of a scope name when cloning a container in the GrahpvizDumper (jakzal)
+ * bug #11448 [MonologBridge] fixed Console handler priorities (fabpot)
+ * bug #11454 [Validator] Fixed memory leak in ValidatorBuilder (webmozart)
+ * bug #11120 [Process] Reduce I/O load on Windows platform (romainneutron)
+ * bug #11370 [FrameworkBundle] avoid raising unexpected RuntimeException when specifying $_SERVER['KERNEL_DIR'] (iteman)
+ * bug #11342 [Form] Check if IntlDateFormatter constructor returned a valid object before using it (romainneutron)
+ * bug #11439 [ExpressionLanguage] Fixed double quoted string literals containing sharps (pylebecq)
+ * bug #11410 [Validator] Fixed object initializers in 2.5 version of the Validator (webmozart)
+ * bug #11411 [Validator] Backported #11410 to 2.3: Object initializers are called only once per object (webmozart)
+ * bug #11403 [Translator][FrameworkBundle] Added @ to the list of allowed chars in Translator (takeit)
+ * bug #11381  [Process] Use correct test for empty string in UnixPipes (whs, romainneutron)
+
 * 2.5.2 (2014-07-15)
 
  * [Security] Forced validate of locales passed to the translator

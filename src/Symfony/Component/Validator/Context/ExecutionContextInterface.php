@@ -66,7 +66,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * Call {@link ConstraintViolationBuilderInterface::addViolation()} to
      * add the violation when you're done with the configuration:
      *
-     *     $context->buildViolation('Please enter a number between %min% and %max.')
+     *     $context->buildViolation('Please enter a number between %min% and %max%.')
      *         ->setParameter('%min%', 3)
      *         ->setParameter('%max%', 10)
      *         ->setTranslationDomain('number_validation')

@@ -49,6 +49,8 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected $propertyPath;
 
+    protected $defaultTimezone;
+
     protected function setUp()
     {
         $this->group = 'MyGroup';
@@ -62,6 +64,31 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $this->validator->initialize($this->context);
 
         \Locale::setDefault('en');
+
+        $this->setDefaultTimezone('UTC');
+    }
+
+    protected function tearDown()
+    {
+        $this->restoreDefaultTimezone();
+    }
+
+    protected function setDefaultTimezone($defaultTimezone)
+    {
+        // Make sure this method can not be called twice before calling
+        // also restoreDefaultTimezone()
+        if (null === $this->defaultTimezone) {
+            $this->defaultTimezone = ini_get('date.timezone');
+            ini_set('date.timezone', $defaultTimezone);
+        }
+    }
+
+    protected function restoreDefaultTimezone()
+    {
+        if (null !== $this->defaultTimezone) {
+            ini_set('date.timezone', $this->defaultTimezone);
+            $this->defaultTimezone = null;
+        }
     }
 
     protected function createContext()

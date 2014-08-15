@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -87,6 +88,18 @@ class DateRangeValidator extends ConstraintValidator
             return;
         }
 
+        $context = $this->context;
+
+        if (!$start instanceof \DateTime) {
+            $this->addViolation($value, $constraint->invalidMessage, array());
+            return;
+        }
+
+        if (!$end instanceof \DateTime) {
+            $this->addViolation($value, $constraint->invalidMessage, array());
+            return;
+        }
+
         $diff = $start->diff($end);
 
         if ($diff->invert === 0) {
@@ -99,25 +112,45 @@ class DateRangeValidator extends ConstraintValidator
             $limit =
                 $constraint->errorPath === $constraint->end ?
                     $start->format($constraint->limitFormat) : $end->format($constraint->limitFormat);
-            $this
-                ->context
-                ->addViolationAt(
-                $constraint->errorPath,
-                    $message,
-                    array(
-                        '{{ limit }}' => $limit,
-                    ),
-                    null
-                );
+
+            $parameters = array(
+                '{{ limit }}' => $limit,
+            );
+
+            $this->addViolation($value, $message, $parameters, $constraint->errorPath);
+
         } else {
-            $this->context
-                ->addViolation(
-                $constraint->invalidMessage,
-                    array(
-                        '{{ start }}' => $start->format($constraint->limitFormat),
-                        '{{ end }}' => $end->format($constraint->limitFormat),
-                    )
-                );
+            $parameters = array(
+                '{{ start }}' => $start->format($constraint->limitFormat),
+                '{{ end }}' => $end->format($constraint->limitFormat),
+            );
+            $this->addViolation($value, $constraint->invalidMessage, $parameters);
+        }
+    }
+
+    /**
+     * Abstract violation handling between Validator APIs
+     *
+     * @param       $message
+     * @param array $parameters
+     * @param null  $path
+     */
+    private function addViolation($value, $message, array $parameters, $path = null)
+    {
+        $context = $this->context;
+        if ($context instanceof ExecutionContextInterface) {
+            $violation = $context->buildViolation($message, $parameters);
+            if ($path !== null) {
+                $violation->atPath($path);
+            }
+            $violation->setInvalidValue($value);
+            $violation->addViolation();
+        } else {
+            if ($path === null) {
+                $context->addViolation($message, $parameters, $value);
+            } else {
+                $context->addViolationAt($path, $message, $parameters, $value);
+            }
         }
     }
 }

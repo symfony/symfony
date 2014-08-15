@@ -12,7 +12,7 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
 
     protected function getApiVersion()
     {
-        return Validation::API_VERSION_2_4;
+        return Validation::API_VERSION_2_5;
     }
 
     protected function createValidator()
@@ -101,7 +101,9 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
              array(
                  '{{ start }}' => $value->getStartDate()->format('Y-m-d'),
                  '{{ end }}' => $value->getEndDate()->format('Y-m-d'),
-             )
+             ),
+             'property.path',
+             $value
         );
     }
 
@@ -132,7 +134,7 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
                  '{{ limit }}' => $value->getEndDate()->format('Y-m-d'),
              ),
              'property.path.startDate',
-             null
+             $value
         );
     }
 
@@ -151,7 +153,7 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
                  '{{ limit }}' => $value->getStartDate()->format('Y-m-d'),
              ),
              'property.path.endDate',
-             null
+             $value
         );
     }
 

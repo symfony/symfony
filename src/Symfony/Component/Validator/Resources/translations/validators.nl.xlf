@@ -180,7 +180,7 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Deze waarde moet exact {{ limit }} tekens lang zijn.</target>
+                <target>Deze waarde moet exact {{ limit }} teken lang zijn.|Deze waarde moet exact {{ limit }} tekens lang zijn.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>

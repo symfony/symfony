@@ -88,8 +88,6 @@ class DateRangeValidator extends ConstraintValidator
             return;
         }
 
-        $context = $this->context;
-
         if (!$start instanceof \DateTime) {
             $this->addViolation($value, $constraint->invalidMessage, array());
             return;
@@ -103,6 +101,7 @@ class DateRangeValidator extends ConstraintValidator
         $diff = $start->diff($end);
 
         if ($diff->invert === 0) {
+            $this->checkIntervals($value, clone $start, clone $end, $constraint, $diff);
             return;
         }
 
@@ -150,6 +149,52 @@ class DateRangeValidator extends ConstraintValidator
                 $context->addViolation($message, $parameters, $value);
             } else {
                 $context->addViolationAt($path, $message, $parameters, $value);
+            }
+        }
+    }
+
+    /**
+     * @param \DateInterval $interval
+     *
+     * @return int
+     */
+    private function convertIntervalToSeconds(\DateInterval $interval)
+    {
+        return $interval->d * 60 * 60 * 24
+             + $interval->h * 60 * 60
+             + $interval->i * 60
+             + $interval->s;
+    }
+
+    private function checkIntervals(
+        $value,
+        \DateTime $start,
+        \DateTime $end,
+        DateRange $constraint,
+        \DateInterval $diff
+    ) {
+
+        $diffSeconds = $this->convertIntervalToSeconds($diff);
+
+        if ($constraint->min) {
+            $minInterval = \DateInterval::createFromDateString('+' . $constraint->min);
+            $start->add($minInterval);
+            $diff = $start->diff($end);
+            if ($diff->invert === 1) {
+                $this->addViolation($value, $constraint->invalidIntervalMessage, array(
+                        '{{ interval }}' => $constraint->min,
+                    ), $constraint->errorPath);
+            }
+        }
+
+        if ($constraint->max) {
+            $maxInterval = \DateInterval::createFromDateString('+' . $constraint->max);
+            $start->add($maxInterval);
+            $diff = $end->diff($start);
+            if ($diff->invert === 1) {
+                $this->addViolation($value, $constraint->invalidIntervalMessage, array(
+                        '{{ interval }}' => $constraint->max,
+                    ), $constraint->errorPath);
             }
         }
     }

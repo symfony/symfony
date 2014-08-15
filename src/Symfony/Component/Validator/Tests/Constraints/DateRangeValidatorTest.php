@@ -129,7 +129,7 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
         $value = new TestEvent(new \DateTime(), new \DateTime('-1 day'));
         $this->validator->validate($value, $constraint);
         $this->assertViolation(
-             'Start date should be less than or equal to {{ limit }}',
+             'Start date should be earlier than or equal to {{ limit }}',
              array(
                  '{{ limit }}' => $value->getEndDate()->format('Y-m-d'),
              ),
@@ -148,12 +148,174 @@ class DateRangeValidatorTest extends AbstractConstraintValidatorTest
         $value = new TestEvent(new \DateTime(), new \DateTime('-1 day'));
         $this->validator->validate($value, $constraint);
         $this->assertViolation(
-             'End date should be greater than or equal to {{ limit }}',
+             'End date should be later than or equal to {{ limit }}',
              array(
                  '{{ limit }}' => $value->getStartDate()->format('Y-m-d'),
              ),
              'property.path.endDate',
              $value
+        );
+    }
+
+    /**
+     * @param $value
+     * @param $interval
+     *
+     * @dataProvider dateMinIntervalViolations
+     */
+    public function testMinIntervalViolations($value, $interval)
+    {
+        $constraint = new DateRange(array(
+            'start' => 'startDate',
+            'end' => 'endDate',
+            'min' => $interval
+        ));
+        $this->validator->validate($value, $constraint);
+        $this->assertViolation(
+             'Dates must be {{ interval }} apart',
+             array(
+                 '{{ interval }}' => $interval,
+             ),
+             'property.path',
+             $value
+        );
+    }
+
+    public function dateMinIntervalViolations()
+    {
+        return array(
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 hour')),
+                '1 day',
+            ),
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 week')),
+                '1 month',
+            ),
+            array(
+                new TestEvent(new \DateTime('2014-02-01'), new \DateTime('2014-02-27')),
+                '1 month',
+            ),
+            array(
+                new TestEvent(new \DateTime('-30 seconds'), new \DateTime()),
+                '1 minute',
+            ),
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 month 2 days')),
+                '1 month + 10 days',
+            ),
+        );
+    }
+
+    /**
+     * @param $value
+     * @param $interval
+     *
+     * @dataProvider dateMinIntervalValid
+     */
+    public function testMinIntervalsValid($value, $interval)
+    {
+        $constraint = new DateRange(array(
+            'start' => 'startDate',
+            'end' => 'endDate',
+            'min' => $interval
+        ));
+        $this->validator->validate($value, $constraint);
+        $this->assertNoViolation();
+    }
+
+    public function dateMinIntervalValid()
+    {
+        return array(
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 day')),
+                '1 day',
+            ),
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 week')),
+                '5 days',
+            ),
+            array(
+                new TestEvent(new \DateTime('2014-02-01'), new \DateTime('2014-03-01')),
+                '1 month',
+            ),
+        );
+    }
+
+    /**
+     * @param $value
+     * @param $interval
+     *
+     * @dataProvider dateMaxIntervalViolations
+     */
+    public function testMaxIntervalViolations($value, $interval)
+    {
+        $constraint = new DateRange(array(
+            'start' => 'startDate',
+            'end' => 'endDate',
+            'max' => $interval
+        ));
+        $this->validator->validate($value, $constraint);
+        $this->assertViolation(
+             'Dates must be {{ interval }} apart',
+                 array(
+                     '{{ interval }}' => $interval,
+                 ),
+                 'property.path',
+                 $value
+        );
+    }
+
+    public function dateMaxIntervalViolations()
+    {
+        return array(
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 day 1 seconds')),
+                '1 day',
+            ),
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 year')),
+                '1 month',
+            ),
+            array(
+                new TestEvent(new \DateTime('2014-12-01'), new \DateTime('2015-01-02')),
+                '1 month',
+            ),
+        );
+    }
+
+    /**
+     * @param $value
+     * @param $interval
+     *
+     * @dataProvider dateMaxIntervalValid
+     */
+    public function testMaxIntervalsValid($value, $interval)
+    {
+        $constraint = new DateRange(array(
+            'start' => 'startDate',
+            'end' => 'endDate',
+            'max' => $interval
+        ));
+        $this->validator->validate($value, $constraint);
+        $this->assertNoViolation();
+    }
+
+    public function dateMaxIntervalValid()
+    {
+        return array(
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+1 day')),
+                '1 day',
+            ),
+            array(
+                new TestEvent(new \DateTime(), new \DateTime('+3 days')),
+                '5 days',
+            ),
+            array(
+                new TestEvent(new \DateTime('2014-02-01'), new \DateTime('2014-03-01')),
+                '1 month',
+            ),
         );
     }
 

@@ -33,17 +33,19 @@ class DateRange extends Constraint
      */
     public $end;
 
-    public $startMessage = 'Start date should be less than or equal to {{ limit }}';
+    public $startMessage = 'Start date should be earlier than or equal to {{ limit }}';
 
-    public $endMessage = 'End date should be greater than or equal to {{ limit }}';
+    public $endMessage = 'End date should be later than or equal to {{ limit }}';
 
-    public $emptyStartMessage = 'Start date cannot be empty';
-
-    public $emptyEndMessage = 'End date cannot be empty';
+    public $invalidIntervalMessage = 'Dates must be {{ interval }} apart';
 
     public $invalidMessage = 'Invalid date range';
 
     public $limitFormat = 'Y-m-d';
+
+    public $min = null;
+
+    public $max = null;
 
     /**
      * @var string The property to attach the error message on.

@@ -15,36 +15,19 @@ use Symfony\Bridge\Doctrine\Logger\DbalLogger;
 
 class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider getLogFixtures
-     */
-    public function testLog($sql, $params, $logParams)
+    public function testLog()
     {
-        $logger = $this->getMock('Psr\\Log\\LoggerInterface');
+        $message = 'message';
+        $params = array('foo' => 'bar');
+        $logger = $this->getMockForAbstractClass('Psr\\Log\\LoggerInterface');
 
-        $dbalLogger = $this
-            ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
-            ->setConstructorArgs(array($logger, null))
-            ->setMethods(array('log'))
-            ->getMock()
-        ;
+        $logger->expects($this->once())
+            ->method('debug')
+            ->with($message, $params);
 
-        $dbalLogger
-            ->expects($this->once())
-            ->method('log')
-            ->with($sql, $logParams)
-        ;
-
-        $dbalLogger->startQuery($sql, $params);
-    }
-
-    public function getLogFixtures()
-    {
-        return array(
-            array('SQL', null, array()),
-            array('SQL', array(), array()),
-            array('SQL', array('foo' => 'bar'), array('foo' => 'bar'))
-        );
+        $method = new \ReflectionMethod('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger', 'log');
+        $method->setAccessible(true);
+        $method->invokeArgs(new DbalLogger($logger), array($message, $params));
     }
 
     public function testLogNonUtf8()

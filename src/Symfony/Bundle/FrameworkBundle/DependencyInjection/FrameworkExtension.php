@@ -714,21 +714,23 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.'.$config['cache'])));
         }
 
-        if ('auto' !== $config['api']) {
-            switch ($config['api']) {
-                case '2.4':
-                    $api = Validation::API_VERSION_2_4;
-                    break;
-                case '2.5':
-                    $api = Validation::API_VERSION_2_5;
-                    break;
-                default:
-                    $api = Validation::API_VERSION_2_5_BC;
-                    break;
-            }
-
-            $validatorBuilder->addMethodCall('setApiVersion', array($api));
+        switch ($config['api']) {
+            case '2.4':
+                $api = Validation::API_VERSION_2_4;
+                break;
+            case '2.5':
+                $api = Validation::API_VERSION_2_5;
+                break;
+            default:
+                $api = Validation::API_VERSION_2_5_BC;
+                break;
         }
+
+        $validatorBuilder->addMethodCall('setApiVersion', array($api));
+
+        // You can use this parameter to check the API version in your own
+        // bundle extension classes
+        $container->setParameter('validator.api', $api);
     }
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)

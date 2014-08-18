@@ -1,0 +1,5 @@
+framework:
+    secret: s3cr3t
+    validation:
+        enabled:     true
+        api:         2.5

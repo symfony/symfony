@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-06T12:12:43Z
+
+I suggest we also add a parameter with the validation API being used, so that other bundles can know it and change their services in a compiler pass to support both the 2.4 and the 2.5 API at the same time. It will be necessary for #11582 in its current form
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-06T12:17:53Z
+
+Yes, I just realized that too. What about transforming "auto" to "2.4"/"2.5-bc" already during configuration parsing?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-06T12:30:21Z
+
+I did both now.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-06T13:04:14Z
+
+:+1:
+
+It's crazy what series of changes have been required to rewrite a part of the validation component in a BC way.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-06T13:26:43Z
+
+@Tobion Yes, indeed.
+
+See #11587 for some more sanity. :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-06T13:38:30Z
+
+@Tobion the point is that the 2.5-BC API is BC. the 2.5 API is *not* BC. this is why we need to have to do lot of work, as we have to support constraint for 2 incompatible APIs
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-06T13:47:19Z
+
+#11587 makes this PR obsolete, right ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-06T13:56:50Z
+
+@stof Not necessarily. We still have different API versions, and I also think that resolving the "auto" value in the Configuration class is more elegant. Whether we add the "validator.api" parameter to the container is a good question, but I guess it's probably useful.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-06T14:08:06Z
+
+yeah, then OK (it will conflict though)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-07T14:13:20Z
+
+I fixed the implementation under PHP < 5.3.9 now. The previous code didn't work.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-07T14:20:09Z
+
+Rebased and resolved conflicts.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-11T12:58:09Z
+
+@stof Is the PR good to merge for you?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-11T13:22:05Z
+
+@webmozart nope it is not. As said in my comment above, the current code of the PR is a BC break.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-15T08:50:33Z
+
+@stof I fixed your comments now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-18T10:44:30Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T11:29:19Z
+
+:+1:

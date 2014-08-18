@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-14T08:20:02Z
+
+:+1: (but be careful to merge #11667 in 2.3 and then 2.3 in all newer branches before this PR is merged, otherwise the revert will do weird stuff with this version of the PR)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-18T09:24:55Z
+
+:+1:

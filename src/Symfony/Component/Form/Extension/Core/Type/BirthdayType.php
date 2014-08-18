@@ -24,6 +24,10 @@ class BirthdayType extends AbstractType
         $resolver->setDefaults(array(
             'years' => range(date('Y') - 120, date('Y')),
         ));
+
+        $resolver->setAllowedTypes(array(
+            'years' => 'array',
+        ));
     }
 
     /**

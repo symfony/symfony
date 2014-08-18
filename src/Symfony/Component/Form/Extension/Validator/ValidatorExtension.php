@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator;
 
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -29,23 +30,19 @@ class ValidatorExtension extends AbstractExtension
 
     /**
      * @param ValidatorInterface|LegacyValidatorInterface $validator
+     *
+     * @throws UnexpectedTypeException If $validator is invalid
      */
     public function __construct($validator)
     {
-        // since validator apiVersion 2.5
+        // 2.5 API
         if ($validator instanceof ValidatorInterface) {
-            $this->validator = $validator;
-
-            /** @var $metadata ClassMetadata */
-            $metadata = $this->validator->getMetadataFor('Symfony\Component\Form\Form');
-        // until validator apiVersion 2.4
+            $metadata = $validator->getMetadataFor('Symfony\Component\Form\Form');
+        // 2.4 API
         } elseif ($validator instanceof LegacyValidatorInterface) {
-            $this->validator = $validator;
-
-            /** @var $metadata ClassMetadata */
-            $metadata = $this->validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
+            $metadata = $validator->getMetadataFactory()->getMetadataFor('Symfony\Component\Form\Form');
         } else {
-            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
+            throw new UnexpectedTypeException($validator, 'Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
         }
 
         // Register the form constraints in the validator programmatically.
@@ -53,13 +50,22 @@ class ValidatorExtension extends AbstractExtension
         // the DIC, where the XML file is loaded automatically. Thus the following
         // code must be kept synchronized with validation.xml
 
+        /** @var $metadata ClassMetadata */
         $metadata->addConstraint(new Form());
         $metadata->addPropertyConstraint('children', new Valid());
+
+        $this->validator = $validator;
     }
 
     public function loadTypeGuesser()
     {
-        return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+        // 2.4 API
+        if ($this->validator instanceof LegacyValidatorInterface) {
+            return new ValidatorTypeGuesser($this->validator->getMetadataFactory());
+        }
+
+        // 2.5 API - ValidatorInterface extends MetadataFactoryInterface
+        return new ValidatorTypeGuesser($this->validator);
     }
 
     protected function loadTypeExtensions()

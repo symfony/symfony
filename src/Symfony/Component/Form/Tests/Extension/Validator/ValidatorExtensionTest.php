@@ -15,79 +15,70 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 
 class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testValidatorInterfaceSinceSymfony25()
+    public function test2Dot5ValidationApi()
     {
-        $classMetaData = $this->createClassMetaDataMock();
-
-        // Mock of ValidatorInterface since apiVersion 2.5
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $validator
-            ->expects($this->once())
+        $validator->expects($this->once())
             ->method('getMetadataFor')
             ->with($this->identicalTo('Symfony\Component\Form\Form'))
-            ->will($this->returnValue($classMetaData))
-        ;
+            ->will($this->returnValue($metadata));
 
-        $validatorExtension = new ValidatorExtension($validator);
-        $this->assertAttributeSame($validator, 'validator', $validatorExtension);
+        // Verify that the constraints are added
+        $metadata->expects($this->once())
+            ->method('addConstraint')
+            ->with($this->isInstanceOf('Symfony\Component\Form\Extension\Validator\Constraints\Form'));
+
+        $metadata->expects($this->once())
+            ->method('addPropertyConstraint')
+            ->with('children', $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid'));
+
+        $extension = new ValidatorExtension($validator);
+        $guesser = $extension->loadTypeGuesser();
+
+        $this->assertInstanceOf('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser', $guesser);
     }
 
-    public function testValidatorInterfaceUntilSymfony24()
+    public function test2Dot4ValidationApi()
     {
-        $classMetaData = $this->createClassMetaDataMock();
+        $factory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $metaDataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $validator->expects($this->any())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($factory));
 
-        $metaDataFactory
-            ->expects($this->once())
+        $factory->expects($this->once())
             ->method('getMetadataFor')
             ->with($this->identicalTo('Symfony\Component\Form\Form'))
-            ->will($this->returnValue($classMetaData))
-        ;
+            ->will($this->returnValue($metadata));
 
-        // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        // Verify that the constraints are added
+        $metadata->expects($this->once())
+            ->method('addConstraint')
+            ->with($this->isInstanceOf('Symfony\Component\Form\Extension\Validator\Constraints\Form'));
 
-        $validator
-            ->expects($this->once())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($metaDataFactory))
-        ;
+        $metadata->expects($this->once())
+            ->method('addPropertyConstraint')
+            ->with('children', $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid'));
 
-        $validatorExtension = new ValidatorExtension($validator);
-        $this->assertAttributeSame($validator, 'validator', $validatorExtension);
+        $extension = new ValidatorExtension($validator);
+        $guesser = $extension->loadTypeGuesser();
+
+        $this->assertInstanceOf('Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser', $guesser);
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      */
     public function testInvalidValidatorInterface()
     {
         new ValidatorExtension(null);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function createClassMetaDataMock()
-    {
-        $classMetaData = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $classMetaData
-            ->expects($this->once())
-            ->method('addConstraint')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Extension\Validator\Constraints\Form'));
-        $classMetaData
-            ->expects($this->once())
-            ->method('addPropertyConstraint')
-            ->with(
-                $this->identicalTo('children'),
-                $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid')
-            );
-
-        return $classMetaData;
     }
 }

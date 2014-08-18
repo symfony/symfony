@@ -72,6 +72,39 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertFalse($form['second']->isRequired());
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidOptions()
+    {
+        $this->factory->create('repeated', null, array(
+            'type'    => 'text',
+            'options' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidFirstOptions()
+    {
+        $this->factory->create('repeated', null, array(
+            'type'          => 'text',
+            'first_options' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidSecondOptions()
+    {
+        $this->factory->create('repeated', null, array(
+            'type'           => 'text',
+            'second_options' => 'bad value',
+        ));
+    }
+
     public function testSetErrorBubblingToTrue()
     {
         $form = $this->factory->create('repeated', null, array(

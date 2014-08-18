@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
-use Symfony\Component\Validator\Validation;
 
 class LanguageValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -83,7 +82,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($language, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $language,
+            '{{ value }}' => '"'.$language.'"',
         ));
     }
 

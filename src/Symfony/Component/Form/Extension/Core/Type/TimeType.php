@@ -47,6 +47,17 @@ class TimeType extends AbstractType
             $parts[] = 'second';
         }
 
+        if (!$options['unspecified_to_origin']) {
+            $parts = [
+                'year',
+                'month',
+                'day',
+                'hour',
+                'minute',
+                'second',
+            ];
+        }
+
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
         } else {
@@ -202,6 +213,7 @@ class TimeType extends AbstractType
             // this option.
             'data_class'     => null,
             'compound'       => $compound,
+            'unspecified_to_origin' => true,
         ));
 
         $resolver->setNormalizers(array(

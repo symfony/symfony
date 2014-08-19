@@ -78,7 +78,11 @@ class Filesystem
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                throw new IOException(sprintf('Failed to create %s', $dir));
+                if (!is_dir($dir)) {
+                    // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to create "%s", error message is "%s".', $dir, $error['message']), 0, null, $dir);
+                }
             }
         }
     }

@@ -633,7 +633,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         // Legacy interface
         $propertyMetadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
         $metadata = new FakeClassMetadata(get_class($entity));
-        $metadata->addPropertyMetadata('firstName', $propertyMetadata);
+        $metadata->addCustomPropertyMetadata('firstName', $propertyMetadata);
 
         $this->metadataFactory->addMetadata($metadata);
 

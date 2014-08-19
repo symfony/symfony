@@ -8,6 +8,9 @@ CHANGELOG
  * [BC BREAK] `UserPasswordValidator` source message change
  * [BC BREAK] added internal `ExecutionContextInterface::setConstraint()`
  * added `ConstraintViolation::getConstraint()`
+ * deprecated `ClassMetadata::hasMemberMetadatas()`
+ * deprecated `ClassMetadata::getMemberMetadatas()`
+ * deprecated `ClassMetadata::addMemberMetadata()`
 
 2.5.0
 -----

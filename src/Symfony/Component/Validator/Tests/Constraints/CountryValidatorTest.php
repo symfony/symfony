@@ -88,7 +88,7 @@ class CountryValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($country, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $country,
+            '{{ value }}' => '"'.$country.'"',
         ));
     }
 

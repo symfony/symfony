@@ -102,7 +102,7 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($currency, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $currency,
+            '{{ value }}' => '"'.$currency.'"',
         ));
     }
 

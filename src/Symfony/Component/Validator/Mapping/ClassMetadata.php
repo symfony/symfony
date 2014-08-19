@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
-use Symfony\Component\Validator\MetadataInterface as LegacyMetadataInterface;
-use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
@@ -29,7 +27,7 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, PropertyMetadataContainerInterface, ClassMetadataInterface
+class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
 {
     /**
      * @var string

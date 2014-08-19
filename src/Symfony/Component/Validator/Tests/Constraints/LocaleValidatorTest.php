@@ -14,7 +14,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
-use Symfony\Component\Validator\Validation;
 
 class LocaleValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -85,7 +84,7 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($locale, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $locale,
+            '{{ value }}' => '"'.$locale.'"',
         ));
     }
 

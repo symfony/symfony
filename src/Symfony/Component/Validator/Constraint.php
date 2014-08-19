@@ -274,7 +274,7 @@ abstract class Constraint
     public function __sleep()
     {
         // Initialize "groups" option if it is not set
-        $this->__get('groups');
+        $this->groups;
 
         return array_keys(get_object_vars($this));
     }

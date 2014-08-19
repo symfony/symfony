@@ -167,22 +167,34 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($constraint, $restoredConstraint);
     }
 
-    public function testSerializeInitializesGroupsOption()
+    public function testSerializeInitializesGroupsOptionToDefault()
     {
-        $constraintWithExplicitGroup = new ConstraintA(array(
+        $constraint = new ConstraintA(array(
+            'property1' => 'foo',
+            'property2' => 'bar',
+        ));
+
+        $constraint = unserialize(serialize($constraint));
+
+        $expected = new ConstraintA(array(
             'property1' => 'foo',
             'property2' => 'bar',
             'groups' => 'Default',
         ));
 
-        $constraintWithoutExplicitGroup = new ConstraintA(array(
+        $this->assertEquals($expected, $constraint);
+    }
+
+    public function testSerializeKeepsCustomGroups()
+    {
+        $constraint = new ConstraintA(array(
             'property1' => 'foo',
             'property2' => 'bar',
+            'groups' => 'MyGroup',
         ));
 
-        $constraintWithExplicitGroup = unserialize(serialize($constraintWithExplicitGroup));
-        $constraintWithoutExplicitGroup = unserialize(serialize($constraintWithoutExplicitGroup));
+        $constraint = unserialize(serialize($constraint));
 
-        $this->assertEquals($constraintWithExplicitGroup, $constraintWithoutExplicitGroup);
+        $this->assertSame(array('MyGroup'), $constraint->groups);
     }
 }

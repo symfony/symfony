@@ -298,6 +298,10 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      */
     public function getMemberMetadatas($property)
     {
+        if (!isset($this->members[$property])) {
+            return array();
+        }
+
         return $this->members[$property];
     }
 
@@ -314,6 +318,10 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      */
     public function getPropertyMetadata($property)
     {
+        if (!isset($this->members[$property])) {
+            return array();
+        }
+
         return $this->members[$property];
     }
 

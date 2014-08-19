@@ -47,7 +47,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMElement');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
@@ -284,7 +284,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMElement');
     }
 
     public function testClear()
@@ -311,6 +311,16 @@ EOF
         });
 
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
+    }
+
+    public function testSlice()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
+        $this->assertNotSame($crawler->slice(), $crawler, '->slice() returns a new instance of a crawler');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler->slice(), '->slice() returns a new instance of a crawler');
+
+        $this->assertCount(3, $crawler->slice(), '->slice() does not slice the nodes in the list if any param is entered');
+        $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
     }
 
     public function testReduce()
@@ -346,6 +356,18 @@ EOF
         $this->assertEquals('sample value', $div->attr('non-empty-attr'), '->attr() reads non-empty attributes correctly');
         $this->assertEquals('', $div->attr('empty-attr'), '->attr() reads empty attributes correctly');
         $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
+    }
+
+    public function testNodeName()
+    {
+        $this->assertEquals('li', $this->createTestCrawler()->filterXPath('//li')->nodeName(), '->nodeName() returns the node name of the first element of the node list');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->nodeName();
+            $this->fail('->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->nodeName() throws an \InvalidArgumentException if the node list is empty');
+        }
     }
 
     public function testText()

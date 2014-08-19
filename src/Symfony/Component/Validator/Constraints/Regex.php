@@ -25,7 +25,7 @@ class Regex extends Constraint
 {
     public $message = 'This value is not valid.';
     public $pattern;
-    public $htmlPattern = null;
+    public $htmlPattern;
     public $match = true;
 
     /**

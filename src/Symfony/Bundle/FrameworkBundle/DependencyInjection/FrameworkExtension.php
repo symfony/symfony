@@ -21,6 +21,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * FrameworkExtension.
@@ -60,6 +61,9 @@ class FrameworkExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
+            $definition = $container->findDefinition('debug.debug_handlers_listener');
+            $definition->replaceArgument(0, array(new Reference('http_kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE), 'terminateWithException'));
+
             $definition = $container->findDefinition('http_kernel');
             $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
 
@@ -68,6 +72,9 @@ class FrameworkExtension extends Extension
             $definition->setPublic(false);
             $container->setDefinition('debug.event_dispatcher.parent', $definition);
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
+        } else {
+            $definition = $container->findDefinition('debug.debug_handlers_listener');
+            $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
         }
 
         $configuration = $this->getConfiguration($configs, $container);
@@ -91,6 +98,10 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        if (isset($config['request'])) {
+            $this->registerRequestConfiguration($config['request'], $container, $loader);
+        }
+
         $loader->load('security.xml');
 
         if ($this->isConfigEnabled($container, $config['form'])) {
@@ -111,6 +122,7 @@ class FrameworkExtension extends Extension
 
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
+        $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
@@ -195,6 +207,22 @@ class FrameworkExtension extends Extension
         }
 
         $loader->load('esi.xml');
+    }
+
+    /**
+     * Loads the SSI configuration.
+     *
+     * @param array            $config    An SSI configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerSsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$this->isConfigEnabled($container, $config)) {
+            return;
+        }
+
+        $loader->load('ssi.xml');
     }
 
     /**
@@ -380,6 +408,24 @@ class FrameworkExtension extends Extension
         }
 
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
+    }
+
+    /**
+     * Loads the request configuration.
+     *
+     * @param array            $config    A session configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerRequestConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if ($config['formats']) {
+            $loader->load('request.xml');
+            $container
+                ->getDefinition('request.add_request_formats_listener')
+                ->replaceArgument(0, $config['formats'])
+            ;
+        }
     }
 
     /**
@@ -654,25 +700,60 @@ class FrameworkExtension extends Extension
 
         $loader->load('validator.xml');
 
+        $validatorBuilder = $container->getDefinition('validator.builder');
+
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
-        $container->setParameter('validator.mapping.loader.xml_files_loader.mapping_files', $this->getValidatorXmlMappingFiles($container));
-        $container->setParameter('validator.mapping.loader.yaml_files_loader.mapping_files', $this->getValidatorYamlMappingFiles($container));
+
+        $xmlMappings = $this->getValidatorXmlMappingFiles($container);
+        $yamlMappings = $this->getValidatorYamlMappingFiles($container);
+
+        if (count($xmlMappings) > 0) {
+            $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
+        }
+
+        if (count($yamlMappings) > 0) {
+            $validatorBuilder->addMethodCall('addYamlMappings', array($yamlMappings));
+        }
+
+        $definition = $container->findDefinition('validator.email');
+        $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
-            $loaderChain = $container->getDefinition('validator.mapping.loader.loader_chain');
-            $arguments = $loaderChain->getArguments();
-            array_unshift($arguments[0], new Reference('validator.mapping.loader.annotation_loader'));
-            $loaderChain->setArguments($arguments);
+            $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
+        }
+
+        if (array_key_exists('static_method', $config) && $config['static_method']) {
+            foreach ($config['static_method'] as $methodName) {
+                $validatorBuilder->addMethodCall('addMethodMapping', array($methodName));
+            }
         }
 
         if (isset($config['cache'])) {
-            $container->getDefinition('validator.mapping.class_metadata_factory')
-                ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
+
+            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.'.$config['cache'])));
         }
+
+        switch ($config['api']) {
+            case '2.4':
+                $api = Validation::API_VERSION_2_4;
+                break;
+            case '2.5':
+                $api = Validation::API_VERSION_2_5;
+                break;
+            default:
+                $api = Validation::API_VERSION_2_5_BC;
+                break;
+        }
+
+        $validatorBuilder->addMethodCall('setApiVersion', array($api));
+
+        // You can use this parameter to check the API version in your own
+        // bundle extension classes
+        $container->setParameter('validator.api', $api);
     }
 
     private function getValidatorXmlMappingFiles(ContainerBuilder $container)

@@ -172,36 +172,7 @@ class FlattenException
 
     public function setTraceFromException(\Exception $exception)
     {
-        $trace = $exception->getTrace();
-
-        if ($exception instanceof FatalErrorException) {
-            if (function_exists('xdebug_get_function_stack')) {
-                $trace = array_slice(array_reverse(xdebug_get_function_stack()), 4);
-
-                foreach ($trace as $i => $frame) {
-                    //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
-                    if (!isset($frame['type'])) {
-                        $trace[$i]['type'] = '??';
-                    }
-
-                    if ('dynamic' === $trace[$i]['type']) {
-                        $trace[$i]['type'] = '->';
-                    } elseif ('static' === $trace[$i]['type']) {
-                        $trace[$i]['type'] = '::';
-                    }
-
-                    // XDebug also has a different name for the parameters array
-                    if (isset($frame['params']) && !isset($frame['args'])) {
-                        $trace[$i]['args'] = $frame['params'];
-                        unset($trace[$i]['params']);
-                    }
-                }
-            } else {
-                $trace = array_slice(array_reverse($trace), 1);
-            }
-        }
-
-        $this->setTrace($trace, $exception->getFile(), $exception->getLine());
+        $this->setTrace($exception->getTrace(), $exception->getFile(), $exception->getLine());
     }
 
     public function setTrace($trace, $file, $line)

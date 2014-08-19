@@ -175,7 +175,7 @@
                 <target>A altura da imagem ({{ height }}px) é muito pequena. A altura miníma da imagem é de: {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Este valor deveria de ser a password atual do utilizador.</target>
             </trans-unit>
             <trans-unit id="48">

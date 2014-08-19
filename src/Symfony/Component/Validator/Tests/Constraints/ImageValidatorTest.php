@@ -24,6 +24,11 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     protected $imageLandscape;
     protected $imagePortrait;
 
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new ImageValidator();

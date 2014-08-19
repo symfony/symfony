@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -53,6 +54,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         );
 
         parent::setUp();
+    }
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
     }
 
     protected function createValidator()
@@ -540,6 +546,28 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertViolation('Extra!', array(
             '{{ extra_fields }}' => 'foo'
         ), 'property.path', array('foo' => 'bar'));
+    }
+
+    public function testNoViolationIfAllowExtraData()
+    {
+        $context = $this->getMockExecutionContext();
+
+        $form = $this
+            ->getBuilder('parent', null, array('allow_extra_fields' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->bind(array('foo' => 'bar'));
+
+        $context->expects($this->never())
+            ->method('addViolation');
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
     }
 
     /**

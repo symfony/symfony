@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -41,6 +42,11 @@ class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
      * @var EncoderFactoryInterface
      */
     protected $encoderFactory;
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
 
     protected function createValidator()
     {

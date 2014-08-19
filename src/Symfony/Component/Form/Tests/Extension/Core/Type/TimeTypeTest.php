@@ -628,8 +628,8 @@ class TimeTypeTest extends TypeTestCase
         ));
         $form['hour']->addError($error);
 
-        $this->assertSame(array(), $form['hour']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['hour']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -643,8 +643,8 @@ class TimeTypeTest extends TypeTestCase
         ));
         $form['minute']->addError($error);
 
-        $this->assertSame(array(), $form['minute']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['minute']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     /**
@@ -659,8 +659,8 @@ class TimeTypeTest extends TypeTestCase
         ));
         $form['second']->addError($error);
 
-        $this->assertSame(array(), $form['second']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['second']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     /**

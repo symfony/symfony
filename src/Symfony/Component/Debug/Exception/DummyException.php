@@ -12,9 +12,9 @@
 namespace Symfony\Component\Debug\Exception;
 
 /**
- * Used to stop execution of a PHP script after handling a fatal error.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class DummyException extends \ErrorException
 {

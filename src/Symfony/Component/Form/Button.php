@@ -184,9 +184,9 @@ class Button implements \IteratorAggregate, FormInterface
     /**
      * {@inheritdoc}
      */
-    public function getErrors()
+    public function getErrors($deep = false, $flatten = true)
     {
-        return array();
+        return new FormErrorIterator($this, array());
     }
 
     /**
@@ -317,7 +317,11 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function isDisabled()
     {
-        return $this->config->getDisabled();
+        if (null === $this->parent || !$this->parent->isDisabled()) {
+            return $this->config->getDisabled();
+        }
+
+        return true;
     }
 
     /**

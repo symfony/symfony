@@ -5,6 +5,7 @@
       <trans-unit id="1" resname="foo">
         <source>foo</source>
         <target>bär</target>
+        <note>bäz</note>
       </trans-unit>
       <trans-unit id="2" resname="bar">
         <source>bar</source>

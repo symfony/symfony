@@ -10,6 +10,7 @@
         <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
+        <parameter key="security.user_password_encoder.generic.class">Symfony\Component\Security\Core\Encoder\UserPasswordEncoder</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
         <parameter key="security.encoder.pbkdf2.class">Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder</parameter>
@@ -79,6 +80,12 @@
         </service>
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
+
+        <service id="security.user_password_encoder.generic" class="%security.user_password_encoder.generic.class%" public="false">
+            <argument type="service" id="security.encoder_factory"></argument>
+        </service>
+
+        <service id="security.password_encoder" alias="security.user_password_encoder.generic"></service>
 
         <service id="security.user_checker" class="%security.user_checker.class%" public="false" />
 

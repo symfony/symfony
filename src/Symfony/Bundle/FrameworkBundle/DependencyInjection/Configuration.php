@@ -81,10 +81,12 @@ class Configuration implements ConfigurationInterface
         $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
+        $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addRouterSection($rootNode);
         $this->addSessionSection($rootNode);
+        $this->addRequestSection($rootNode);
         $this->addTemplatingSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
@@ -145,6 +147,17 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function addSsiSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('ssi')
+                    ->info('ssi configuration')
+                    ->canBeEnabled()
+                ->end()
+            ->end();
     }
 
     private function addFragmentsSection(ArrayNodeDefinition $rootNode)
@@ -243,12 +256,41 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('cookie_secure')->end()
                         ->booleanNode('cookie_httponly')->end()
                         ->scalarNode('gc_divisor')->end()
-                        ->scalarNode('gc_probability')->end()
+                        ->scalarNode('gc_probability')->defaultValue(1)->end()
                         ->scalarNode('gc_maxlifetime')->end()
                         ->scalarNode('save_path')->defaultValue('%kernel.cache_dir%/sessions')->end()
                         ->integerNode('metadata_update_threshold')
                             ->defaultValue('0')
                             ->info('seconds to wait between 2 session metadata updates, it will also prevent the session handler to write if the session has not changed')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addRequestSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('request')
+                    ->info('request configuration')
+                    ->canBeUnset()
+                    ->fixXmlConfig('format')
+                    ->children()
+                        ->arrayNode('formats')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) { return is_array($v) && isset($v['mime_type']); })
+                                    ->then(function ($v) { return $v['mime_type']; })
+                                ->end()
+                                ->beforeNormalization()
+                                    ->ifTrue(function ($v) { return !is_array($v); })
+                                    ->then(function ($v) { return array($v); })
+                                ->end()
+                                ->prototype('scalar')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -414,9 +456,42 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->arrayNode('static_method')
+                            ->defaultValue(array('loadValidatorMetadata'))
+                            ->prototype('scalar')->end()
+                            ->treatFalseLike(array())
+                            ->validate()
+                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->then(function ($v) { return (array) $v; })
+                            ->end()
+                        ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
+                        ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->enumNode('api')
+                            ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
+                            ->beforeNormalization()
+                                // XML/YAML parse as numbers, not as strings
+                                ->ifTrue(function ($v) { return is_scalar($v); })
+                                ->then(function ($v) { return (string) $v; })
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return !isset($v['validation']['api']) || 'auto' === $v['validation']['api']; })
+                ->then(function ($v) {
+                    // This condition is duplicated in ValidatorBuilder. This
+                    // duplication is necessary in order to know the desired
+                    // API version already during container configuration
+                    // (to adjust service classes etc.)
+                    // See https://github.com/symfony/symfony/issues/11580
+                    $v['validation']['api'] = version_compare(PHP_VERSION, '5.3.9', '<')
+                        ? '2.4'
+                        : '2.5-bc';
+
+                    return $v;
+                })
             ->end()
         ;
     }

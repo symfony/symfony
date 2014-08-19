@@ -15,26 +15,34 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Tests\Fixtures\Entity;
+use Symfony\Component\Validator\Validation;
 
 class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new ExpressionValidator(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testNullIsValid()
+    public function testExpressionIsEvaluatedWithNullValue()
     {
-        $this->validator->validate(null, new Expression('value == 1'));
+        $this->context->expects($this->once())
+            ->method('addViolation');
 
-        $this->assertNoViolation();
+        $this->validator->validate(null, new Expression('false'));
     }
 
-    public function testEmptyStringIsValid()
+    public function testExpressionIsEvaluatedWithEmptyStringValue()
     {
-        $this->validator->validate('', new Expression('value == 1'));
+        $this->context->expects($this->once())
+            ->method('addViolation');
 
-        $this->assertNoViolation();
+        $this->validator->validate('', new Expression('false'));
     }
 
     public function testSucceedingExpressionAtObjectLevel()

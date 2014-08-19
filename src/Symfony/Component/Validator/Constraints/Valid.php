@@ -26,12 +26,18 @@ class Valid extends Constraint
 {
     public $traverse = true;
 
-    public $deep = false;
+    /**
+     * @deprecated Deprecated as of version 2.5, to be removed in Symfony 3.0.
+     */
+    public $deep = true;
 
     public function __construct($options = null)
     {
         if (is_array($options) && array_key_exists('groups', $options)) {
-            throw new ConstraintDefinitionException(sprintf('The option "groups" is not supported by the constraint %s', __CLASS__));
+            throw new ConstraintDefinitionException(sprintf(
+                'The option "groups" is not supported by the constraint %s',
+                __CLASS__
+            ));
         }
 
         parent::__construct($options);

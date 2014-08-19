@@ -433,8 +433,8 @@ class DateTimeTypeTest extends TypeTestCase
 
         $form['date']->addError($error);
 
-        $this->assertSame(array(), $form['date']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['date']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     public function testDateTypeSingleTextErrorsBubbleUp()
@@ -446,8 +446,8 @@ class DateTimeTypeTest extends TypeTestCase
 
         $form['date']->addError($error);
 
-        $this->assertSame(array(), $form['date']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['date']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     public function testTimeTypeChoiceErrorsBubbleUp()
@@ -457,8 +457,8 @@ class DateTimeTypeTest extends TypeTestCase
 
         $form['time']->addError($error);
 
-        $this->assertSame(array(), $form['time']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['time']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
     public function testTimeTypeSingleTextErrorsBubbleUp()
@@ -470,8 +470,8 @@ class DateTimeTypeTest extends TypeTestCase
 
         $form['time']->addError($error);
 
-        $this->assertSame(array(), $form['time']->getErrors());
-        $this->assertSame(array($error), $form->getErrors());
+        $this->assertSame(array(), iterator_to_array($form['time']->getErrors()));
+        $this->assertSame(array($error), iterator_to_array($form->getErrors()));
     }
 
 }

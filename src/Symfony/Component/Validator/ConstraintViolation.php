@@ -31,12 +31,12 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * @var array
      */
-    private $messageParameters;
+    private $parameters;
 
     /**
      * @var int|null
      */
-    private $messagePluralization;
+    private $plural;
 
     /**
      * @var mixed
@@ -54,6 +54,11 @@ class ConstraintViolation implements ConstraintViolationInterface
     private $invalidValue;
 
     /**
+     * @var Constraint|null
+     */
+    private $constraint;
+
+    /**
      * @var mixed
      */
     private $code;
@@ -61,30 +66,32 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Creates a new constraint violation.
      *
-     * @param string       $message               The violation message.
-     * @param string       $messageTemplate       The raw violation message.
-     * @param array        $messageParameters     The parameters to substitute
-     *                                            in the raw message.
-     * @param mixed        $root                  The value originally passed
-     *                                            to the validator.
-     * @param string       $propertyPath          The property path from the
-     *                                            root value to the invalid
-     *                                            value.
-     * @param mixed        $invalidValue          The invalid value causing the
-     *                                            violation.
-     * @param int|null     $messagePluralization  The pluralization parameter.
-     * @param mixed        $code                  The error code of the
-     *                                            violation, if any.
+     * @param string          $message         The violation message
+     * @param string          $messageTemplate The raw violation message
+     * @param array           $parameters      The parameters to substitute in the
+     *                                         raw violation message
+     * @param mixed           $root            The value originally passed to the
+     *                                         validator
+     * @param string          $propertyPath    The property path from the root
+     *                                         value to the invalid value
+     * @param mixed           $invalidValue    The invalid value that caused this
+     *                                         violation
+     * @param int|null        $plural          The number for determining the plural
+     *                                         form when translating the message
+     * @param mixed           $code            The error code of the violation
+     * @param Constraint|null $constraint      The constraint that caused the
+     *                                         violation
      */
-    public function __construct($message, $messageTemplate, array $messageParameters, $root, $propertyPath, $invalidValue, $messagePluralization = null, $code = null)
+    public function __construct($message, $messageTemplate, array $parameters, $root, $propertyPath, $invalidValue, $plural = null, $code = null, Constraint $constraint = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
-        $this->messageParameters = $messageParameters;
-        $this->messagePluralization = $messagePluralization;
+        $this->parameters = $parameters;
+        $this->plural = $plural;
         $this->root = $root;
         $this->propertyPath = $propertyPath;
         $this->invalidValue = $invalidValue;
+        $this->constraint = $constraint;
         $this->code = $code;
     }
 
@@ -130,7 +137,15 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessageParameters()
     {
-        return $this->messageParameters;
+        return $this->parameters;
+    }
+
+    /**
+     * Alias of {@link getMessageParameters()}.
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 
     /**
@@ -138,7 +153,15 @@ class ConstraintViolation implements ConstraintViolationInterface
      */
     public function getMessagePluralization()
     {
-        return $this->messagePluralization;
+        return $this->plural;
+    }
+
+    /**
+     * Alias of {@link getMessagePluralization()}.
+     */
+    public function getPlural()
+    {
+        return $this->plural;
     }
 
     /**
@@ -171,6 +194,16 @@ class ConstraintViolation implements ConstraintViolationInterface
     public function getInvalidValue()
     {
         return $this->invalidValue;
+    }
+
+    /**
+     * Returns the constraint that caused the violation.
+     *
+     * @return Constraint|null The constraint or null if it is not known
+     */
+    public function getConstraint()
+    {
+        return $this->constraint;
     }
 
     /**

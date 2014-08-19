@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
-
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -65,7 +65,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->arrayNode('access_decision_manager')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('strategy')->defaultValue('affirmative')->end()
+                        ->scalarNode('strategy')->defaultValue(AccessDecisionManager::STRATEGY_AFFIRMATIVE)->end()
                         ->booleanNode('allow_if_all_abstain')->defaultFalse()->end()
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
@@ -201,6 +201,10 @@ class MainConfiguration implements ConfigurationInterface
         $firewallNodeBuilder
             ->scalarNode('pattern')->end()
             ->scalarNode('host')->end()
+            ->arrayNode('methods')
+                ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                ->prototype('scalar')->end()
+            ->end()
             ->booleanNode('security')->defaultTrue()->end()
             ->scalarNode('request_matcher')->end()
             ->scalarNode('access_denied_url')->end()

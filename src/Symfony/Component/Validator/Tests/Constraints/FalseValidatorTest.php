@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\False;
 use Symfony\Component\Validator\Constraints\FalseValidator;
+use Symfony\Component\Validator\Validation;
 
 class FalseValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new FalseValidator();

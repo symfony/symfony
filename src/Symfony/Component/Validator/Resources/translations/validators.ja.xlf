@@ -298,6 +298,10 @@
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>画像が縦向きになっています({{ width }}x{{ height }}ピクセル)。縦向きの画像は許可されていません。</target>
             </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>空のファイルは許可されていません。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

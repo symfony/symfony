@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 
 /**
@@ -28,14 +26,11 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     protected $validators = array();
 
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct($propertyAccessor = null)
     {
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**

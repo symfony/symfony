@@ -19,9 +19,9 @@
         "php": ">=5.3.3",
         "symfony/dependency-injection" : "~2.2",
         "symfony/config" : "~2.4",
-        "symfony/event-dispatcher": "~2.1",
+        "symfony/event-dispatcher": "~2.5",
         "symfony/http-foundation": "~2.4",
-        "symfony/http-kernel": "~2.4",
+        "symfony/http-kernel": "~2.6",
         "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.2",
         "symfony/security-core": "~2.4",
@@ -43,6 +43,7 @@
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
+        "symfony/yaml": "For using the config:debug and yaml:lint commands",
         "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {
@@ -52,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.4-dev"
+            "dev-master": "2.6-dev"
         }
     }
 }

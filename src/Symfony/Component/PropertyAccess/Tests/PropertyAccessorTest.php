@@ -28,35 +28,23 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function getValidPropertyPaths()
+    public function getValidGetPropertyPaths()
     {
-        return array(
-            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
-            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
-            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
-            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
-            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
-            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
-            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
-            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+        return array_merge(
+            array(
+                array(new TestClass('Bernhard'), 'publicMethodAccessor', 'Bernhard', 'Bernhard'),
+            ),
+            $this->getValidPropertyPaths()
+        );
+    }
 
-            // Accessor methods
-            array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
-            array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
-
-            // Methods are camelized
-            array(new TestClass('Bernhard'), 'public_accessor', 'Bernhard'),
-
-            // Missing indices
-            array(array('index' => array()), '[index][firstName]', null),
-            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
-
-            // Special chars
-            array(array('%!@$§.' => 'Bernhard'), '[%!@$§.]', 'Bernhard'),
-            array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
-            array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
+    public function getValidSetPropertyPaths()
+    {
+        return array_merge(
+            array(
+                array(new TestClass('Bernhard'), 'publicMethodMutator', 'Bernhard', 'Bernhard'),
+            ),
+            $this->getValidPropertyPaths()
         );
     }
 
@@ -92,7 +80,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidGetPropertyPaths
      */
     public function testGetValue($objectOrArray, $path, $value)
     {
@@ -127,7 +115,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
      */
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -193,7 +181,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getValidPropertyPaths
+     * @dataProvider getValidSetPropertyPaths
      */
     public function testSetValue($objectOrArray, $path)
     {
@@ -233,7 +221,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
@@ -247,6 +235,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($author, 'magicProperty', 'Updated');
 
         $this->assertEquals('Updated', $author->__get('magicProperty'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     */
+    public function testSetValueThrowsExceptionIfThereAreMissingParameters()
+    {
+        $this->propertyAccessor->setValue(new TestClass('Bernhard'), 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
     /**
@@ -298,5 +294,176 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $value = '';
 
         $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+    }
+
+    /**
+     * @dataProvider getValidGetPropertyPaths
+     */
+    public function testIsReadable($objectOrArray, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     */
+    public function testIsReadableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsReadableReturnsTrueIfIndexNotFound($objectOrArray, $path)
+    {
+        // Non-existing indices can be read. In this case, null is returned
+        $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsReadableReturnsFalseIfIndexNotFoundAndIndexExceptionsEnabled($objectOrArray, $path)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+
+        // When exceptions are enabled, non-existing indices cannot be read
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    public function testIsReadableRecognizesMagicGet()
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicGet('Bernhard'), 'magicProperty'));
+    }
+
+    public function testIsReadableDoesNotRecognizeMagicCallByDefault()
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
+    }
+
+    public function testIsReadableRecognizesMagicCallIfEnabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
+    }
+
+    public function testIsReadableThrowsExceptionIfNotObjectOrArray()
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable('baz', 'foobar'));
+    }
+
+    public function testIsReadableThrowsExceptionIfNull()
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable(null, 'foobar'));
+    }
+
+    public function testIsReadableThrowsExceptionIfEmpty()
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable('', 'foobar'));
+    }
+
+    /**
+     * @dataProvider getValidSetPropertyPaths
+     */
+    public function testIsWritable($objectOrArray, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path, 'Updated'));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     */
+    public function testIsWritableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path, 'Updated'));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsWritableReturnsTrueIfIndexNotFound($objectOrArray, $path)
+    {
+        // Non-existing indices can be written. Arrays are created on-demand.
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path, 'Updated'));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsEnabled($objectOrArray, $path)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+
+        // Non-existing indices can be written even if exceptions are enabled
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path, 'Updated'));
+    }
+
+    public function testIsWritableRecognizesMagicSet()
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicGet('Bernhard'), 'magicProperty', 'Updated'));
+    }
+
+    public function testIsWritableDoesNotRecognizeMagicCallByDefault()
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty', 'Updated'));
+    }
+
+    public function testIsWritableRecognizesMagicCallIfEnabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty', 'Updated'));
+    }
+
+    public function testIsWritableThrowsExceptionIfNotObjectOrArray()
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable('baz', 'foobar', 'Updated'));
+    }
+
+    public function testIsWritableThrowsExceptionIfNull()
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable(null, 'foobar', 'Updated'));
+    }
+
+    public function testIsWritableThrowsExceptionIfEmpty()
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable('', 'foobar', 'Updated'));
+    }
+
+    private function getValidPropertyPaths()
+    {
+        return array(
+            array(array('Bernhard', 'Schussek'), '[0]', 'Bernhard'),
+            array(array('Bernhard', 'Schussek'), '[1]', 'Schussek'),
+            array(array('firstName' => 'Bernhard'), '[firstName]', 'Bernhard'),
+            array(array('index' => array('firstName' => 'Bernhard')), '[index][firstName]', 'Bernhard'),
+            array((object) array('firstName' => 'Bernhard'), 'firstName', 'Bernhard'),
+            array((object) array('property' => array('firstName' => 'Bernhard')), 'property[firstName]', 'Bernhard'),
+            array(array('index' => (object) array('firstName' => 'Bernhard')), '[index].firstName', 'Bernhard'),
+            array((object) array('property' => (object) array('firstName' => 'Bernhard')), 'property.firstName', 'Bernhard'),
+
+            // Accessor methods
+            array(new TestClass('Bernhard'), 'publicProperty', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessor', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithDefaultValue', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicAccessorWithRequiredAndDefaultValue', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicIsAccessor', 'Bernhard'),
+            array(new TestClass('Bernhard'), 'publicHasAccessor', 'Bernhard'),
+
+            // Methods are camelized
+            array(new TestClass('Bernhard'), 'public_accessor', 'Bernhard'),
+
+            // Missing indices
+            array(array('index' => array()), '[index][firstName]', null),
+            array(array('root' => array('index' => array())), '[root][index][firstName]', null),
+
+            // Special chars
+            array(array('%!@$§.' => 'Bernhard'), '[%!@$§.]', 'Bernhard'),
+            array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
+            array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
+            array((object) array('property' => (object) array('%!@$§' => 'Bernhard')), 'property.%!@$§', 'Bernhard'),
+        );
     }
 }

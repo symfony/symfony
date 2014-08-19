@@ -69,16 +69,16 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->at(0))
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
         $this->factory->expects($this->at(1))
             ->method('createNamed')
-            ->with(2, 'text', null, array('property_path' => '[2]', 'max_length' => 10, 'auto_initialize' => false))
+            ->with(2, 'text', null, array('property_path' => '[2]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('2')));
 
         $data = array(1 => 'string', 2 => 'string');
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', array('max_length' => '10'), false, false);
+        $listener = new ResizeFormListener('text', array('attr' => array('maxlength' => 10)), false, false);
         $listener->preSetData($event);
 
         $this->assertFalse($this->form->has('0'));
@@ -113,12 +113,12 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with(1, 'text', null, array('property_path' => '[1]', 'max_length' => 10, 'auto_initialize' => false))
+            ->with(1, 'text', null, array('property_path' => '[1]', 'attr' => array('maxlength' => 10), 'auto_initialize' => false))
             ->will($this->returnValue($this->getForm('1')));
 
         $data = array(0 => 'string', 1 => 'string');
         $event = new FormEvent($this->form, $data);
-        $listener = new ResizeFormListener('text', array('max_length' => 10), true, false);
+        $listener = new ResizeFormListener('text', array('attr' => array('maxlength' => 10)), true, false);
         $listener->preSubmit($event);
 
         $this->assertTrue($this->form->has('0'));

@@ -313,10 +313,20 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
-    public function testSchemeRequirement()
+    public function testSchemeRequirementBC()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testSchemeRequirement()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
         $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
     }

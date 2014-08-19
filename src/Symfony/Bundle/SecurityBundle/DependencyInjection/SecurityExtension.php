@@ -259,7 +259,8 @@ class SecurityExtension extends Extension
         } elseif (isset($firewall['pattern']) || isset($firewall['host'])) {
             $pattern = isset($firewall['pattern']) ? $firewall['pattern'] : null;
             $host = isset($firewall['host']) ? $firewall['host'] : null;
-            $matcher = $this->createRequestMatcher($container, $pattern, $host);
+            $methods = isset($firewall['methods']) ? $firewall['methods'] : array();
+            $matcher = $this->createRequestMatcher($container, $pattern, $host, $methods);
         }
 
         // Security disabled?

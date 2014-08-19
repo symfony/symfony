@@ -21,7 +21,7 @@ namespace Symfony\Component\DomCrawler;
 class Link
 {
     /**
-     * @var \DOMNode A \DOMNode instance
+     * @var \DOMElement
      */
     protected $node;
 
@@ -38,15 +38,15 @@ class Link
     /**
      * Constructor.
      *
-     * @param \DOMNode $node       A \DOMNode instance
-     * @param string   $currentUri The URI of the page where the link is embedded (or the base href)
-     * @param string   $method     The method to use for the link (get by default)
+     * @param \DOMElement $node       A \DOMElement instance
+     * @param string      $currentUri The URI of the page where the link is embedded (or the base href)
+     * @param string      $method     The method to use for the link (get by default)
      *
      * @throws \InvalidArgumentException if the node is not a link
      *
      * @api
      */
-    public function __construct(\DOMNode $node, $currentUri, $method = 'GET')
+    public function __construct(\DOMElement $node, $currentUri, $method = 'GET')
     {
         if (!in_array(strtolower(substr($currentUri, 0, 4)), array('http', 'file'))) {
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
@@ -60,7 +60,7 @@ class Link
     /**
      * Gets the node associated with this link.
      *
-     * @return \DOMNode A \DOMNode instance
+     * @return \DOMElement A \DOMElement instance
      */
     public function getNode()
     {
@@ -171,13 +171,13 @@ class Link
     }
 
     /**
-     * Sets current \DOMNode instance.
+     * Sets current \DOMElement instance.
      *
-     * @param \DOMNode $node A \DOMNode instance
+     * @param \DOMElement $node A \DOMElement instance
      *
      * @throws \LogicException If given node is not an anchor
      */
-    protected function setNode(\DOMNode $node)
+    protected function setNode(\DOMElement $node)
     {
         if ('a' !== $node->nodeName && 'area' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to click on a "%s" tag.', $node->nodeName));

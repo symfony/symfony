@@ -16,8 +16,10 @@ use Symfony\Component\Validator\GlobalExecutionContextInterface;
 use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
- * @since  2.3.19
+ * @since  2.5.3
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated
  */
 class StubGlobalExecutionContext implements GlobalExecutionContextInterface
 {

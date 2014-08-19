@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Currency;
 use Symfony\Component\Validator\Constraints\CurrencyValidator;
+use Symfony\Component\Validator\Validation;
 
 class CurrencyValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -22,6 +23,11 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
         IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
+    }
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
     }
 
     protected function createValidator()

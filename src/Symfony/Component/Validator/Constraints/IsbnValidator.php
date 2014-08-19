@@ -16,9 +16,10 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates whether the value is a valid ISBN-10 or ISBN-13.
+ * Validates whether the value is a valid ISBN-10 or ISBN-13
  *
  * @author The Whole Life To Learn <thewholelifetolearn@gmail.com>
+ * @author Manuel Reinhard <manu@sprain.ch>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see https://en.wikipedia.org/wiki/Isbn
@@ -30,6 +31,10 @@ class IsbnValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Isbn) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Isbn');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -39,32 +44,32 @@ class IsbnValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
-        $canonical = strtoupper(str_replace('-', '', $value));
+        $canonical = str_replace('-', '', $value);
 
-        if ($constraint->isbn10 && $this->isValidIsbn10($canonical)) {
-            return;
+        if (null == $constraint->type) {
+            if ($constraint->isbn10 && !$constraint->isbn13) {
+                $constraint->type = 'isbn10';
+            } elseif ($constraint->isbn13 && !$constraint->isbn10) {
+                $constraint->type = 'isbn13';
+            }
         }
 
-        if ($constraint->isbn13 && $this->isValidIsbn13($canonical)) {
-            return;
-        }
-
-        if ($constraint->isbn10 && $constraint->isbn13) {
-            $this->context->addViolation($constraint->bothIsbnMessage, array(
+        if ('isbn10' === $constraint->type && !$this->validateIsbn10($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint, 'isbn10'), array(
                 '{{ value }}' => $this->formatValue($value),
             ));
-        } elseif ($constraint->isbn10) {
-            $this->context->addViolation($constraint->isbn10Message, array(
+        } elseif ('isbn13' === $constraint->type && !$this->validateIsbn13($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint, 'isbn13'), array(
                 '{{ value }}' => $this->formatValue($value),
             ));
-        } else {
-            $this->context->addViolation($constraint->isbn13Message, array(
+        } elseif (!$this->validateIsbn10($canonical) && !$this->validateIsbn13($canonical)) {
+            $this->context->addViolation($this->getMessage($constraint), array(
                 '{{ value }}' => $this->formatValue($value),
             ));
         }
     }
 
-    private function isValidIsbn10($isbn)
+    protected function validateIsbn10($isbn)
     {
         if (10 !== strlen($isbn)) {
             return false;
@@ -87,7 +92,7 @@ class IsbnValidator extends ConstraintValidator
         return 0 === $checkSum % 11;
     }
 
-    private function isValidIsbn13($isbn)
+    protected function validateIsbn13($isbn)
     {
         if (13 !== strlen($isbn) || !ctype_digit($isbn)) {
             return false;
@@ -104,5 +109,18 @@ class IsbnValidator extends ConstraintValidator
         }
 
         return 0 === $checkSum % 10;
+    }
+
+    protected function getMessage($constraint, $type = null)
+    {
+        if (null !== $constraint->message) {
+            return $constraint->message;
+        } elseif ($type == 'isbn10') {
+            return $constraint->isbn10Message;
+        } elseif ($type == 'isbn13') {
+            return $constraint->isbn13Message;
+        }
+
+        return $constraint->bothIsbnMessage;
     }
 }

@@ -10,6 +10,7 @@
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
+        <parameter key="form.type_extension.form.request_handler.class">Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler</parameter>
     </parameters>
 
     <services>
@@ -148,8 +149,12 @@
 
         <!-- FormTypeHttpFoundationExtension -->
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
+            <argument type="service" id="form.type_extension.form.request_handler" />
             <tag name="form.type_extension" alias="form" />
         </service>
+
+        <!-- HttpFoundationRequestHandler -->
+        <service id="form.type_extension.form.request_handler" class="%form.type_extension.form.request_handler.class%" public="false" />
 
         <!-- FormTypeValidatorExtension -->
         <service id="form.type_extension.form.validator" class="Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension">

@@ -5,7 +5,7 @@
     </h3>
     <form action="{{ path('_profiler_search') }}" method="get">
         <label for="ip">IP</label>
-        <input type="text" name="ip" id="ip" value="{{ ip }}">
+        <input type="text" name="ip" id="ip" value="{{ ip }}" placeholder="e.g. 127.0.0.1">
         <div class="clear-fix"></div>
         <label for="method">Method</label>
         <select name="method" id="method">
@@ -15,16 +15,16 @@
         </select>
         <div class="clear-fix"></div>
         <label for="url">URL</label>
-        <input type="text" name="url" id="url" value="{{ url }}">
+        <input type="url" name="url" id="url" value="{{ url }}" placeholder="e.g. {{ app.request.baseUrl }}">
         <div class="clear-fix"></div>
         <label for="token">Token</label>
-        <input type="text" name="token" id="token" value="{{ token }}">
+        <input type="text" name="token" id="token" value="{{ token }}" placeholder="e.g. 1f321b">
         <div class="clear-fix"></div>
         <label for="start">From</label>
-        <input type="text" name="start" id="start" value="{{ start }}">
+        <input type="date" name="start" id="start" value="{{ start }}" placeholder="e.g. {{ '-2days'|date('dd.mm.YYYY') }}">
         <div class="clear-fix"></div>
         <label for="end">Until</label>
-        <input type="text" name="end" id="end" value="{{ end }}">
+        <input type="date" name="end" id="end" value="{{ end }}" placeholder="e.g. {{ 'now'|date('dd.mm.YYYY') }}">
         <div class="clear-fix"></div>
         <label for="limit">Limit</label>
         <select name="limit" id="limit">

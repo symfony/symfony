@@ -34,8 +34,8 @@ class PhpExecutableFinder
     public function find()
     {
         // HHVM support
-        if (defined('HHVM_VERSION') && false !== $hhvm = getenv('PHP_BINARY')) {
-            return $hhvm;
+        if (defined('HHVM_VERSION')) {
+            return (false !== ($hhvm = getenv('PHP_BINARY')) ? $hhvm : PHP_BINARY).' --php';
         }
 
         // PHP_BINARY return the current sapi executable

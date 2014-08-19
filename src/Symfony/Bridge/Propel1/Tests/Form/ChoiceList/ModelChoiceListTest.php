@@ -259,4 +259,26 @@ class ModelChoiceListTest extends Propel1TestCase
     {
         $choiceList = new ModelChoiceList('Foo\Bar\DoesNotExistClass');
     }
+
+    public function testCustomIdentifier()
+    {
+        $item1 = new Item(1, 'Foo', null, null, 'slug');
+        $item2 = new Item(2, 'Bar', null, null, 'slug2');
+
+        $choiceList = new ModelChoiceList(
+            self::ITEM_CLASS,
+            'value',
+            array(
+                $item1,
+                $item2,
+            ),
+            null,
+            null,
+            array(),
+            null,
+            'slug'
+        );
+
+        $this->assertSame(array('slug' => $item1, 'slug2' => $item2), $choiceList->getChoices());
+    }
 }

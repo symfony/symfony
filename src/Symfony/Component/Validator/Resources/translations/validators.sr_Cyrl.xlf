@@ -175,7 +175,7 @@
                 <target>Висина слике је премала ({{ height }}px). Најмања дозвољена висина је {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Вредност треба да буде тренутна корисничка лозинка.</target>
             </trans-unit>
             <trans-unit id="48">

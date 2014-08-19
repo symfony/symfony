@@ -107,6 +107,36 @@ class ControllerNameParserTest extends TestCase
         );
     }
 
+    /**
+     * @expectedException
+     * @dataProvider getInvalidBundleNameTests
+     */
+    public function testInvalidBundleName($bundleName, $suggestedBundleName)
+    {
+        $parser = $this->createParser();
+
+        try {
+            $parser->parse($bundleName);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the bundle does not exist');
+
+            if (false === $suggestedBundleName) {
+                // make sure we don't have a suggestion
+                $this->assertNotContains('Did you mean', $e->getMessage());
+            } else {
+                $this->assertContains(sprintf('Did you mean "%s"', $suggestedBundleName), $e->getMessage());
+            }
+        }
+    }
+
+    public function getInvalidBundleNameTests()
+    {
+        return array(
+            array('FoodBundle:Default:index', 'FooBundle:Default:index'),
+            array('CrazyBundle:Default:index', false),
+        );
+    }
+
     private function createParser()
     {
         $bundles = array(
@@ -121,6 +151,10 @@ class ControllerNameParserTest extends TestCase
             ->expects($this->any())
             ->method('getBundle')
             ->will($this->returnCallback(function ($bundle) use ($bundles) {
+                if (!isset($bundles[$bundle])) {
+                    throw new \InvalidArgumentException(sprintf('Invalid bundle name "%s"', $bundle));
+                }
+
                 return $bundles[$bundle];
             }))
         ;

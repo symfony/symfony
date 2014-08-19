@@ -82,6 +82,22 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
     }
 
+    public function testDurationBeforeStop()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        usleep(200000);
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        usleep(100000);
+        $event->stop();
+        $event->start();
+        usleep(100000);
+        $this->assertEquals(100, $event->getDuration(), null, self::DELTA);
+    }
+
     /**
      * @expectedException \LogicException
      */

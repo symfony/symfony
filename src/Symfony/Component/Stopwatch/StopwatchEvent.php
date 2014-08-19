@@ -173,8 +173,17 @@ class StopwatchEvent
      */
     public function getDuration()
     {
+        $periods = $this->periods;
+        $stopped = count($periods);
+        $left = count($this->started) - $stopped;
+
+        for ($i = 0; $i < $left; $i++) {
+            $index = $stopped + $i;
+            $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow());
+        }
+
         $total = 0;
-        foreach ($this->periods as $period) {
+        foreach ($periods as $period) {
             $total += $period->getDuration();
         }
 

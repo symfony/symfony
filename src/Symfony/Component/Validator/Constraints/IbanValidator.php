@@ -28,6 +28,10 @@ class IbanValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Iban) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Iban');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }

@@ -192,7 +192,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     {
         self::validateName($name);
 
-        if (null !== $dataClass && !class_exists($dataClass)) {
+        if (null !== $dataClass && !class_exists($dataClass) && !interface_exists($dataClass)) {
             throw new InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
         }
 

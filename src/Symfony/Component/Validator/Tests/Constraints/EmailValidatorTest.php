@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use Symfony\Component\Validator\Validation;
 
 class EmailValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new EmailValidator(false);
@@ -85,5 +91,14 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example@'),
             array('example@localhost'),
         );
+    }
+
+    public function testStrict()
+    {
+        $constraint = new Email(array('strict' => true));
+
+        $this->validator->validate('example@localhost', $constraint);
+
+        $this->assertNoViolation();
     }
 }

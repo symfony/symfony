@@ -92,6 +92,7 @@ EOF;
             $properties[] = $route->getRequirements();
             $properties[] = $compiledRoute->getTokens();
             $properties[] = $compiledRoute->getHostTokens();
+            $properties[] = $route->getSchemes();
 
             $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
@@ -114,9 +115,9 @@ EOF;
             throw new RouteNotFoundException(sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', \$name));
         }
 
-        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens) = self::\$declaredRoutes[\$name];
+        list(\$variables, \$defaults, \$requirements, \$tokens, \$hostTokens, \$requiredSchemes) = self::\$declaredRoutes[\$name];
 
-        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens);
+        return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens, \$requiredSchemes);
     }
 EOF;
     }

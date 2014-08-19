@@ -23,6 +23,11 @@ class FileType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        if ($options['multiple']) {
+            $view->vars['full_name'] .= '[]';
+            $view->vars['attr']['multiple'] = 'multiple';
+        }
+
         $view->vars = array_replace($view->vars, array(
             'type'  => 'file',
             'value' => '',
@@ -48,6 +53,7 @@ class FileType extends AbstractType
             'compound' => false,
             'data_class' => 'Symfony\Component\HttpFoundation\File\File',
             'empty_data' => null,
+            'multiple' => false,
         ));
     }
 

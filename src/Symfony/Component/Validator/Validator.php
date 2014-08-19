@@ -11,17 +11,20 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ValidatorInterface}.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ *             Use {@link Validator\RecursiveValidator} instead.
  */
-class Validator implements ValidatorInterface
+class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryInterface
 {
     /**
      * @var MetadataFactoryInterface
@@ -82,6 +85,14 @@ class Validator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
+    public function hasMetadataFor($value)
+    {
+        return $this->metadataFactory->hasMetadataFor($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
         $visitor = $this->createVisitor($value);
@@ -131,7 +142,7 @@ class Validator implements ValidatorInterface
      */
     public function validatePropertyValue($containingValue, $property, $value, $groups = null)
     {
-        $visitor = $this->createVisitor($containingValue);
+        $visitor = $this->createVisitor(is_object($containingValue) ? $containingValue : $value);
         $metadata = $this->metadataFactory->getMetadataFor($containingValue);
 
         if (!$metadata instanceof PropertyMetadataContainerInterface) {
@@ -142,13 +153,17 @@ class Validator implements ValidatorInterface
             throw new ValidatorException(sprintf('The metadata for '.$valueAsString.' does not support properties.'));
         }
 
+        // If $containingValue is passed as class name, take $value as root
+        // and start the traversal with an empty property path
+        $propertyPath = is_object($containingValue) ? $property : '';
+
         foreach ($this->resolveGroups($groups) as $group) {
             if (!$metadata->hasPropertyMetadata($property)) {
                 continue;
             }
 
             foreach ($metadata->getPropertyMetadata($property) as $propMeta) {
-                $propMeta->accept($visitor, $value, $group, $property);
+                $propMeta->accept($visitor, $value, $group, $propertyPath);
             }
         }
 

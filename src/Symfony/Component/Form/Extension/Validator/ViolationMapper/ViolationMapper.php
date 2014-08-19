@@ -128,7 +128,8 @@ class ViolationMapper implements ViolationMapperInterface
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
                 $violation->getMessageParameters(),
-                $violation->getMessagePluralization()
+                $violation->getMessagePluralization(),
+                $violation
             ));
         }
     }
@@ -291,6 +292,9 @@ class ViolationMapper implements ViolationMapperInterface
      */
     private function acceptsErrors(FormInterface $form)
     {
-        return $this->allowNonSynchronized || $form->isSynchronized();
+        // Ignore non-submitted forms. This happens, for example, in PATCH
+        // requests.
+        // https://github.com/symfony/symfony/pull/10567
+        return $form->isSubmitted() && ($this->allowNonSynchronized || $form->isSynchronized());
     }
 }

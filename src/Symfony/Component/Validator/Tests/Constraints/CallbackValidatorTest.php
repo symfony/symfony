@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Validation;
 
 class CallbackValidatorTest_Class
 {
@@ -45,6 +46,11 @@ class CallbackValidatorTest_Object
 
 class CallbackValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new CallbackValidator();
@@ -109,6 +115,21 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
         ));
     }
 
+    public function testClosureNullObject()
+    {
+        $constraint = new Callback(function ($object, ExecutionContextInterface $context) {
+            $context->addViolation('My message', array('{{ value }}' => 'foobar'));
+
+            return false;
+        });
+
+        $this->validator->validate(null, $constraint);
+
+        $this->assertViolation('My message', array(
+            '{{ value }}' => 'foobar',
+        ));
+    }
+
     public function testClosureExplicitName()
     {
         $object = new CallbackValidatorTest_Object();
@@ -133,6 +154,17 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Callback(array(__CLASS__.'_Class', 'validateCallback'));
 
         $this->validator->validate($object, $constraint);
+
+        $this->assertViolation('Callback message', array(
+            '{{ value }}' => 'foobar',
+        ));
+    }
+
+    public function testArrayCallableNullObject()
+    {
+        $constraint = new Callback(array(__CLASS__.'_Class', 'validateCallback'));
+
+        $this->validator->validate(null, $constraint);
 
         $this->assertViolation('Callback message', array(
             '{{ value }}' => 'foobar',
@@ -283,8 +315,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     public function testConstraintGetTargets()
     {
         $constraint = new Callback(array('foo'));
+        $targets = array(Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT);
 
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
+        $this->assertEquals($targets, $constraint->getTargets());
     }
 
     // Should succeed. Needed when defining constraints as annotations.

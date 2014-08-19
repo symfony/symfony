@@ -20,12 +20,12 @@ namespace Symfony\Component\Validator\Constraints;
 class Image extends File
 {
     public $mimeTypes = 'image/*';
-    public $minWidth = null;
-    public $maxWidth = null;
-    public $maxHeight = null;
-    public $minHeight = null;
-    public $maxRatio = null;
-    public $minRatio = null;
+    public $minWidth;
+    public $maxWidth;
+    public $maxHeight;
+    public $minHeight;
+    public $maxRatio;
+    public $minRatio;
     public $allowSquare = true;
     public $allowLandscape = true;
     public $allowPortrait = true;

@@ -13,10 +13,11 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\True;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -86,6 +87,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
+        $expected->addGetterConstraint('valid', new True());
+        $expected->addGetterConstraint('permissions', new True());
 
         $this->assertEquals($expected, $metadata);
     }

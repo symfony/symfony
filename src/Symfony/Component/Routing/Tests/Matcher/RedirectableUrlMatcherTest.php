@@ -41,7 +41,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirect()
+    public function testSchemeRedirectBC()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
@@ -52,6 +52,34 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
             ->method('redirect')
             ->with('/foo', 'foo', 'https')
             ->will($this->returnValue(array('_route' => 'foo')))
+        ;
+        $matcher->match('/foo');
+    }
+
+    public function testSchemeRedirectRedirectsToFirstScheme()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('FTP', 'HTTPS')));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo', 'foo', 'ftp')
+            ->will($this->returnValue(array('_route' => 'foo')))
+        ;
+        $matcher->match('/foo');
+    }
+
+    public function testNoSchemaRedirectIfOnOfMultipleSchemesMatches()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https', 'http')));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->never())
+            ->method('redirect')
         ;
         $matcher->match('/foo');
     }

@@ -92,8 +92,8 @@ class FormType extends BaseType
             'value'      => $form->getViewData(),
             'data'       => $form->getNormData(),
             'required'   => $form->isRequired(),
-            'max_length' => $options['max_length'],
-            'pattern'    => $options['pattern'],
+            'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
+            'pattern'    => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
             'size'       => null,
             'label_attr' => $options['label_attr'],
             'compound'   => $form->getConfig()->getCompound(),
@@ -170,6 +170,22 @@ class FormType extends BaseType
             'data',
         ));
 
+        // BC clause for the "max_length" and "pattern" option
+        // Add these values to the "attr" option instead
+        $defaultAttr = function (Options $options) {
+            $attributes = array();
+
+            if (null !== $options['max_length']) {
+                $attributes['maxlength'] = $options['max_length'];
+            }
+
+            if (null !== $options['pattern']) {
+                $attributes['pattern'] = $options['pattern'];
+            }
+
+            return $attributes;
+        };
+
         $resolver->setDefaults(array(
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
@@ -190,6 +206,7 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action'             => '',
+            'attr'               => $defaultAttr
         ));
 
         $resolver->setAllowedTypes(array(

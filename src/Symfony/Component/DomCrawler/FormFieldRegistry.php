@@ -12,6 +12,7 @@
 namespace Symfony\Component\DomCrawler;
 
 use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\UnresolvedFormField;
 
 /**
  * This is an internal class that must not be used directly.
@@ -21,6 +22,8 @@ class FormFieldRegistry
     private $fields = array();
 
     private $base;
+
+    private $createMissingFields = false;
 
     /**
      * Adds a field to the registry.
@@ -86,7 +89,16 @@ class FormFieldRegistry
         while ($segments) {
             $path = array_shift($segments);
             if (!array_key_exists($path, $target)) {
-                throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+                if ($this->createMissingFields) {
+                    if (count($segments) > 0) {
+                        $field = array();
+                    } else {
+                        $field = new UnresolvedFormField($this, $name);
+                    }
+                    $target[$path] = $field;
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
+                }
             }
             $target =& $target[$path];
         }
@@ -127,7 +139,7 @@ class FormFieldRegistry
         if (!is_array($value) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } else {
-            $fields = self::create($name, $value);
+            $fields = self::create($name, $value, $this->createMissingFields);
             foreach ($fields->all() as $k => $v) {
                 $this->set($k, $v);
             }
@@ -144,22 +156,34 @@ class FormFieldRegistry
         return $this->walk($this->fields, $this->base);
     }
 
+    public function createMissingFields()
+    {
+        $this->createMissingFields = true;
+
+        return $this;
+    }
+
     /**
      * Creates an instance of the class.
      *
      * This function is made private because it allows overriding the $base and
      * the $values properties without any type checking.
      *
-     * @param string $base   The fully qualified name of the base field
-     * @param array  $values The values of the fields
+     * @param string $base The fully qualified name of the base field
+     * @param array $values The values of the fields
+     * @param bool $createMissingFields
      *
      * @return FormFieldRegistry
      */
-    private static function create($base, array $values)
+    private static function create($base, array $values, $createMissingFields = false)
     {
         $registry = new static();
         $registry->base = $base;
         $registry->fields = $values;
+
+        if ($createMissingFields) {
+            $registry->createMissingFields();
+        }
 
         return $registry;
     }

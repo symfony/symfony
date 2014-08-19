@@ -360,6 +360,13 @@ class Form extends Link implements \ArrayAccess
         return $this;
     }
 
+    public function createMissingFields()
+    {
+        $this->fields->createMissingFields();
+
+        return $this;
+    }
+
     /**
      * Sets the node for the form.
      *

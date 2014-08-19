@@ -802,6 +802,36 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testFormRegistryCanCreateNonExistingFields()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+        <html>
+            <form id="form" action="" method="POST">
+            </form>
+        </html>');
+
+        $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
+        $form->createMissingFields();
+        $form['foo[bar][baz]'] = 'baz';
+        $form['foo[bar][bar]']->setValue('bar');
+
+        $form['foo[baz][bar]']->tick();
+        $form['foo[baz][baz]']->untick();
+
+        $form['foo[foo]']->upload(__FILE__);
+
+        $values = $form->getPhpValues();
+        $files = $form->getPhpFiles();
+        $this->assertEquals('baz', $values['foo']['bar']['baz']);
+        $this->assertEquals('bar', $values['foo']['bar']['bar']);
+        $this->assertEquals('on', $values['foo']['baz']['bar']);
+        if (array_key_exists('baz', $values['foo']['baz'])) {
+            $this->fail();
+        }
+        $this->assertCount(1, $files['foo']);
+    }
+
     protected function getFormFieldMock($name, $value = null)
     {
         $field = $this

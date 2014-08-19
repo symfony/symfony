@@ -499,7 +499,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     /**
      * Class nodes are never cascaded.
      *
-     * @return bool    Always returns false.
+     * {@inheritdoc}
      */
     public function getCascadingStrategy()
     {

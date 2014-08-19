@@ -88,7 +88,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($language, $constraint);
 
         $this->assertViolation('myMessage', array(
-            '{{ value }}' => $language,
+            '{{ value }}' => '"'.$language.'"',
         ));
     }
 

@@ -130,7 +130,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'static_method'      => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email'       => false,
-                'api'                => 'auto',
+                'api'                => version_compare(PHP_VERSION, '5.3.9', '<') ? '2.4' : '2.5-bc',
             ),
             'annotations'         => array(
                 'cache'          => 'file',

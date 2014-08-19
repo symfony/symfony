@@ -56,15 +56,15 @@ class DbalLogger implements SQLLogger
                 }
 
                 // non utf-8 strings break json encoding
-                if (!preg_match('#[\p{L}\p{N} ]#u', $params[$index])) {
+                if (!preg_match('//u', $params[$index])) {
                     $params[$index] = self::BINARY_DATA_VALUE;
                     continue;
                 }
 
                 // detect if the too long string must be shorten
-                if (function_exists('mb_detect_encoding') && false !== $encoding = mb_detect_encoding($params[$index])) {
-                    if (self::MAX_STRING_LENGTH < mb_strlen($params[$index], $encoding)) {
-                        $params[$index] = mb_substr($params[$index], 0, self::MAX_STRING_LENGTH - 6, $encoding).' [...]';
+                if (function_exists('mb_strlen')) {
+                    if (self::MAX_STRING_LENGTH < mb_strlen($params[$index], 'UTF-8')) {
+                        $params[$index] = mb_substr($params[$index], 0, self::MAX_STRING_LENGTH - 6, 'UTF-8').' [...]';
                         continue;
                     }
                 } else {

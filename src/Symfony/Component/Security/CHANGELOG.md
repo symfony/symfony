@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added Symfony\Component\Security\Http\Authentication\AuthenticationUtils
+
 2.4.0
 -----
 

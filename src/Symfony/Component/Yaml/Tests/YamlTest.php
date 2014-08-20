@@ -28,4 +28,11 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $parsedByContents = Yaml::parse($contents);
         $this->assertEquals($parsedByFilename, $parsedByContents);
     }
+
+    public function testSupressedFileCheck()
+    {
+        $filename = __DIR__ . '/Fixtures/index.yml';
+        $parsed = Yaml::parse($filename, false, false, false);
+        $this->assertEquals($filename, $parsed);
+    }
 }

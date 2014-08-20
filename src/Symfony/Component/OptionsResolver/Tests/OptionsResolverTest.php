@@ -43,6 +43,23 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $this->resolver->resolve($options));
     }
 
+    public function testResolveNumericOptions()
+    {
+        $this->resolver->setDefaults(array(
+            '1' => '1',
+            '2' => '2',
+        ));
+
+        $options = array(
+            '2' => '20',
+        );
+
+        $this->assertEquals(array(
+            '1' => '1',
+            '2' => '20',
+        ), $this->resolver->resolve($options));
+    }
+
     public function testResolveLazy()
     {
         $this->resolver->setDefaults(array(
@@ -94,7 +111,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             },
         ));
 
-        $options = array(
+        $options = array(,
         );
 
         $this->assertEquals(array(
@@ -623,7 +640,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ), $this->resolver->resolve(array()));
     }
 
@@ -637,7 +654,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ), $this->resolver->resolve(array()));
     }
 
@@ -652,7 +669,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $options = array(
             'one' => '1',
-            'two' => '2'
+            'two' => '2',
         );
 
         $this->assertEquals($options, $this->resolver->resolve($options));

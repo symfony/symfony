@@ -38,9 +38,10 @@ class Yaml
      * you must validate the input before calling this method. Passing a file
      * as an input is a deprecated feature and will be removed in 3.0.
      *
-     * @param string  $input                  Path to a YAML file or a string containing YAML
-     * @param bool    $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param bool    $objectSupport          True if object support is enabled, false otherwise
+     * @param string $input                  Path to a YAML file or a string containing YAML
+     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param bool   $objectSupport          True if object support is enabled, false otherwise
+     * @param bool   $checkFile              False to force the first parameter to be always interpreted as a string even if it's as a file.
      *
      * @return array The YAML converted to a PHP array
      *
@@ -48,11 +49,11 @@ class Yaml
      *
      * @api
      */
-    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $checkFile = true)
     {
         // if input is a file, process it
         $file = '';
-        if (strpos($input, "\n") === false && is_file($input)) {
+        if ($checkFile === true && strpos($input, "\n") === false && is_file($input)) {
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
             }

@@ -11,6 +11,7 @@ CHANGELOG
  * deprecated `ClassMetadata::hasMemberMetadatas()`
  * deprecated `ClassMetadata::getMemberMetadatas()`
  * deprecated `ClassMetadata::addMemberMetadata()`
+ * [BC BREAK] added `Mapping\MetadataInterface::getConstraints()`
 
 2.5.0
 -----

@@ -319,10 +319,8 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
             foreach ($source->getPropertyMetadata($property) as $member) {
                 $member = clone $member;
 
-                if ($member instanceof GenericMetadata) {
-                    foreach ($member->getConstraints() as $constraint) {
-                        $constraint->addImplicitGroupName($this->getDefaultGroup());
-                    }
+                foreach ($member->getConstraints() as $constraint) {
+                    $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 
                 $this->addPropertyMetadata($member);

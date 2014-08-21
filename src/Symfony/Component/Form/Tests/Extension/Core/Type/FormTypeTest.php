@@ -107,7 +107,7 @@ class FormTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('readonly', $view['child']->vars['attr']['readonly']);
+        $this->assertSame('readonly', $view['child']->vars['attr']['readonly']);
     }
 
     public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
@@ -117,7 +117,7 @@ class FormTypeTest extends BaseTypeTest
             ->getForm()
             ->createView();
 
-        $this->assertEquals('readonly', $view['child']->vars['attr']['readonly']);
+        $this->assertSame('readonly', $view['child']->vars['attr']['readonly']);
     }
 
     public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()
@@ -127,7 +127,7 @@ class FormTypeTest extends BaseTypeTest
                 ->getForm()
                 ->createView();
 
-        $this->assertEquals(false, $view['child']->vars['attr']['readonly']);
+        $this->assertFalse($view['child']->vars['attr']['readonly']);
     }
 
     public function testPassMaxLengthToView()

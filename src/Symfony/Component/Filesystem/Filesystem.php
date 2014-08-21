@@ -363,7 +363,7 @@ class Filesystem
         $originDir = rtrim($originDir, '/\\');
 
         // Iterate in destination folder to remove obsolete entries
-        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+        if ($this->exists($targetDir) && !empty($options['delete'])) {
             $deleteIterator = $iterator;
             if (null === $deleteIterator) {
                 $flags = \FilesystemIterator::SKIP_DOTS;
@@ -377,10 +377,7 @@ class Filesystem
             }
         }
 
-        $copyOnWindows = false;
-        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
-            $copyOnWindows = $options['copy_on_windows'];
-        }
+        $copyOnWindows = !empty($options['copy_on_windows']) && !function_exists('symlink');
 
         if (null === $iterator) {
             $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
@@ -392,7 +389,7 @@ class Filesystem
 
             if ($copyOnWindows) {
                 if (is_link($file) || is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, !empty($options['override']));
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
@@ -404,7 +401,7 @@ class Filesystem
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, !empty($options['override']));
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
                 }

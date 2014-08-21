@@ -139,7 +139,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer'          => array(
                 'enabled' => false
-            )
+            ),
+            'property_access' => array(
+                'magic_call' => false,
+                'throw_exception_on_invalid_index' => false,
+            ),
         );
     }
 }

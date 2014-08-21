@@ -133,6 +133,8 @@ class FrameworkExtension extends Extension
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
 
+        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+
         if (isset($config['serializer']) && $config['serializer']['enabled']) {
             $loader->load('serializer.xml');
         }
@@ -816,6 +818,15 @@ class FrameworkExtension extends Extension
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
         }
+    }
+
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    {
+        $container
+            ->getDefinition('property_accessor')
+            ->replaceArgument(0, $config['magic_call'])
+            ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
+        ;
     }
 
     /**

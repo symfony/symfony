@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added `Controller::isCsrfTokenValid` helper
+ * Added configuration for the PropertyAccess component
 
 2.5.0
 -----

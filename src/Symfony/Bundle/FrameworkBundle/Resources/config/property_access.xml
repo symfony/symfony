@@ -9,6 +9,9 @@
     </parameters>
 
     <services>
-        <service id="property_accessor" class="%property_accessor.class%" />
+        <service id="property_accessor" class="%property_accessor.class%" >
+            <argument /> <!-- magicCall, set by the extension -->
+            <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
+        </service>
     </services>
 </container>

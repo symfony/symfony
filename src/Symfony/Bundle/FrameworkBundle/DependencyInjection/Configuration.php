@@ -92,6 +92,7 @@ class Configuration implements ConfigurationInterface
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode);
+        $this->addPropertyAccessSection($rootNode);
 
         return $treeBuilder;
     }
@@ -520,6 +521,22 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addPropertyAccessSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('property_access')
+                    ->addDefaultsIfNotSet()
+                    ->info('Property access configuration')
+                    ->children()
+                        ->booleanNode('magic_call')->defaultFalse()->end()
+                        ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
+                    ->end()
                 ->end()
             ->end()
         ;

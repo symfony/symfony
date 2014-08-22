@@ -225,7 +225,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         } catch (ParameterNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent parameter "foo".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a parameter in a cleared bag');
         }
-
     }
 
     /**

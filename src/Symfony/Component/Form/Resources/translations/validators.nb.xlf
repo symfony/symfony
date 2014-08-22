@@ -11,7 +11,7 @@
                 <target>Den opplastede file var for stor. Vennligst last opp en mindre fil.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
                 <target>CSRF nøkkelen er ugyldig.</target>
             </trans-unit>
         </body>

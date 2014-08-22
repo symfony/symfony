@@ -11,7 +11,7 @@
                 <target>הקובץ שהועלה גדול מדי. נסה להעלות קובץ קטן יותר.</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
                 <target>אסימון CSRF אינו חוקי.</target>
             </trans-unit>
         </body>

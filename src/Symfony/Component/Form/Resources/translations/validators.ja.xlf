@@ -11,7 +11,7 @@
                 <target>アップロードされたファイルが大きすぎます。小さなファイルで再度アップロードしてください。</target>
             </trans-unit>
             <trans-unit id="30">
-                <source>The CSRF token is invalid.</source>
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
                 <target>CSRFトークンが無効です。</target>
             </trans-unit>
         </body>

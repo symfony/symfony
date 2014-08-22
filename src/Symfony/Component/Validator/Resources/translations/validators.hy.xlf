@@ -138,7 +138,7 @@
                 <source>This is not a valid IP address.</source>
                 <target>Արժեքը թույլատրելի IP հասցե չէ.</target>
             </trans-unit>
-			<trans-unit id="38">
+            <trans-unit id="38">
                 <source>This value is not a valid language.</source>
                 <target>Արժեքը թույլատրելի լեզու չէ.</target>
             </trans-unit>

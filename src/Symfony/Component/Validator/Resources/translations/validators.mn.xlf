@@ -35,7 +35,7 @@
                 <target>Өгөгдсөн нэг эсвэл нэгээс олон утга буруу байна.</target>
             </trans-unit>
             <trans-unit id="9">
-            	<source>The fields {{ fields }} were not expected.</source>
+                <source>The fields {{ fields }} were not expected.</source>
                 <target>Талбарууд {{ fields }} зөвшөөрөгдөөгүй байна.</target>
             </trans-unit>
             <trans-unit id="10">

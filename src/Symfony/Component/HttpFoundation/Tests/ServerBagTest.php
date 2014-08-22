@@ -67,6 +67,15 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         ), $bag->getHeaders());
     }
 
+    public function testHttpBasicAuthWithPhpCgiBogus()
+    {
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => 'Basic_'.base64_encode('foo:bar')));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => 'Basic_'.base64_encode('foo:bar'),
+        ), $bag->getHeaders());
+    }
+
     public function testHttpBasicAuthWithPhpCgiRedirect()
     {
         $bag = new ServerBag(array('REDIRECT_HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')));
@@ -97,6 +106,16 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'AUTHORIZATION' => $digest,
             'PHP_AUTH_DIGEST' => $digest,
+        ), $bag->getHeaders());
+    }
+
+    public function testHttpDigestAuthWithPhpCgiBogus()
+    {
+        $digest = 'Digest_username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
+        $bag = new ServerBag(array('HTTP_AUTHORIZATION' => $digest));
+
+        $this->assertEquals(array(
+            'AUTHORIZATION' => $digest,
         ), $bag->getHeaders());
     }
 

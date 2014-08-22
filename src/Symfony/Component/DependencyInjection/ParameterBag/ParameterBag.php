@@ -190,7 +190,7 @@ class ParameterBag implements ParameterBagInterface
     {
         if ($this->resolved) {
             return $this->get($name);
-        } else if (isset($this->resolvedParameters[$name])) {
+        } elseif (isset($this->resolvedParameters[$name])) {
             return $this->resolvedParameters[$name];
         } else {
             return $this->resolvedParameters[$name] = $this->resolveValue($this->get($name), $resolving);
@@ -252,6 +252,7 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $resolving[$key] = true;
+
             return $this->resolveParameter($key, $resolving);
 
         }
@@ -276,6 +277,7 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $resolving[$key] = true;
+
             return (string) $self->resolveParameter($key, $resolving);
 
         }, $value);

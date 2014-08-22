@@ -126,7 +126,7 @@ Validator
    Also you have to add to your composer.json:
 
    ```
-   "egulias/email-validator": "1.1.*"
+   "egulias/email-validator": "~1.2"
    ```
 
  * `ClassMetadata::getGroupSequence()` now returns `GroupSequence` instances

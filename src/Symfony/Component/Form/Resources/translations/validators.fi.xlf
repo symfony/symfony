@@ -3,7 +3,7 @@
     <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
             <trans-unit id="28">
-                <source>This field group should not contain extra fields.</source>
+                <source>This form should not contain extra fields.</source>
                 <target>Tämä kenttäryhmä ei voi sisältää ylimääräisiä kenttiä.</target>
             </trans-unit>
             <trans-unit id="29">

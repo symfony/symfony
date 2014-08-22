@@ -1595,9 +1595,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         Request::setTrustedHosts(array());
     }
 
-    public function testVeryLongHost()
+    /**
+     * @dataProvider getLongHostNames
+     */
+    public function testVeryLongHosts($host)
     {
-        $host = 'a'.str_repeat('.a', 40000);
         $start = microtime(true);
 
         $request = Request::create('/');
@@ -1609,13 +1611,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getHostValidities
      */
-    public function testHostValidity($host, $isValid)
+    public function testHostValidity($host, $isValid, $expectedHost = null, $expectedPort = null)
     {
         $request = Request::create('/');
         $request->headers->set('host', $host);
 
         if ($isValid) {
-            $this->assertSame($host, $request->getHost());
+            $this->assertSame($expectedHost ?: $host, $request->getHost());
+            if ($expectedPort) {
+                $this->assertSame($expectedPort, $request->getPort());
             }
         } else {
             $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
@@ -1631,6 +1635,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('a.', true),
             array("\xE9", false),
             array('[::1]', true),
+            array('[::1]:80', true, '[::1]', 80),
+            array(str_repeat('.', 101), false),
+        );
+    }
+
+    public function getLongHostNames()
+    {
+        return array(
+            array('a'.str_repeat('.a', 40000)),
+            array(str_repeat(':', 101)),
         );
     }
 }

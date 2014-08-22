@@ -26,6 +26,7 @@ class ParameterBag implements ParameterBagInterface
 {
     protected $parameters = array();
     protected $resolved = false;
+    protected $resolvedParameters = array();
 
     /**
      * Constructor.
@@ -160,7 +161,7 @@ class ParameterBag implements ParameterBagInterface
         $parameters = array();
         foreach ($this->parameters as $key => $value) {
             try {
-                $value = $this->resolveValue($value);
+                $value = $this->resolveParameter($key);
                 $parameters[$key] = $this->unescapeValue($value);
             } catch (ParameterNotFoundException $e) {
                 $e->setSourceKey($key);
@@ -171,6 +172,29 @@ class ParameterBag implements ParameterBagInterface
 
         $this->parameters = $parameters;
         $this->resolved = true;
+    }
+
+    /**
+     * Replaces parameter placeholders (%name%) by their values, inside a parameter's value.
+     *
+     * @param string $name The parameter name whose value we want to resolve
+     * @param array $resolving An array of keys that are being resolved (used internally to detect circular references)
+     *
+     * @return mixed  The resolved parameter value
+     *
+     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterCircularReferenceException if a circular reference if detected
+     * @throws RuntimeException when a given parameter has a type problem.
+     */
+    public function resolveParameter($name, array $resolving = array())
+    {
+        if ($this->resolved) {
+            return $this->get($name);
+        } else if (isset($this->resolvedParameters[$name])) {
+            return $this->resolvedParameters[$name];
+        } else {
+            return $this->resolvedParameters[$name] = $this->resolveValue($this->get($name), $resolving);
+        }
     }
 
     /**
@@ -221,15 +245,15 @@ class ParameterBag implements ParameterBagInterface
         // as the preg_replace_callback throw an exception when trying
         // a non-string in a parameter value
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
-            $key = strtolower($match[1]);
 
+            $key = strtolower($match[1]);
             if (isset($resolving[$key])) {
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
             $resolving[$key] = true;
+            return $this->resolveParameter($key, $resolving);
 
-            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }
 
         $self = $this;
@@ -245,16 +269,15 @@ class ParameterBag implements ParameterBagInterface
                 throw new ParameterCircularReferenceException(array_keys($resolving));
             }
 
-            $resolved = $self->get($key);
+            $paramValue = $self->get($key);
 
-            if (!is_string($resolved) && !is_numeric($resolved)) {
-                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($resolved), $value));
+            if (!is_string($paramValue) && !is_numeric($paramValue)) {
+                throw new RuntimeException(sprintf('A string value must be composed of strings and/or numbers, but found parameter "%s" of type %s inside string value "%s".', $key, gettype($paramValue), $value));
             }
 
-            $resolved = (string) $resolved;
             $resolving[$key] = true;
+            return (string) $self->resolveParameter($key, $resolving);
 
-            return $self->isResolved() ? $resolved : $self->resolveString($resolved, $resolving);
         }, $value);
     }
 

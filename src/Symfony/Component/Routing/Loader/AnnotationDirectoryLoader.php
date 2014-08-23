@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
@@ -56,6 +57,15 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
 
                 $collection->addCollection($this->loader->load($class, $type));
             }
+        }
+
+        if ($this->loader->hasRouteWithPriority()) {
+            $collection->getIterator()->uasort(function(Route $a, Route $b){
+                if ($a->getOption('priority') == $b->getOption('priority')) {
+                    return 0;
+                }
+                return $a->getOption('priority') > $b->getOption('priority') ? 1 : -1;
+            });
         }
 
         return $collection;

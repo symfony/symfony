@@ -91,6 +91,11 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foo'), 'condition' => 'context.getMethod() == "GET"'),
                 array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
             ),
+            array(
+                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
+                array('name' => 'route_priority', 'options' => array('priority' => '10')),
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
+            ),
         );
     }
 
@@ -120,9 +125,10 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
 
         $this->assertSame($routeDatas['path'], $route->getPath(), '->load preserves path annotation');
         $this->assertSame($routeDatas['requirements'],$route->getRequirements(), '->load preserves requirements annotation');
-        $this->assertCount(0, array_intersect($route->getOptions(), $routeDatas['options']), '->load preserves options annotation');
+        $this->assertSame(count($routeDatas['options']), count(array_intersect($route->getOptions(), $routeDatas['options'])), '->load preserves options annotation');
         $this->assertSame(array_replace($methodArgs, $routeDatas['defaults']), $route->getDefaults(), '->load preserves defaults annotation');
         $this->assertEquals($routeDatas['condition'], $route->getCondition(), '->load preserves condition annotation');
+        $this->assertSame(isset($routeDatas['options']['priority']), $this->loader->hasRouteWithPriority());
     }
 
     public function testClassRouteLoad()

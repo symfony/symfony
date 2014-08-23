@@ -60,7 +60,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
         }
 
         if ($this->loader->hasRouteWithPriority()) {
-            $collection->getIterator()->uasort(function(Route $a, Route $b){
+            $collection->getIterator()->uasort(function(Route $a, Route $b) {
                 if ($a->getOption('priority') == $b->getOption('priority')) {
                     return 0;
                 }

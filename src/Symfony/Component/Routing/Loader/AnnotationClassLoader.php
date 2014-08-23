@@ -73,6 +73,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected $defaultRouteIndex = 0;
 
     /**
+     * @var bool
+     */
+    protected $routeWithPriority = false;
+
+    /**
      * Constructor.
      *
      * @param Reader $reader
@@ -93,6 +98,16 @@ abstract class AnnotationClassLoader implements LoaderInterface
     }
 
     /**
+     * Tells if one of the annotationed route has priority info
+     *
+     * @return bool
+     */
+    public function hasRouteWithPriority()
+    {
+        return $this->routeWithPriority;
+    }
+
+    /**
      * Loads from annotations from a class.
      *
      * @param string      $class A class name
@@ -104,6 +119,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
      */
     public function load($class, $type = null)
     {
+        $hasPriority = false;
+
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
@@ -123,6 +140,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
                     $this->addRoute($collection, $annot, $globals, $class, $method);
+                    if (array_key_exists('priority',$annot->getOptions())) {
+                        $this->routeWithPriority = true;
+                    }
                 }
             }
         }

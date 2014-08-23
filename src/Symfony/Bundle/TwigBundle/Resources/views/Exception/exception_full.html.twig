@@ -13,7 +13,14 @@
 {% endblock %}
 
 {% block header_right %}
+    {% if showErrorTemplateLink %}
     <span class="sf-reset">
-        <a href="?_real_template=1" title="Render the true error page that your end users will see">Render True Error Page</a>
+        <a href="?{{ errorTemplateParams|url_encode }}"
+           title="Render the true error page that your end users will see"
+           onclick="alert('If you don\'t see an error page after the refresh, see: http://symfony.com/doc/current/cookbook/controller/error_pages.html');"
+        >
+            Render True Error Page
+        </a>
     </span>
+    {% endif %}
 {% endblock %}

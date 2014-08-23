@@ -35,8 +35,10 @@ abstract class AbstractVoter implements VoterInterface
     }
 
     /**
-     * Iteratively check all given attributes by calling voteOnAttribute
-     * This method terminates as soon as it is able to return either ACCESS_GRANTED or ACCESS_DENIED vote
+     * Iteratively check all given attributes by calling isGranted
+     *
+     * This method terminates as soon as it is able to return ACCESS_GRANTED
+     * If at least one attribute is supported, but access not granted, then ACCESS_DENIED is returned
      * Otherwise it will return ACCESS_ABSTAIN
      *
      * @param TokenInterface $token      A TokenInterface instance
@@ -47,22 +49,28 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
-        if (!$this->supportsClass(get_class($object))) {
-            return VoterInterface::ACCESS_ABSTAIN;
+        if (!$object || !$this->supportsClass(get_class($object))) {
+            return self::ACCESS_ABSTAIN;
         }
 
-        $user = $token->getUser();
+        // abstain vote by default in case none of the attributes are supported
+        $vote = self::ACCESS_ABSTAIN;
 
         foreach ($attributes as $attribute) {
-            if ($this->supportsAttribute($attribute)) {
-                $vote = $this->voteOnAttribute($attribute, $object, $user);
-                if (VoterInterface::ACCESS_ABSTAIN !== $vote) {
-                    return $vote;
-                }
+            if (!$this->supportsAttribute($attribute)) {
+                continue;
+            }
+
+            // as soon as at least one attribute is supported, default is to deny access
+            $vote = self::ACCESS_DENIED;
+
+            if ($this->isGranted($attribute, $object, $token->getUser())) {
+                // grant access as soon as at least one voter returns a positive response
+                return self::ACCESS_GRANTED;
             }
         }
 
-        return VoterInterface::ACCESS_ABSTAIN;
+        return $vote;
     }
 
     /**
@@ -80,14 +88,18 @@ abstract class AbstractVoter implements VoterInterface
     abstract protected function getSupportedAttributes();
 
     /**
-     * Perform a single vote operation on a given attribute, object and (optionally) user
+     * Perform a single access check operation on a given attribute, object and (optionally) user
      * It is safe to assume that $attribute and $object's class pass supportsAttribute/supportsClass
+     * $user can be one of the following:
+     *   a UserInterface object (fully authenticated user)
+     *   a string               (anonymously authenticated user)
+     *   null                   (non-authenticated user)
      *
-     * @param string        $attribute
-     * @param object        $object
-     * @param UserInterface $user
+     * @param string                    $attribute
+     * @param object                    $object
+     * @param UserInterface|string|null $user
      *
-     * @return int     either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
+     * @return bool
      */
-    abstract protected function voteOnAttribute($attribute, $object, UserInterface $user = null);
+    abstract protected function isGranted($attribute, $object, $user = null);
 }

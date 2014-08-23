@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -93,11 +102,10 @@ abstract class AbstractVoter implements VoterInterface
      * $user can be one of the following:
      *   a UserInterface object (fully authenticated user)
      *   a string               (anonymously authenticated user)
-     *   null                   (non-authenticated user)
      *
-     * @param string                    $attribute
-     * @param object                    $object
-     * @param UserInterface|string|null $user
+     * @param string               $attribute
+     * @param object               $object
+     * @param UserInterface|string $user
      *
      * @return bool
      */

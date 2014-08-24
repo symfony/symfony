@@ -211,6 +211,60 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name' => array('foo', 'bar', 'baz', 'bat')), $input->getArguments(), '->parse() parses array arguments');
     }
 
+    /**
+     * @dataProvider provideTailArgumentInput
+     */
+    public function testParseTailArgument($input, $options, $expectedOptions, $expectedArguments)
+    {
+        $input = new ArgvInput($input);
+        $input->bind(new InputDefinition($options));
+
+        $this->assertEquals($expectedOptions, $input->getOptions(), '->parse() parses options');
+        $this->assertEquals($expectedArguments, $input->getArguments(), '->parse() parses tail arguments');
+    }
+
+    public function provideTailArgumentInput()
+    {
+        return array(
+            array(
+                array('cli.php', 'foo', '--bar', 'baz', '--bat'),
+                array(new InputArgument('tail', InputArgument::IS_ARRAY | InputArgument::IS_TAIL)),
+                array(),
+                array('tail' => array('foo', '--bar', 'baz', '--bat')),
+            ),
+            array(
+                array('cli.php', '--foo', 'toto', 'foo', '--bar', 'baz', '--bat'),
+                array(
+                    new InputOption('foo', null, InputOption::VALUE_OPTIONAL),
+                    new InputArgument('tail', InputArgument::IS_ARRAY | InputArgument::IS_TAIL),
+                ),
+                array('foo' => 'toto'),
+                array('tail' => array('foo', '--bar', 'baz', '--bat')),
+            ),
+            array(
+                array('cli.php', 'toto', 'foo', '--bar', 'baz', '--bat'),
+                array(
+                    new InputArgument('foo', InputArgument::REQUIRED),
+                    new InputArgument('tail', InputArgument::IS_ARRAY | InputArgument::IS_TAIL),
+                ),
+                array(),
+                array('foo' => 'toto', 'tail' => array('foo', '--bar', 'baz', '--bat')),
+            ),
+        );
+    }
+
+    /**
+     * @expectedException        \RuntimeException
+     * @expectedExceptionMessage The "--bar" option does not exist.
+     */
+    public function testParseInvalidTailArgument()
+    {
+        $input = new ArgvInput(array('cli.php', '--bar'));
+        $input->bind(new InputDefinition(array(
+            new InputArgument('foo', InputArgument::REQUIRED),
+        )));
+    }
+
     public function testParseArrayOption()
     {
         $input = new ArgvInput(array('cli.php', '--name=foo', '--name=bar', '--name=baz'));

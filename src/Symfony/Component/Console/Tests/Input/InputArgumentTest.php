@@ -50,7 +50,8 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('ANOTHER_ONE'),
-            array(-1)
+            array(-1),
+            array(16),
         );
     }
 
@@ -62,6 +63,23 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
         $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument can not be an array');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage InputArgument::IS_TAIL requires InputArgument::IS_ARRAY
+     */
+    public function testInvalidTailMode()
+    {
+        new InputArgument('foo', InputArgument::IS_TAIL);
+    }
+
+    public function testIsTail()
+    {
+        $argument = new InputArgument('foo', InputArgument::IS_ARRAY | InputArgument::IS_TAIL);
+        $this->assertTrue($argument->isTail(), '->isTail() returns true if the argument is a tail');
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL);
+        $this->assertFalse($argument->isTail(), '->isTail() returns false if the argument is not a tail');
     }
 
     public function testGetDescription()

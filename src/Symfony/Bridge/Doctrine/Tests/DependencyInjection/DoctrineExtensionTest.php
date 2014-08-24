@@ -96,6 +96,62 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function providerBasicDriversWithConnectionService()
+    {
+        return array(
+            array('doctrine.orm.cache.redis.class',     array('type' => 'redis', 'instance_id' => 'connection'),     'setRedis'),
+            array('doctrine.orm.cache.memcache.class',  array('type' => 'memcache', 'instance_id' => 'connection'),  'setMemcache'),
+            array('doctrine.orm.cache.memcached.class', array('type' => 'memcached', 'instance_id' => 'connection'), 'setMemcached'),
+        );
+    }
+
+    /**
+     * @param string $class
+     * @param array  $config
+     *
+     * @dataProvider providerBasicDriversWithConnectionService
+     */
+    public function testLoadBasicCacheDriverWithConnectionService($class, array $config, $setConnection)
+    {
+        $expectedCalls = array();
+
+        $container      = $this->createContainer(array(
+            'connection' => $this->getMock('StdClass')
+        ));
+        $cacheName      = 'metadata_cache';
+        $objectManager  = array(
+            'name'                  => 'default',
+            'metadata_cache_driver' => $config
+        );
+
+        $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
+
+        $this->assertTrue($container->hasDefinition('doctrine.orm.default_metadata_cache'));
+
+        $definition      = $container->getDefinition('doctrine.orm.default_metadata_cache');
+        $defCalls        = $definition->getMethodCalls();
+        $expectedCalls[] = 'setNamespace';
+        $connectionReference = null;
+        $actualCalls     = array_map(function ($call) use ($setConnection, &$connectionReference) {
+            if ($setConnection == $call[0])
+                $connectionReference = $call[1][0];
+
+            return $call[0];
+        }, $defCalls);
+
+        $this->assertFalse($definition->isPublic());
+        $this->assertEquals("%$class%", $definition->getClass());
+
+        foreach (array_unique($expectedCalls) as $call) {
+            $this->assertContains($call, $actualCalls);
+        }
+
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $connectionReference);
+        $connAlias = $container->getAlias($connectionReference);
+        $this->assertFalse($connAlias->isPublic());
+        $this->assertEquals('connection', $connAlias);
+    }
+
     public function testServiceCacheDriver()
     {
         $cacheName      = 'metadata_cache';

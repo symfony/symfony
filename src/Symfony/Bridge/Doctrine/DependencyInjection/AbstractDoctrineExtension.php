@@ -330,42 +330,57 @@ abstract class AbstractDoctrineExtension extends Extension
                 return $cacheDriverServiceId;
             case 'memcache':
                 $memcacheClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.memcache.class').'%';
-                $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcache_instance.class').'%';
-                $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcache_host').'%';
-                $memcachePort = !empty($cacheDriver['port']) || (isset($cacheDriver['port']) && $cacheDriver['port'] === 0)  ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
                 $cacheDef = new Definition($memcacheClass);
-                $memcacheInstance = new Definition($memcacheInstanceClass);
-                $memcacheInstance->addMethodCall('connect', array(
-                    $memcacheHost, $memcachePort
-                ));
-                $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_memcache_instance', $objectManagerName)), $memcacheInstance);
-                $cacheDef->addMethodCall('setMemcache', array(new Reference($this->getObjectManagerElementName(sprintf('%s_memcache_instance', $objectManagerName)))));
+                $memcacheInstanceName = $this->getObjectManagerElementName(sprintf('%s_memcache_instance', $objectManagerName));
+                if (! empty($cacheDriver['instance_id'])) {
+                    $container->setAlias($memcacheInstanceName, new Alias($cacheDriver['instance_id'], false));
+                } else {
+                    $memcacheInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcache_instance.class').'%';
+                    $memcacheHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcache_host').'%';
+                    $memcachePort = !empty($cacheDriver['port']) || (isset($cacheDriver['port']) && $cacheDriver['port'] === 0)  ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcache_port').'%';
+                    $memcacheInstance = new Definition($memcacheInstanceClass);
+                    $memcacheInstance->addMethodCall('connect', array(
+                        $memcacheHost, $memcachePort
+                    ));
+                    $container->setDefinition($memcacheInstanceName, $memcacheInstance);
+                }
+                $cacheDef->addMethodCall('setMemcache', array(new Reference($memcacheInstanceName)));
                 break;
             case 'memcached':
                 $memcachedClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.memcached.class').'%';
-                $memcachedInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcached_instance.class').'%';
-                $memcachedHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcached_host').'%';
-                $memcachedPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcached_port').'%';
                 $cacheDef = new Definition($memcachedClass);
-                $memcachedInstance = new Definition($memcachedInstanceClass);
-                $memcachedInstance->addMethodCall('addServer', array(
-                    $memcachedHost, $memcachedPort
-                ));
-                $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManagerName)), $memcachedInstance);
-                $cacheDef->addMethodCall('setMemcached', array(new Reference($this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManagerName)))));
+                $memcachedInstanceName = $this->getObjectManagerElementName(sprintf('%s_memcached_instance', $objectManagerName));
+                if (! empty($cacheDriver['instance_id'])) {
+                    $container->setAlias($memcachedInstanceName, new Alias($cacheDriver['instance_id'], false));
+                } else {
+                    $memcachedInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.memcached_instance.class').'%';
+                    $memcachedHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.memcached_host').'%';
+                    $memcachedPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.memcached_port').'%';
+                    $memcachedInstance = new Definition($memcachedInstanceClass);
+                    $memcachedInstance->addMethodCall('addServer', array(
+                        $memcachedHost, $memcachedPort
+                    ));
+                    $container->setDefinition($memcachedInstanceName, $memcachedInstance);
+                }
+                $cacheDef->addMethodCall('setMemcached', array(new Reference($memcachedInstanceName)));
                 break;
-             case 'redis':
+            case 'redis':
                 $redisClass = !empty($cacheDriver['class']) ? $cacheDriver['class'] : '%'.$this->getObjectManagerElementName('cache.redis.class').'%';
-                $redisInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.redis_instance.class').'%';
-                $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.redis_host').'%';
-                $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.redis_port').'%';
                 $cacheDef = new Definition($redisClass);
-                $redisInstance = new Definition($redisInstanceClass);
-                $redisInstance->addMethodCall('connect', array(
-                    $redisHost, $redisPort
-                ));
-                $container->setDefinition($this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManagerName)), $redisInstance);
-                $cacheDef->addMethodCall('setRedis', array(new Reference($this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManagerName)))));
+                $redisInstanceName = $this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManagerName));
+                if (! empty($cacheDriver['instance_id'])) {
+                    $container->setAlias($redisInstanceName, new Alias($cacheDriver['instance_id'], false));
+                } else {
+                    $redisInstanceClass = !empty($cacheDriver['instance_class']) ? $cacheDriver['instance_class'] : '%'.$this->getObjectManagerElementName('cache.redis_instance.class').'%';
+                    $redisHost = !empty($cacheDriver['host']) ? $cacheDriver['host'] : '%'.$this->getObjectManagerElementName('cache.redis_host').'%';
+                    $redisPort = !empty($cacheDriver['port']) ? $cacheDriver['port'] : '%'.$this->getObjectManagerElementName('cache.redis_port').'%';
+                    $redisInstance = new Definition($redisInstanceClass);
+                    $redisInstance->addMethodCall('connect', array(
+                        $redisHost, $redisPort
+                    ));
+                    $container->setDefinition($redisInstanceName, $redisInstance);
+                }
+                $cacheDef->addMethodCall('setRedis', array(new Reference($redisInstanceName)));
                 break;
             case 'apc':
             case 'array':

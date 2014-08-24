@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Loader\AnnotationDirectoryLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
 {
     protected $loader;

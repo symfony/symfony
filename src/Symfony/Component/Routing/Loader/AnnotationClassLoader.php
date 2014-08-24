@@ -144,7 +144,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
-    public function adddPriorityRoutes()
+    public function addPriorityRoutes()
     {
         krsort($this->routesWithPriority);
         $collection = new RouteCollection();

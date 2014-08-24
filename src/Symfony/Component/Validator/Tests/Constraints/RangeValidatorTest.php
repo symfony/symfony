@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
 use Symfony\Component\Validator\Validation;
@@ -174,6 +175,196 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
         $this->assertViolation('myMinMessage', array(
             '{{ value }}' => $value,
             '{{ limit }}' => 10,
+        ));
+    }
+
+    public function getTenthToTwentiethMarch2014()
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $this->setDefaultTimezone('UTC');
+
+        $tests = array(
+            array(new \DateTime('March 10, 2014')),
+            array(new \DateTime('March 15, 2014')),
+            array(new \DateTime('March 20, 2014')),
+        );
+
+        if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
+            $tests[] = array(new \DateTimeImmutable('March 10, 2014'));
+            $tests[] = array(new \DateTimeImmutable('March 15, 2014'));
+            $tests[] = array(new \DateTimeImmutable('March 20, 2014'));
+        }
+
+        $this->restoreDefaultTimezone();
+
+        return $tests;
+    }
+
+    public function getSoonerThanTenthMarch2014()
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $this->setDefaultTimezone('UTC');
+
+        $tests = array(
+            array(new \DateTime('March 20, 2013')),
+            array(new \DateTime('March 9, 2014')),
+        );
+
+        if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
+            $tests[] = array(new \DateTimeImmutable('March 20, 2013'));
+            $tests[] = array(new \DateTimeImmutable('March 9, 2014'));
+        }
+
+        $this->restoreDefaultTimezone();
+
+        return $tests;
+    }
+
+    public function getLaterThanTwentiethMarch2014()
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $this->setDefaultTimezone('UTC');
+
+        $tests = array(
+            array(new \DateTime('March 21, 2014')),
+            array(new \DateTime('March 9, 2015')),
+        );
+
+        if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
+            $tests[] = array(new \DateTimeImmutable('March 21, 2014'));
+            $tests[] = array(new \DateTimeImmutable('March 9, 2015'));
+        }
+
+        $this->restoreDefaultTimezone();
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMin($value)
+    {
+        $constraint = new Range(array('min' => 'March 10, 2014'));
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMax($value)
+    {
+        $constraint = new Range(array('max' => 'March 20, 2014'));
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getTenthToTwentiethMarch2014
+     */
+    public function testValidDatesMinMax($value)
+    {
+        $constraint = new Range(array('min' => 'March 10, 2014', 'max' => 'March 20, 2014'));
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @dataProvider getSoonerThanTenthMarch2014
+     */
+    public function testInvalidDatesMin($value)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this);
+
+        $constraint = new Range(array(
+            'min' => 'March 10, 2014',
+            'minMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $value,
+            '{{ limit }}' => 'Mar 10, 2014, 12:00 AM',
+        ));
+    }
+
+    /**
+     * @dataProvider getLaterThanTwentiethMarch2014
+     */
+    public function testInvalidDatesMax($value)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this);
+
+        $constraint = new Range(array(
+            'max' => 'March 20, 2014',
+            'maxMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => $value,
+            '{{ limit }}' => 'Mar 20, 2014, 12:00 AM',
+        ));
+    }
+
+    /**
+     * @dataProvider getLaterThanTwentiethMarch2014
+     */
+    public function testInvalidDatesCombinedMax($value)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this);
+
+        $constraint = new Range(array(
+            'min' => 'March 10, 2014',
+            'max' => 'March 20, 2014',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMaxMessage', array(
+            '{{ value }}' => $value,
+            '{{ limit }}' => 'Mar 20, 2014, 12:00 AM',
+        ));
+    }
+
+    /**
+     * @dataProvider getSoonerThanTenthMarch2014
+     */
+    public function testInvalidDatesCombinedMin($value)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this);
+
+        $constraint = new Range(array(
+            'min' => 'March 10, 2014',
+            'max' => 'March 20, 2014',
+            'minMessage' => 'myMinMessage',
+            'maxMessage' => 'myMaxMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        $this->assertViolation('myMinMessage', array(
+            '{{ value }}' => $value,
+            '{{ limit }}' => 'Mar 10, 2014, 12:00 AM',
         ));
     }
 

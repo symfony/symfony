@@ -61,7 +61,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance.
      */
     protected function getBarService()
     {
@@ -80,7 +80,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Baz A Baz instance.
+     * @return \Baz A Baz instance.
      */
     protected function getBazService()
     {
@@ -97,7 +97,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance.
      */
     protected function getConfiguredServiceService()
     {
@@ -117,7 +117,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance.
      */
     protected function getDecoratorServiceService()
     {
@@ -130,7 +130,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance.
      */
     protected function getDecoratorServiceWithNameService()
     {
@@ -143,7 +143,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance.
      */
     protected function getDependsOnRequestService()
     {
@@ -160,7 +160,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Bar A Bar instance.
+     * @return \Bar A Bar instance.
      */
     protected function getFactoryServiceService()
     {
@@ -173,7 +173,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance.
      */
     protected function getFooService()
     {
@@ -197,7 +197,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return BazClass A BazClass instance.
+     * @return \BazClass A BazClass instance.
      */
     protected function getFoo_BazService()
     {
@@ -211,7 +211,7 @@ class ProjectServiceContainer extends Container
     /**
      * Gets the 'foo_bar' service.
      *
-     * @return Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance.
      */
     protected function getFooBarService()
     {
@@ -224,7 +224,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Foo A Foo instance.
+     * @return \Foo A Foo instance.
      */
     protected function getFooWithInlineService()
     {
@@ -246,7 +246,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance.
      */
     protected function getMethodCall1Service()
     {

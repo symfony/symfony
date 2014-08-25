@@ -213,15 +213,15 @@ class Container implements IntrospectableContainerInterface
 
         $this->services[$id] = $service;
 
-        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
+        if (method_exists($this, $method = 'synchronize'.self::camelize($id).'Service')) {
             $this->$method();
         }
 
-        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
-            unset($this->scopedServices[$scope][$id]);
-        }
-
         if (null === $service) {
+            if (self::SCOPE_CONTAINER !== $scope) {
+                unset($this->scopedServices[$scope][$id]);
+            }
+
             unset($this->services[$id]);
         }
     }
@@ -246,7 +246,7 @@ class Container implements IntrospectableContainerInterface
         return isset($this->services[$id])
             || array_key_exists($id, $this->services)
             || isset($this->aliases[$id])
-            || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')
+            || method_exists($this, 'get'.self::camelize($id).'Service')
         ;
     }
 
@@ -298,7 +298,7 @@ class Container implements IntrospectableContainerInterface
 
         if (isset($this->methodMap[$id])) {
             $method = $this->methodMap[$id];
-        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
+        } elseif (method_exists($this, $method = 'get'.self::camelize($id).'Service')) {
             // $method is set to the right value, proceed
         } else {
             if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
@@ -450,20 +450,25 @@ class Container implements IntrospectableContainerInterface
         // the global service map
         $services = array($this->services, $this->scopedServices[$name]);
         unset($this->scopedServices[$name]);
-        foreach ($this->scopeChildren[$name] as $child) {
-            if (!isset($this->scopedServices[$child])) {
-                continue;
-            }
 
-            $services[] = $this->scopedServices[$child];
-            unset($this->scopedServices[$child]);
+        foreach ($this->scopeChildren[$name] as $child) {
+            if (isset($this->scopedServices[$child])) {
+                $services[] = $this->scopedServices[$child];
+                unset($this->scopedServices[$child]);
+            }
         }
+
+        // update global map
         $this->services = call_user_func_array('array_diff_key', $services);
 
         // check if we need to restore services of a previous scope of this type
         if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
+
+            if (count($this->scopeStacks[$name]) === 0) {
+                unset($this->scopeStacks[$name]);
+            }
 
             foreach ($services as $array) {
                 foreach ($array as $id => $service) {

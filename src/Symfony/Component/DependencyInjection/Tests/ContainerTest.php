@@ -493,7 +493,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Exception
-     * @expectedExceptionMessage 'Something went terribly wrong!'
+     * @expectedExceptionMessage Something went terribly wrong!
      */
     public function testGetThrowsException()
     {

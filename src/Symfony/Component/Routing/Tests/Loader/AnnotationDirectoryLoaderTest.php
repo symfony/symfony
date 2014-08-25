@@ -70,7 +70,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
             ->will($this->returnValue($routeDatas));
 
         $routeCollection = $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
-        $expectedOrder = array('foo', 'bar', 'home', 'login', 'static_contact', 'static_location', 'static_id');
+        $expectedOrder = array( 'static_contact', 'static_location', 'static_id', 'foo', 'bar', 'home', 'login');
         $this->assertEquals($expectedOrder, array_keys($routeCollection->all()));
     }
 }

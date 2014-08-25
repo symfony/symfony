@@ -133,8 +133,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
                     if ($annot->getOption('priority')) {
+                        //These routes will be added to the collection later in File or Directory Loader
                         $this->routesWithPriority[$annot->getOption('priority')][]
                             = array($annot, $globals, $class, $method);
+                        continue;
                     }
                     $this->addRoute($collection, $annot, $globals, $class, $method);
                 }
@@ -144,7 +146,16 @@ abstract class AnnotationClassLoader implements LoaderInterface
         return $collection;
     }
 
-    public function addPriorityRoutes()
+    /**
+     * Create a new collection of routes with priority
+     * These routes will be already sorted by priority
+     * and after that append all the other routes which
+     * don't have any priority
+     *
+     * @param $originalCollection
+     * @return RouteCollection
+     */
+    public function addPriorityRoutes($originalCollection)
     {
         krsort($this->routesWithPriority);
         $collection = new RouteCollection();
@@ -154,6 +165,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
                 $this->addRoute($collection, $route[0], $route[1], $route[2], $route[3]);
             }
         }
+        $collection->addCollection($originalCollection);
 
         return $collection;
     }

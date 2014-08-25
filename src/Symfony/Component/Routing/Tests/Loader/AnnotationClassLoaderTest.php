@@ -91,11 +91,6 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foo'), 'condition' => 'context.getMethod() == "GET"'),
                 array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3')
             ),
-            array(
-                'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
-                array('name' => 'route_priority', 'options' => array('priority' => 10)),
-                array('arg2' => 'defaultValue2', 'arg3' =>'defaultValue3'),
-            ),
         );
     }
 

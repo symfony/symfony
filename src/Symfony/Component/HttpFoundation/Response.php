@@ -372,6 +372,11 @@ class Response
      */
     public function send()
     {
+        
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
         $this->sendHeaders();
         $this->sendContent();
 

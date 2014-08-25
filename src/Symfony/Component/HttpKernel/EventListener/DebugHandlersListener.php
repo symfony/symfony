@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\AbstractExceptionHandler;
+use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -37,9 +37,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      */
     public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $debug = true)
     {
-        if (is_callable($exceptionHandler)) {
-            $this->exceptionHandler = $exceptionHandler;
-        }
+        $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
         $this->levels = $levels;
         $this->debug = $debug;
@@ -76,7 +74,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                 $handler->setExceptionHandler($h);
                 $handler = is_array($h) ? $h[0] : null;
             }
-            if ($handler instanceof AbstractExceptionHandler) {
+            if ($handler instanceof ExceptionHandler) {
                 $handler->setHandler($this->exceptionHandler);
             }
             $this->exceptionHandler = null;

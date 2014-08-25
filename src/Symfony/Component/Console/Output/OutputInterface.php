@@ -76,6 +76,42 @@ interface OutputInterface
     public function getVerbosity();
 
     /**
+     * The current verbosity of the output is quiet
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isQuiet();
+
+    /**
+     * The current verbosity of the output is verbose
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isVerbose();
+
+    /**
+     * The current verbosity of the output is very verbose
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isVeryVerbose();
+
+    /**
+     * The current verbosity of the output is debug
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function isDebug();
+
+    /**
      * Sets the decorated flag.
      *
      * @param bool    $decorated Whether to decorate the messages

@@ -466,7 +466,7 @@ class Container implements IntrospectableContainerInterface
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
 
-            if (count($this->scopeStacks[$name]) === 0) {
+            if ($this->scopeStacks[$name]->isEmpty()) {
                 unset($this->scopeStacks[$name]);
             }
 

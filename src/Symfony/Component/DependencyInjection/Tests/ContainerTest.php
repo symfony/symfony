@@ -264,48 +264,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
     }
 
-    public function testGetThrowsException()
-    {
-        $c = new ProjectServiceContainer();
-
-        try {
-            $c->get('throw_exception');
-            $this->fail();
-        } catch (\Exception $e) {
-            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
-        }
-
-        // Repeat the test, to make sure that the service wasn't improperly initialized.
-        try {
-            $c->get('throw_exception');
-            $this->fail();
-        } catch (\Exception $e) {
-            $this->assertEquals('Something went terribly wrong!', $e->getMessage());
-        }
-    }
-
-    public function testGetThrowsExceptionOnServiceConfiguration()
-    {
-        $c = new ProjectServiceContainer();
-
-        try {
-            $c->get('throws_exception_on_service_configuration');
-            $this->fail('The container can not contain invalid service!');
-        } catch (\Exception $e) {
-            $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
-        }
-        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
-
-        // Repeat the test, to make sure that the service wasn't improperly initialized.
-        try {
-            $c->get('throws_exception_on_service_configuration');
-            $this->fail('The container can not contain invalid service!');
-        } catch (\Exception $e) {
-            $this->assertEquals('Something was terribly wrong while trying to configure the service!', $e->getMessage());
-        }
-        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
-    }
-
     public function testEnterLeaveCurrentScope()
     {
         $container = new ProjectServiceContainer();
@@ -531,6 +489,45 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->hasScope('foo'));
         $c->addScope(new Scope('foo'));
         $this->assertTrue($c->hasScope('foo'));
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage 'Something went terribly wrong!'
+     */
+    public function testGetThrowsException()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throw_exception');
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+
+        // Retry, to make sure that get*Service() will be called.
+        $c->get('throw_exception');
+    }
+
+    public function testGetThrowsExceptionOnServiceConfiguration()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throws_exception_on_service_configuration');
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+
+        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
+
+        // Retry, to make sure that get*Service() will be called.
+        try {
+            $c->get('throws_exception_on_service_configuration');
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+        $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
     public function testIsScopeActive()

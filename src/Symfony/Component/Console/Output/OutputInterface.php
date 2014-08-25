@@ -75,7 +75,6 @@ interface OutputInterface
      */
     public function getVerbosity();
 
-
     /**
      * The current verbosity of the output is quiet
      *

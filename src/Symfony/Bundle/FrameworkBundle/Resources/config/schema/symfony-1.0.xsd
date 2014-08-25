@@ -20,10 +20,11 @@
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="trusted-proxy" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="trusted-host" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:all>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
-        <xsd:attribute name="trusted-proxies" type="xsd:string" />
         <xsd:attribute name="ide" type="xsd:string" />
         <xsd:attribute name="secret" type="xsd:string" />
         <xsd:attribute name="default-locale" type="xsd:string" />

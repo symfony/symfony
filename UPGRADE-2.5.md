@@ -45,6 +45,18 @@ Form
    {
    ```
 
+   Before:
+
+   ```
+   {% if form.vars.errors %}
+   ```
+
+   After:
+
+   ```
+   {% if form.vars.errors|length %}
+   ```
+
 PropertyAccess
 --------------
 

@@ -121,4 +121,18 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
         $loader->load('withdoctype.xml');
     }
+
+    public function testNullValues()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('null_values.xml');
+        $route = $routeCollection->get('blog_show');
+
+        $this->assertTrue($route->hasDefault('foo'));
+        $this->assertNull($route->getDefault('foo'));
+        $this->assertTrue($route->hasDefault('bar'));
+        $this->assertNull($route->getDefault('bar'));
+        $this->assertEquals('foo', $route->getDefault('foobar'));
+        $this->assertEquals('bar', $route->getDefault('baz'));
+    }
 }

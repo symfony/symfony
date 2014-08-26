@@ -49,7 +49,7 @@ interface VoterInterface
      * ACCESS_GRANTED, ACCESS_DENIED, or ACCESS_ABSTAIN.
      *
      * @param TokenInterface $token      A TokenInterface instance
-     * @param object         $object     The object to secure
+     * @param object|null    $object     The object to secure
      * @param array          $attributes An array of attributes associated with the method being invoked
      *
      * @return int     either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED

@@ -802,6 +802,28 @@ class FormTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testDifferentFieldTypesWithSameName()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <body>
+                    <form action="/">
+                        <input type="hidden" name="option" value="default">
+                        <input type="radio" name="option" value="A">
+                        <input type="radio" name="option" value="B">
+                        <input type="hidden" name="settings[1]" value="0">
+                        <input type="checkbox" name="settings[1]" value="1" id="setting-1">
+                        <button>klickme</button>
+                    </form>
+                </body>
+            </html>
+        ');
+        $form = new Form($dom->getElementsByTagName('form')->item(0), 'http://example.com');
+
+        $this->assertInstanceOf('Symfony\Component\DomCrawler\Field\ChoiceFormField', $form->get('option'));
+    }
+
     protected function getFormFieldMock($name, $value = null)
     {
         $field = $this

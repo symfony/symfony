@@ -30,6 +30,7 @@ class Route
     private $methods = array();
     private $schemes = array();
     private $condition;
+    private $namePrefix;
 
     /**
      * Constructor.
@@ -158,5 +159,15 @@ class Route
     public function getCondition()
     {
         return $this->condition;
+    }
+
+    public function setNamePrefix($namePrefix)
+    {
+        $this->namePrefix = $namePrefix;
+    }
+
+    public function getNamePrefix()
+    {
+        return $this->namePrefix;
     }
 }

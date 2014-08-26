@@ -45,6 +45,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             array('methods', array('GET', 'POST'), 'getMethods'),
             array('host', array('{locale}.example.com'), 'getHost'),
             array('condition', array('context.getMethod() == "GET"'), 'getCondition'),
+            array('namePrefix', array('sf2_'), 'getNamePrefix'),
         );
     }
 }

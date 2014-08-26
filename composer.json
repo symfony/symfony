@@ -87,7 +87,7 @@
         ],
         "files": [
             "src/Symfony/Component/Intl/Resources/stubs/functions.php",
-            "src/Symfony/Bundle/DebugBundle/Resources/functions/debug.php"
+            "src/Symfony/Bundle/DebugBundle/Resources/functions/dump.php"
         ]
     },
     "minimum-stability": "dev",

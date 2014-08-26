@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Debug;
 
+use Symfony\Component\VarDumper\Cloner\ExtCloner;
+use Symfony\Component\VarDumper\Cloner\PhpCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+
 /**
  * Registers all the debug tools.
  *
@@ -19,6 +24,7 @@ namespace Symfony\Component\Debug;
 class Debug
 {
     private static $enabled = false;
+    private static $dumpHandler;
 
     /**
      * Enables the debug tools.
@@ -58,5 +64,43 @@ class Debug
         }
 
         DebugClassLoader::enable();
+    }
+
+    public static function dump($var)
+    {
+        if (null === self::$dumpHandler) {
+            $cloner = extension_loaded('symfony_debug') ? new ExtCloner() : new PhpCloner();
+            $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
+            self::$dumpHandler = function ($var) use ($cloner, $dumper) {
+                $dumper->dump($cloner->cloneVar($var));
+            };
+        }
+
+        $h = self::$dumpHandler;
+
+        if (is_array($h)) {
+            return $h[0]->{$h[1]}($var);
+        }
+
+        return $h($var);
+    }
+
+    public static function setDumpHandler($callable)
+    {
+        if (!is_callable($callable)) {
+            throw new \InvalidArgumentException('Invalid PHP callback.');
+        }
+
+        $prevHandler = self::$dumpHandler;
+
+        if (is_array($callable)) {
+            if (!is_object($callable[0])) {
+                self::$dumpHandler = $callable[0].'::'.$callable[1];
+            }
+        } else {
+            self::$dumpHandler = $callable;
+        }
+
+        return $prevHandler;
     }
 }

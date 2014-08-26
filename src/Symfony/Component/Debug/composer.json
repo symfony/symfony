@@ -20,10 +20,12 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "symfony/var-dumper": "~2.6",
         "symfony/http-kernel": "~2.1",
         "symfony/http-foundation": "~2.1"
     },
     "suggest": {
+        "symfony/var-dumper": "For using Debug::dump()",
         "symfony/http-foundation": "",
         "symfony/http-kernel": ""
     },

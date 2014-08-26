@@ -21,7 +21,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutputStream = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-var-debug style=white-space:pre>';
+    protected $dumpPrefix = '<pre class=sf-dump style=white-space:pre>';
     protected $dumpSuffix = '</pre>';
     protected $colors = true;
     protected $headerIsDumped = false;
@@ -88,7 +88,7 @@ class HtmlDumper extends CliDumper
         $this->headerIsDumped = true;
         $line = $this->line;
 
-        $p = 'sf-var-debug';
+        $p = 'sf-dump';
         $this->line = '<!DOCTYPE html><style>';
         parent::dumpLine(0);
         $this->line .= "a.$p-ref {{$this->styles['ref']}}";
@@ -119,9 +119,9 @@ class HtmlDumper extends CliDumper
         if ('ref' === $style) {
             $ref = substr($val, 1);
             if ('#' === $val[0]) {
-                return "<a class=sf-var-debug-ref name=\"sf-var-debug-ref$ref\">$val</a>";
+                return "<a class=sf-dump-ref name=\"sf-dump-ref$ref\">$val</a>";
             } else {
-                return "<a class=sf-var-debug-ref href=\"#sf-var-debug-ref$ref\">$val</a>";
+                return "<a class=sf-dump-ref href=\"#sf-dump-ref$ref\">$val</a>";
             }
         }
 
@@ -131,12 +131,12 @@ class HtmlDumper extends CliDumper
             foreach (static::$controlChars as $c) {
                 if (false !== strpos($val, $c)) {
                     $r = "\x7F" === $c ? '?' : chr(64 + ord($c));
-                    $val = str_replace($c, "<span class=sf-var-debug-cchr>$r</span>", $val);
+                    $val = str_replace($c, "<span class=sf-dump-cchr>$r</span>", $val);
                 }
             }
         }
 
-        return "<span class=sf-var-debug-$style>$val</span>";
+        return "<span class=sf-dump-$style>$val</span>";
     }
 
     /**
@@ -150,7 +150,7 @@ class HtmlDumper extends CliDumper
 
         switch ($this->lastDepth - $depth) {
             case +1: $this->line = '</span>'.$this->line; break;
-            case -1: $this->line = "<span class=sf-var-debug-$depth>$this->line"; break;
+            case -1: $this->line = "<span class=sf-dump-$depth>$this->line"; break;
         }
 
         if (-1 === $this->lastDepth) {

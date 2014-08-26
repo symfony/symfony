@@ -50,7 +50,7 @@ class UndefinedMethodFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined method SplObjectStorage::walid()',
                 ),
-                'Attempted to call method "walid" on class "SplObjectStorage". Did you mean to call "valid"?',
+                "Attempted to call method \"walid\" on class \"SplObjectStorage\".\nDid you mean to call \"valid\"?",
             ),
             array(
                 array(
@@ -59,7 +59,7 @@ class UndefinedMethodFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Call to undefined method SplObjectStorage::offsetFet()',
                 ),
-                'Attempted to call method "offsetFet" on class "SplObjectStorage". Did you mean to call e.g. "offsetGet", "offsetSet" or "offsetUnset"?',
+                "Attempted to call method \"offsetFet\" on class \"SplObjectStorage\".\nDid you mean to call e.g. \"offsetGet\", \"offsetSet\" or \"offsetUnset\"?",
             ),
         );
     }

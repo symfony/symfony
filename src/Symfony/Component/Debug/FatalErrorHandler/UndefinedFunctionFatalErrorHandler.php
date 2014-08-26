@@ -76,7 +76,7 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
             } else {
                 $candidates = '"'.$last;
             }
-            $message .= ' Did you mean to call '.$candidates;
+            $message .= "\nDid you mean to call ".$candidates;
         }
 
         return new UndefinedFunctionException($message, $exception);

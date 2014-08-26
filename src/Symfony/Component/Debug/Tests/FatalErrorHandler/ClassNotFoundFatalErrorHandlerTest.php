@@ -41,7 +41,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'WhizBangFactory\' not found',
                 ),
-                'Attempted to load class "WhizBangFactory" from the global namespace. Did you forget a "use" statement?',
+                "Attempted to load class \"WhizBangFactory\" from the global namespace.\nDid you forget a \"use\" statement?",
             ),
             array(
                 array(
@@ -50,7 +50,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'Foo\\Bar\\WhizBangFactory\' not found',
                 ),
-                'Attempted to load class "WhizBangFactory" from namespace "Foo\\Bar". Did you forget a "use" statement for another namespace?',
+                "Attempted to load class \"WhizBangFactory\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
             ),
             array(
                 array(
@@ -59,7 +59,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'UndefinedFunctionException\' not found',
                 ),
-                'Attempted to load class "UndefinedFunctionException" from the global namespace. Did you forget a "use" statement for "Symfony\Component\Debug\Exception\UndefinedFunctionException"?',
+                "Attempted to load class \"UndefinedFunctionException\" from the global namespace.\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
             ),
             array(
                 array(
@@ -68,7 +68,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'PEARClass\' not found',
                 ),
-                'Attempted to load class "PEARClass" from the global namespace. Did you forget a "use" statement for "Symfony_Component_Debug_Tests_Fixtures_PEARClass"?',
+                "Attempted to load class \"PEARClass\" from the global namespace.\nDid you forget a \"use\" statement for \"Symfony_Component_Debug_Tests_Fixtures_PEARClass\"?",
             ),
             array(
                 array(
@@ -77,7 +77,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
                 ),
-                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar". Did you forget a "use" statement for "Symfony\Component\Debug\Exception\UndefinedFunctionException"?',
+                "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\Bar\".\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
             ),
         );
     }

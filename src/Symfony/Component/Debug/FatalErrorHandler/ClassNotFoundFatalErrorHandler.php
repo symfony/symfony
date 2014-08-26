@@ -67,7 +67,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                     $tail = ' for "'.$tail;
                 }
             }
-            $message .= ' Did you forget a "use" statement'.$tail;
+            $message .= "\nDid you forget a \"use\" statement".$tail;
 
             return new ClassNotFoundException($message, $exception);
         }

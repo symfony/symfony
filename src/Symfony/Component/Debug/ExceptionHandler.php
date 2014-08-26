@@ -210,9 +210,11 @@ class ExceptionHandler
                     $class = $this->formatClass($e['class']);
                     $message = nl2br(self::utf8Htmlize($e['message']));
                     $content .= sprintf(<<<EOF
-                        <div class="block_exception clear_fix">
-                            <h2><span>%d/%d</span> %s%s:<br />%s</h2>
-                        </div>
+                        <h2 class="block_exception clear_fix">
+                            <span class="exception_counter">%d/%d</span>
+                            <span class="exception_title">%s%s:</span>
+                            <span class="exception_message">%s</span>
+                        </h2>
                         <div class="block">
                             <ol class="traces list_exception">
 
@@ -269,12 +271,14 @@ EOF;
             .sf-reset abbr { border-bottom: 1px dotted #000; cursor: help; }
             .sf-reset p { font-size:14px; line-height:20px; color:#868686; padding-bottom:20px }
             .sf-reset strong { font-weight:bold; }
-            .sf-reset a { color:#6c6159; }
+            .sf-reset a { color:#6c6159; cursor: default; }
             .sf-reset a img { border:none; }
             .sf-reset a:hover { text-decoration:underline; }
             .sf-reset em { font-style:italic; }
             .sf-reset h1, .sf-reset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
-            .sf-reset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
+            .sf-reset .exception_counter { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; float: left; display: block; }
+            .sf-reset .exception_title { margin-left: 3em; margin-bottom: 0.7em; display: block; }
+            .sf-reset .exception_message { margin-left: 3em; display: block; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 -webkit-border-bottom-right-radius: 16px;
@@ -352,10 +356,10 @@ EOF;
         if ($linkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) {
             $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
 
-            return sprintf(' <a href="%s" title="Go to source">in %s line %d</a>', $link, $file, $line);
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
         }
 
-        return sprintf(' <a title="in %s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">in %s line %d</a>', $path, $file, $line);
+        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
     }
 
     /**

@@ -742,8 +742,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $testDir = self::$tmpDir.DIRECTORY_SEPARATOR.'foo';
         chmod($testDir, 0333);
 
-        if (false === ($couldRead = is_readable($testDir))) {
-
+        if (false === $couldRead = is_readable($testDir)) {
             try {
                 $this->assertIterator($this->toAbsolute(array('foo bar', 'test.php', 'test.py')), $finder->getIterator());
                 $this->fail('Finder should throw an exception when opening a non-readable directory.');

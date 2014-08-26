@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-22T08:50:00Z
+
+Great!
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-22T08:59:08Z
+
+You need to update the XML schema definition too.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-22T09:12:34Z
+
+@xabbuh Thanks. I update the XML schema. Can you double check, I never did that before...
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T09:16:17Z
+
+you are missing the usage of the type to define the element using it in the ``config`` type:
+
+```xml
+<xsd:element name="property-accessor" type="property_accessor" minOccurs="0" maxOccurs="1" />
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-22T10:08:14Z
+
+@stof  Done. But other block misses `minOccurs` and co ...
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T10:16:15Z
+
+@lyrixx nope. The issue is that what you did is not what I asked for. the definition of the ``property_accessor`` complexType was right before. what was missing was the usage of this complexType to say that the ``config`` type (defined at the beginning of the XSD) can have a ``property-accessor`` child appearing 0 or 1 times and using this ``property_accessor`` type.
+
+your current XSD is allowing to put ``property-accessor`` as a top-level element in the config, not as a child of ``<config>``, which is wrong.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-22T11:40:04Z
+
+@stof Thanks. It should be ok now. I just rename `property_accessor` to `property_access`. Is it ok now ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T12:00:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-22T13:17:27Z
+
+:+1:

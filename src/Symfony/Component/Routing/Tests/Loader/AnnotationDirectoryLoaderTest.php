@@ -56,6 +56,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
     {
         $routeDatas = array(
             'foo' => new Route(array('name' => 'foo', 'path' => '/foo')),
+            'unimportant' => new Route(array('name' => 'unimportant', 'path' => '/unimportant', 'options' => array('priority' => -10))),
             'bar' => new Route(array('name' => 'bar', 'path' => '/bar')),
             'static_id' => new Route(array('name' => 'static_id', 'path' => '/static/{id}', 'options' => array('priority' => 1))),
             'home' => new Route(array('name' => 'home', 'path' => '/home')),
@@ -70,7 +71,7 @@ class AnnotationDirectoryLoaderTest extends AbstractAnnotationLoaderTest
             ->will($this->returnValue($routeDatas));
 
         $routeCollection = $this->loader->load(__DIR__.'/../Fixtures/AnnotatedClasses');
-        $expectedOrder = array( 'static_contact', 'static_location', 'static_id', 'foo', 'bar', 'home', 'login');
+        $expectedOrder = array( 'static_contact', 'static_location', 'static_id', 'foo', 'bar', 'home', 'login', 'unimportant');
         $this->assertEquals($expectedOrder, array_keys($routeCollection->all()));
     }
 }

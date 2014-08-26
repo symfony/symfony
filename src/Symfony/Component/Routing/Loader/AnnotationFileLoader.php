@@ -65,9 +65,7 @@ class AnnotationFileLoader extends FileLoader
             $collection->addCollection($this->loader->load($class, $type));
         }
 
-        if ($this->loader->hasRoutesWithPriority()) {
-            $collection = $this->loader->addPriorityRoutes($collection);
-        }
+        $collection = $this->loader->addPriorityRoutes($collection);
 
         return $collection;
     }

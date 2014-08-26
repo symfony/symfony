@@ -97,11 +97,6 @@ abstract class AnnotationClassLoader implements LoaderInterface
         $this->routeAnnotationClass = $class;
     }
 
-    public function hasRoutesWithPriority()
-    {
-        return !empty($this->routesWithPriority);
-    }
-
     /**
      * Loads from annotations from a class.
      *
@@ -132,40 +127,32 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->defaultRouteIndex = 0;
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
-                    if ($annot->getOption('priority')) {
-                        //These routes will be added to the collection later in File or Directory Loader
-                        $this->routesWithPriority[$annot->getOption('priority')][]
-                            = array($annot, $globals, $class, $method);
-                        continue;
-                    }
-                    $this->addRoute($collection, $annot, $globals, $class, $method);
+                    $priority = (int) $annot->getOption('priority');
+                    $this->routesWithPriority[$priority][] = array($annot, $globals, $class, $method);
                 }
             }
         }
+
+        $collection = $this->addPriorityRoutes($collection);
 
         return $collection;
     }
 
     /**
-     * Create a new collection of routes with priority
-     * These routes will be already sorted by priority
-     * and after that append all the other routes which
-     * don't have any priority
+     * Add the prioritised routes to the collection
      *
-     * @param $originalCollection
+     * @param $collection
      * @return RouteCollection
      */
-    public function addPriorityRoutes($originalCollection)
+    public function addPriorityRoutes($collection)
     {
         krsort($this->routesWithPriority);
-        $collection = new RouteCollection();
 
         foreach ($this->routesWithPriority as $priorityGroup) {
             foreach ($priorityGroup as $route) {
                 $this->addRoute($collection, $route[0], $route[1], $route[2], $route[3]);
             }
         }
-        $collection->addCollection($originalCollection);
 
         return $collection;
     }

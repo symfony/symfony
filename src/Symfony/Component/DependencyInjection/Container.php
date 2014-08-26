@@ -213,7 +213,7 @@ class Container implements IntrospectableContainerInterface
 
         $this->services[$id] = $service;
 
-        if (method_exists($this, $method = 'synchronize'.self::camelize($id).'Service')) {
+        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
             $this->$method();
         }
 
@@ -246,7 +246,7 @@ class Container implements IntrospectableContainerInterface
         return isset($this->services[$id])
             || array_key_exists($id, $this->services)
             || isset($this->aliases[$id])
-            || method_exists($this, 'get'.self::camelize($id).'Service')
+            || method_exists($this, 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')
         ;
     }
 
@@ -298,7 +298,7 @@ class Container implements IntrospectableContainerInterface
 
         if (isset($this->methodMap[$id])) {
             $method = $this->methodMap[$id];
-        } elseif (method_exists($this, $method = 'get'.self::camelize($id).'Service')) {
+        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
             // $method is set to the right value, proceed
         } else {
             if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {

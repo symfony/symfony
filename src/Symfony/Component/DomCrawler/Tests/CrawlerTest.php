@@ -400,8 +400,8 @@ EOF
         $this->assertCount(1, $crawler->filterXPath('//body'));
         $this->assertCount(1, $crawler->filterXPath('descendant-or-self::body'));
         $this->assertCount(1, $crawler->filterXPath('//div[@id="parent"]')->filterXPath('./div'), 'A child selection finds only the current div');
-        $this->assertCount(2, $crawler->filterXPath('//div[@id="parent"]')->filterXPath('descendant::div'), 'A descendant selector matches the current div and its child');
-        $this->assertCount(2, $crawler->filterXPath('//div[@id="parent"]')->filterXPath('//div'), 'A descendant selector matches the current div and its child');
+        $this->assertCount(3, $crawler->filterXPath('//div[@id="parent"]')->filterXPath('descendant::div'), 'A descendant selector matches the current div and its child');
+        $this->assertCount(3, $crawler->filterXPath('//div[@id="parent"]')->filterXPath('//div'), 'A descendant selector matches the current div and its child');
         $this->assertCount(5, $crawler->filterXPath('(//a | //div)//img'));
         $this->assertCount(7, $crawler->filterXPath('((//a | //div)//img | //ul)'));
         $this->assertCount(7, $crawler->filterXPath('( ( //a | //div )//img | //ul )'));
@@ -472,72 +472,104 @@ EOF
         $this->assertSame('Music', $crawler->text());
     }
 
+    public function testFilterXPathWithFakeRoot()
+    {
+        $crawler = $this->createTestCrawler();
+        $this->assertCount(0, $crawler->filterXPath('.'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+        $this->assertCount(0, $crawler->filterXPath('/_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+        $this->assertCount(0, $crawler->filterXPath('self::*'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+        $this->assertCount(0, $crawler->filterXPath('self::_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
+    }
+
     public function testFilterXPathWithAncestorAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
-        $this->assertCount(2, $crawler->filterXPath('ancestor::*'));
+        $this->assertCount(0, $crawler->filterXPath('ancestor::*'), 'The fake root node has no ancestor nodes');
     }
 
     public function testFilterXPathWithAncestorOrSelfAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
-        $this->assertCount(3, $crawler->filterXPath('ancestor-or-self::*'));
+        $this->assertCount(0, $crawler->filterXPath('ancestor-or-self::*'), 'The fake root node has no ancestor nodes');
     }
 
     public function testFilterXPathWithAttributeAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
-        $this->assertCount(2, $crawler->filterXPath('attribute::*'));
+        $this->assertCount(0, $crawler->filterXPath('attribute::*'), 'The fake root node has no attribute nodes');
+    }
+
+    public function testFilterXPathWithAttributeAxisAfterElementAxis()
+    {
+        $this->assertCount(3, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
     }
 
     public function testFilterXPathWithChildAxis()
     {
-        $crawler = $this->createTestCrawler()->filterXPath('//body');
+        $crawler = $this->createTestCrawler()->filterXPath('//div[@id="parent"]');
 
-        $this->assertCount(2, $crawler->filterXPath('child::input'));
+        $this->assertCount(1, $crawler->filterXPath('child::div'), 'A child selection finds only the current div');
     }
 
     public function testFilterXPathWithFollowingAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//a');
 
-        $this->assertCount(3, $crawler->filterXPath('following::div'));
+        $this->assertCount(0, $crawler->filterXPath('following::div'), 'The fake root node has no following nodes');
     }
 
     public function testFilterXPathWithFollowingSiblingAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//a');
 
-        $this->assertCount(2, $crawler->filterXPath('following-sibling::div'));
+        $this->assertCount(0, $crawler->filterXPath('following-sibling::div'), 'The fake root node has no following nodes');
+    }
+
+    public function testFilterXPathWithNamespaceAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//button');
+
+        $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'The fake root node has no namespace nodes');
+    }
+
+    public function testFilterXPathWithNamespaceAxisAfterElementAxis()
+    {
+        $crawler = $this->createTestCrawler()->filterXPath('//div[@id="parent"]/namespace::*');
+
+        $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'Namespace axes cannot be requested');
     }
 
     public function testFilterXPathWithParentAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//button');
 
-        $this->assertEquals('foo', $crawler->filterXPath('parent::*')->attr('action'));
+        $this->assertCount(0, $crawler->filterXPath('parent::*'), 'The fake root node has no parent nodes');
     }
 
     public function testFilterXPathWithPrecedingAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
-        $this->assertCount(13, $crawler->filterXPath('preceding::*'));
+        $this->assertCount(0, $crawler->filterXPath('preceding::*'), 'The fake root node has no preceding nodes');
     }
 
     public function testFilterXPathWithPrecedingSiblingAxis()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
-        $this->assertCount(9, $crawler->filterXPath('preceding-sibling::*'));
+        $this->assertCount(0, $crawler->filterXPath('preceding-sibling::*'), 'The fake root node has no preceding nodes');
     }
 
     public function testFilterXPathWithSelfAxes()
     {
-        $this->assertCount(1, $this->createTestCrawler()->filterXPath('self::*'));
+        $crawler = $this->createTestCrawler()->filterXPath('//a');
+
+        $this->assertCount(0, $crawler->filterXPath('self::a'), 'The fake root node has no "real" element name');
+        $this->assertCount(0, $crawler->filterXPath('self::a/img'), 'The fake root node has no "real" element name');
+        $this->assertCount(9, $crawler->filterXPath('self::*/a'));
     }
 
     /**
@@ -947,6 +979,7 @@ HTML;
                     </ul>
                     <div id="parent">
                         <div id="child"></div>
+                        <div id="child2" xmlns:foo="http://example.com"></div>
                     </div>
                     <div id="sibling"><img /></div>
                 </body>

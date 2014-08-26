@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-25T15:23:57Z
+
+Can you share some screenshots (before/after) with us?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-25T15:30:23Z
+
+Current master:
+![capture du 2014-08-25 17 27 32](https://cloud.githubusercontent.com/assets/243674/4032052/8ad967f6-2c6c-11e4-8604-78a8b15de5ec.png)
+
+Enhanced fall-back error page:
+![capture du 2014-08-25 17 28 22](https://cloud.githubusercontent.com/assets/243674/4032072/9dfe8fe6-2c6c-11e4-9c2f-6f07eb8806fc.png)
+
+And for fatal errors that are re-injectable, this was supposed to work but a wrong type hint prevented it:
+![capture du 2014-08-25 17 28 36](https://cloud.githubusercontent.com/assets/243674/4032091/b99348dc-2c6c-11e4-8111-5e874b51d4cb.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:25:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-26T16:00:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T17:29:51Z
+
+This is only for master?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-26T17:32:40Z
+
+Yep, the feature has been introduced here: https://github.com/symfony/symfony/commit/1701447c858f2ca5fb9a1d5be880366dee153991

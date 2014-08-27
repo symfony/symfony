@@ -54,7 +54,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         $trace = PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS : true;
         if (PHP_VERSION_ID >= 50400) {
-            $trace = debug_backtrace($trace, 6);
+            $trace = debug_backtrace($trace, 7);
         } else {
             $trace = debug_backtrace($trace);
         }
@@ -72,10 +72,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $file = $trace[$i]['file'];
                 $line = $trace[$i]['line'];
 
-                while (++$i < 6) {
-                    if (isset($trace[$i]['function']) && empty($trace[$i]['class'])) {
+                while (++$i < 7) {
+                    if (isset($trace[$i]['function']) && empty($trace[$i]['class']) && 'call_user_func' !== $trace[$i]['function']) {
                         $file = $trace[$i]['file'];
                         $line = $trace[$i]['line'];
+
                         break;
                     } elseif (isset($trace[$i]['object']) && $trace[$i]['object'] instanceof \Twig_Template) {
                         $info = $trace[$i]['object'];

@@ -62,7 +62,7 @@ class DumpNode extends \Twig_Node
         } else {
             $compiler
                 ->addDebugInfo($this)
-                ->write('\Symfony\Component\VarDumper\VarDumper::dump(array(')
+                ->write('\Symfony\Component\VarDumper\VarDumper::dump(array('."\n")
                 ->indent()
             ;
             foreach ($values as $node) {
@@ -80,13 +80,13 @@ class DumpNode extends \Twig_Node
             }
             $compiler
                 ->outdent()
-                ->raw("));\n")
+                ->write("));\n")
             ;
         }
 
         $compiler
             ->outdent()
-            ->write("}\n")
+            ->raw("}\n")
         ;
     }
 }

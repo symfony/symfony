@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
-use Symfony\Component\Debug\Debug;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Configures dump() handler.
@@ -43,11 +43,11 @@ class DumpListener implements EventSubscriberInterface
             $dumper = $this->dumper;
             $this->container = null;
 
-            Debug::setDumpHandler(function ($var) use ($container, $dumper) {
+            VarDumper::setHandler(function ($var) use ($container, $dumper) {
                 $dumper = $container->get($dumper);
                 $cloner = $container->get('var_dumper.cloner');
                 $handler = function ($var) use ($dumper, $cloner) {$dumper->dump($cloner->cloneVar($var));};
-                Debug::setDumpHandler($handler);
+                VarDumper::setHandler($handler);
                 $handler($var);
             });
         }

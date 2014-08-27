@@ -35,12 +35,12 @@
                 <target>En eller flere av de oppgitte verdier er ugyldige.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Feltene {{ fields }} var ikke forventet.</target>
+                <source>This field was not expected.</source>
+                <target>Dette feltet ikke var forventet.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Feltene {{ fields }} mangler.</target>
+                <source>This field is missing.</source>
+                <target>Dette feltet mangler.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

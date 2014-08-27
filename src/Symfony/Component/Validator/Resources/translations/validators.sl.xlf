@@ -35,12 +35,12 @@
                 <target>Ena ali več podanih vrednosti ni veljavnih.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Polja {{ fields }} niso bila pričakovana.</target>
+                <source>This field was not expected.</source>
+                <target>To polje ni bilo pričakovati.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Polja {{ fields }} manjkajo.</target>
+                <source>This field is missing.</source>
+                <target>To polje manjka.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

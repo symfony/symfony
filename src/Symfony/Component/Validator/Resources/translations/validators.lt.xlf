@@ -35,12 +35,12 @@
                 <target>Viena ar daugiau įvestų reikšmių yra netinkamos.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Laukai {{ fields }} yra nenumatyti.</target>
+                <source>This field was not expected.</source>
+                <target>Nebuvo tikimasi Šis laukas.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Trūkstami laukai {{ fields }}.</target>
+                <source>This field is missing.</source>
+                <target>Šiame lauke yra dingęs.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

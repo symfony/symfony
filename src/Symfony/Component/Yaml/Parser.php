@@ -196,13 +196,27 @@ class Parser
                 // 1-liner optionally followed by newline
                 $lineCount = count($this->lines);
                 if (1 === $lineCount || (2 === $lineCount && empty($this->lines[1]))) {
-                    try {
-                        $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport);
-                    } catch (ParseException $e) {
-                        $e->setParsedLine($this->getRealCurrentLineNb() + 1);
-                        $e->setSnippet($this->currentLine);
+                    $line = $this->lines[0];
+                    $value = null;
 
-                        throw $e;
+                    if (in_array($line[0], array('"', "'")) && false !== strpos($line, ': ')) {
+                        // mapping?
+                        try {
+                            $value = Inline::parse('{'.$line.'}');
+                        } catch (ParseException $e) {
+                            // no, it's not
+                        }
+                    }
+
+                    if (null === $value) {
+                        try {
+                            $value = Inline::parse($line, $exceptionOnInvalidType, $objectSupport);
+                        } catch (ParseException $e) {
+                            $e->setParsedLine($this->getRealCurrentLineNb() + 1);
+                            $e->setSnippet($this->currentLine);
+
+                            throw $e;
+                        }
                     }
 
                     if (is_array($value)) {

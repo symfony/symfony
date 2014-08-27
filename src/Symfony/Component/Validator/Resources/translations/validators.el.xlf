@@ -35,12 +35,12 @@
                 <target>Μια ή περισσότερες τιμές δεν είναι έγκυρες.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Τα πεδία {{ fields }} δεν ήταν αναμενόμενα.</target>
+                <source>This field was not expected.</source>
+                <target>Αυτό το πεδίο δεν ήταν αναμενόμενο.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Τα πεδία {{ fields }} απουσιάζουν.</target>
+                <source>This field is missing.</source>
+                <target>Λείπει αυτό το πεδίο.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

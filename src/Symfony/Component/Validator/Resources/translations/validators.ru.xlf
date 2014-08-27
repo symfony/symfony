@@ -35,12 +35,12 @@
                 <target>Одно или несколько заданных значений недопустимо.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Поля {{ fields }} не ожидались.</target>
+                <source>This field was not expected.</source>
+                <target>Это поле не ожидалось.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Поля {{ fields }} отсутствуют.</target>
+                <source>This field is missing.</source>
+                <target>Это поле отсутствует.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

@@ -53,7 +53,7 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
     public function testPrepareWithHeadRequest()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
-        $request = Request::create('/', 'HEAD');
+        $request = Request::create('/', Request::METHOD_HEAD);
 
         $response->prepare($request);
     }

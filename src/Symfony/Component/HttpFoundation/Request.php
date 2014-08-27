@@ -35,6 +35,17 @@ class Request
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT  = 'client_port';
 
+    const METHOD_HEAD    = 'HEAD';
+    const METHOD_GET     = 'GET';
+    const METHOD_POST    = 'POST';
+    const METHOD_PUT     = 'PUT';
+    const METHOD_PATCH   = 'PATCH';
+    const METHOD_DELETE  = 'DELETE';
+    const METHOD_PURGE   = 'PURGE';
+    const METHOD_OPTIONS = 'OPTIONS';
+    const METHOD_TRACE   = 'TRACE';
+    const METHOD_CONNECT = 'CONNECT';
+
     protected static $trustedProxies = array();
 
     /**
@@ -271,7 +282,7 @@ class Request
         $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
-            && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))
+            && in_array(strtoupper($request->server->get('REQUEST_METHOD', self::METHOD_GET)), array(self::METHOD_PUT, self::METHOD_DELETE, self::METHOD_PATCH))
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -298,7 +309,7 @@ class Request
      *
      * @api
      */
-    public static function create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
+    public static function create($uri, $method = self::METHOD_GET, $parameters = array(), $cookies = array(), $files = array(), $server = array(), $content = null)
     {
         $server = array_replace(array(
             'SERVER_NAME'          => 'localhost',
@@ -352,14 +363,14 @@ class Request
         }
 
         switch (strtoupper($method)) {
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
+            case self::METHOD_POST:
+            case self::METHOD_PUT:
+            case self::METHOD_DELETE:
                 if (!isset($server['CONTENT_TYPE'])) {
                     $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
                 }
                 // no break
-            case 'PATCH':
+            case self::METHOD_PATCH:
                 $request = $parameters;
                 $query = array();
                 break;
@@ -1230,13 +1241,13 @@ class Request
     public function getMethod()
     {
         if (null === $this->method) {
-            $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+            $this->method = strtoupper($this->server->get('REQUEST_METHOD', self::METHOD_GET));
 
-            if ('POST' === $this->method) {
+            if (self::METHOD_POST === $this->method) {
                 if ($method = $this->headers->get('X-HTTP-METHOD-OVERRIDE')) {
                     $this->method = strtoupper($method);
                 } elseif (self::$httpMethodParameterOverride) {
-                    $this->method = strtoupper($this->request->get('_method', $this->query->get('_method', 'POST')));
+                    $this->method = strtoupper($this->request->get('_method', $this->query->get('_method', self::METHOD_POST)));
                 }
             }
         }
@@ -1253,7 +1264,7 @@ class Request
      */
     public function getRealMethod()
     {
-        return strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
+        return strtoupper($this->server->get('REQUEST_METHOD', self::METHOD_GET));
     }
 
     /**
@@ -1424,7 +1435,7 @@ class Request
      */
     public function isMethodSafe()
     {
-        return in_array($this->getMethod(), array('GET', 'HEAD'));
+        return in_array($this->getMethod(), array(self::METHOD_GET, self::METHOD_HEAD));
     }
 
     /**

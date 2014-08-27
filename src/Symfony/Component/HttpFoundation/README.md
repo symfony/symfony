@@ -17,7 +17,7 @@ variables:
 
 You can also create a Request directly -- that's interesting for unit testing:
 
-    $request = Request::create('/?foo=bar', 'GET');
+    $request = Request::create('/?foo=bar', Request::METHOD_GET);
     echo $request->getPathInfo();
 
 And here is how to create and send a Response:

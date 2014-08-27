@@ -133,7 +133,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsNotModifiedNotSafe()
     {
-        $request = Request::create('/homepage', 'POST');
+        $request = Request::create('/homepage', Request::METHOD_POST);
 
         $response = new Response();
         $this->assertFalse($response->isNotModified($request));
@@ -426,7 +426,7 @@ class ResponseTest extends ResponseTestCase
     public function testPrepareRemovesContentForHeadRequests()
     {
         $response = new Response('foo');
-        $request = Request::create('/', 'HEAD');
+        $request = Request::create('/', Request::METHOD_HEAD);
 
         $length = 12345;
         $response->headers->set('Content-Length', $length);
@@ -472,7 +472,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testPrepareSetsPragmaOnHttp10Only()
     {
-        $request = Request::create('/', 'GET');
+        $request = Request::create('/', Request::METHOD_GET);
         $request->server->set('SERVER_PROTOCOL', 'HTTP/1.0');
 
         $response = new Response('foo');

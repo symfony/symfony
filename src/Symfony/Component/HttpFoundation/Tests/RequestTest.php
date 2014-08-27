@@ -107,7 +107,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
 
-        $request = Request::create('http://test.com/foo', Request::METHOD_GET, array('bar' => 'baz'));
+        $request = Request::create('http://test.com/foo', 'GET', array('bar' => 'baz'));
         $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('bar=baz', $request->getQueryString());
@@ -115,7 +115,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test.com', $request->getHttpHost());
         $this->assertFalse($request->isSecure());
 
-        $request = Request::create('http://test.com/foo?bar=foo', Request::METHOD_GET, array('bar' => 'baz'));
+        $request = Request::create('http://test.com/foo?bar=foo', 'GET', array('bar' => 'baz'));
         $this->assertEquals('http://test.com/foo?bar=baz', $request->getUri());
         $this->assertEquals('/foo', $request->getPathInfo());
         $this->assertEquals('bar=baz', $request->getQueryString());
@@ -172,7 +172,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->isSecure());
 
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
-        $request = Request::create('http://example.com/jsonrpc', Request::METHOD_POST, array(), array(), array(), array(), $json);
+        $request = Request::create('http://example.com/jsonrpc', 'POST', array(), array(), array(), array(), $json);
         $this->assertEquals($json, $request->getContent());
         $this->assertFalse($request->isSecure());
 
@@ -231,7 +231,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testCreateCheckPrecedence()
     {
         // server is used by default
-        $request = Request::create('/', Request::METHOD_DELETE, array(), array(), array(), array(
+        $request = Request::create('/', 'DELETE', array(), array(), array(), array(
             'HTTP_HOST'     => 'example.com',
             'HTTPS'         => 'on',
             'SERVER_PORT'   => 443,
@@ -249,7 +249,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('application/json', $request->headers->get('CONTENT_TYPE'));
 
         // URI has precedence over server
-        $request = Request::create('http://thomas:pokemon@example.net:8080/?foo=bar', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://thomas:pokemon@example.net:8080/?foo=bar', 'GET', array(), array(), array(), array(
             'HTTP_HOST'   => 'example.com',
             'HTTPS'       => 'on',
             'SERVER_PORT' => 443,
@@ -695,7 +695,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPort()
     {
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'https',
             'HTTP_X_FORWARDED_PORT' => '443'
         ));
@@ -704,7 +704,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(80, $port, 'Without trusted proxies FORWARDED_PROTO and FORWARDED_PORT are ignored.');
 
         Request::setTrustedProxies(array('1.1.1.1'));
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'https',
             'HTTP_X_FORWARDED_PORT'  => '8443'
         ));
@@ -712,33 +712,33 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precedence.');
 
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'https'
         ));
         $port = $request->getPort();
 
         $this->assertEquals(443, $port, 'With only PROTO set getPort() defaults to 443.');
 
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'http'
         ));
         $port = $request->getPort();
 
         $this->assertEquals(80, $port, 'If X_FORWARDED_PROTO is set to HTTP return 80.');
 
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'On'
         ));
         $port = $request->getPort();
         $this->assertEquals(443, $port, 'With only PROTO set and value is On, getPort() defaults to 443.');
 
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => '1'
         ));
         $port = $request->getPort();
         $this->assertEquals(443, $port, 'With only PROTO set and value is 1, getPort() defaults to 443.');
 
-        $request = Request::create('http://example.com', Request::METHOD_GET, array(), array(), array(), array(
+        $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'something-else'
         ));
         $port = $request->getPort();
@@ -765,23 +765,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $this->assertEquals(Request::METHOD_GET, $request->getMethod(), '->getMethod() returns GET if no method is defined');
+        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns GET if no method is defined');
 
         $request->setMethod('get');
-        $this->assertEquals(Request::METHOD_GET, $request->getMethod(), '->getMethod() returns an uppercased string');
+        $this->assertEquals('GET', $request->getMethod(), '->getMethod() returns an uppercased string');
 
-        $request->setMethod(Request::METHOD_PURGE);
-        $this->assertEquals(Request::METHOD_PURGE, $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
+        $request->setMethod('PURGE');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method even if it is not a standard one');
 
-        $request->setMethod(Request::METHOD_POST);
-        $this->assertEquals(Request::METHOD_POST, $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
+        $request->setMethod('POST');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() returns the method POST if no _method is defined');
 
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->request->set('_method', 'purge');
-        $this->assertEquals(Request::METHOD_POST, $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->request->set('_method', 'purge');
 
         $this->assertFalse(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be disabled by default');
@@ -790,30 +790,30 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(Request::getHttpMethodParameterOverride(), 'httpMethodParameterOverride should be enabled now but it is not');
 
-        $this->assertEquals(Request::METHOD_PURGE, $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->query->set('_method', 'purge');
-        $this->assertEquals(Request::METHOD_POST, $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
+        $this->assertEquals('POST', $request->getMethod(), '->getMethod() does not return the method from _method if defined and POST but support not enabled');
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->query->set('_method', 'purge');
         Request::enableHttpMethodParameterOverride();
-        $this->assertEquals(Request::METHOD_PURGE, $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
+        $this->assertEquals('PURGE', $request->getMethod(), '->getMethod() returns the method from _method if defined and POST');
         $this->disableHttpMethodParameterOverride();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals(Request::METHOD_DELETE, $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
+        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override even though _method is set if defined and POST');
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'delete');
-        $this->assertEquals(Request::METHOD_DELETE, $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
+        $this->assertEquals('DELETE', $request->getMethod(), '->getMethod() returns the method from X-HTTP-Method-Override if defined and POST');
     }
 
     /**
@@ -927,9 +927,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function provideOverloadedMethods()
     {
         return array(
-            array(Request::METHOD_PUT),
-            array(Request::METHOD_DELETE),
-            array(Request::METHOD_PATCH),
+            array('PUT'),
+            array('DELETE'),
+            array('PATCH'),
             array('put'),
             array('delete'),
             array('patch'),
@@ -974,7 +974,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_METHOD'] = 'PoSt';
         $request = Request::createFromGlobals();
         $this->assertEquals($normalizedMethod, $request->getMethod());
-        $this->assertEquals(Request::METHOD_POST, $request->getRealMethod());
+        $this->assertEquals('POST', $request->getRealMethod());
         $this->assertEquals('bar6', $request->request->get('foo6'));
 
         unset($_POST['_method'], $_POST['foo6'], $_SERVER['REQUEST_METHOD']);
@@ -1296,16 +1296,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testIsMethod()
     {
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
-        $this->assertTrue($request->isMethod(Request::METHOD_POST));
+        $request->setMethod('POST');
+        $this->assertTrue($request->isMethod('POST'));
         $this->assertTrue($request->isMethod('post'));
-        $this->assertFalse($request->isMethod(Request::METHOD_GET));
+        $this->assertFalse($request->isMethod('GET'));
         $this->assertFalse($request->isMethod('get'));
 
-        $request->setMethod(Request::METHOD_GET);
-        $this->assertTrue($request->isMethod(Request::METHOD_GET));
+        $request->setMethod('GET');
+        $this->assertTrue($request->isMethod('GET'));
         $this->assertTrue($request->isMethod('get'));
-        $this->assertFalse($request->isMethod(Request::METHOD_POST));
+        $this->assertFalse($request->isMethod('POST'));
         $this->assertFalse($request->isMethod('post'));
     }
 
@@ -1314,7 +1314,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBaseUrl($uri, $server, $expectedBaseUrl, $expectedPathInfo)
     {
-        $request = Request::create($uri, Request::METHOD_GET, array(), array(), array(), $server);
+        $request = Request::create($uri, 'GET', array(), array(), array(), $server);
 
         $this->assertSame($expectedBaseUrl, $request->getBaseUrl(), 'baseUrl');
         $this->assertSame($expectedPathInfo, $request->getPathInfo(), 'pathInfo');
@@ -1663,7 +1663,7 @@ class RequestContentProxy extends Request
 {
     public function getContent($asResource = false)
     {
-        return http_build_query(array('_method' => Request::METHOD_PUT, 'content' => 'mycontent'));
+        return http_build_query(array('_method' => 'PUT', 'content' => 'mycontent'));
     }
 }
 

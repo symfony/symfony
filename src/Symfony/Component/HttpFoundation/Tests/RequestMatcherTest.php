@@ -37,9 +37,9 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
             array('get', 'get', true),
             array('get', array('get', 'post'), true),
             array('get', 'post', false),
-            array('get', Request::METHOD_GET, true),
-            array('get', array(Request::METHOD_GET, Request::METHOD_POST), true),
-            array('get', Request::METHOD_POST, false),
+            array('get', 'GET', true),
+            array('get', array('GET', 'POST'), true),
+            array('get', 'POST', false),
         );
     }
 

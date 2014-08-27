@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2013-12-26T08:53:14Z
+
+@Grygir there's no need to create a new PR. You could've just pushed to your branch and PR would be updated.
+
+You have to merge master into your branch and resolve conflicts.
+
+Please add a PR description with a table.
+
+---------------------------------------------------------------------------
+
+by Grygir at 2013-12-26T10:46:00Z
+
+@jakzal thanks. That was a bit misunderstanding from my side.
+
+I've applied all changes for comments from symfony/symfony#8597 and created a paragraph in symfony/symfony-docs#3386.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-28T07:28:55Z
+
+@Grygir You should remove the merge commit (squashing you commits would help here).
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-01-08T10:00:23Z
+
+@fabpot thanks, all commented issues are fixed.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-01-14T09:25:21Z
+
+You should update the CHANGELOG file (in the component dir)
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-01-15T09:23:58Z
+
+@aitboudad, do I understand correctly, this note should be in a section related to the coming version (2.5.0)?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-01-15T10:18:45Z
+
+@Grygir  yes https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Translation/CHANGELOG.md
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-01-15T10:29:10Z
+
+@aitboudad, done, thanks
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-07-24T12:20:04Z
+
+@fabpot is there any change this can be merged?
+
+@Grygir you have to rebase this PR, there are merge conflicts now.
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-07-24T14:02:13Z
+
+@WouterJ pull request is updated, thanks
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-07-24T14:23:47Z
+
+:+1: great!
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-07-24T17:16:56Z
+
+@fabpot thank you, all comments are fixed (related symfony-docs pull request is updated as well)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-24T17:47:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-07-24T17:49:19Z
+
+Great work, @fabpot, nice to see this one picked up that fast!
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-07-24T18:44:47Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-07-25T08:50:52Z
+
+:+1: thanks @Grygir  (although I have no vote permission)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-16T16:45:08Z
+
+Apart from the phpdoc above, :+1:
+
+---------------------------------------------------------------------------
+
+by Grygir at 2014-08-18T13:13:19Z
+
+@Tobion, thank you. Done.

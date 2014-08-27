@@ -64,10 +64,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $name = false;
         $fileExcerpt = false;
 
-        for ($i = 1; $i < 6; ++$i) {
+        for ($i = 1; $i < 7; ++$i) {
             if (isset($trace[$i]['class'], $trace[$i]['function'])
                 && 'dump' === $trace[$i]['function']
-                && 'Symfony\Bundle\DebugBundle\DebugBundle' === $trace[$i]['class']
+                && 'Symfony\Component\VarDumper\VarDumper' === $trace[$i]['class']
             ) {
                 $file = $trace[$i]['file'];
                 $line = $trace[$i]['line'];

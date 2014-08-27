@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="debug.templating.engine.twig.class">Symfony\Bundle\TwigBundle\Debug\TimedTwigEngine</parameter>
+        <parameter key="twig.extension.dump.class">Symfony\Bridge\Twig\Extension\DumpExtension</parameter>
     </parameters>
 
     <services>
@@ -17,6 +18,10 @@
         </service>
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false">
+            <tag name="twig.extension" />
+        </service>
+
+        <service id="twig.extension.dump" class="%twig.extension.dump.class%" public="false">
             <tag name="twig.extension" />
         </service>
     </services>

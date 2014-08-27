@@ -16,9 +16,12 @@ namespace Symfony\Bridge\Twig\Node;
  */
 class DumpNode extends \Twig_Node
 {
-    public function __construct(\Twig_NodeInterface $values = null, $lineno, $tag = null)
+    private $varPrefix;
+
+    public function __construct($varPrefix, \Twig_NodeInterface $values = null, $lineno, $tag = null)
     {
         parent::__construct(array('values' => $values), array(), $lineno, $tag);
+        $this->varPrefix = $varPrefix;
     }
 
     /**
@@ -36,30 +39,30 @@ class DumpNode extends \Twig_Node
         if (null === $values) {
             // remove embedded templates (macros) from the context
             $compiler
-                ->write("\$vars = array();\n")
-                ->write("foreach (\$context as \$key => \$value) {\n")
+                ->write(sprintf('$%svars = array();'."\n", $this->varPrefix))
+                ->write(sprintf('foreach ($context as $%1$skey => $%1$sval) {'."\n", $this->varPrefix))
                 ->indent()
-                ->write("if (!\$value instanceof Twig_Template) {\n")
+                ->write(sprintf('if (!$%sval instanceof \Twig_Template) {'."\n", $this->varPrefix))
                 ->indent()
-                ->write("\$vars[\$key] = \$value;\n")
+                ->write(sprintf('$%1$svars[$%1$skey] = $%1$sval;'."\n", $this->varPrefix))
                 ->outdent()
                 ->write("}\n")
                 ->outdent()
                 ->write("}\n")
                 ->addDebugInfo($this)
-                ->write('\Symfony\Component\Debug\Debug::dump($vars);'."\n")
+                ->write(sprintf('\Symfony\Component\VarDumper\VarDumper::dump($%svars);'."\n", $this->varPrefix))
             ;
         } elseif (1 === $values->count()) {
             $compiler
                 ->addDebugInfo($this)
-                ->write('\Symfony\Component\Debug\Debug::dump(')
+                ->write('\Symfony\Component\VarDumper\VarDumper::dump(')
                 ->subcompile($values->getNode(0))
                 ->raw(");\n")
             ;
         } else {
             $compiler
                 ->addDebugInfo($this)
-                ->write('\Symfony\Component\Debug\Debug::dump(array(')
+                ->write('\Symfony\Component\VarDumper\VarDumper::dump(array(')
                 ->indent()
             ;
             foreach ($values as $node) {

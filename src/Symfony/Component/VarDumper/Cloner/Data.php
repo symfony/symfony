@@ -183,19 +183,19 @@ class Data
     {
         if (function_exists('iconv')) {
             return iconv('CP1252', 'UTF-8', $s);
-        } else {
-            $s .= $s;
-            $len = strlen($s);
-
-            for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
-                switch (true) {
-                    case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                    case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                    default: $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
-                }
-            }
-
-            return substr($s, 0, $j);
         }
+
+        $s .= $s;
+        $len = strlen($s);
+
+        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
+            switch (true) {
+                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
+                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
+                default: $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
+            }
+        }
+
+        return substr($s, 0, $j);
     }
 }

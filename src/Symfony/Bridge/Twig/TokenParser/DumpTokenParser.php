@@ -38,7 +38,7 @@ class DumpTokenParser extends \Twig_TokenParser
         }
         $this->parser->getStream()->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new DumpNode($values, $token->getLine(), $this->getTag());
+        return new DumpNode($this->parser->getVarName(), $values, $token->getLine(), $this->getTag());
     }
 
     /**

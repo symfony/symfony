@@ -68,6 +68,8 @@ class DOMCaster
 
     public static function castNode(\DOMNode $dom, array $a, $isNested, &$cut)
     {
+        // Commented lines denote properties that exist but are better not dumped for clarity.
+
         $a += array(
             'nodeName' => $dom->nodeName,
             //'nodeValue' => $dom->nodeValue,
@@ -93,6 +95,8 @@ class DOMCaster
 
     public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, $isNested, &$cut)
     {
+        // Commented lines denote properties that exist but are better not dumped for clarity.
+
         $a += array(
             'nodeName' => $dom->nodeName,
             //'nodeValue' => $dom->nodeValue,

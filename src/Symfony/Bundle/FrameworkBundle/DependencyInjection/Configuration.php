@@ -327,6 +327,7 @@ class Configuration implements ConfigurationInterface
                     ->info('templating configuration')
                     ->canBeUnset()
                     ->children()
+                        ->scalarNode('write_to')->defaultValue('web')->end()
                         ->scalarNode('assets_version')->defaultValue(null)->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()

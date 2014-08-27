@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T02:18:06Z
+
+I'm not even sure adding these constants adds much value
+
+---------------------------------------------------------------------------
+
+by phansys at 2014-08-27T03:15:47Z
+
+Hi @stof.
+From my point of view the value I see in this change resides in allow to compare in a simple way (without taking care about specific request method names or case sensitivity)  the result of Request::getMethod() against the value of these constants, in the same way that passing method name as argument to Request::isMethod().
+IE:
+```php
+
+switch ($request->getMethod()) {
+    case Resquest::METHOD_POST:
+        // do some stuff...
+    break;
+}
+```
+The main purpose is to allow this type of comparison outside this component, thus I understand that these internal modifications does not have much sense to you. I've updated the uses of method names here in order to keep coherence with this addition.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T08:40:07Z
+
+Adding the constant is ok-ish for me but using them internally is definitely not ok.
+
+---------------------------------------------------------------------------
+
+by phansys at 2014-08-27T12:45:32Z
+
+Ok, reverted internal uses of these class constants.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T13:06:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T13:18:42Z
+
+OK, then :+1:

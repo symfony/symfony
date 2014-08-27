@@ -252,13 +252,11 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * Collects all messages.
-     *
      * Collects all messages for the given locale.
      *
      * @param string|null $locale Locale of translations, by default is current locale
      *
-     * @return array[array] indexed by catalog.
+     * @return array[array] indexed by catalog
      */
     public function getMessages($locale = null)
     {

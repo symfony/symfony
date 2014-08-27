@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-21T08:03:52Z
+
+I made a pull request into master instead of 2.3 by error.
+I just corrected this mistake.
+
+For information, the bad PR is here https://github.com/symfony/symfony/pull/11697
+
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-21T08:33:46Z
+
+Can somebody help me with travis failure ? What should I do ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-08-21T09:09:08Z
+
+@kcassam travis fails because you gave wrong number of arguments to the constructor. It only has 3 arguments, like the main [PHP exception](http://uk1.php.net/manual/en/class.exception.php) class.
+
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-21T18:13:03Z
+
+Thanks @jakzal @nicolas-grekas, i reworked my changes
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-08-21T19:47:41Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by 1emming at 2014-08-21T20:57:55Z
+
+Cool fix :)
+One question though. In the code of the last commit when the `make dir` fails but no error can be found and there still is no directory then no exception is thrown (but it should). If this cannot happen because there always will be an error then the error doesn`t need to be checked. If we cannot rely on an error being there then an exception should be thrown without the error message.
+
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-21T21:09:21Z
+
+Question : Who will do the adaptation for version >= 2.4 because IOException constructor call are not the same :
+
+    //2.3 :
+    throw new IOException(sprintf('Failed to create %s', $dir));
+
+    // >= 2.4 :
+    throw new IOException(sprintf('Failed to create "%s".', $dir), 0, null, $dir);
+
+Should I do another pull request ?
+
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-21T21:14:16Z
+
+I agree with @1emming  https://github.com/symfony/symfony/pull/11726#issuecomment-52983430
+
+I suggest
+
+Simpler :
+
+    if (true !== @mkdir($dir, $mode, true)) {
+        if (!is_dir($dir)) {
+            // The directory was not created by a concurrent process.
+            throw new IOException(sprintf('Failed to create "%s"', $dir));
+        }
+    }
+
+Or
+
+More developer friendly :
+
+    if (true !== @mkdir($dir, $mode, true)) {
+        $error = error_get_last();
+        if (!is_dir($dir)) {
+            if ($error) {
+                // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message
+                throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']));
+            }
+            throw new IOException(sprintf('Failed to create "%s"', $dir));
+        }
+    }
+
+Which is better ?
+
+---------------------------------------------------------------------------
+
+by kcassam at 2014-08-25T16:53:00Z
+
+I commited the developer friendly version
+
+---------------------------------------------------------------------------
+
+by 1emming at 2014-08-25T17:02:10Z
+
+The Dev friendly version looks good. It is an edge case anyway so the few extra cycles to create the best exception message possible seems justified to me.
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T09:35:31Z
+
+:+1:

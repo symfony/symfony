@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by rdohms at 2014-06-30T11:33:33Z
+
+Humm, not sure what triggered the broken test, seems like a Travis config bug as it says `The command "false" exited with 1.`
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-30T11:44:24Z
+
+this is because we have ``|| false`` at the end of the parallel command (which actually does not make sense and should be removed). this means that the testsuite failed actually.
+However, I indeed don't see the failure. This is weird
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-06-30T14:51:24Z
+
+Console tests crashed with [a segmentation fault](https://travis-ci.org/symfony/symfony/jobs/28766594#L315).
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-06-30T15:48:54Z
+
+@jakzal so that has nothing to do with the FrameworkBundle i'm guessing?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-06-30T16:01:06Z
+
+@rdohms it shouldn't. I'll restart the build and keep an eye on them.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-06-30T16:11:20Z
+
+Aaand it pased... looks like one of the accidental failures :(
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-07-10T08:55:32Z
+
+Any word on merging this? @fapot?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:12:55Z
+
+Besides my small comments, that looks good to me.
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-07-25T09:14:23Z
+
+@fabpot thanks, i'm on them
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-07-25T09:18:45Z
+
+Done. Should I rebase into a single commit?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:33:26Z
+
+:+1:
+
+You can squash the commits into one, but it's going to be done automatically anyway when merging.
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-07-25T10:00:27Z
+
+opps, messed up, let me fix this
+
+---------------------------------------------------------------------------
+
+by rdohms at 2014-07-25T10:46:52Z
+
+Rebased and squashed.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-14T03:16:03Z
+
+:+1:

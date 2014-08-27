@@ -198,6 +198,35 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
+    public function testResolveAfterSettingAddingRemovingClearingParameters()
+    {
+        $bag = new ParameterBag(array('foo' => 'foo', 'bar' => 'bar', 'baz' => '%foo% %bar%', 'qux' => '%baz%'));
+        $bag->resolveValue('%qux%');
+
+        $bag->set('baz', '%bar% %foo%');
+        $this->assertEquals('bar foo', $bag->resolveValue('%qux%'), '->resolveValue() resolves placeholders after changing a referenced parameter via ->set()');
+
+        $bag->add(array('baz' => '%foo% %bar%'));
+        $this->assertEquals('foo bar', $bag->resolveValue('%qux%'), '->resolveValue() resolves placeholders after changing a referenced parameter via ->add');
+
+        $bag->remove('qux');
+        try {
+            $bag->resolveValue('%qux%');
+            $this->fail('->resolveValue() throws a ParameterNotFoundException if a placeholder references a removed parameter');
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "qux".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a removed parameter');
+        }
+
+        $bag->resolveValue('%baz%');
+        $bag->clear();
+        try {
+            $bag->resolveValue('%foo%');
+            $this->fail('->resolveValue() throws a ParameterNotFoundException if a placeholder references a parameter in a cleared bag');
+        } catch (ParameterNotFoundException $e) {
+            $this->assertEquals('You have requested a non-existent parameter "foo".', $e->getMessage(), '->resolveValue() throws a ParameterNotFoundException if a placeholder references a parameter in a cleared bag');
+        }
+    }
+
     /**
      * @covers Symfony\Component\DependencyInjection\ParameterBag\ParameterBag::resolve
      */

@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-19T02:52:51Z
+
+@stof should I add the following test to `src/Symfony/Component/DependencyInjection/Tests/Compiler/RemoveUnusedDefinitionsPassTest.php`?
+```PHP
+
+    public function testPrivateFactoryRemoved()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('foo', 'Bar\\FooClass')
+            ->setFactoryClass('Bar\\FooClass')
+            ->setFactoryMethod('getInstance')
+            ->setPublic(false);
+
+        $container
+            ->register('bar', 'Bar\\FooClass')
+            ->setFactoryService('foo')
+            ->setFactoryMethod('getInstance')
+            ->setPublic(false);
+
+        $container
+            ->register('foobar')
+            ->addArgument(new Reference('bar'));
+
+        $this->process($container);
+
+        $this->assertTrue($container->hasDefinition('foo'));
+        $this->assertTrue($container->hasDefinition('bar'));
+        $this->assertTrue($container->hasDefinition('foobar'));
+    }
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-19T08:46:54Z
+
+looks like a good idea (except the test name as it is checking that the factory service is *not* removed)
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-19T09:17:11Z
+
+Added `testProcessWontRemovePrivateFactory` to `src/Symfony/Component/DependencyInjection/Tests/Compiler/RemoveUnusedDefinitionsPassTest.php` and did a rebase.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-22T03:27:31Z
+
+@stof is there anything else I can do to get this merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:37:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T14:56:32Z
+
+This should be done outside the ``if (!$this->onlyConstructorArguments) {`` IMO. The factory service needs to be taken into account when analyzing the circular references
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T14:57:35Z
+
+note to maintainers: this should go in 2.3
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-26T16:35:50Z
+
+@stof should I do a rebase based on the 2.3 branch?
+I will take a look at the circular reference and write a test case for it. I didn't do it at first since it maybe a BC break for some (very strange) edge cases but I think we can ignore those.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T17:18:15Z
+
+@boekkooi no, we will do it when merging. If you rebase now, the PR diff will show all 2.3 commits which have not yet been merged in master.
+
+Regarding the circular reference, there is a check using an analysis based only on the constructor arguments (to check it at compile time rather than at runtime for things where we can detect that it will be a circular reference issue in all case). The factory service is one of these cases: we need the factory service before instantiating the service (given that it is the one doing the instantiation), so it will always trigger a circular reference even if we inline some stuff.
+Checking it will not be a BC break. It is *already* a circular reference triggering an exception. The difference is tahat currently, it is detected only when trying to get one of these services
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-27T03:21:25Z
+
+@stof Great information! Thanks!
+
+The circular reference tests has been added and the if statement is moved (else the test fails), also did a rebase.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-08-27T03:34:43Z
+
+@stof but we do have a BC break. Before you could define a circular reference between factory services and it was allowed but would throw a exception when called at runtime (if it was ever called).
+With this PR a ServiceCircularReferenceException is throw on compiling the container.
+
+Should this "minor" BC break be documented some where?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T07:53:52Z
+
+so you mean defining broken servces but not using them ? I don't think this needs to have BC preserved IMO.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T07:55:07Z
+
+:+1:

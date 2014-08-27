@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by samicemalone at 2014-08-27T03:41:35Z
+
+I have changed every translation except for Luxembourgish and Persian. I could not find a reliable translation for them.
+
+I checked each translation against multiple websites, and reverse checked each one to make sure they made sense.
+
+---------------------------------------------------------------------------
+
+by 1emming at 2014-08-27T05:38:31Z
+
+Thanks for the PR and looking into the issue. I'm not sure the translation values have to be changed or only the source (ie. key).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T07:47:08Z
+
+@1emming translations should be updated of course, to translate the right message.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T08:27:45Z
+
+:+1:

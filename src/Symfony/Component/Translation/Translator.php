@@ -251,6 +251,39 @@ class Translator implements TranslatorInterface
         return $this->loaders;
     }
 
+    /**
+     * Collects all messages.
+     *
+     * Collects all messages for the given locale.
+     *
+     * @param string|null $locale Locale of translations, by default is current locale
+     *
+     * @return array[array] indexed by catalog.
+     */
+    public function getMessages($locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        $catalogues = array();
+        $catalogues[] = $catalogue = $this->catalogues[$locale];
+        while ($catalogue = $catalogue->getFallbackCatalogue()) {
+            $catalogues[] = $catalogue;
+        }
+        $messages = array();
+        for ($i = count($catalogues) - 1; $i >= 0; $i--) {
+            $localeMessages = $catalogues[$i]->all();
+            $messages = array_replace_recursive($messages, $localeMessages);
+        }
+
+        return $messages;
+    }
+
     protected function loadCatalogue($locale)
     {
         try {

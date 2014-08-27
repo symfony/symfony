@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by brianfreytag at 2014-08-22T16:04:55Z
+
+Just a quick note that the validator may not pass tests at this time because @egulias is in the process of creating a new tagged release with my PR to his library that is required for my PR here.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-08-22T16:41:49Z
+
+The tests of the legacy app should not be failing with this change, since they don't use the lib.
+They extend the `EmailValidatorTest` so they all pass the `testStrict` for older apis.
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2014-08-22T17:51:09Z
+
+If that's the case, then the tests have been failing before making this change. I'll investigate.
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-08-22T18:16:03Z
+
+Not necessary, this was triggered by your PR prior to me tagging the lib so the failure is fine. What seems weird is that the legacy tests are tied to the current implementation. So this Pr, IMHO, should have triggered only one error.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T18:18:22Z
+
+@egulias all constraint validators are tested 3 times in 2.5, with the Validator itself being in 2.4, 2.5-bc and 2.5 modes (to ensure that all APIs are supported). This is why there is 3 failures. It is the same test against 3 APIs
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T18:19:08Z
+
+and I just relaunch the Travis build now, so that it can install the new tag of the library
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2014-08-22T18:35:55Z
+
+Thanks @stof.
+
+It looks like the updated library resolved the failures, so we're good to move forward on this. Let me know if there is anything else needed.
+
+/cc @egulias
+
+---------------------------------------------------------------------------
+
+by jeremylivingston at 2014-08-25T12:14:57Z
+
+When do we anticipate this task being merged? I am wondering if I should use my own fork of Symfony to handle this bug or wait until it is merged. Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:28:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:28:53Z
+
+should probably be merged in the 2.5 branch instead of master.
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2014-08-27T16:49:01Z
+
+@stof @fabpot
+
+Just a follow up. Any idea when this task will be merged? We're still getting a lot of bleeding of invalid e-mail addresses and would like to get our codebase updated with this PR.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by egulias at 2014-08-27T17:43:04Z
+
+@brianfreytag if you update the requirement in `composer.json` to `~1.2` part of the problem may get solved, right?
+
+---------------------------------------------------------------------------
+
+by brianfreytag at 2014-08-27T17:58:18Z
+
+@egulias
+
+Yes, it will fix part of the problem, but it's still not passing strict to the library so at the end of the day, it's not going to be the fix. Getting this PR merged in is something we'll require to be 100% satisfied with email validation in Symfony.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T19:03:19Z
+
+@brianfreytag should be merged soon but we first need at least two positive votes from @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-27T19:10:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T19:33:01Z
+
+here we go. :+1:

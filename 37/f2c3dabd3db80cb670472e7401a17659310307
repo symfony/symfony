@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T13:58:30Z
+
+I would rather throw an exception instead of ignoring it silently, to be consistent with the way Symfony listeners work
+
+---------------------------------------------------------------------------
+
+by merk at 2014-06-18T14:00:07Z
+
+So it isn't a supported use case to tag an abstract service?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T14:02:28Z
+
+well, not for registering it as a Doctrine listener, as the abstract service cannot be referenced later (there are some tags for which it can make sense to apply them on abstract definitions, for instance ``monolog.logger``, but not tags used to aggregate dependencies)
+
+---------------------------------------------------------------------------
+
+by merk at 2014-06-18T23:15:02Z
+
+Are the reasons the same for the Doctrine and Symfony event dispatchers? The Doctrine one doesnt appear to lazily load its listeners (which means it can accept private services?)
+
+I'm happy to update the PR for whatever solution so people can avoid the time it took me to work it out. This exposed a deficiency in the design of the FOSElasticaBundle listeners where we should only register one, not one per type.
+
+Should it just throw an exception that abstract services cannot be tagged as doctrine listeners or subscribers?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T23:17:38Z
+
+the lazyness is the reason why symfony listeners must be public. But we are not talking about private services here but about abstract services. Abstract services don't exist at runtime anymore. they are just prototypes for child definitions.
+
+so yes, it should be an exception (it currently also leads to an exception later because the service does not exist, so it would not change the behavior but simply give a much better error message)
+
+---------------------------------------------------------------------------
+
+by merk at 2014-06-18T23:24:35Z
+
+And what message should be presented to the developer? "An abstract service cannot be tagged as a doctrine listener or subscriber."?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T23:40:36Z
+
+This looks good, except that the message should contain the id of the service to make it easier to fix it.
+
+---------------------------------------------------------------------------
+
+by merk at 2014-06-19T00:48:02Z
+
+Updated to throw an exception
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:58:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T19:56:09Z
+
+:+1:

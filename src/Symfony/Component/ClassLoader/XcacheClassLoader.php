@@ -47,15 +47,15 @@ class XcacheClassLoader
     /**
      * The class loader object being decorated.
      *
-     * @var \Symfony\Component\ClassLoader\ClassLoader
+     * @var object
      *   A class loader object that implements the findFile() method.
      */
-    protected $decorated;
+    private $decorated;
 
     /**
      * Constructor.
      *
-     * @param string $prefix      The XCache namespace prefix to user.
+     * @param string $prefix      The XCache namespace prefix to use.
      * @param object $decorated   A class loader object that implements the findFile() method.
      *
      * @throws \RuntimeException
@@ -137,5 +137,4 @@ class XcacheClassLoader
     {
         return call_user_func_array(array($this->decorated, $method), $args);
     }
-
 }

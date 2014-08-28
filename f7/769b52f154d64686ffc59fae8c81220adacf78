@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-25T21:46:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by sun at 2014-08-25T22:04:19Z
+
+Possibly my fault; I guess #5950 could/should have adjusted all of the decorators, instead of only APC.
+
+Might be worth to make it fully consistent with https://github.com/symfony/symfony/commit/d231b8f16e5789f7b9f8554df05b90bb957b0bc0 ?
+
+---------------------------------------------------------------------------
+
+by tstoeckler at 2014-08-25T22:20:33Z
+
+Yes, I was wondering about the different variable names. I think `decorated` does make a tad more sense, but I don't feel strongly.
+
+---------------------------------------------------------------------------
+
+by tstoeckler at 2014-08-26T07:55:34Z
+
+https://travis-ci.org/symfony/symfony/jobs/33537860
+
+Seems like a random failure or something strange. Tests pass locally and all of the fails there aren't related to ClassLoader. Can someone trigger a re-run? Or am I missing something?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T01:08:01Z
+
+@tstoeckler This PR looks good. Can you just fix the three small comments before we can merge?
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by tstoeckler at 2014-08-28T09:49:56Z
+
+I think that covers everything mentioned thus far.
+
+---------------------------------------------------------------------------
+
+by tstoeckler at 2014-08-28T10:02:17Z
+
+Ahh yes, good catch! I changed that to keep consistency between the two classes, but you are of course correct. Sorry.

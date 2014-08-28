@@ -49,7 +49,7 @@ class ApcClassLoader
      * @var object
      *   A class loader object that implements the findFile() method.
      */
-    private $decorated;
+    protected $decorated;
 
     /**
      * Constructor.

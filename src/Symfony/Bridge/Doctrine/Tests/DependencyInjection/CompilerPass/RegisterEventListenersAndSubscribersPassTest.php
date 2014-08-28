@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,38 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
             $this->markTestSkipped('The "DependencyInjection" component is not available');
         }
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedSubscriber()
+    {
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_subscriber');
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedListener()
+    {
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_listener', array('event' => 'test'));
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
     }
 
     public function testProcessEventListenersWithPriorities()

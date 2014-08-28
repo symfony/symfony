@@ -68,6 +68,10 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
             uasort($subscribers, $sortFunc);
             foreach ($subscribers as $id => $instance) {
+                if ($container->getDefinition($id)->isAbstract()) {
+                    throw new \InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event subscriber.', $id));
+                }
+
                 $em->addMethodCall('addEventSubscriber', array(new Reference($id)));
             }
         }
@@ -78,6 +82,10 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
 
             uasort($listeners, $sortFunc);
             foreach ($listeners as $id => $instance) {
+                if ($container->getDefinition($id)->isAbstract()) {
+                    throw new \InvalidArgumentException(sprintf('The abstract service "%s" cannot be tagged as a doctrine event listener.', $id));
+                }
+
                 $em->addMethodCall('addEventListener', array(
                     array_unique($instance['event']),
                     isset($instance['lazy']) && $instance['lazy'] ? $id : new Reference($id),

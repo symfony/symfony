@@ -45,10 +45,7 @@ class XcacheClassLoader
     private $prefix;
 
     /**
-     * The class loader object being decorated.
-     *
-     * @var object
-     *   A class loader object that implements the findFile() method.
+     * @var object A class loader object that implements the findFile() method
      */
     private $decorated;
 

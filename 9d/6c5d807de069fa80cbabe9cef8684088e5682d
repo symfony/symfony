@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T12:51:11Z
+
+I think you did a great job! But now I kind of think this exception class needs a test to test for these different message possibilities!
+
+---------------------------------------------------------------------------
+
+by JanDC at 2014-07-07T11:52:22Z
+
+~~Hi @weaverryan ,
+should it be necessary to cover those different messages in a test? Given the fact that it's still the same exception being thrown, only with the message presented differently...~~
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-07T12:08:23Z
+
+given that we have some logic in there, it should be tested IMO, to ensure that the code is not broken
+
+---------------------------------------------------------------------------
+
+by tvlooy at 2014-07-08T20:19:13Z
+
+@JanDC is my colleague, we talked about adding this test
+
+---------------------------------------------------------------------------
+
+by tvlooy at 2014-07-09T08:12:39Z
+
+we rebased and squashed some commits
+
+---------------------------------------------------------------------------
+
+by tvlooy at 2014-07-22T09:34:38Z
+
+@stof this is ready to be merged imo /cc @JanDC
+
+---------------------------------------------------------------------------
+
+by tvlooy at 2014-07-22T12:57:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:53:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by JanDC at 2014-08-02T12:37:44Z
+
+Hey @stof / @fabpot ,
+I think it's ready to be merged by now...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:48:27Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-08-28T07:03:41Z
+
++1

@@ -15,6 +15,7 @@ namespace Symfony\Component\Security\Core\Util;
  * String utility functions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class StringUtils
 {
@@ -35,6 +36,11 @@ class StringUtils
      */
     public static function equals($knownString, $userInput)
     {
+        // Use hash_equals if applicable
+        if (function_exists('hash_equals') && strlen($knownString) === strlen($userInput)) {
+            return hash_equals($knownString, $userInput);
+        }
+
         // Prevent issues if string length is 0
         $knownString .= chr(0);
         $userInput .= chr(0);

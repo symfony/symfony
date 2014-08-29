@@ -114,7 +114,7 @@ class Parser
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport);
                     }
                 }
-            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && false === strpos($values['key'],' #')) {
+            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'],' #') || in_array($values['key'][0], array('"', "'")))) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
                 }

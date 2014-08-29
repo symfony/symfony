@@ -35,6 +35,11 @@ class StringUtils
      */
     public static function equals($knownString, $userInput)
     {
+        // Use hash_equals if available (since PHP 5.6)
+        if (function_exists('hash_equals')) {
+            return hash_equals($knownString, $userInput);
+        }
+
         // Prevent issues if string length is 0
         $knownString .= chr(0);
         $userInput .= chr(0);

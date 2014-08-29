@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by kerdany at 2014-08-25T13:27:43Z
+
+@stof Done 832f6d4
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T01:10:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-28T01:39:37Z
+
+Is it really desired to move the ``testCamelize()`` method and its data provider?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T20:12:55Z
+
+no, it should stay in the same location to make merging between branches easier
+
+---------------------------------------------------------------------------
+
+by kerdany at 2014-08-28T20:40:51Z
+
+@stof, actually @xabbuh seems to mean the same thing you do.
+I seem to have also moved testCamelize() to the very bottom when I added testUnderscore() in the very first commit in this PR.
+I'll fix that shortly.
+
+---------------------------------------------------------------------------
+
+by kerdany at 2014-08-28T21:10:25Z
+
+@xabbuh, @stof Done ce76ca5
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T21:39:19Z
+
+:+1:

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2014-08-29T23:01:47Z
+
+Better change the PHPDoc to a fully qualified name than add an (unused) use statement.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-29T23:21:38Z
+
+@dunglas nope. Our coding standards are to use the short name in the phpdoc
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-29T23:22:17Z
+
+:+1:
+
+note to maintainers: this should go in 2.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-30T07:45:30Z
+
+:+1:

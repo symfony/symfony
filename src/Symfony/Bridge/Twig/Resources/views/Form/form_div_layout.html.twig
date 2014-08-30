@@ -192,6 +192,11 @@
     {{- block('button_widget') -}}
 {%- endblock reset_widget %}
 
+{% block tel_widget %}
+    {% set type = type|default('tel') %}
+    {{ block('form_widget_simple') }}
+{% endblock tel_widget %}
+
 {# Labels #}
 
 {% block form_label -%}

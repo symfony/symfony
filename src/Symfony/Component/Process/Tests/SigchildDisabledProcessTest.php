@@ -53,6 +53,15 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
      * @expectedException \Symfony\Component\Process\Exception\RuntimeException
      * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
      */
+    public function testMustRun()
+    {
+        parent::testMustRun();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.
+     */
     public function testSuccessfulMustRunHasCorrectExitCode()
     {
         parent::testSuccessfulMustRunHasCorrectExitCode();
@@ -230,6 +239,15 @@ class SigchildDisabledProcessTest extends AbstractProcessTest
     public function testRunProcessWithTimeout()
     {
         $this->markTestSkipped('Signal (required for timeout) is not supported in sigchild environment');
+    }
+
+    public function provideStartMethods()
+    {
+        return array(
+            array('start', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('run', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('mustRun', 'Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.'),
+        );
     }
 
     /**

@@ -215,9 +215,16 @@ class Process
      * @param callable|null $callback
      *
      * @return self
+     *
+     * @throws RuntimeException       if PHP was compiled with --enable-sigchild and the enhanced sigchild compatibility mode is not enabled
+     * @throws ProcessFailedException if the process didn't terminate successfully
      */
     public function mustRun($callback = null)
     {
+        if ($this->isSigchildEnabled() && !$this->enhanceSigchildCompatibility) {
+            throw new RuntimeException('This PHP has been compiled with --enable-sigchild. You must use setEnhanceSigchildCompatibility() to use this method.');
+        }
+
         if (0 !== $this->run($callback)) {
             throw new ProcessFailedException($this);
         }

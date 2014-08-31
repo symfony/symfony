@@ -35,12 +35,12 @@
                 <target>Některé z uvedených hodnot jsou neplatné.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Neočekávaná pole {{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Toto pole nebyla očekávána.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Chybí následující pole {{ fields }}.</target>
+                <source>This field is missing.</source>
+                <target>Toto pole chybí.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

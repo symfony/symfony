@@ -35,12 +35,12 @@
                 <target>無効な選択肢が含まれています。</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>フィールド{{ fields }}は無効です。</target>
+                <source>This field was not expected.</source>
+                <target>このフィールドは予期されていませんでした。</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>フィールド{{ fields }}は必須です。</target>
+                <source>This field is missing.</source>
+                <target>このフィールドは、欠落しています。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

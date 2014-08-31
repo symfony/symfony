@@ -35,12 +35,12 @@
                 <target>A megadott értékek közül legalább egy érvénytelen.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Váratlan mezők: {{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Ez a mező nem számítottak.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>A következő mezők hiányoznak: {{ fields }}.</target>
+                <source>This field is missing.</source>
+                <target>Ez a mező hiányzik.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

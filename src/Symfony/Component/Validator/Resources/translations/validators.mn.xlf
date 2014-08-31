@@ -35,12 +35,12 @@
                 <target>Өгөгдсөн нэг эсвэл нэгээс олон утга буруу байна.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>Талбарууд {{ fields }} зөвшөөрөгдөөгүй байна.</source>
-                <target>{{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Энэ талбар нь хүлээгдэж байсан юм.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>{{ fields }} талбарууд дутуу байна.</target>
+                <source>This field is missing.</source>
+                <target>Энэ талбар нь алга болсон байна.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

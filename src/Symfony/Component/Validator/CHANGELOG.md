@@ -8,6 +8,7 @@ CHANGELOG
  * [BC BREAK] `UserPasswordValidator` source message change
  * [BC BREAK] added internal `ExecutionContextInterface::setConstraint()`
  * added `ConstraintViolation::getConstraint()`
+ * [BC BREAK] The `ExpressionValidator` will now evaluate the Expression even when the property value is null or an empty string
 
 2.5.0
 -----

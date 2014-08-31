@@ -17,3 +17,14 @@ Validator
    {
    }
    ```
+
+ * Prior to 2.6 `Symfony\Component\Validator\Constraints\ExpressionValidator`
+   would not execute the Expression if it was attached to a property on an
+   object and that property was set to `null` or an empty string.
+
+   To emulate the old behaviour change your expression to something like
+   this:
+
+   ```
+   value == null or (YOUR_EXPRESSION)
+   ```

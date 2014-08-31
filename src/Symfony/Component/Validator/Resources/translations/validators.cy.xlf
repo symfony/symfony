@@ -35,12 +35,12 @@
                 <target>Mae un neu fwy o'r gwerthoedd a roddwyd yn annilys.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Roedd y maesydd {{ fields }} yn anisgwyl.</target>
+                <source>This field was not expected.</source>
+                <target>Nid oedd disgwyl y maes hwn.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Roedd y maesydd {{ fields }} ar goll.</target>
+                <source>This field is missing.</source>
+                <target>Mae'r maes hwn ar goll.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

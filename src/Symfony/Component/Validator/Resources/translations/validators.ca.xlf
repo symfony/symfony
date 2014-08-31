@@ -35,12 +35,12 @@
                 <target>Un o més dels valors facilitats són incorrectes.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>No s'esperaven els camps {{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Aquest camp no s'esperava.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Falten els camps {{ fields }}.</target>
+                <source>This field is missing.</source>
+                <target>Aquest camp està desaparegut.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

@@ -35,12 +35,12 @@
                 <target>Yksi tai useampi annetuista arvoista on virheellinen.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Odottamattomia kenttiä {{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Tässä kentässä ei odotettu.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Kentät {{ fields }} puuttuvat.</target>
+                <source>This field is missing.</source>
+                <target>Tämä kenttä puuttuu.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

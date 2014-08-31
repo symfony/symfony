@@ -35,12 +35,12 @@
                 <target>Satu atau lebih nilai yang diberikan tidak sah.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Kolom {{ fields }} tidak seperti yang diharapkan.</target>
+                <source>This field was not expected.</source>
+                <target>Bidang ini tidak diharapkan.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Kolom {{ fields }} hilang.</target>
+                <source>This field is missing.</source>
+                <target>Bidang ini hilang.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

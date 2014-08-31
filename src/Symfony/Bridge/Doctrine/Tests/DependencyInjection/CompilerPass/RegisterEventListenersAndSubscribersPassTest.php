@@ -13,9 +13,42 @@ namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedSubscriber()
+    {
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_subscriber');
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedListener()
+    {
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_listener', array('event' => 'test'));
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
+    }
+
     public function testProcessEventListenersWithPriorities()
     {
         $container = $this->createBuilder();

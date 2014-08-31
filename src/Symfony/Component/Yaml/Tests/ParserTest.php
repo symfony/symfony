@@ -652,6 +652,32 @@ EOT
 EOF
         ));
     }
+
+    public function testReferenceResolvingInInlineStrings()
+    {
+        $this->assertEquals(array(
+            'var' => 'var-value',
+            'scalar' => 'var-value',
+            'list' => array('var-value'),
+            'list_in_list' => array(array('var-value')),
+            'map_in_list' => array(array('key' => 'var-value')),
+            'embedded_mapping' => array(array('key' => 'var-value')),
+            'map' => array('key' => 'var-value'),
+            'list_in_map' => array('key' => array('var-value')),
+            'map_in_map' => array('foo' => array('bar' => 'var-value')),
+        ), Yaml::parse(<<<EOF
+var:  &var var-value
+scalar: *var
+list: [ *var ]
+list_in_list: [[ *var ]]
+map_in_list: [ { key: *var } ]
+embedded_mapping: [ key: *var ]
+map: { key: *var }
+list_in_map: { key: [*var] }
+map_in_map: { foo: { bar: *var } }
+EOF
+        ));
+    }
 }
 
 class B

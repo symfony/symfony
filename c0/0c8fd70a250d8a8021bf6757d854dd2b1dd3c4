@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by sstok at 2014-08-17T07:13:46Z
+
+You can actually solve this by overwriting the getExtension method.
+Which is recommended by @matthiasnoback http://php-and-symfony.matthiasnoback.nl/2013/10/symfony2-some-things-i-dont-like-about-bundles/
+
+Removing this validation can have unexpected consequence.
+
+Edit. Missed the original conversation https://github.com/symfony/symfony/commit/97f66e93ac78a2f775c67ff38bb362b1e65da1d8#commitcomment-7399987
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T12:09:03Z
+
+To be exact, the commit on which the conversation started did not introduce the requirement. It reimplemented after being removed in a previous commit of the same PR https://github.com/symfony/symfony/pull/653
+
+The original implementation was in https://github.com/symfony/symfony/commit/14aa95ba218c9fd6d02e770e279ed854314fea75
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-19T22:09:04Z
+
++1 for this, unless I'm missing some reason why we're enforcing this. This has always seemed a bit odd to me, and I've seen it make a few people unhappy recently :).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:32:42Z
+
+The convention is enforced on purpose. It allows to easily guess the config entry for any bundles, instead of having to look at the docs to figure it out. Of course, having this convention also allows tools (IDE, generators, checkers, ...) to also do their job easily. As already said, if you really insist on changing the default, you can still override the getExtension method.
+
+:-1: for this change as I really think the current way is way better for end users. Removing it would be a regression in the DX IMO.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-26T14:47:13Z
+
+If we keep it, I would be happy with an updated exception message (I've seen the message quoted in frustration on Twitter). If we remove the word "must" and explain that there is a convention that should be followed, but that it can be changed by overriding getExtension(), that would do it for me!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:48:18Z
+
+Improving the error message is fine by me.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-30T10:58:08Z
+
+I've updated the PR to improve the error message instead. Of course, I'm open for any better suggestions :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T03:01:20Z
+
+:+1:

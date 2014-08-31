@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-19T16:06:25Z
+
+This must be documented in the component changelog for 2.6 (prefixed with ``[BC Break]`` and in the UDGRADE-2.6 file (as it is a BC break)
+
+---------------------------------------------------------------------------
+
+by tommygnr at 2014-08-19T16:09:01Z
+
+@stof I will do that once it is agreed that this can be merged. I have restricted it to a rebase of #11590 until there is agreement about exactly what to do.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T08:53:27Z
+
+> I will do that once it is agreed that this can be merged
+
+I don't understand the reasoning: it cannot be merged without the changelog update requested
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-20T09:00:42Z
+
+@stof As far as I understand, @tommygnr wanted to know whether or not the way he fixed the issue is approriate before investing more time in this (mainly because of the BC break I think).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T09:06:23Z
+
+Well, the discussion in the previous PR already indicate that we agreed abotu merging such change in master (the reason the PR was replaced is that we rejected changing this behavior in 2.4).
+And the way to fix it is the only one (removing the check for ``null`` and empty strings).
+
+IMO, the only thing missing to make it mergeable is precisely the changelog update
+
+---------------------------------------------------------------------------
+
+by tommygnr at 2014-08-21T06:55:51Z
+
+@xabbuh was on the money. Anyway, since I am now clear that the approach I took is acceptable I have added the required changelog entries. @stof let me know if you are happy with the wording of those entries.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T01:47:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T20:11:38Z
+
+:+1:

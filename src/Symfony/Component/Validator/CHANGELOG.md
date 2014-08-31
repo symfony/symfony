@@ -9,6 +9,10 @@ CHANGELOG
  * [BC BREAK] added internal `ExecutionContextInterface::setConstraint()`
  * added `ConstraintViolation::getConstraint()`
  * [BC BREAK] The `ExpressionValidator` will now evaluate the Expression even when the property value is null or an empty string
+ * deprecated `ClassMetadata::hasMemberMetadatas()`
+ * deprecated `ClassMetadata::getMemberMetadatas()`
+ * deprecated `ClassMetadata::addMemberMetadata()`
+ * [BC BREAK] added `Mapping\MetadataInterface::getConstraints()`
 
 2.5.0
 -----

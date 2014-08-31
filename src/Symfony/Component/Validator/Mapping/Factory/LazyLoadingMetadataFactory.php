@@ -74,7 +74,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * Returns the metadata for the given class name or object.
+     * {@inheritdoc}
      *
      * If the method was called with the same class name (or an object of that
      * class) before, the same metadata instance is returned.
@@ -87,12 +87,6 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      * configured with a loader, the metadata is passed to the
      * {@link LoaderInterface::loadClassMetadata()} method for further
      * configuration. At last, the new object is returned.
-     *
-     * @param string|object $value A class name or an object
-     *
-     * @return MetadataInterface The metadata for the value
-     *
-     * @throws NoSuchMetadataException If no metadata exists for the given value
      */
     public function getMetadataFor($value)
     {
@@ -141,12 +135,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     }
 
     /**
-     * Returns whether the factory is able to return metadata for the given
-     * class name or object.
-     *
-     * @param string|object $value A class name or an object
-     *
-     * @return bool    Whether metadata can be returned for that class
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {

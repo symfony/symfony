@@ -101,7 +101,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             ))),
         );
 
-        $members = $this->metadata->getMemberMetadatas('firstName');
+        $members = $this->metadata->getPropertyMetadata('firstName');
 
         $this->assertCount(1, $members);
         $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());
@@ -112,8 +112,8 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->metadata->addPropertyConstraint('firstName', new ConstraintA());
 
-        $this->assertTrue($this->metadata->hasMemberMetadatas('firstName'));
-        $this->assertFalse($this->metadata->hasMemberMetadatas('non_existant_field'));
+        $this->assertTrue($this->metadata->hasPropertyMetadata('firstName'));
+        $this->assertFalse($this->metadata->hasPropertyMetadata('non_existant_field'));
     }
 
     public function testMergeConstraintsKeepsPrivateMembersSeparate()
@@ -138,7 +138,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             ))),
         );
 
-        $members = $this->metadata->getMemberMetadatas('internal');
+        $members = $this->metadata->getPropertyMetadata('internal');
 
         $this->assertCount(2, $members);
         $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());

@@ -89,7 +89,7 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * The current validation metadata.
      *
-     * @var MetadataInterface
+     * @var MetadataInterface|null
      */
     private $metadata;
 

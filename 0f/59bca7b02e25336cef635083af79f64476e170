@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-14T12:54:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-14T13:07:09Z
+
+@sstok is talking about "filtering". Not sure what he means. Filtering is not done. Either an exception is thrown or all options are returned. So I don't see the impact of this change here.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-08-14T13:33:35Z
+
+When I set which value-types are allowed they are validated *after* the normalizing process.
+So the normalizer is receiving possible invalid values.
+
+Second, the value returned by the normalizer is validated for correctness. Meaning that when I want to return something special the validation needs to be configured to accept the returned value.
+
+So technically the normalizer should be run after the validating, instead of running it as first.
+Or we can add an after-normalizer/transformer that is run after the validating and merging.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-14T13:42:47Z
+
+So this change here has nothing to do with #4500
+But we can still merge it because I think it makes sense to validate types before values.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-08-14T13:44:08Z
+
+Indeed. I have updated the original issue so it will get lost when merging this PR.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-14T15:04:16Z
+
+Ah, now your issue is clear to me, @sstok. thanks! I've removed it from the PR description.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:17:51Z
+
+:+1: Looks like a bug fix to me.

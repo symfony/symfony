@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by tPl0ch at 2014-07-25T09:24:17Z
+
+@fabpot I now use return code `113`, which is in the recommended range for user-specified return codes in the document you linked to. Commits have been rebased to current master.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:27:10Z
+
+:+1: Can you create a PR on the docs as well?
+
+---------------------------------------------------------------------------
+
+by tPl0ch at 2014-07-25T11:01:33Z
+
+@fabpot Created PR on the docs :)

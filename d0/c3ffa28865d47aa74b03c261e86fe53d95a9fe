@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-02-04T10:35:35Z
+
+Supporting Heredoc is a bit more complex, because you can have string interpolation in it (and your eval call would probably be totally broken in such case).
+
+And if you support Heredoc, you should also support [Nowdoc](http://fr2.php.net/manual/en/language.types.string.php#language.types.string.syntax.nowdoc) (which should be simpler as there is no interpolation in it)
+
+---------------------------------------------------------------------------
+
+by mtibben at 2014-02-04T11:10:39Z
+
+The alternative to `eval` would be to do something like https://github.com/nikic/PHP-Parser/blob/master/lib/PHPParser/Node/Scalar/String.php
+
+However I can find quite a few places in symfony where `eval` is being used. Is this a hard requirement, or just a suggestion?
+
+---------------------------------------------------------------------------
+
+by mtibben at 2014-02-05T00:15:30Z
+
+@stof the php extractor does not do any type of interpolation - that's pretty much impossible. It just tokenizes PHP and extracts strings.
+
+So this should probably already work with Nowdoc. I'll add a testcase
+
+---------------------------------------------------------------------------
+
+by mtibben at 2014-02-05T06:29:23Z
+
+The code I've used here is BSD-3 clause. Is this compatible with MIT ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-03T21:18:28Z
+
+Any update on this PR?
+
+---------------------------------------------------------------------------
+
+by mtibben at 2014-06-04T10:28:47Z
+
+@fabpot I've added the license headers. Is that what you had in mind ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:54:53Z
+
+:+1:

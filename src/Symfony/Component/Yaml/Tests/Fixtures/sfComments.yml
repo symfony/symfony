@@ -63,3 +63,11 @@ brief: >
 yaml: 'foo#bar: baz'
 php: |
     array('foo#bar' => 'baz')
+---
+test: 'Hash key ending with a space and a #'
+brief: >
+    'Hash key ending with a space and a #'
+yaml: |
+    'foo #': baz
+php: |
+    array('foo #' => 'baz')

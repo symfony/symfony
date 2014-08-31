@@ -448,7 +448,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\ProcessFailedException
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      */
     public function testMustRunThrowsException()
     {
@@ -669,7 +669,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpDeadlock()
     {
-        $this->markTestSkipped('Can course PHP to hang');
+        $this->markTestSkipped('Can cause PHP to hang');
 
         // Sleep doesn't work as it will allow the process to handle signals and close
         // file handles from the other end.
@@ -1011,20 +1011,20 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideStartMethods
      */
-    public function testStartWithACallbackAndDisabledOutput($startMethod)
+    public function testStartWithACallbackAndDisabledOutput($startMethod, $exception, $exceptionMessage)
     {
         $p = $this->getProcess('php -r "usleep(500000);"');
         $p->disableOutput();
-        $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.');
+        $this->setExpectedException($exception, $exceptionMessage);
         call_user_func(array($p, $startMethod), function () {});
     }
 
     public function provideStartMethods()
     {
         return array(
-            array('start'),
-            array('run'),
-            array('mustRun'),
+            array('start', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('run', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('mustRun', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
         );
     }
 

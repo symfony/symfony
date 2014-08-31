@@ -119,6 +119,38 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, Inline::parseScalar($value));
     }
 
+    /**
+     * @dataProvider getDataForParseReferences
+     */
+    public function testParseReferences($yaml, $expected)
+    {
+        $this->assertSame($expected, Inline::parse($yaml, false, false, false, array('var' => 'var-value')));
+    }
+
+    public function getDataForParseReferences()
+    {
+        return array(
+            'scalar' => array('*var', 'var-value'),
+            'list' => array('[ *var ]', array('var-value')),
+            'list-in-list' => array('[[ *var ]]', array(array('var-value'))),
+            'map-in-list' => array('[ { key: *var } ]', array(array('key' => 'var-value'))),
+            'embedded-mapping-in-list' => array('[ key: *var ]', array(array('key' => 'var-value'))),
+            'map' => array('{ key: *var }', array('key' => 'var-value')),
+            'list-in-map' => array('{ key: [*var] }', array('key' => array('var-value'))),
+            'map-in-map' => array('{ foo: { bar: *var } }', array('foo' => array('bar' => 'var-value'))),
+        );
+    }
+
+    public function testParseMapReferenceInSequence()
+    {
+        $foo = array(
+            'a' => 'Steve',
+            'b' => 'Clark',
+            'c' => 'Brian',
+        );
+        $this->assertSame(array($foo), Inline::parse('[*foo]', false, false, false, array('foo' => $foo)));
+    }
+
     public function getTestsForParse()
     {
         return array(

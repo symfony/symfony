@@ -35,12 +35,12 @@
                 <target>Uno o più valori inseriti non sono validi.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>I campi {{ fields }} non sono validi.</target>
+                <source>This field was not expected.</source>
+                <target>Questo campo non è stato previsto.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>I campi {{ fields }} sono mancanti.</target>
+                <source>This field is missing.</source>
+                <target>Questo campo è manca.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

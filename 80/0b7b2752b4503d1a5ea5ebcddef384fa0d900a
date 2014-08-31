@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T16:15:55Z
+
+Awesome! @i3or1s Can you create a pull request or an issue on the docs to reflect this change (which I'm happy to say will simplify the docs nicely)?
+
+Thanks for the nice PR!
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-07-05T16:47:40Z
+
+Created related issue in Docs https://github.com/symfony/symfony-docs/issues/3996
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-10T03:16:16Z
+
+Issues that stof reported have been fixed.
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-07-17T14:13:03Z
+
+Issues are fixed any news on the PR
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:39:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-08-11T06:58:05Z
+
+Hi @weaverryan @stof @romainneutron could you check out the PR
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-11T07:06:11Z
+
+Shouldn't this also get a changelog entry?
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-08-18T14:01:49Z
+
+Issues have been fixed. This is my first contribution so i am eager to see how it all goes. I apologize if i am breaking some rules on this.
+Could you point me to the correct direction (document) on what i should do next, if anything, so that PR is merged.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-08-18T15:34:31Z
+
+@i3or1s I think you're done :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-19T20:43:07Z
+
+@i3or1s You're doing great :). You could add a new 2.6.0 CHANGELOG entry to this file: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/CHANGELOG.md
+
+But unless someone sees some other change, we're just waiting for merge (some people are on holiday right now).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-08-20T08:26:09Z
+
+@weaverryan Should i change Component CHANGELOG.md since class is added there or Bundle one because it is registered there or maybe both?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-20T08:30:00Z
+
+You also have to update the version of ``symfony/security`` in the bundle's composer.json file, don't you?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T08:37:15Z
+
+@i3or1s the class is added in the component, so the changelog entry should be added in the component.
+
+And indeed, @xabbuh is right about bumping the SecurityBundle requirement on the component for people installing the subtree repos
+
+---------------------------------------------------------------------------
+
+by i3or1s at 2014-08-20T08:52:47Z
+
+@stof @xabbuh Component is in `2.5` is this going to be `2.6` so i can change dependency to `2.6`.
+Current one is `"symfony/security": "~2.4"`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:41:24Z
+
+@i3or1s Yes, you should change the dep to `symfony/security": "~2.6`

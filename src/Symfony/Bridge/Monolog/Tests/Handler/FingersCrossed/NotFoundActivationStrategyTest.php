@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Tests\Handler\FingersCrossed;
 
 use Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Monolog\Logger;
 
@@ -23,8 +24,10 @@ class NotFoundActivationStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsActivated($url, $record, $expected)
     {
-        $strategy = new NotFoundActivationStrategy(array('^/foo', 'bar'), Logger::WARNING);
-        $strategy->setRequest(Request::create($url));
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create($url));
+
+        $strategy = new NotFoundActivationStrategy($requestStack, array('^/foo', 'bar'), Logger::WARNING);
 
         $this->assertEquals($expected, $strategy->isHandlerActivated($record));
     }

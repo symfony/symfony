@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class TimeValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -51,8 +51,8 @@ class TimeValidator extends ConstraintValidator
     /**
      * Returns the regex pattern for validating
      *
-     * @param Boolean $withMinutes
-     * @param Boolean $withSeconds
+     * @param bool    $withMinutes
+     * @param bool    $withSeconds
      * @return string
      */
     protected function getPattern($withMinutes, $withSeconds)

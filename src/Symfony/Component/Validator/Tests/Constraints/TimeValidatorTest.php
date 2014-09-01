@@ -104,7 +104,9 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array('01'),
             array('00'),
+            array('0'),
             array('23'),
+            array('5'),
         );
     }
 
@@ -125,6 +127,7 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array('01:02'),
             array('00:00'),
+            array('4:00'),
             array('23:59'),
         );
     }
@@ -152,6 +155,7 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
             array('foobar 12:34:56'),
             array('12:34:56 foobar'),
             array('00:00'),
+            array('05:3'),
             array('24:00:00'),
             array('00:60:00'),
             array('00:00:60'),

@@ -58,7 +58,7 @@ class TimeValidator extends ConstraintValidator
     protected function getPattern($withMinutes, $withSeconds)
     {
         // pattern for hours
-        $pattern = "(0[0-9]|1[0-9]|2[0-3])";
+        $pattern = "(0?[0-9]|1[0-9]|2[0-3])";
 
         if ($withMinutes) {
             // pattern for minutes

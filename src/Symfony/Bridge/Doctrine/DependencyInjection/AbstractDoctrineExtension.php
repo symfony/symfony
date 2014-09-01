@@ -397,30 +397,6 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
-     * Search for a manager that is declared as 'auto_mapping' = true
-     * @param array $managerConfigs
-     * @throws \LogicException
-     * @return null|string The name of the manager. If no one manager is found, returns null.
-     */
-    private function validateAutoMapping(array $managerConfigs)
-    {
-        $autoMappedManager = null;
-        foreach ($managerConfigs as $name => $manager) {
-            if (!$manager['auto_mapping']) {
-                continue;
-            }
-
-            if (null !== $autoMappedManager) {
-                throw new \LogicException(sprintf('You cannot enable "auto_mapping" on more than one manager at the same time (found in "%s" and %s").', $autoMappedManager, $name));
-            }
-
-            $autoMappedManager = $name;
-        }
-
-        return $autoMappedManager;
-    }
-
-    /**
      * Returns a modified version of $managerConfigs.
      * The manager called $autoMappedManager will map all bundles that are not mepped by other managers.
      * @param array $managerConfigs
@@ -477,4 +453,28 @@ abstract class AbstractDoctrineExtension extends Extension
      * @return string
      */
     abstract protected function getMappingResourceExtension();
+
+    /**
+     * Search for a manager that is declared as 'auto_mapping' = true
+     * @param array $managerConfigs
+     * @throws \LogicException
+     * @return null|string The name of the manager. If no one manager is found, returns null.
+     */
+    private function validateAutoMapping(array $managerConfigs)
+    {
+        $autoMappedManager = null;
+        foreach ($managerConfigs as $name => $manager) {
+            if (!$manager['auto_mapping']) {
+                continue;
+            }
+
+            if (null !== $autoMappedManager) {
+                throw new \LogicException(sprintf('You cannot enable "auto_mapping" on more than one manager at the same time (found in "%s" and %s").', $autoMappedManager, $name));
+            }
+
+            $autoMappedManager = $name;
+        }
+
+        return $autoMappedManager;
+    }
 }

@@ -32,7 +32,7 @@ class Time extends Constraint
     {
         parent::__construct($options);
 
-        if (isset($options['withMinutes']) && !isset($options['withSeconds']) && $options['withMinutes'] == false) {
+        if (isset($options['withMinutes']) && !isset($options['withSeconds']) && $options['withMinutes'] === false) {
             $this->withSeconds = false;
         }
 

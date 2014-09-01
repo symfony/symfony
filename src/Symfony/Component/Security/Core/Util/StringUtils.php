@@ -38,7 +38,7 @@ class StringUtils
         $knownLen = strlen($knownString);
         $userLen = strlen($userInput);
 
-        // Extend know string to avoid uninitialized string offsets
+        // Extend the known string to avoid uninitialized string offsets
         $knownString .= $userInput;
 
         // Set the result to the difference between the lengths

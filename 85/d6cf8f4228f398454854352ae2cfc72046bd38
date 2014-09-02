@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-02T14:44:42Z
+
+You forgot the PR description: http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+Then the file was valid, see [the spec](http://yaml.org/spec/1.1/index.html#indentation%20space/)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-02T14:46:12Z
+
+yes is more for consistency
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-02T15:08:10Z
+
+this should go in 2.3 to avoid the pain when merging between branches
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-02T15:09:16Z
+
+let me see if i can pick it up with gush and rebase it to 2.3, or does gh can do this without me worrying about further?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-02T15:15:54Z
+
+you don't need to worry (if you do the rebase yourself, it would require creating a new PR to change the target)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-02T15:17:44Z
+
+i will leave it as it is now then.

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-08-31T17:53:01Z
+
+Can you use a dataprovider instead of multiples asserts?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-08-31T17:55:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-09-01T09:27:50Z
+
+@fabpot The use of the short array notation (introduced in PHP 5.4) is a bug in fabbot?
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-09-01T09:39:06Z
+
+@dunglas Symfony should be compatible with php 5.3
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-09-01T09:51:07Z
+
+@jeremy-derusse yes I know, I'm talking about the error reported by fabbot: http://fabbot.io/report/symfony/symfony/11808/f9c08a32747428212be3f10a4deccf00815fd017
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-01T11:39:26Z
+
+@dunglas I've just removed the check for the short array syntax. The report is more relevant now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-09-01T11:48:03Z
+
+@fabpot thanks. CS fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-01T20:55:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-02T00:20:53Z
+
+:+1:

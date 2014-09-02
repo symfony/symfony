@@ -863,7 +863,6 @@ UPGRADE FROM 2.x to 3.0
        ->atPath('property')
        ->setParameter('{{ value }}', $invalidValue)
        ->addViolation();
-   ));
    ```
 
    The methods `validate()` and `validateValue()` were removed. You should use

@@ -22,10 +22,10 @@ before_install:
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
+#    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;'
 
 install:
     - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source install
-#    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;'
 
 script:
     - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};'

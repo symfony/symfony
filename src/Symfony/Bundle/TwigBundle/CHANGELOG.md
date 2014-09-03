@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * fixed error.json.twig and exception.json.twig have same structure making clients independent of runtime environment.
+
 2.3.0
 -----
 

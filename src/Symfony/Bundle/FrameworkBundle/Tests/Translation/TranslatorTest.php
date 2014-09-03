@@ -92,6 +92,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
+    public function testTransWithCachingWithInvalidLocale()
+    {
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator->setLocale('invalid locale');
+
+        $this->setExpectedException('\InvalidArgumentException');
+        $translator->trans('foo');
+    }
+
     public function testGetLocale()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
@@ -130,6 +140,49 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($translator->getLocale());
         $this->assertSame('en', $translator->getLocale());
     }
+
+    public function testGetLocaleWithInvalidLocale()
+    {
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+
+        $request
+            ->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue('foo bar'))
+        ;
+        $request
+            ->expects($this->once())
+            ->method('getDefaultLocale')
+            ->will($this->returnValue('en-US'))
+        ;
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $container
+            ->expects($this->once())
+            ->method('isScopeActive')
+            ->with('request')
+            ->will($this->returnValue(true))
+        ;
+
+        $container
+            ->expects($this->once())
+            ->method('has')
+            ->with('request')
+            ->will($this->returnValue(true))
+        ;
+
+        $container
+            ->expects($this->any())
+            ->method('get')
+            ->with('request')
+            ->will($this->returnValue($request))
+        ;
+
+        $translator = new Translator($container, new MessageSelector());
+        $this->assertSame('en-US', $translator->getLocale());
+    }
+
 
     protected function getCatalogue($locale, $messages)
     {
@@ -211,9 +264,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array())
+    public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
-        $translator = new Translator(
+        $translator = new $translatorClass(
             $this->getContainer($loader),
             new MessageSelector(),
             array('loader' => array('loader')),
@@ -229,5 +282,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
 
         return $translator;
+    }
+}
+
+class TranslatorWithInvalidLocale extends Translator
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
     }
 }

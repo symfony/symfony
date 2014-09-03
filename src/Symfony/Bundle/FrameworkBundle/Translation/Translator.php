@@ -67,6 +67,11 @@ class Translator extends BaseTranslator
     {
         if (null === $this->locale && $request = $this->container->get('request_stack')->getCurrentRequest()) {
             $this->locale = $request->getLocale();
+            try {
+                $this->setLocale($request->getLocale());
+            } catch (\InvalidArgumentException $e) {
+                $this->setLocale($request->getDefaultLocale());
+            }
         }
 
         return $this->locale;
@@ -86,6 +91,8 @@ class Translator extends BaseTranslator
 
             return parent::loadCatalogue($locale);
         }
+
+        $this->assertValidLocale($locale);
 
         $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
         if (!$cache->isFresh()) {

@@ -52,7 +52,8 @@ class Filesystem
         if ($doCopy) {
             // https://bugs.php.net/bug.php?id=64634
             $source = fopen($originFile, 'r');
-            $target = fopen($targetFile, 'w');
+            // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
+            $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))));
             stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\HttpCache\SurrogateInterface;
+use Symfony\Component\HttpKernel\UriSigner;
 
 /**
  * Implements Surrogate rendering strategy.
@@ -25,6 +26,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
 {
     private $surrogate;
     private $inlineStrategy;
+    private $signer;
 
     /**
      * Constructor.
@@ -34,11 +36,13 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
      *
      * @param SurrogateInterface        $surrogate      An Surrogate instance
      * @param FragmentRendererInterface $inlineStrategy The inline strategy to use when the surrogate is not supported
+     * @param UriSigner                 $signer
      */
-    public function __construct(SurrogateInterface $surrogate = null, FragmentRendererInterface $inlineStrategy)
+    public function __construct(SurrogateInterface $surrogate = null, FragmentRendererInterface $inlineStrategy, UriSigner $signer = null)
     {
         $this->surrogate = $surrogate;
         $this->inlineStrategy = $inlineStrategy;
+        $this->signer = $signer;
     }
 
     /**
@@ -64,16 +68,28 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         }
 
         if ($uri instanceof ControllerReference) {
-            $uri = $this->generateFragmentUri($uri, $request);
+            $uri = $this->generateSignedFragmentUri($uri, $request);
         }
 
         $alt = isset($options['alt']) ? $options['alt'] : null;
         if ($alt instanceof ControllerReference) {
-            $alt = $this->generateFragmentUri($alt, $request);
+            $alt = $this->generateSignedFragmentUri($alt, $request);
         }
 
         $tag = $this->surrogate->renderIncludeTag($uri, $alt, isset($options['ignore_errors']) ? $options['ignore_errors'] : false, isset($options['comment']) ? $options['comment'] : '');
 
         return new Response($tag);
+    }
+
+    private function generateSignedFragmentUri($uri, Request $request)
+    {
+        if (null === $this->signer) {
+            throw new \LogicException('You must use a URI when using the ESI rendering strategy or set a URL signer.');
+        }
+
+        // we need to sign the absolute URI, but want to return the path only.
+        $fragmentUri = $this->signer->sign($this->generateFragmentUri($uri, $request, true));
+
+        return substr($fragmentUri, strlen($request->getSchemeAndHttpHost()));
     }
 }

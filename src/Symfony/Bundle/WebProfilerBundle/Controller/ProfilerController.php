@@ -112,33 +112,6 @@ class ProfilerController
     }
 
     /**
-     * Exports data for a given token.
-     *
-     * @param string $token The profiler token
-     *
-     * @return Response A Response instance
-     *
-     * @throws NotFoundHttpException
-     */
-    public function exportAction($token)
-    {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
-        }
-
-        $this->profiler->disable();
-
-        if (!$profile = $this->profiler->loadProfile($token)) {
-            throw new NotFoundHttpException(sprintf('Token "%s" does not exist.', $token));
-        }
-
-        return new Response($this->profiler->export($profile), 200, array(
-            'Content-Type'        => 'text/plain',
-            'Content-Disposition' => 'attachment; filename= '.$token.'.txt',
-        ));
-    }
-
-    /**
      * Purges all tokens.
      *
      * @return Response A Response instance
@@ -155,36 +128,6 @@ class ProfilerController
         $this->profiler->purge();
 
         return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'purge')), 302, array('Content-Type' => 'text/html'));
-    }
-
-    /**
-     * Imports token data.
-     *
-     * @param Request $request The current HTTP Request
-     *
-     * @return Response A Response instance
-     *
-     * @throws NotFoundHttpException
-     */
-    public function importAction(Request $request)
-    {
-        if (null === $this->profiler) {
-            throw new NotFoundHttpException('The profiler must be enabled.');
-        }
-
-        $this->profiler->disable();
-
-        $file = $request->files->get('file');
-
-        if (empty($file) || !$file->isValid()) {
-            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'upload_error')), 302, array('Content-Type' => 'text/html'));
-        }
-
-        if (!$profile = $this->profiler->import(file_get_contents($file->getPathname()))) {
-            return new RedirectResponse($this->generator->generate('_profiler_info', array('about' => 'already_exists')), 302, array('Content-Type' => 'text/html'));
-        }
-
-        return new RedirectResponse($this->generator->generate('_profiler', array('token' => $profile->getToken())), 302, array('Content-Type' => 'text/html'));
     }
 
     /**

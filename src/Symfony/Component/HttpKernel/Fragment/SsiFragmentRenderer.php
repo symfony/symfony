@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\UriSigner;
-
 /**
  * Implements the SSI rendering strategy.
  *
@@ -22,38 +18,11 @@ use Symfony\Component\HttpKernel\UriSigner;
  */
 class SsiFragmentRenderer extends AbstractSurrogateFragmentRenderer
 {
-    /** @var UriSigner */
-    private $signer;
-
-    /**
-     * Set uri signer
-     *
-     * @param UriSigner $signer
-     */
-    public function setUriSigner(UriSigner $signer)
-    {
-        $this->signer = $signer;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
         return 'ssi';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function generateFragmentUri(ControllerReference $reference, Request $request, $absolute = false, $strict = true)
-    {
-        $uri = parent::generateFragmentUri($reference, $request, $absolute, $strict);
-
-        if ($this->signer) {
-            $uri = $this->signer->sign($uri);
-        }
-
-        return $uri;
     }
 }

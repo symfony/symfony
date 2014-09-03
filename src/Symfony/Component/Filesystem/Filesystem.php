@@ -54,9 +54,12 @@ class Filesystem
             if (false === $source = @fopen($originFile, 'r')) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading.', $originFile, $targetFile), 0, null, $originFile);
             }
-            if (false === $target = @fopen($targetFile, 'w')) {
+
+            // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
+            if (false === $target = fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))))) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing.', $originFile, $targetFile), 0, null, $originFile);
             }
+
             stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);

@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\UriSigner;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -24,8 +25,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * All URL paths starting with /_fragment are handled as
  * content fragments by this listener.
  *
- * If the request does not come from a trusted IP, it throws an
- * AccessDeniedHttpException exception.
+ * If throws an AccessDeniedHttpException exception if the request
+ * is not signed or if it is not an internal sub-request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -61,7 +62,9 @@ class FragmentListener implements EventSubscriberInterface
             return;
         }
 
-        $this->validateRequest($request);
+        if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
+            $this->validateRequest($request);
+        }
 
         parse_str($request->query->get('_path', ''), $attributes);
         $request->attributes->add($attributes);

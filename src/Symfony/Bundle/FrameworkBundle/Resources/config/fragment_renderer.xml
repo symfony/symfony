@@ -48,12 +48,8 @@
             <tag name="kernel.fragment_renderer" />
             <argument type="service" id="ssi" on-invalid="null" />
             <argument type="service" id="fragment.renderer.inline" />
-            <call method="setFragmentPath">
-                <argument>%fragment.path%</argument>
-            </call>
-            <call method="setUriSigner">
-                <argument type="service" id="uri_signer" />
-            </call>
+            <argument type="service" id="uri_signer" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
         </service>
     </services>
 </container>

@@ -35,13 +35,13 @@ class BinaryFileResponse extends Response
     /**
      * Constructor.
      *
-     * @param \SplFileInfo|string $file               The file to stream
-     * @param int                 $status             The response status code
-     * @param array               $headers            An array of response headers
-     * @param bool                $public             Files are public by default
-     * @param null|string         $contentDisposition The type of Content-Disposition to set automatically with the filename
-     * @param bool                $autoEtag           Whether the ETag header should be automatically set
-     * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param File|string $file               The file to stream
+     * @param int         $status             The response status code
+     * @param array       $headers            An array of response headers
+     * @param bool        $public             Files are public by default
+     * @param null|string $contentDisposition The type of Content-Disposition to set automatically with the filename
+     * @param bool        $autoEtag           Whether the ETag header should be automatically set
+     * @param bool        $autoLastModified   Whether the Last-Modified header should be automatically set
      */
     public function __construct($file, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -55,13 +55,13 @@ class BinaryFileResponse extends Response
     }
 
     /**
-     * @param \SplFileInfo|string $file               The file to stream
-     * @param int                 $status             The response status code
-     * @param array               $headers            An array of response headers
-     * @param bool                $public             Files are public by default
-     * @param null|string         $contentDisposition The type of Content-Disposition to set automatically with the filename
-     * @param bool                $autoEtag           Whether the ETag header should be automatically set
-     * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     * @param File|string $file               The file to stream
+     * @param int         $status             The response status code
+     * @param array       $headers            An array of response headers
+     * @param bool        $public             Files are public by default
+     * @param null|string $contentDisposition The type of Content-Disposition to set automatically with the filename
+     * @param bool        $autoEtag           Whether the ETag header should be automatically set
+     * @param bool        $autoLastModified   Whether the Last-Modified header should be automatically set
      *
      * @return BinaryResponse The created response
      */
@@ -73,10 +73,10 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param \SplFileInfo|string $file The file to stream
-     * @param string              $contentDisposition
-     * @param bool                $autoEtag
-     * @param bool                $autoLastModified
+     * @param File|string $file The file to stream
+     * @param string      $contentDisposition
+     * @param bool        $autoEtag
+     * @param bool        $autoLastModified
      *
      * @return BinaryFileResponse
      *

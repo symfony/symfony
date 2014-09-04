@@ -188,10 +188,8 @@ class Ssi implements SurrogateInterface
             throw new \RuntimeException('Unable to process an SSI tag without a "virtual" attribute.');
         }
 
-        return sprintf('<?php echo $this->surrogate->handle($this, \'%s\', \'%s\', %s) ?>' . "\n",
-            $options['virtual'],
-            '',
-            'false'
+        return sprintf('<?php echo $this->surrogate->handle($this, %s, \'\', false) ?>' . "\n",
+            var_export($options['virtual'], true)
         );
     }
 }

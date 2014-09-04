@@ -312,12 +312,62 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testNonDecoratedOutput()
     {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 200);
+        $bar->start();
+
+        for ($i = 0; $i < 200; $i++) {
+            $bar->advance();
+        }
+
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "   0/200 [>---------------------------]   0%\n".
+            "  20/200 [==>-------------------------]  10%\n".
+            "  40/200 [=====>----------------------]  20%\n".
+            "  60/200 [========>-------------------]  30%\n".
+            "  80/200 [===========>----------------]  40%\n".
+            " 100/200 [==============>-------------]  50%\n".
+            " 120/200 [================>-----------]  60%\n".
+            " 140/200 [===================>--------]  70%\n".
+            " 160/200 [======================>-----]  80%\n".
+            " 180/200 [=========================>--]  90%\n".
+            " 200/200 [============================] 100%",
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testNonDecoratedOutputWithClear()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(false), 50);
+        $bar->start();
+        $bar->setProgress(25);
+        $bar->clear();
+        $bar->setProgress(50);
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            "  0/50 [>---------------------------]   0%\n".
+            " 25/50 [==============>-------------]  50%\n".
+            " 50/50 [============================] 100%",
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testNonDecoratedOutputWithoutMax()
+    {
         $bar = new ProgressBar($output = $this->getOutputStream(false));
         $bar->start();
         $bar->advance();
 
         rewind($output->getStream());
-        $this->assertEquals('', stream_get_contents($output->getStream()));
+        $this->assertEquals(
+            "    0 [>---------------------------]\n".
+            "    1 [->--------------------------]",
+            stream_get_contents($output->getStream())
+        );
     }
 
     public function testParallelBars()

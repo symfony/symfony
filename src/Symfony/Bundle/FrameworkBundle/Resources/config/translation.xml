@@ -44,6 +44,7 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <argument type="service" id="config.resource.chain_refresher" />
         </service>
 
         <service id="translator" class="%translator.identity.class%">

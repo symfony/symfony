@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="config.resource.chain_refresher.class">Symfony\Component\Config\Resource\Refresher\ChainRefresher</parameter>
+        <parameter key="config.resource.container_aware_refresher.class">Symfony\Bundle\FrameworkBundle\Config\Resource\Refresher\ContainerAwareRefresher</parameter>
+    </parameters>
+
+    <services>
+        <service id="config.resource.chain_refresher" class="%config.resource.chain_refresher.class%">
+        </service>
+        <service id="config.resource.container_aware_refresher" class="%config.resource.container_aware_refresher.class%">
+            <argument type="service" id="service_container" />
+            <tag name="config.resource_refresher" />
+        </service>
+    </services>
+</container>

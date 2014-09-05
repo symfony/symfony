@@ -27,6 +27,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtra
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigResourceRefresherPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
@@ -81,6 +82,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new ConfigResourceRefresherPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_AFTER_REMOVING);

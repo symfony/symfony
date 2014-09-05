@@ -15,6 +15,7 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\Refresher\RefresherInterface;
 
 /**
  * Translator.
@@ -29,6 +30,7 @@ class Translator extends BaseTranslator
         'debug'     => false,
     );
     protected $loaderIds;
+    protected $refresher;
 
     /**
      * Constructor.
@@ -45,10 +47,11 @@ class Translator extends BaseTranslator
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), RefresherInterface $refresher = null)
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
+        $this->refresher = $refresher;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
@@ -95,7 +98,7 @@ class Translator extends BaseTranslator
         $this->assertValidLocale($locale);
 
         $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
-        if (!$cache->isFresh()) {
+        if (!$cache->isFresh($this->refresher)) {
             $this->initialize();
 
             parent::loadCatalogue($locale);

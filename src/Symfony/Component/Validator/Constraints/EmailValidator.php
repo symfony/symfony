@@ -68,8 +68,14 @@ class EmailValidator extends ConstraintValidator
 
         if ($valid) {
             $host = substr($value, strpos($value, '@') + 1);
+            
+            // Convert host to IDNA ASCII form
+            // 'täst.de' is converted to 'xn--tst-qla.de'
+            if (function_exists(idn_to_ascii)) {
+                $host = idn_to_ascii($host);
+            }
+            
             // Check for host DNS resource records
-
             if ($valid && $constraint->checkMX) {
                 $valid = $this->checkMX($host);
             } elseif ($valid && $constraint->checkHost) {

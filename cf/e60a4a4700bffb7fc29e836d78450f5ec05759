@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T19:11:38Z
+
+shoudn't this be handled by the escaping of backslahes already ? It is actually a matter of a backslash followed by another char
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T19:14:23Z
+
+hmm, actually, we are only escaping doubled backslahes, which is wrong IMO. we should escape all backslashes to be safe
+
+Btw, your own list is incomplete. There is more escaped chars in YAML: http://www.yaml.org/spec/1.2/spec.html#id2776092
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-04T19:19:35Z
+
+You're right. I tried escaping first which didn't work. But I guess that was simply a matter of where they have been placed.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T19:20:42Z
+
+I think it is a matter of replacing the first element to escape single backslahes
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-04T19:22:27Z
+
+I modified the escaper. This should now work as expected.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-04T20:02:42Z
+
+And I added some more tests (mainly to ensure that constructs like `\t\\` or `\t\\\\` don't break).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T08:01:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-05T09:52:09Z
+
+:+1:

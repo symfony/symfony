@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by ClementGautier at 2014-07-11T13:37:25Z
+
+@OwlyCode Squash your commits please
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-07-16T06:04:41Z
+
+Given the security issue: http://symfony.com/blog/security-releases-cve-2014-4931-symfony-2-3-18-2-4-8-and-2-5-2-released, you have to rebase this PR and re-apply modifications on Translator: https://github.com/symfony/symfony/commit/06a80fbdbe744ad6f3010479ba64ef5cf35dd9af#diff-abaa70edd88fdf9fbf5f2ab72ab89891R100
+
+---------------------------------------------------------------------------
+
+by OwlyCode at 2014-07-16T12:21:25Z
+
+I rebased the commits on master so they benefit from the security release and are ready to be merged. All tests on Translator are green on my machine. @jeremy-derusse is it ok for you ?
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-07-16T13:14:36Z
+
+@OwlyCode sounds good.
+I think, you can also copy new tests into TranslatorCacheTest.php (https://github.com/symfony/symfony/commit/06a80fbdbe744ad6f3010479ba64ef5cf35dd9af#diff-990df0e8238847f8ae54e8227f295c22R48)
+to avoid regression on #11093
+
+And fix the Coding Standard: http://fabbot.io/report/symfony/symfony/11373/4022cb2c12d8ef7a24773e09430e200459a9bdb2
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-17T23:41:10Z
+
+If there is a cache within a component it should be a generic CacheInterface injected and one implementation by using the filesystem. As it has been refactored in twig.
+See fabpot/Twig#1421
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-18T05:35:57Z
+
+The cache only makes sense if this a PHP file that PHP itself is able to "optimize". There is indeed a PR on Twig, but I'm still **not** in favor of it. I can understand some usages, but people should not use it blindly.
+
+So, we can indeed provide a cache interface, but we need to make it clear that we will only ever support the PHP implementation and document the limitation of the other possible implementations.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T06:57:33Z
+
+Can you rebase this PR on current master. Be careful as we made several security issue fixes.
+
+---------------------------------------------------------------------------
+
+by OwlyCode at 2014-09-05T08:47:18Z
+
+I rebased master, the security fixes didn't conflict but the `assertValidLocale` call added by 9e1bc22388d393d320d56f63dfbe006c267582c4 did. This is fixed and tested, but I left `assertValidLocale` as `protected` even if not needed anymore to avoid BC break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T08:48:50Z
+
+@jeremy-derusse Can you review this one?
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-09-05T09:00:26Z
+
+ Can you add (or move) new tests added on https://github.com/symfony/symfony/pull/11830/files ?
+
+---------------------------------------------------------------------------
+
+by OwlyCode at 2014-09-05T11:08:41Z
+
+I fixed the issues reported by @fabpot and @jeremy-derusse on this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T13:22:09Z
+
+Is it mergeable now?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-05T13:29:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T13:31:14Z
+
+@OwlyCode Can you fix the CS issue reported by fabbot?
+
+---------------------------------------------------------------------------
+
+by OwlyCode at 2014-09-05T13:37:27Z
+
+I'm not sure on the way to solve this as the `use` statement causing the CS issue is inside an heredoc string (it is the content of a generated file).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-05T13:40:25Z
+
+Indeed. It looks like a false positive of the PHP-CS-Fixer here. I suspect fabbot is running the stable release for now, while the dev version should be fixed for this case
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T13:43:46Z
+
+:+1:

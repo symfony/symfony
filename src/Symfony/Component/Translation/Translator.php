@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
@@ -54,19 +55,33 @@ class Translator implements TranslatorInterface
     private $selector;
 
     /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
      * Constructor.
      *
      * @param string               $locale   The locale
      * @param MessageSelector|null $selector The message selector for pluralization
+     * @param string|null          $cacheDir The directory to use for the cache
+     * @param bool                 $debug    Use cache in debug mode ?
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null)
+    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
     {
         $this->setLocale($locale);
         $this->selector = $selector ?: new MessageSelector();
+        $this->cacheDir = $cacheDir;
+        $this->debug = $debug;
     }
 
     /**
@@ -282,8 +297,25 @@ class Translator implements TranslatorInterface
         return $messages;
     }
 
+    /*
+     * @param string $locale
+     */
     protected function loadCatalogue($locale)
     {
+        if (null === $this->cacheDir) {
+            $this->initializeCatalogue($locale);
+        } else {
+            $this->initializeCacheCatalogue($locale);
+        }
+    }
+
+    /**
+     * @param string $locale
+     */
+    protected function initializeCatalogue($locale)
+    {
+        $this->assertValidLocale($locale);
+
         try {
             $this->doLoadCatalogue($locale);
         } catch (NotFoundResourceException $e) {
@@ -292,6 +324,75 @@ class Translator implements TranslatorInterface
             }
         }
         $this->loadFallbackCatalogues($locale);
+    }
+
+    /**
+     * @param string $locale
+     */
+    private function initializeCacheCatalogue($locale)
+    {
+
+        if (isset($this->catalogues[$locale])) {
+            return;
+        }
+
+        if (null === $this->cacheDir) {
+            $this->initialize();
+
+            return $this->loadCatalogue($locale);
+        }
+
+        $this->assertValidLocale($locale);
+        $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
+        if (!$cache->isFresh()) {
+            $this->initializeCatalogue($locale);
+
+            $fallbackContent = '';
+            $current = '';
+            $replacementPattern = '/[^a-z0-9_]/i';
+            foreach ($this->computeFallbackLocales($locale) as $fallback) {
+                $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
+                $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
+
+                $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+
+EOF
+                    ,
+                    $fallbackSuffix,
+                    $fallback,
+                    var_export($this->catalogues[$fallback]->all(), true),
+                    $currentSuffix,
+                    $fallbackSuffix
+                );
+                $current = $fallback;
+            }
+
+            $content = sprintf(<<<EOF
+<?php
+
+use Symfony\Component\Translation\MessageCatalogue;
+
+\$catalogue = new MessageCatalogue('%s', %s);
+
+%s
+return \$catalogue;
+
+EOF
+                ,
+                $locale,
+                var_export($this->catalogues[$locale]->all(), true),
+                $fallbackContent
+            );
+
+            $cache->write($content, $this->catalogues[$locale]->getResources());
+
+            return;
+        }
+
+        $this->catalogues[$locale] = include $cache;
     }
 
     private function doLoadCatalogue($locale)

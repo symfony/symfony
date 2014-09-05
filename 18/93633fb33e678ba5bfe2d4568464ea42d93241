@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-09-05T12:22:32Z
+
+We addressed this issue by introducing a https://github.com/doctrine/DoctrineCacheBundle
+IMHO, since this is currently unusable, it should be removed. There's no way someone can use this class without experiencing E_FATAL.
+
+---------------------------------------------------------------------------
+
+by mauchede at 2014-09-05T12:38:39Z
+
+@romainneutron : If I remove the type hint, we are not sure to have a `CacheProvider` (so not sure to have the method `deleteAll`).
+
+@stof : I reverted the changes on constructor but I checked if the property `cache` inherits `CacheProvider`.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-05T12:44:46Z
+
+OK, :+1: for the current PR to avoid the E_FATAL
+
+---------------------------------------------------------------------------
+
+by mauchede at 2014-09-05T12:47:44Z
+
+OK, so we agree: I never pushed a BC! ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T12:52:58Z
+
+:+1:

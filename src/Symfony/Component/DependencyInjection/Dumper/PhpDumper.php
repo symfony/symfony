@@ -109,6 +109,7 @@ class PhpDumper extends Dumper
 
         if ($this->container->isFrozen()) {
             $code .= $this->addFrozenConstructor();
+            $code .= $this->addFrozenCompile();
         } else {
             $code .= $this->addConstructor();
         }
@@ -849,6 +850,26 @@ EOF;
 EOF;
 
         return $code;
+    }
+
+    /**
+     * Adds the constructor for a frozen container.
+     *
+     * @return string
+     */
+    private function addFrozenCompile()
+    {
+        return <<<EOF
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException("You cannot compile a dumped frozen container");
+    }
+
+EOF;
     }
 
     /**

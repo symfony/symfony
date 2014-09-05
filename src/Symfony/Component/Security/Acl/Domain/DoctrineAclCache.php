@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -55,7 +56,9 @@ class DoctrineAclCache implements AclCacheInterface
      */
     public function clearCache()
     {
-        $this->cache->deleteByPrefix($this->prefix);
+        if ($this->cache instanceof CacheProvider) {
+            $this->cache->deleteAll();
+        }
     }
 
     /**

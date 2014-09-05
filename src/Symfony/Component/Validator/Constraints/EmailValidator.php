@@ -71,7 +71,7 @@ class EmailValidator extends ConstraintValidator
             
             // Convert host to IDNA ASCII form
             // 'täst.de' is converted to 'xn--tst-qla.de'
-            if (function_exists(idn_to_ascii)) {
+            if (function_exists('idn_to_ascii')) {
                 $host = idn_to_ascii($host);
             }
             

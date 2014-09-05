@@ -101,6 +101,11 @@ class SsiTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'...\', \'\', false) ?>'."\n", $response->getContent());
         $this->assertEquals('SSI', $response->headers->get('x-body-eval'));
+
+        $response = new Response('foo <!--#include virtual="foo\'" -->');
+        $ssi->process($request, $response);
+
+        $this->assertEquals("foo <?php echo \$this->surrogate->handle(\$this, 'foo\\'', '', false) ?>"."\n", $response->getContent());
     }
 
     public function testProcessEscapesPhpTags()

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 
 /**
  * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
@@ -20,6 +22,22 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
+    /**
+     * @var ServerParams
+     */
+    private $serverParams;
+
+    /**
+     * Creates a validator with the given server parameters.
+     *
+     * @param ServerParams $params The server parameters. Default
+     *                             parameters are created if null.
+     */
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
+
     /**
      * The allowed keys of the $_FILES array.
      *
@@ -75,6 +93,10 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $params = array_key_exists($name, $_POST) ? $_POST[$name] : $default;
                 $files = array_key_exists($name, $fixedFiles) ? $fixedFiles[$name] : $default;
             } else {
+                if ($this->serverParams->getContentLength() > $this->serverParams->getPostMaxSize()) {
+                    throw new InvalidConfigurationException('Max post size exceeded.');
+                }
+
                 // Don't submit the form if it is not present in the request
                 return;
             }

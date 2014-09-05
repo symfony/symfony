@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +26,22 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
+    /**
+     * @var ServerParams
+     */
+    private $serverParams;
+
+    /**
+     * Creates a validator with the given server parameters.
+     *
+     * @param ServerParams $params The server parameters. Default
+     *                             parameters are created if null.
+     */
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -61,6 +79,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $params = $request->request->get($name, $default);
                 $files = $request->files->get($name, $default);
             } else {
+                if ($this->serverParams->getContentLength() > $this->serverParams->getPostMaxSize()) {
+                    throw new InvalidConfigurationException('Max post size exceeded.');
+                }
+
                 // Don't submit the form if it is not present in the request
                 return;
             }

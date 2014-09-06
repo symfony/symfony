@@ -279,6 +279,9 @@ EOF;
         $this->assertEquals($expected, $output);
     }
 
+    /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     */
     public function testIsClassInActiveBundleFalse()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
@@ -286,6 +289,9 @@ EOF;
         $this->assertFalse($kernel->isClassInActiveBundle('Not\In\Active\Bundle'));
     }
 
+    /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     */
     public function testIsClassInActiveBundleFalseNoNamespace()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
@@ -293,6 +299,9 @@ EOF;
         $this->assertFalse($kernel->isClassInActiveBundle('NotNamespacedClass'));
     }
 
+    /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     */
     public function testIsClassInActiveBundleTrue()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
@@ -300,6 +309,9 @@ EOF;
         $this->assertTrue($kernel->isClassInActiveBundle(__NAMESPACE__.'\Fixtures\FooBarBundle\SomeClass'));
     }
 
+    /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     */
     protected function getKernelMockForIsClassInActiveBundleTest()
     {
         $bundle = new FooBarBundle();

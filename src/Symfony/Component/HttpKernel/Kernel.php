@@ -209,9 +209,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function isClassInActiveBundle($class)
     {
+        trigger_error('isClassInActiveBundle is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         foreach ($this->getBundles() as $bundle) {
             if (0 === strpos($class, $bundle->getNamespace())) {
                 return true;

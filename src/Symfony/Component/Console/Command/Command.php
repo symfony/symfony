@@ -542,7 +542,7 @@ class Command
      *
      * @api
      */
-    public function setAliases($aliases)
+    public function setAliases(array $aliases)
     {
         foreach ($aliases as $alias) {
             $this->validateName($alias);

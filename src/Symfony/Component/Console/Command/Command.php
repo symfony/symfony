@@ -521,11 +521,11 @@ class Command
 
         $placeholders = array(
             '%command.name%',
-            '%command.full_name%'
+            '%command.full_name%',
         );
         $replacements = array(
             $name,
-            $_SERVER['PHP_SELF'].' '.$name
+            $_SERVER['PHP_SELF'].' '.$name,
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp());

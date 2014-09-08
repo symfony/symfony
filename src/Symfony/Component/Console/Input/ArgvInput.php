@@ -169,7 +169,7 @@ class ArgvInput extends Input
         // if input is expecting another argument, add it
         if ($this->definition->hasArgument($c)) {
             $arg = $this->definition->getArgument($c);
-            $this->arguments[$arg->getName()] = $arg->isArray()? array($token) : $token;
+            $this->arguments[$arg->getName()] = $arg->isArray() ? array($token) : $token;
 
         // if last argument isArray(), append token to last argument
         } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
@@ -249,7 +249,7 @@ class ArgvInput extends Input
 
         if ($option->isArray()) {
             $this->options[$name][] = $value;
-        } else if ($option->isValueOptionull() && true === $value) {
+        } elseif ($option->isValueOptionull() && true === $value) {
             $this->options[$name] = $option->getSetDefault();
         } else {
             $this->options[$name] = $value;
@@ -338,7 +338,7 @@ class ArgvInput extends Input
         $self = $this;
         $tokens = array_map(function ($token) use ($self) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
-                return $match[1] . $self->escapeToken($match[2]);
+                return $match[1].$self->escapeToken($match[2]);
             }
 
             if ($token && $token[0] !== '-') {

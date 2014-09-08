@@ -213,7 +213,6 @@ class InputOption
         return $this->set_default;
     }
 
-
     /**
      * Returns the description text.
      *

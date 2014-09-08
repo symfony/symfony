@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
+        <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
     </parameters>
 
     <services>
@@ -17,5 +18,7 @@
             <argument /><!-- Log levels map for enabled error levels -->
             <argument>%kernel.debug%</argument>
         </service>
+
+        <service id="debug.stopwatch" class="%debug.stopwatch.class%" />
     </services>
 </container>

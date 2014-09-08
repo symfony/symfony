@@ -23,9 +23,15 @@ class StopwatchExtension extends \Twig_Extension
 {
     private $stopwatch;
 
-    public function __construct(Stopwatch $stopwatch = null)
+    /**
+     * @var bool
+     */
+    private $enabled;
+
+    public function __construct(Stopwatch $stopwatch = null, $enabled = true)
     {
         $this->stopwatch = $stopwatch;
+        $this->enabled = $enabled;
     }
 
     public function getStopwatch()
@@ -41,7 +47,7 @@ class StopwatchExtension extends \Twig_Extension
              * Some stuff which will be recorded on the timeline
              * {% endstopwatch %}
              */
-            new StopwatchTokenParser($this->stopwatch !== null),
+            new StopwatchTokenParser($this->stopwatch !== null && $this->enabled),
         );
     }
 

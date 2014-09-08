@@ -200,7 +200,7 @@ abstract class AbstractCloner implements ClonerInterface
         }
 
         if ($classInfo[1]) {
-            $a = $this->callCaster(array($obj, '__debugInfo'), $obj, array(), null, $isNested);
+            $a = $this->callCaster(function ($obj) {return $obj->__debugInfo();}, $obj, array(), null, $isNested);
         } else {
             $a = (array) $obj;
         }

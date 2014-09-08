@@ -1,0 +1,66 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-03T22:50:31Z
+
+This looks logical to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-04T09:26:55Z
+
+Get caught by this one this morning!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-04T09:27:56Z
+
+The path should be from the current directory (to allow completion in some bashes.) Also, if the router does not exist, the web server should throw an exception before starting, which is not the case now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-04T09:43:57Z
+
+Actually, the built-in server writes messages to stderr:
+
+```
+[Thu Sep  4 11:39:09 2014] PHP Warning:  Unknown: failed to open stream: No such file or directory in Unknown on line 0
+[Thu Sep  4 11:39:09 2014] PHP Fatal error:  Unknown: Failed opening required 'app/config/router_foo.php' (include_path='.:/usr/share/php:/usr/share/pear') in Unknown on line 0
+```
+
+We simply don't see them when using the ``server:run`` command because [output is disabled](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Command/ServerRunCommand.php#L106-108) when run without the ``-vvv`` option.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-05T07:40:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-09-08T16:28:07Z
+
+ping @symfony/voters
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-08T16:32:41Z
+
+@WouterJ it is @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-08T16:33:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-09-08T16:34:28Z
+
+thanks @stof  :)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-08T18:44:17Z
+
+:+1:

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T05:33:31Z
+
+Also, would it makes sense to make this class more "flexible" like explained in symfony/MonologBundle#89?
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T05:47:26Z
+
+see symfony/MonologBundle#94 for the bundle counterpart.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T06:19:08Z
+
+Just noticed that the class from the bundle uses the request instead of the request stack. I've made a second commit to use the request stack for the class in the bridge.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-09-07T15:27:14Z
+
+:+1:

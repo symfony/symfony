@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\VarDumper\Cloner\Stub;
+
 /**
  * Casts SPL related classes to array representation.
  *
@@ -18,9 +20,9 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class SplCaster
 {
-    public static function castArrayObject(\ArrayObject $c, array $a)
+    public static function castArrayObject(\ArrayObject $c, array $a, Stub $stub, $isNested)
     {
-        $class = get_class($c);
+        $class = $stub->class;
         $flags = $c->getFlags();
 
         $b = array(
@@ -55,7 +57,7 @@ class SplCaster
         return $a;
     }
 
-    public static function castHeap(\Iterator $c, array $a)
+    public static function castHeap(\Iterator $c, array $a, Stub $stub, $isNested)
     {
         $a += array(
             "\0~\0heap" => iterator_to_array(clone $c),
@@ -64,13 +66,13 @@ class SplCaster
         return $a;
     }
 
-    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a)
+    public static function castDoublyLinkedList(\SplDoublyLinkedList $c, array $a, Stub $stub, $isNested)
     {
         $mode = $c->getIteratorMode();
         $c->setIteratorMode(\SplDoublyLinkedList::IT_MODE_KEEP | $mode & ~\SplDoublyLinkedList::IT_MODE_DELETE);
 
         $a += array(
-            "\0~\0mode" => (($mode & \SplDoublyLinkedList::IT_MODE_LIFO) ? 'IT_MODE_LIFO' : 'IT_MODE_FIFO').' | '.(($mode & \SplDoublyLinkedList::IT_MODE_KEEP) ? 'IT_MODE_KEEP' : 'IT_MODE_DELETE'),
+            "\0~\0mode" => new CasterStub((($mode & \SplDoublyLinkedList::IT_MODE_LIFO) ? 'IT_MODE_LIFO' : 'IT_MODE_FIFO').' | '.(($mode & \SplDoublyLinkedList::IT_MODE_KEEP) ? 'IT_MODE_KEEP' : 'IT_MODE_DELETE'), 'const'),
             "\0~\0dllist" => iterator_to_array($c),
         );
         $c->setIteratorMode($mode);
@@ -78,7 +80,7 @@ class SplCaster
         return $a;
     }
 
-    public static function castFixedArray(\SplFixedArray $c, array $a)
+    public static function castFixedArray(\SplFixedArray $c, array $a, Stub $stub, $isNested)
     {
         $a += array(
             "\0~\0storage" => $c->toArray(),
@@ -87,7 +89,7 @@ class SplCaster
         return $a;
     }
 
-    public static function castObjectStorage(\SplObjectStorage $c, array $a)
+    public static function castObjectStorage(\SplObjectStorage $c, array $a, Stub $stub, $isNested)
     {
         $storage = array();
         unset($a["\0+\0\0gcdata"]); // Don't hit https://bugs.php.net/65967

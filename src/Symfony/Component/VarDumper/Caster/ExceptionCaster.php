@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Caster;
 
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * Casts common Exception classes to array representation.
@@ -39,7 +40,7 @@ class ExceptionCaster
         E_STRICT => 'E_STRICT',
     );
 
-    public static function castException(\Exception $e, array $a)
+    public static function castException(\Exception $e, array $a, Stub $stub, $isNested)
     {
         $trace = $a["\0Exception\0trace"];
         unset($a["\0Exception\0trace"]); // Ensures the trace is always last
@@ -57,16 +58,16 @@ class ExceptionCaster
         return $a;
     }
 
-    public static function castErrorException(\ErrorException $e, array $a)
+    public static function castErrorException(\ErrorException $e, array $a, Stub $stub, $isNested)
     {
         if (isset($a[$s = "\0*\0severity"], self::$errorTypes[$a[$s]])) {
-            $a[$s] = self::$errorTypes[$a[$s]];
+            $a[$s] = new CasterStub(self::$errorTypes[$a[$s]], 'const');
         }
 
         return $a;
     }
 
-    public static function castThrowingCasterException(ThrowingCasterException $e, array $a)
+    public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, $isNested)
     {
         $b = (array) $a["\0Exception\0previous"];
 
@@ -74,7 +75,7 @@ class ExceptionCaster
 
         $t = static::$traceArgs;
         static::$traceArgs = false;
-        $b = static::castException($a["\0Exception\0previous"], $b);
+        $b = static::castException($a["\0Exception\0previous"], $b, $stub, $isNested);
         static::$traceArgs = $t;
 
         if (empty($a["\0*\0message"])) {

@@ -52,7 +52,7 @@ span.sf-dump-meta {color:#005FFF}
 </style>
 
 <pre class=sf-dump style=white-space:pre><span class=sf-dump-0><span class=sf-dump-note>array:25</span> [
-  <span class=sf-dump-1>"<span class=sf-dump-meta>number</span>" => <span class=sf-dump-const>1</span>
+  <span class=sf-dump-1>"<span class=sf-dump-meta>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-meta>0</span> => <span class=sf-dump-const>null</span> <a class=sf-dump-ref name="sf-dump-ref1">#1</a>
   "<span class=sf-dump-meta>const</span>" => <span class=sf-dump-num>1.1</span>
   <span class=sf-dump-meta>1</span> => <span class=sf-dump-const>true</span>
@@ -60,7 +60,7 @@ span.sf-dump-meta {color:#005FFF}
   <span class=sf-dump-meta>3</span> => <span class=sf-dump-num>NAN</span>
   <span class=sf-dump-meta>4</span> => <span class=sf-dump-num>INF</span>
   <span class=sf-dump-meta>5</span> => <span class=sf-dump-num>-INF</span>
-  <span class=sf-dump-meta>6</span> => <span class=sf-dump-const>9223372036854775807</span>
+  <span class=sf-dump-meta>6</span> => <span class=sf-dump-num>9223372036854775807</span>
   "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str>déjà</span>"
   <span class=sf-dump-meta>7</span> => b"<span class=sf-dump-str>é</span>"
   "<span class=sf-dump-meta>[]</span>" => []
@@ -68,7 +68,7 @@ span.sf-dump-meta {color:#005FFF}
     <span class=sf-dump-2><span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str>plainfile</span>"
     <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str>dir</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
-    <span class=sf-dump-meta>unread_bytes</span>: <span class=sf-dump-const>0</span>
+    <span class=sf-dump-meta>unread_bytes</span>: <span class=sf-dump-num>0</span>
     <span class=sf-dump-meta>seekable</span>: <span class=sf-dump-const>true</span>
     <span class=sf-dump-meta>timed_out</span>: <span class=sf-dump-const>false</span>
     <span class=sf-dump-meta>blocked</span>: <span class=sf-dump-const>true</span>
@@ -92,16 +92,16 @@ span.sf-dump-meta {color:#005FFF}
       <span class=sf-dump-str>}</span>
       """
   </span>}
-  "<span class=sf-dump-meta>line</span>" => <span class=sf-dump-const>{$var['line']}</span>
+  "<span class=sf-dump-meta>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
   "<span class=sf-dump-meta>nobj</span>" => <span class=sf-dump-note>array:1</span> [
     <span class=sf-dump-2><span class=sf-dump-meta>0</span> => {} <a class=sf-dump-ref name="sf-dump-ref3">#3</a>
   </span>]
   "<span class=sf-dump-meta>recurs</span>" => <span class=sf-dump-note>array:1</span> [ <a class=sf-dump-ref name="sf-dump-ref4">#4</a>
-    <span class=sf-dump-2><span class=sf-dump-meta>0</span> => <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href="#sf-dump-ref4">&4</a>]
+    <span class=sf-dump-2><span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href="#sf-dump-ref4">&4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href="#sf-dump-ref4">@4</a>]
   </span>]
-  <span class=sf-dump-meta>9</span> => <span class=sf-dump-const>null</span> <a class=sf-dump-ref href="#sf-dump-ref1">&1</a>
+  <span class=sf-dump-meta>9</span> => <a class=sf-dump-ref href="#sf-dump-ref1">&1</a> <span class=sf-dump-const>null</span>
   "<span class=sf-dump-meta>sobj</span>" => <span class=sf-dump-note>Symfony\Component\VarDumper\Tests\Fixture\DumbFoo</span> {<a class=sf-dump-ref href="#sf-dump-ref2">@2</a>}
-  "<span class=sf-dump-meta>snobj</span>" => {<a class=sf-dump-ref href="#sf-dump-ref3">&3</a>}
+  "<span class=sf-dump-meta>snobj</span>" => <a class=sf-dump-ref href="#sf-dump-ref3">&3</a> {<a class=sf-dump-ref href="#sf-dump-ref3">@3</a>}
   "<span class=sf-dump-meta>snobj2</span>" => {<a class=sf-dump-ref href="#sf-dump-ref3">@3</a>}
   "<span class=sf-dump-meta>file</span>" => "<span class=sf-dump-str>{$var['file']}</span>"
   b"<span class=sf-dump-meta>bin-key-é</span>" => ""

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\VarDumper\Cloner\Stub;
+
 /**
  * Casts PDO related classes to array representation.
  *
@@ -55,7 +57,7 @@ class PdoCaster
         ),
     );
 
-    public static function castPdo(\PDO $c, array $a)
+    public static function castPdo(\PDO $c, array $a, Stub $stub, $isNested)
     {
         $a = array();
         $errmode = $c->getAttribute(\PDO::ATTR_ERRMODE);
@@ -70,7 +72,7 @@ class PdoCaster
             try {
                 $a[$attr] = 'ERRMODE' === $attr ? $errmode : $c->getAttribute(constant("PDO::ATTR_{$attr}"));
                 if (isset($values[$a[$attr]])) {
-                    $a[$attr] = $values[$a[$attr]];
+                    $a[$attr] = new CasterStub($values[$a[$attr]], 'const');
                 }
             } catch (\Exception $m) {
             }
@@ -98,7 +100,7 @@ class PdoCaster
         return $a;
     }
 
-    public static function castPdoStatement(\PDOStatement $c, array $a)
+    public static function castPdoStatement(\PDOStatement $c, array $a, Stub $stub, $isNested)
     {
         $m = "\0~\0";
         $a[$m.'errorInfo'] = $c->errorInfo();

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Dumper;
 
+use Symfony\Component\VarDumper\Cloner\Stub;
+
 /**
  * Represents the current state of a dumper while dumping.
  *
@@ -18,15 +20,15 @@ namespace Symfony\Component\VarDumper\Dumper;
  */
 class Cursor
 {
-    const HASH_INDEXED = 'indexed-array';
-    const HASH_ASSOC = 'associative-array';
-    const HASH_OBJECT = 'object';
-    const HASH_RESOURCE = 'resource';
+    const HASH_INDEXED = Stub::ARRAY_INDEXED;
+    const HASH_ASSOC = Stub::ARRAY_ASSOC;
+    const HASH_OBJECT = Stub::TYPE_OBJECT;
+    const HASH_RESOURCE = Stub::TYPE_RESOURCE;
 
     public $depth = 0;
     public $refIndex = false;
-    public $refTo = false;
-    public $refIsHard = false;
+    public $softRefTo = false;
+    public $hardRefTo = false;
     public $hashType;
     public $hashKey;
     public $hashIndex = 0;

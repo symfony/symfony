@@ -82,11 +82,11 @@ array:25 [
     0 => {} #3
   ]
   "recurs" => array:1 [ #4
-    0 => array:1 [&4]
+    0 => &4 array:1 [@4]
   ]
-  9 => null &1
+  9 => &1 null
   "sobj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {@2}
-  "snobj" => {&3}
+  "snobj" => &3 {@3}
   "snobj2" => {@3}
   "file" => "{$var['file']}"
   b"bin-key-é" => ""

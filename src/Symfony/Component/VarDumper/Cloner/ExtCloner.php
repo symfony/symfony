@@ -32,7 +32,7 @@ class ExtCloner extends AbstractCloner
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $a = null;                      // Array cast for nested structures
-        $stub = null;                   // stdClass capturing the main properties of an original item value,
+        $stub = null;                   // Stub capturing the main properties of an original item value,
                                         // or null if the original value is used directly
 
         for ($i = 0; $i < $len; ++$i) {
@@ -60,15 +60,20 @@ class ExtCloner extends AbstractCloner
                 switch ($zval['type']) {
                     case 'string':
                         if (isset($v[0]) && !preg_match('//u', $v)) {
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_STRING;
+                            $stub->class = Stub::STRING_BINARY;
                             if (0 <= $maxString && 0 < $cut = strlen($v) - $maxString) {
-                                $stub = substr_replace($v, '', -$cut);
-                                $stub = (object) array('cut' => $cut, 'bin' => Data::utf8Encode($stub));
-                            } else {
-                                $stub = (object) array('bin' => Data::utf8Encode($v));
+                                $stub->cut = $cut;
+                                $v = substr_replace($v, '', -$cut);
                             }
+                            $stub->value = Data::utf8Encode($v);
                         } elseif (0 <= $maxString && isset($v[1+($maxString>>2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
-                            $stub = iconv_substr($v, 0, $maxString, 'UTF-8');
-                            $stub = (object) array('cut' => $cut, 'str' => $stub);
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_STRING;
+                            $stub->class = Stub::STRING_UTF8;
+                            $stub->cut = $cut;
+                            $stub->value = iconv_substr($v, 0, $maxString, 'UTF-8');
                         }
                         break;
 
@@ -77,23 +82,33 @@ class ExtCloner extends AbstractCloner
 
                     case 'array':
                         if ($v) {
-                            $stub = (object) array('count' => $zval['array_count']);
-                            $arrayRefs[$len] = $stub;
+                            $stub = $arrayRefs[$len] = new Stub();
+                            $stub->type = Stub::TYPE_ARRAY;
+                            $stub->class = Stub::ARRAY_ASSOC;
+                            $stub->value = $zval['array_count'];
                             $a = $v;
                         }
                         break;
 
                     case 'object':
                         if (empty($softRefs[$h = $zval['object_hash']])) {
-                            $stub = $softRefs[$h] = (object) array('class' => $zval['object_class']);
-                            if (0 > $maxItems || $pos < $maxItems) {
-                                $a = $this->castObject($stub->class, $v, 0 < $i, $cut);
-                                if ($cut) {
-                                    $stub->cut = $cut;
-                                }
-                            } else {
-                                $stub->cut = -1;
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_OBJECT;
+                            $stub->class = $zval['object_class'];
+                            $stub->value = $h;
+                            $a = $this->castObject($v, $stub, 0 < $i);
+                            if (Stub::TYPE_OBJECT !== $stub->type) {
+                                break;
                             }
+                            $h = $stub->value;
+                            $stub->value = '';
+                            if (0 <= $maxItems && $maxItems <= $pos) {
+                                $stub->cut = count($a);
+                                $a = array();
+                            }
+                        }
+                        if (empty($softRefs[$h])) {
+                            $softRefs[$h] = $stub;
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
@@ -101,13 +116,24 @@ class ExtCloner extends AbstractCloner
                         break;
 
                     case 'resource':
-                        if (empty($softRefs[$h = $zval['resource_id']])) {
-                            $stub = $softRefs[$h] = (object) array('res' => $zval['resource_type']);
-                            if (0 > $maxItems || $pos < $maxItems) {
-                                $a = $this->castResource($stub->res, $v, 0 < $i);
-                            } else {
-                                $stub->cut = -1;
+                        if (empty($softRefs[$h = (int) $v])) {
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_RESOURCE;
+                            $stub->class = $zval['resource_type'];
+                            $stub->value = $h;
+                            $a = $this->castResource($v, $stub, 0 < $i);
+                            if (Stub::TYPE_RESOURCE !== $stub->type) {
+                                break;
                             }
+                            $h = $stub->value;
+                            $stub->value = '';
+                            if (0 <= $maxItems && $maxItems <= $pos) {
+                                $stub->cut = count($a);
+                                $a = array();
+                            }
+                        }
+                        if (empty($softRefs[$h])) {
+                            $softRefs[$h] = $stub;
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
@@ -117,10 +143,11 @@ class ExtCloner extends AbstractCloner
 
                 if (isset($stub)) {
                     if ($zval['zval_isref']) {
-                        if (isset($stub->count)) {
+                        if (Stub::TYPE_ARRAY === $stub->type) {
                             $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = $stub;
                         } else {
-                            $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = (object) array('val' => $stub);
+                            $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = $v = new Stub();
+                            $v->value = $stub;
                         }
                     } else {
                         $queue[$i][$k] = $stub;
@@ -132,16 +159,12 @@ class ExtCloner extends AbstractCloner
                             if ($pos < $maxItems) {
                                 if ($maxItems < $pos += $k) {
                                     $a = array_slice($a, 0, $maxItems - $pos);
-                                    if (empty($stub->cut)) {
-                                        $stub->cut = $pos - $maxItems;
-                                    } elseif ($stub->cut > 0) {
+                                    if ($stub->cut >= 0) {
                                         $stub->cut += $pos - $maxItems;
                                     }
                                 }
                             } else {
-                                if (empty($stub->cut)) {
-                                    $stub->cut = $k;
-                                } elseif ($stub->cut > 0) {
+                                if ($stub->cut >= 0) {
                                     $stub->cut += $k;
                                 }
                                 $stub = $a = null;
@@ -150,17 +173,18 @@ class ExtCloner extends AbstractCloner
                             }
                         }
                         $queue[$len] = $a;
-                        $stub->pos = $len++;
+                        $stub->position = $len++;
                     }
                     $stub = $a = null;
                 } elseif ($zval['zval_isref']) {
-                    $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = (object) array('val' => $v);
+                    $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = new Stub();
+                    $queue[$i][$k]->value = $v;
                 }
             }
 
             if (isset($arrayRefs[$i])) {
                 if ($indexed) {
-                    $arrayRefs[$i]->indexed = 1;
+                    $arrayRefs[$i]->class = Stub::ARRAY_INDEXED;
                 }
                 unset($arrayRefs[$i]);
             }

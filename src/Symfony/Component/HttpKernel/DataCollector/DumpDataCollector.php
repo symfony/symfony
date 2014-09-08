@@ -218,7 +218,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
             $h = headers_list();
             $i = count($h);
-            array_unshift($h, 'Content-Type: ' . ini_get('default_mimetype'));
+            array_unshift($h, 'Content-Type: '.ini_get('default_mimetype'));
             while (0 !== stripos($h[$i], 'Content-Type:')) {
                 --$i;
             }

@@ -35,7 +35,7 @@ class PhpCloner extends AbstractCloner
         $cookie = (object) array();     // Unique object used to detect hard references
         $isRef = false;
         $a = null;                      // Array cast for nested structures
-        $stub = null;                   // stdClass capturing the main properties of an original item value,
+        $stub = null;                   // Stub capturing the main properties of an original item value,
                                         // or null if the original value is used directly
 
         for ($i = 0; $i < $len; ++$i) {
@@ -52,7 +52,7 @@ class PhpCloner extends AbstractCloner
                 if ($queue[$i][$k] === $cookie) {
                     $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
-                    if ($v instanceof \stdClass && isset($hardRefs[spl_object_hash($v)])) {
+                    if ($v instanceof Stub && isset($hardRefs[spl_object_hash($v)])) {
                         $v->ref = ++$refs;
                         $step[$k] = $queue[$i][$k] = $v;
                         continue;
@@ -64,15 +64,22 @@ class PhpCloner extends AbstractCloner
                 switch (gettype($v)) {
                     case 'string':
                         if (isset($v[0]) && !preg_match('//u', $v)) {
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_STRING;
+                            $stub->class = Stub::STRING_BINARY;
                             if (0 <= $maxString && 0 < $cut = strlen($v) - $maxString) {
-                                $stub = substr_replace($v, '', -$cut);
-                                $stub = (object) array('cut' => $cut, 'bin' => Data::utf8Encode($stub));
+                                $stub->cut = $cut;
+                                $cut = substr_replace($v, '', -$cut);
                             } else {
-                                $stub = (object) array('bin' => Data::utf8Encode($v));
+                                $cut = $v;
                             }
+                            $stub->value = Data::utf8Encode($cut);
                         } elseif (0 <= $maxString && isset($v[1+($maxString>>2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
-                            $stub = iconv_substr($v, 0, $maxString, 'UTF-8');
-                            $stub = (object) array('cut' => $cut, 'str' => $stub);
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_STRING;
+                            $stub->class = Stub::STRING_UTF8;
+                            $stub->cut = $cut;
+                            $stub->value = iconv_substr($v, 0, $maxString, 'UTF-8');
                         }
                         break;
 
@@ -81,23 +88,33 @@ class PhpCloner extends AbstractCloner
 
                     case 'array':
                         if ($v) {
-                            $stub = (object) array('count' => count($v));
-                            $arrayRefs[$len] = $stub;
+                            $stub = $arrayRefs[$len] = new Stub();
+                            $stub->type = Stub::TYPE_ARRAY;
+                            $stub->class = Stub::ARRAY_ASSOC;
+                            $stub->value = count($v);
                             $a = $v;
                         }
                         break;
 
                     case 'object':
                         if (empty($softRefs[$h = spl_object_hash($v)])) {
-                            $stub = $softRefs[$h] = (object) array('class' => get_class($v));
-                            if (0 > $maxItems || $pos < $maxItems) {
-                                $a = $this->castObject($stub->class, $v, 0 < $i, $cut);
-                                if ($cut) {
-                                    $stub->cut = $cut;
-                                }
-                            } else {
-                                $stub->cut = -1;
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_OBJECT;
+                            $stub->class = get_class($v);
+                            $stub->value = $h;
+                            $a = $this->castObject($v, $stub, 0 < $i);
+                            if (Stub::TYPE_OBJECT !== $stub->type) {
+                                break;
                             }
+                            $h = $stub->value;
+                            $stub->value = '';
+                            if (0 <= $maxItems && $maxItems <= $pos) {
+                                $stub->cut = count($a);
+                                $a = array();
+                            }
+                        }
+                        if (empty($softRefs[$h])) {
+                            $softRefs[$h] = $stub;
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
@@ -106,13 +123,24 @@ class PhpCloner extends AbstractCloner
 
                     case 'resource':
                     case 'unknown type':
-                        if (empty($softRefs[$h = (int) substr_replace($v, '', 0, 13)])) {
-                            $stub = $softRefs[$h] = (object) array('res' => @get_resource_type($v));
-                            if (0 > $maxItems || $pos < $maxItems) {
-                                $a = $this->castResource($stub->res, $v, 0 < $i);
-                            } else {
-                                $stub->cut = -1;
+                        if (empty($softRefs[$h = (int) $v])) {
+                            $stub = new Stub();
+                            $stub->type = Stub::TYPE_RESOURCE;
+                            $stub->class = get_resource_type($v);
+                            $stub->value = $h;
+                            $a = $this->castResource($v, $stub, 0 < $i);
+                            if (Stub::TYPE_RESOURCE !== $stub->type) {
+                                break;
                             }
+                            $h = $stub->value;
+                            $stub->value = '';
+                            if (0 <= $maxItems && $maxItems <= $pos) {
+                                $stub->cut = count($a);
+                                $a = array();
+                            }
+                        }
+                        if (empty($softRefs[$h])) {
+                            $softRefs[$h] = $stub;
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
@@ -122,10 +150,11 @@ class PhpCloner extends AbstractCloner
 
                 if (isset($stub)) {
                     if ($isRef) {
-                        if (isset($stub->count)) {
+                        if (Stub::TYPE_ARRAY === $stub->type) {
                             $step[$k] = $stub;
                         } else {
-                            $step[$k] = (object) array('val' => $stub);
+                            $step[$k] = new Stub();
+                            $step[$k]->value = $stub;
                         }
                         $h = spl_object_hash($step[$k]);
                         $queue[$i][$k] = $hardRefs[$h] =& $step[$k];
@@ -141,16 +170,12 @@ class PhpCloner extends AbstractCloner
                             if ($pos < $maxItems) {
                                 if ($maxItems < $pos += $k) {
                                     $a = array_slice($a, 0, $maxItems - $pos);
-                                    if (empty($stub->cut)) {
-                                        $stub->cut = $pos - $maxItems;
-                                    } elseif ($stub->cut > 0) {
+                                    if ($stub->cut >= 0) {
                                         $stub->cut += $pos - $maxItems;
                                     }
                                 }
                             } else {
-                                if (empty($stub->cut)) {
-                                    $stub->cut = $k;
-                                } elseif ($stub->cut > 0) {
+                                if ($stub->cut >= 0) {
                                     $stub->cut += $k;
                                 }
                                 $stub = $a = null;
@@ -159,21 +184,22 @@ class PhpCloner extends AbstractCloner
                             }
                         }
                         $queue[$len] = $a;
-                        $stub->pos = $len++;
+                        $stub->position = $len++;
                     }
                     $stub = $a = null;
                 } elseif ($isRef) {
-                    $step[$k] = $queue[$i][$k] = $v = (object) array('val' => $v);
-                    $h = spl_object_hash($v);
+                    $step[$k] = $queue[$i][$k] = new Stub();
+                    $step[$k]->value = $v;
+                    $h = spl_object_hash($step[$k]);
                     $hardRefs[$h] =& $step[$k];
-                    $values[$h] = $v->val;
+                    $values[$h] = $v;
                     $isRef = false;
                 }
             }
 
             if (isset($arrayRefs[$i])) {
                 if ($indexed) {
-                    $arrayRefs[$i]->indexed = 1;
+                    $arrayRefs[$i]->class = Stub::ARRAY_INDEXED;
                 }
                 unset($arrayRefs[$i]);
             }

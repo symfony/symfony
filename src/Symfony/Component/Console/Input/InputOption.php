@@ -24,11 +24,13 @@ class InputOption
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
+    const VALUE_OPTIONULL = 16;
 
     private $name;
     private $shortcut;
     private $mode;
     private $default;
+    private $set_default;
     private $description;
 
     /**
@@ -73,7 +75,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
+        } elseif (!is_int($mode) || $mode > 31 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -116,7 +118,7 @@ class InputOption
      */
     public function acceptValue()
     {
-        return $this->isValueRequired() || $this->isValueOptional();
+        return $this->isValueRequired() || $this->isValueOptional() || $this->isValueOptionull();
     }
 
     /**
@@ -150,6 +152,16 @@ class InputOption
     }
 
     /**
+     * Returns true if the option takes an optional value with null as default.
+     *
+     * @return bool    true if mode is self::VALUE_OPTIONULL, false otherwise
+     */
+    public function isValueOptionull()
+    {
+        return self::VALUE_OPTIONULL === (self::VALUE_OPTIONULL & $this->mode);
+    }
+
+    /**
      * Sets the default value.
      *
      * @param mixed $default The default value
@@ -170,6 +182,14 @@ class InputOption
             }
         }
 
+        $set_default = false;
+
+        if ($this->isValueOptionull()) {
+            $set_default = $default;
+            $default = false;
+        }
+
+        $this->set_default = $set_default;
         $this->default = $this->acceptValue() ? $default : false;
     }
 
@@ -182,6 +202,17 @@ class InputOption
     {
         return $this->default;
     }
+
+    /**
+     * Returns the default value.
+     *
+     * @return mixed The default value
+     */
+    public function getSetDefault()
+    {
+        return $this->set_default;
+    }
+
 
     /**
      * Returns the description text.
@@ -207,6 +238,7 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
+            && $option->isValueOptionull() === $this->isValueOptionull()
         ;
     }
 }

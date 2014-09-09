@@ -20,6 +20,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Writer;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+ *
+ * @internal
  */
 class TextBundleWriter implements BundleWriterInterface
 {

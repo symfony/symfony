@@ -18,6 +18,8 @@ use Symfony\Component\Intl\Exception\RuntimeException;
  * Reads .php resource bundles.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class PhpBundleReader extends AbstractBundleReader implements BundleReaderInterface
 {

@@ -18,6 +18,8 @@ use Symfony\Component\Intl\ResourceBundle\Util\ArrayAccessibleResourceBundle;
  * Reads binary .res resource bundles.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class BinaryBundleReader extends AbstractBundleReader implements BundleReaderInterface
 {

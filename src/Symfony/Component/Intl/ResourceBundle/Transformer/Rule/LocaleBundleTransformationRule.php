@@ -21,6 +21,8 @@ use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
  * The rule for compiling the locale bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class LocaleBundleTransformationRule implements TransformationRuleInterface
 {

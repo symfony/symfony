@@ -13,6 +13,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Util;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class RecursiveArrayAccess
 {

@@ -13,6 +13,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Transformer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface StubbingContextInterface
 {

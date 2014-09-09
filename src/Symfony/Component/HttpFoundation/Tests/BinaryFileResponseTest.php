@@ -211,6 +211,16 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFileNotExists($path);
     }
 
+    public function testSplFileObject()
+    {
+        $filePath = __DIR__.'/File/Fixtures/test';
+        $file = new \SplFileObject($filePath);
+
+        $response = new BinaryFileResponse($file);
+
+        $this->assertEquals($response->getfile()->getPathname(), $filePath);
+    }
+
     public function getSampleXAccelMappings()
     {
         return array(

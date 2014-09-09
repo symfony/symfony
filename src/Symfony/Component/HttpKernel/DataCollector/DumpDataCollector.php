@@ -26,20 +26,28 @@ use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 class DumpDataCollector extends DataCollector implements DataDumperInterface
 {
     private $stopwatch;
+    private $dataCount = 0;
     private $isCollected = true;
-    private $clonesRoot;
     private $clonesCount = 0;
+    private $clonesIndex = 0;
+    private $rootRefs;
 
     public function __construct(Stopwatch $stopwatch = null)
     {
         $this->stopwatch = $stopwatch;
-        $this->clonesRoot = $this;
+
+        // All clones share these properties by reference:
+        $this->rootRefs = array(
+            &$this->data,
+            &$this->dataCount,
+            &$this->isCollected,
+            &$this->clonesCount,
+        );
     }
 
     public function __clone()
     {
-        $this->data = array();
-        $this->clonesRoot->clonesCount++;
+        $this->clonesIndex = ++$this->clonesCount;
     }
 
     public function dump(Data $data)
@@ -47,9 +55,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if ($this->stopwatch) {
            $this->stopwatch->start('dump');
         }
-        if ($this->clonesRoot->isCollected) {
-            $this->clonesRoot->isCollected = false;
-            register_shutdown_function(array($this->clonesRoot, 'flushDumps'));
+        if ($this->isCollected) {
+            $this->isCollected = false;
         }
 
         $trace = PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS : true;
@@ -66,7 +73,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         for ($i = 1; $i < 7; ++$i) {
             if (isset($trace[$i]['class'], $trace[$i]['function'])
-                && 'dump' === $trace[$i]['function']
+                && ('dump' === $trace[$i]['function'] || 'debug' === $trace[$i]['function'])
                 && 'Symfony\Component\VarDumper\VarDumper' === $trace[$i]['class']
             ) {
                 $file = $trace[$i]['file'];
@@ -107,7 +114,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $name = substr($file, strrpos($file, '/') + 1);
         }
 
-        $this->clonesRoot->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
+        $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
+        ++$this->dataCount;
 
         if ($this->stopwatch) {
             $this->stopwatch->stop('dump');
@@ -120,9 +128,14 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function serialize()
     {
-        $ser = serialize($this->clonesRoot->data);
-        $this->clonesRoot->data = array();
-        $this->clonesRoot->isCollected = true;
+        if ($this->clonesCount !== $this->clonesIndex) {
+            return 'a:0:{}';
+        }
+
+        $ser = serialize($this->data);
+        $this->data = array();
+        $this->dataCount = 0;
+        $this->isCollected = true;
 
         return $ser;
     }
@@ -130,13 +143,13 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function unserialize($data)
     {
         parent::unserialize($data);
-
-        $this->clonesRoot = $this;
+        $this->dataCount = count($this->data);
+        self::__construct($this->stopwatch);
     }
 
     public function getDumpsCount()
     {
-        return count($this->clonesRoot->data);
+        return $this->dataCount;
     }
 
     public function getDumpsExcerpts()
@@ -193,7 +206,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
         $dumps = array();
 
-        foreach ($this->clonesRoot->data as $dump) {
+        foreach ($this->data as $dump) {
             $json = '';
             if ($getData) {
                 $dumper->dump($dump['data'], function ($line) use (&$json) {$json .= $line;});
@@ -210,11 +223,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return 'dump';
     }
 
-    public function flushDumps()
+    public function __destruct()
     {
-        if (0 === $this->clonesRoot->clonesCount-- && !$this->clonesRoot->isCollected && $this->clonesRoot->data) {
-            $this->clonesRoot->clonesCount = 0;
-            $this->clonesRoot->isCollected = true;
+        if (0 === $this->clonesCount-- && !$this->isCollected && $this->data) {
+            $this->clonesCount = 0;
+            $this->isCollected = true;
 
             $h = headers_list();
             $i = count($h);
@@ -223,16 +236,16 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 --$i;
             }
 
-            if (stripos($h[$i], 'html')) {
+            if ('cli' !== PHP_SAPI && stripos($h[$i], 'html')) {
                 echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
-                $dumper = new HtmlDumper();
+                $dumper = new HtmlDumper('php://output');
             } else {
-                $dumper = new CliDumper();
+                $dumper = new CliDumper('php://output');
                 $dumper->setColors(false);
             }
 
-            foreach ($this->clonesRoot->data as $i => $dump) {
-                $this->clonesRoot->data[$i] = null;
+            foreach ($this->data as $i => $dump) {
+                $this->data[$i] = null;
 
                 if ($dumper instanceof HtmlDumper) {
                     $dump['name'] = htmlspecialchars($dump['name'], ENT_QUOTES, 'UTF-8');
@@ -240,14 +253,15 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                     if ('' !== $dump['file']) {
                         $dump['name'] = "<abbr title=\"{$dump['file']}\">{$dump['name']}</abbr>";
                     }
-                    echo "\n<br><span class=\"sf-dump-meta\">in {$dump['name']} on line {$dump['line']}:</span>";
+                    echo "\n<span class=\"sf-dump-meta\">{$dump['name']} on line {$dump['line']}:</span>";
                 } else {
-                    echo "\nin {$dump['name']} on line {$dump['line']}:\n\n";
+                    echo "{$dump['name']} on line {$dump['line']}:\n";
                 }
                 $dumper->dump($dump['data']);
             }
 
-            $this->clonesRoot->data = array();
+            $this->data = array();
+            $this->dataCount = 0;
         }
     }
 }

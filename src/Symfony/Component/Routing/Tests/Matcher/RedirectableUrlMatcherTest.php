@@ -27,6 +27,20 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
+    public function testRedirectWhenNoSlashPreservesSchema()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/'));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext('', 'GET', 'localhost', 'https')));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo/', null, 'https')
+        ;
+        $matcher->match('/foo');
+    }
+
     /**
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */

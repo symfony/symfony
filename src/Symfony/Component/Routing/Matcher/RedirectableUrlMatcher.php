@@ -36,7 +36,7 @@ abstract class RedirectableUrlMatcher extends UrlMatcher implements Redirectable
             try {
                 parent::match($pathinfo.'/');
 
-                return $this->redirect($pathinfo.'/', null);
+                return $this->redirect($pathinfo.'/', null, $this->getContext()->getScheme());
             } catch (ResourceNotFoundException $e2) {
                 throw $e;
             }

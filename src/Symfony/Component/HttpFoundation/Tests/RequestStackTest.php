@@ -66,4 +66,75 @@ class RequestStackTest extends \PHPUnit_Framework_TestCase
         $requestStack->push($secondSubRequest);
         $this->assertSame($firstSubRequest, $requestStack->getParentRequest());
     }
+
+    public function testWithRequest()
+    {
+        $requestStack = new RequestStack();
+        $this->assertNull($requestStack->withCurrentRequest($this->expectNoCall()));
+        $this->assertNull($requestStack->withMasterRequest($this->expectNoCall()));
+        $this->assertNull($requestStack->withParentRequest($this->expectNoCall()));
+
+        $masterRequest = Request::create('/foo');
+        $requestStack->push($masterRequest);
+
+        $this->assertSame('value', $requestStack->withCurrentRequest($this->expectCall($masterRequest)));
+        $this->assertNull($requestStack->withParentRequest($this->expectNoCall()));
+        $this->assertSame('value', $requestStack->withMasterRequest($this->expectCall($masterRequest)));
+
+        $request = Request::create('/foo');
+        $requestStack->push($request);
+
+        $this->assertSame('value', $requestStack->withCurrentRequest($this->expectCall($request)));
+        $this->assertSame('value', $requestStack->withParentRequest($this->expectCall($masterRequest)));
+        $this->assertSame('value', $requestStack->withMasterRequest($this->expectCall($masterRequest)));
+
+        $nextRequest = Request::create('/foo');
+        $requestStack->push($nextRequest);
+
+        $this->assertSame('value', $requestStack->withCurrentRequest($this->expectCall($nextRequest)));
+        $this->assertSame('value', $requestStack->withParentRequest($this->expectCall($request)));
+        $this->assertSame('value', $requestStack->withMasterRequest($this->expectCall($masterRequest)));
+    }
+
+    /** @expectedException InvalidArgumentException */
+    public function testExceptionWithParentRequest()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->withParentRequest('invalid');
+    }
+
+    /** @expectedException InvalidArgumentException */
+    public function testExceptionWithMasterRequest()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->withMasterRequest('invalid');
+    }
+
+    /** @expectedException InvalidArgumentException */
+    public function testExceptionWithCurrentRequest()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->withCurrentRequest('invalid');
+    }
+
+    private function expectCall($request)
+    {
+        $functor = $this->getMockBuilder('stdClass')
+            ->setMethods(['__invoke'])
+            ->getMock();
+
+        $functor->expects($this->once())
+            ->method('__invoke')
+            ->with($this->identicalTo($request))
+            ->will($this->returnValue('value'));
+
+        return $functor;
+    }
+
+    private function expectNoCall()
+    {
+        return static function() {
+            throw new \Exception('Should not be called');
+        };
+    }
 }

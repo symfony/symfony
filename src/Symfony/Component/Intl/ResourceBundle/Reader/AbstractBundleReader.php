@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Reader;
  * Base class for {@link BundleReaderInterface} implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 abstract class AbstractBundleReader implements BundleReaderInterface
 {

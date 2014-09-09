@@ -19,6 +19,8 @@ use Symfony\Component\Intl\ResourceBundle\Util\RecursiveArrayAccess;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see StructuredResourceBundleBundleReaderInterface
+ *
+ * @internal
  */
 class StructuredBundleReader implements StructuredBundleReaderInterface
 {

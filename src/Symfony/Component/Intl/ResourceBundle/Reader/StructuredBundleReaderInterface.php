@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Reader;
  * Reads individual entries of a resource file.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface StructuredBundleReaderInterface extends BundleReaderInterface
 {

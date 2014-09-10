@@ -91,7 +91,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('ANOTHER_ONE'),
-            array(-1)
+            array(-1),
         );
     }
 
@@ -159,7 +159,6 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_TERNARY, '', 'default');
         $this->assertFalse($option->getDefault(), '->getDefault() returns false');
     }
-
 
     public function testGetFlagValue()
     {

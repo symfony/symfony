@@ -24,13 +24,13 @@ class InputOption
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
-    const VALUE_OPTIONULL = 16;
+    const VALUE_TERNARY = 16;
 
     private $name;
     private $shortcut;
     private $mode;
     private $default;
-    private $set_default;
+    private $setDefault;
     private $description;
 
     /**
@@ -154,11 +154,11 @@ class InputOption
     /**
      * Returns true if the option takes an optional value with null as default.
      *
-     * @return bool    true if mode is self::VALUE_OPTIONULL, false otherwise
+     * @return bool    true if mode is self::VALUE_TERNARY, false otherwise
      */
     public function isValueOptionull()
     {
-        return self::VALUE_OPTIONULL === (self::VALUE_OPTIONULL & $this->mode);
+        return self::VALUE_TERNARY === (self::VALUE_TERNARY & $this->mode);
     }
 
     /**
@@ -182,14 +182,14 @@ class InputOption
             }
         }
 
-        $set_default = false;
+        $setDefault = false;
 
         if ($this->isValueOptionull()) {
-            $set_default = $default;
+            $setDefault = $default;
             $default = false;
         }
 
-        $this->set_default = $set_default;
+        $this->setDefault = $setDefault;
         $this->default = $this->acceptValue() ? $default : false;
     }
 
@@ -210,7 +210,7 @@ class InputOption
      */
     public function getSetDefault()
     {
-        return $this->set_default;
+        return $this->setDefault;
     }
 
     /**

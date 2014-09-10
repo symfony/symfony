@@ -30,7 +30,7 @@ class InputOption
     private $shortcut;
     private $mode;
     private $default;
-    private $setDefault;
+    private $flagValue;
     private $description;
 
     /**
@@ -152,7 +152,7 @@ class InputOption
     }
 
     /**
-     * Returns true if the option takes an optional value with false as default and setDefault as default
+     * Returns true if the option takes an optional value with false as default and flagValue as default
      *
      * @return bool    true if mode is self::VALUE_TERNARY, false otherwise
      */
@@ -165,7 +165,7 @@ class InputOption
      * Sets the default value.
      *
      * For VALUE_TERNARY the $default will always be set to false (for when the long option is not used)
-     * and $setDefault will be used to store the default (for when the long option is used without a value)
+     * and $flagValue will be used to store the default (for when the long option is used without a value)
      *
      * @param mixed $default The default value
      *
@@ -185,14 +185,14 @@ class InputOption
             }
         }
 
-        $setDefault = false;
+        $flagValue = false;
 
         if ($this->isValueTernary()) {
-            $setDefault = $default;
+            $flagValue = $default;
             $default = false;
         }
 
-        $this->setDefault = $setDefault;
+        $this->flagValue = $flagValue;
         $this->default = $this->acceptValue() ? $default : false;
     }
 
@@ -211,9 +211,9 @@ class InputOption
      *
      * @return mixed The default value
      */
-    public function getSetDefault()
+    public function getFlagValue()
     {
-        return $this->setDefault;
+        return $this->flagValue;
     }
 
     /**

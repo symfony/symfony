@@ -161,16 +161,16 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetSetDefault()
+    public function testGetFlagValue()
     {
         $option = new InputOption('foo');
-        $this->assertEquals(false, $option->getSetDefault(), '->getDefault() returns false');
+        $this->assertEquals(false, $option->getFlagValue(), '->getDefault() returns false');
 
         $option = new InputOption('foo', null, InputOption::VALUE_TERNARY);
-        $this->assertEquals(null, $option->getSetDefault(), '->getDefault() returns null if the option does not have a value');
+        $this->assertEquals(null, $option->getFlagValue(), '->getDefault() returns null if the option does not have a value');
 
         $option = new InputOption('foo', null, InputOption::VALUE_TERNARY, '', 'default');
-        $this->assertEquals('default', $option->getSetDefault(), '->getDefault() returns the default value');
+        $this->assertEquals('default', $option->getFlagValue(), '->getDefault() returns the default value');
     }
 
     public function testSetDefault()

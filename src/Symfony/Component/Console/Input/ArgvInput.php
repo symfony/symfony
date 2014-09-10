@@ -250,7 +250,7 @@ class ArgvInput extends Input
         if ($option->isArray()) {
             $this->options[$name][] = $value;
         } elseif ($option->isValueTernary() && true === $value) {
-            $this->options[$name] = $option->getSetDefault();
+            $this->options[$name] = $option->getFlagValue();
         } else {
             $this->options[$name] = $value;
         }

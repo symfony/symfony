@@ -118,7 +118,7 @@ class InputOption
      */
     public function acceptValue()
     {
-        return $this->isValueRequired() || $this->isValueOptional() || $this->isValueOptionull();
+        return $this->isValueRequired() || $this->isValueOptional() || $this->isValueTernary();
     }
 
     /**
@@ -152,17 +152,20 @@ class InputOption
     }
 
     /**
-     * Returns true if the option takes an optional value with null as default.
+     * Returns true if the option takes an optional value with false as default and setDefault as default
      *
      * @return bool    true if mode is self::VALUE_TERNARY, false otherwise
      */
-    public function isValueOptionull()
+    public function isValueTernary()
     {
         return self::VALUE_TERNARY === (self::VALUE_TERNARY & $this->mode);
     }
 
     /**
      * Sets the default value.
+     *
+     * For VALUE_TERNARY the $default will always be set to false (for when the longoption is not used)
+     * and $setDefault will be used to store the default (for when the longoption is used without a value)
      *
      * @param mixed $default The default value
      *
@@ -184,7 +187,7 @@ class InputOption
 
         $setDefault = false;
 
-        if ($this->isValueOptionull()) {
+        if ($this->isValueTernary()) {
             $setDefault = $default;
             $default = false;
         }
@@ -204,7 +207,7 @@ class InputOption
     }
 
     /**
-     * Returns the default value.
+     * Returns the default value for a longoption without a value
      *
      * @return mixed The default value
      */
@@ -237,7 +240,7 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
-            && $option->isValueOptionull() === $this->isValueOptionull()
+            && $option->isValueTernary() === $this->isValueTernary()
         ;
     }
 }

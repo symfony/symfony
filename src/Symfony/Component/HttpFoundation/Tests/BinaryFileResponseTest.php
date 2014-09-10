@@ -218,7 +218,7 @@ class BinaryFileResponseTest extends ResponseTestCase
 
         $response = new BinaryFileResponse($file);
 
-        $this->assertEquals($response->getFile()->getPathname(), $filePath);
+        $this->assertEquals(realpath($response->getFile()->getPathname()), realpath($filePath));
     }
 
     public function getSampleXAccelMappings()

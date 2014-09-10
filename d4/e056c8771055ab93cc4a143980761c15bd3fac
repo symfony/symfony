@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-11T23:54:37Z
+
+Some of the exceptions you added end with a dot, some other not.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-15T11:40:59Z
+
+> Some of the exceptions you added end with a dot, some other not.
+
+each code throwing exceptions is copy-pasted from similar safeguards already existing in the class. So this means that these inconsistencies already exist in the current exception messages
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:31:36Z
+
+@stof Can you fixed the typo and add dots everywhere?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-02T01:25:37Z
+
+PR updated.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T13:00:19Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-04T17:17:45Z
+
+:+1:

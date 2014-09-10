@@ -179,6 +179,37 @@ class TwigExtensionTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider stopwatchExtensionAvailabilityProvider
+     */
+    public function testStopwatchExtensionAvailability($debug, $stopwatchEnabled, $expected)
+    {
+        $container = $this->createContainer();
+        $container->setParameter('kernel.debug', $debug);
+        if ($stopwatchEnabled) {
+            $container->register('debug.stopwatch', 'Symfony\Component\Stopwatch\Stopwatch');
+        }
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', array());
+        $this->compileContainer($container);
+
+        $tokenParsers = $container->get('twig.extension.debug.stopwatch')->getTokenParsers();
+        $stopwatchIsAvailable = new \ReflectionProperty($tokenParsers[0], 'stopwatchIsAvailable');
+        $stopwatchIsAvailable->setAccessible(true);
+
+        $this->assertSame($expected, $stopwatchIsAvailable->getValue($tokenParsers[0]));
+    }
+
+    public function stopwatchExtensionAvailabilityProvider()
+    {
+        return array(
+            'debug-and-stopwatch-enabled' => array(true, true, true),
+            'only-stopwatch-enabled' => array(false, true, false),
+            'only-debug-enabled' => array(true, false, false),
+            'debug-and-stopwatch-disabled' => array(false, false, false),
+        );
+    }
+
     private function createContainer()
     {
         $container = new ContainerBuilder(new ParameterBag(array(

@@ -164,8 +164,8 @@ class InputOption
     /**
      * Sets the default value.
      *
-     * For VALUE_TERNARY the $default will always be set to false (for when the longoption is not used)
-     * and $setDefault will be used to store the default (for when the longoption is used without a value)
+     * For VALUE_TERNARY the $default will always be set to false (for when the long option is not used)
+     * and $setDefault will be used to store the default (for when the long option is used without a value)
      *
      * @param mixed $default The default value
      *

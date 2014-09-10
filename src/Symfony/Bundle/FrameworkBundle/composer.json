@@ -29,14 +29,14 @@
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.3",
+        "symfony/validator": "~2.1",
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
         "symfony/finder": "~2.0",
         "symfony/security": "~2.4",
         "symfony/form": "~2.3",
-        "symfony/class-loader": "~2.1",
-        "symfony/validator": "~2.1"
+        "symfony/class-loader": "~2.1"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

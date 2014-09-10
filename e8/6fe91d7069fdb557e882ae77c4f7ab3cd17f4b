@@ -1,0 +1,136 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-26T14:40:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T14:49:53Z
+
+the drawback of this is that the ``{% stopwatch %}`` tags in Twig will now trigger the stopwatch in prod as well (thus adding some overhead you don't need) rather than being removed at compile time
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-26T20:35:11Z
+
+@stof Indeed. Do you have any suggestions how to overcome this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T09:04:33Z
+
+@xabbuh Right now, the stopwatch tag is only active when the stopwatch service is available because of the way the extension is registered in the DIC:
+
+```xml
+        <service id="twig.extension.debug.stopwatch" class="%twig.extension.debug.stopwatch.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+        </service>
+```
+
+We could change the `StopwatchExtension` class to accept a second argument that enable the stopwatch conditionally (probably based on the `kernel.debug` value):
+
+```php
+    public function __construct(Stopwatch $stopwatch = null, $enabled)
+    {
+        $this->stopwatch = $stopwatch;
+        $this->enabled = $enabled;
+    }
+
+    // ...
+
+    public function getTokenParsers()
+    {
+        return array(
+            /*
+             * {% stopwatch foo %}
+             * Some stuff which will be recorded on the timeline
+             * {% endstopwatch %}
+             */
+            new StopwatchTokenParser($this->enabled),
+        );
+    }
+```
+
+The XML configuration would then be:
+
+```xml
+        <service id="twig.extension.debug.stopwatch" class="%twig.extension.debug.stopwatch.class%" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+            <argument>%kernel.debug%</argument>
+        </service>
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-27T14:13:28Z
+
+@fabpot or we make it based on ``$twigEnvironment->isDebug()``, which does not require passing another argument to the extension
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-27T14:18:03Z
+
+The issue I just see is that people already might have enabled the stopwatch in the prod environment using the ``stopwatch`` tag on purpose (this might not be really clever though). With the changes they won't be able to that any more without making changes, would they?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-27T19:05:51Z
+
+@xabbuh That's probably a BC break, but something I'm ready to do on master as the use cases seem not really legitimate. Basing the implementation on the `isDebug()` value coming from the Twig env as suggested by @stof looks like indeed an even better idea.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-27T19:33:28Z
+
+@fabpot Alright, if that's fine for you, I'll soon update the pull request accordingly.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-28T19:14:26Z
+
+I updated the code.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T04:06:33Z
+
+@xabbuh Sorry about that but after re-reading the code, I think my first idea was better: tying the availability to the `kernel.debug` value. That way, if someone wants to "decouples" the availability from the debug value, it's possible, whereas retrieving the value from the Twig env does not allow to do this.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-31T06:04:04Z
+
+@fabpot Never mind. I understand your concerns. The code is updated to use the ``kernel.debug`` parameter instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-31T06:07:45Z
+
+@xabbuh not pushed yet apparently
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-31T06:09:52Z
+
+@fabpot Done.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-31T06:36:47Z
+
+The test in the extension now doesn't work as expected. I'll have to update them.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-31T18:09:48Z
+
+Tests are fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-01T11:57:08Z
+
+:+1:

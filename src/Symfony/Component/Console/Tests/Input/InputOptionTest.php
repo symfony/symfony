@@ -70,6 +70,11 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
         $this->assertTrue($option->isValueOptional(), '__construct() can take "InputOption::VALUE_OPTIONAL" as its mode');
+
+        $option = new InputOption('foo', 'f', InputOption::VALUE_TERNARY);
+        $this->assertTrue($option->acceptValue(), '__construct() can take "InputOption::VALUE_TERNARY" as its mode');
+        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_TERNARY" as its mode');
+        $this->assertTrue($option->isValueTernary(), '__construct() can take "InputOption::VALUE_TERNARY" as its mode');
     }
 
     /**
@@ -144,6 +149,28 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
 
         $option = new InputOption('foo', null, InputOption::VALUE_NONE);
         $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_TERNARY);
+        $this->assertFalse($option->getDefault(), '->getDefault() returns false if the option does not take a value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_TERNARY);
+        $this->assertEquals(false, $option->getDefault(), '->getDefault() returns false');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_TERNARY, '', 'default');
+        $this->assertEquals(false, $option->getDefault(), '->getDefault() returns false');
+    }
+
+
+    public function testGetSetDefault()
+    {
+        $option = new InputOption('foo');
+        $this->assertEquals(false, $option->getSetDefault(), '->getDefault() returns false');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_TERNARY);
+        $this->assertEquals(null, $option->getSetDefault(), '->getDefault() returns null if the option does not have a value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_TERNARY, '', 'default');
+        $this->assertEquals('default', $option->getSetDefault(), '->getDefault() returns the default value');
     }
 
     public function testSetDefault()

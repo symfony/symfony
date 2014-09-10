@@ -142,6 +142,24 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
                 array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL), new InputOption('bar', 'b', InputOption::VALUE_OPTIONAL)),
                 array('foo' => 'bbar', 'bar' => null),
                 '->parse() parses short options when they are aggregated as a single one and one of them takes a value'
+            ),
+            array(
+                array('cli.php'),
+                array(new InputOption('foo', 'f', InputOption::VALUE_TERNARY)),
+                array('foo' => false),
+                '->parse() parses undefined ternary long option'
+            ),
+            array(
+                array('cli.php', '--foo'),
+                array(new InputOption('foo', 'f', InputOption::VALUE_TERNARY)),
+                array('foo' => null),
+                '->parse() parses ternary long option without a value'
+            ),
+            array(
+                array('cli.php', '--foo=test'),
+                array(new InputOption('foo', 'f', InputOption::VALUE_TERNARY)),
+                array('foo' => 'test'),
+                '->parse() parses ternary long option with a value'
             )
         );
     }

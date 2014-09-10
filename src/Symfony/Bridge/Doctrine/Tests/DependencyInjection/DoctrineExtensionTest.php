@@ -48,6 +48,128 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
             }));
     }
 
+    /**
+     * @expectedException LogicException
+     */
+    public function testFixManagersAutoMappingsWithTwoAutomappings()
+    {
+        $emConfigs = array(
+            'em1'=> array(
+                'auto_mapping' => true
+            ),
+            'em2'=> array(
+                'auto_mapping' => true
+            ),
+        );
+
+        $bundles = array(
+            'FristBundle'=> 'My\FristBundle',
+            'SecondBundle'=> 'My\SecondBundle',
+        );
+
+        $reflection = new \ReflectionClass(get_class($this->extension));
+        $method = $reflection->getMethod('fixManagersAutoMappings');
+        $method->setAccessible(true);
+
+        $method->invoke($this->extension, $emConfigs, $bundles);
+    }
+
+    public function getAutomappingData()
+    {
+        return array(
+            array(
+                array( // no auto mapping on em1
+                    'auto_mapping' => false
+                ),
+                array( // no auto mapping on em2
+                    'auto_mapping' => false
+                ),
+                array(),
+                array()
+            ),
+            array(
+                array( // no auto mapping on em1
+                    'auto_mapping' => false
+                ),
+                array( // auto mapping enabled on em2
+                    'auto_mapping' => true
+                ),
+                array(),
+                array(
+                    'mappings' => array(
+                        'FristBundle' => array(
+                            'mapping' => true,
+                            'is_bundle' => true
+                        ),
+                        'SecondBundle' => array(
+                            'mapping' => true,
+                            'is_bundle' => true
+                        )
+                    )
+                )
+            ),
+            array(
+                array( // no auto mapping on em1, but it defines SecondBundle as own
+                    'auto_mapping' => false,
+                    'mappings' => array(
+                        'SecondBundle' => array(
+                            'mapping' => true,
+                            'is_bundle' => true
+                        )
+                    )
+                ),
+                array( // auto mapping enabled on em2
+                    'auto_mapping' => true
+                ),
+                array(
+                    'mappings' => array(
+                        'SecondBundle' => array(
+                            'mapping' => true,
+                            'is_bundle' => true
+                        )
+                    )
+                ),
+                array(
+                    'mappings' => array(
+                        'FristBundle' => array(
+                            'mapping' => true,
+                            'is_bundle' => true
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * @dataProvider getAutomappingData
+     */
+    public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2)
+    {
+        $emConfigs = array(
+            'em1'=> $originalEm1,
+            'em2'=> $originalEm2,
+        );
+
+        $bundles = array(
+            'FristBundle'=> 'My\FristBundle',
+            'SecondBundle'=> 'My\SecondBundle',
+        );
+
+        $reflection = new \ReflectionClass(get_class($this->extension));
+        $method = $reflection->getMethod('fixManagersAutoMappings');
+        $method->setAccessible(true);
+
+        $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
+
+        $this->assertEquals($newEmConfigs["em1"], array_merge(array(
+            'auto_mapping' => false
+        ), $expectedEm1));
+        $this->assertEquals($newEmConfigs["em2"], array_merge(array(
+            'auto_mapping' => false
+        ), $expectedEm2));
+    }
+
     public function providerBasicDrivers()
     {
         return array(

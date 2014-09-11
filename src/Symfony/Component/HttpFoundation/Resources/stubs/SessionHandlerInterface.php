@@ -1,5 +1,5 @@
 <?php
-
+namespace Symfony\Component\HttpFoundation;
 /*
  * This file is part of the Symfony package.
  *

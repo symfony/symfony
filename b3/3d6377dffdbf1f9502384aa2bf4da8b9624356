@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-28T13:33:50Z
+
+Doesn't this have to be merged into the 2.3 branch since the SensioDistributionBundle can be used with older Symfony versions too?
+
+---------------------------------------------------------------------------
+
+by JJK801 at 2014-07-28T13:37:04Z
+
+@xabbuh I took care not to cause BC break by adding a param to find() function
+
+---------------------------------------------------------------------------
+
+by acoquoin at 2014-07-28T13:38:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-28T13:43:08Z
+
+@JJK801 But the ``findArguments()`` method of the ``PhpExecutableFinder`` class wouldn't be available if you didn't require the Process component in a higher version than 2.2.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-14T08:31:23Z
+
+this should be covered by a test IMO
+
+---------------------------------------------------------------------------
+
+by JJK801 at 2014-09-01T15:46:55Z
+
+@stof done ;)
+
+---------------------------------------------------------------------------
+
+by JJK801 at 2014-09-02T07:25:44Z
+
+@fabpot is it ok to merge it ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-11T06:37:43Z
+
+@JJK801 :+1: This looks good to me know. However, can you rebase your PR on current master to remove the merge commit? Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-11T06:38:44Z
+
+This should be merged in 2.3 to be able to resolve sensiolabs/SensioDistributionBundle#150.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-11T06:39:36Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-09-11T06:46:03Z
+
+I guess under normal circumstances we wouldnt merge something like this into 2.3. but I guess it can be seen as a bug fix, rather than a new feature. also alternative language implementation compatibility issue are sort of a new category of issue to deal with.
+
+---------------------------------------------------------------------------
+
+by JJK801 at 2014-09-11T07:25:31Z
+
+@lsmith77 :+1:
+
+---------------------------------------------------------------------------
+
+by JJK801 at 2014-09-11T07:45:35Z
+
+@fabpot done, rebased and squashed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-11T07:47:15Z
+
+@lsmith77 So, is it a +1 from you?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-09-11T08:27:14Z
+
+yes .. +1
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-11T08:54:12Z
+
+:+1:

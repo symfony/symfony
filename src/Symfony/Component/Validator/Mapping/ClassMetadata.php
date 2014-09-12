@@ -184,7 +184,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
             'members',
             'name',
             'properties',
-            'defaultGroup'
+            'defaultGroup',
         ));
     }
 
@@ -279,6 +279,21 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
+     * @param string       $property
+     * @param Constraint[] $constraints
+     *
+     * @return ClassMetadata
+     */
+    public function addPropertyConstraints($property, array $constraints)
+    {
+        foreach ($constraints as $constraint) {
+            $this->addPropertyConstraint($property, $constraint);
+        }
+
+        return $this;
+    }
+
+    /**
      * Adds a constraint to the getter of the given property.
      *
      * The name of the getter is assumed to be the name of the property with an
@@ -300,6 +315,21 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
         $constraint->addImplicitGroupName($this->getDefaultGroup());
 
         $this->getters[$property]->addConstraint($constraint);
+
+        return $this;
+    }
+
+    /**
+     * @param string       $property
+     * @param Constraint[] $constraints
+     *
+     * @return ClassMetadata
+     */
+    public function addGetterConstraints($property, array $constraints)
+    {
+        foreach ($constraints as $constraint) {
+            $this->addGetterConstraint($property, $constraint);
+        }
 
         return $this;
     }

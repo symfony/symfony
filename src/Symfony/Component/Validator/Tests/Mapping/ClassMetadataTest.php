@@ -58,6 +58,22 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('firstName', 'lastName'), $this->metadata->getConstrainedProperties());
     }
 
+    public function testAddMultiplePropertyConstraints()
+    {
+        $this->metadata->addPropertyConstraints('lastName', array(new ConstraintA(), new ConstraintB()));
+
+        $constraints = array(
+            new ConstraintA(array('groups' => array('Default', 'Entity'))),
+            new ConstraintB(array('groups' => array('Default', 'Entity'))),
+        );
+
+        $properties = $this->metadata->getPropertyMetadata('lastName');
+
+        $this->assertCount(1, $properties);
+        $this->assertEquals('lastName', $properties[0]->getName());
+        $this->assertEquals($constraints, $properties[0]->getConstraints());
+    }
+
     public function testMergeConstraintsMergesClassConstraints()
     {
         $parent = new ClassMetadata(self::PARENTCLASS);

@@ -21,7 +21,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutputStream = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-dump style=white-space:pre>';
+    protected $dumpPrefix = '<pre class=sf-dump>';
     protected $dumpSuffix = '</pre>';
     protected $colors = true;
     protected $headerIsDumped = false;
@@ -59,7 +59,7 @@ class HtmlDumper extends CliDumper
     }
 
     /**
-     * Sets an HTML header the will be dumped once in the output stream.
+     * Sets an HTML header that will be dumped once in the output stream.
      *
      * @param string $header An HTML string.
      */
@@ -83,28 +83,32 @@ class HtmlDumper extends CliDumper
     /**
      * Dumps the HTML header.
      */
-    protected function dumpHeader()
+    protected function getDumpHeader()
     {
         $this->headerIsDumped = true;
-        $line = $this->line;
 
         $p = 'sf-dump';
-        $this->line = '<!DOCTYPE html><style>';
-        parent::dumpLine(0);
-        $this->line .= "a.$p-ref {{$this->styles['ref']}}";
-        parent::dumpLine(0);
+        $line = <<<EOHTML
+<!DOCTYPE html><style>
+pre.sf-dump {
+    background-color: #300a24;
+    white-space: pre;
+    line-height: 1.2em;
+    color: #eee8d5;
+    font-family: monospace, sans-serif;
+    padding: 5px;
+}
+.sf-dump span {
+    display: inline;
+}
+EOHTML;
+        $line .= "a.$p-ref {{$this->styles['ref']}}";
 
         foreach ($this->styles as $class => $style) {
-            $this->line .= "span.$p-$class {{$style}}";
-            parent::dumpLine(0);
+            $line .= "span.$p-$class {{$style}}";
         }
 
-        $this->line .= '</style>';
-        parent::dumpLine(0);
-        $this->line .= $this->dumpHeader;
-        parent::dumpLine(0);
-
-        $this->line = $line;
+        return preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
     }
 
     /**
@@ -144,9 +148,6 @@ class HtmlDumper extends CliDumper
      */
     protected function dumpLine($depth)
     {
-        if (!$this->headerIsDumped) {
-            $this->dumpHeader();
-        }
 
         switch ($this->lastDepth - $depth) {
             case +1: $this->line = '</span>'.$this->line; break;
@@ -155,6 +156,9 @@ class HtmlDumper extends CliDumper
 
         if (-1 === $this->lastDepth) {
             $this->line = $this->dumpPrefix.$this->line;
+        }
+        if (!$this->headerIsDumped) {
+            $this->line = $this->getDumpHeader().$this->line;
         }
 
         if (false === $depth) {

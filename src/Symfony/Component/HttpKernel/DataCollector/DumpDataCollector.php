@@ -73,7 +73,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         for ($i = 1; $i < 7; ++$i) {
             if (isset($trace[$i]['class'], $trace[$i]['function'])
-                && ('dump' === $trace[$i]['function'] || 'debug' === $trace[$i]['function'])
+                && 'dump' === $trace[$i]['function']
                 && 'Symfony\Component\VarDumper\VarDumper' === $trace[$i]['class']
             ) {
                 $file = $trace[$i]['file'];
@@ -152,66 +152,29 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         return $this->dataCount;
     }
 
-    public function getDumpsExcerpts()
+    public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1)
     {
-        $dumps = array();
-
-        foreach ($this->data as $dump) {
-            $data = $dump['data']->getRawData();
-            unset($dump['data']);
-
-            $data = $data[0][0];
-
-            if (isset($data->val)) {
-                $data = $data->val;
-            }
-
-            if (isset($data->bin)) {
-                $data = 'b"'.$data->bin.'"';
-            } elseif (isset($data->str)) {
-                $data = '"'.$data->str.'"';
-            } elseif (isset($data->count)) {
-                $data = 'array('.$data->count.')';
-            } elseif (isset($data->class)) {
-                $data = $data->class.'{...}';
-            } elseif (isset($data->res)) {
-                $data = 'resource:'.$data->res.'{...}';
-            } elseif (is_array($data)) {
-                $data = 'array()';
-            } elseif (null === $data) {
-                $data = 'null';
-            } elseif (false === $data) {
-                $data = 'false';
-            } elseif (INF === $data) {
-                $data = 'INF';
-            } elseif (-INF === $data) {
-                $data = '-INF';
-            } elseif (NAN === $data) {
-                $data = 'NAN';
-            } elseif (true === $data) {
-                $data = 'true';
-            }
-
-            $dump['dataExcerpt'] = $data;
-            $dumps[] = $dump;
-        }
-
-        return $dumps;
-    }
-
-    public function getDumps($getData = false)
-    {
-        if ($getData) {
+        if ('html' === $format) {
+            $dumper = new HtmlDumper();
+        } elseif ('json' === $format) {
             $dumper = new JsonDumper();
+        } else {
+            throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
+
         }
         $dumps = array();
 
         foreach ($this->data as $dump) {
-            $json = '';
-            if ($getData) {
-                $dumper->dump($dump['data'], function ($line) use (&$json) {$json .= $line;});
-            }
-            $dump['data'] = $json;
+            $data = '';
+            $dumper->dump(
+                $dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth),
+                function ($line, $depth) use (&$data) {
+                    if (false !==$depth) {
+                        $data .= str_repeat('  ', $depth).$line."\n";
+                    }
+                }
+            );
+            $dump['data'] = $data;
             $dumps[] = $dump;
         }
 

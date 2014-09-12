@@ -37,21 +37,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             <<<EOTXT
-<!DOCTYPE html><style>
-a.sf-dump-ref {color:#444444}
-span.sf-dump-num {font-weight:bold;color:#0087FF}
-span.sf-dump-const {font-weight:bold;color:#0087FF}
-span.sf-dump-str {font-weight:bold;color:#00D7FF}
-span.sf-dump-cchr {font-style: italic}
-span.sf-dump-note {color:#D7AF00}
-span.sf-dump-ref {color:#444444}
-span.sf-dump-public {color:#008700}
-span.sf-dump-protected {color:#D75F00}
-span.sf-dump-private {color:#D70000}
-span.sf-dump-meta {color:#005FFF}
-</style>
-
-<pre class=sf-dump style=white-space:pre><span class=sf-dump-0><span class=sf-dump-note>array:25</span> [
+<!DOCTYPE html><style> pre.sf-dump { background-color: #300a24; white-space: pre; line-height: 1.2em; color: #eee8d5; font-family: monospace, sans-serif; padding: 5px; } .sf-dump span { display: inline; }a.sf-dump-ref {color:#444444}span.sf-dump-num {font-weight:bold;color:#0087FF}span.sf-dump-const {font-weight:bold;color:#0087FF}span.sf-dump-str {font-weight:bold;color:#00D7FF}span.sf-dump-cchr {font-style: italic}span.sf-dump-note {color:#D7AF00}span.sf-dump-ref {color:#444444}span.sf-dump-public {color:#008700}span.sf-dump-protected {color:#D75F00}span.sf-dump-private {color:#D70000}span.sf-dump-meta {color:#005FFF}</style><pre class=sf-dump><span class=sf-dump-0><span class=sf-dump-note>array:25</span> [
   <span class=sf-dump-1>"<span class=sf-dump-meta>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-meta>0</span> => <span class=sf-dump-const>null</span> <a class=sf-dump-ref name="sf-dump-ref1">#1</a>
   "<span class=sf-dump-meta>const</span>" => <span class=sf-dump-num>1.1</span>

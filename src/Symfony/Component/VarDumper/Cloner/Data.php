@@ -20,6 +20,8 @@ use Symfony\Component\VarDumper\Dumper\Cursor;
 class Data
 {
     private $data;
+    private $maxDepth = -1;
+    private $maxItemsPerDepth = -1;
 
     /**
      * @param array $data A array as returned by ClonerInterface::cloneVar().
@@ -29,9 +31,29 @@ class Data
         $this->data = $data;
     }
 
+    /**
+     * @return array The raw data structure.
+     */
     public function getRawData()
     {
         return $this->data;
+    }
+
+    /**
+     * Returns a depth limited clone of $this.
+     *
+     * @param int $maxDepth         The max dumped depth level.
+     * @param int $maxItemsPerDepth The max number of items dumped per depth level.
+     *
+     * @return self A depth limited clone of $this.
+     */
+    public function getLimitedClone($maxDepth, $maxItemsPerDepth)
+    {
+        $data = clone $this;
+        $data->maxDepth = (int) $maxDepth;
+        $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+
+        return $data;
     }
 
     /**
@@ -147,20 +169,23 @@ class Data
     private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType)
     {
         if ($children) {
-            $cursor = clone $parentCursor;
-            ++$cursor->depth;
-            $cursor->hashType = $hashType;
-            $cursor->hashIndex = 0;
-            $cursor->hashLength = count($children);
-            $cursor->hashCut = $hashCut;
-            foreach ($children as $cursor->hashKey => $child) {
-                $this->dumpItem($dumper, $cursor, $refs, $child);
-                ++$cursor->hashIndex;
-                if ($cursor->stop) {
-                    $parentCursor->stop = true;
+            if ($parentCursor->depth !== $this->maxDepth && $this->maxItemsPerDepth) {
+                $cursor = clone $parentCursor;
+                ++$cursor->depth;
+                $cursor->hashType = $hashType;
+                $cursor->hashIndex = 0;
+                $cursor->hashLength = count($children);
+                $cursor->hashCut = $hashCut;
+                foreach ($children as $cursor->hashKey => $child) {
+                    $this->dumpItem($dumper, $cursor, $refs, $child);
+                    if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
+                        $parentCursor->stop = true;
 
-                    return $hashCut >= 0 ? $hashCut + $children - $cursor->hashIndex : $hashCut;
+                        return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
+                    }
                 }
+            } elseif ($hashCut >= 0) {
+                $hashCut += count($children);
             }
         }
 

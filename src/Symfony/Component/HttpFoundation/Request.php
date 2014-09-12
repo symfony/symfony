@@ -1010,9 +1010,9 @@ class Request
     }
 
     /**
-     * Returns the requested URI.
+     * Returns the requested URI (path and query).
      *
-     * @return string The raw URI (i.e. not urldecoded)
+     * @return string The raw URI (i.e. not URI decoded)
      *
      * @api
      */
@@ -1039,9 +1039,9 @@ class Request
     }
 
     /**
-     * Generates a normalized URI for the Request.
+     * Generates a normalized URI (URL) for the Request.
      *
-     * @return string A normalized URI for the Request
+     * @return string A normalized URI (URL) for the Request
      *
      * @see getQueryString()
      *

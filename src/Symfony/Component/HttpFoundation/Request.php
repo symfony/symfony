@@ -1044,7 +1044,7 @@ class Request
     }
 
     /**
-     * Returns the requested URI (URN).
+     * Returns the requested URI (path and query).
      *
      * @return string The raw URI (i.e. not URI decoded)
      *

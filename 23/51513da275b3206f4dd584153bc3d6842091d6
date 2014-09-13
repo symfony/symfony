@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-10T15:51:22Z
+
+IMO, all 5.x versions should be allowed given that Swiftmailer now follows semver
+
+---------------------------------------------------------------------------
+
+by ymc-dabe at 2014-09-10T16:19:21Z
+
+I'm not sure if Swiftmailer follows semantic versioning, but I suspect it to. I therefore just updated the pull request to require `">=4.2.0,<6.0-dev"` (instead of  `">=4.2.0,<5.3-dev"`).
+Thanks for the hint.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-13T09:30:12Z
+
+:+1:

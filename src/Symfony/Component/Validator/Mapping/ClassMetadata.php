@@ -320,6 +320,21 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
     }
 
     /**
+     * @param string       $property
+     * @param Constraint[] $constraints
+     *
+     * @return ClassMetadata
+     */
+    public function addGetterConstraints($property, array $constraints)
+    {
+        foreach ($constraints as $constraint) {
+            $this->addGetterConstraint($property, $constraint);
+        }
+
+        return $this;
+    }
+
+    /**
      * Merges the constraints of the given metadata into this object.
      *
      * @param ClassMetadata $source The source metadata

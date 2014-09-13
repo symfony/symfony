@@ -23,7 +23,6 @@
         <parameter>bar</parameter>
       </parameter>
     </parameter>
-    <parameter key="foo_bar" type="service" id="foo_bar" />
     <parameter key="MixedCase" type="collection"> <!-- Should be lower cased -->
       <parameter key="MixedCaseKey">value</parameter> <!-- Should stay mixed case -->
     </parameter>

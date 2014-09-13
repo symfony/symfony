@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +26,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandler implements RequestHandlerInterface
 {
+    /**
+     * @var ServerParams
+     */
+    private $serverParams;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -61,6 +76,10 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $params = $request->request->get($name, $default);
                 $files = $request->files->get($name, $default);
             } else {
+                if ($this->serverParams->getContentLength() > $this->serverParams->getPostMaxSize()) {
+                    $form->addError(new FormError('Max post size exceeded.'));
+                }
+
                 // Don't submit the form if it is not present in the request
                 return;
             }

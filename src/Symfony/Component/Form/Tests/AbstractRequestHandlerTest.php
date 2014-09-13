@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\Forms;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -21,11 +23,17 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $requestHandler;
 
+    /**
+     * @var \Symfony\Component\Form\FormFactory
+     */
+    protected $factory;
+
     protected $request;
 
     protected function setUp()
     {
         $this->requestHandler = $this->getRequestHandler();
+        $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
     }
 
@@ -247,6 +255,19 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($file, 'PATCH' !== $method);
 
         $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    public function testAddFormErrorIfPostMaxSizeExceeded()
+    {
+        $form = $this->factory->createNamed('name', 'text');
+        $this->setRequestData('POST', array(), array());
+        $_SERVER['CONTENT_LENGTH'] = 1000000000;
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEquals("ERROR: Max post size exceeded.\n", $form->getErrorsAsString());
+
+        unset($_SERVER['CONTENT_LENGTH']);
     }
 
     abstract protected function setRequestData($method, $data, $files = array());

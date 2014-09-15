@@ -184,7 +184,7 @@ class ClassMetadata extends ElementMetadata implements LegacyMetadataInterface, 
             'members',
             'name',
             'properties',
-            'defaultGroup'
+            'defaultGroup',
         ));
     }
 

@@ -1010,7 +1010,7 @@ class Request
     }
 
     /**
-     * Returns the requested URI (path and query).
+     * Returns the requested URI (path and query string).
      *
      * @return string The raw URI (i.e. not URI decoded)
      *

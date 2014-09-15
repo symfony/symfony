@@ -11,6 +11,30 @@ yaml: |
 php: |
     array('apple', 'banana', 'carrot')
 ---
+test: Sequence With Item Being Null In The Middle
+brief: |
+    You can specify a list in YAML by placing each
+    member of the list on a new line with an opening
+    dash. These lists are called sequences.
+yaml: |
+    - apple
+    -
+    - carrot
+php: |
+    array('apple', null, 'carrot')
+---
+test: Sequence With Last Item Being Null
+brief: |
+    You can specify a list in YAML by placing each
+    member of the list on a new line with an opening
+    dash. These lists are called sequences.
+yaml: |
+    - apple
+    - banana
+    -
+php: |
+    array('apple', 'banana', null)
+---
 test: Nested Sequences
 brief: |
     You can include a sequence within another

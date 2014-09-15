@@ -43,7 +43,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
 
     protected function getRequestHandler()
     {
-        return new HttpFoundationRequestHandler();
+        return new HttpFoundationRequestHandler($this->serverParams);
     }
 
     protected function getMockFile()

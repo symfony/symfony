@@ -12,10 +12,10 @@
 namespace Symfony\Component\Form\Extension\HttpFoundation;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
+use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -34,9 +34,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct(ServerParams $params = null)
+    public function __construct(ServerParams $serverParams = null)
     {
-        $this->serverParams = $params ?: new ServerParams();
+        $this->serverParams = $serverParams ?: new ServerParams();
     }
 
     /**
@@ -68,6 +68,25 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $data = $request->query->get($name);
             }
         } else {
+            // Mark the form with an error if the uploaded size was too large
+            // This is done here and not in FormValidator because $_POST is
+            // empty when that error occurs. Hence the form is never submitted.
+            $contentLength = $this->serverParams->getContentLength();
+            $maxContentLength = $this->serverParams->getPostMaxSize();
+
+            if (!empty($maxContentLength) && $contentLength > $maxContentLength) {
+                // Submit the form, but don't clear the default values
+                $form->submit(null, false);
+
+                $form->addError(new FormError(
+                    $form->getConfig()->getOption('post_max_size_message'),
+                    null,
+                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
+                ));
+
+                return;
+            }
+
             if ('' === $name) {
                 $params = $request->request->all();
                 $files = $request->files->all();
@@ -76,10 +95,6 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 $params = $request->request->get($name, $default);
                 $files = $request->files->get($name, $default);
             } else {
-                if ($this->serverParams->getContentLength() > $this->serverParams->getPostMaxSize()) {
-                    $form->addError(new FormError('Max post size exceeded.'));
-                }
-
                 // Don't submit the form if it is not present in the request
                 return;
             }

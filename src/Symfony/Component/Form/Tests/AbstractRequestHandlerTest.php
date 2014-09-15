@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\RequestHandlerInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -19,19 +22,25 @@ use Symfony\Component\Form\Forms;
 abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\Form\RequestHandlerInterface
+     * @var RequestHandlerInterface
      */
     protected $requestHandler;
 
     /**
-     * @var \Symfony\Component\Form\FormFactory
+     * @var FormFactory
      */
     protected $factory;
 
     protected $request;
 
+    protected $serverParams;
+
     protected function setUp()
     {
+        $this->serverParams = $this->getMock(
+            'Symfony\Component\Form\Util\ServerParams',
+            array('getNormalizedIniPostMaxSize', 'getContentLength')
+        );
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
@@ -257,17 +266,48 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         $this->requestHandler->handleRequest($form, $this->request);
     }
 
-    public function testAddFormErrorIfPostMaxSizeExceeded()
+    /**
+     * @dataProvider getPostMaxSizeFixtures
+     */
+    public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
     {
-        $form = $this->factory->createNamed('name', 'text');
+        $this->serverParams->expects($this->once())
+            ->method('getContentLength')
+            ->will($this->returnValue($contentLength));
+        $this->serverParams->expects($this->any())
+            ->method('getNormalizedIniPostMaxSize')
+            ->will($this->returnValue($iniMax));
+
+        $options = array('post_max_size_message' => 'Max {{ max }}!');
+        $form = $this->factory->createNamed('name', 'text', null, $options);
         $this->setRequestData('POST', array(), array());
-        $_SERVER['CONTENT_LENGTH'] = 1000000000;
 
         $this->requestHandler->handleRequest($form, $this->request);
 
-        $this->assertEquals("ERROR: Max post size exceeded.\n", $form->getErrorsAsString());
+        if ($shouldFail) {
+            $errors = array(new FormError($options['post_max_size_message'], null, $errorParams));
 
-        unset($_SERVER['CONTENT_LENGTH']);
+            $this->assertEquals($errors, $form->getErrors());
+            $this->assertTrue($form->isSubmitted());
+        } else {
+            $this->assertCount(0, $form->getErrors());
+            $this->assertFalse($form->isSubmitted());
+        }
+    }
+
+    public function getPostMaxSizeFixtures()
+    {
+        return array(
+            array(pow(1024, 3) + 1, '1G', true, array('{{ max }}' => '1G')),
+            array(pow(1024, 3), '1G', false),
+            array(pow(1024, 2) + 1, '1M', true, array('{{ max }}' => '1M')),
+            array(pow(1024, 2), '1M', false),
+            array(1024 + 1, '1K', true, array('{{ max }}' => '1K')),
+            array(1024, '1K', false),
+            array(null, '1K', false),
+            array(1024, '', false),
+            array(1024, 0, false),
+        );
     }
 
     abstract protected function setRequestData($method, $data, $files = array());

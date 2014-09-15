@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Util\ServerParams;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -31,10 +32,10 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
      */
     private $requestHandler;
 
-    public function __construct()
+    public function __construct(ServerParams $serverParams = null)
     {
         $this->listener = new BindRequestListener();
-        $this->requestHandler = new HttpFoundationRequestHandler();
+        $this->requestHandler = new HttpFoundationRequestHandler($serverParams);
     }
 
     /**

@@ -62,7 +62,7 @@ class ImageValidator extends FileValidator
             if ($width < $constraint->minWidth) {
                 $this->context->addViolation($constraint->minWidthMessage, array(
                     '{{ width }}'    => $width,
-                    '{{ min_width }}' => $constraint->minWidth
+                    '{{ min_width }}' => $constraint->minWidth,
                 ));
 
                 return;
@@ -77,7 +77,7 @@ class ImageValidator extends FileValidator
             if ($width > $constraint->maxWidth) {
                 $this->context->addViolation($constraint->maxWidthMessage, array(
                     '{{ width }}'    => $width,
-                    '{{ max_width }}' => $constraint->maxWidth
+                    '{{ max_width }}' => $constraint->maxWidth,
                 ));
 
                 return;
@@ -92,7 +92,7 @@ class ImageValidator extends FileValidator
             if ($height < $constraint->minHeight) {
                 $this->context->addViolation($constraint->minHeightMessage, array(
                     '{{ height }}'    => $height,
-                    '{{ min_height }}' => $constraint->minHeight
+                    '{{ min_height }}' => $constraint->minHeight,
                 ));
 
                 return;
@@ -107,12 +107,12 @@ class ImageValidator extends FileValidator
             if ($height > $constraint->maxHeight) {
                 $this->context->addViolation($constraint->maxHeightMessage, array(
                     '{{ height }}'    => $height,
-                    '{{ max_height }}' => $constraint->maxHeight
+                    '{{ max_height }}' => $constraint->maxHeight,
                 ));
             }
         }
 
-        $ratio = $width / $height;
+        $ratio = round($width / $height, 2);
 
         if (null !== $constraint->minRatio) {
             if (!is_numeric((string) $constraint->minRatio)) {
@@ -122,7 +122,7 @@ class ImageValidator extends FileValidator
             if ($ratio < $constraint->minRatio) {
                 $this->context->addViolation($constraint->minRatioMessage, array(
                     '{{ ratio }}' => $ratio,
-                    '{{ min_ratio }}' => $constraint->minRatio
+                    '{{ min_ratio }}' => $constraint->minRatio,
                 ));
             }
         }
@@ -135,7 +135,7 @@ class ImageValidator extends FileValidator
             if ($ratio > $constraint->maxRatio) {
                 $this->context->addViolation($constraint->maxRatioMessage, array(
                     '{{ ratio }}' => $ratio,
-                    '{{ max_ratio }}' => $constraint->maxRatio
+                    '{{ max_ratio }}' => $constraint->maxRatio,
                 ));
             }
         }
@@ -143,21 +143,21 @@ class ImageValidator extends FileValidator
         if (!$constraint->allowSquare && $width == $height) {
             $this->context->addViolation($constraint->allowSquareMessage, array(
                 '{{ width }}' => $width,
-                '{{ height }}' => $height
+                '{{ height }}' => $height,
             ));
         }
 
         if (!$constraint->allowLandscape && $width > $height) {
             $this->context->addViolation($constraint->allowLandscapeMessage, array(
                 '{{ width }}' => $width,
-                '{{ height }}' => $height
+                '{{ height }}' => $height,
             ));
         }
 
         if (!$constraint->allowPortrait && $width < $height) {
             $this->context->addViolation($constraint->allowPortraitMessage, array(
                 '{{ width }}' => $width,
-                '{{ height }}' => $height
+                '{{ height }}' => $height,
             ));
         }
 

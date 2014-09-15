@@ -13,16 +13,21 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
-use Symfony\Component\Validator\Validation;
 
 class ImageValidatorTest extends AbstractConstraintValidatorTest
 {
     protected $context;
+
+    /**
+     * @var ImageValidator
+     */
     protected $validator;
+
     protected $path;
     protected $image;
     protected $imageLandscape;
     protected $imagePortrait;
+    protected $image4By3;
 
     protected function createValidator()
     {
@@ -36,6 +41,7 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
         $this->image = __DIR__.'/Fixtures/test.gif';
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
         $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
+        $this->image4By3 = __DIR__.'/Fixtures/test_4by3.gif';
     }
 
     public function testNullIsValid()
@@ -209,6 +215,17 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
             '{{ ratio }}' => 1,
             '{{ max_ratio }}' => 0.5,
         ));
+    }
+
+    public function testMaxRatioUsesTwoDecimalsOnly()
+    {
+        $constraint = new Image(array(
+            'maxRatio' => 1.33,
+        ));
+
+        $this->validator->validate($this->image4By3, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**

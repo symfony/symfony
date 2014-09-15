@@ -290,26 +290,23 @@ class Filesystem
 
         $this->mkdir(dirname($targetDir));
 
-        $ok = false;
         if (is_link($targetDir)) {
             if (readlink($targetDir) != $originDir) {
                 $this->remove($targetDir);
             } else {
-                $ok = true;
+                return;
             }
         }
 
-        if (!$ok) {
-            if (true !== @symlink($originDir, $targetDir)) {
-                $report = error_get_last();
-                if (is_array($report)) {
-                    if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
-                        throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
-                    }
+        if (true !== @symlink($originDir, $targetDir)) {
+            $report = error_get_last();
+            if (is_array($report)) {
+                if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
+                    throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                 }
-
-                throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
             }
+
+            throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
         }
     }
 
@@ -373,7 +370,7 @@ class Filesystem
         $originDir = rtrim($originDir, '/\\');
 
         // Iterate in destination folder to remove obsolete entries
-        if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
+        if ($this->exists($targetDir) && !empty($options['delete'])) {
             $deleteIterator = $iterator;
             if (null === $deleteIterator) {
                 $flags = \FilesystemIterator::SKIP_DOTS;
@@ -387,10 +384,7 @@ class Filesystem
             }
         }
 
-        $copyOnWindows = false;
-        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
-            $copyOnWindows = $options['copy_on_windows'];
-        }
+        $copyOnWindows = !empty($options['copy_on_windows']) && !function_exists('symlink');
 
         if (null === $iterator) {
             $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
@@ -402,7 +396,7 @@ class Filesystem
 
             if ($copyOnWindows) {
                 if (is_link($file) || is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, !empty($options['override']));
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } else {
@@ -414,7 +408,7 @@ class Filesystem
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {
-                    $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
+                    $this->copy($file, $target, !empty($options['override']));
                 } else {
                     throw new IOException(sprintf('Unable to guess "%s" file type.', $file), 0, null, $file);
                 }

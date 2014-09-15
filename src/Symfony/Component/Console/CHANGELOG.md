@@ -6,6 +6,7 @@ CHANGELOG
 
  * added a Process helper
  * added a DebugFormatter helper
+ * added a way for events to be triggered on commands run from within other commands
 
 2.5.0
 -----

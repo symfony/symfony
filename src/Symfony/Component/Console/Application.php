@@ -199,6 +199,23 @@ class Application
     }
 
     /**
+     * Public version of doRunCommand().
+     *
+     * If an event dispatcher has been attached to the application,
+     * events are also dispatched during the life-cycle of the command.
+     *
+     * @param Command         $command A Command instance
+     * @param InputInterface  $input   An Input instance
+     * @param OutputInterface $output  An Output instance
+     *
+     * @return int 0 if everything went fine, or an error code
+     */
+    public function runCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        return $this->doRunCommand($command, $input, $output);
+    }
+
+    /**
      * Set a helper set to be used with the command.
      *
      * @param HelperSet $helperSet The helper set

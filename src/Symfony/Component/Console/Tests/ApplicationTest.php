@@ -907,6 +907,21 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
     }
 
+    public function testRunCommandWithDispatcher()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setDispatcher($this->getDispatcher());
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->runCommand(array('command' => 'foo'));
+        $this->assertEquals('before.foo.after.', $tester->getDisplay());
+    }
+
     public function testTerminalDimensions()
     {
         $application = new Application();

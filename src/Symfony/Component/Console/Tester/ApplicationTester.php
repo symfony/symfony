@@ -77,6 +77,40 @@ class ApplicationTester
     }
 
     /**
+     * Executes a specific command.
+     *
+     * Available options:
+     *
+     *  * interactive: Sets the input interactive flag
+     *  * decorated:   Sets the output decorated flag
+     *  * verbosity:   Sets the output verbosity flag
+     *
+     * @param array $input   An array of arguments and options
+     * @param array $options An array of options
+     *
+     * @return int     The command exit code
+     */
+    public function runCommand(array $input, $options = array())
+    {
+        $this->input = new ArrayInput($input);
+        if (isset($options['interactive'])) {
+            $this->input->setInteractive($options['interactive']);
+        }
+
+        $this->output = new StreamOutput(fopen('php://memory', 'w', false));
+        if (isset($options['decorated'])) {
+            $this->output->setDecorated($options['decorated']);
+        }
+        if (isset($options['verbosity'])) {
+            $this->output->setVerbosity($options['verbosity']);
+        }
+
+        $command = $this->application->find($input["command"]);
+
+        return $this->statusCode = $this->application->runCommand($command, $this->input, $this->output);
+    }
+
+    /**
      * Gets the display returned by the last execution of the application.
      *
      * @param bool    $normalize Whether to normalize end of lines to \n or not

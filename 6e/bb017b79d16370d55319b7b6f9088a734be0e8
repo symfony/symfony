@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by egeloen at 2014-07-07T11:09:48Z
+
+Not sure if this PR is fully BC. Does it will still support to merge extra resources in a DI extension as done [here](https://github.com/egeloen/IvoryCKEditorBundle/blob/master/DependencyInjection/IvoryCKEditorExtension.php#L71-L77)?
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-07-07T12:21:47Z
+
+@egeloen No, you're right, it doesn't support the merge of extra resources at the moment.
+Maybe we can keep the parameter name `twig.form.resources` instead of using the new one (`twig.form_themes`) even if it matches with the config array structure.
+What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-07T12:23:33Z
+
+the name of the DIC parameter should indeed be preserved
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-07-07T12:29:55Z
+
+Fixed. :+1:
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-07-07T12:49:29Z
+
+Doc PR created.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-15T02:40:16Z
+
+@stefanosala There is a slight code standards issue - check out fabbot on the link near the bottom.
+
+And awesome job!
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-07-15T20:37:51Z
+
+@weaverryan :+1: thank you for the review!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:29:55Z
+
+:+1:

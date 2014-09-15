@@ -13,6 +13,12 @@ namespace Symfony\Component\Routing\Matcher;
 
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\Strategy\CompositeStrategy;
+use Symfony\Component\Routing\Matcher\Strategy\HostRegexStrategy;
+use Symfony\Component\Routing\Matcher\Strategy\HttpMethodStrategy;
+use Symfony\Component\Routing\Matcher\Strategy\MatcherStrategy;
+use Symfony\Component\Routing\Matcher\Strategy\RegexStrategy;
+use Symfony\Component\Routing\Matcher\Strategy\StaticPrefixStrategy;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -43,6 +49,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected $allow = array();
 
     /**
+     * @var array
+     */
+    protected $matcherStrategy;
+
+    /**
      * @var RouteCollection
      */
     protected $routes;
@@ -62,6 +73,13 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         $this->routes = $routes;
         $this->context = $context;
+
+        $this->matcherStrategy = new CompositeStrategy(array(
+            new StaticPrefixStrategy(),
+            new RegexStrategy(),
+            new HostRegexStrategy(),
+            new HttpMethodStrategy(),
+        ));
     }
 
     /**
@@ -111,6 +129,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     }
 
     /**
+     * @param MatcherStrategy $strategy
+     */
+    public function setMatcherStrategy(MatcherStrategy $strategy)
+    {
+        $this->matcherStrategy = $strategy;
+    }
+
+    /**
      * Tries to match a URL with a set of routes.
      *
      * @param string          $pathinfo The path info to be parsed
@@ -124,34 +150,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function matchCollection($pathinfo, RouteCollection $routes)
     {
         foreach ($routes as $name => $route) {
-            $compiledRoute = $route->compile();
+            $this->addReqToAllow($route);
 
-            // check the static prefix of the URL first. Only use the more expensive preg_match when it matches
-            if ('' !== $compiledRoute->getStaticPrefix() && 0 !== strpos($pathinfo, $compiledRoute->getStaticPrefix())) {
+            if (!$this->matcherStrategy->matches($pathinfo, $route, $this->context)) {
                 continue;
-            }
-
-            if (!preg_match($compiledRoute->getRegex(), $pathinfo, $matches)) {
-                continue;
-            }
-
-            $hostMatches = array();
-            if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
-                continue;
-            }
-
-            // check HTTP method requirement
-            if ($req = $route->getRequirement('_method')) {
-                // HEAD and GET are equivalent as per RFC
-                if ('HEAD' === $method = $this->context->getMethod()) {
-                    $method = 'GET';
-                }
-
-                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
-                    $this->allow = array_merge($this->allow, $req);
-
-                    continue;
-                }
             }
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
@@ -163,6 +165,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
             }
+
+            $compiledRoute = $route->compile();
+            preg_match($compiledRoute->getRegex(), $pathinfo, $matches);
+            $hostMatches = $this->extractHostMatches($route);
 
             return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
         }
@@ -240,5 +246,34 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
 
         return $this->expressionLanguage;
+    }
+
+    /**
+     * @param $route
+     */
+    protected function addReqToAllow($route)
+    {
+        if ($req = $route->getRequirement('_method')) {
+            if (!in_array($this->context->getMethod(), $req = explode('|', strtoupper($req)))) {
+                $this->allow = array_merge($this->allow, $req);
+            }
+        }
+    }
+
+    /**
+     * @param Route $route
+     * @return array
+     */
+    protected function extractHostMatches(Route $route)
+    {
+        $compiledRoute = $route->compile();
+        if ($compiledRoute->getHostRegex()) {
+            $host = $this->context->getHost();
+            preg_match($compiledRoute->getHostRegex(), $host, $hostMatches);
+
+            return $hostMatches;
+        }
+
+        return array();
     }
 }

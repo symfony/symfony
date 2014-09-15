@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Tests\Matcher\Strategy\AlwaysMatchStrategy;
 
 class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
@@ -402,5 +403,15 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
         $matcher->match('/foo/bar');
+    }
+
+    public function testSetMatcherStrategy()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $coll->add('foo', $route);
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->setMatcherStrategy(new AlwaysMatchStrategy());
+        $matcher->match('/bar');
     }
 }

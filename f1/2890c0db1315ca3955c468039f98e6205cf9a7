@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-29T12:14:05Z
+
+Actually, I think this doesn't cover all edge-cases. Something like the following would still fail:
+
+```yaml
+- foo
+  - bar
+  -
+- baz
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-29T13:56:47Z
+
+Checked it and the example from my previous comment works as expected.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:23:01Z
+
+:+1:

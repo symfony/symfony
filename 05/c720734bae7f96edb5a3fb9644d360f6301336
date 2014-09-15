@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-13T10:15:20Z
+
+Great! Could you fix the CS issues and @Tobion's comment?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-15T13:44:58Z
+
+@jakzal Could you fix the CS issues please?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-15T14:43:07Z
+
+Which one?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-15T14:47:03Z
+
+I suppose you also see the status bar?
+
+![error](https://cloud.githubusercontent.com/assets/176399/4273010/23ea1104-3ce7-11e4-944d-8a24cf9096c9.png)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-15T14:48:06Z
+
+Ah, right. That's not related to the changes I made, but I guess can fix it since I'm here anyway ;)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-15T14:49:13Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-15T14:52:25Z
+
+Great, thanks! :) Yes, AFAIK fabbot checks all modified files, so sometimes old errors turn up.
+
+:+1:

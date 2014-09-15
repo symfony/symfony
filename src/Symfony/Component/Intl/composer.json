@@ -24,8 +24,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/icu": "~1.0-RC"
+        "php": ">=5.3.3"
     },
     "require-dev": {
         "symfony/filesystem": ">=2.1"

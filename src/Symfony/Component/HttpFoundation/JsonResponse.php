@@ -107,6 +107,9 @@ class JsonResponse extends Response
         });
 
         try {
+            // Clear json_last_error()
+            json_encode(null);
+
             $this->data = json_encode($data, $this->encodingOptions);
 
             restore_error_handler();

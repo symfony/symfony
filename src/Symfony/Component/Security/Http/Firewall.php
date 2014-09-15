@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Security\Http;
 
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -49,9 +51,9 @@ class Firewall implements EventSubscriberInterface
     /**
      * Handles security.
      *
-     * @param GetResponseEvent $event An GetResponseEvent instance
+     * @param KernelEvent $event An GetResponseEvent instance
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(KernelEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -84,6 +86,14 @@ class Firewall implements EventSubscriberInterface
         }
     }
 
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        $exception = $event->getException();
+        if ($exception instanceof HttpException && 404 === $exception->getStatusCode()) {
+            $this->onKernelRequest($event);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -92,6 +102,7 @@ class Firewall implements EventSubscriberInterface
         return array(
             KernelEvents::REQUEST => array('onKernelRequest', 8),
             KernelEvents::FINISH_REQUEST => 'onKernelFinishRequest',
+            KernelEvents::EXCEPTION => array('onKernelException', 900),
         );
     }
 }

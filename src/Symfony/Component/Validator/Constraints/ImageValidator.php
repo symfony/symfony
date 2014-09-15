@@ -119,6 +119,13 @@ class ImageValidator extends FileValidator
 
         $ratio = $width / $height;
 
+        if (null !== $constraint->ratioPrecision) {
+            if (!is_numeric($constraint->ratioPrecision)) {
+                throw new ConstraintDefinitionException(sprintf('"%s" is not a valid ratio precision', $constraint->ratioPrecision));
+            }
+            $ratio = round($ratio, $constraint->ratioPrecision);
+        }
+
         if (null !== $constraint->minRatio) {
             if (!is_numeric((string) $constraint->minRatio)) {
                 throw new ConstraintDefinitionException(sprintf('"%s" is not a valid minimum ratio', $constraint->minRatio));

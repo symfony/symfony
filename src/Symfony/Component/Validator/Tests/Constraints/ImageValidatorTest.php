@@ -23,6 +23,7 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     protected $image;
     protected $imageLandscape;
     protected $imagePortrait;
+    protected $imageRatioPrecision;
 
     protected function getApiVersion()
     {
@@ -41,6 +42,7 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
         $this->image = __DIR__.'/Fixtures/test.gif';
         $this->imageLandscape = __DIR__.'/Fixtures/test_landscape.gif';
         $this->imagePortrait = __DIR__.'/Fixtures/test_portrait.gif';
+        $this->imageRatioPrecision = __DIR__.'/Fixtures/test_ratio_precision.gif';
     }
 
     public function testNullIsValid()
@@ -238,6 +240,49 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
         ));
 
         $this->validator->validate($this->image, $constraint);
+    }
+
+    public function testRatioTooBigWithoutPrecision()
+    {
+        $constraint = new Image(array(
+            'maxRatio' => '1.333',
+            'maxRatioMessage' => 'myMessage'
+        ));
+
+        $this->context->expects($this->once())
+            ->method('addViolation')
+            ->with('myMessage', array(
+                '{{ ratio }}' => 1.33333333333333,
+                '{{ max_ratio }}' => 1.333,
+            ));
+
+        $this->validator->validate($this->imageRatioPrecision, $constraint);
+    }
+
+    public function testRatioPrecision()
+    {
+        $constraint = new Image(array(
+            'maxRatio' => '1.333',
+            'ratioPrecision' => '3'
+        ));
+
+        $this->context->expects($this->never())
+            ->method('addViolation');
+
+        $this->validator->validate($this->imageRatioPrecision, $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testInvalidRatioPrecision()
+    {
+        $constraint = new Image(array(
+            'maxRatio' => '1.333',
+            'ratioPrecision' => '1abc'
+        ));
+
+        $this->validator->validate($this->imageRatioPrecision, $constraint);
     }
 
     public function testSquareNotAllowed()

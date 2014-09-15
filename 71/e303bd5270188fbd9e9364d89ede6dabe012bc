@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-07T19:18:36Z
+
+the phpdoc should then be changed to `string[]|string`
+
+---------------------------------------------------------------------------
+
+by thierrymarianne at 2014-09-07T19:50:27Z
+
+@Tobion I've made the phpdoc change. Thank you!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-08T06:38:08Z
+
+AFAIU, the description of the PR and the commit message are wrong as it does not improve the feedback but add the possibility to pass a single alias, which looks weird to me.
+
+Instead, I would throw an `\InvalidArgumentException` when a user does not pass an iterable argument.
+
+---------------------------------------------------------------------------
+
+by thierrymarianne at 2014-09-08T07:51:02Z
+
+Sorry for the wrong description message (I've updated it). I'll make a new proposal which throws an exception.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-08T09:39:35Z
+
+IMHO we should either add the array typehint or also allow a single alias to be passed. Exceptions are just not developer friendly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-08T09:43:56Z
+
+The array typehint would raise an error if not used correctly, so that's the same as throwing an exception.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-08T10:43:10Z
+
+Yes but the array typehint is part of the method signature. So it's way more unlikely to be used wrong.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-08T18:50:44Z
+
+But adding the array typehint is a BC break for people extending the class, as it changes the signature. So we cannot add it until 3.0 (while we can add the clean exception on invalid arg to avoid the PHP error later).
+The typehint was submitted previously in https://github.com/symfony/symfony/pull/11873, which has been replaced by this PR
+
+---------------------------------------------------------------------------
+
+by thierrymarianne at 2014-09-08T21:53:25Z
+
+@stof I've removed `string` from the php docblock. Thank you for having noticed!
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-08T22:08:23Z
+
+But then the question is whether we actually want to introduce the array typehint in 3.0. Because now it also supports Tranversable. And according to the Exception Traversable is also supported. Whereas before it was just a conincidence that it was supported and it was not documented (phpdoc only allowed array).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-08T22:11:34Z
+
+So again, my option: Either allow string[]|string to be dev-friendly or don't change anything (since adding array typehint would be a BC break and adding the exception will basically permit Traversable).
+Or the exception should only allow array and not traversable.
+
+---------------------------------------------------------------------------
+
+by thierrymarianne at 2014-09-09T05:08:19Z
+
+I intended originally to figure how to prevent developers to face a message like `Invalid argument supplied for foreach()` when for instance passing a string to `setAliases`.
+
+If we're ok with the fact that people (like me) should read the `Console` class or the API at least to understand what went wrong, then we could close this PR.
+
+Today, I better understand the BC break issue and I'd believe throwing an exception "would do the trick" tough I would have favoured the earlier "one is a special case of many" substitution.
+
+And then again, I may not totally understand the issue with permitting `Traversable` as it would go through the next [`foreach`](https://github.com/symfony/symfony/pull/11874/files#diff-8e80595663798837db1b033187835535R551) loop but perhaps the individual alias validation is an issue, isn't it? Is it about the docblock consistency?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-09T05:27:03Z
+
+My point of view:
+
+* Adding support for passing a string does not make sense (as the method name is `setAliases`);
+* Adding the array type hint is a BC break, so out of question;
+* Throwing an exception is always better than getting a PHP fatal error;
+* Supporting `\Traversable` is not needed for this method (I don't see any valid use case) but it is supported today so not supporting it is a BC break;
+* Code always win over phpdocs.
+
+Based on that, I'm :+1: for the PR as it is now.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-09T07:55:42Z
+
+:+1: as well
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-09T08:21:43Z
+
+> Adding support for passing a string does not make sense (as the method name is setAliases);
+
+Would at least be consistent with Route::setSchemes and Route::setMethods. See https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Routing/Route.php#L234
+
+---------------------------------------------------------------------------
+
+by thierrymarianne at 2014-09-10T05:53:03Z
+
+@fabpot @stof @Tobion Thank you very much for your positive feedback!
+
+@Tobion At the beginning, I would have preferred not having to pass a single item array such as `array('qik')`. In fact there might have been two issues, I was trying to solve:
+ * Preventing the raise of a fatal error
+ * Tolerating the case when the developer passes a string for the simplest cases
+
+Perhaps I could open another issue for the latter item?

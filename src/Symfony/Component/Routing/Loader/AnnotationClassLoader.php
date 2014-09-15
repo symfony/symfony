@@ -122,6 +122,9 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->defaultRouteIndex = 0;
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
+                    if (null !== $annot->getNamePrefix()) {
+                        throw new \InvalidArgumentException(sprintf('Annotation for method %s in class %s may not contain "namePrefix" option.', $method, $class));
+                    }
                     $this->addRoute($collection, $annot, $globals, $class, $method);
                 }
             }
@@ -136,6 +139,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         if (null === $name) {
             $name = $this->getDefaultRouteName($class, $method);
         }
+        $name = $globals['namePrefix'].$name;
 
         $defaults = array_replace($globals['defaults'], $annot->getDefaults());
         foreach ($method->getParameters() as $param) {
@@ -217,6 +221,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
             'methods'      => array(),
             'host'         => '',
             'condition'    => '',
+            'namePrefix'   => '',
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {
@@ -253,6 +258,10 @@ abstract class AnnotationClassLoader implements LoaderInterface
 
             if (null !== $annot->getCondition()) {
                 $globals['condition'] = $annot->getCondition();
+            }
+
+            if (null !== $annot->getNamePrefix()) {
+                $globals['namePrefix'] = $annot->getNamePrefix();
             }
         }
 

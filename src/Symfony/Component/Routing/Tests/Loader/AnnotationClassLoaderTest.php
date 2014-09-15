@@ -42,6 +42,28 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testLoadWithNamePrefixOptionInMethod()
+    {
+        $this->reader
+            ->expects($this->once())
+            ->method('getClassAnnotation')
+            ->will($this->returnValue(array()))
+        ;
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotations')
+            ->will($this->returnValue(array($this->getAnnotatedRoute(array(
+                'namePrefix' => 'sf2_',
+            )))))
+        ;
+
+        $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\NamePrefixInMethodClass');
+    }
+
+    /**
      * @dataProvider provideTestSupportsChecksResource
      */
     public function testSupportsChecksResource($resource, $expectedSupports)
@@ -108,6 +130,7 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             'schemes'      => array(),
             'methods'      => array(),
             'condition'    => null,
+            'namePrefix'   => null,
         ), $routeDatas);
 
         $this->reader

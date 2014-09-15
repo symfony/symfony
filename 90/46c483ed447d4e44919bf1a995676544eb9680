@@ -1,0 +1,297 @@
+---------------------------------------------------------------------------
+
+by saro0h at 2014-03-05T21:44:49Z
+
+Nice idea!
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-03-07T19:38:09Z
+
+The PR has been updated. The descriptor now manages all known callables (found [7 different types](http://php.net/manual/fr/language.types.callable.php)) and unit tests have been added.
+
+Thanks for the feedback
+
+---------------------------------------------------------------------------
+
+by elnur at 2014-03-09T20:12:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-03-11T18:34:05Z
+
+@fabpot , could you give me your opinion about this ?
+
+---------------------------------------------------------------------------
+
+by Miliooo at 2014-03-12T23:28:08Z
+
+:thumbsup:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-28T07:15:22Z
+
+Can you rebase this on master as there are some conflicts? Thanks.
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-04-09T21:54:16Z
+
+The PR is finished, all formats are now supported and all descriptors tested.
+
+You can see the output in the test files :
+
+event-dispatcher:debug
+[Text](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_events.txt)
+[Xml](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_events.xml)
+[Json](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_events.json)
+[Markdown](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_events.md)
+
+event-dispatcher:debug event1
+[Text](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_event1.txt)
+[Xml](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_event1.xml)
+[Json](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_event1.json)
+[Markdown](https://github.com/matthieuauger/symfony/blob/feature-framework-bundle-event-dispatcher-command/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/event_dispatcher_1_event1.md)
+
+The diff is quite big due to all the formats but the functionnality is now fully working.
+
+Feedbacks always welcomed
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-04-14T11:55:02Z
+
+@fabpot : Any chances for this to be shipped in 2.5 along with translation:debug and config:debug ?
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-04-26T17:07:05Z
+
+This is visibly not going to be shipped in 2.5 due to feature freeze, but it would still be much appreciated to have feedback of the core team decision makers @jakzal @stof @Seldaek @lsmith77
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2014-06-18T16:06:42Z
+
+I like that kind of feature!
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2014-06-18T16:38:16Z
+
+I like it. :+1:
+
+btw: this PR is asking for the DX label (@javiereguiluz I saw you managing the other labels)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-06-18T16:44:11Z
+
+@apfelbox applied the `DX` label. Thanks for noticing it.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T16:46:38Z
+
+I like the feature, however I think discussing the naming of the command is important for DX (see https://github.com/symfony/symfony/pull/10388#discussion_r10337083) so I'm waiting for this discussion to complete before voting on the PR.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2014-06-18T16:48:05Z
+
+@stof I really like your idea on grouping all debug-related commands under `debug:`, btw.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-06-18T17:00:35Z
+
+@stof I really like your idea about grouping debug commands under `debug` namespace. I'd love to do something similar with the `check` namespace. That's why [I proposed](https://github.com/symfony/symfony/issues/11146) to create a `check:security` command and not `security:check`. We could create the following:
+
+  * `check:security` looks for known security vulnerabilities
+  * `check:permissions` checks if the project folders have the right permissions to execute Symfony
+  * `check:yaml` would deprecate `yaml:lint`
+  * `check:twig` would deprecate `twig:lint`
+  * `check:doctrine-settings` would deprecate `doctrine:ensure-production-settings`
+  * `check:configuration` would check if there is any problem in all your project configuration files
+  * etc.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-06-18T17:48:31Z
+
+I like this command very much but I think the name is too long. Should we just keep `dispatcher:debug` instead of `event-dispatcher:debug`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-06-18T17:50:28Z
+
+@hhamon and we could even shorten it a bit more: `debug:events` or `debug:listeners`
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-06-18T18:27:19Z
+
+I'm not sure the command should be named `debug:something`. Actually, if we tried to establish a name convention from the existing commands, i would say the pattern is
+
+`vendor:object:action`
+- doctrine:database:create
+- doctrine:mapping:convert
+- swiftmailer: email:send
+
+Plus an exception for the framework-related commands where the vendor is omitted for simplicity i guess (but the action is almost everytime at the end).
+- cache:clear
+- assetic:dump
+- router:match
+
+The advantage of this pattern is that we follow the general idea of namespaces where the vendor is first.
+
+Grouping all the debug commands in a debug namespace is really convenient, but shouldn't it be the alias instead of the command name ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T22:46:06Z
+
+@hhamon given that any command name can be shorten as long as it is not ambiguous, the current name allows to reference it as ``event:debug`` (or even ``ev:d`` if you want)
+
+@matthieuauger my advice is to apply the renaming to existing commands too. We currently have many debugging commands which are alone in their top-level namespace. It makes more sense to group debug commands together than to group ``event-dispatcher`` commands together when you only have 1 IMO
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-06-26T11:24:42Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by Sogara at 2014-07-01T15:10:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T13:11:25Z
+
+The only point left here is the discussion about the command name IMO: https://github.com/symfony/symfony/pull/10388#discussion_r10337083
+
+@fabpot what do you think about this ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-10T02:35:12Z
+
+I agree with grouping into `debug:` namespace. I think a newer user especially will appreciate having all these `debug:*` commands grouped together, rather than grouping based on individual components.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2014-07-10T08:00:12Z
+
+What about aliases to keep both?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-10T08:42:28Z
+
+@jeremyFreeAgent existing commands will have an alias for the ``*:debug`` name (otherwise it would be a BC break). However, I'm not sure adding an alias is needed for new debug commands
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-14T14:54:01Z
+
+So let me try to summarize and we'll see if we agree.
+
+1) Move existing commands into the `debug:*` namespace, but then create an alias so that the existing command works (e.g. `*:debug`)
+
+2) For new debug commands, simply put them into the `debug:*` namespace. We don't really need an extra alias for these, but we could discuss them on a case-by-case basis.
+
+Action items:
+
+A) Rename the command to `debug:event-dispatcher`
+B) On a *separate* PR, move existing debug commands into the `debug:*` namespace and give them aliases for BC.
+
+Is this accurate? What does everyone think about the naming? Remember, the goal was to help clarity by grouping things into `debug:*`.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-15T09:07:46Z
+
+I agree with the move of commands to a new `debug` namespace.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-15T11:10:38Z
+
+@weaverryan yes, this is accurate
+
+@matthieuauger can you update your PR to name the command ``debug:event-dispatcher`` ?
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-07-16T00:14:39Z
+
+@stof: PR rebased and command moved to debug namespace. Let me know if something is still missing !
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-07-28T16:16:02Z
+
+@stof : PR updated, thanks for the review
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-08-20T14:05:19Z
+
+@weaverryan : The 2 points you mentioned earlier are now OK
+
+> Action items:
+>
+> A) Rename the command to debug:event-dispatcher
+> B) On a separate PR, move existing debug commands into the debug:* namespace and give them aliases for BC
+
+The A) is updated here and B) has been merged to master a week ago. The only missing point here is :+1:  or new feedback from the core team decision makers
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T14:24:47Z
+
+:+1: from me
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-08-22T16:08:47Z
+
+Awesome, thanks @stof
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-09-01T14:37:32Z
+
+ping @symfony/deciders ( @jakzal @Seldaek @lsmith77 )
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-12T22:09:02Z
+
+Apart from a minor comment, big :+1:
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-13T18:29:25Z
+
+big :thumbsup: it can be very helpful
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-09-13T21:01:42Z
+
+Thanks, we are almost there :metal: !
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T20:11:31Z
+
+:+1:

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-02T14:42:29Z
+
+You forgot the PR description: http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-02T14:44:08Z
+
+"good catch" @lyrixx hu hu :blush:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-02T16:05:47Z
+
+the errors on the php version is unrelated (i.e. stopwatch):
+
+```
+
+There was 1 failure:
+1) Symfony\Component\Stopwatch\Tests\StopwatchEventTest::testEnsureStopped
+Failed asserting that 346 matches expected 300.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Stopwatch/Tests/StopwatchEventTest.php:132
+
+FAILURES!
+Tests: 22, Assertions: 35, Failures: 1.
+Running src/Symfony/Component/Templating tests
+PHPUnit 4.2.3 by Sebastian Bergmann.
+Configuration read from /home/travis/build/symfony/symfony/phpunit.xml.dist
+```
+
+however the hhvm errors, i am not sure the source cc @stof

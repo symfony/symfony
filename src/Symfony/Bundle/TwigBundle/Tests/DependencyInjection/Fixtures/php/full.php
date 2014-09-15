@@ -3,8 +3,11 @@
 $container->loadFromExtension('twig', array(
     'form' => array(
         'resources' => array(
-            'MyBundle::form.html.twig',
+            'MyBundle::formDeprecated.html.twig',
         )
+     ),
+     'form_themes' => array(
+         'MyBundle::form.html.twig'
      ),
      'globals' => array(
          'foo' => '@bar',
@@ -24,5 +27,5 @@ $container->loadFromExtension('twig', array(
          'path2',
          'namespaced_path1' => 'namespace1',
          'namespaced_path2' => 'namespace2',
-      ),
+     ),
 ));

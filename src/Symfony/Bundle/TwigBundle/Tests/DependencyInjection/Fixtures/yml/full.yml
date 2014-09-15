@@ -1,7 +1,9 @@
 twig:
+    form_themes:
+        - MyBundle::form.html.twig
     form:
         resources:
-            - MyBundle::form.html.twig
+            - MyBundle::formDeprecated.html.twig
     globals:
         foo: "@bar"
         baz: "@@qux"

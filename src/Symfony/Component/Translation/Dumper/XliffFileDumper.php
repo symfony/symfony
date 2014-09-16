@@ -48,9 +48,7 @@ class XliffFileDumper extends FileDumper
             $s->appendChild($dom->createTextNode($source));
 
             // Does the target contain characters requiring a CDATA section?
-            $text = (1 === preg_match('/[&<>]/', $target))
-                    ? $dom->createCDATASection($target)
-                    : $dom->createTextNode($target);
+            $text = 1 === preg_match('/[&<>]/', $target) ? $dom->createCDATASection($target) : $dom->createTextNode($target);
 
             $t = $translation->appendChild($dom->createElement('target'));
             $t->appendChild($text);

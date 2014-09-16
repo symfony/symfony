@@ -1156,6 +1156,28 @@ class HttpCacheTest extends HttpCacheTestCase
     }
 
     /**
+     * @dataProvider getTrustedProxyData
+     */
+    public function testHttpCacheIsSetAsATrustedProxy(array $existing, array $expected)
+    {
+        Request::setTrustedProxies($existing);
+
+        $this->setNextResponse();
+        $this->request('GET', '/', array('REMOTE_ADDR' => '10.0.0.1'));
+
+        $this->assertEquals($expected, Request::getTrustedProxies());
+    }
+
+    public function getTrustedProxyData()
+    {
+        return array(
+            array(array(), array('127.0.0.1')),
+            array(array('10.0.0.2'), array('10.0.0.2', '127.0.0.1')),
+            array(array('10.0.0.2', '127.0.0.1'), array('10.0.0.2', '127.0.0.1')),
+        );
+    }
+
+    /**
      * @dataProvider getXForwardedForData
      */
     public function testXForwarderForHeaderForForwardedRequests($xForwardedFor, $expected)

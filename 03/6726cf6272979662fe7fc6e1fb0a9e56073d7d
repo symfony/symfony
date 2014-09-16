@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-07-29T19:40:20Z
+
+I'm not sure if this PR is legit but currently if an XLIFF file contains CDATA sections, they're removed when updating the file with the `translation:update` command.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:43:31Z
+
+@hhamon What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-16T00:29:17Z
+
+:+1:

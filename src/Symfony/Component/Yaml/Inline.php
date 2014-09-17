@@ -410,7 +410,7 @@ class Inline
      *
      * @return string A YAML string
      *
-     * @throws ParseException when object parsing support was disabled and the parser detected a PHP object
+     * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
     private static function evaluateScalar($scalar, $references = array())
     {
@@ -422,6 +422,11 @@ class Inline
                 $value = substr($scalar, 1, $pos - 2);
             } else {
                 $value = substr($scalar, 1);
+            }
+
+            // an unquoted *
+            if (false === $value || '' === $value) {
+                throw new ParseException('A reference must contain at least one character.');
             }
 
             if (!array_key_exists($value, $references)) {

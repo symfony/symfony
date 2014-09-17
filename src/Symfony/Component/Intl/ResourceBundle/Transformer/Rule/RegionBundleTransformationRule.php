@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the region bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class RegionBundleTransformationRule implements TransformationRuleInterface
 {

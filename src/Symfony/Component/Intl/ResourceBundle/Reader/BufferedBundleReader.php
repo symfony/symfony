@@ -15,6 +15,8 @@ use Symfony\Component\Intl\ResourceBundle\Util\RingBuffer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class BufferedBundleReader implements BundleReaderInterface
 {

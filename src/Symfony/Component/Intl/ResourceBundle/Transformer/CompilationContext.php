@@ -18,6 +18,8 @@ use Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface;
  * Default implementation of {@link CompilationContextInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class CompilationContext implements CompilationContextInterface
 {

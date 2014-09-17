@@ -24,14 +24,6 @@
         <default key="_controller">web_profiler.controller.profiler:infoAction</default>
     </route>
 
-    <route id="_profiler_import" pattern="/import">
-        <default key="_controller">web_profiler.controller.profiler:importAction</default>
-    </route>
-
-    <route id="_profiler_export" pattern="/export/{token}.txt">
-        <default key="_controller">web_profiler.controller.profiler:exportAction</default>
-    </route>
-
     <route id="_profiler_phpinfo" pattern="/phpinfo">
         <default key="_controller">web_profiler.controller.profiler:phpinfoAction</default>
     </route>

@@ -169,7 +169,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $dumper->dump(
                 $dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth),
                 function ($line, $depth) use (&$data) {
-                    if (false !==$depth) {
+                    if (-1 !== $depth) {
                         $data .= str_repeat('  ', $depth).$line."\n";
                     }
                 }

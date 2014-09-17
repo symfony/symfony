@@ -25,7 +25,16 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new HtmlDumper('php://output');
         $dumper->setColors(false);
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
         $cloner = new PhpCloner();
+        $cloner->addCasters(array(
+            ':stream' => function ($res, $a) {
+                unset($a['uri']);
+
+                return $a;
+            }
+        ));
         $data = $cloner->cloneVar($var);
 
         ob_start();
@@ -37,7 +46,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             <<<EOTXT
-<!DOCTYPE html><style> pre.sf-dump { background-color: #300a24; white-space: pre; line-height: 1.2em; color: #eee8d5; font-family: monospace, sans-serif; padding: 5px; } .sf-dump span { display: inline; }a.sf-dump-ref {color:#444444}span.sf-dump-num {font-weight:bold;color:#0087FF}span.sf-dump-const {font-weight:bold;color:#0087FF}span.sf-dump-str {font-weight:bold;color:#00D7FF}span.sf-dump-cchr {font-style: italic}span.sf-dump-note {color:#D7AF00}span.sf-dump-ref {color:#444444}span.sf-dump-public {color:#008700}span.sf-dump-protected {color:#D75F00}span.sf-dump-private {color:#D70000}span.sf-dump-meta {color:#005FFF}</style><pre class=sf-dump><span class=sf-dump-0><span class=sf-dump-note>array:25</span> [
+<foo></foo><bar><span class=sf-dump-0><span class=sf-dump-note>array:25</span> [<span name=sf-dump-child>
   <span class=sf-dump-1>"<span class=sf-dump-meta>number</span>" => <span class=sf-dump-num>1</span>
   <span class=sf-dump-meta>0</span> => <span class=sf-dump-const>null</span> <a class=sf-dump-ref name="sf-dump-ref1">#1</a>
   "<span class=sf-dump-meta>const</span>" => <span class=sf-dump-num>1.1</span>
@@ -50,9 +59,9 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str>déjà</span>"
   <span class=sf-dump-meta>7</span> => b"<span class=sf-dump-str>é</span>"
   "<span class=sf-dump-meta>[]</span>" => []
-  "<span class=sf-dump-meta>res</span>" => resource:<span class=sf-dump-note>stream</span> {
+  "<span class=sf-dump-meta>res</span>" => resource:<span class=sf-dump-note>stream</span> {<span name=sf-dump-child>
     <span class=sf-dump-2><span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str>plainfile</span>"
-    <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str>dir</span>"
+    <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str>STDIO</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
     <span class=sf-dump-meta>unread_bytes</span>: <span class=sf-dump-num>0</span>
     <span class=sf-dump-meta>seekable</span>: <span class=sf-dump-const>true</span>
@@ -60,13 +69,13 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
     <span class=sf-dump-meta>blocked</span>: <span class=sf-dump-const>true</span>
     <span class=sf-dump-meta>eof</span>: <span class=sf-dump-const>false</span>
     <span class=sf-dump-meta>options</span>: []
-  </span>}
+  </span></span>}
   <span class=sf-dump-meta>8</span> => resource:<span class=sf-dump-note>Unknown</span> {}
-  "<span class=sf-dump-meta>obj</span>" => <span class=sf-dump-note>Symfony\Component\VarDumper\Tests\Fixture\DumbFoo</span> { <a class=sf-dump-ref name="sf-dump-ref2">#2</a>
+  "<span class=sf-dump-meta>obj</span>" => <span class=sf-dump-note><abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr></span> {<span name=sf-dump-child> <a class=sf-dump-ref name="sf-dump-ref2">#2</a>
     <span class=sf-dump-2><span class=sf-dump-public>foo</span>: "<span class=sf-dump-str>foo</span>"
     "<span class=sf-dump-public>bar</span>": "<span class=sf-dump-str>bar</span>"
-  </span>}
-  "<span class=sf-dump-meta>closure</span>" => <span class=sf-dump-note>Closure</span> {
+  </span></span>}
+  "<span class=sf-dump-meta>closure</span>" => <span class=sf-dump-note>Closure</span> {<span name=sf-dump-child>
     <span class=sf-dump-2><span class=sf-dump-meta>reflection</span>: """
       <span class=sf-dump-str>Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
       <span class=sf-dump-str>  @@ {$var['file']} {$var['line']} - {$var['line']}</span>
@@ -77,22 +86,22 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
       <span class=sf-dump-str>  }</span>
       <span class=sf-dump-str>}</span>
       """
-  </span>}
+  </span></span>}
   "<span class=sf-dump-meta>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
-  "<span class=sf-dump-meta>nobj</span>" => <span class=sf-dump-note>array:1</span> [
+  "<span class=sf-dump-meta>nobj</span>" => <span class=sf-dump-note>array:1</span> [<span name=sf-dump-child>
     <span class=sf-dump-2><span class=sf-dump-meta>0</span> => {} <a class=sf-dump-ref name="sf-dump-ref3">#3</a>
-  </span>]
-  "<span class=sf-dump-meta>recurs</span>" => <span class=sf-dump-note>array:1</span> [ <a class=sf-dump-ref name="sf-dump-ref4">#4</a>
+  </span></span>]
+  "<span class=sf-dump-meta>recurs</span>" => <span class=sf-dump-note>array:1</span> [<span name=sf-dump-child> <a class=sf-dump-ref name="sf-dump-ref4">#4</a>
     <span class=sf-dump-2><span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href="#sf-dump-ref4">&4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href="#sf-dump-ref4">@4</a>]
-  </span>]
+  </span></span>]
   <span class=sf-dump-meta>9</span> => <a class=sf-dump-ref href="#sf-dump-ref1">&1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-meta>sobj</span>" => <span class=sf-dump-note>Symfony\Component\VarDumper\Tests\Fixture\DumbFoo</span> {<a class=sf-dump-ref href="#sf-dump-ref2">@2</a>}
+  "<span class=sf-dump-meta>sobj</span>" => <span class=sf-dump-note><abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr></span> {<a class=sf-dump-ref href="#sf-dump-ref2">@2</a>}
   "<span class=sf-dump-meta>snobj</span>" => <a class=sf-dump-ref href="#sf-dump-ref3">&3</a> {<a class=sf-dump-ref href="#sf-dump-ref3">@3</a>}
   "<span class=sf-dump-meta>snobj2</span>" => {<a class=sf-dump-ref href="#sf-dump-ref3">@3</a>}
   "<span class=sf-dump-meta>file</span>" => "<span class=sf-dump-str>{$var['file']}</span>"
   b"<span class=sf-dump-meta>bin-key-é</span>" => ""
-</span>]
-</pre>
+</span></span>]
+</span></bar>
 
 EOTXT
             ,

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarDumper\Dumper;
+namespace Symfony\Component\VarDumper\Cloner;
 
 /**
  * DumperInterface used by Data objects.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-interface DumperInternalsInterface
+interface DumperInterface
 {
     /**
      * Dumps a scalar value.

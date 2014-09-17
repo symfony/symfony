@@ -29,8 +29,9 @@ class ReflectionCaster
 
     public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested)
     {
+        $stub->class = 'Closure'; // HHVM generates unique class names for closures
         $a = static::castReflector(new \ReflectionFunction($c), $a, $stub, $isNested);
-        unset($a["\0+\0000"], $a['name']);
+        unset($a["\0+\0000"], $a['name'], $a["\0+\0this"], $a["\0+\0parameter"]);
 
         return $a;
     }

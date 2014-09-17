@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Dumper;
 
+use Symfony\Component\VarDumper\Cloner\Cursor;
+
 /**
  * HtmlDumper dumps variables as HTML.
  *
@@ -21,8 +23,8 @@ class HtmlDumper extends CliDumper
     public static $defaultOutputStream = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-dump>';
-    protected $dumpSuffix = '</pre>';
+    protected $dumpPrefix = '<pre id=sf-dump>';
+    protected $dumpSuffix = '</pre><script>Sfjs.dump.instrument()</script>';
     protected $colors = true;
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
@@ -74,7 +76,7 @@ class HtmlDumper extends CliDumper
      * @param string $prefix The prepended HTML string.
      * @param string $suffix The appended HTML string.
      */
-    public function setDumpBoudaries($prefix, $suffix)
+    public function setDumpBoundaries($prefix, $suffix)
     {
         $this->dumpPrefix = $prefix;
         $this->dumpSuffix = $suffix;
@@ -87,28 +89,104 @@ class HtmlDumper extends CliDumper
     {
         $this->headerIsDumped = true;
 
-        $p = 'sf-dump';
-        $line = <<<EOHTML
-<!DOCTYPE html><style>
-pre.sf-dump {
+        if (null !== $this->dumpHeader) {
+            return $this->dumpHeader;
+        }
+
+        $line = <<<'EOHTML'
+<script>
+Sfjs = window.Sfjs || {};
+Sfjs.dump = Sfjs.dump || {};
+Sfjs.dump.childElts = document.getElementsByName('sf-dump-child');
+Sfjs.dump.childLen = 0;
+Sfjs.dump.instrument = function () {
+    var elt,
+        i = this.childLen,
+        aCompact = '▶</a><span class="sf-dump-compact">',
+        aExpanded = '▼</a><span class="sf-dump-expanded">';
+
+    this.childLen= this.childElts.length;
+
+    while (i < this.childLen) {
+        elt = this.childElts[i];
+        if ("" == elt.className) {
+            elt.className = "sf-dump-child";
+            elt.innerHTML = '<a class=sf-dump-ref onclick="Sfjs.dump.toggle(this)">'+('sf-dump-0' == elt.parentNode.className ? aExpanded : aCompact)+elt.innerHTML+'</span>';
+        }
+        ++i;
+    }
+};
+Sfjs.dump.toggle = function(a) {
+    var s = a.nextElementSibling;
+
+    if ('sf-dump-compact' == s.className) {
+        a.innerHTML = '▼';
+        s.className = 'sf-dump-expanded';
+    } else {
+        a.innerHTML = '▶';
+        s.className = 'sf-dump-compact';
+    }
+};
+</script>
+<style>
+#sf-dump {
+    display: block;
     background-color: #300a24;
     white-space: pre;
     line-height: 1.2em;
     color: #eee8d5;
-    font-family: monospace, sans-serif;
+    font: 12px monospace, sans-serif;
     padding: 5px;
 }
-.sf-dump span {
+#sf-dump span {
     display: inline;
 }
+#sf-dump .sf-dump-compact {
+    display: none;
+}
+#sf-dump abbr {
+    text-decoration: none;
+    border: none;
+    cursor: help;
+}
+#sf-dump a {
+    text-decoration: none;
+    cursor: pointer;
+}
+#sf-dump a:hover {
+    text-decoration: underline;
+}
 EOHTML;
-        $line .= "a.$p-ref {{$this->styles['ref']}}";
 
         foreach ($this->styles as $class => $style) {
-            $line .= "span.$p-$class {{$style}}";
+            $line .= "#sf-dump .sf-dump-$class {{$style}}";
         }
 
-        return preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+        return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function enterHash(Cursor $cursor, $prefix, $hasChild)
+    {
+        if ($hasChild) {
+            $prefix .= '<span name=sf-dump-child>';
+        }
+
+        return parent::enterHash($cursor, $prefix, $hasChild);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function leaveHash(Cursor $cursor, $suffix, $hasChild, $cut)
+    {
+        if ($hasChild) {
+            $suffix = '</span>'.$suffix;
+        }
+
+        return parent::leaveHash($cursor, $suffix, $hasChild, $cut);
     }
 
     /**
@@ -138,6 +216,10 @@ EOHTML;
                     $val = str_replace($c, "<span class=sf-dump-cchr>$r</span>", $val);
                 }
             }
+        } elseif ('note' === $style) {
+            if (false !== $c = strrpos($val, '\\')) {
+                $val = sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $val, $style, substr($val, $c+1));
+            }
         }
 
         return "<span class=sf-dump-$style>$val</span>";
@@ -148,7 +230,6 @@ EOHTML;
      */
     protected function dumpLine($depth)
     {
-
         switch ($this->lastDepth - $depth) {
             case +1: $this->line = '</span>'.$this->line; break;
             case -1: $this->line = "<span class=sf-dump-$depth>$this->line"; break;
@@ -161,13 +242,11 @@ EOHTML;
             $this->line = $this->getDumpHeader().$this->line;
         }
 
-        if (false === $depth) {
-            $this->lastDepth = -1;
+        if (-1 === $depth) {
             $this->line .= $this->dumpSuffix;
             parent::dumpLine(0);
-        } else {
-            $this->lastDepth = $depth;
         }
+        $this->lastDepth = $depth;
 
         parent::dumpLine($depth);
     }

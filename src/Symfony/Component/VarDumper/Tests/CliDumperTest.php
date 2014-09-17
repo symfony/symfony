@@ -26,6 +26,13 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new CliDumper('php://output');
         $dumper->setColors(false);
         $cloner = new PhpCloner();
+        $cloner->addCasters(array(
+            ':stream' => function ($res, $a) {
+                unset($a['uri']);
+
+                return $a;
+            }
+        ));
         $data = $cloner->cloneVar($var);
 
         ob_start();
@@ -51,7 +58,7 @@ array:25 [
   "[]" => []
   "res" => resource:stream {
     wrapper_type: "plainfile"
-    stream_type: "dir"
+    stream_type: "STDIO"
     mode: "r"
     unread_bytes: 0
     seekable: true

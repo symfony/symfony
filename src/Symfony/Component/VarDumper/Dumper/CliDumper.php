@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Cursor;
 
 /**
  * CliDumper dumps variables for command line output.

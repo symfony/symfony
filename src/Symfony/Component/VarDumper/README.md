@@ -1,10 +1,10 @@
-Symfony mechanim for exploring and dumping PHP variables
-========================================================
+Symfony mechanism for exploring and dumping PHP variables
+=========================================================
 
 This component provides a mechanism that allows exploring then dumping
 any PHP variable.
 
-It handles scalar, objects and resources properly, taking hard and soft
+It handles scalars, objects and resources properly, taking hard and soft
 references into account. More than being immune to inifinite recursion
 problems, it allows dumping where references link to each other.
 It explores recursive structures using a breadth-first algorithm.

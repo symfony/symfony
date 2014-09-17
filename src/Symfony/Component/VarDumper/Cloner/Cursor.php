@@ -9,9 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarDumper\Dumper;
-
-use Symfony\Component\VarDumper\Cloner\Stub;
+namespace Symfony\Component\VarDumper\Cloner;
 
 /**
  * Represents the current state of a dumper while dumping.

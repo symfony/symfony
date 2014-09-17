@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-03T11:50:28Z
+
+Removing ``\SplFileInfo`` is wrong. It is accepted too. And adding ``File`` is not needed as it is a child class of ``\SplFileInfo``
+
+---------------------------------------------------------------------------
+
+by nervo at 2014-09-03T15:24:29Z
+
+Ok, let's try to disambiguate the situation.
+I was trying to use a \SplFileObject as $file parameter. \SplFileObject extends \SplFileInfo, but don't stringify the same.
+\SplFileObject::__toString() is an alias of ::current and returns the current line of file (and returns an array if csv flag is set)(true story)
+\SplFileInfo::__toString() returns the pathname, which is acceptable as the File class constructor.
+
+I think, we should check the instance of file, and in case of \SplFileInfo, use the getPathName() method instead of string casting
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-03T16:03:55Z
+
+then we should fix the way we get the path name for SplFileInfo to support the SplFileObject child class. This is actually a bug.
+
+Btw, the fact that SplFileObject::__toString() can return an array should be reported as a PHP bug IMO
+
+---------------------------------------------------------------------------
+
+by nervo at 2014-09-04T11:52:01Z
+
+Ok, i've updated the pr.
+Could we say i have just been half-stoffed ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T11:56:07Z
+
+Please add a test using SplFileObject to avoid regressions
+
+---------------------------------------------------------------------------
+
+by nervo at 2014-09-09T19:54:56Z
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-10T05:09:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nervo at 2014-09-10T17:01:14Z
+
+Ok, using realpath should do the trick.

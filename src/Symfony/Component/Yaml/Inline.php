@@ -218,6 +218,8 @@ class Inline
                 if (false !== $strpos = strpos($output, ' #')) {
                     $output = rtrim(substr($output, 0, $strpos));
                 }
+            } elseif (self::$objectSupport && '!!' === substr($scalar, $i, 2)) {
+                throw new ParseException('Object support is not supported in the inline YAML syntax.');
             } elseif (preg_match('/^(.+?)('.implode('|', $delimiters).')/', substr($scalar, $i), $match)) {
                 $output = $match[1];
                 $i += strlen($output);

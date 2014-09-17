@@ -45,6 +45,12 @@ abstract class BaseType extends AbstractType
         $blockName = $options['block_name'] ?: $form->getName();
         $translationDomain = $options['translation_domain'];
 
+        $isRootBlockName = false;
+        if (0 === strpos($blockName, '@')) {
+            $blockName = substr($blockName, 1);
+            $isRootBlockName = true;
+        }
+
         if ($view->parent) {
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
                 $id = sprintf('%s_%s', $view->parent->vars['id'], $name);
@@ -75,6 +81,10 @@ abstract class BaseType extends AbstractType
             array_unshift($blockPrefixes, $type->getName());
         }
         $blockPrefixes[] = $uniqueBlockPrefix;
+
+        if ($isRootBlockName) {
+            $blockPrefixes[] = $blockName;
+        }
 
         if (!$translationDomain) {
             $translationDomain = 'messages';

@@ -194,8 +194,10 @@ class QuestionHelper extends Helper
             if ("\177" === $c) {
                 if (0 === $numMatches && 0 !== $i) {
                     $i--;
-                    // Move cursor backwards
-                    $output->write("\033[1D");
+                    if ($output->isDecorated()) {
+                        // Move cursor backwards
+                        $output->write("\033[1D");
+                    }
                 }
 
                 if ($i === 0) {
@@ -258,16 +260,18 @@ class QuestionHelper extends Helper
                 }
             }
 
-            // Erase characters from cursor to end of line
-            $output->write("\033[K");
+            if ($output->isDecorated()) {
+                // Erase characters from cursor to end of line
+                $output->write("\033[K");
 
-            if ($numMatches > 0 && -1 !== $ofs) {
-                // Save cursor position
-                $output->write("\0337");
-                // Write highlighted text
-                $output->write('<hl>'.substr($matches[$ofs], $i).'</hl>');
-                // Restore cursor position
-                $output->write("\0338");
+                if ($numMatches > 0 && -1 !== $ofs) {
+                    // Save cursor position
+                    $output->write("\0337");
+                    // Write highlighted text
+                    $output->write('<hl>'.substr($matches[$ofs], $i).'</hl>');
+                    // Restore cursor position
+                    $output->write("\0338");
+                }
             }
         }
 

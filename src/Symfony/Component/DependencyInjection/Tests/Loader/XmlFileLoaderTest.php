@@ -110,7 +110,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'a string',
                 array('foo', 'bar'),
             ),
-            'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
             'constant' => PHP_EOL,
         );
@@ -147,7 +146,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'a string',
                 array('foo', 'bar'),
             ),
-            'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
             'constant' => PHP_EOL,
             'bar' => '%foo%',

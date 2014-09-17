@@ -491,11 +491,11 @@ class Command
 
         $placeholders = array(
             '%command.name%',
-            '%command.full_name%'
+            '%command.full_name%',
         );
         $replacements = array(
             $name,
-            $_SERVER['PHP_SELF'].' '.$name
+            $_SERVER['PHP_SELF'].' '.$name,
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp());
@@ -504,7 +504,7 @@ class Command
     /**
      * Sets the aliases for the command.
      *
-     * @param array $aliases An array of aliases for the command
+     * @param string[] $aliases An array of aliases for the command
      *
      * @return Command The current instance
      *
@@ -514,6 +514,10 @@ class Command
      */
     public function setAliases($aliases)
     {
+        if (!is_array($aliases) && !$aliases instanceof \Traversable) {
+            throw new \InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
+        }
+
         foreach ($aliases as $alias) {
             $this->validateName($alias);
         }

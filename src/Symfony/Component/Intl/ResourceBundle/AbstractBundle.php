@@ -17,6 +17,8 @@ use Symfony\Component\Intl\ResourceBundle\Reader\StructuredBundleReaderInterface
  * Base class for {@link ResourceBundleInterface} implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 abstract class AbstractBundle implements ResourceBundleInterface
 {

@@ -19,6 +19,8 @@ use Symfony\Component\Intl\ResourceBundle\Writer\PhpBundleWriter;
  * Compiles a number of resource bundles based on predefined compilation rules.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class BundleTransformer
 {

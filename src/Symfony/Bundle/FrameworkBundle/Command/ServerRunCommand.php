@@ -101,15 +101,34 @@ EOF
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
+        if (!file_exists($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+
+            return 1;
+        }
+
+        $router = realpath($router);
+
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
 
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
+        $process = $builder->getProcess();
+        $process->run(function ($type, $buffer) use ($output) {
             if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
                 $output->write($buffer);
             }
         });
+
+        if (!$process->isSuccessful()) {
+            $output->writeln('<error>Built-in server terminated unexpectedly</error>');
+
+            if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+                $output->writeln('<error>Run the command again with -v option for more details</error>');
+            }
+        }
+
+        return $process->getExitCode();
     }
 }

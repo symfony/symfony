@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Writer;
  * Writes resource bundle files.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface BundleWriterInterface
 {

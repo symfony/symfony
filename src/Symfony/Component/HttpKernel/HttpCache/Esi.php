@@ -281,9 +281,9 @@ class Esi implements SurrogateInterface
             throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
         }
 
-        return sprintf('<?php echo $this->surrogate->handle($this, \'%s\', \'%s\', %s) ?>'."\n",
-            $options['src'],
-            isset($options['alt']) ? $options['alt'] : null,
+        return sprintf('<?php echo $this->surrogate->handle($this, %s, %s, %s) ?>'."\n",
+            var_export($options['src'], true),
+            var_export(isset($options['alt']) ? $options['alt'] : '', true),
             isset($options['onerror']) && 'continue' == $options['onerror'] ? 'true' : 'false'
         );
     }

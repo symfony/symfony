@@ -30,7 +30,7 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadReturnsArray()
     {
-        $data = $this->reader->read(__DIR__ . '/Fixtures', 'en');
+        $data = $this->reader->read(__DIR__.'/Fixtures/php', 'en');
 
         $this->assertTrue(is_array($data));
         $this->assertSame('Bar', $data['Foo']);
@@ -38,11 +38,11 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Intl\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Intl\Exception\ResourceBundleNotFoundException
      */
-    public function testReadFailsIfLocaleOtherThanEn()
+    public function testReadFailsIfNonExistingLocale()
     {
-        $this->reader->read(__DIR__ . '/Fixtures', 'foo');
+        $this->reader->read(__DIR__.'/Fixtures/php', 'foo');
     }
 
     /**
@@ -50,7 +50,7 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadFailsIfNonExistingDirectory()
     {
-        $this->reader->read(__DIR__ . '/foo', 'en');
+        $this->reader->read(__DIR__.'/foo', 'en');
     }
 
     /**
@@ -58,6 +58,6 @@ class PhpBundleReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadFailsIfNotAFile()
     {
-        $this->reader->read(__DIR__ . '/Fixtures/NotAFile', 'en');
+        $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 }

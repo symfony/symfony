@@ -15,6 +15,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class StubbingContext implements StubbingContextInterface
 {

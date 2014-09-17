@@ -130,6 +130,14 @@ EOF
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
 
+        if (!file_exists($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+
+            return 1;
+        }
+
+        $router = realpath($router);
+
         return new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
     }
 }

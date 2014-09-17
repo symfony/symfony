@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Reader;
 
+use Symfony\Component\Intl\Exception\MissingResourceException;
+
 /**
  * Reads individual entries of a resource file.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface StructuredBundleReaderInterface extends BundleReaderInterface
 {
@@ -43,8 +47,9 @@ interface StructuredBundleReaderInterface extends BundleReaderInterface
      *                           in the requested locale.
      *
      * @return mixed Returns an array or {@link \ArrayAccess} instance for
-     *               complex data, a scalar value for simple data and NULL
-     *               if the given path could not be accessed.
+     *               complex data and a scalar value for simple data.
+     *
+     * @throws MissingResourceException If the indices cannot be accessed
      */
     public function readEntry($path, $locale, array $indices, $fallback = true);
 }

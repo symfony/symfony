@@ -18,6 +18,8 @@ use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContextInterface;
  * Contains instruction for compiling a resource bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface TransformationRuleInterface
 {

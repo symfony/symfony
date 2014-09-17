@@ -151,6 +151,24 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($foo), Inline::parse('[*foo]', false, false, false, array('foo' => $foo)));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage A reference must contain at least one character.
+     */
+    public function testParseUnquotedAsterisk()
+    {
+        Inline::parse('{ foo: * }');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage A reference must contain at least one character.
+     */
+    public function testParseUnquotedAsteriskFollowedByAComment()
+    {
+        Inline::parse('{ foo: * #foo }');
+    }
+
     public function getTestsForParse()
     {
         return array(

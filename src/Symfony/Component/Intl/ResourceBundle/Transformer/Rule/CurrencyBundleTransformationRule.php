@@ -21,6 +21,8 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the currency bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class CurrencyBundleTransformationRule implements TransformationRuleInterface
 {

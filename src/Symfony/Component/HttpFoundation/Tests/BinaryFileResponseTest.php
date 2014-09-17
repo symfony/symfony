@@ -193,6 +193,16 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($virtual, $response->headers->get('X-Accel-Redirect'));
     }
 
+    public function testSplFileObject()
+    {
+        $filePath = __DIR__.'/File/Fixtures/test';
+        $file = new \SplFileObject($filePath);
+
+        $response = new BinaryFileResponse($file);
+
+        $this->assertEquals(realpath($response->getFile()->getPathname()), realpath($filePath));
+    }
+
     public function getSampleXAccelMappings()
     {
         return array(

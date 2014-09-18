@@ -157,6 +157,33 @@ class TextDescriptor extends Descriptor
                 $this->writeText("\n");
             }
         } else {
+            if (($help = $application->getHelp()) != '') {
+                $this->writeText("{$help}\n\n");
+            }
+            
+            $this->writeText("<comment>Usage:</comment>\n");
+            $this->writeText(" [options] command [arguments]\n\n");
+            $this->writeText('<comment>Options:</comment>');
+            
+            $inputOptions = $application->getDefinition()->getOptions();
+            
+            $width = 0;
+            foreach ($inputOptions as $option) {
+                $nameLength = strlen($option->getName()) + 2;
+                if ($option->getShortcut()) {
+                    $nameLength += strlen($option->getShortcut()) + 3;
+                }
+                $width = max($width, $nameLength);
+            }
+            ++$width;
+
+            foreach ($inputOptions as $option) {
+                $this->writeText("\n");
+                $this->describeInputOption($option, array_merge($options, array('name_width' => $width)));
+            }
+            
+            $this->writeText("\n\n");
+
             $width = $this->getColumnWidth($description->getCommands());
 
             $this->writeText($application->getHelp(), $options);

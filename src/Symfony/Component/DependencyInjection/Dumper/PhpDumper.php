@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Dumper\ClosureDumper\ClosureDumperInterface;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -61,6 +62,11 @@ class PhpDumper extends Dumper
     private $proxyDumper;
 
     /**
+     * @var \Symfony\Component\DependencyInjection\Dumper\ClosureDumper\ClosureDumperInterface
+     */
+    private $closureDumper;
+
+    /**
      * {@inheritdoc}
      *
      * @api
@@ -80,6 +86,16 @@ class PhpDumper extends Dumper
     public function setProxyDumper(ProxyDumper $proxyDumper)
     {
         $this->proxyDumper = $proxyDumper;
+    }
+
+    /**
+     * Sets the dumper of closures
+     *
+     * @param ClosureDumperInterface $closureDumper
+     */
+    public function setClosureDumper(ClosureDumperInterface $closureDumper)
+    {
+        $this->closureDumper = $closureDumper;
     }
 
     /**
@@ -701,6 +717,16 @@ EOF;
         }
 
         if (null !== $definition->getFactoryMethod()) {
+            if ($definition->getFactoryMethod() instanceof \Closure) {
+                if ($this->closureDumper === null) {
+                    throw new RuntimeException('DIC PhpDumper requires ClosureParser in order to dump closures');
+                }
+
+                $closureCode = $this->closureDumper->dump($definition->getFactoryMethod());
+
+                return sprintf("        $return{$instantiation}call_user_func(%s, %s);\n", $closureCode, $arguments ? implode(', ', $arguments) : '$this');
+            }
+
             if (null !== $definition->getFactoryClass()) {
                 $class = $this->dumpValue($definition->getFactoryClass());
 

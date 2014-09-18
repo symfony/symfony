@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -195,5 +196,55 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    public function testClosureAsFactoryMethod()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setFactoryMethod(
+            function (ContainerInterface $container) {
+                return new \stdClass();
+            }
+        );
+
+        $container->register('bar', 'stdClass')->setFactoryMethod(
+            function (\stdClass $foo) {
+                $bar = clone $foo;
+                $bar->bar = 42;
+
+                return $bar;
+            }
+        )->addArgument(new Reference('foo'));
+
+        $closureDumperMock = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\Dumper\ClosureDumper\ClosureDumperInterface');
+
+        $closureDumperMock
+            ->expects($this->at(0))
+            ->method('dump')
+            ->will($this->returnValue(
+                <<<'CODE'
+function (\stdClass $foo) {
+            $bar = clone $foo;
+            $bar->bar = 42;
+            return $bar;
+        }
+CODE
+            ));
+
+        $closureDumperMock
+            ->expects($this->at(1))
+            ->method('dump')
+            ->will($this->returnValue(
+                <<<'CODE'
+function (\Symfony\Component\DependencyInjection\ContainerInterface $container) {
+            return new \stdClass();
+        }
+CODE
+            ));
+
+        $dumper = new PhpDumper($container);
+        $dumper->setClosureDumper($closureDumperMock);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services12.php', $dumper->dump());
     }
 }

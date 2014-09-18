@@ -212,6 +212,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
         $this->assertSame($error['file'], $exceptionHandler->e->getFile());
         $this->assertSame($error['line'], $exceptionHandler->e->getLine());
+        restore_error_handler();
     }
 
     public function provideFatalErrorHandlersData()

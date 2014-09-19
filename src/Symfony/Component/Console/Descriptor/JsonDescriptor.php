@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,7 +51,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(CommandInterface $command, array $options = array())
     {
         $this->writeData($this->getCommandData($command), $options);
     }
@@ -144,11 +144,11 @@ class JsonDescriptor extends Descriptor
     }
 
     /**
-     * @param Command $command
+     * @param CommandInterface $command
      *
      * @return array
      */
-    private function getCommandData(Command $command)
+    private function getCommandData(CommandInterface $command)
     {
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);

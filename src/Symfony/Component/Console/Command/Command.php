@@ -29,7 +29,7 @@ use Symfony\Component\Console\Helper\HelperSet;
  *
  * @api
  */
-class Command
+class Command implements CommandInterface
 {
     private $application;
     private $name;
@@ -80,11 +80,7 @@ class Command
     }
 
     /**
-     * Sets the application instance for this command.
-     *
-     * @param Application $application An Application instance
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function setApplication(Application $application = null)
     {
@@ -107,9 +103,7 @@ class Command
     }
 
     /**
-     * Gets the helper set.
-     *
-     * @return HelperSet A HelperSet instance
+     * {@inheritdoc}
      */
     public function getHelperSet()
     {
@@ -117,11 +111,7 @@ class Command
     }
 
     /**
-     * Gets the application instance for this command.
-     *
-     * @return Application An Application instance
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getApplication()
     {
@@ -129,12 +119,7 @@ class Command
     }
 
     /**
-     * Checks whether the command is enabled or not in the current environment
-     *
-     * Override this to check for x or y and return false if the command can not
-     * run properly under the current conditions.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isEnabled()
     {
@@ -193,23 +178,14 @@ class Command
     }
 
     /**
-     * Runs the command.
+     * {@inheritdoc}
      *
      * The code to execute is either defined directly with the
      * setCode() method or by overriding the execute() method
      * in a sub-class.
      *
-     * @param InputInterface  $input  An InputInterface instance
-     * @param OutputInterface $output An OutputInterface instance
-     *
-     * @return int     The command exit code
-     *
-     * @throws \Exception
-     *
      * @see setCode()
      * @see execute()
-     *
-     * @api
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
@@ -283,11 +259,7 @@ class Command
     }
 
     /**
-     * Merges the application definition with the command definition.
-     *
-     * This method is not part of public API and should not be used directly.
-     *
-     * @param bool    $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
+     * {@inheritdoc}
      */
     public function mergeApplicationDefinition($mergeArgs = true)
     {
@@ -332,11 +304,7 @@ class Command
     }
 
     /**
-     * Gets the InputDefinition attached to this Command.
-     *
-     * @return InputDefinition An InputDefinition instance
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getDefinition()
     {
@@ -344,14 +312,7 @@ class Command
     }
 
     /**
-     * Gets the InputDefinition to be used to create XML and Text representations of this Command.
-     *
-     * Can be overridden to provide the original command representation when it would otherwise
-     * be changed by merging with the application InputDefinition.
-     *
-     * This method is not part of public API and should not be used directly.
-     *
-     * @return InputDefinition An InputDefinition instance
+     * {@inheritdoc}
      */
     public function getNativeDefinition()
     {
@@ -442,11 +403,7 @@ class Command
     }
 
     /**
-     * Returns the command name.
-     *
-     * @return string The command name
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -470,11 +427,7 @@ class Command
     }
 
     /**
-     * Returns the description for the command.
-     *
-     * @return string The description for the command
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -498,11 +451,7 @@ class Command
     }
 
     /**
-     * Returns the help for the command.
-     *
-     * @return string The help for the command
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getHelp()
     {
@@ -510,10 +459,7 @@ class Command
     }
 
     /**
-     * Returns the processed help for the command replacing the %command.name% and
-     * %command.full_name% patterns with the real values dynamically.
-     *
-     * @return string  The processed help for the command
+     * {@inheritdoc}
      */
     public function getProcessedHelp()
     {
@@ -558,11 +504,7 @@ class Command
     }
 
     /**
-     * Returns the aliases for the command.
-     *
-     * @return array An array of aliases for the command
-     *
-     * @api
+     * {@inheritdoc}
      */
     public function getAliases()
     {
@@ -570,9 +512,7 @@ class Command
     }
 
     /**
-     * Returns the synopsis for the command.
-     *
-     * @return string The synopsis
+     * {@inheritdoc}
      */
     public function getSynopsis()
     {

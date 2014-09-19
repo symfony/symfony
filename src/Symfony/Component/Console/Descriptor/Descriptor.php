@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -45,7 +45,7 @@ abstract class Descriptor implements DescriptorInterface
             case $object instanceof InputDefinition:
                 $this->describeInputDefinition($object, $options);
                 break;
-            case $object instanceof Command:
+            case $object instanceof CommandInterface:
                 $this->describeCommand($object, $options);
                 break;
             case $object instanceof Application:
@@ -100,12 +100,12 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Describes a Command instance.
      *
-     * @param Command $command
-     * @param array   $options
+     * @param CommandInterface $command
+     * @param array            $options
      *
      * @return string|mixed
      */
-    abstract protected function describeCommand(Command $command, array $options = array());
+    abstract protected function describeCommand(CommandInterface $command, array $options = array());
 
     /**
      * Describes an Application instance.

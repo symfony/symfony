@@ -60,7 +60,19 @@ class ExpressionLanguage
      */
     public function evaluate($expression, $values = array())
     {
-        return $this->parse($expression, array_keys($values))->getNodes()->evaluate($this->functions, $values);
+        $functions = $this->functions;
+
+        foreach ($values as $name => $value) {
+            if (is_callable($value)) {
+                $functions[$name] = array('evaluator' => function () use ($value) {
+                    return call_user_func_array($value, array_slice(func_get_args(), 1));
+                });
+
+                unset($values[$name]);
+            }
+        }
+
+        return $this->parse($expression, array_keys($values))->getNodes()->evaluate($functions, $values);
     }
 
     /**

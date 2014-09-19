@@ -96,4 +96,30 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             array('true or foo', array('foo' => 'foo'), true),
         );
     }
+
+    public function testEvaluateCallable()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $this->assertEquals(
+            'Name: John Doe',
+            $expressionLanguage->evaluate("name() ~ concatenate(firstName, ' Doe')", array(
+                'firstName' => 'John',
+                'name' => function () {
+                    return 'Name: ';
+                },
+                'concatenate' => function ($left, $right) {
+                    return $left.$right;
+                },
+            ))
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\ExpressionLanguage\RuntimeError
+     */
+    public function testEvaluateFunctionNotRegistered()
+    {
+        $expressionLanguage = new ExpressionLanguage();
+        $expressionLanguage->evaluate("not_registered()");
+    }
 }

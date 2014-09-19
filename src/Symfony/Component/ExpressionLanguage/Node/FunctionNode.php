@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\RuntimeError;
 
 class FunctionNode extends Node
 {
@@ -42,6 +43,12 @@ class FunctionNode extends Node
             $arguments[] = $node->evaluate($functions, $values);
         }
 
-        return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
+        $functionName = $this->attributes['name'];
+
+        if (!isset($functions[$functionName])) {
+            throw new RuntimeError(sprintf('The function "%s" does not exist', $functionName));
+        }
+
+        return call_user_func_array($functions[$functionName]['evaluator'], $arguments);
     }
 }

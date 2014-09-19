@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-06T18:37:31Z
+
+There is an error in the tests but not coming from the code for this PR.
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-07T13:33:36Z
+
+@fabpot That's done, thanks for the feedback!  (in commit 82d29b0)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-16T14:54:26Z
+
+@Cydonia7 Can you open an issue or PR on the docs for this?
+
+It looks good to me. There may be other shortcuts we want to add, but I'm happy with these 3.
+
+Do we need any CHANGELOG or UPGRADE to be modified? This is technically a tiny BC break for someone that has these methods in their own base controller already but with a different signature - that's why I was wondering about updating one of these files (but maybe that's overkill).
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-17T09:14:11Z
+
+@weaverryan I already created a PR for the docs but I just forgot to reference it in the first message, now that's done (https://github.com/symfony/symfony-docs/pull/4109). Do you think I should implement FlashAwareSessionInterface to check if getFlashbag exists ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-17T15:27:01Z
+
+Perfect - thanks @Cydonia7!
+
+I don't think you should make any changes to the flashbag stuff. In reality, when you're using the framework, the `session` service is a `Session` object, not a `SessionInterface`. In other words, imo, since you're using the framework, we *know* you'll get back something that has access to a flashbag (unless you're really changing something core and overriding the session with something that doesn't support flashes, in which case, you're smart enough to know not to try calling this method).
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-17T17:00:28Z
+
+I agree with you, waiting for someone to give more feedback or merge the PR then. Do I have to squash the commits first ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T11:47:15Z
+
+@Cydonia7 you can squash if you want, but it is not necessary. We are able to do it automatically when merging.
+
+Please add a note in the changelog of the FrameworkBundle to mention the new methods, so that people know that we have added them (as we did for ``Controller::isCsrfTokenValid``)
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-18T19:34:27Z
+
+@stof That's done. I didn't know Github was clever enough to allow squashing pull requests, pretty cool but it should be removed from the patches documentation then.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T21:21:30Z
+
+@Cydonia7 it is not github. It is the Symfony core team (we don't use the green merge button)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T21:22:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-19T08:59:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-08-23T08:43:13Z
+
+I finally squashed the commits as @WouterJ said it was better.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-10T10:09:38Z
+
+@Cydonia7 If you have a chance, can you rebase again to resolve the conflict? I think this can be merged even with the conflict, but maybe it'll help.
+
+This has a :thumbsup: from me too fwiw.
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2014-09-10T13:07:57Z
+
+@weaverryan I think it should be okay.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-18T17:43:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-19T06:10:46Z
+
+:+1:

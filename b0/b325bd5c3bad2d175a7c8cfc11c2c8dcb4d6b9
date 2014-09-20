@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by hugohenrique at 2014-09-20T00:10:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-20T00:16:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-20T00:17:20Z
+
+@lyrixx in which branch should these be applied ? Is it only for master ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-20T00:24:10Z
+
+tests in ` src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/FrameworkExtensionTest.php` are only into master. So I opened this pr against master, because I did not want to create 2 PR and so make to much noise with this useless PR ;) I just did it because I was frustrated fabbot yield on me in 11961  :p
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-20T00:26:06Z
+
+but fabbot would still yield on next contributors to older branches, which is why we should fix it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-20T00:34:37Z
+
+OK ,I split this PR into 2 PR:
+
+* this one against master
+* #11964 against 2.4
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-20T05:59:34Z
+
+:+1:

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
@@ -23,7 +22,7 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
         $services = array(
             'my_cache_warmer_service1' => array(0 => array('priority' => 100)),
             'my_cache_warmer_service2' => array(0 => array('priority' => 200)),
-            'my_cache_warmer_service3' => array()
+            'my_cache_warmer_service3' => array(),
         );
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
@@ -46,7 +45,7 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
             ->with(0, array(
                 new Reference('my_cache_warmer_service2'),
                 new Reference('my_cache_warmer_service1'),
-                new Reference('my_cache_warmer_service3')
+                new Reference('my_cache_warmer_service3'),
             ));
 
         $addCacheWarmerPass = new AddCacheWarmerPass();

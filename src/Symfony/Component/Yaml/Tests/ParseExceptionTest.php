@@ -12,7 +12,6 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 
 class ParseExceptionTest extends \PHPUnit_Framework_TestCase
 {

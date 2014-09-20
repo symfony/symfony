@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\CacheClearer;
 
-use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 
 class ChainCacheClearerTest extends \PHPUnit_Framework_TestCase

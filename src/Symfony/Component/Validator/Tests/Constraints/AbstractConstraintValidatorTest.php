@@ -90,15 +90,15 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         // Make sure this method can not be called twice before calling
         // also restoreDefaultTimezone()
         if (null === $this->defaultTimezone) {
-            $this->defaultTimezone = ini_get('date.timezone');
-            ini_set('date.timezone', $defaultTimezone);
+            $this->defaultTimezone = date_default_timezone_get();
+            date_default_timezone_set($defaultTimezone);
         }
     }
 
     protected function restoreDefaultTimezone()
     {
         if (null !== $this->defaultTimezone) {
-            ini_set('date.timezone', $this->defaultTimezone);
+            date_default_timezone_set($this->defaultTimezone);
             $this->defaultTimezone = null;
         }
     }
@@ -116,7 +116,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
                     $this->metadata,
                     $this->value,
                     $this->group,
-                    $this->propertyPath
+                    $this->propertyPath,
                 ))
                 ->setMethods(array('validate', 'validateValue'))
                 ->getMock();

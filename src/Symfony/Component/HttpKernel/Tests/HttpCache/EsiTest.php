@@ -106,7 +106,7 @@ class EsiTest extends \PHPUnit_Framework_TestCase
         $response = new Response('foo <esi:comment text="some comment" /><esi:include src="foo\'" alt="bar\'" onerror="continue" />');
         $esi->process($request, $response);
 
-        $this->assertEquals("foo <?php echo \$this->esi->handle(\$this, 'foo\\'', 'bar\\'', true) ?>"."\n", $response->getContent());
+        $this->assertEquals('foo <?php echo $this->surrogate->handle($this, \'foo\\\'\', \'bar\\\'\', true) ?>'."\n", $response->getContent());
 
         $response = new Response('foo <esi:include src="..." />');
         $esi->process($request, $response);

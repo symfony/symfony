@@ -379,6 +379,11 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
 
         $form->submit('Foobar');
 
+        $submittedData = $this->dataExtractor->extractSubmittedData($form);
+
+        $this->assertSynchronizationFailureCause('Fail!', $submittedData);
+        unset($submittedData['synchronization_failure_cause']);
+
         $this->assertSame(array(
             'submitted_data' => array(
                 'norm' => "'Foobar'",
@@ -386,7 +391,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
             ),
             'errors' => array(),
             'synchronized' => 'false',
-        ), $this->dataExtractor->extractSubmittedData($form));
+        ), $submittedData);
     }
 
     public function testExtractViewVariables()
@@ -423,5 +428,14 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     private function createBuilder($name, array $options = array())
     {
         return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
+    }
+
+    private function assertSynchronizationFailureCause($expectedCause, $submittedData)
+    {
+        $this->assertTrue(
+            isset($submittedData['synchronization_failure_cause']),
+            'cause of synchronization failure was not be extracted'
+        );
+        $this->assertContains($expectedCause, $submittedData['synchronization_failure_cause']);
     }
 }

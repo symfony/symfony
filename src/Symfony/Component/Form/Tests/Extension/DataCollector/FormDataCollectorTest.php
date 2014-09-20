@@ -495,6 +495,7 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
         $form1 = $this->createForm('form1');
         $childForm1 = $this->createForm('child1');
         $form2 = $this->createForm('form2');
+        $form3 = $this->createForm('form3');
 
         $form1->add($childForm1);
 
@@ -510,6 +511,10 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('extractSubmittedData')
             ->with($form2)
             ->will($this->returnValue(array('errors' => array('baz'))));
+        $this->dataExtractor->expects($this->at(3))
+            ->method('extractSubmittedData')
+            ->with($form3)
+            ->will($this->returnValue(array('errors' => array(), 'synchronization_failure_cause' => 'Failure!')));
 
         $this->dataCollector->collectSubmittedData($form1);
 
@@ -521,6 +526,10 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
         $data = $this->dataCollector->getData();
         $this->assertSame(4, $data['nb_errors']);
 
+        $this->dataCollector->collectSubmittedData($form3);
+
+        $data = $this->dataCollector->getData();
+        $this->assertSame(5, $data['nb_errors']);
     }
 
     private function createForm($name)

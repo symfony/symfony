@@ -152,6 +152,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             $this->data['nb_errors'] += count($this->dataByForm[$hash]['errors']);
         }
 
+        // Count synchronization failures
+        if (isset($this->dataByForm[$hash]['synchronization_failure_cause'])) {
+            $this->data['nb_errors'] += 1;
+        }
+
         foreach ($form as $child) {
             $this->collectSubmittedData($child);
         }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\DataCollector;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
@@ -133,6 +134,10 @@ class FormDataExtractor implements FormDataExtractorInterface
         }
 
         $data['synchronized'] = $this->valueExporter->exportValue($form->isSynchronized());
+
+        if ($form instanceof Form && null !== $form->getSynchronizationFailureCause()) {
+            $data['synchronization_failure_cause'] = $form->getSynchronizationFailureCause()->getMessage();
+        }
 
         return $data;
     }

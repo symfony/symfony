@@ -24,11 +24,13 @@ class InputOption
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
+    const VALUE_TERNARY = 16;
 
     private $name;
     private $shortcut;
     private $mode;
     private $default;
+    private $flagValue;
     private $description;
 
     /**
@@ -73,7 +75,7 @@ class InputOption
 
         if (null === $mode) {
             $mode = self::VALUE_NONE;
-        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
+        } elseif (!is_int($mode) || $mode > 31 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -116,7 +118,7 @@ class InputOption
      */
     public function acceptValue()
     {
-        return $this->isValueRequired() || $this->isValueOptional();
+        return $this->isValueRequired() || $this->isValueOptional() || $this->isValueTernary();
     }
 
     /**
@@ -150,7 +152,20 @@ class InputOption
     }
 
     /**
+     * Returns true if the option takes an optional value with false as default and flagValue as default
+     *
+     * @return bool    true if mode is self::VALUE_TERNARY, false otherwise
+     */
+    public function isValueTernary()
+    {
+        return self::VALUE_TERNARY === (self::VALUE_TERNARY & $this->mode);
+    }
+
+    /**
      * Sets the default value.
+     *
+     * For VALUE_TERNARY the $default will always be set to false (for when the long option is not used)
+     * and $flagValue will be used to store the default (for when the long option is used without a value)
      *
      * @param mixed $default The default value
      *
@@ -170,6 +185,14 @@ class InputOption
             }
         }
 
+        $flagValue = false;
+
+        if ($this->isValueTernary()) {
+            $flagValue = $default;
+            $default = false;
+        }
+
+        $this->flagValue = $flagValue;
         $this->default = $this->acceptValue() ? $default : false;
     }
 
@@ -181,6 +204,16 @@ class InputOption
     public function getDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * Returns the default value for a longoption without a value
+     *
+     * @return mixed The default value
+     */
+    public function getFlagValue()
+    {
+        return $this->flagValue;
     }
 
     /**
@@ -207,6 +240,7 @@ class InputOption
             && $option->isArray() === $this->isArray()
             && $option->isValueRequired() === $this->isValueRequired()
             && $option->isValueOptional() === $this->isValueOptional()
+            && $option->isValueTernary() === $this->isValueTernary()
         ;
     }
 }

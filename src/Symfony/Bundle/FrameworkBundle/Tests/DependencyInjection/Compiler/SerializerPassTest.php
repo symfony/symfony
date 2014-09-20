@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 
@@ -75,13 +74,13 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
        $services = array(
             'n3' => array('tag' => array()),
             'n1' => array('tag' => array('priority' => 200)),
-            'n2' => array('tag' => array('priority' => 100))
+            'n2' => array('tag' => array('priority' => 100)),
         );
 
        $expected = array(
            new Reference('n1'),
            new Reference('n2'),
-           new Reference('n3')
+           new Reference('n3'),
        );
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');

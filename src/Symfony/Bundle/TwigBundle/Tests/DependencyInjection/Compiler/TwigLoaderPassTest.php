@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 
@@ -27,8 +26,7 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
     public function testMapperPassWithOneTaggedLoaders()
     {
         $serviceIds = array(
-            'test_loader_1' => array(
-            ),
+            'test_loader_1' => array(),
         );
 
         $this->builder->expects($this->once())
@@ -49,10 +47,8 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
     public function testMapperPassWithTwoTaggedLoaders()
     {
         $serviceIds = array(
-            'test_loader_1' => array(
-            ),
-            'test_loader_2' => array(
-            ),
+            'test_loader_1' => array(),
+            'test_loader_2' => array(),
         );
 
         $this->builder->expects($this->once())

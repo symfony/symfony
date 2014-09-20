@@ -23,6 +23,7 @@ class InputArgument
     const REQUIRED = 1;
     const OPTIONAL = 2;
     const IS_ARRAY = 4;
+    const IS_TAIL  = 8;
 
     private $name;
     private $mode;
@@ -45,8 +46,10 @@ class InputArgument
     {
         if (null === $mode) {
             $mode = self::OPTIONAL;
-        } elseif (!is_int($mode) || $mode > 7 || $mode < 1) {
+        } elseif (!is_int($mode) || $mode > 15 || $mode < 1) {
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
+        } elseif ($mode & self::IS_TAIL && !($mode & self::IS_ARRAY)) {
+            throw new \InvalidArgumentException('InputArgument::IS_TAIL requires InputArgument::IS_ARRAY');
         }
 
         $this->name        = $name;
@@ -84,6 +87,16 @@ class InputArgument
     public function isArray()
     {
         return self::IS_ARRAY === (self::IS_ARRAY & $this->mode);
+    }
+
+    /**
+     * Returns true if the argument absorbs all the values at the tail.
+     *
+     * @return bool    true if mode is self::IS_TAIL, false otherwise
+     */
+    public function isTail()
+    {
+        return self::IS_TAIL === (self::IS_TAIL & $this->mode);
     }
 
     /**

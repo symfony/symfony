@@ -42,6 +42,7 @@ class ArgvInput extends Input
 {
     private $tokens;
     private $parsed;
+    private $parseOptions;
 
     /**
      * Constructor.
@@ -75,19 +76,45 @@ class ArgvInput extends Input
      */
     protected function parse()
     {
-        $parseOptions = true;
         $this->parsed = $this->tokens;
+        $this->parseOptions = true;
         while (null !== $token = array_shift($this->parsed)) {
-            if ($parseOptions && '' == $token) {
-                $this->parseArgument($token);
-            } elseif ($parseOptions && '--' == $token) {
-                $parseOptions = false;
-            } elseif ($parseOptions && 0 === strpos($token, '--')) {
-                $this->parseLongOption($token);
-            } elseif ($parseOptions && '-' === $token[0] && '-' !== $token) {
-                $this->parseShortOption($token);
+            if ($this->parseOptions) {
+                if ('' == $token) {
+                    $this->parseArgument($token);
+                } elseif ('--' == $token) {
+                    $this->parseOptions = false;
+                } elseif ('-' === $token[0] && strlen($token) > 1) {
+                    $this->parseOption($token);
+                } else {
+                    $this->parseArgument($token);
+                }
             } else {
                 $this->parseArgument($token);
+            }
+        }
+    }
+
+    /**
+     * Parse an option.
+     *
+     * @param string $token The current token.
+     */
+    private function parseOption($token)
+    {
+        try {
+            if (0 === strpos($token, '--')) {
+                $this->parseLongOption($token);
+            } else {
+                $this->parseShortOption($token);
+            }
+        } catch (\RuntimeException $e) {
+            // parsing the option failed, check if we are on a tail argument
+            // that could absorb the token.
+            if ($this->isOnTailArgument()) {
+                $this->parseArgument($token);
+            } else {
+                throw $e;
             }
         }
     }
@@ -180,6 +207,20 @@ class ArgvInput extends Input
         } else {
             throw new \RuntimeException('Too many arguments.');
         }
+
+        $this->parseOptions = $this->parseOptions && !$arg->isTail();
+    }
+
+    /**
+     * Checks if the current argument is a tail.
+     *
+     * @return bool
+     */
+    private function isOnTailArgument()
+    {
+        $c = count($this->arguments);
+
+        return $this->definition->hasArgument($c) && $this->definition->getArgument($c)->isTail();
     }
 
     /**

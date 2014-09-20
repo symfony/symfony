@@ -69,8 +69,9 @@ class Finder implements \IteratorAggregate, \Countable
         $this
             ->addAdapter(new GnuFindAdapter())
             ->addAdapter(new BsdFindAdapter())
+            ->addAdapter(new Scanner\Adapter())
             ->addAdapter(new PhpAdapter(), -50)
-            ->setAdapter('php')
+            ->setAdapter('scanner')
         ;
     }
 

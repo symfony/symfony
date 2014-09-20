@@ -39,16 +39,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $container = $this->createContainerFromFile('full');
 
         $def = $container->getDefinition('property_accessor');
-        $this->assertEquals(false, $def->getArgument(0));
-        $this->assertEquals(false, $def->getArgument(1));
+        $this->assertFalse($def->getArgument(0));
+        $this->assertFalse($def->getArgument(1));
     }
 
     public function testPropertyAccessWithOverriddenValues()
     {
         $container = $this->createContainerFromFile('property_accessor');
         $def = $container->getDefinition('property_accessor');
-        $this->assertEquals(true, $def->getArgument(0));
-        $this->assertEquals(true, $def->getArgument(1));
+        $this->assertTrue($def->getArgument(0));
+        $this->assertTrue($def->getArgument(1));
     }
 
     /**

@@ -206,13 +206,13 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $m->setAccessible(true);
         $m->invoke($handler, array($exceptionHandler, 'handle'), $error);
 
+        restore_error_handler();
         $this->assertInstanceof($class, $exceptionHandler->e);
         // class names are case insensitive and PHP/HHVM do not return the same
         $this->assertSame(strtolower($translatedMessage), strtolower($exceptionHandler->e->getMessage()));
         $this->assertSame($error['type'], $exceptionHandler->e->getSeverity());
         $this->assertSame($error['file'], $exceptionHandler->e->getFile());
         $this->assertSame($error['line'], $exceptionHandler->e->getLine());
-        restore_error_handler();
     }
 
     public function provideFatalErrorHandlersData()

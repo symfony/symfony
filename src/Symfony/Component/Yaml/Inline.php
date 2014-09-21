@@ -134,7 +134,7 @@ class Inline
                         $repr = str_ireplace('INF', '.Inf', $repr);
                     } elseif (floor($value) == $value && $repr == $value) {
                         // Preserve float data type since storing a whole number will result in integer value.
-                        $repr = '!!float ' . $repr;
+                        $repr = '!!float '.$repr;
                     }
                 } else {
                     $repr = is_string($value) ? "'$value'" : strval($value);

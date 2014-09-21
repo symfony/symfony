@@ -270,7 +270,7 @@ class ProcessBuilder
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         foreach ($this->pipeProcess as $processBuilder) {
-            $script .= ' | ' . $processBuilder->getProcess()->getCommandLine();
+            $script .= ' | '.$processBuilder->getProcess()->getCommandLine();
         }
 
         if ($this->inheritEnv) {

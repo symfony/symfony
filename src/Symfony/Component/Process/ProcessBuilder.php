@@ -267,7 +267,7 @@ class ProcessBuilder
         }
 
         $arguments = array_merge($this->prefix, $this->arguments);
-        $script = implode(' ', array_map(array(__NAMESPACE__ . '\\ProcessUtils', 'escapeArgument'), $arguments));
+        $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
 
         foreach ($this->pipeProcess as $processBuilder) {
             $script .= ' | ' . $processBuilder->getProcess()->getCommandLine();

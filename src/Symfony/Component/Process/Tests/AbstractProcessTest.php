@@ -77,9 +77,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         while ($p->isRunning()) {
             usleep(1000);
         }
-        $duration = microtime(true) - $start;
 
-        $this->assertLessThan(1.8, $duration);
+        $this->assertLessThan(4, microtime(true) - $start);
     }
 
     public function testAllOutputIsActuallyReadOnTermination()
@@ -396,7 +395,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $start = microtime(true);
         $process->start();
         $end = microtime(true);
-        $this->assertLessThan(0.2, $end-$start);
+        $this->assertLessThan(1, $end - $start);
         $process->wait();
     }
 

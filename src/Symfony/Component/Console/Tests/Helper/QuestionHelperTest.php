@@ -75,6 +75,24 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
+    public function testAskWithShowDefaults()
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream("\n8AM\n"));
+
+        $question = new Question('What time is it?', '2PM');
+        $question->setShowDefault(true);
+        $this->assertEquals('2PM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+
+        $question = new Question('What time is it?', '2PM');
+        $question->setShowDefault(true);
+        $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question));
+
+        rewind($output->getStream());
+        $this->assertEquals('What time is it? [2PM]', stream_get_contents($output->getStream()));
+    }
+
     public function testAsk()
     {
         $dialog = new QuestionHelper();

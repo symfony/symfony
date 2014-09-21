@@ -213,6 +213,15 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($process->isOutputDisabled());
     }
 
+    public function testShouldReturnProcessWithPipe()
+    {
+        $process = ProcessBuilder::create(array('/usr/bin/php'))
+            ->pipe(ProcessBuilder::create(array('/bin/grep', 'mysql')))
+            ->getProcess();
+
+        $this->assertEquals("'/usr/bin/php' | '/bin/grep' 'mysql'", $process->getCommandLine());
+    }
+
     /**
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
      * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings or stream resources.

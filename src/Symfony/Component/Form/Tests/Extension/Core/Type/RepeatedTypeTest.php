@@ -52,7 +52,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             // the global required value cannot be overridden
             'type'           => 'text',
             'first_options'  => array('label' => 'Test', 'required' => false),
-            'second_options' => array('label' => 'Test2')
+            'second_options' => array('label' => 'Test2'),
         ));
 
         $this->assertEquals('Test', $form['first']->getConfig()->getOption('label'));
@@ -112,7 +112,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $form = $this->factory->create('repeated', null, array(
             'type'           => 'text',
             'options'        => array('label' => 'Label'),
-            'second_options' => array('label' => 'Second label')
+            'second_options' => array('label' => 'Second label'),
         ));
 
         $this->assertEquals('Label', $form['first']->getConfig()->getOption('label'));

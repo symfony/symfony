@@ -61,7 +61,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         if (isset($config['token_provider'])) {
             $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference($config['token_provider'])
+                new Reference($config['token_provider']),
             ));
         }
 

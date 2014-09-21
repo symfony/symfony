@@ -120,7 +120,7 @@ class ArrayInput extends Input
         $params = array();
         foreach ($this->parameters as $param => $val) {
             if ($param && '-' === $param[0]) {
-                $params[] = $param . ('' != $val ? '='.$this->escapeToken($val) : '');
+                $params[] = $param.('' != $val ? '='.$this->escapeToken($val) : '');
             } else {
                 $params[] = $this->escapeToken($val);
             }

@@ -340,7 +340,7 @@ class TestEventSubscriberWithMultipleListeners implements EventSubscriberInterfa
     {
         return array('pre.foo' => array(
             array('preFoo1'),
-            array('preFoo2', 10)
+            array('preFoo2', 10),
         ));
     }
 }

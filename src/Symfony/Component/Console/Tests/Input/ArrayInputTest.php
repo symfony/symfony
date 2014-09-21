@@ -62,26 +62,26 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
                 array('--foo' => 'bar'),
                 array(new InputOption('foo')),
                 array('foo' => 'bar'),
-                '->parse() parses long options'
+                '->parse() parses long options',
             ),
             array(
                 array('--foo' => 'bar'),
                 array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
                 array('foo' => 'bar'),
-                '->parse() parses long options with a default value'
+                '->parse() parses long options with a default value',
             ),
             array(
                 array('--foo' => null),
                 array(new InputOption('foo', 'f', InputOption::VALUE_OPTIONAL, '', 'default')),
                 array('foo' => 'default'),
-                '->parse() parses long options with a default value'
+                '->parse() parses long options with a default value',
             ),
             array(
                 array('-f' => 'bar'),
                 array(new InputOption('foo', 'f')),
                 array('foo' => 'bar'),
-                '->parse() parses short options'
-            )
+                '->parse() parses short options',
+            ),
         );
     }
 
@@ -101,23 +101,23 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
             array(
                 array('foo' => 'foo'),
                 new InputDefinition(array(new InputArgument('name'))),
-                'The "foo" argument does not exist.'
+                'The "foo" argument does not exist.',
             ),
             array(
                 array('--foo' => null),
                 new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))),
-                'The "--foo" option requires a value.'
+                'The "--foo" option requires a value.',
             ),
             array(
                 array('--foo' => 'foo'),
                 new InputDefinition(),
-                'The "--foo" option does not exist.'
+                'The "--foo" option does not exist.',
             ),
             array(
                 array('-o' => 'foo'),
                 new InputDefinition(),
-                'The "-o" option does not exist.'
-            )
+                'The "-o" option does not exist.',
+            ),
         );
     }
 

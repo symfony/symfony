@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
@@ -40,7 +39,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
             array('0321812700'),
             array('0-45122-5244'),
             array('0-4712-92311'),
-            array('0-9752298-0-X')
+            array('0-9752298-0-X'),
         );
     }
 
@@ -181,7 +180,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testValidIsbn13($isbn)
     {
-        $constraint = new Isbn(array('isbn13' => true,));
+        $constraint = new Isbn(array('isbn13' => true));
 
         $this->validator->validate($isbn, $constraint);
 

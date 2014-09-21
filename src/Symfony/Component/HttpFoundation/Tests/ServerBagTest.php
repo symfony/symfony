@@ -52,7 +52,7 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'AUTHORIZATION' => 'Basic '.base64_encode('foo:'),
             'PHP_AUTH_USER' => 'foo',
-            'PHP_AUTH_PW' => ''
+            'PHP_AUTH_PW' => '',
         ), $bag->getHeaders());
     }
 
@@ -63,7 +63,7 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'AUTHORIZATION' => 'Basic '.base64_encode('foo:bar'),
             'PHP_AUTH_USER' => 'foo',
-            'PHP_AUTH_PW' => 'bar'
+            'PHP_AUTH_PW' => 'bar',
         ), $bag->getHeaders());
     }
 
@@ -84,7 +84,7 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'AUTHORIZATION' => 'Basic '.base64_encode('username:pass:word'),
             'PHP_AUTH_USER' => 'username',
-            'PHP_AUTH_PW' => 'pass:word'
+            'PHP_AUTH_PW' => 'pass:word',
         ), $bag->getHeaders());
     }
 
@@ -95,7 +95,7 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'AUTHORIZATION' => 'Basic '.base64_encode('foo:'),
             'PHP_AUTH_USER' => 'foo',
-            'PHP_AUTH_PW' => ''
+            'PHP_AUTH_PW' => '',
         ), $bag->getHeaders());
     }
 

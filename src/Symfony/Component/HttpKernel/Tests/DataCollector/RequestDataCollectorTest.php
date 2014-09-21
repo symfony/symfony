@@ -74,7 +74,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
-                    'line' => $r1->getStartLine()
+                    'line' => $r1->getStartLine(),
                 ),
             ),
 
@@ -102,7 +102,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
                     'method' => 'staticControllerMethod',
                     'file' => __FILE__,
-                    'line' => $r2->getStartLine()
+                    'line' => $r2->getStartLine(),
                 ),
             ),
 
@@ -113,7 +113,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
                     'method' => 'staticControllerMethod',
                     'file' => __FILE__,
-                    'line' => $r2->getStartLine()
+                    'line' => $r2->getStartLine(),
                 ),
             ),
 
@@ -124,7 +124,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
                     'method' => 'magicMethod',
                     'file' => 'n/a',
-                    'line' => 'n/a'
+                    'line' => 'n/a',
                 ),
             ),
 
@@ -135,7 +135,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
                     'method' => 'magicMethod',
                     'file' => 'n/a',
-                    'line' => 'n/a'
+                    'line' => 'n/a',
                 ),
             ),
         );
@@ -166,7 +166,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $response->headers->setCookie(new Cookie('bazz','foo','2000-12-12'));
 
         return array(
-            array($request, $response)
+            array($request, $response),
         );
     }
 
@@ -204,5 +204,4 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         throw new \LogicException('Unexpected method call');
     }
-
 }

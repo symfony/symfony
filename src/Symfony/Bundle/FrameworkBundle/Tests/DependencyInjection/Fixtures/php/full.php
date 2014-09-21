@@ -54,7 +54,7 @@ $container->loadFromExtension('framework', array(
             ),
         ),
         'form'              => array(
-            'resources'     => array('theme1', 'theme2')
+            'resources'     => array('theme1', 'theme2'),
         ),
         'hinclude_default_template' => 'global_hinclude_template',
     ),
@@ -71,5 +71,5 @@ $container->loadFromExtension('framework', array(
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
     ),
-    'ide' => 'file%%link%%format'
+    'ide' => 'file%%link%%format',
 ));

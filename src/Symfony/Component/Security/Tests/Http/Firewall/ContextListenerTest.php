@@ -186,7 +186,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         return array(
             array(serialize(new \__PHP_Incomplete_Class())),
             array(serialize(null)),
-            array(null)
+            array(null),
         );
     }
 

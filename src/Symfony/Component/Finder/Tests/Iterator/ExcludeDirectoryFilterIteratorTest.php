@@ -39,7 +39,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             'test.py',
             'test.php',
             'toto',
-            'foo bar'
+            'foo bar',
         );
 
         $fo = array(
@@ -53,7 +53,7 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
-            'foo bar'
+            'foo bar',
         );
 
         return array(
@@ -61,5 +61,4 @@ class ExcludeDirectoryFilterIteratorTest extends RealIteratorTestCase
             array(array('fo'), $this->toAbsolute($fo)),
         );
     }
-
 }

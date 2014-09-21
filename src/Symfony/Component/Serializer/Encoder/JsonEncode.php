@@ -18,7 +18,7 @@ namespace Symfony\Component\Serializer\Encoder;
  */
 class JsonEncode implements EncoderInterface
 {
-    private $options ;
+    private $options;
     private $lastError = JSON_ERROR_NONE;
 
     public function __construct($bitmask = 0)

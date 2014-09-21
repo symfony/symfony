@@ -48,11 +48,17 @@ class PropertyAccessorCollectionTest_Car
 
 class PropertyAccessorCollectionTest_CarCustomSingular
 {
-    public function addFoo($axis) {}
+    public function addFoo($axis)
+    {
+    }
 
-    public function removeFoo($axis) {}
+    public function removeFoo($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_Engine
@@ -61,44 +67,66 @@ class PropertyAccessorCollectionTest_Engine
 
 class PropertyAccessorCollectionTest_CarOnlyAdder
 {
-    public function addAxis($axis) {}
+    public function addAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarOnlyRemover
 {
-    public function removeAxis($axis) {}
+    public function removeAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarNoAdderAndRemover
 {
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarNoAdderAndRemoverWithProperty
 {
     protected $axes = array();
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CompositeCar
 {
-    public function getStructure() {}
+    public function getStructure()
+    {
+    }
 
-    public function setStructure($structure) {}
+    public function setStructure($structure)
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarStructure
 {
-    public function addAxis($axis) {}
+    public function addAxis($axis)
+    {
+    }
 
-    public function removeAxis($axis) {}
+    public function removeAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCase

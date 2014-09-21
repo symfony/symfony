@@ -43,7 +43,7 @@ class FormThemeTokenParserTest extends TestCase
                     ), 1),
                     1,
                     'form_theme'
-                )
+                ),
             ),
             array(
                 '{% form_theme form "tpl1" "tpl2" %}',
@@ -53,11 +53,11 @@ class FormThemeTokenParserTest extends TestCase
                         new \Twig_Node_Expression_Constant(0, 1),
                         new \Twig_Node_Expression_Constant('tpl1', 1),
                         new \Twig_Node_Expression_Constant(1, 1),
-                        new \Twig_Node_Expression_Constant('tpl2', 1)
+                        new \Twig_Node_Expression_Constant('tpl2', 1),
                     ), 1),
                     1,
                     'form_theme'
-                )
+                ),
             ),
             array(
                 '{% form_theme form with "tpl1" %}',
@@ -66,7 +66,7 @@ class FormThemeTokenParserTest extends TestCase
                     new \Twig_Node_Expression_Constant('tpl1', 1),
                     1,
                     'form_theme'
-                )
+                ),
             ),
             array(
                 '{% form_theme form with ["tpl1"] %}',
@@ -78,7 +78,7 @@ class FormThemeTokenParserTest extends TestCase
                     ), 1),
                     1,
                     'form_theme'
-                )
+                ),
             ),
             array(
                 '{% form_theme form with ["tpl1", "tpl2"] %}',
@@ -88,11 +88,11 @@ class FormThemeTokenParserTest extends TestCase
                         new \Twig_Node_Expression_Constant(0, 1),
                         new \Twig_Node_Expression_Constant('tpl1', 1),
                         new \Twig_Node_Expression_Constant(1, 1),
-                        new \Twig_Node_Expression_Constant('tpl2', 1)
+                        new \Twig_Node_Expression_Constant('tpl2', 1),
                     ), 1),
                     1,
                     'form_theme'
-                )
+                ),
             ),
         );
     }

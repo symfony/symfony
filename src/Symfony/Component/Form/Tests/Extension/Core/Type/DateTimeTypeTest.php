@@ -441,7 +441,7 @@ class DateTimeTypeTest extends TypeTestCase
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create('datetime', null, array(
-            'date_widget' => 'single_text'
+            'date_widget' => 'single_text',
         ));
 
         $form['date']->addError($error);
@@ -465,7 +465,7 @@ class DateTimeTypeTest extends TypeTestCase
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create('datetime', null, array(
-            'time_widget' => 'single_text'
+            'time_widget' => 'single_text',
         ));
 
         $form['time']->addError($error);
@@ -473,5 +473,4 @@ class DateTimeTypeTest extends TypeTestCase
         $this->assertSame(array(), $form['time']->getErrors());
         $this->assertSame(array($error), $form->getErrors());
     }
-
 }

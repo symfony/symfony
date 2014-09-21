@@ -196,7 +196,7 @@ class PhpDumper extends Dumper
         $code = '';
 
         foreach ($definitions as $definition) {
-            $code .= "\n" . $this->getProxyDumper()->getProxyCode($definition);
+            $code .= "\n".$this->getProxyDumper()->getProxyCode($definition);
         }
 
         return $code;
@@ -844,7 +844,7 @@ EOF;
             $code .= '            '.var_export($id, true).' => '.var_export('get'.$this->camelize($id).'Service', true).",\n";
         }
 
-        return $code . "        );\n";
+        return $code."        );\n";
     }
 
     /**
@@ -872,7 +872,7 @@ EOF;
             $code .= '            '.var_export($alias, true).' => '.var_export($id, true).",\n";
         }
 
-        return $code . "        );\n";
+        return $code."        );\n";
     }
 
     /**

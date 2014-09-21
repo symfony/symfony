@@ -26,7 +26,7 @@ class YamlFileDumper extends FileDumper
      */
     protected function format(MessageCatalogue $messages, $domain)
     {
-         return Yaml::dump($messages->all($domain));
+        return Yaml::dump($messages->all($domain));
     }
 
     /**

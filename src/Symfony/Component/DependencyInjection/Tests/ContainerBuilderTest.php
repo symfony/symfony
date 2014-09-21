@@ -477,7 +477,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             'foo' => array(
                 array('foo' => 'foo'),
                 array('foofoo' => 'foofoo'),
-            )
+            ),
         ), '->findTaggedServiceIds() returns an array of service ids and its tag attributes');
         $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
     }
@@ -659,7 +659,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $container->addDefinitions(array(
             'bar'       => $fooDefinition,
-            'bar_user'  => $fooUserDefinition
+            'bar_user'  => $fooUserDefinition,
         ));
 
         $container->compile();
@@ -820,7 +820,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class FooClass {}
+class FooClass
+{
+}
 
 class ProjectContainer extends ContainerBuilder
 {

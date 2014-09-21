@@ -70,4 +70,6 @@ class ElementMetadataTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class TestElementMetadata extends ElementMetadata {}
+class TestElementMetadata extends ElementMetadata
+{
+}

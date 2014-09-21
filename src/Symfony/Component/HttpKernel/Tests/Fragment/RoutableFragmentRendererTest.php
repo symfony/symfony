@@ -62,8 +62,12 @@ class RoutableFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
 class Renderer extends RoutableFragmentRenderer
 {
-    public function render($uri, Request $request, array $options = array()) {}
-    public function getName() {}
+    public function render($uri, Request $request, array $options = array())
+    {
+    }
+    public function getName()
+    {
+    }
 
     public function doGenerateFragmentUri(ControllerReference $reference, Request $request, $absolute = false)
     {

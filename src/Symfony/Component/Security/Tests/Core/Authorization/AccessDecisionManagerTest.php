@@ -85,7 +85,7 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
             array($token, 'consensus', $this->getVoter(VoterInterface::ACCESS_DENIED), false),
             array($token, 'consensus', $this->getVoter(VoterInterface::ACCESS_GRANTED), true),
- 
+
             array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_DENIED), false),
             array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_GRANTED), false),
             array($token, 'unanimous', $this->getVoterFor2Roles($token, VoterInterface::ACCESS_GRANTED, VoterInterface::ACCESS_DENIED), false),
@@ -164,7 +164,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValue($vote));
-        ;
 
         return $voter;
     }
@@ -175,7 +174,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->any())
               ->method('supportsClass')
               ->will($this->returnValue($ret));
-        ;
 
         return $voter;
     }
@@ -186,7 +184,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->any())
               ->method('supportsAttribute')
               ->will($this->returnValue($ret));
-        ;
 
         return $voter;
     }

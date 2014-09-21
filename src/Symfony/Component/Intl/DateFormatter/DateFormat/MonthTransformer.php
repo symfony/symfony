@@ -33,7 +33,7 @@ class MonthTransformer extends Transformer
         'September',
         'October',
         'November',
-        'December'
+        'December',
     );
 
     /**

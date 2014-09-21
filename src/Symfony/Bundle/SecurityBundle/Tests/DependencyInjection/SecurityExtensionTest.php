@@ -35,9 +35,9 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
                     'pattern' => '/secured_area/.*',
                     'form_login' => array(
                         'check_path' => '/some_area/login_check',
-                    )
-                )
-            )
+                    ),
+                ),
+            ),
         ));
 
         $container->compile();
@@ -59,8 +59,8 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
-                )
-            )
+                ),
+            ),
         ));
 
         $container->compile();

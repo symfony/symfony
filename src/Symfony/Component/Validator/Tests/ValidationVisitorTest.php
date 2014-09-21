@@ -587,7 +587,7 @@ class ValidationVisitorTest extends \PHPUnit_Framework_TestCase
 
         $this->visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), new DefaultTranslator(), null, array(
             $initializer1,
-            $initializer2
+            $initializer2,
         ));
 
         // prepare constraint which

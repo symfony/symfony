@@ -33,5 +33,4 @@ class CurrencyTypeTest extends TypeTestCase
         $this->assertContains(new ChoiceView('USD', 'USD', 'US Dollar'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices, '', false, false);
     }
-
 }

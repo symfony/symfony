@@ -50,7 +50,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $c->getQueryCount());
 
         $queries = array(
-            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 0)
+            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 0),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -64,7 +64,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $c->getTime());
 
         $queries = array(
-            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 1)
+            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -72,7 +72,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $queries = array(
             array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 1),
-            array('sql' => "SELECT * FROM table2", 'params' => array(), 'types' => array(), 'executionMS' => 2)
+            array('sql' => "SELECT * FROM table2", 'params' => array(), 'types' => array(), 'executionMS' => 2),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -85,7 +85,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testCollectQueries($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
+            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -101,7 +101,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testSerialization($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
+            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());

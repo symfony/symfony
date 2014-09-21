@@ -183,7 +183,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('en-US', $translator->getLocale());
     }
 
-
     protected function getCatalogue($locale, $messages)
     {
         $catalogue = new MessageCatalogue($locale);

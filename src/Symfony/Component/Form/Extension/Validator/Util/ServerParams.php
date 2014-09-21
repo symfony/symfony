@@ -69,5 +69,4 @@ class ServerParams
             ? (int) $_SERVER['CONTENT_LENGTH']
             : null;
     }
-
 }

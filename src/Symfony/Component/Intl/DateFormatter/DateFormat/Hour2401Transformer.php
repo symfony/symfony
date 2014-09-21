@@ -58,7 +58,7 @@ class Hour2401Transformer extends HourTransformer
     {
         return array(
             'hour' => (int) $matched,
-            'hourInstance' => $this
+            'hourInstance' => $this,
         );
     }
 }

@@ -20,7 +20,6 @@ use Symfony\Component\Finder\Expression\Expression;
  */
 class FilenameFilterIterator extends MultiplePcreFilterIterator
 {
-
     /**
      * Filters the iterator values.
      *

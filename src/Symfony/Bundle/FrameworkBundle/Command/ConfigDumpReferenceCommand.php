@@ -32,7 +32,7 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias')
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle or extension alias'),
             ))
             ->setDescription('Dumps default configuration for an extension')
             ->setHelp(<<<EOF

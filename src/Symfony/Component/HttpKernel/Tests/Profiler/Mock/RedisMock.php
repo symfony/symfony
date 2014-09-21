@@ -18,7 +18,6 @@ namespace Symfony\Component\HttpKernel\Tests\Profiler\Mock;
  */
 class RedisMock
 {
-
     private $connected;
     private $storage;
 

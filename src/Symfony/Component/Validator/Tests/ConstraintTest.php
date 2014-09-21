@@ -53,7 +53,7 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
 
         new ConstraintC(array(
             'option1' => 'default',
-            'foo' => 'bar'
+            'foo' => 'bar',
         ));
     }
 

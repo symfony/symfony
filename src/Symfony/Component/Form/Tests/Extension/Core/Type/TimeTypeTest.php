@@ -276,7 +276,7 @@ class TimeTypeTest extends TypeTestCase
         $displayedData = array(
             'hour' => (int) $outputTime->format('H'),
             'minute' => (int) $outputTime->format('i'),
-            'second' => (int) $outputTime->format('s')
+            'second' => (int) $outputTime->format('s'),
         );
 
         $this->assertEquals($displayedData, $form->getViewData());
@@ -302,7 +302,7 @@ class TimeTypeTest extends TypeTestCase
         $displayedData = array(
             'hour' => (int) $outputTime->format('H'),
             'minute' => (int) $outputTime->format('i'),
-            'second' => (int) $outputTime->format('s')
+            'second' => (int) $outputTime->format('s'),
         );
 
         $this->assertDateTimeEquals($dateTime, $form->getData());
@@ -510,8 +510,8 @@ class TimeTypeTest extends TypeTestCase
             'widget' => 'single_text',
             'with_seconds' => true,
             'attr' => array(
-                'step' => 30
-            )
+                'step' => 30,
+            ),
         ));
 
         $view = $form->createView();

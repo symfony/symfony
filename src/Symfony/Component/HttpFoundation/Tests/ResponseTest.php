@@ -532,7 +532,7 @@ class ResponseTest extends ResponseTestCase
             array('200', 'foo', 'foo'),
             array('199', null, ''),
             array('199', false, ''),
-            array('199', 'foo', 'foo')
+            array('199', 'foo', 'foo'),
         );
     }
 

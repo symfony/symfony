@@ -89,7 +89,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
 
         $transformer = new NumberToLocalizedStringTransformer(2, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
         $this->assertEquals('1234,54', $transformer->transform(1234.547), '->transform() rounding-mode works');
-
     }
 
     /**

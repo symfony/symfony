@@ -20,7 +20,7 @@ class BinaryFileResponseTest extends ResponseTestCase
 {
     public function testConstruction()
     {
-        $file = __DIR__ . '/../README.md';
+        $file = __DIR__.'/../README.md';
         $response = new BinaryFileResponse($file, 404, array('X-Header' => 'Foo'), true, null, true, true);
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('Foo', $response->headers->get('X-Header'));
@@ -152,7 +152,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     {
         return array(
             array('bytes=-40'),
-            array('bytes=30-40')
+            array('bytes=30-40'),
         );
     }
 
@@ -162,7 +162,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $request->headers->set('X-Sendfile-Type', 'X-Sendfile');
 
         BinaryFileResponse::trustXSendfileTypeHeader();
-        $response = BinaryFileResponse::create(__DIR__ . '/../README.md');
+        $response = BinaryFileResponse::create(__DIR__.'/../README.md');
         $response->prepare($request);
 
         $this->expectOutputString('');
@@ -213,6 +213,6 @@ class BinaryFileResponseTest extends ResponseTestCase
 
     protected function provideResponse()
     {
-        return new BinaryFileResponse(__DIR__ . '/../README.md');
+        return new BinaryFileResponse(__DIR__.'/../README.md');
     }
 }

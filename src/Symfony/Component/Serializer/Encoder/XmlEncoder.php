@@ -435,5 +435,4 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             ? $context['xml_root_node_name']
             : $this->rootNodeName;
     }
-
 }

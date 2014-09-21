@@ -86,7 +86,7 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('ANOTHER_ONE'),
-            array(-1)
+            array(-1),
         );
     }
 

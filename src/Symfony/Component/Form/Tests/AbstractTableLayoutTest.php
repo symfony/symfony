@@ -42,7 +42,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testLabelIsNotRenderedWhenSetToFalse()
     {
         $form = $this->factory->createNamed('name', 'text', null, array(
-            'label' => false
+            'label' => false,
         ));
         $html = $this->renderRow($form->createView());
 
@@ -401,7 +401,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'repeated', 'foobar', array(
             'type'           => 'password',
             'first_options'  => array('label' => 'Test', 'required' => false),
-            'second_options' => array('label' => 'Test2')
+            'second_options' => array('label' => 'Test2'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -471,7 +471,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
         // tag is missing. If someone renders a form with table layout
         // manually, she should call form_rest() explicitly within the <table>
         // tag.
-        $this->assertMatchesXpath('<form>' . $html,
+        $this->assertMatchesXpath('<form>'.$html,
 '/form
     [
         ./tr

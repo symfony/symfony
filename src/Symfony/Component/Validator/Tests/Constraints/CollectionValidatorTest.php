@@ -112,7 +112,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'fields' => array(
                 'foo' => $constraints,
                 'bar' => $constraints,
-            )
+            ),
         )));
 
         $this->assertNoViolation();
@@ -137,7 +137,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"baz"'
+            '{{ field }}' => '"baz"',
         ), 'property.path[baz]', 6);
     }
 
@@ -196,7 +196,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"foo"'
+            '{{ field }}' => '"foo"',
         ), 'property.path[foo]', null);
     }
 
@@ -306,7 +306,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         )));
 
         $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"foo"'
+            '{{ field }}' => '"foo"',
         ), 'property.path[foo]', null);
     }
 
@@ -354,7 +354,7 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
     public function testObjectShouldBeLeftUnchanged()
     {
         $value = new \ArrayObject(array(
-            'foo' => 3
+            'foo' => 3,
         ));
 
         $constraint = new Range(array('min' => 2));
@@ -364,11 +364,11 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($value, new Collection(array(
             'fields' => array(
                 'foo' => $constraint,
-            )
+            ),
         )));
 
         $this->assertEquals(array(
-            'foo' => 3
+            'foo' => 3,
         ), (array) $value);
     }
 }

@@ -15,7 +15,6 @@ use Symfony\Component\Finder\Iterator\PathFilterIterator;
 
 class PathFilterIteratorTest extends IteratorTestCase
 {
-
     /**
      * @dataProvider getTestFilterData
      */
@@ -81,5 +80,4 @@ class PathFilterIteratorTest extends IteratorTestCase
 
         );
     }
-
 }

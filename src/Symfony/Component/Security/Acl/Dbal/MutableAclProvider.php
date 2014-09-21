@@ -188,7 +188,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 $propertyChanges['aces'] = new \SplObjectStorage();
             }
 
-            $acePropertyChanges = $propertyChanges['aces']->contains($ace)? $propertyChanges['aces']->offsetGet($ace) : array();
+            $acePropertyChanges = $propertyChanges['aces']->contains($ace) ? $propertyChanges['aces']->offsetGet($ace) : array();
 
             if (isset($acePropertyChanges[$propertyName])) {
                 $oldValue = $acePropertyChanges[$propertyName][0];
@@ -448,8 +448,8 @@ QUERY;
             $query,
             $this->options['entry_table_name'],
             $classId,
-            null === $objectIdentityId? 'NULL' : intval($objectIdentityId),
-            null === $field? 'NULL' : $this->connection->quote($field),
+            null === $objectIdentityId ? 'NULL' : intval($objectIdentityId),
+            null === $field ? 'NULL' : $this->connection->quote($field),
             $aceOrder,
             $securityIdentityId,
             $mask,
@@ -767,7 +767,7 @@ QUERY;
         $classIds = new \SplObjectStorage();
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i=0,$c=count($new); $i<$c; $i++) {
+            for ($i = 0,$c = count($new); $i<$c; $i++) {
                 $ace = $new[$i];
 
                 if (null === $ace->getId()) {
@@ -844,7 +844,7 @@ QUERY;
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
         $currentIds = array();
-        for ($i=0,$c=count($new); $i<$c; $i++) {
+        for ($i = 0,$c = count($new); $i<$c; $i++) {
             $ace = $new[$i];
 
             if (null === $ace->getId()) {
@@ -887,7 +887,7 @@ QUERY;
         list($old, $new) = $changes;
         $currentIds = array();
 
-        for ($i=0,$c=count($new); $i<$c; $i++) {
+        for ($i = 0,$c = count($new); $i<$c; $i++) {
             $ace = $new[$i];
 
             if (null !== $ace->getId()) {
@@ -925,11 +925,11 @@ QUERY;
         if (isset($propertyChanges['aceOrder'])
             && $propertyChanges['aceOrder'][1] > $propertyChanges['aceOrder'][0]
             && $propertyChanges == $aces->offsetGet($ace)) {
-                $aces->next();
-                if ($aces->valid()) {
-                    $this->updateAce($aces, $aces->current());
-                }
+            $aces->next();
+            if ($aces->valid()) {
+                $this->updateAce($aces, $aces->current());
             }
+        }
 
         if (isset($propertyChanges['mask'])) {
             $sets[] = sprintf('mask = %d', $propertyChanges['mask'][1]);
@@ -949,5 +949,4 @@ QUERY;
 
         $this->connection->executeQuery($this->getUpdateAccessControlEntrySql($ace->getId(), $sets));
     }
-
 }

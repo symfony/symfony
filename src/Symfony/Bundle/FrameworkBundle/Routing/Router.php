@@ -90,7 +90,7 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                 $route->setRequirement($name, $this->resolve($value));
+                $route->setRequirement($name, $this->resolve($value));
             }
 
             $route->setPath($this->resolve($route->getPath()));
@@ -138,7 +138,7 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             throw new RuntimeException(sprintf(
-                'The container parameter "%s", used in the route configuration value "%s", ' .
+                'The container parameter "%s", used in the route configuration value "%s", '.
                 'must be a string or numeric, but it is of type %s.',
                 $match[1],
                 $value,

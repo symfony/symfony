@@ -55,7 +55,6 @@ class RoleVoterTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->once())
               ->method('getRoles')
               ->will($this->returnValue($roles));
-        ;
 
         return $token;
     }

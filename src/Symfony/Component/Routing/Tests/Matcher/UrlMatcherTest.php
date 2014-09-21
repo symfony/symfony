@@ -78,7 +78,8 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/no-match');
             $this->fail();
-        } catch (ResourceNotFoundException $e) {}
+        } catch (ResourceNotFoundException $e) {
+        }
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
 
         // test that defaults are merged
@@ -98,7 +99,8 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/foo');
             $this->fail();
-        } catch (MethodNotAllowedException $e) {}
+        } catch (MethodNotAllowedException $e) {
+        }
 
         // route does match with GET or HEAD method context
         $matcher = new UrlMatcher($collection, new RequestContext());

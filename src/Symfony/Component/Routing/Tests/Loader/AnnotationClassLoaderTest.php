@@ -74,17 +74,17 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
                 array('name' => 'route1'),
-                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3'),
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foo')),
-                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3')
+                array('arg2' => 'defaultValue2', 'arg3' => 'defaultValue3'),
             ),
             array(
                 'Symfony\Component\Routing\Tests\Fixtures\AnnotatedClasses\BarClass',
                 array('name' => 'route1', 'defaults' => array('arg2' => 'foobar')),
-                array('arg2' => false, 'arg3' => 'defaultValue3')
+                array('arg2' => false, 'arg3' => 'defaultValue3'),
             ),
         );
     }

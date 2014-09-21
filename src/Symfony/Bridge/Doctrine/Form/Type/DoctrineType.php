@@ -60,7 +60,7 @@ abstract class DoctrineType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceListCache =& $this->choiceListCache;
+        $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
         $propertyAccessor = $this->propertyAccessor;
         $type = $this;
@@ -121,7 +121,7 @@ abstract class DoctrineType extends AbstractType
                 $loaderHash,
                 $choiceHashes,
                 $preferredChoiceHashes,
-                $groupByHash
+                $groupByHash,
             )));
 
             if (!isset($choiceListCache[$hash])) {
@@ -150,7 +150,7 @@ abstract class DoctrineType extends AbstractType
 
             if (null === $em) {
                 throw new RuntimeException(sprintf(
-                    'Class "%s" seems not to be a managed Doctrine entity. ' .
+                    'Class "%s" seems not to be a managed Doctrine entity. '.
                     'Did you forget to map it?',
                     $options['class']
                 ));

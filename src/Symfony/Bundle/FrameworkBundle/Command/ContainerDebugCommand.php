@@ -46,7 +46,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
-                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application')
+                new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
             ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF

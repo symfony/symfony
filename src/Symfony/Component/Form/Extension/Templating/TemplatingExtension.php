@@ -27,7 +27,7 @@ class TemplatingExtension extends AbstractExtension
     public function __construct(PhpEngine $engine, CsrfProviderInterface $csrfProvider = null, array $defaultThemes = array())
     {
         $engine->addHelpers(array(
-            new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfProvider))
+            new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfProvider)),
         ));
     }
 }

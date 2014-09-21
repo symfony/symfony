@@ -452,7 +452,7 @@ class EntityChoiceList extends ObjectChoiceList
     {
         if (!$this->em->contains($entity)) {
             throw new RuntimeException(
-                'Entities passed to the choice field must be managed. Maybe ' .
+                'Entities passed to the choice field must be managed. Maybe '.
                 'persist them in the entity manager?'
             );
         }

@@ -26,7 +26,7 @@ class ReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
     private function getConfigurationAsString()
     {
-      return <<<EOL
+        return <<<EOL
 root:
     boolean:              true
     scalar_empty:         ~

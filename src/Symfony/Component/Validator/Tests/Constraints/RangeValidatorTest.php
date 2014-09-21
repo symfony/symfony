@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
-use Symfony\Component\Validator\Validation;
 
 class RangeValidatorTest extends AbstractConstraintValidatorTest
 {

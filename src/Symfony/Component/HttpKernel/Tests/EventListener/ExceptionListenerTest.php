@@ -108,7 +108,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
 
         return array(
-            array($event, $event2)
+            array($event, $event2),
         );
     }
 

@@ -88,7 +88,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             array(
                 $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
                 $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false),
-                HttpKernelInterface::MASTER_REQUEST
+                HttpKernelInterface::MASTER_REQUEST,
             )
         );
         $event

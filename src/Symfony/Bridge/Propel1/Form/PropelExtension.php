@@ -26,7 +26,7 @@ class PropelExtension extends AbstractExtension
         return array(
             new Type\ModelType(PropertyAccess::createPropertyAccessor()),
             new Type\TranslationCollectionType(),
-            new Type\TranslationType()
+            new Type\TranslationType(),
         );
     }
 

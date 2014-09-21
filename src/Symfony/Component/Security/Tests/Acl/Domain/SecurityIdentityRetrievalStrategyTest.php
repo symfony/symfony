@@ -103,7 +103,7 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
             array('guest', array('ROLE_FOO'), 'anonymous', array(
                 new RoleSecurityIdentity('ROLE_FOO'),
                 new RoleSecurityIdentity('IS_AUTHENTICATED_ANONYMOUSLY'),
-            ))
+            )),
         );
     }
 

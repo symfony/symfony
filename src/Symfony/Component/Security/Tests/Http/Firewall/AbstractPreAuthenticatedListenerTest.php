@@ -64,7 +64,7 @@ class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
             $context,
             $authenticationManager,
-            'TheProviderKey'
+            'TheProviderKey',
         ));
         $listener
             ->expects($this->once())
@@ -110,7 +110,7 @@ class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
             $context,
             $authenticationManager,
-            'TheProviderKey'
+            'TheProviderKey',
         ));
         $listener
             ->expects($this->once())
@@ -158,7 +158,7 @@ class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
             $context,
             $authenticationManager,
-            'TheProviderKey'
+            'TheProviderKey',
         ));
         $listener
             ->expects($this->once())
@@ -199,7 +199,7 @@ class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
             $context,
             $authenticationManager,
-            'TheProviderKey'
+            'TheProviderKey',
         ));
         $listener
             ->expects($this->once())
@@ -248,7 +248,7 @@ class AbstractPreAuthenticatedListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->getMockForAbstractClass('Symfony\Component\Security\Http\Firewall\AbstractPreAuthenticatedListener', array(
             $context,
             $authenticationManager,
-            'TheProviderKey'
+            'TheProviderKey',
         ));
         $listener
             ->expects($this->once())

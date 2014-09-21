@@ -74,7 +74,6 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('__metadata', $this->bag->getName());
         $this->bag->setName('foo');
         $this->assertEquals('foo', $this->bag->getName());
-
     }
 
     public function testGetStorageKey()

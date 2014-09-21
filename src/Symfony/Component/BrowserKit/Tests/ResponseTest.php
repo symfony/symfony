@@ -61,13 +61,13 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $headers = array(
             'content-type' => 'text/html; charset=utf-8',
-            'set-cookie'   => array('foo=bar', 'bar=foo')
+            'set-cookie'   => array('foo=bar', 'bar=foo'),
         );
 
         $expected = 'content-type: text/html; charset=utf-8'."\n";
-        $expected.= 'set-cookie: foo=bar'."\n";
-        $expected.= 'set-cookie: bar=foo'."\n\n";
-        $expected.= 'foo';
+        $expected .= 'set-cookie: foo=bar'."\n";
+        $expected .= 'set-cookie: bar=foo'."\n\n";
+        $expected .= 'foo';
 
         $response = new Response('foo', 304, $headers);
 

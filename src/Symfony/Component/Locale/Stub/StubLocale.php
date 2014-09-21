@@ -101,7 +101,7 @@ class StubLocale extends Locale
                 'name' => $name,
                 'symbol' => $bundle->getCurrencySymbol($currency, $locale),
                 'fractionDigits' => $bundle->getFractionDigits($currency),
-                'roundingIncrement' => $bundle->getRoundingIncrement($currency)
+                'roundingIncrement' => $bundle->getRoundingIncrement($currency),
             );
             self::$currenciesNames[$currency] = $name;
         }

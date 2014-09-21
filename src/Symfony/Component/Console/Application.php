@@ -532,7 +532,7 @@ class Application
                 throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions($abbrevs[$part])));
             }
 
-            $found .= $found ? ':' . $abbrevs[$part][0] : $abbrevs[$part][0];
+            $found .= $found ? ':'.$abbrevs[$part][0] : $abbrevs[$part][0];
         }
 
         return $found;

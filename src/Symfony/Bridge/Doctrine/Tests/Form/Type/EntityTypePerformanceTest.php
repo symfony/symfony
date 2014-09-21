@@ -44,7 +44,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
         return array(
             new CoreExtension(),
-            new DoctrineOrmExtension($manager)
+            new DoctrineOrmExtension($manager),
         );
     }
 

@@ -59,7 +59,7 @@ class TranslationCollectionType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(array(
-            'languages'
+            'languages',
         ));
 
         $resolver->setDefaults(array(
@@ -68,8 +68,8 @@ class TranslationCollectionType extends AbstractType
             'allow_delete' => false,
             'options' => array(
                 'data_class' => null,
-                'columns' => null
-            )
+                'columns' => null,
+            ),
         ));
     }
 }

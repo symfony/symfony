@@ -36,7 +36,6 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
 
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-
     }
 
     protected function tearDown()

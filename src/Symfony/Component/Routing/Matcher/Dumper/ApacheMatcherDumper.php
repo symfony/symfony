@@ -50,7 +50,6 @@ class ApacheMatcherDumper extends MatcherDumper
         $prevHostRegex = '';
 
         foreach ($this->getRoutes()->all() as $name => $route) {
-
             $compiledRoute = $route->compile();
             $hostRegex = $compiledRoute->getHostRegex();
 

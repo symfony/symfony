@@ -152,7 +152,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         return $this->kernel;
     }
 
-
     /**
      * Gets the Esi instance
      *

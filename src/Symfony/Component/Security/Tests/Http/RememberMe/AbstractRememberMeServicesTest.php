@@ -250,7 +250,7 @@ class AbstractRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         }
 
         return $this->getMockForAbstractClass('Symfony\Component\Security\Http\RememberMe\AbstractRememberMeServices', array(
-            array($userProvider), 'fookey', 'fookey', $options, $logger
+            array($userProvider), 'fookey', 'fookey', $options, $logger,
         ));
     }
 

@@ -284,7 +284,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
                 'foo' => new ConstraintA(),
                 'bar' => new ConstraintA(),
              )),
-            'name' => new ConstraintA()
+            'name' => new ConstraintA(),
         ));
 
         $visitor = new ValidationVisitor('Root', $this->metadataFactory, new ConstraintValidatorFactory(), $this->translator);

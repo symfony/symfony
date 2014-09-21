@@ -52,7 +52,9 @@ class ConcreteToken extends AbstractToken
         parent::unserialize($parentStr);
     }
 
-    public function getCredentials() {}
+    public function getCredentials()
+    {
+    }
 }
 
 class AbstractTokenTest extends \PHPUnit_Framework_TestCase
@@ -227,13 +229,13 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
                 'foo', $user,
             ),
             array(
-                'foo', $advancedUser
+                'foo', $advancedUser,
             ),
             array(
-                $user, 'foo'
+                $user, 'foo',
             ),
             array(
-                $advancedUser, 'foo'
+                $advancedUser, 'foo',
             ),
             array(
                 $user, new TestUser('foo'),
@@ -254,10 +256,10 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
                 new TestUser('foo'), $advancedUser,
             ),
             array(
-                $user, $advancedUser
+                $user, $advancedUser,
             ),
             array(
-                $advancedUser, $user
+                $advancedUser, $user,
             ),
         );
     }

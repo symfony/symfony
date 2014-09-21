@@ -89,7 +89,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Choice(array('callback' => function () {
             return array('foo', 'bar');
-        }));
+        },));
 
         $this->validator->validate('bar', $constraint);
 
@@ -228,7 +228,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Choice(array(
             'choices' => array(1, 2),
             'strict' => true,
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate('2', $constraint);
@@ -243,7 +243,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Choice(array(
             'choices' => array(1, 2, 3),
             'multiple' => true,
-            'strict' => false
+            'strict' => false,
         ));
 
         $this->validator->validate(array('2', 3), $constraint);

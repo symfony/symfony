@@ -240,7 +240,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         return array(
             array('f', 'Command "f" is not defined.'),
             array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
-            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).')
+            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1).'),
         );
     }
 
@@ -270,7 +270,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foo:baR'),
-            array('foO:bar')
+            array('foO:bar'),
         );
     }
 

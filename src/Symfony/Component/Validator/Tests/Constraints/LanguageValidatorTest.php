@@ -76,7 +76,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidLanguages($language)
     {
         $constraint = new Language(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($language, $constraint);
@@ -100,7 +100,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
         $existingLanguage = 'en';
 
         $this->validator->validate($existingLanguage, new Language(array(
-            'message' => 'aMessage'
+            'message' => 'aMessage',
         )));
 
         $this->assertNoViolation();

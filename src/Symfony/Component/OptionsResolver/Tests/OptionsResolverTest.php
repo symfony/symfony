@@ -623,7 +623,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ), $this->resolver->resolve(array()));
     }
 
@@ -637,7 +637,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ), $this->resolver->resolve(array()));
     }
 
@@ -652,7 +652,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $options = array(
             'one' => '1',
-            'two' => '2'
+            'two' => '2',
         );
 
         $this->assertEquals($options, $this->resolver->resolve($options));

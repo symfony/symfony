@@ -82,11 +82,21 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
 
 class SomeUser implements UserInterface
 {
-    public function getRoles() {}
-    public function getPassword() {}
-    public function getSalt() {}
-    public function getUsername() {}
-    public function eraseCredentials() {}
+    public function getRoles()
+    {
+    }
+    public function getPassword()
+    {
+    }
+    public function getSalt()
+    {
+    }
+    public function getUsername()
+    {
+    }
+    public function eraseCredentials()
+    {
+    }
 }
 
 class SomeChildUser extends SomeUser

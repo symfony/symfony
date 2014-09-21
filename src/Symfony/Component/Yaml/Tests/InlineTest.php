@@ -40,7 +40,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
-        $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
+        $this->assertSame($value, Inline::parse(Inline::dump($value)), 'check consistency');
     }
 
     public function testDumpNumericValueWithLocale()
@@ -323,7 +323,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('true', true),
             array('12', 12),
             array("'quoted string'", 'quoted string'),
-            array('12.30e+02', 12.30e+02),
+            array('!!float 1230', 12.30e+02),
             array('1234', 0x4D2),
             array('1243', 02333),
             array('.Inf', -log(0)),

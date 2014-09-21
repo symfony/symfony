@@ -148,6 +148,10 @@ class Process
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
+        if (!$commandline instanceof Command) {
+            $commandline = Command::fromString($commandline);
+        }
+
         $this->commandline = $commandline;
         $this->cwd = $cwd;
 
@@ -274,21 +278,29 @@ class Process
         $this->callback = $this->buildCallback($callback);
         $descriptors = $this->getDescriptors();
 
-        $commandline = $this->commandline;
+        $commandline = clone $this->commandline;
+
+        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
+            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
+            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
+
+            $commandline
+                ->redirect(3, '/dev/null')
+                ->append(new Command('code=$?', false))
+                ->append(new Command('echo $code >&3', false))
+                ->append(new Command('exit $code', false));
+        }
 
         if (defined('PHP_WINDOWS_VERSION_BUILD') && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
-                $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
+                $commandline->redirect($offset, $filename);
             }
-            $commandline .= '"';
-
             if (!isset($this->options['bypass_shell'])) {
                 $this->options['bypass_shell'] = true;
             }
         }
 
-        $this->process = proc_open($commandline, $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
+        $this->process = proc_open($commandline->prepareForexecution(), $descriptors, $this->processPipes->pipes, $this->cwd, $this->env, $this->options);
 
         if (!is_resource($this->process)) {
             throw new RuntimeException('Unable to launch a new process.');
@@ -841,13 +853,37 @@ class Process
     }
 
     /**
+     * Gets the command to be executed.
+     *
+     * @return Command The command to execute
+     */
+    public function getCommand()
+    {
+        return $this->commandline;
+    }
+
+    /**
+     * Gets the command to be executed.
+     *
+     * @param Command $command The command to execute
+     *
+     * @return Command The command to execute
+     */
+    public function setCommand(Command $command)
+    {
+        return $this->commandline = $command;
+    }
+
+    /**
      * Gets the command line to be executed.
      *
      * @return string The command to execute
+     *
+     * @deprecated Deprecated since Symfony 2.6 in favor of setCommand, to be removed in Symfony 3.0
      */
     public function getCommandLine()
     {
-        return $this->commandline;
+        return (string) $this->commandline;
     }
 
     /**
@@ -856,10 +892,12 @@ class Process
      * @param string $commandline The command to execute
      *
      * @return self The current Process instance
+     *
+     * @deprecated Deprecated since Symfony 2.6 in favor of setCommand, to be removed in Symfony 3.0
      */
     public function setCommandLine($commandline)
     {
-        $this->commandline = $commandline;
+        $this->commandline = Command::fromString($commandline);
 
         return $this;
     }
@@ -1255,13 +1293,6 @@ class Process
             $this->processPipes = UnixPipes::create($this, $this->input);
         }
         $descriptors = $this->processPipes->getDescriptors($this->outputDisabled);
-
-        if (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
-            // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
-            $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
-
-            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
-        }
 
         return $descriptors;
     }

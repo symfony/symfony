@@ -77,7 +77,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
                     $this->metadata,
                     $this->value,
                     $this->group,
-                    $this->propertyPath
+                    $this->propertyPath,
                 ))
                 ->setMethods(array('validate', 'validateValue'))
                 ->getMock();

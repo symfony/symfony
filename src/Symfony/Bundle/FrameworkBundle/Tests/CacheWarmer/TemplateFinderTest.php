@@ -53,5 +53,4 @@ class TemplateFinderTest extends TestCase
         $this->assertContains('::this.is.a.template.format.engine', $templates);
         $this->assertContains('::resource.format.engine', $templates);
     }
-
 }

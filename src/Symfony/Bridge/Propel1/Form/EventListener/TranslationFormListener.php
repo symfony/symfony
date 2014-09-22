@@ -70,7 +70,7 @@ class TranslationFormListener implements EventSubscriberInterface
                 $customOptions = $options['options'];
             }
             $options = array(
-                'label' => $label.' '.strtoupper($data->getLocale())
+                'label' => $label.' '.strtoupper($data->getLocale()),
             );
 
             $options = array_merge($options, $customOptions);

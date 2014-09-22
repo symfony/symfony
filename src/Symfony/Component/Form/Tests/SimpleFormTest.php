@@ -518,7 +518,7 @@ class SimpleFormTest extends AbstractFormTest
                 '' => '',
                 // direction is reversed!
                 'norm' => 'filteredclient',
-                'filterednorm' => 'cleanedclient'
+                'filterednorm' => 'cleanedclient',
             )))
             ->addModelTransformer(new FixedDataTransformer(array(
                 '' => '',

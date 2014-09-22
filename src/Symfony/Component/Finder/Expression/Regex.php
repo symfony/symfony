@@ -178,7 +178,7 @@ class Regex implements ValueInterface
     public function addOption($option)
     {
         if (!$this->hasOption($option)) {
-            $this->options.= $option;
+            $this->options .= $option;
         }
 
         return $this;

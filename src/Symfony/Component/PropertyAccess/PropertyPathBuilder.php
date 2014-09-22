@@ -129,7 +129,7 @@ class PropertyPathBuilder
         if ($offset < 0 && abs($offset) <= $this->getLength()) {
             $offset = $this->getLength() + $offset;
         } elseif (!isset($this->elements[$offset])) {
-            throw new OutOfBoundsException('The offset ' . $offset . ' is not within the property path');
+            throw new OutOfBoundsException('The offset '.$offset.' is not within the property path');
         }
 
         if (0 === $pathLength) {

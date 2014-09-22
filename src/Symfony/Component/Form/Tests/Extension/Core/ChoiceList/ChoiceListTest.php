@@ -60,7 +60,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         $this->list = new ChoiceList(
             new \ArrayIterator(array(
                 'Group' => array($this->obj1, $this->obj2),
-                'Not a Group' => $traversableChoice
+                'Not a Group' => $traversableChoice,
             )),
             array(
                 'Group' => array('A', 'B'),
@@ -72,11 +72,11 @@ class ChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array($this->obj1, $this->obj2, $traversableChoice), $this->list->getChoices());
         $this->assertSame(array('0', '1', '2'), $this->list->getValues());
         $this->assertEquals(array(
-            'Group' => array(1 => new ChoiceView($this->obj2, '1', 'B'))
+            'Group' => array(1 => new ChoiceView($this->obj2, '1', 'B')),
         ), $this->list->getPreferredViews());
         $this->assertEquals(array(
             'Group' => array(0 => new ChoiceView($this->obj1, '0', 'A')),
-            2 => new ChoiceView($traversableChoice, '2', 'C')
+            2 => new ChoiceView($traversableChoice, '2', 'C'),
         ), $this->list->getRemainingViews());
     }
 
@@ -86,11 +86,11 @@ class ChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
         $this->assertEquals(array(
             'Group 1' => array(1 => new ChoiceView($this->obj2, '1', 'B')),
-            'Group 2' => array(2 => new ChoiceView($this->obj3, '2', 'C'))
+            'Group 2' => array(2 => new ChoiceView($this->obj3, '2', 'C')),
         ), $this->list->getPreferredViews());
         $this->assertEquals(array(
             'Group 1' => array(0 => new ChoiceView($this->obj1, '0', 'A')),
-            'Group 2' => array(3 => new ChoiceView($this->obj4, '3', 'D'))
+            'Group 2' => array(3 => new ChoiceView($this->obj4, '3', 'D')),
         ), $this->list->getRemainingViews());
     }
 

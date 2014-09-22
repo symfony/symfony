@@ -62,7 +62,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
             array(new ComparisonTest_Class(4), '4', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
             array(new ComparisonTest_Class(5), '5', new ComparisonTest_Class(5), '5', __NAMESPACE__.'\ComparisonTest_Class'),
             array('22', '"22"', '333', '"333"', 'string'),
-            array('22', '"22"', '22', '"22"', 'string')
+            array('22', '"22"', '22', '"22"', 'string'),
         );
     }
 }

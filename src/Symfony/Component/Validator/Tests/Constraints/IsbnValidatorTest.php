@@ -45,7 +45,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
             array('0321812700'),
             array('0-45122-5244'),
             array('0-4712-92311'),
-            array('0-9752298-0-X')
+            array('0-9752298-0-X'),
         );
     }
 
@@ -156,7 +156,7 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
     public function testValidIsbn10($isbn)
     {
         $constraint = new Isbn(array(
-            'type' => 'isbn10'
+            'type' => 'isbn10',
         ));
 
         $this->validator->validate($isbn, $constraint);

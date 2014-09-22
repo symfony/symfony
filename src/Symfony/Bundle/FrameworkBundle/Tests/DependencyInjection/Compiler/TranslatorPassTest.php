@@ -40,8 +40,6 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
         $container->expects($this->once())
             ->method('findDefinition')
             ->will($this->returnValue($this->getMock('Symfony\Component\DependencyInjection\Definition')));
-        ;
-
         $pass = new TranslatorPass();
         $pass->process($container);
     }

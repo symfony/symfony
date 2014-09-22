@@ -24,7 +24,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',
-            'PHP_AUTH_PW'   => 'ThePassword'
+            'PHP_AUTH_PW'   => 'ThePassword',
         ));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
@@ -70,7 +70,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',
-            'PHP_AUTH_PW'   => 'ThePassword'
+            'PHP_AUTH_PW'   => 'ThePassword',
         ));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
@@ -199,7 +199,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request(array(), array(), array(), array(), array(), array(
             'PHP_AUTH_USER' => 'TheUsername',
-            'PHP_AUTH_PW'   => 'ThePassword'
+            'PHP_AUTH_PW'   => 'ThePassword',
         ));
 
         $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', array('ROLE_FOO'));

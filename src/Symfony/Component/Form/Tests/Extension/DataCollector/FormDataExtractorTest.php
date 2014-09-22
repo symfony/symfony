@@ -216,7 +216,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->createBuilder('name')
             ->addModelTransformer(new FixedDataTransformer(array(
-                'Foo' => 'Bar'
+                'Foo' => 'Bar',
             )))
             ->getForm();
 
@@ -235,7 +235,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->createBuilder('name')
             ->addViewTransformer(new FixedDataTransformer(array(
-                'Foo' => 'Bar'
+                'Foo' => 'Bar',
             )))
             ->getForm();
 

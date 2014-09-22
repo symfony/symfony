@@ -80,7 +80,7 @@ class GnuFindAdapter extends AbstractFindAdapter
      */
     protected function buildFindCommand(Command $command, $dir)
     {
-      return parent::buildFindCommand($command, $dir)->add('-regextype posix-extended');
+        return parent::buildFindCommand($command, $dir)->add('-regextype posix-extended');
     }
 
     /**

@@ -43,7 +43,7 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::NOTICE => OutputInterface::VERBOSITY_VERBOSE,
         LogLevel::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
-        LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG
+        LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
     );
     /**
      * @var array
@@ -56,7 +56,7 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::WARNING => self::INFO,
         LogLevel::NOTICE => self::INFO,
         LogLevel::INFO => self::INFO,
-        LogLevel::DEBUG => self::INFO
+        LogLevel::DEBUG => self::INFO,
     );
 
     /**

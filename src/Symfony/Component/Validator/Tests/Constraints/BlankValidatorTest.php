@@ -47,7 +47,7 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Blank(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

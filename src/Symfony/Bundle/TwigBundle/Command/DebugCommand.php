@@ -77,7 +77,7 @@ EOF
             $items = array();
             foreach ($twig->{'get'.ucfirst($type)}() as $name => $entity) {
                 if (!$filter || false !== strpos($name, $filter)) {
-                    $items[$name] = $name . $this->getPrettyMetadata($type, $entity);
+                    $items[$name] = $name.$this->getPrettyMetadata($type, $entity);
                 }
             }
 
@@ -87,7 +87,7 @@ EOF
             if ($index > 0) {
                 $output->writeln('');
             }
-            $output->writeln('<info>' . ucfirst($type) . '</info>');
+            $output->writeln('<info>'.ucfirst($type).'</info>');
             ksort($items);
             foreach ($items as $item) {
                 $output->writeln('  '.$item);
@@ -138,7 +138,7 @@ EOF
             // format args
             $args = array_map(function ($param) {
                 if ($param->isDefaultValueAvailable()) {
-                    return $param->getName() . ' = ' . json_encode($param->getDefaultValue());
+                    return $param->getName().' = '.json_encode($param->getDefaultValue());
                 }
 
                 return $param->getName();
@@ -165,7 +165,7 @@ EOF
                 return '(unknown?)';
             }
         } catch (\UnexpectedValueException $e) {
-            return ' <error>' . $e->getMessage() . '</error>';
+            return ' <error>'.$e->getMessage().'</error>';
         }
 
         if ($type === 'globals') {
@@ -177,11 +177,11 @@ EOF
         }
 
         if ($type === 'functions') {
-            return '(' . implode(', ', $meta) . ')';
+            return '('.implode(', ', $meta).')';
         }
 
         if ($type === 'filters') {
-            return $meta ? '(' . implode(', ', $meta) . ')' : '';
+            return $meta ? '('.implode(', ', $meta).')' : '';
         }
     }
 }

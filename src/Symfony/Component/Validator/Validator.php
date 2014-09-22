@@ -57,8 +57,7 @@ class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryIn
         TranslatorInterface $translator,
         $translationDomain = 'validators',
         array $objectInitializers = array()
-    )
-    {
+    ) {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
         $this->translator = $translator;

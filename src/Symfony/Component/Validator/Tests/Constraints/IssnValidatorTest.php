@@ -84,7 +84,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array(0),
             array('1539'),
-            array('2156-537A')
+            array('2156-537A'),
         );
     }
 
@@ -97,7 +97,6 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
             array('1684-537X'),
             array('1996-0795'),
         );
-
     }
 
     public function getInvalidIssn()

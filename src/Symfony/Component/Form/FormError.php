@@ -169,7 +169,7 @@ class FormError implements \Serializable
             $this->messageTemplate,
             $this->messageParameters,
             $this->messagePluralization,
-            $this->cause
+            $this->cause,
         ));
     }
 

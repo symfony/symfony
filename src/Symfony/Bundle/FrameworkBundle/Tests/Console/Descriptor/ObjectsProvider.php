@@ -72,7 +72,7 @@ class ObjectsProvider
         $builder->setParameter('database_name', 'symfony');
 
         return array(
-            'parameter' =>  $builder
+            'parameter' =>  $builder,
         );
     }
 

@@ -36,7 +36,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, array(array(
             'secret'          => 's3cr3t',
-            'trusted_proxies' => $trustedProxies
+            'trusted_proxies' => $trustedProxies,
         )));
 
         $this->assertEquals($processedProxies, $config['trusted_proxies']);
@@ -66,8 +66,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
-                'trusted_proxies' => 'Not an IP address'
-            )
+                'trusted_proxies' => 'Not an IP address',
+            ),
         ));
     }
 
@@ -81,8 +81,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor->processConfiguration($configuration, array(
             array(
                 'secret' => 's3cr3t',
-                'trusted_proxies' => array('Not an IP address')
-            )
+                'trusted_proxies' => array('Not an IP address'),
+            ),
         ));
     }
 
@@ -137,8 +137,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'debug'          => '%kernel.debug%',
             ),
             'serializer'          => array(
-                'enabled' => false
-            )
+                'enabled' => false,
+            ),
         );
     }
 }

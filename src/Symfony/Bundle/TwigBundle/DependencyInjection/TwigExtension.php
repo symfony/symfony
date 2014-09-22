@@ -42,7 +42,7 @@ class TwigExtension extends Extension
                     if (is_array($value) && isset($value['key'])) {
                         $config['globals'][$name] = array(
                             'key'   => $name,
-                            'value' => $config['globals'][$name]
+                            'value' => $config['globals'][$name],
                         );
                     }
                 }

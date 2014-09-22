@@ -53,7 +53,7 @@ class TimeZoneTransformer extends Transformer
     public function extractDateOptions($matched, $length)
     {
         return array(
-            'timezone' => self::getEtcTimeZoneId($matched)
+            'timezone' => self::getEtcTimeZoneId($matched),
         );
     }
 

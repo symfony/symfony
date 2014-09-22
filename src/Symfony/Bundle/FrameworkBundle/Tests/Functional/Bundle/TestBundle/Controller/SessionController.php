@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 class SessionController extends ContainerAware
 {
-    public function welcomeAction(Request $request, $name=null)
+    public function welcomeAction(Request $request, $name = null)
     {
         $session = $request->getSession();
 

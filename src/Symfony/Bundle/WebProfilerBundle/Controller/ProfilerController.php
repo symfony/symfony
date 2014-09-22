@@ -148,7 +148,7 @@ class ProfilerController
         $this->profiler->disable();
 
         return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
-            'about' => $about
+            'about' => $about,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

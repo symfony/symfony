@@ -105,7 +105,8 @@ class IsbnValidator extends ConstraintValidator
         }
 
         for ($i = 1; $i < 12; $i += 2) {
-            $checkSum += $isbn{$i} * 3;
+            $checkSum += $isbn{$i}
+            * 3;
         }
 
         return 0 === $checkSum % 10;

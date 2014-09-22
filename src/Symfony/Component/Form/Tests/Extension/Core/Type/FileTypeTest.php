@@ -47,7 +47,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testSubmitMultiple()
     {
         $form = $this->factory->createBuilder('file', null, array(
-            'multiple' => true
+            'multiple' => true,
         ))->getForm();
 
         $data = array(

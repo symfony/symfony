@@ -91,5 +91,4 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 
 class MyCommand extends Command
 {
-
 }

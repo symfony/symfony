@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
-use Symfony\Component\Validator\Validation;
 
 class TypeValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -118,7 +117,7 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Type(array(
             'type' => $type,
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

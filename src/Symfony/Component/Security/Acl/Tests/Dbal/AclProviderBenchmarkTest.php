@@ -92,7 +92,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $this->insertEntryStmt = $this->con->prepare('INSERT INTO acl_entries (id, class_id, object_identity_id, field_name, ace_order, security_identity_id, mask, granting, granting_strategy, audit_success, audit_failure) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $this->insertOidAncestorStmt = $this->con->prepare('INSERT INTO acl_object_identity_ancestors (object_identity_id, ancestor_id) VALUES (?, ?)');
 
-        for ($i=0; $i<40000; $i++) {
+        for ($i = 0; $i<40000; $i++) {
             $this->generateAclHierarchy();
         }
     }
@@ -107,7 +107,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected function generateAclLevel($depth, $parentId, $ancestors)
     {
         $level = count($ancestors);
-        for ($i=0,$t=rand(1, 10); $i<$t; $i++) {
+        for ($i = 0,$t = rand(1, 10); $i<$t; $i++) {
             $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
 
             if ($level < $depth) {
@@ -161,7 +161,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             $this->insertSidStmt->execute(array(
                 $id,
                 $this->getRandomString(rand(5, 30)),
-                rand(0, 1)
+                rand(0, 1),
             ));
             $id += 1;
 
@@ -178,7 +178,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $sids = array();
         $fieldOrder = array();
 
-        for ($i=0; $i<=30; $i++) {
+        for ($i = 0; $i <= 30; $i++) {
             $fieldName = rand(0, 1) ? null : $this->getRandomString(rand(10, 20));
 
             do {

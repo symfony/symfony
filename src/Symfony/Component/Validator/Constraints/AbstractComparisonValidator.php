@@ -39,7 +39,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE),
                 '{{ compared_value }}' => $this->formatValue($constraint->value, self::OBJECT_TO_STRING | self::PRETTY_DATE),
-                '{{ compared_value_type }}' => $this->formatTypeOf($constraint->value)
+                '{{ compared_value_type }}' => $this->formatTypeOf($constraint->value),
             ));
         }
     }

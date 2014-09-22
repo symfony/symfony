@@ -130,7 +130,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name'
+            'property' => 'name',
         ));
 
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
@@ -165,7 +165,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
             'property' => 'name',
-            'query_builder' => $qb
+            'query_builder' => $qb,
         ));
 
         $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
@@ -541,7 +541,7 @@ class EntityTypeTest extends TypeTestCase
         $this->assertEquals(array(
             'Group1' => array(1 => new ChoiceView($item1, '1', 'Foo'), 2 => new ChoiceView($item2, '2', 'Bar')),
             'Group2' => array(3 => new ChoiceView($item3, '3', 'Baz')),
-            '4' => new ChoiceView($item4, '4', 'Boo!')
+            '4' => new ChoiceView($item4, '4', 'Boo!'),
         ), $field->createView()->vars['choices']);
     }
 
@@ -754,7 +754,7 @@ class EntityTypeTest extends TypeTestCase
         $this->factory->createNamed('name', 'entity', null, array(
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name'
+            'property' => 'name',
         ));
     }
 

@@ -84,7 +84,7 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new EncoderFactory(array(
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha256'),
-            'encoder_name' => new MessageDigestPasswordEncoder('sha1')
+            'encoder_name' => new MessageDigestPasswordEncoder('sha1'),
         ));
 
         $encoder = $factory->getEncoder(new EncAwareUser('user', 'pass'));
@@ -96,7 +96,7 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new EncoderFactory(array(
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha1'),
-            'encoder_name' => new MessageDigestPasswordEncoder('sha256')
+            'encoder_name' => new MessageDigestPasswordEncoder('sha256'),
         ));
 
         $user = new EncAwareUser('user', 'pass');
@@ -113,7 +113,7 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new EncoderFactory(array(
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha1'),
-            'encoder_name' => new MessageDigestPasswordEncoder('sha256')
+            'encoder_name' => new MessageDigestPasswordEncoder('sha256'),
         ));
 
         $user = new EncAwareUser('user', 'pass');
@@ -125,7 +125,7 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new EncoderFactory(array(
             'Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser' => new MessageDigestPasswordEncoder('sha1'),
-            'encoder_name' => new MessageDigestPasswordEncoder('sha256')
+            'encoder_name' => new MessageDigestPasswordEncoder('sha256'),
         ));
 
         $encoder = $factory->getEncoder('Symfony\Component\Security\Core\Tests\Encoder\EncAwareUser');
@@ -136,11 +136,21 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
 
 class SomeUser implements UserInterface
 {
-    public function getRoles() {}
-    public function getPassword() {}
-    public function getSalt() {}
-    public function getUsername() {}
-    public function eraseCredentials() {}
+    public function getRoles()
+    {
+    }
+    public function getPassword()
+    {
+    }
+    public function getSalt()
+    {
+    }
+    public function getUsername()
+    {
+    }
+    public function eraseCredentials()
+    {
+    }
 }
 
 class SomeChildUser extends SomeUser

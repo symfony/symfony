@@ -59,7 +59,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption(
                     'clean', null, InputOption::VALUE_NONE,
                     'Should clean not found messages'
-                )
+                ),
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<EOF

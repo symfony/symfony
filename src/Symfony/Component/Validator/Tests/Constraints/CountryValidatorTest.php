@@ -82,7 +82,7 @@ class CountryValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidCountries($country)
     {
         $constraint = new Country(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($country, $constraint);

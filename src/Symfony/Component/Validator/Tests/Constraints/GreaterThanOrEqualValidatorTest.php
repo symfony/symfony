@@ -59,7 +59,7 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
         return array(
             array(1, '1', 2, '2', 'integer'),
             array(new \DateTime('2000/01/01'), 'Jan 1, 2000, 12:00 AM', new \DateTime('2005/01/01'), 'Jan 1, 2005, 12:00 AM', 'DateTime'),
-            array('b', '"b"', 'c', '"c"', 'string')
+            array('b', '"b"', 'c', '"c"', 'string'),
         );
     }
 }

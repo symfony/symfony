@@ -28,7 +28,7 @@ class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
     private function getConfigurationAsString()
     {
-      return <<<EOL
+        return <<<EOL
 acme_root:
     boolean:              true
     scalar_empty:         ~

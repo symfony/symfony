@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\True;
 use Symfony\Component\Validator\Constraints\TrueValidator;
-use Symfony\Component\Validator\Validation;
 
 class TrueValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -44,7 +43,7 @@ class TrueValidatorTest extends AbstractConstraintValidatorTest
     public function testFalseIsInvalid()
     {
         $constraint = new True(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(false, $constraint);

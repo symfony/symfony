@@ -341,11 +341,11 @@ class MainConfiguration implements ConfigurationInterface
                             'memory' => array(
                                 'users' => array(
                                     'foo' => array('password' => 'foo', 'roles' => 'ROLE_USER'),
-                                    'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]')
+                                    'bar' => array('password' => 'bar', 'roles' => '[ROLE_USER, ROLE_ADMIN]'),
                                 ),
-                            )
+                            ),
                         ),
-                        'my_entity_provider' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username'))
+                        'my_entity_provider' => array('entity' => array('class' => 'SecurityBundle:User', 'property' => 'username')),
                     ))
                     ->disallowNewKeysInSubsequentConfigs()
                     ->isRequired()
@@ -402,8 +402,8 @@ class MainConfiguration implements ConfigurationInterface
                         'Acme\DemoBundle\Entity\User2' => array(
                             'algorithm' => 'sha512',
                             'encode_as_base64' => 'true',
-                            'iterations'=> 5000
-                        )
+                            'iterations' => 5000,
+                        ),
                     ))
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('class')

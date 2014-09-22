@@ -79,7 +79,7 @@ class CollectionValidator extends ConstraintValidator
                 } else {
                     // 2.4 API
                     $context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
-                        '{{ field }}' => $this->formatValue($field)
+                        '{{ field }}' => $this->formatValue($field),
                     ), null);
                 }
             }
@@ -97,7 +97,7 @@ class CollectionValidator extends ConstraintValidator
                     } else {
                         // 2.4 API
                         $context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
-                            '{{ field }}' => $this->formatValue($field)
+                            '{{ field }}' => $this->formatValue($field),
                         ), $fieldValue);
                     }
                 }

@@ -33,11 +33,11 @@ class SimpleChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getValues());
         $this->assertEquals(array(
             'Group 1' => array(1 => new ChoiceView('b', 'b', 'B')),
-            'Group 2' => array(2 => new ChoiceView('c', 'c', 'C'))
+            'Group 2' => array(2 => new ChoiceView('c', 'c', 'C')),
         ), $this->list->getPreferredViews());
         $this->assertEquals(array(
             'Group 1' => array(0 => new ChoiceView('a', 'a', 'A')),
-            'Group 2' => array(3 => new ChoiceView('d', 'd', 'D'))
+            'Group 2' => array(3 => new ChoiceView('d', 'd', 'D')),
         ), $this->list->getRemainingViews());
     }
 

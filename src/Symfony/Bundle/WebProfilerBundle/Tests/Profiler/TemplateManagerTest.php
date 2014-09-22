@@ -48,9 +48,9 @@ class TemplateManagerTest extends TestCase
         $profiler = $this->mockProfiler();
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = array(
-            'data_collector.foo'=>array('foo','FooBundle:Collector:foo'),
-            'data_collector.bar'=>array('bar','FooBundle:Collector:bar'),
-            'data_collector.baz'=>array('baz','FooBundle:Collector:baz')
+            'data_collector.foo' => array('foo','FooBundle:Collector:foo'),
+            'data_collector.bar' => array('bar','FooBundle:Collector:bar'),
+            'data_collector.baz' => array('baz','FooBundle:Collector:baz'),
             );
 
         $this->templateManager = new TemplateManager($profiler, $twigEnvironment, $templates);

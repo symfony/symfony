@@ -373,7 +373,7 @@ class FormTypeTest extends BaseTypeTest
             // reference has a getter, but not setter
             'reference' => array(
                 'firstName' => 'Foo',
-            )
+            ),
         ));
 
         $this->assertEquals('Foo', $author->getReference()->firstName);
@@ -398,7 +398,7 @@ class FormTypeTest extends BaseTypeTest
         // referenceCopy has a getter that returns a copy
             'referenceCopy' => array(
                 'firstName' => 'Foo',
-        )
+        ),
         ));
 
         $this->assertEquals('Foo', $author->getReferenceCopy()->firstName);
@@ -411,7 +411,7 @@ class FormTypeTest extends BaseTypeTest
         $builder = $this->factory->createBuilder('form', $author);
         $builder->add('referenceCopy', 'form', array(
             'data_class' => 'Symfony\Component\Form\Tests\Fixtures\Author',
-            'by_reference' => false
+            'by_reference' => false,
         ));
         $builder->get('referenceCopy')->add('firstName', 'text');
         $form = $builder->getForm();
@@ -420,7 +420,7 @@ class FormTypeTest extends BaseTypeTest
             // referenceCopy has a getter that returns a copy
             'referenceCopy' => array(
                 'firstName' => 'Foo',
-            )
+            ),
         ));
 
         // firstName can only be updated if setReferenceCopy() was called
@@ -630,7 +630,7 @@ class FormTypeTest extends BaseTypeTest
     public function testPassZeroLabelToView()
     {
         $view = $this->factory->create('form', null, array(
-                'label' => '0'
+                'label' => '0',
             ))
             ->createView();
 

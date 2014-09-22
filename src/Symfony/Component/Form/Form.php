@@ -351,20 +351,20 @@ class Form implements \IteratorAggregate, FormInterface
                 $expectedType = 'scalar, array or an instance of \ArrayAccess';
 
                 throw new LogicException(
-                    'The form\'s view data is expected to be of type '.$expectedType.', ' .
-                    'but is '.$actualType.'. You ' .
-                    'can avoid this error by setting the "data_class" option to ' .
-                    '"'.get_class($viewData).'" or by adding a view transformer ' .
+                    'The form\'s view data is expected to be of type '.$expectedType.', '.
+                    'but is '.$actualType.'. You '.
+                    'can avoid this error by setting the "data_class" option to '.
+                    '"'.get_class($viewData).'" or by adding a view transformer '.
                     'that transforms '.$actualType.' to '.$expectedType.'.'
                 );
             }
 
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 throw new LogicException(
-                    'The form\'s view data is expected to be an instance of class ' .
-                    $dataClass.', but is '. $actualType.'. You can avoid this error ' .
-                    'by setting the "data_class" option to null or by adding a view ' .
-                    'transformer that transforms '.$actualType.' to an instance of ' .
+                    'The form\'s view data is expected to be an instance of class '.
+                    $dataClass.', but is '.$actualType.'. You can avoid this error '.
+                    'by setting the "data_class" option to null or by adding a view '.
+                    'transformer that transforms '.$actualType.' to an instance of '.
                     $dataClass.'.'
                 );
             }

@@ -182,7 +182,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
             'members',
             'name',
             'properties',
-            'defaultGroup'
+            'defaultGroup',
         ));
     }
 

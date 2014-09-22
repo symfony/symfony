@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Null;
 use Symfony\Component\Validator\Constraints\NullValidator;
-use Symfony\Component\Validator\Validation;
 
 class NullValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -40,7 +39,7 @@ class NullValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidValues($value, $valueAsString)
     {
         $constraint = new Null(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

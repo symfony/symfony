@@ -77,7 +77,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
             array(
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
-            )
+            ),
         );
     }
 

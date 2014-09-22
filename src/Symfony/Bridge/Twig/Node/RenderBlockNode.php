@@ -29,7 +29,7 @@ class RenderBlockNode extends \Twig_Node_Expression_Function
 
         if (isset($arguments[0])) {
             $compiler->subcompile($arguments[0]);
-            $compiler->raw(', \'' . $this->getAttribute('name') . '\'');
+            $compiler->raw(', \''.$this->getAttribute('name').'\'');
 
             if (isset($arguments[1])) {
                 $compiler->raw(', ');

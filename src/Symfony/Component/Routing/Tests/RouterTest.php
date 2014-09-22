@@ -31,7 +31,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->router->setOptions(array(
             'cache_dir' => './cache',
             'debug' => true,
-            'resource_type' => 'ResourceType'
+            'resource_type' => 'ResourceType',
         ));
 
         $this->assertSame('./cache', $this->router->getOption('cache_dir'));
@@ -49,7 +49,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'cache_dir' => './cache',
             'option_foo' => true,
             'option_bar' => 'baz',
-            'resource_type' => 'ResourceType'
+            'resource_type' => 'ResourceType',
         ));
     }
 
@@ -103,14 +103,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RouteCollection')));
 
         $this->assertInstanceOf('Symfony\\Component\\Routing\\Matcher\\UrlMatcher', $this->router->getMatcher());
-
     }
 
     public function provideMatcherOptionsPreventingCaching()
     {
         return array(
             array('cache_dir'),
-            array('matcher_cache_class')
+            array('matcher_cache_class'),
         );
     }
 
@@ -126,14 +125,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getMock('Symfony\Component\Routing\RouteCollection')));
 
         $this->assertInstanceOf('Symfony\\Component\\Routing\\Generator\\UrlGenerator', $this->router->getGenerator());
-
     }
 
     public function provideGeneratorOptionsPreventingCaching()
     {
         return array(
             array('cache_dir'),
-            array('generator_cache_class')
+            array('generator_cache_class'),
         );
     }
 

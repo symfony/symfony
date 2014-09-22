@@ -22,7 +22,6 @@ use Symfony\Component\Intl\Intl;
  */
 abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
 {
-
     protected function setUp()
     {
         \Locale::setDefault('en');
@@ -272,7 +271,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
         // With PHP 5.5 IntlDateFormatter accepts empty values ('0')
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
             return array(
-                array('y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR')
+                array('y-M-d', 'foobar', 'datefmt_format: string \'foobar\' is not numeric, which would be required for it to be a valid date: U_ILLEGAL_ARGUMENT_ERROR'),
             );
         }
 

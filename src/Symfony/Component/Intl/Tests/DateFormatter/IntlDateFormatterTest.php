@@ -49,7 +49,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
             'tm_year'  => 112,
             'tm_wday'  => 0,
             'tm_yday'  => 105,
-            'tm_isdst' => 0
+            'tm_isdst' => 0,
         );
 
         try {

@@ -21,7 +21,9 @@ class StringUtils
     /**
      * This class should not be instantiated
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * Compares two strings.

@@ -43,7 +43,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
     {
         $options = array(
             'always_use_default_target_path' => true,
-            'default_target_path' => '/dashboard'
+            'default_target_path' => '/dashboard',
         );
 
         $response = $this->expectRedirectResponse('/dashboard');

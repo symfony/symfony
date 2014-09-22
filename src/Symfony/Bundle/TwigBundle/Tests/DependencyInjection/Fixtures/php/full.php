@@ -4,7 +4,7 @@ $container->loadFromExtension('twig', array(
     'form' => array(
         'resources' => array(
             'MyBundle::form.html.twig',
-        )
+        ),
      ),
      'globals' => array(
          'foo' => '@bar',

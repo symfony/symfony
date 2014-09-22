@@ -56,14 +56,14 @@ class SvnRepository
 
         $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($targetDir . '/.svn')) {
+        if (!$filesystem->exists($targetDir.'/.svn')) {
             $filesystem->remove($targetDir);
             $filesystem->mkdir($targetDir);
 
-            exec('svn checkout ' . $url . ' ' . $targetDir, $output, $result);
+            exec('svn checkout '.$url.' '.$targetDir, $output, $result);
 
             if ($result !== 0) {
-                throw new RuntimeException('The SVN checkout of ' . $url . 'failed.');
+                throw new RuntimeException('The SVN checkout of '.$url.'failed.');
             }
         }
 

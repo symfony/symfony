@@ -207,5 +207,7 @@ class Intl
     /**
      * This class must not be instantiated.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

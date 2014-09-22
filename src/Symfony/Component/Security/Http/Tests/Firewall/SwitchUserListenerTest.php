@@ -157,7 +157,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
         $this->request->query->expects($this->once())->method('remove','_switch_user');
-        $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array('page'=>3,'section'=>2)));
+        $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array('page' => 3,'section' => 2)));
         $this->request->expects($this->any())->method('getUri')->will($this->returnValue('/'));
         $this->request->server->expects($this->once())->method('set')->with('QUERY_STRING', 'page=3&section=2');
 

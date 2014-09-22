@@ -57,7 +57,6 @@ class DumperPrefixCollection extends DumperCollection
         $prefix = $route->getRoute()->compile()->getStaticPrefix();
 
         for ($collection = $this; null !== $collection; $collection = $collection->getParent()) {
-
             // Same prefix, add to current leave
             if ($collection->prefix === $prefix) {
                 $collection->add($route);

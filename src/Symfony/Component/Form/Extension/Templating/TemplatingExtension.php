@@ -36,7 +36,7 @@ class TemplatingExtension extends AbstractExtension
         }
 
         $engine->addHelpers(array(
-            new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfTokenManager))
+            new FormHelper(new FormRenderer(new TemplatingRendererEngine($engine, $defaultThemes), $csrfTokenManager)),
         ));
     }
 }

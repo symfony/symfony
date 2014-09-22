@@ -112,14 +112,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     public static function themeBlockInheritanceProvider()
     {
         return array(
-            array(array('TestBundle:Parent'))
+            array(array('TestBundle:Parent')),
         );
     }
 
     public static function themeInheritanceProvider()
     {
         return array(
-            array(array('TestBundle:Parent'), array('TestBundle:Child'))
+            array(array('TestBundle:Parent'), array('TestBundle:Child')),
         );
     }
 }

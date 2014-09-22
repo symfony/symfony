@@ -49,7 +49,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
             $this->data = array(
                 'error_count'       => $this->logger->countErrors(),
                 'logs'              => $this->sanitizeLogs($this->logger->getLogs()),
-                'deprecation_count' => $this->computeDeprecationCount()
+                'deprecation_count' => $this->computeDeprecationCount(),
             );
         }
     }

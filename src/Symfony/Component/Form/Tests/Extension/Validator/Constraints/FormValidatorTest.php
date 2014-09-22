@@ -221,7 +221,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertViolation('invalid_message_key', array(
             '{{ value }}' => 'foo',
-            '{{ foo }}' => 'bar'
+            '{{ foo }}' => 'bar',
         ), 'property.path', 'foo', null, Form::ERR_INVALID);
     }
 
@@ -253,7 +253,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertViolation('invalid_message_key', array(
             '{{ value }}' => 'foo',
-            '{{ foo }}' => 'bar'
+            '{{ foo }}' => 'bar',
         ), 'property.path', 'foo', null, Form::ERR_INVALID);
     }
 
@@ -355,7 +355,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $object = $this->getMock('\stdClass');
         $options = array('validation_groups' => function (FormInterface $form) {
             return array('group1', 'group2');
-        });
+        },);
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
@@ -538,7 +538,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($form, new Form());
 
         $this->assertViolation('Extra!', array(
-            '{{ extra_fields }}' => 'foo'
+            '{{ extra_fields }}' => 'foo',
         ), 'property.path', array('foo' => 'bar'));
     }
 

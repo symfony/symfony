@@ -783,7 +783,8 @@ class Finder implements \IteratorAggregate, \Countable
                     return $this
                         ->buildAdapter($adapter['adapter'])
                         ->searchInDirectory($dir);
-                } catch (ExceptionInterface $e) {}
+                } catch (ExceptionInterface $e) {
+                }
             }
         }
 

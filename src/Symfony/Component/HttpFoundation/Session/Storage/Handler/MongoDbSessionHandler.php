@@ -90,7 +90,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     public function destroy($sessionId)
     {
         $this->getCollection()->remove(array(
-            $this->options['id_field'] => $sessionId
+            $this->options['id_field'] => $sessionId,
         ));
 
         return true;

@@ -309,7 +309,7 @@ class PrototypedArrayNode extends ArrayNode
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
                     $ex = new InvalidConfigurationException(sprintf(
-                        'You are not allowed to define new elements for path "%s". ' .
+                        'You are not allowed to define new elements for path "%s". '.
                         'Please define all elements for this path in one config file.',
                         $this->getPath()
                     ));

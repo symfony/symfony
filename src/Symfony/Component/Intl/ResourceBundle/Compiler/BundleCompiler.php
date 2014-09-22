@@ -38,7 +38,7 @@ class BundleCompiler implements BundleCompilerInterface
      */
     public function __construct($genrb = 'genrb', $envVars = '')
     {
-        exec('which ' . $genrb, $output, $status);
+        exec('which '.$genrb, $output, $status);
 
         if (0 !== $status) {
             throw new RuntimeException(sprintf(
@@ -47,7 +47,7 @@ class BundleCompiler implements BundleCompilerInterface
             ));
         }
 
-        $this->genrb = ($envVars ? $envVars . ' ' : '') . $genrb;
+        $this->genrb = ($envVars ? $envVars.' ' : '').$genrb;
     }
 
     /**

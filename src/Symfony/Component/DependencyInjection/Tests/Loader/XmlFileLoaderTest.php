@@ -150,7 +150,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             'constant' => PHP_EOL,
             'bar' => '%foo%',
             'imported_from_ini' => true,
-            'imported_from_yaml' => true
+            'imported_from_yaml' => true,
         );
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');

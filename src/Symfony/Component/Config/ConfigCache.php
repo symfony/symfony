@@ -113,5 +113,4 @@ class ConfigCache
     {
         return $this->file.'.meta';
     }
-
 }

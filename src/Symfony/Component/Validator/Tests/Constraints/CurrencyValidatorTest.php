@@ -90,7 +90,7 @@ class CurrencyValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidCurrencies($currency)
     {
         $constraint = new Currency(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($currency, $constraint);

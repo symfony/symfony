@@ -114,7 +114,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidUrls($url)
     {
         $constraint = new Url(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($url, $constraint);
@@ -155,7 +155,7 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
     public function testCustomProtocolIsValid($url)
     {
         $constraint = new Url(array(
-            'protocols' => array('ftp', 'file', 'git')
+            'protocols' => array('ftp', 'file', 'git'),
         ));
 
         $this->validator->validate($url, $constraint);

@@ -69,7 +69,7 @@ class ChoiceValidator extends ConstraintValidator
 
             if ($constraint->min !== null && $count < $constraint->min) {
                 $this->context->addViolation($constraint->minMessage, array(
-                    '{{ limit }}' => $constraint->min
+                    '{{ limit }}' => $constraint->min,
                 ), $value, (int) $constraint->min);
 
                 return;
@@ -77,14 +77,14 @@ class ChoiceValidator extends ConstraintValidator
 
             if ($constraint->max !== null && $count > $constraint->max) {
                 $this->context->addViolation($constraint->maxMessage, array(
-                    '{{ limit }}' => $constraint->max
+                    '{{ limit }}' => $constraint->max,
                 ), $value, (int) $constraint->max);
 
                 return;
             }
         } elseif (!in_array($value, $choices, $constraint->strict)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value)
+                '{{ value }}' => $this->formatValue($value),
             ));
         }
     }

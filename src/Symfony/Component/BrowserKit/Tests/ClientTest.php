@@ -466,7 +466,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'HTTP_HOST'       => 'www.example.com:8080',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
             'HTTPS'           => false,
-            'HTTP_REFERER'    => 'http://www.example.com:8080/'
+            'HTTP_REFERER'    => 'http://www.example.com:8080/',
         );
 
         $client = new TestClient();
@@ -600,7 +600,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'HTTP_HOST'       => 'testhost',
             'HTTP_USER_AGENT' => 'testua',
             'HTTPS'           => false,
-            'NEW_SERVER_KEY'  => 'new-server-key-value'
+            'NEW_SERVER_KEY'  => 'new-server-key-value',
         ));
 
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));

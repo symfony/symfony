@@ -40,7 +40,7 @@ class RenderTokenParserTest extends TestCase
                     new \Twig_Node_Expression_Array(array(), 1),
                     1,
                     'render'
-                )
+                ),
             ),
             array(
                 '{% render "foo", {foo: 1} %}',
@@ -52,7 +52,7 @@ class RenderTokenParserTest extends TestCase
                     ), 1),
                     1,
                     'render'
-                )
+                ),
             ),
         );
     }

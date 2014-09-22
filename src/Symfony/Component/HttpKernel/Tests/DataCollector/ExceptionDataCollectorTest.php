@@ -36,5 +36,4 @@ class ExceptionDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('exception',$c->getName());
         $this->assertSame($trace,$c->getTrace());
     }
-
 }

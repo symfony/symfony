@@ -39,7 +39,7 @@ class ApacheRequestTest extends \PHPUnit_Framework_TestCase
                 ),
                 '/foo/app_dev.php/bar',
                 '/foo/app_dev.php',
-                '/bar'
+                '/bar',
             ),
             array(
                 array(

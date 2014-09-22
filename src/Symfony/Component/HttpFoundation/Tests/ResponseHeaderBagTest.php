@@ -32,31 +32,31 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 array('fOo' => 'BAR'),
-                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache'))
+                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache')),
             ),
             array(
                 array('ETag' => 'xyzzy'),
-                array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate'))
+                array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate')),
             ),
             array(
                 array('Content-MD5' => 'Q2hlY2sgSW50ZWdyaXR5IQ=='),
-                array('Content-MD5' => array('Q2hlY2sgSW50ZWdyaXR5IQ=='), 'Cache-Control' => array('no-cache'))
+                array('Content-MD5' => array('Q2hlY2sgSW50ZWdyaXR5IQ=='), 'Cache-Control' => array('no-cache')),
             ),
             array(
                 array('P3P' => 'CP="CAO PSA OUR"'),
-                array('P3P' => array('CP="CAO PSA OUR"'), 'Cache-Control' => array('no-cache'))
+                array('P3P' => array('CP="CAO PSA OUR"'), 'Cache-Control' => array('no-cache')),
             ),
             array(
                 array('WWW-Authenticate' => 'Basic realm="WallyWorld"'),
-                array('WWW-Authenticate' => array('Basic realm="WallyWorld"'), 'Cache-Control' => array('no-cache'))
+                array('WWW-Authenticate' => array('Basic realm="WallyWorld"'), 'Cache-Control' => array('no-cache')),
             ),
             array(
                 array('X-UA-Compatible' => 'IE=edge,chrome=1'),
-                array('X-UA-Compatible' => array('IE=edge,chrome=1'), 'Cache-Control' => array('no-cache'))
+                array('X-UA-Compatible' => array('IE=edge,chrome=1'), 'Cache-Control' => array('no-cache')),
             ),
             array(
                 array('X-XSS-Protection' => '1; mode=block'),
-                array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache'))
+                array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache')),
             ),
         );
     }
@@ -82,7 +82,7 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new ResponseHeaderBag(array(
             'Expires' => 'Wed, 16 Feb 2011 14:17:43 GMT',
-            'Cache-Control' => 'max-age=3600'
+            'Cache-Control' => 'max-age=3600',
         ));
         $this->assertEquals('max-age=3600, private', $bag->get('Cache-Control'));
 

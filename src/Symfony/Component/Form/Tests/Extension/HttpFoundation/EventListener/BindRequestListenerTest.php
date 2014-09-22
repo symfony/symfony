@@ -51,7 +51,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
                 'name' => 'upload.png',
                 'size' => 123,
                 'tmp_name' => $path,
-                'type' => 'image/png'
+                'type' => 'image/png',
             ),
         );
 

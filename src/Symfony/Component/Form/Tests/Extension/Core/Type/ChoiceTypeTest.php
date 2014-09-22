@@ -43,7 +43,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         'Doctrine' => array(
             'd' => 'Jon',
             'e' => 'Roman',
-        )
+        ),
     );
 
     protected function setUp()
@@ -868,7 +868,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
                 '' => 'Empty',
                 1 => 'Not Empty',
                 2 => 'Not Empty 2',
-            )
+            ),
         ));
 
         $form->submit(array('', '2'));

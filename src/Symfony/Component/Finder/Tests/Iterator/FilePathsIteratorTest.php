@@ -42,7 +42,7 @@ class FilePathsIteratorTest extends RealIteratorTestCase
                     $tmpDir.DIRECTORY_SEPARATOR.'foo' => $tmpDir.DIRECTORY_SEPARATOR.'foo',
                     $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
                     $tmpDir.DIRECTORY_SEPARATOR.'test.php' => $tmpDir.DIRECTORY_SEPARATOR.'test.php',
-                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => $tmpDir.DIRECTORY_SEPARATOR.'toto'
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => $tmpDir.DIRECTORY_SEPARATOR.'toto',
                 ),
                 array( // subPaths
                     $tmpDir.DIRECTORY_SEPARATOR.'.git' => '',
@@ -50,7 +50,7 @@ class FilePathsIteratorTest extends RealIteratorTestCase
                     $tmpDir.DIRECTORY_SEPARATOR.'foo' => '',
                     $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => 'foo',
                     $tmpDir.DIRECTORY_SEPARATOR.'test.php' => '',
-                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => ''
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => '',
                 ),
                 array( // subPathnames
                     $tmpDir.DIRECTORY_SEPARATOR.'.git' => '.git',
@@ -58,7 +58,7 @@ class FilePathsIteratorTest extends RealIteratorTestCase
                     $tmpDir.DIRECTORY_SEPARATOR.'foo' => 'foo',
                     $tmpDir.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'bar.tmp' => 'foo'.DIRECTORY_SEPARATOR.'bar.tmp',
                     $tmpDir.DIRECTORY_SEPARATOR.'test.php' => 'test.php',
-                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => 'toto'
+                    $tmpDir.DIRECTORY_SEPARATOR.'toto' => 'toto',
                 ),
             ),
         );

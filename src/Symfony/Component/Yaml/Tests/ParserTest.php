@@ -405,7 +405,7 @@ foo: |-
 
 EOF;
         $expected = array(
-            'foo' => "\n\nbar"
+            'foo' => "\n\nbar",
         );
 
         $this->assertSame($expected, $this->parser->parse($yaml));
@@ -449,7 +449,7 @@ EOF;
         $yamls = array(
             iconv("UTF-8", "ISO-8859-1", "foo: 'äöüß'"),
             iconv("UTF-8", "ISO-8859-15", "euro: '€'"),
-            iconv("UTF-8", "CP1252", "cp1252: '©ÉÇáñ'")
+            iconv("UTF-8", "CP1252", "cp1252: '©ÉÇáñ'"),
         );
 
         foreach ($yamls as $yaml) {
@@ -458,7 +458,7 @@ EOF;
 
                 $this->fail('charsets other than UTF-8 are rejected.');
             } catch (\Exception $e) {
-                 $this->assertInstanceOf('Symfony\Component\Yaml\Exception\ParseException', $e, 'charsets other than UTF-8 are rejected.');
+                $this->assertInstanceOf('Symfony\Component\Yaml\Exception\ParseException', $e, 'charsets other than UTF-8 are rejected.');
             }
         }
     }

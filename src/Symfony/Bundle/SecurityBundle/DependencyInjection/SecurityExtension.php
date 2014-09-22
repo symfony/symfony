@@ -144,7 +144,7 @@ class SecurityExtension extends Extension
             ->addTag('doctrine.event_listener', array(
                 'connection' => $config['connection'],
                 'event'      => 'postGenerateSchema',
-                'lazy'       => true
+                'lazy'       => true,
             ))
         ;
 

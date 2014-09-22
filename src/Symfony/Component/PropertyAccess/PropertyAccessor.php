@@ -56,7 +56,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
         return $propertyValues[count($propertyValues) - 1][self::VALUE];
     }
@@ -72,7 +72,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new UnexpectedTypeException($propertyPath, 'string or Symfony\Component\PropertyAccess\PropertyPathInterface');
         }
 
-        $propertyValues =& $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
+        $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
         $overwrite = true;
 
         // Add the root object to the list
@@ -82,7 +82,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         ));
 
         for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
-            $objectOrArray =& $propertyValues[$i][self::VALUE];
+            $objectOrArray = & $propertyValues[$i][self::VALUE];
 
             if ($overwrite) {
                 if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
@@ -100,7 +100,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 }
             }
 
-            $value =& $objectOrArray;
+            $value = & $objectOrArray;
             $overwrite = !$propertyValues[$i][self::IS_REF];
         }
     }
@@ -154,14 +154,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             if ($isIndex) {
-                $propertyValue =& $this->readIndex($objectOrArray, $property);
+                $propertyValue = & $this->readIndex($objectOrArray, $property);
             } else {
-                $propertyValue =& $this->readProperty($objectOrArray, $property);
+                $propertyValue = & $this->readProperty($objectOrArray, $property);
             }
 
-            $objectOrArray =& $propertyValue[self::VALUE];
+            $objectOrArray = & $propertyValue[self::VALUE];
 
-            $propertyValues[] =& $propertyValue;
+            $propertyValues[] = & $propertyValue;
         }
 
         return $propertyValues;
@@ -186,12 +186,12 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Use an array instead of an object since performance is very crucial here
         $result = array(
             self::VALUE => null,
-            self::IS_REF => false
+            self::IS_REF => false,
         );
 
         if (isset($array[$index])) {
             if (is_array($array)) {
-                $result[self::VALUE] =& $array[$index];
+                $result[self::VALUE] = & $array[$index];
                 $result[self::IS_REF] = true;
             } else {
                 $result[self::VALUE] = $array[$index];
@@ -220,7 +220,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         // very crucial here
         $result = array(
             self::VALUE => null,
-            self::IS_REF => false
+            self::IS_REF => false,
         );
 
         if (!is_object($object)) {
@@ -243,7 +243,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
             $result[self::VALUE] = $object->$property;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
-            $result[self::VALUE] =& $object->$property;
+            $result[self::VALUE] = & $object->$property;
             $result[self::IS_REF] = true;
         } elseif (!$classHasProperty && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
@@ -251,7 +251,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // a *protected* property was found on the class, property_exists()
             // returns true, consequently the following line will result in a
             // fatal error.
-            $result[self::VALUE] =& $object->$property;
+            $result[self::VALUE] = & $object->$property;
             $result[self::IS_REF] = true;
         } elseif ($this->magicCall && $reflClass->hasMethod('__call') && $reflClass->getMethod('__call')->isPublic()) {
             // we call the getter and hope the __call do the job

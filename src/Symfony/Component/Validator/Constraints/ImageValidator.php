@@ -160,6 +160,5 @@ class ImageValidator extends FileValidator
                 '{{ height }}' => $height,
             ));
         }
-
     }
 }

@@ -24,7 +24,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $routes->add('foo', new Route(
             ' /{_locale}',
             array(
-                '_locale' => '%locale%'
+                '_locale' => '%locale%',
             ),
             array(
                 '_locale' => 'en|es',

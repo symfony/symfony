@@ -187,7 +187,7 @@ class DateType extends AbstractType
             return array(
                 'year' => $emptyValue,
                 'month' => $emptyValue,
-                'day' => $emptyValue
+                'day' => $emptyValue,
             );
         };
 

@@ -98,5 +98,4 @@ interface FormDataCollectorInterface extends DataCollectorInterface
      * @return array
      */
     public function getData();
-
 }

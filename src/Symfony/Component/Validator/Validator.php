@@ -54,8 +54,7 @@ class Validator implements ValidatorInterface
         TranslatorInterface $translator,
         $translationDomain = 'validators',
         array $objectInitializers = array()
-    )
-    {
+    ) {
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
         $this->translator = $translator;

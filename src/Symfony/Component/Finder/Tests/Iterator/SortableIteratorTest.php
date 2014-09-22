@@ -59,7 +59,6 @@ class SortableIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
-
         $sortByName = array(
             '.bar',
             '.foo',
@@ -113,7 +112,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             '.git',
-            '.bar'
+            '.bar',
         );
 
         $sortByChangedTime = array(
@@ -127,7 +126,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             'test.php',
-            'test.py'
+            'test.py',
         );
 
         $sortByModifiedTime = array(
@@ -141,7 +140,7 @@ class SortableIteratorTest extends RealIteratorTestCase
             '.foo/.bar',
             '.foo/bar',
             'test.php',
-            'test.py'
+            'test.py',
         );
 
         return array(

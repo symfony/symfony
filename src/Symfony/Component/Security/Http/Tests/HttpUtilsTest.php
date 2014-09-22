@@ -128,7 +128,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
         return array(
             array(SecurityContextInterface::AUTHENTICATION_ERROR),
             array(SecurityContextInterface::ACCESS_DENIED_ERROR),
-            array(SecurityContextInterface::LAST_USERNAME)
+            array(SecurityContextInterface::LAST_USERNAME),
         );
     }
 

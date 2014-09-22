@@ -81,5 +81,4 @@ class DataCollectorListener implements EventSubscriberInterface
             $this->dataCollector->buildPreliminaryFormTree($event->getForm());
         }
     }
-
 }

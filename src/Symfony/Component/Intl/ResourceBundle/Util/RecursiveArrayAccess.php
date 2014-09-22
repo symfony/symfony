@@ -35,7 +35,7 @@ class RecursiveArrayAccess
                     continue;
                 }
             }
-            
+
             throw new OutOfBoundsException(sprintf(
                 'The index %s does not exist.',
                 $index
@@ -45,5 +45,7 @@ class RecursiveArrayAccess
         return $array;
     }
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

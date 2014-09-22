@@ -129,7 +129,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
             $class,
             base64_encode($username),
             $expires,
-            $this->generateCookieHash($class, $username, $expires, $password)
+            $this->generateCookieHash($class, $username, $expires, $password),
         ));
     }
 

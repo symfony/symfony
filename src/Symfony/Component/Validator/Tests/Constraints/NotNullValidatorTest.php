@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotNullValidator;
-use Symfony\Component\Validator\Validation;
 
 class NotNullValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -45,7 +44,7 @@ class NotNullValidatorTest extends AbstractConstraintValidatorTest
     public function testNullIsInvalid()
     {
         $constraint = new NotNull(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(null, $constraint);

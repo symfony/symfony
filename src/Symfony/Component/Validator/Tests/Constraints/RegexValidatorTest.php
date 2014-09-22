@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
-use Symfony\Component\Validator\Validation;
 
 class RegexValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -72,7 +71,7 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+$/',
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -151,7 +150,7 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
         // Dropped because of match=false
         $constraint = new Regex(array(
             'pattern' => '/[a-z]+/',
-            'match' => false
+            'match' => false,
         ));
         $this->assertNull($constraint->getHtmlPattern());
     }

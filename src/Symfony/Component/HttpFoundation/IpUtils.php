@@ -21,7 +21,9 @@ class IpUtils
     /**
      * This class should not be instantiated
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets
@@ -37,7 +39,7 @@ class IpUtils
             $ips = array($ips);
         }
 
-        $method = false !== strpos($requestIp, ':') ? 'checkIp6': 'checkIp4';
+        $method = false !== strpos($requestIp, ':') ? 'checkIp6' : 'checkIp4';
 
         foreach ($ips as $ip) {
             if (self::$method($requestIp, $ip)) {

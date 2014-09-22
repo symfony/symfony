@@ -268,7 +268,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         if ($listener instanceof \Closure) {
             $info += array(
                 'type' => 'Closure',
-                'pretty' => 'closure'
+                'pretty' => 'closure',
             );
         } elseif (is_string($listener)) {
             try {
@@ -346,7 +346,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 // which must be caught.
                 try {
                     $this->stopwatch->openSection($token);
-                } catch (\LogicException $e) {}
+                } catch (\LogicException $e) {
+                }
                 break;
         }
     }
@@ -367,7 +368,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 try {
                     $this->stopwatch->stopSection($token);
-                } catch (\LogicException $e) {}
+                } catch (\LogicException $e) {
+                }
                 break;
         }
 

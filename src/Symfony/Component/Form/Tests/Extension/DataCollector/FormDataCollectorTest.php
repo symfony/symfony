@@ -449,7 +449,6 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->dataCollector->getData();
         $this->assertSame(4, $data['nb_errors']);
-
     }
 
     private function createForm($name)

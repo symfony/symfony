@@ -123,7 +123,7 @@ class ItemQuery
         return array(
             $mainAuthorRelation,
             $authorRelation,
-            $resellerRelation
+            $resellerRelation,
         );
     }
 }

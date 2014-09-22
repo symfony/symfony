@@ -353,13 +353,12 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $constraint = new File(array(
             $message => 'myMessage',
-            'maxSize' => $maxSize
+            'maxSize' => $maxSize,
         ));
 
         $this->validator->validate($file, $constraint);
 
         $this->assertViolation('myMessage', $params);
-
     }
 
     public function uploadedFileErrorProvider()

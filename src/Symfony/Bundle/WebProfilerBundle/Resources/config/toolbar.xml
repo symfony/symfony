@@ -15,8 +15,8 @@
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>
             <argument>%web_profiler.debug_toolbar.mode%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
-            <argument>%web_profiler.debug_toolbar.excluded_ajax_paths%</argument>
             <argument type="service" id="router" on-invalid="ignore" />
+            <argument>%web_profiler.debug_toolbar.excluded_ajax_paths%</argument>
         </service>
     </services>
 </container>

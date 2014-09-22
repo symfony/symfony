@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class AjaxDataCollector extends DataCollector
 {
-
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         // all collecting is done client side
@@ -32,5 +31,4 @@ class AjaxDataCollector extends DataCollector
     {
         return 'ajax';
     }
-
 }

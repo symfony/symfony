@@ -40,7 +40,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $position;
     protected $excludedAjaxPaths;
 
-    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', $excludedAjaxPaths = '^/bundles|^/_wdt', UrlGeneratorInterface $urlGenerator = null)
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt')
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;

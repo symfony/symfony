@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Luhn;
 use Symfony\Component\Validator\Constraints\LuhnValidator;
+use Symfony\Component\Validator\Validation;
 
 class LuhnValidatorTest extends AbstractConstraintValidatorTest
 {

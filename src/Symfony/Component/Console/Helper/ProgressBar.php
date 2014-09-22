@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -42,6 +41,7 @@ class ProgressBar
     private $lastMessagesLength = 0;
     private $formatLineCount;
     private $messages;
+    private $overwrite = true;
 
     private static $formatters;
     private static $formats;
@@ -54,9 +54,18 @@ class ProgressBar
      */
     public function __construct(OutputInterface $output, $max = 0)
     {
-        // Disabling output when it does not support ANSI codes as it would result in a broken display anyway.
-        $this->output = $output->isDecorated() ? $output : new NullOutput();
+        $this->output = $output;
         $this->setMaxSteps($max);
+
+        if (!$this->output->isDecorated()) {
+            // disable overwrite when output does not support ANSI codes.
+            $this->overwrite = false;
+
+            if ($this->max > 10) {
+                // set a reasonable redraw frequency so output isn't flooded
+                $this->setRedrawFrequency($max / 10);
+            }
+        }
 
         $this->setFormat($this->determineBestFormat());
 
@@ -361,6 +370,16 @@ class ProgressBar
     }
 
     /**
+     * Sets whether to overwrite the progressbar, false for new line
+     *
+     * @param bool $overwrite
+     */
+    public function setOverwrite($overwrite)
+    {
+        $this->overwrite = (bool) $overwrite;
+    }
+
+    /**
      * Sets the current progress.
      *
      * @param int     $step The current progress
@@ -394,6 +413,11 @@ class ProgressBar
     {
         if (!$this->max) {
             $this->max = $this->step;
+        }
+
+        if ($this->step === $this->max && !$this->overwrite) {
+            // prevent double 100% output
+            return;
         }
 
         $this->setProgress($this->max);
@@ -438,6 +462,10 @@ class ProgressBar
      */
     public function clear()
     {
+        if (!$this->overwrite) {
+            return;
+        }
+
         $this->overwrite(str_repeat("\n", $this->formatLineCount));
     }
 
@@ -470,8 +498,14 @@ class ProgressBar
             }
         }
 
-        // move back to the beginning of the progress bar before redrawing it
-        $this->output->write("\x0D");
+        if ($this->overwrite) {
+            // move back to the beginning of the progress bar before redrawing it
+            $this->output->write("\x0D");
+        } elseif ($this->step > 0) {
+            // move to new line
+            $this->output->writeln('');
+        }
+
         if ($this->formatLineCount) {
             $this->output->write(sprintf("\033[%dA", $this->formatLineCount));
         }

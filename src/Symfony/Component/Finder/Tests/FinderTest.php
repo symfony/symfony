@@ -569,6 +569,20 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
+    /**
+     * @dataProvider getAdaptersTestData
+     */
+    public function testRegexSpecialCharsLocationWithPathRestrictionContainingStartFlag(Adapter\AdapterInterface $adapter)
+    {
+        $finder = $this->buildFinder($adapter);
+        $finder->in(__DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'r+e.g?e*x[c]a(r)s')
+            ->path('/^dir/');
+
+        $expected = array('r+e.g?e*x[c]a(r)s'.DIRECTORY_SEPARATOR.'dir',
+                          'r+e.g?e*x[c]a(r)s'.DIRECTORY_SEPARATOR.'dir'.DIRECTORY_SEPARATOR.'bar.dat',);
+        $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
+    }
+
     public function testAdaptersOrdering()
     {
         $finder = Finder::create()

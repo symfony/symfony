@@ -60,13 +60,17 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing.', $originFile, $targetFile), 0, null, $originFile);
             }
 
-            stream_copy_to_stream($source, $target);
+            $bytesCopied = stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);
             unset($source, $target);
 
             if (!is_file($targetFile)) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
+            }
+
+            if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {
+                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s %g bytes copied".', $originFile, $targetFile, $bytesCopied), 0, null, $originFile);
             }
         }
     }

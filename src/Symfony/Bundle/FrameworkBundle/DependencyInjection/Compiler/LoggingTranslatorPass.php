@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggableTranslatorPass implements CompilerPassInterface
+class LoggingTranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
@@ -32,7 +32,7 @@ class LoggableTranslatorPass implements CompilerPassInterface
 
             $refClass = new \ReflectionClass($class);
             if ($refClass->implementsInterface('Symfony\Component\Translation\TranslatorInterface') && $refClass->implementsInterface('Symfony\Component\Translation\TranslatorBagInterface')) {
-                $container->getDefinition('translator.loggable')->setDecoratedService('translator');
+                $container->getDefinition('translator.logging')->setDecoratedService('translator');
             }
         }
     }

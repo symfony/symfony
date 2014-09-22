@@ -12,10 +12,10 @@
 namespace Symfony\Component\Translation\Tests;
 
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\LoggableTranslator;
+use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-class LoggableTranslatorTest extends \PHPUnit_Framework_TestCase
+class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -33,7 +33,7 @@ class LoggableTranslatorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $translator = new Translator('ar');
-        $loggableTranslator = new LoggableTranslator($translator, $logger);
+        $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
         $loggableTranslator->trans('bar');
     }
@@ -50,7 +50,7 @@ class LoggableTranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');
-        $loggableTranslator = new LoggableTranslator($translator, $logger);
+        $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
     }
 }

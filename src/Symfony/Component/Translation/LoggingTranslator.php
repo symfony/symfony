@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggableTranslator implements TranslatorInterface
+class LoggingTranslator implements TranslatorInterface
 {
     /**
      * @var TranslatorInterface
@@ -28,6 +28,10 @@ class LoggableTranslator implements TranslatorInterface
      */
     private $logger;
 
+    /**
+     * @param Translator      $translator
+     * @param LoggerInterface $logger
+     */
     public function __construct($translator, LoggerInterface $logger)
     {
         if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {

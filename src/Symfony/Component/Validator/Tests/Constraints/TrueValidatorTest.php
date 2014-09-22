@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\True;
 use Symfony\Component\Validator\Constraints\TrueValidator;
+use Symfony\Component\Validator\Validation;
 
 class TrueValidatorTest extends AbstractConstraintValidatorTest
 {

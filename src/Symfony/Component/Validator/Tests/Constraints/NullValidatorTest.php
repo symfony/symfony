@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Null;
 use Symfony\Component\Validator\Constraints\NullValidator;
+use Symfony\Component\Validator\Validation;
 
 class NullValidatorTest extends AbstractConstraintValidatorTest
 {

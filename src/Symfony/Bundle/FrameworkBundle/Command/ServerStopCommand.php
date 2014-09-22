@@ -56,12 +56,12 @@ EOF
         $lockFile = $this->getLockFile($address);
 
         if (!file_exists($lockFile)) {
-            $output->writeln(sprintf('<error>No web server is listening on %s</error>', $address));
+            $output->writeln(sprintf('<error>No web server is listening on http://%s</error>', $address));
 
             return 1;
         }
 
         unlink($lockFile);
-        $output->writeln(sprintf('<info>Stopped the web server listening on %s</info>', $address));
+        $output->writeln(sprintf('<info>Stopped the web server listening on http://%s</info>', $address));
     }
 }

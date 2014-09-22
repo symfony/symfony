@@ -50,9 +50,9 @@ class ServerStatusCommand extends ServerCommand
         }
 
         if (file_exists($this->getLockFile($address))) {
-            $output->writeln(sprintf('<info>Web server still listening on %s</info>', $address));
+            $output->writeln(sprintf('<info>Web server still listening on http://%s</info>', $address));
         } else {
-            $output->writeln(sprintf('<error>No web server is listening on %s</error>', $address));
+            $output->writeln(sprintf('<error>No web server is listening on http://%s</error>', $address));
         }
     }
 

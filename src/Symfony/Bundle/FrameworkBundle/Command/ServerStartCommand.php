@@ -84,8 +84,10 @@ EOF
             return 1;
         }
 
+        $address = $input->getArgument('address');
+
         if ($pid > 0) {
-            $output->writeln('<info>Server started successfully</info>');
+            $output->writeln(sprintf('<info>Web server listening on http://%s</info>', $address));
 
             return;
         }
@@ -97,7 +99,7 @@ EOF
         }
 
         $process = $this->createServerProcess(
-            $input->getArgument('address'),
+            $address,
             $input->getOption('docroot'),
             $input->getOption('router'),
             $env,
@@ -105,7 +107,7 @@ EOF
         );
         $process->disableOutput();
         $process->start();
-        $lockFile = $this->getLockFile($input->getArgument('address'));
+        $lockFile = $this->getLockFile($address);
         touch($lockFile);
 
         if (!$process->isRunning()) {

@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-03T13:02:25Z
+
+It is not a required dependency actually. the class is used only when the validator is enabled in the FrameworkBundle config, and it is possible to disable it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-03T13:32:37Z
+
+The issue is that you didn't need to explicitly enable validation. Having the ``form`` section enabled, enables validation as well. Before 2.5.4, this didn't fail because no code related to the Validator component was used in the extension class.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-03T13:35:42Z
+
+Well, IMO, the real issue is the fact the enabling the form system enables the validator system silently
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-03T13:39:06Z
+
+Do you have an idea how to solve this then? Not implictly enabling the validation when forms are enabled doesn't seem to be an option. This behaviour is there for quite a long time (afaik since 2011) and people may rely on it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:17:33Z
+
+I think this PR does not hurt and can be merged as is. The framework bundle is really what glues everything together. Most of the time, we get `symfony/symfony` anyway.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-15T18:27:59Z
+
+IIUC, this problem occurs only when someone requires "symfony/framework-bundle" and "symfony/form", **but not** "symfony/validator". Is that correct?
+
+In that case, this seems like a documentation issue to me. I don't think it is necessary to add "symfony/validator" as a hard dependency just to solve that edge case.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-15T18:50:14Z
+
+Yes, that's exactly the issue I ran into. We could maybe also just test whether the symfony/validator package is available when ``form`` is activated and throw an exception if it isn't. What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:52:32Z
+
+@xabbuh Seems like a good alternative.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-15T20:02:25Z
+
+@xabbuh Yes, that sounds much better.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-17T19:10:19Z
+
+The extension class now throws an exception. Is an ``InvalidConfigurationException`` the best choice or is there another exception class that better fits in this context?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-17T19:51:22Z
+
+At some other places, we are using `\LogicException`. I don't have a strong opinion on the exception class.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-17T19:58:52Z
+
+Okay, let's see what the other deciders think about the exception.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T16:03:04Z
+
+@xabbuh Let's use LogicException ;)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-22T16:54:32Z
+
+Changed the exception to ``LogicException``. :)

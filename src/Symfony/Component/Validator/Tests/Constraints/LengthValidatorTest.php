@@ -151,7 +151,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $constraint = new Length(array(
             'min' => 4,
-            'minMessage' => 'myMessage'
+            'minMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -173,7 +173,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $constraint = new Length(array(
             'max' => 4,
-            'maxMessage' => 'myMessage'
+            'maxMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -196,7 +196,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Length(array(
             'min' => 4,
             'max' => 4,
-            'exactMessage' => 'myMessage'
+            'exactMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

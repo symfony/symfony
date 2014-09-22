@@ -55,6 +55,6 @@ class Uuid extends Constraint
         self::V2_DCE,
         self::V3_MD5,
         self::V4_RANDOM,
-        self::V5_SHA1
+        self::V5_SHA1,
     );
 }

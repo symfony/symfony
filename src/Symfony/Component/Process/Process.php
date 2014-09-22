@@ -357,7 +357,7 @@ class Process
         do {
             $this->checkTimeout();
             $running = defined('PHP_WINDOWS_VERSION_BUILD') ? $this->isRunning() : $this->processPipes->areOpen();
-            $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;;
+            $close = !defined('PHP_WINDOWS_VERSION_BUILD') || !$running;
             $this->readPipes(true, $close);
         } while ($running);
 

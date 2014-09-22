@@ -283,7 +283,7 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
         $this->validator = $this->createValidator($this->metadataFactory, array(
             $initializer1,
-            $initializer2
+            $initializer2,
         ));
 
         // prepare constraint which

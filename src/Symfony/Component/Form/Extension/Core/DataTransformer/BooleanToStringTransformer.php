@@ -81,5 +81,4 @@ class BooleanToStringTransformer implements DataTransformerInterface
 
         return true;
     }
-
 }

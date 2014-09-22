@@ -53,7 +53,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
             array('defaultValue', array(array())),
             array('addDefaultChildrenIfNoneSet', array()),
             array('requiresAtLeastOneElement', array()),
-            array('useAttributeAsKey', array('foo'))
+            array('useAttributeAsKey', array('foo')),
         );
     }
 

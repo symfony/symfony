@@ -39,7 +39,9 @@ class ClassUtils
     /**
      * This class should not be instantiated
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      * Gets the real class name of a class name that could be a proxy.

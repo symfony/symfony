@@ -768,7 +768,7 @@ class CompoundFormTest extends AbstractFormTest
         $values = array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
-            'extra' => 'data'
+            'extra' => 'data',
         );
 
         $request = new Request($values, array(), array(), array(), array(), array(

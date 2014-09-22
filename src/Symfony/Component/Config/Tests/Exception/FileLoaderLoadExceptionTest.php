@@ -31,7 +31,7 @@ class FileLoaderLoadExceptionTest extends \PHPUnit_Framework_TestCase
     {
         $exception = new FileLoaderLoadException('@resource', 'sourceResource');
         $this->assertEquals(
-            'Cannot import resource "@resource" from "sourceResource". ' .
+            'Cannot import resource "@resource" from "sourceResource". '.
             'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class.',
             $exception->getMessage()
         );
@@ -74,8 +74,8 @@ class FileLoaderLoadExceptionTest extends \PHPUnit_Framework_TestCase
             new \Exception('There was a previous error with an ending dot.')
         );
         $this->assertEquals(
-            'There was a previous error with an ending dot in @resource ' .
-            '(which is loaded in resource "@resource"). ' .
+            'There was a previous error with an ending dot in @resource '.
+            '(which is loaded in resource "@resource"). '.
             'Make sure the "resource" bundle is correctly registered and loaded in the application kernel class.',
             $exception->getMessage()
         );

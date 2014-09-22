@@ -132,7 +132,7 @@ class JsonDecode implements DecoderInterface
         $defaultOptions = array(
             'json_decode_associative' => $this->associative,
             'json_decode_recursion_depth' => $this->recursionDepth,
-            'json_decode_options' => 0
+            'json_decode_options' => 0,
         );
 
         return array_merge($defaultOptions, $context);

@@ -4,10 +4,10 @@ $container->loadFromExtension('twig', array(
     'form' => array(
         'resources' => array(
             'MyBundle::formDeprecated.html.twig',
-        )
+        ),
      ),
      'form_themes' => array(
-         'MyBundle::form.html.twig'
+         'MyBundle::form.html.twig',
      ),
      'globals' => array(
          'foo' => '@bar',

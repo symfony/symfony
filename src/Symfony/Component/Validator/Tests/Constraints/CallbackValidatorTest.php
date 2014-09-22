@@ -254,7 +254,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     {
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array(
-            array(__CLASS__.'_Class', 'validateCallback')
+            array(__CLASS__.'_Class', 'validateCallback'),
         ));
 
         $this->validator->validate($object, $constraint);

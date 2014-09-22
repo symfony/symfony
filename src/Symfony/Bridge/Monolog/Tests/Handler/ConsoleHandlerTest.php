@@ -70,10 +70,10 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             array(OutputInterface::VERBOSITY_DEBUG, Logger::DEBUG, true),
             array(OutputInterface::VERBOSITY_DEBUG, Logger::EMERGENCY, true),
             array(OutputInterface::VERBOSITY_NORMAL, Logger::NOTICE, true, array(
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE
+                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
             )),
             array(OutputInterface::VERBOSITY_DEBUG, Logger::NOTICE, true, array(
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE
+                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
             )),
         );
     }

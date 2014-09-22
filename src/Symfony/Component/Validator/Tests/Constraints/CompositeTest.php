@@ -29,7 +29,6 @@ class ConcreteComposite extends Composite
     {
         return 'constraints';
     }
-
 }
 
 /**

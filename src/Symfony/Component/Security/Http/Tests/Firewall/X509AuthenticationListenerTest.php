@@ -106,7 +106,7 @@ class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request(array(), array(), array(), array(), array(), array(
             'TheUserKey' => 'TheUser',
-            'TheCredentialsKey' => 'TheCredentials'
+            'TheCredentialsKey' => 'TheCredentials',
         ));
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 

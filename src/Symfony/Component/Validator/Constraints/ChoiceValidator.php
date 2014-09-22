@@ -88,7 +88,7 @@ class ChoiceValidator extends ConstraintValidator
                 } else {
                     // 2.4 API
                     $this->context->addViolation($constraint->minMessage, array(
-                        '{{ limit }}' => $constraint->min
+                        '{{ limit }}' => $constraint->min,
                     ), $value, (int) $constraint->min);
                 }
 
@@ -104,7 +104,7 @@ class ChoiceValidator extends ConstraintValidator
                 } else {
                     // 2.4 API
                     $this->context->addViolation($constraint->maxMessage, array(
-                        '{{ limit }}' => $constraint->max
+                        '{{ limit }}' => $constraint->max,
                     ), $value, (int) $constraint->max);
                 }
 

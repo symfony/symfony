@@ -53,7 +53,7 @@ class ArrayLoader implements LoaderInterface
     private function flatten(array &$messages, array $subnode = null, $path = null)
     {
         if (null === $subnode) {
-            $subnode =& $messages;
+            $subnode = & $messages;
         }
         foreach ($subnode as $key => $value) {
             if (is_array($value)) {

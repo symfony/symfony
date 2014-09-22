@@ -118,7 +118,7 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Type(array(
             'type' => $type,
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

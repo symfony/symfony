@@ -82,7 +82,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
             'url' => $profile->getUrl(),
-            'time' => $profile->getTime()
+            'time' => $profile->getTime(),
         );
 
         $result = $this->getMongo()->update(array('_id' => $profile->getToken()), array_filter($record, function ($v) { return !empty($v); }), array('upsert' => true));

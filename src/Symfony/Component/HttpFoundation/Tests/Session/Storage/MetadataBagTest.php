@@ -70,7 +70,6 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('__metadata', $this->bag->getName());
         $this->bag->setName('foo');
         $this->assertEquals('foo', $this->bag->getName());
-
     }
 
     public function testGetStorageKey()
@@ -110,7 +109,7 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $sessionMetadata = array(
             MetadataBag::CREATED => $created,
             MetadataBag::UPDATED => $created,
-            MetadataBag::LIFETIME => 1000
+            MetadataBag::LIFETIME => 1000,
         );
         $bag->initialize($sessionMetadata);
 
@@ -126,7 +125,7 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
         $sessionMetadata = array(
             MetadataBag::CREATED => $created,
             MetadataBag::UPDATED => $created,
-            MetadataBag::LIFETIME => 1000
+            MetadataBag::LIFETIME => 1000,
         );
         $bag->initialize($sessionMetadata);
 

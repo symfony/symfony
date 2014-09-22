@@ -173,7 +173,7 @@ class UnixPipes extends AbstractPipes
 
         if (null !== $w && 0 < count($w)) {
             while ($len = strlen($this->inputBuffer)) {
-                $written = fwrite($w[0], $this->inputBuffer, 2<<18); // write 512k
+                $written = fwrite($w[0], $this->inputBuffer, 2 << 18); // write 512k
                 if ($written > 0) {
                     $this->inputBuffer = (string) substr($this->inputBuffer, $written);
                 } else {

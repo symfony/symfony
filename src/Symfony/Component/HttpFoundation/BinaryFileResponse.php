@@ -85,7 +85,11 @@ class BinaryFileResponse extends Response
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         if (!$file instanceof File) {
-            $file = new File((string) $file);
+            if ($file instanceof \SplFileInfo) {
+                $file = new File($file->getPathname());
+            } else {
+                $file = new File((string) $file);
+            }
         }
 
         if (!$file->isReadable()) {
@@ -310,5 +314,4 @@ class BinaryFileResponse extends Response
 
         return $this;
     }
-
 }

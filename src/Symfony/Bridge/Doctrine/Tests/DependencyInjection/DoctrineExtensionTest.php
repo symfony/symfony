@@ -74,7 +74,7 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $cacheName      = 'metadata_cache';
         $objectManager  = array(
             'name'                  => 'default',
-            'metadata_cache_driver' => $config
+            'metadata_cache_driver' => $config,
         );
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);
@@ -105,8 +105,8 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
             'name'                  => 'default',
             'metadata_cache_driver' => array(
                 'type' => 'service',
-                'id'   => 'service_driver'
-            )
+                'id'   => 'service_driver',
+            ),
         );
 
         $container->setDefinition('service_driver', $definition);
@@ -127,8 +127,8 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $objectManager  = array(
             'name'                  => 'default',
             'metadata_cache_driver' => array(
-                'type' => 'unrecognized_type'
-            )
+                'type' => 'unrecognized_type',
+            ),
         );
 
         $this->invokeLoadCacheDriver($objectManager, $container, $cacheName);

@@ -13,7 +13,6 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Command;
 
 use Symfony\Bundle\WebProfilerBundle\Command\ImportCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Application;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ImportCommandTest extends \PHPUnit_Framework_TestCase

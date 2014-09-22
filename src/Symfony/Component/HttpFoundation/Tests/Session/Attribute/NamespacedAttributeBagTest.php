@@ -43,7 +43,7 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
             'category' => array(
                 'fishing' => array(
                     'first' => 'cod',
-                    'second' => 'sole')
+                    'second' => 'sole',),
                 ),
         );
         $this->bag = new NamespacedAttributeBag('_sf2', '/');

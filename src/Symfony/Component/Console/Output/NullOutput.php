@@ -74,7 +74,7 @@ class NullOutput implements OutputInterface
     {
         return self::VERBOSITY_QUIET;
     }
-    
+
     public function isQuiet()
     {
         return true;

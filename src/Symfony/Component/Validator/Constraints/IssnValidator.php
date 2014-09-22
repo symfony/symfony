@@ -59,7 +59,8 @@ class IssnValidator extends ConstraintValidator
         $canonical = strtoupper(str_replace('-', '', $value));
 
         // Calculate a checksum. "X" equals 10.
-        $checkSum = 'X' === $canonical{7} ? 10 : $canonical{7};
+        $checkSum = 'X' === $canonical{7}
+        ? 10 : $canonical{7};
 
         for ($i = 0; $i < 7; ++$i) {
             // Multiply the first digit by 8, the second by 7, etc.

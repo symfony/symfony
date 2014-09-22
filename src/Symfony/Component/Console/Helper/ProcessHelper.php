@@ -112,6 +112,7 @@ class ProcessHelper extends Helper
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         $that = $this;
+
         return function ($type, $buffer) use ($output, $process, $callback, $formatter, $that) {
             $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
 

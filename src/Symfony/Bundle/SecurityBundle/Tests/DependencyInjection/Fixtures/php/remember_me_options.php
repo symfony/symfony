@@ -11,7 +11,7 @@ $container->loadFromExtension('security', array(
                 'key' => 'TheyKey',
                 'catch_exceptions' => false,
                 'token_provider' => 'token_provider_id',
-            )
-        )
+            ),
+        ),
     ),
 ));

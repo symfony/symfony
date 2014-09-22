@@ -73,7 +73,7 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->matchHost($pattern);
         $this->assertSame($isMatch, $matcher->matches($request));
 
-        $matcher= new RequestMatcher(null, $pattern);
+        $matcher = new RequestMatcher(null, $pattern);
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 

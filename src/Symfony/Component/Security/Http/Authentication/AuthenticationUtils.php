@@ -54,7 +54,6 @@ class AuthenticationUtils
             if ($clearSession) {
                 $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
             }
-
         }
 
         return $authenticationException;

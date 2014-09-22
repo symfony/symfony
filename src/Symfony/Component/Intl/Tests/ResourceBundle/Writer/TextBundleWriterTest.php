@@ -92,7 +92,7 @@ class TextBundleWriterTest extends \PHPUnit_Framework_TestCase
     public function testWriteNoFallback()
     {
         $data = array(
-            'Entry' => 'Value'
+            'Entry' => 'Value',
         );
 
         $this->writer->write($this->directory, 'en_nofallback', $data, $fallback = false);

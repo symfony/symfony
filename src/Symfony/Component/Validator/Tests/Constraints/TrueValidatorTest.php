@@ -44,7 +44,7 @@ class TrueValidatorTest extends AbstractConstraintValidatorTest
     public function testFalseIsInvalid()
     {
         $constraint = new True(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(false, $constraint);

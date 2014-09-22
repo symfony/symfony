@@ -15,7 +15,6 @@ use Symfony\Component\Validator\Constraints\File;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @param mixed $maxSize
      * @param int   bytes

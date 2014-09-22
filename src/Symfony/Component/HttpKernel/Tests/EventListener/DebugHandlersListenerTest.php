@@ -26,7 +26,7 @@ class DebugHandlersListenerTest extends \PHPUnit_Framework_TestCase
     public function testConfigure()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');
-        $userHandler = function() {};
+        $userHandler = function () {};
         $listener = new DebugHandlersListener($userHandler, $logger);
         $xHandler = new ExceptionHandler();
         $eHandler = new ErrorHandler();

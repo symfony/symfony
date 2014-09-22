@@ -261,7 +261,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCircularReference()
     {
-
         $sc = new ProjectServiceContainer();
         try {
             $sc->get('circular');
@@ -444,8 +443,8 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     public function testEnterScopeNotAdded()
     {
-      $container = new Container();
-      $container->enterScope('foo');
+        $container = new Container();
+        $container->enterScope('foo');
     }
 
     /**

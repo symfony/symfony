@@ -78,7 +78,7 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
     public function testInvalidStrictUuids($uuid)
     {
         $constraint = new Uuid(array(
-            'message' => 'testMessage'
+            'message' => 'testMessage',
         ));
 
         $this->validator->validate($uuid, $constraint);
@@ -110,7 +110,7 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
     public function testVersionConstraintIsValid($uuid)
     {
         $constraint = new Uuid(array(
-            'versions' => array(Uuid::V1_MAC, Uuid::V4_RANDOM)
+            'versions' => array(Uuid::V1_MAC, Uuid::V4_RANDOM),
         ));
 
         $this->validator->validate($uuid, $constraint);
@@ -141,7 +141,7 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
     public function testValidNonStrictUuids($uuid)
     {
         $constraint = new Uuid(array(
-            'strict' => false
+            'strict' => false,
         ));
 
         $this->validator->validate($uuid, $constraint);

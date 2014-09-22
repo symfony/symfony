@@ -331,7 +331,6 @@ class Translator implements TranslatorInterface
      */
     private function initializeCacheCatalogue($locale)
     {
-
         if (isset($this->catalogues[$locale])) {
             return;
         }

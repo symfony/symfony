@@ -73,7 +73,7 @@ class ObjectsProvider
         $builder->setParameter('database_name', 'symfony');
 
         return array(
-            'parameter' =>  $builder
+            'parameter' =>  $builder,
         );
     }
 
@@ -143,7 +143,7 @@ class ObjectsProvider
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
             'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
             'callable_6' => function () { return 'Closure'; },
-            'callable_7' => new CallableClass()
+            'callable_7' => new CallableClass(),
         );
     }
 }

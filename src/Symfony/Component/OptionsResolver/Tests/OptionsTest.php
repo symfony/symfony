@@ -372,7 +372,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             'two' => '2',
             'three' => function (Options $options) {
                 return '2' === $options['two'] ? '3' : 'foo';
-            }
+            },
         ));
 
         $this->assertEquals(array(
@@ -389,7 +389,6 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         $this->options->clear();
 
         $this->assertEmpty($this->options->all());
-
     }
 
     /**

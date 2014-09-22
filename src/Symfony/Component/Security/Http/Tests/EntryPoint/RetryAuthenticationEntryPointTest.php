@@ -39,26 +39,26 @@ class RetryAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
                 80,
                 443,
                 Request::create('http://localhost/foo/bar?baz=bat'),
-                'https://localhost/foo/bar?baz=bat'
+                'https://localhost/foo/bar?baz=bat',
             ),
             array(
                 80,
                 443,
                 Request::create('https://localhost/foo/bar?baz=bat'),
-                'http://localhost/foo/bar?baz=bat'
+                'http://localhost/foo/bar?baz=bat',
             ),
             array(
                 80,
                 123,
                 Request::create('http://localhost/foo/bar?baz=bat'),
-                'https://localhost:123/foo/bar?baz=bat'
+                'https://localhost:123/foo/bar?baz=bat',
             ),
             array(
                 8080,
                 443,
                 Request::create('https://localhost/foo/bar?baz=bat'),
-                'http://localhost:8080/foo/bar?baz=bat'
-            )
+                'http://localhost:8080/foo/bar?baz=bat',
+            ),
         );
     }
 }

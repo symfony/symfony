@@ -77,7 +77,7 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Regex(array(
             'pattern' => '/^[0-9]+$/',
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -156,7 +156,7 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
         // Dropped because of match=false
         $constraint = new Regex(array(
             'pattern' => '/[a-z]+/',
-            'match' => false
+            'match' => false,
         ));
         $this->assertNull($constraint->getHtmlPattern());
     }

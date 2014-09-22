@@ -19,8 +19,8 @@ use Symfony\Component\Intl\ResourceBundle\Transformer\Rule\LocaleBundleTransform
 use Symfony\Component\Intl\ResourceBundle\Transformer\Rule\RegionBundleTransformationRule;
 use Symfony\Component\Intl\ResourceBundle\Transformer\StubbingContext;
 
-require_once __DIR__ . '/common.php';
-require_once __DIR__ . '/autoload.php';
+require_once __DIR__.'/common.php';
+require_once __DIR__.'/autoload.php';
 
 if (1 !== $GLOBALS['argc']) {
     bailout(<<<MESSAGE
@@ -38,7 +38,7 @@ MESSAGE
 }
 
 echo LINE;
-echo centered("ICU Resource Bundle Stub Creation") . "\n";
+echo centered("ICU Resource Bundle Stub Creation")."\n";
 echo LINE;
 
 if (!Intl::isExtensionLoaded()) {
@@ -67,7 +67,7 @@ if ($shortIcuVersionInIntlComponent !== $shortIcuVersionInIcuComponent) {
     bailout("The ICU version of the component ($shortIcuVersionInIcuComponent) does not match the ICU version of the stub classes in the Intl component ($shortIcuVersionInIntlComponent).");
 }
 
-echo wordwrap("Make sure that you don't have any ICU development files " .
+echo wordwrap("Make sure that you don't have any ICU development files ".
     "installed. If the build fails, try to run:\n", LINE_WIDTH);
 
 echo "\n    sudo apt-get remove libicu-dev\n\n";
@@ -78,7 +78,7 @@ echo "Compiling stubs for ICU version $icuVersionInIcuComponent.\n";
 
 echo "Preparing stub creation...\n";
 
-$targetDir = sys_get_temp_dir() . '/icu-stubs';
+$targetDir = sys_get_temp_dir().'/icu-stubs';
 
 $context = new StubbingContext(
     IcuData::getResourceDirectory(),
@@ -99,7 +99,7 @@ $transformer->createStubs($context);
 
 echo "Wrote stubs to $targetDir.\n";
 
-$versionFile = $context->getStubDir() . '/version.txt';
+$versionFile = $context->getStubDir().'/version.txt';
 
 file_put_contents($versionFile, "$icuVersionInIcuComponent\n");
 

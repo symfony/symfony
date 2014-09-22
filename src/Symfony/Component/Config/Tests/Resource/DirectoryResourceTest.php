@@ -42,9 +42,9 @@ class DirectoryResourceTest extends \PHPUnit_Framework_TestCase
                 continue;
             }
             if ($path->isDir()) {
-               rmdir($path->__toString());
+                rmdir($path->__toString());
             } else {
-               unlink($path->__toString());
+                unlink($path->__toString());
             }
         }
         rmdir($directory);

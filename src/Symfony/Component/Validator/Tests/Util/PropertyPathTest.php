@@ -29,7 +29,7 @@ class PropertyPathTest extends \PHPUnit_Framework_TestCase
             array('foo', '', 'foo', 'It returns the basePath if subPath is empty'),
             array('', 'bar', 'bar', 'It returns the subPath if basePath is empty'),
             array('foo', 'bar', 'foo.bar', 'It append the subPath to the basePath'),
-            array('foo', '[bar]', 'foo[bar]', 'It does not include the dot separator if subPath uses the array notation')
+            array('foo', '[bar]', 'foo[bar]', 'It does not include the dot separator if subPath uses the array notation'),
         );
     }
 }

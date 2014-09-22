@@ -150,7 +150,7 @@ abstract class AbstractToken implements TokenInterface
                 is_object($this->user) ? clone $this->user : $this->user,
                 $this->authenticated,
                 $this->roles,
-                $this->attributes
+                $this->attributes,
             )
         );
     }

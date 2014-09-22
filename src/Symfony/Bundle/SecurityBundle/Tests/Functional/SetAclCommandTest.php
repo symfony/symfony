@@ -46,7 +46,7 @@ class SetAclCommandTest extends WebTestCase
         $setAclCommandTester->execute(array(
             'command' => 'acl:set',
             'arguments' => array($grantedPermission1, $grantedPermission2, sprintf('%s:%s', self::OBJECT_CLASS, $objectId)),
-            '--user' => array(sprintf('%s:%s', self::SECURITY_CLASS, $securityUsername1), sprintf('%s:%s', self::SECURITY_CLASS, $securityUsername2))
+            '--user' => array(sprintf('%s:%s', self::SECURITY_CLASS, $securityUsername1), sprintf('%s:%s', self::SECURITY_CLASS, $securityUsername2)),
         ));
 
         $objectIdentity = new ObjectIdentity($objectId, self::OBJECT_CLASS);
@@ -90,7 +90,7 @@ class SetAclCommandTest extends WebTestCase
         $setAclCommandTester->execute(array(
             'command' => 'acl:set',
             'arguments' => array($grantedPermission, sprintf('%s:%s', strtr(self::OBJECT_CLASS, '\\', '/'), $objectId)),
-            '--role' => array($role)
+            '--role' => array($role),
         ));
 
         $objectIdentity = new ObjectIdentity($objectId, self::OBJECT_CLASS);
@@ -133,7 +133,7 @@ class SetAclCommandTest extends WebTestCase
             'command' => 'acl:set',
             'arguments' => array($grantedPermission, sprintf('%s:%s', self::OBJECT_CLASS, $objectId)),
             '--class-scope' => true,
-            '--role' => array($role)
+            '--role' => array($role),
         ));
 
         $objectIdentity1 = new ObjectIdentity($objectId, self::OBJECT_CLASS);

@@ -60,7 +60,7 @@ class RedirectControllerTest extends TestCase
                 'route' => $route,
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
-                'ignoreAttributes' => $ignoreAttributes
+                'ignoreAttributes' => $ignoreAttributes,
             ),
         );
 

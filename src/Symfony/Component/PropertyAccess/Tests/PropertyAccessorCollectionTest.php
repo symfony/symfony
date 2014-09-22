@@ -45,37 +45,57 @@ class PropertyAccessorCollectionTest_Car
 
 class PropertyAccessorCollectionTest_CarOnlyAdder
 {
-    public function addAxis($axis) {}
+    public function addAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarOnlyRemover
 {
-    public function removeAxis($axis) {}
+    public function removeAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarNoAdderAndRemover
 {
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CompositeCar
 {
-    public function getStructure() {}
+    public function getStructure()
+    {
+    }
 
-    public function setStructure($structure) {}
+    public function setStructure($structure)
+    {
+    }
 }
 
 class PropertyAccessorCollectionTest_CarStructure
 {
-    public function addAxis($axis) {}
+    public function addAxis($axis)
+    {
+    }
 
-    public function removeAxis($axis) {}
+    public function removeAxis($axis)
+    {
+    }
 
-    public function getAxes() {}
+    public function getAxes()
+    {
+    }
 }
 
 abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAccessTest

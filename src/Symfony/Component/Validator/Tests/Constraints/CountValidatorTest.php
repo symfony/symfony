@@ -122,7 +122,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Count(array(
             'max' => 4,
-            'maxMessage' => 'myMessage'
+            'maxMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -140,7 +140,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Count(array(
             'min' => 4,
-            'minMessage' => 'myMessage'
+            'minMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);
@@ -159,7 +159,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
         $constraint = new Count(array(
             'min' => 4,
             'max' => 4,
-            'exactMessage' => 'myMessage'
+            'exactMessage' => 'myMessage',
         ));
 
         $this->validator->validate($value, $constraint);

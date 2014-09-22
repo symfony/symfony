@@ -51,7 +51,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
     public function testNullIsInvalid()
     {
         $constraint = new NotBlank(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(null, $constraint);
@@ -64,7 +64,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
     public function testBlankIsInvalid()
     {
         $constraint = new NotBlank(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate('', $constraint);
@@ -77,7 +77,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
     public function testFalseIsInvalid()
     {
         $constraint = new NotBlank(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(false, $constraint);
@@ -90,7 +90,7 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
     public function testEmptyArrayIsInvalid()
     {
         $constraint = new NotBlank(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
         $this->validator->validate(array(), $constraint);

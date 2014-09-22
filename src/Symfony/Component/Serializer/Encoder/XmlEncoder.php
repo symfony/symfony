@@ -99,7 +99,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         // todo: throw an exception if the root node name is not correctly configured (bc)
 
         if ($rootNode->hasChildNodes()) {
-
             $xpath = new \DOMXPath($dom);
             $data = array();
             foreach ($xpath->query('namespace::*', $dom->documentElement) as $nsNode) {

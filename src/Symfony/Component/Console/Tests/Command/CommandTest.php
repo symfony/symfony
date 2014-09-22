@@ -111,7 +111,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(''),
-            array('foo:')
+            array('foo:'),
         );
     }
 

@@ -113,7 +113,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @since Support for bundle alias was added in Symfony 2.6
      */
-    public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false, $configurationPattern = '', $registerAliasMethodName = '', array $aliasMap = array()) {
+    public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false, $configurationPattern = '', $registerAliasMethodName = '', array $aliasMap = array())
+    {
         $this->driver = $driver;
         $this->namespaces = $namespaces;
         $this->managerParameters = $managerParameters;
@@ -226,7 +227,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
         }
 
         throw new ParameterNotFoundException('None of the managerParameters resulted in a valid name');
-
     }
 
     /**

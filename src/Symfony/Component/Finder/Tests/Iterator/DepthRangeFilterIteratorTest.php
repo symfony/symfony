@@ -77,5 +77,4 @@ class DepthRangeFilterIteratorTest extends RealIteratorTestCase
             array(1, 1, $this->toAbsolute($equalTo1)),
         );
     }
-
 }

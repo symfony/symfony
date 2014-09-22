@@ -87,7 +87,7 @@ class TextBundleWriter implements BundleWriterInterface
             $intValues = count($value) === count(array_filter($value, 'is_int'));
 
             $keys = array_keys($value);
-            
+
             // check that the keys are 0-indexed and ascending
             $intKeys = $keys === range(0, count($keys) - 1);
 

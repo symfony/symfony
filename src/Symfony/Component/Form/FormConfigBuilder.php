@@ -44,7 +44,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         'PUT',
         'POST',
         'DELETE',
-        'PATCH'
+        'PATCH',
     );
 
     /**

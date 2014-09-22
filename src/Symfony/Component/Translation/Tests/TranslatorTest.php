@@ -17,7 +17,6 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @dataProvider      getInvalidLocalesTests
      * @expectedException \InvalidArgumentException
@@ -357,12 +356,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $messages = array(
             'symfony2' => array(
                 'is' => array(
-                    'great' => 'Symfony2 est super!'
-                )
+                    'great' => 'Symfony2 est super!',
+                ),
             ),
             'foo' => array(
                 'bar' => array(
-                    'baz' => 'Foo Bar Baz'
+                    'baz' => 'Foo Bar Baz',
                 ),
                 'baz' => 'Foo Baz',
             ),

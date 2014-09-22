@@ -44,7 +44,7 @@ class MergeOperationTest extends AbstractOperationTest
     {
         $this->assertEquals(
             new MessageCatalogue('en', array(
-                'messages' => array('a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c')
+                'messages' => array('a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c'),
             )),
             $this->createOperation(
                 new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b'))),

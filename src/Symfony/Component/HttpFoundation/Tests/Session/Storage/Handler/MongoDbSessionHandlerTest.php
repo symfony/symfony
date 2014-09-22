@@ -108,7 +108,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             'time_field' => 'time',
             'database' => 'sf2-test',
             'collection' => 'session-test',
-            'expiry_field' => 'expiresAt'
+            'expiry_field' => 'expiresAt',
         );
 
         $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
@@ -207,7 +207,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             'time_field' => 'time',
             'database' => 'sf2-test',
             'collection' => 'session-test',
-            'expiry_field' => 'expiresAt'
+            'expiry_field' => 'expiresAt',
         );
 
         $this->storage = new MongoDbSessionHandler($this->mongo, $this->options);
@@ -237,7 +237,6 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     private function createMongoCollectionMock()
     {
-
         $mongoClient = $this->getMockBuilder('MongoClient')
             ->getMock();
         $mongoDb = $this->getMockBuilder('MongoDB')

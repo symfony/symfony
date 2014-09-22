@@ -13,7 +13,6 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 
 abstract class RealIteratorTestCase extends IteratorTestCase
 {
-
     protected static $tmpDir;
     protected static $files;
 
@@ -32,7 +31,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto/',
-            'foo bar'
+            'foo bar',
         );
 
         self::$files = self::toAbsolute(self::$files);
@@ -103,5 +102,4 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
         return $f;
     }
-
 }

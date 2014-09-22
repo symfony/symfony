@@ -77,7 +77,7 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->builder->append('new1[new2]');
 
-        $path = new PropertyPath(self::PREFIX . '.new1[new2]');
+        $path = new PropertyPath(self::PREFIX.'.new1[new2]');
 
         $this->assertEquals($path, $this->builder->getPropertyPath());
     }

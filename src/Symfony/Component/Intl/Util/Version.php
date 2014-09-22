@@ -73,7 +73,7 @@ class Version
     public static function normalize($version, $precision)
     {
         if (null === $precision) {
-           return $version;
+            return $version;
         }
 
         $pattern = '[^\.]+';
@@ -82,7 +82,7 @@ class Version
             $pattern = sprintf('[^\.]+(\.%s)?', $pattern);
         }
 
-        if (!preg_match('/^' . $pattern . '/', $version, $matches)) {
+        if (!preg_match('/^'.$pattern.'/', $version, $matches)) {
             return;
         }
 
@@ -92,5 +92,7 @@ class Version
     /**
      * Must not be instantiated.
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

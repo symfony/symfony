@@ -619,8 +619,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
-     *
-     * @return Response A Response instance
      */
     private function restoreResponseBody(Request $request, Response $response)
     {

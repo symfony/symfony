@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-06T14:41:24Z
+
+Both the ``server:status`` and ``server:stop`` commands have to rely on the fact that the ``server:status`` command terminates the proper process. The usage of ``exec`` is required for this to work as expected. Thus, #11335 or a similar solution needs to be merged first (currently, this change is based on the modifications made for #11335).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-08T18:33:52Z
+
+I modified this a bit. The pull request is no longer based off #11335. Instead the script that is executed by the ``start:start`` command is built manually which was way easier than I had expected.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-15T17:43:33Z
+
+Any thoughts on this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T06:45:39Z
+
+I've not tried it but it looks good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-02T14:07:33Z
+
+@romainneutron should give you some feedback soon...
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-03T08:34:30Z
+
+It would be nice to add correct exitcodes (0 on success, other codes in case of failures)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-03T08:50:06Z
+
+@romainneutron I added 1 where necessary. 0 is the default behaviour. Do you think it makes sense to return 0 explicitly?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-03T08:53:38Z
+
+No need to return 0 in case the command was successful
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-03T08:54:20Z
+
+The lock management could/should use #10475  (but it's not yet merged)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-03T08:54:33Z
+
+You can then have another look.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-03T17:28:40Z
+
+I addressed your other suggestions.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-09T09:20:01Z
+
+Thanks for the feedback.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-09T09:23:59Z
+
+I'm :+1: on this one (once my last comment would be addressed)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-21T18:38:53Z
+
+Any other opinion on this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-21T18:52:15Z
+
+:+1:

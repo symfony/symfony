@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-07T19:08:50Z
+
+Thanks for the tip @stof, PR has been updated
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-09T21:42:58Z
+
+thanks again @stof ! PR has been upadted
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-19T18:33:28Z
+
+Is it ready to be merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T14:34:49Z
+
+ping @romainneutron
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-12T18:11:32Z
+
+Yes it is, ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-21T13:41:16Z
+
+PR updated and comments addressed. Build is still failing because HttpFoundation master in not sync'd anymore with current master (@fabpot alerted)
+
+After fixing this issue, test will pass and this PR should be mergeable
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T14:51:36Z
+
+@romainneutron the HttpFoundation split has been fixed now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T14:54:28Z
+
+@romainneutron Can you trigger another build on Travis?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-22T14:55:20Z
+
+@fabpot I just triggered it :) https://travis-ci.org/symfony/symfony/builds/35861815

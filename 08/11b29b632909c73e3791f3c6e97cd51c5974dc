@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T20:57:44Z
+
+it would be good to add a test using ``clear`` in non-overwrite mode, to ensure it does not do weird stuff
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-04T21:23:32Z
+
+Done, good catch.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-05T21:59:32Z
+
+btw, the windows cmd shell supports the overwriting sequence, while it does not support colors (it requires wrapping it in ConEmu or Ansicon to get color support). would it make sense to tweak a bit the default value of ``overwrite`` for Windows ?
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-08T18:59:30Z
+
+hmm, what would we do if someone used the `--no-ansi` flag on windows then?
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-21T14:26:29Z
+
+Anything preventing this from making it into 2.6?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-21T16:04:33Z
+
+:+1:

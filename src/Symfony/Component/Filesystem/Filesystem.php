@@ -282,9 +282,10 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if (!function_exists('symlink') && $copyOnWindows) {
-            $this->mirror($originDir, $targetDir);
+        $onWindows = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN';
 
+        if ($onWindows && $copyOnWindows) {
+            $this->mirror($originDir, $targetDir);
             return;
         }
 
@@ -307,8 +308,11 @@ class Filesystem
                         throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
-
                 throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
+            }
+
+            if (!file_exists($targetDir)) {
+                throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $targetDir), 0, null, $targetDir);
             }
         }
     }
@@ -388,7 +392,7 @@ class Filesystem
         }
 
         $copyOnWindows = false;
-        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
+        if (isset($options['copy_on_windows'])) {
             $copyOnWindows = $options['copy_on_windows'];
         }
 

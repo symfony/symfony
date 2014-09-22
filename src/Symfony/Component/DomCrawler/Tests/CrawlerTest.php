@@ -801,6 +801,33 @@ HTML;
         }
     }
 
+    public function testFormTextarea()
+    {
+        $html = <<<EOL
+            <html>
+                <script id="comment-form-template" type="text/template">
+                    <form method="post" action="#">
+                        <textarea id="violation_comment_comment" name="violation_comment[comment]" required="required"></textarea>
+                        <button type="submit" name="action" value="comment">Comment</button>
+                    </form>
+                </script>
+            </html>
+EOL;
+
+        $crawler1 = new Crawler(null, 'http://localhost/');
+        $crawler1->addContent($html);
+
+        $expected = <<<EOL
+
+                    <form method="post" action="#">
+                        <textarea id="violation_comment_comment" name="violation_comment[comment]" required="required"></textarea>
+                        <button type="submit" name="action" value="comment">Comment</button>
+                    </form>
+EOL;
+        $this->assertSame($expected, $crawler1->filter('#comment-form-template')->text());
+    }
+
+
     public function testLast()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');

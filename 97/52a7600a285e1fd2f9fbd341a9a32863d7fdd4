@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-06-08T08:57:28Z
+
+Running tests just for this bundle depends on #11077
+
+---------------------------------------------------------------------------
+
+by clemens-tolboom at 2014-06-08T09:01:12Z
+
+I have no clues why both Travis and fabbot.io failed.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-06-08T09:43:12Z
+
+@clemens-tolboom is not your fault on travis-ci, about fabbot.io no idea
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-23T15:14:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T03:01:22Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-08-28T07:07:33Z
+
+I guess due to the different structure anyone relying on the structure probably just created code that would be able to deal with both structures .. at the very least it should be an easy fix to either remove the now no longer needed version or to overwrite this template.
+
+so +1
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-28T08:42:39Z
+
+:+1: however: should we add a note in the CHANGELOG.md or UPGRADE.md files ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T14:32:52Z
+
+I think the changelog is enough (this does not affect the prod environment, only the debug ones)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-28T14:33:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-01T20:35:45Z
+
+@clemens-tolboom Can you add a note in the CHANGELOG file of the bundle?

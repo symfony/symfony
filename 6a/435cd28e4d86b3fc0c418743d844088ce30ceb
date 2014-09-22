@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:58:58Z
+
+@GromNaN What's the status of this PR? Is it ready to be merged?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2014-09-15T21:18:34Z
+
+That's very hard to test and to catch all cases.
+I've rebased the branch, but I'm not sure if it fixes the issue perfectly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-16T05:14:39Z
+
+@GromNaN Thanks for your feedback. As your PR is an improvement over the current situation, I think it's safe to merge it as is. Perfection can be achieved later on... is possible at all.
+
+:+1:

@@ -1,0 +1,433 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T12:05:04Z
+
+We *may* need to move this into a new command or only activate this new "figure out the best option" behavior with a new flag (e.g. ``--auto``) depending on if we need to protect BC. I have a feeling that we *will* need to protect BC, since people have deploy scripts that use this.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-05T12:06:06Z
+
+Actually, yes - Fabien just commented about the BC break. Let's try that ``--auto`` option and keep ``symlink`` on there. Or if someone else has a good suggestion :).
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-07-05T14:14:54Z
+
+Added the --auto option and removed function_exists checks for symlink function.
+Also there is an extra check whether an symlinked path actually exists after creation
+
+---------------------------------------------------------------------------
+
+by Richtermeister at 2014-07-06T20:16:42Z
+
+:+1: awesome! I'm on windows and this will be nice.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-07-06T22:45:19Z
+
+@Richtermeister Would you be able to test this? With and without the permissions setup to allow to create symlinks on windows (see comments on #11297).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-07T10:19:47Z
+
+@pborreli Can you try it on your Windows machine?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-07T10:24:05Z
+
+@fabpot sure I'll test that with multiple env (pure windows, vagrant on windows with and without permissions)
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-07T12:36:26Z
+
+it doesn't work as expected right now :
+
+ * --auto shows the same exception as before
+ * --symlink works silently (but makes an hardcopy without saying anything)
+
+I added a note in the PR which could explain it.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-07T13:06:24Z
+
+Works now like expected for Windows machine, give me some time to test it from a vagrant machine on Windows host.
+
+On Windows without any rights
+--
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+It looks like your system doesn't support symbolic links, so the assets were installed by copying them.
+
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --symlink
+Installing assets as symlinks
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+
+  [Symfony\Component\Filesystem\Exception\IOException]
+  Unable to create symlink due to error code 1314: 'A required privilege is not held by the client'. Do you have the required Administrator-rights?
+
+assets:install [--symlink] [--auto] [--relative] [target]
+
+C:\Users\Pascal\Projects\symfony>php app/console assets:install
+Installing assets as hard copies
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+```
+
+On Windows machine with admin right :
+---
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+The assets were installed using symbolic links.
+
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --symlink
+Installing assets as symlinks
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+
+C:\Users\Pascal\Projects\symfony>php app/console assets:install
+Installing assets as hard copies
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-07-07T13:20:38Z
+
+Btw, does it make sense to think about combination of --auto and --relative as well here or is only absolute links supported on Windows?
+
+(Advantage og relative symlinks is transportability, however it seems to work poorly with archive formats and maybe also other operations, so might be something to avoid to make it clear they need to be regenerated on move.)
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-07T13:57:16Z
+
+@andrerom you are totally right, if symlink is correctly dealt with, relative option should too.
+But :interrobang:, right now, relative option doesn't seem to work even if the combination code should:
+
+Tested on Windows:tm: with Admin rights
+--
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto --relative
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Installing assets for Acme\DemoBundle into web/bundles/acmedemo
+Installing assets for Sensio\Bundle\DistributionBundle into web/bundles/sensiodistribution
+It looks like your system doesn't support symbolic links, so the assets were installed by copying them.
+```
+Removing the try catch block to have the error message:
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto --relativ
+e
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+
+  [Symfony\Component\Filesystem\Exception\IOException]
+  Failed to create symbolic link from "../../vendor/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Resources/public/" to "web/bundles/framework".
+
+assets:install [--symlink] [--auto] [--relative] [target]
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-07-07T14:39:06Z
+
+ok, nice to know.. If it is confirmed/decided to not work, then maybe it should throw early saying the combination is not supported.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-07T14:42:15Z
+
+@andrerom looks like it's possible http://superuser.com/questions/361826/how-do-you-make-a-symbolic-link-with-a-relative-path-using-mklink indicating the path should be relative to user's **working directory** instead of related path, worth the try
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-07-07T15:10:19Z
+
+I will give it a try tomorrow,  can't get to my src atm.  Don't have a windows machine to test BTW.
+
+Pascal Borreli <notifications@github.com>schreef:
+
+>@andreromlookslikeit'spossiblehttp://superuser.com/questions/361826/how-do-you-make-a-symbolic-link-with-a-relative-path-using-mklinkindicatingthepathrelativetouser'sworkingdirectoryinsteadofrelatedpath,worththetryReplytothisemaildirectlyorviewitonGitHub.
+
+---------------------------------------------------------------------------
+
+by Richtermeister at 2014-07-07T16:14:27Z
+
+@andrerom Yes, happy to join the testers.
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-07-08T18:13:47Z
+
+I implemented mklink for windows. I sadly couldn't test it because of my lacking of windows.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-09T02:31:27Z
+
+Looks like mklink implementation doesn't work
+
+On Windows with and without admin right :
+---
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+Invalid switch - "bundles".
+
+  [Symfony\Component\Filesystem\Exception\IOException]
+  Failed to create symbolic link on Windows from "C:\Users\Pascal\Projects\symfony\vendor\symfony\symfony\src\Symfony\Bundle\FrameworkBundle/Resources/public" to "web/bundles/framework" with error(s): "".
+
+assets:install [--symlink] [--auto] [--relative] [target]
+```
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-09T02:36:32Z
+
+slashes have to be escaped on windows exec unless `/bundles` is taken as an option.
+personally I would first make this PR ready to merge without this --relative option then we will see how to implement --auto and --relative together later
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-07-09T05:48:02Z
+
+@pborreli or I could escape the origin/target paths. I don't think it such a big deal to get this working. The only problem I have is I can't test on Windows myself so I'm blindly committing.
+My main question is : Will exec("mklink ..") be accepted as solution, when working? If this is considered bad practice I'll revert to one of my previous commits and throw a warning when a user is trying to use --auto with --relative
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-07-09T07:23:15Z
+
+@fabpot / @weaverryan / @stof exec or not? I would kind of say the same as @pborreli, make it throw for --auto --relative combination for now, try to find a clean solution for it later (and report lack of support for this on symlink functions to PHP core..)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-10T03:10:45Z
+
+My overall hope here with the `--auto` is simply that we *try* symlinking first (if they pass us `relative`, then we try a relative symlink), and if that fails, use hard copy AND tell the user.
+
+If we can get more combinations of symlinking working later, then awesome. But I'd rather get this merged as I've described above and hunt down the relative symlinks afterwards.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-10T03:14:33Z
+
+So to go further, the `--auto --relative` fails, but *does* fallback to the nice message and does a hard copy. The only thing I think we need to check still is whether we get the nice hardcopy fallback on vagrant as well.
+
+Thanks everyone! This is really awesome and has happened so quickly. I wish we had done it years ago :).
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-07-10T07:16:22Z
+
+Reverted it back to the earlier behaviour, but kept the windows check. Without it function symlink will hardcopy whenever $copyOnWindows is set to true, even when not on windows.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-07-10T10:09:44Z
+
+So last testing needed: @pborreli @Richtermeister @Swader  Especially interested in tests on the Vagrant setup @Swader, but you should use pure symfony here as eZ Publish has a few other places that needs adoption after this is in.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-10T13:20:32Z
+
+doesn't work like expected **On Windows without any rights**, all the others cases are ok. (did not test the vagrant setup yet)
+
+```
+C:\Users\Pascal\Projects\symfony>php app/console assets:install --auto
+Trying to install assets as symbolic links.
+Installing assets for Symfony\Bundle\FrameworkBundle into web/bundles/framework
+
+  [Symfony\Component\Filesystem\Exception\IOException]
+  Unable to create symlink due to error code 1314: 'A required privilege is not held by the client'. Do you have the required Administrator-rights?
+
+assets:install [--symlink] [--auto] [--relative] [target]
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-13T22:05:35Z
+
+@pborreli Hmm, this doesn't make sense - so I may need your helping understanding :). The exception is being thrown from `Filesystem::symlink`. But if you look in the new code, this is *only* called from within a try-catch for `IOException`: https://github.com/rvanginneken/symfony/blob/feature/smarter_assets/src/Symfony/Bundle/FrameworkBundle/Command/AssetsInstallCommand.php#L111-L119.
+
+So, it seems the only way for this to be thrown is if, in the `catch`, the `auto` option is `false`.
+
+What do you think? Your report shows that it's not working as intended, but I can't logically see where the bug is. Maybe someone else can see it?
+
+Thanks Pascal!
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-07-13T22:30:22Z
+
+@weaverryan sorry my bad :facepunch: i edited a file to add a throw and didn't removed it.
+works as expected :+1:
+only missing tests are vagrant
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-13T22:35:01Z
+
+@pborreli You rock man! Thanks for the fast response!
+
+Ok, I think we just need someone to test with a Vagrant setup. The expected behavior is for the failure of the symlinks to be detected and to fallback to hard-copy with a message.
+
+Anyone have Vagrant setup from a Windows host that can try this?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Swader at 2014-09-07T17:19:56Z
+
+Oh wow, dropped the ball on this, sorry all :(
+Trying now.
+
+@weaverryan @andrerom I got through the installation without asset and symlink problems. Looks like we're golden. I'll test further and report my findings, but so far so good. I've got some other DX feedback but I'll shoot that over to Ryan directly.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-12T13:07:23Z
+
+@Swader yea, thanks for checking! Was your setup, by chance, a Windows host with Vagrant? That's the last combination that hasn't been tried (but I'm hoping this is what you had).
+
+Thanks for coming back to this - very awesome.
+
+---------------------------------------------------------------------------
+
+by Swader at 2014-09-12T14:07:14Z
+
+Yup, Win 8.1 host, Vagrant guest
+On Sep 12, 2014 3:10 PM, "Ryan Weaver" <notifications@github.com> wrote:
+
+> @Swader <https://github.com/Swader> yea, thanks for checking! Was your
+> setup, by chance, a Windows host with Vagrant? That's the last combination
+> that hasn't been tried (but I'm hoping this is what you had).
+>
+> Thanks for coming back to this - very awesome.
+>
+> —
+> Reply to this email directly or view it on GitHub
+> <https://github.com/symfony/symfony/pull/11312#issuecomment-55399927>.
+>
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-12T14:12:38Z
+
+Brilliant! We've tested with every reasonable setup that I can think of. I think this PR is ready!
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T15:03:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-12T15:26:49Z
+
+IMO we can just change the `--symlink` option to fallback to copying ( = --auto) since it's not considered a bc break. Then we don't need the auto option at all.
+Also it would be helpful to display the error message from the exception when the symlink failed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-12T15:32:30Z
+
+Reading the comments, I don't see the reasoning behind being a bc break. It would mean a deploy script relied on the command to raise an error when the symlink failed. But when it expects that it fails, it would not have used the --symlink option.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-09-12T23:17:12Z
+
+@Swader did you run vagrant as an admin ? or with simple user ?
+
+---------------------------------------------------------------------------
+
+by Swader at 2014-09-13T04:40:42Z
+
+Simple user, non elevated
+On Sep 13, 2014 1:17 AM, "Pascal Borreli" <notifications@github.com> wrote:
+
+> @Swader <https://github.com/Swader> did you run vagrant as an admin ? or
+> with simple user ?
+>
+> —
+> Reply to this email directly or view it on GitHub
+> <https://github.com/symfony/symfony/pull/11312#issuecomment-55472132>.
+>
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-09-13T04:59:52Z
+
+@Swader great then :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-16T07:16:16Z
+
+@Tobion idea looks like a good one. If we can avoid creating an option, it's even better.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-09-16T08:45:38Z
+
+Maybe rather a --no-auto-symlink option to opt out.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-16T09:00:57Z
+
+@andrerom I agree with you but as we need to keep BC, @Tobion looks like the best compromise.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2014-09-16T09:33:58Z
+
+ok
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-16T12:23:46Z
+
+@rvanginneken Can you update the PR so that the nice new behavior happens automatically with the `--symlink` option (and remove the new `auto` option)?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by rvanginneken at 2014-09-16T12:32:13Z
+
+@weaverryan  Yep, I'm still following the thread. I don't have time right now but I'll update it in 1 or 2 days.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-16T12:35:16Z
+
+@rvanginneken Perfect, thanks :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T13:50:00Z
+
+:+1:

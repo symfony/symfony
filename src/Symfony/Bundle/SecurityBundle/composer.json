@@ -21,8 +21,11 @@
         "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
+        "symfony/browser-kit": "~2.3",
+        "symfony/form": "~2.3",
         "symfony/framework-bundle": "~2.2",
         "symfony/twig-bundle": "~2.2",
+        "symfony/process": "~2.0",
         "symfony/validator": "~2.2",
         "symfony/yaml": "~2.0",
         "symfony/expression-language": "~2.4",

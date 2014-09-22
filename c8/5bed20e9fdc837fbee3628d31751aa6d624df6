@@ -1,0 +1,791 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-03-18T00:41:14Z
+
+Actually, `register_shutdown_function` is resistant to fatal error. So the PID check is a bonus for linux user.
+
+But signals don't not trigger it. Same thing for `__destruct`.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-18T02:46:26Z
+
+please add a checkbox for writing the documentation PR
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-18T05:05:53Z
+
+should we add a soft suggest on the process component? Of course redis sounds like a good fit, about the drivers would be good to first get the use case right, so could you please provide an explanation like @webmozart does ? :baby:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-03-18T09:35:36Z
+
+@cordoval The use case is already described in the 2 linked issues.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2014-03-18T10:54:19Z
+
+I think that all drivers will check for pid - isn't it better to have class AbstractLocker which could look like
+```
+abstract class AbstractLocker
+{
+    public function isLocked($name)
+    {
+        $pid=$this->retrievePid($name);
+        // system based check goes here
+    }
+
+    abstract function lock($name) {  }
+
+    abstract function unlock($name) {  }
+
+    abstract function retrievePid($name) {  }
+}
+```
+It should make all drivers more DRY :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-03-18T11:06:55Z
+
+@malarzm Retrieving the PID is only possible when everything is on the same machine. So it does not make sens. More over, I think I will remove this implementation and use `flock`
+
+---------------------------------------------------------------------------
+
+by malarzm at 2014-03-18T11:15:46Z
+
+I thought retrievePid would be less confusing than getPid ;) I meant use of ``$pid = file_get_contents($lockFile);`` for FilesystemLocker in retrievePid function
+
+---------------------------------------------------------------------------
+
+by stof at 2014-03-18T12:37:08Z
+
+@malarzm what @lyrixx meant is that a locking mechanism which supports locking accross several servers (when you have 2 workers for instance) would not be based on checking a PID.
+
+---------------------------------------------------------------------------
+
+by malarzm at 2014-03-18T12:40:36Z
+
+Ah right, sorry, I think I need more sleep
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-18T13:43:26Z
+
+#3586 talks about a doctrine driver so i guess that is a request.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-03-18T17:13:52Z
+
+Actually, I will remove the interface. And so I will not implement doctrine or redis. Distributed lock is really too hard, with too many edge case. So We will keep something very simple, that work only for one server.
+
+( @romainneutron found this gist for windows)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-03-18T19:54:10Z
+
+should we add a soft suggest on the process component?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-03-18T21:48:06Z
+
+@lyrixx keep the interface maybe, to let others provide their own implementations (not in the core)?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-05-28T09:25:44Z
+
+Hello. I have updated the code. All code came from @romainneutron ;)
+
+Now, we support **only** one kind of driver (file-system), So there is no need for an interface. It is done on purpose. Using a lock feature in a network is a nightmare. So we do not want to support it at all.
+
+ping @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-05-28T17:09:55Z
+
+I've some concerns about this implementation:
+- it doesn't fit my use case. I need blocking locks to allow a command waiting the end of a previous one before running. Here, the non blocking mode is hardcoded (and according to the PHP doc, this mode is not supported on Windows)
+- I think it's not the responsibility of this class to kill processes. Let the developer - or the OS - doing that. And what if the killed process is a daemon or something like that? Locks aren't necessary pid files.
+- The interface was a good idea IMO (and I'll probably need "network" locks soon). A memcache lock should not be too hard to implement (even outside of core as already said).
+
+What about
+```php
+interface Lock
+{
+    public function lock($blocking = true);
+    public function unlock();
+    public function isLocked();
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-05-28T17:36:21Z
+
+> it doesn't fit my use case. I need blocking locks to allow a command waiting the end of a previous one before running. Here, the non blocking mode is hardcoded (and according to the PHP doc, this mode is not supported on Windows)
+
+Why not ;)
+
+> I think it's not the responsibility of this class to kill processes. Let the developer - or the OS - doing that. And what if the killed process is a daemon or something like that? Locks aren't necessary pid files.
+
+We kill nothing.
+
+> The interface was a good idea IMO (and I'll probably need "network" locks soon). A memcache lock should not be too hard to implement (even outside of core as already said).
+
+Actually, It's VERY VERY hard to implement. What if your command segfault ? nobody will release the lock... The only almost working implementation implies heart beat... And this is hard to implements. See the "warning" section I added to the `LockHelper` class
+
+Then, If you need a custom lockHelper, just create a new one. There is no need to use an interface for that ;)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-05-28T18:48:37Z
+
+> We kill nothing.
+
+Sorry I was on my phone and I missed the meaning of this code snippet.
+
+> Actually, It's VERY VERY hard to implement.
+
+I agree, but implementations exist anyway (see below).
+
+> What if your command segfault ?
+
+What if a command (or any process) having a filesystem lock segfault? The OS can take minutes to release the lock. The lock can even be set "forever".
+
+IMO this is not the responsibility of a standard lock system in a web framework to handle failures. This can be the responsibility of a monitoring system, or of custom implementations.
+Depending of the use case, heartbeats - like you suggest -, locks that automatically expire after a reasonable time (think memcache), tests to see if the job is still processed regularly or anything else can be used.
+
+Description of a use case for the interface:
+Two commands must never run the same time. I create a superclass, say "NotInTheSameTimeCommand" that use a lock (provided by dependency injection):
+```php
+// Sample code
+// use ...
+
+abstract class NotInTheSameTimeCommand extends ContainerAwareCommand
+{
+   private $locker;
+
+   public function setLock(LockInterface $lock)
+   {
+       $this->lock = $lock;
+   }
+
+   public function run(InputInterface $input, OutputInterface $output)
+   {
+       $lock->lock(); // Blocking mode
+       $code = parent:run($input, $output);
+       $lock->unlock();
+
+       return $code;
+   }
+}
+```
+
+If the commands are on the same machine, it will work fine. But what if a customer wants to run my app on a distributed env (commands run on separates servers)? With an interface I "just" (yes, this is not trivial) inject a "distributed" locker.
+Thanks to the abstraction I can use Memcache, Redis, or anything that fit my use case (a remote webservice?).
+
+But for now, my use case is just the local blocking mode :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-05-29T14:41:55Z
+
+I updated the code to use only `flock`
+
+@dunglas: I understand an interface could fit. But this adds not value here.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-05-29T14:53:50Z
+
+@dunglas I added a `blocking` option.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-05-29T15:08:21Z
+
+:+1:
+Looks like you can tick the checkboxes in your introduction.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-05-29T15:23:46Z
+
+@nicolas-grekas no, I did not open a PR on the doc repo yet ;)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-05-29T18:34:56Z
+
+:+1:
+Good job!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-05-30T10:16:55Z
+
+@lyrixx Added a test for the blocking mode: https://github.com/lyrixx/symfony/pull/5
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-05-30T13:51:44Z
+
+A working snippet to create commands that wait for the previous ones to finish before running:
+
+```php
+<?php
+
+namespace Dunglas\FrameworkBundle\Command;
+
+use Dunglas\FrameworkBundle\Helper\LockHelper;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/**
+ * Uses a lock to allow only one command to run at the same time.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+abstract class LockCommand extends ContainerAwareCommand
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function run(InputInterface $input, OutputInterface $output)
+    {
+        $lock = new LockHelper($this->getContainer()->getParameter('kernel.cache_dir') . '/command.lock');
+        $lock->lock(true);
+
+        try {
+            return parent::run($input, $output);
+        } finally {
+            $lock->unlock();
+        }
+    }
+
+}
+```
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T00:12:38Z
+
+:+1: Please open a doc PR and I think it's alright
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T00:14:31Z
+
+@lyrixx Please rebase
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-17T10:21:11Z
+
+Rebased, doc PR opened.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-06-17T10:23:34Z
+
+update table PR field and also todo checkbox list please
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-17T11:56:47Z
+
+@cordoval fixed.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-24T21:22:49Z
+
+@fabpot This PR is ready for a final review and / or merge
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-24T21:27:16Z
+
+What about registering the helper in the Console\Application helper set?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-24T21:36:18Z
+
+Because you have to give an arg to the constructor ?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-24T21:47:57Z
+
+absolutely, that's fine.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-24T21:48:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-28T11:41:59Z
+
+I don't see what a this lock helper has to do with the console component. It could be used anywhere.
+So IMO it doesn't belong here and could just be a new external bundle. I'm :-1: at the moment.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-28T11:50:07Z
+
+Btw, locking could also be done using databases etc. See #10931 So maybe it could be a new component with different implemenations. But I think it's kinda difficult to make a useable component out of it.
+
+Btw nr. 2, usually locks also block for a given time. This does not seem the case here.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-28T12:26:12Z
+
+What is nr. 2 ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-28T12:37:45Z
+
+number 2
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-28T13:22:34Z
+
+> Btw, locking could also be done using databases etc.
+
+Yes, you can implement lot of way to lock a command, but with this implementation there is no external dependency. It does the job. Therefore there is no other advantage to use a DB / Redis / .. to lock a command when you use a single server. As We said before, Locking when there are multiple servers is too complicated, and need external tools. So we are not going to implement these solutions here.
+
+> I don't see what a this lock helper has to do with the console component. It could be used anywhere. So IMO it doesn't belong here and could just be a new external bundle
+
+Yes, you can find use case for "lock" outside the console component. For instance people used to use lock with DB or redis when it is related to data. Here we are not talking about data. It's just for workflow. But I totally understand that people may want to use this helper to lock data process. And I think it's a bad idea because it's not salable. It works with only one server; So it should not be done like that.
+
+Here, it's just a simple command helper, with known limitation (works with one and only server), only for the console component.
+
+A generic solution for lock is just **impossible**. Please do not block this PR because you want something that is impossible in the core ;)
+
+Then why do you want to create a new bundle ? It will not work with silex. I prefer to keep thing as simple as possible.
+
+Finally, what does "number 2" refer ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-28T14:08:56Z
+
+Number 2 means, it's the second "btw".
+My point is, this lock helper is not tied to the console component and totally unrelated class. Just make a new repository with it. It doesn't have to be a "bundle". Of course it will work with Silex then as well.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-28T14:18:51Z
+
+new repository, like a new component? Having this class in the core it's easier for me, and I guess much more people. ;)
+
+About the blocking timing: It's up to you. You can ask to wait the release of the lock, or not.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-07-05T18:08:17Z
+
+@Tobion Such lock file feature would be very useful, for example in #11311.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-01T13:26:28Z
+
+So, should I move this class to the FS component? I have no thought about that.
+
+But I disagree the move to the Process component. This class is not related to process.
+
+Should it be a new component? `Lock`? It's weird for me to have a component with only one class. But it's already the case for the FS component.
+Anyway, I think it is a bad idea to create a new Lock Component because people will want to implement more locking strategy (redis, memcache, db...). And it's really hard to do it well. So IMHO, we should no promote that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-01T13:38:12Z
+
+I agree with putting this in the fs component. It's coherent with the locking strategy and says in the name that no other locking strategy is expected to be build later, which is safe, because locking with the network in between is way more complex
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-08-01T13:58:46Z
+
+@lyrixx What if someone do a well implementation of dbLock ? It can be realy usefull for project using multiple servers
+
+FileSystem is not the target of your class, it's a dependency used by your implementation.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-01T14:04:40Z
+
+> What if someone do a well implementation of dbLock
+
+After a talk few weeks / month ago with @fabpot , we did not want this kind of code in symfony, because it's too hard to do something very strong. (how to release a lot when PHP die after a fatal error, or after a segfault ?)
+
+> FileSystem is not the target of your class, it's a dependency used by your implementation.
+
+Does that mean you don't want the move to FS component? What do you propose instead?
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-08-01T14:42:16Z
+
+When a process terminate, File System release his exclusives locks, StreamSockets are closed, SGDB rollbacks his pending transactions. I thinks there is a place for extending properly your implementation.
+
+BTW, actualy there is no component who fits with this class. If this feature would be shared with other bundles/component, I think it should have is own component. Does it's worst it ? https://github.com/symfony/symfony/issues/10962#issuecomment-44776371
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-08-07T08:47:44Z
+
+Just came into the situation that I would require such a LOCK component :-/
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-08-07T09:43:39Z
+
+what to you think about a shorthand method with a callable?
+
+```php
+$locker = new LockHelper();
+$locker->mutualAccess(function() {
+  // do whatever you like, LockHelper will do the locking+unlocking
+  // for you before/after this callable is executed
+});
+```
+
+I am not sold on the method name...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-07T09:49:53Z
+
+> what to you think about a shorthand method with a callable?
+
+I'm not sure to like it because:
+* you have to put lot of code inside the closure
+* not easy to read
+* do not respect the fail fast principal
+* you do not know if the code was executed or not (could be fixed, but the code will become ugly)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-07T11:58:55Z
+
+I moved the class to the `Filesystem` Component. And now the `unlock` remove the file from the filesystem.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-07T12:24:03Z
+
+Acutally, I remove the unlink, because it does not work (race condition):
+
+A and B are two process.
+
+1. A lock
+1. A unlock (start)
+1. A unlock => fclock(unlock)
+1. B lock
+1. A unlock => unlink
+
+Now B use a lock file that does not exist on the FS anymore.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-07T12:55:36Z
+
+When working with locks you always have to implement retry-logic because you can never 100% prevent race conditions.
+
+Btw, as far as I see most deciders already expressed their -1 for locking
+stof: https://github.com/symfony/symfony/issues/9357#issuecomment-26788145
+fabpot: https://github.com/symfony/symfony/issues/3586#issuecomment-4471141
+tobion: https://github.com/symfony/symfony/pull/10475#issuecomment-47425294
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-07T12:57:56Z
+
+One more thing. From an API point of view (imagine a LockInterface), you would want to express what thing to lock (e.g. command name), e.g. `function lock($name)` and based on that the file name is determined. Not the other way round.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-14T09:05:30Z
+
+> One more thing. From an API point of view (imagine a LockInterface), you would want to express what thing to lock (e.g. command name), e.g. function lock($name) and based on that the file name is determined. Not the other way round.
+
+1. I had an initial use case: lock command to allow only one instance at the same time
+1. So I create a PR with a command lock helper with an interface.
+1. we talked with @fabpot @nicolas-grekas @romainneutron (offline), and we decided to not add an interface, because only the FS Lock is easy to maintain / implement and is enough robust.
+1. Then some people here said I should not put this Helper into the Command NS, So I put it in the FS NS.
+
+So now, I do not understand what is happening. What do you want?
+
+Then @fabpot could be :+1: with this PR iff there is no interface :) And I did not know for @stof
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-04T20:38:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-08T18:19:55Z
+
+@Tobion You are the only last one against this PR. What should I do to make this PR mergeable?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-09T09:54:11Z
+
+@Tobion ping
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-09T21:02:45Z
+
+How is ensured the lock is released at script end?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-09T21:16:05Z
+
+So if I want to actually write to the locked file, I would need to create another file handle? Because I cannot access to file handle created by the lock handler.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-09T23:31:30Z
+
+@Tobion Worse, the class like that can't be used at all because you need to call flock yourself.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-09T23:36:43Z
+
+For your first question the lock is released at script end by the system because a new process is created, if you use php with FPM it should be the same I think but I'm not sure (it could depends on the OS and the strategy with the locks acquired by sub processes... but in general they should be released at the end of the sub process) and with HHVM I don't know at all.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-10T12:22:18Z
+
+@Tobion what is your use case for writing in the lock file ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-10T13:43:21Z
+
+Well the main point of locking a file is that only one process can write to it.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-10T14:09:52Z
+
+The sue case of the LockHandler is not locking a file (for this, PHP has the methods already in its file API). The use case is locking your command, to forbid running it several times concurrently. and for this, it relies on a file lock internally (you could implement it using a lock stored in Redis rather than on the filesystem but it gets much more complex, especially to ensure they are released on fatal errors, and we voted against adding such behavior in Symfony. There is some dedicated libraries on Packagist if you need to lock between all your servers rather than on a single server)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-10T15:00:25Z
+
+Which PHP methods are there for locking a file apart from flock?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-10T15:01:30Z
+
+None...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-10T15:04:18Z
+
+I forgot to push a commit :s it's done now. I added PHP Doc everywhere.
+
+> How is ensured the lock is released at script end?
+
+I added a test for that `testLockIsReleased`
+
+> So if I want to actually write to the locked file, I would need to create another file handle? Because I cannot access to file handle created by the lock handler.
+
+I guess the comment from @stof is enough.
+
+> @Tobion Worse, the class like that can't be used at all because you need to call flock yourself.
+
+@Nicofuma I did not understand your comment. This class work out of the box. See the test for example, or look at the PR description, I put some example.
+
+> For your first question the lock is released at script end by the system because a new process is created, if you use php with FPM it should be the same I think but I'm not sure (it could depends on the OS and the strategy with the locks acquired by sub processes... but in general they should be released at the end of the sub process) and with HHVM I don't know at all.
+
+I'm not sure to understand you. ` because a new process is created` is wrong. PHP just release the log when the object is destructed.  then you talk about FPM. FPM (or other sapi) has nothing to do here. PHP does it alone.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-10T15:08:58Z
+
+So to sum it up: You want to introduce a Lock Handler in the Filesystem component that must not be used to lock a file? It can only be used to lock something else by means of a file. So this needs to be made clear in the phpdoc.
+
+Again, as I said before, I think for the above usage, the class should not expect a filename as parameter, but a key for what should be locked. Then the class determines the filename based on the key automatically. As a user, I don't care what the filename is that is used for locking.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-10T15:11:15Z
+
+E.g. `new LockHandler('acme:hello')->lock()`. Why would I pass a filename when I cannot actually lock the file for writing?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-10T15:20:59Z
+
+> So to sum it up: You want to introduce a Lock Handler in the Filesystem component that must not be used to lock a file?
+
+Initially, I wanted to add this class as `LockHelper` in the Command component. but [**you**](https://github.com/symfony/symfony/pull/10475#issuecomment-47425294) ask to change the component. So I choose the FS component because it was the closer one.
+
+Then, the `LockHandler` is not for locking a file. It's for locking something (a command, an access to something, ...). But internally, we use a file and `flock` to do the job.
+
+> So this needs to be made clear in the phpdoc.
+
+Sure, can you give me a sentence? thanks
+
+> Again, as I said before, I think for the above usage, the class should not expect a filename as parameter, but a key for what should be locked. Then the class determines the filename based on the key automatically. As a user, I don't care what the filename is that is used for locking.
+
+This is quite hard to dead with. Because where to write this file by default?
+As you may know  `cache` and `logs` are a nightmare for some SF2 fullstack users.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-10T16:18:26Z
+
+> This is quite hard to dead with. Because where to write this file by default?
+
+You configure a directory optionally (if not given just uses sys temp dir). But the filename is automatically determiend, e.g. hash, based on the key.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-10T17:19:45Z
+
+So what whould be the api:
+
+```php
+    public function __construct($name, $folder = null)
+    {
+        $folder = $folder ?: sys_get_temp_dir();
+
+        // remove "weird" characters ..
+        $name = sanitize($name);
+
+        $file = sprintf('%s/%s', $folder, $name);
+    }
+```
+?
+
+I like it. I will implement that asap.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-10T17:38:43Z
+
+@Tobion done.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-10T17:41:07Z
+
+It's not better to use a hash instead of removing all non ascii characters?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-10T21:33:23Z
+
+> It's not better to use a hash instead of removing all non ascii characters?
+
+I will use a mix between ascii + hash, because I think it's always better to be able to find the generated files.
+
+> Is it possible to use a subdirectory of / tmp to avoid collision with existing files?
+
+As there is the name + an hash, it should not conflict. See test file.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-10T21:44:06Z
+
+> I will use a mix between ascii + hash, because I think it's always better to be able to find the generated files.
+
+You're right, it's nice like that.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-11T10:01:45Z
+
+I addressed all comments. I think this PR is ready for merge.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-11T16:49:25Z
+
+@Tobion So, what is missing to get your go?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-11T20:46:53Z
+
+A test for locking on the same handler twice should be added, like
+
+```
+$l = new LockHandler($name);
+$this->assertTrue($l->lock(true));
+$this->assertTrue($l->lock(true));
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-11T20:51:42Z
+
+I'm :+1: when obove things are fixed
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-11T21:18:54Z
+
+@Tobion Thanks for the review. I hope it's ok now ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-22T08:47:27Z
+
+Travis and fabbot are of. shippable no and I don't know why. ping @fabpot.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T08:52:11Z
+
+forget about shippable, it was just a test
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-22T09:24:19Z
+
+So it's ready for merge
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T10:14:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-09-22T11:34:18Z
+
+Just curious what you folks think about getting rid of the file locks and using port bindings, like it's described [here](https://josephscott.org/archives/2011/09/solo/)?

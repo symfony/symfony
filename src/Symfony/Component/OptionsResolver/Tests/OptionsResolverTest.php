@@ -111,8 +111,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             },
         ));
 
-        $options = array(,
-        );
+        $options = array();
 
         $this->assertEquals(array(
             'two' => '2',

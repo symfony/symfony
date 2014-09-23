@@ -24,6 +24,8 @@
 
         <parameter key="security.authentication.listener.x509.class">Symfony\Component\Security\Http\Firewall\X509AuthenticationListener</parameter>
 
+        <parameter key="security.authentication.listener.remote_user.class">Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener</parameter>
+
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener</parameter>
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
@@ -169,6 +171,16 @@
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- x509 user -->
             <argument /> <!-- x509 credentials -->
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null"/>
+        </service>
+
+        <service id="security.authentication.listener.remote_user" class="%security.authentication.listener.remote_user.class%" public="false" abstract="true">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="security.context" />
+            <argument type="service" id="security.authentication.manager" />
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- REMOTE_USER server env var -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>

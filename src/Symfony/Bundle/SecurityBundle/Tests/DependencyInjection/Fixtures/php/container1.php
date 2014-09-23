@@ -69,6 +69,7 @@ $container->loadFromExtension('security', array(
             'anonymous' => true,
             'switch_user' => true,
             'x509' => true,
+            'remote_user' => true,
             'logout' => true,
             'remember_me' => array('key' => 'TheKey'),
         ),

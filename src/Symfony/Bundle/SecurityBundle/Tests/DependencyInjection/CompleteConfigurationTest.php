@@ -78,6 +78,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.channel_listener',
                 'security.logout_listener.secure',
                 'security.authentication.listener.x509.secure',
+                'security.authentication.listener.remote_user.secure',
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
                 'security.authentication.listener.digest.secure',

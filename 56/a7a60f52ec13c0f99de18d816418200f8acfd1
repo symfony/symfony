@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by skafandri at 2014-09-23T05:41:53Z
+
+#fabpot why not? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T06:00:15Z
+
+:+1: for master
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-23T08:15:56Z
+
+You have to change the expected exception message in the test [here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Tests/Command/CommandTest.php#L44) too.
+
+---------------------------------------------------------------------------
+
+by skafandri at 2014-09-23T08:40:18Z
+
+Thanks for spotting it. I changed the expected exception message.

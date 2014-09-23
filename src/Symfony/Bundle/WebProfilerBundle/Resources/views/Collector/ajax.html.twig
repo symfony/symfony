@@ -1,0 +1,29 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <span>
+            <img width="13" height="28" alt="AJAX requests" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gUIEiMpCg3ocwAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAABAElEQVRIx+3WMQ6CMBQG4L+EMHEIuAOTiZvxEl1g4AAubsa4ungAhnbhFmwmTtwBDsHE8pxIAGkh0BCjdKNJ8/H6Cn8ZEWHNYWHlsTpoD03W9ZPuuxMy19Uu9mIByX3WPBdpSDdcO3PGKhzCoqREmUQI04KMgiqsGTrUMo2NofYUpKoOeLzO2DtOpzcqrINCUPsFZ/cwDQMtpqrUngtymTOuONWqHfmPD38DN3ADvyiA0zCgpGwFbit8XTfD5ZgBAAFA5cXIJWeLKuQyZyL2JsXTXOzj5+1zyQTUkaPNwpHriLKHPpeDlU4N3lmHpo+awrR52Gxv/xa2BAMA9vM37zcnf5IxgZnMRAAAAABJRU5ErkJggg==">
+            <span class="sf-toolbar-ajax-requests">0</span>
+        </span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <p><b>AJAX requests</b> <span class="sf-toolbar-ajax-info"></span></p>
+            <div>
+                <table class="sf-toolbar-ajax-requests">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>URL</th>
+                            <th>Time</th>
+                            <th>Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sf-toolbar-ajax-request-list"></tbody>
+                </table>
+            </div>
+        </div>
+    {% endset %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': false } %}
+{% endblock %}

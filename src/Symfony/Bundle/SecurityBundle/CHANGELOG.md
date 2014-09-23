@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * Added the possibility to override the default success/failure handler
+   to get the provider key and the options injected
+
 2.4.0
 -----
 

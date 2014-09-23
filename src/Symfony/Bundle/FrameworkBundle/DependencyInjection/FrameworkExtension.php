@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
@@ -108,6 +109,10 @@ class FrameworkExtension extends Extension
             $this->formConfigEnabled = true;
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
+
+            if (!class_exists('Symfony\Component\Validator\Validator')) {
+                throw new LogicException('The Validator component is required to use the Form component.');
+            }
 
             if ($this->isConfigEnabled($container, $config['form']['csrf_protection'])) {
                 $config['csrf_protection']['enabled'] = true;

@@ -150,6 +150,7 @@ class XliffFileLoader implements LoaderInterface
 
         $dom->normalizeDocument();
 
+        libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);
 
         return array(simplexml_import_dom($dom), strtoupper($dom->encoding));
@@ -158,7 +159,7 @@ class XliffFileLoader implements LoaderInterface
     /**
      * Returns the XML errors of the internal XML parser
      *
-     * @param bool    $internalErrors
+     * @param bool $internalErrors
      *
      * @return array An array of errors
      */

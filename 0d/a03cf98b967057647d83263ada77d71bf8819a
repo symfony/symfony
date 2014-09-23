@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by hason at 2013-07-19T13:17:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pilotci at 2013-12-04T06:07:50Z
+
+I think this is related to this https://github.com/symfony/symfony/issues/7123 :baby:
+
+---------------------------------------------------------------------------
+
+by pilotci at 2013-12-04T06:14:35Z
+
+@csanquer could you please add this ticket number to the table on the description if it fixes it too? :baby: thanks, ~ cordoval
+
+---------------------------------------------------------------------------
+
+by csanquer at 2013-12-04T07:13:52Z
+
+done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-29T15:36:52Z
+
+@bschussek Can you have a look at this one?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-03-27T09:07:00Z
+
+@fabpot, seems like you've confused @webmozart's nickname :)
++1 here, we need a way to disable HTML5 widgets somehow.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-03-27T09:08:53Z
+
+well, three months ago his nickname was @bschussek :)
+
+---------------------------------------------------------------------------
+
+by csanquer at 2014-07-15T13:47:07Z
+
+@fabpot I rebased the PR on master.
+
+I know this PR is quite old but still useful, because the HTML5 date input lacks of real support even in latest browser version and jquery plugin like [bootstrap-datetimepicker](https://github.com/Eonasdan/bootstrap-datetimepicker)  need an input text.
+
+Is there anything wrong that prevent merging I can fix ?
+
+---------------------------------------------------------------------------
+
+by csanquer at 2014-07-16T08:04:46Z
+
+I fixed the test for initializing the data transformer and i rebased with squashing over master.
+
+It is ready for merge.
+
+---------------------------------------------------------------------------
+
+by csanquer at 2014-07-24T09:12:39Z
+
+@fabpot @stof  I rebased on latest master.
+On travis the unit tests failed only on some PHP version and for components other than Form which is the only component modified by this PR.
+
+Can you merge this PR however ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-14T02:45:00Z
+
+:+1:

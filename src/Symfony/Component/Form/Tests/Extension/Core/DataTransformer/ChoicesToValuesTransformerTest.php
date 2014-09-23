@@ -19,15 +19,19 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected $transformer;
 
+    protected $transformer2;
+
     protected function setUp()
     {
         $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B', 2 => 'C'));
-        $this->transformer = new ChoicesToValuesTransformer($list);
+        $this->transformer = new ChoicesToValuesTransformer($list, false);
+        $this->transformer2 = new ChoicesToValuesTransformer($list, true);
     }
 
     protected function tearDown()
     {
         $this->transformer = null;
+        $this->transformer2 = null;
     }
 
     public function testTransform()
@@ -72,5 +76,14 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformExpectsArray()
     {
         $this->transformer->reverseTransform('foobar');
+    }
+
+    public function testIgnoreInvalidChoicesTransform()
+    {
+        // Value strategy in SimpleChoiceList is to copy and convert to string
+        $in = array(2, 3, 4, 5);
+        $out = array('2');
+
+        $this->assertSame($out, $this->transformer2->transform($in));
     }
 }

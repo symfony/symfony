@@ -70,14 +70,14 @@ class ChoiceType extends AbstractType
 
             if ($options['multiple']) {
                 $builder->addViewTransformer(new ChoicesToBooleanArrayTransformer($options['choice_list']));
-                $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list']), 10);
+                $builder->addEventSubscriber(new FixCheckboxInputListener($options['choice_list'], $options['ignore_invalid_choices']), 10);
             } else {
                 $builder->addViewTransformer(new ChoiceToBooleanArrayTransformer($options['choice_list'], $builder->has('placeholder')));
                 $builder->addEventSubscriber(new FixRadioInputListener($options['choice_list'], $builder->has('placeholder')), 10);
             }
         } else {
             if ($options['multiple']) {
-                $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list']));
+                $builder->addViewTransformer(new ChoicesToValuesTransformer($options['choice_list'], $options['ignore_invalid_choices']));
             } else {
                 $builder->addViewTransformer(new ChoiceToValueTransformer($options['choice_list']));
             }
@@ -208,19 +208,20 @@ class ChoiceType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'multiple'          => false,
-            'expanded'          => false,
-            'choice_list'       => $choiceList,
-            'choices'           => array(),
-            'preferred_choices' => array(),
-            'empty_data'        => $emptyData,
-            'empty_value'       => $emptyValue,
-            'error_bubbling'    => false,
-            'compound'          => $compound,
+            'multiple'               => false,
+            'expanded'               => false,
+            'choice_list'            => $choiceList,
+            'choices'                => array(),
+            'preferred_choices'      => array(),
+            'ignore_invalid_choices' => false,
+            'empty_data'             => $emptyData,
+            'empty_value'            => $emptyValue,
+            'error_bubbling'         => false,
+            'compound'               => $compound,
             // The view data is always a string, even if the "data" option
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
-            'data_class'        => null,
+            'data_class'             => null,
         ));
 
         $resolver->setNormalizers(array(

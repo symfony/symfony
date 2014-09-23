@@ -81,6 +81,14 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     }
 
     /**
+     * @param ExpressionLanguage $expressionLanguage
+     */
+    public function setExpressionLanguage(ExpressionLanguage $expressionLanguage = null)
+    {
+        $this->expressionLanguage = $expressionLanguage;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function match($pathinfo)

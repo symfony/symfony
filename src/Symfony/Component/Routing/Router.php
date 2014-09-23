@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
@@ -69,6 +70,11 @@ class Router implements RouterInterface, RequestMatcherInterface
      * @var LoggerInterface|null
      */
     protected $logger;
+
+    /**
+     * @var ExpressionLanguage|null
+     */
+    private $expressionLanguage;
 
     /**
      * Constructor.
@@ -148,6 +154,14 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         $this->options[$key] = $value;
+    }
+
+    /**
+     * @param ExpressionLanguage $expressionLanguage
+     */
+    public function setExpressionLanguage(ExpressionLanguage $expressionLanguage = null)
+    {
+        $this->expressionLanguage = $expressionLanguage;
     }
 
     /**
@@ -245,13 +259,21 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            if (method_exists($this->matcher, 'setExpressionLanguage')) {
+                $this->matcher->setExpressionLanguage($this->expressionLanguage);
+            }
+
+            return $this->matcher;
         }
 
         $class = $this->options['matcher_cache_class'];
         $cache = new ConfigCache($this->options['cache_dir'].'/'.$class.'.php', $this->options['debug']);
         if (!$cache->isFresh()) {
             $dumper = $this->getMatcherDumperInstance();
+            if (method_exists($dumper, 'setExpressionLanguage')) {
+                $dumper->setExpressionLanguage($this->expressionLanguage);
+            }
 
             $options = array(
                 'class'      => $class,
@@ -263,7 +285,12 @@ class Router implements RouterInterface, RequestMatcherInterface
 
         require_once $cache;
 
-        return $this->matcher = new $class($this->context);
+        $this->matcher = new $class($this->context);
+        if (method_exists($this->matcher, 'setExpressionLanguage')) {
+            $this->matcher->setExpressionLanguage($this->expressionLanguage);
+        }
+
+        return $this->matcher;
     }
 
     /**

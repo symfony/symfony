@@ -11,6 +11,18 @@
 
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
+// check if symfony/intl-data is installed
+if (!class_exists('Symfony\IntlData\IntlData')) {
+    // fallback to our English only stub data
+    class_alias('Symfony\Component\Intl\Icu\IcuData', 'Symfony\IntlData\IntlData');
+}
+
+// create aliases for BC
+class_alias('Symfony\Component\Intl\Icu\IcuCurrencyBundle', 'Symfony\Component\Icu\IcuCurrencyBundle');
+class_alias('Symfony\Component\Intl\Icu\IcuLanguageBundle', 'Symfony\Component\Icu\IcuLanguageBundle');
+class_alias('Symfony\Component\Intl\Icu\IcuLocaleBundle', 'Symfony\Component\Icu\IcuLocaleBundle');
+class_alias('Symfony\Component\Intl\Icu\IcuRegionBundle', 'Symfony\Component\Icu\IcuRegionBundle');
+
 if (!function_exists('intl_is_failure')) {
     /**
      * Stub implementation for the {@link intl_is_failure()} function of the intl

@@ -1,9 +1,6 @@
 imports:
     - { resource: ./../config/default.yml }
 
-services:
-    localized_form_failure_handler: { class: stdClass }
-
 security:
     encoders:
         Symfony\Component\Security\Core\User\User: plaintext

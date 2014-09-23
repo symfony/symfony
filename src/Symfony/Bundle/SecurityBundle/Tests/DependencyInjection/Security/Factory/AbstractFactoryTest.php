@@ -13,7 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Facto
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,8 +35,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $definition = $container->getDefinition('abstract_listener.foo');
         $this->assertEquals(array(
             'index_4' => 'foo',
-            'index_5' => new Reference('custom_success_handler'),
-            'index_6' => new Reference('custom_failure_handler'),
+            'index_5' => new Reference('security.authentication.success_handler.foo.abstract_factory'),
+            'index_6' => new Reference('security.authentication.failure_handler.foo.abstract_factory'),
             'index_7' => array(
                 'use_forward' => true,
             ),
@@ -50,7 +49,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getFailureHandlers
      */
-    public function testDefaultFailureHandler($handlerId, $serviceId, $defaultHandlerInjection)
+    public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection)
     {
         $options = array(
             'remember_me' => true,
@@ -65,7 +64,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference($handlerId), $arguments['index_6']);
+        $this->assertEquals(new Reference('security.authentication.failure_handler.foo.abstract_factory'), $arguments['index_6']);
         $failureHandler = $container->findDefinition((string) $arguments['index_6']);
 
         $methodCalls = $failureHandler->getMethodCalls();
@@ -80,16 +79,15 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
     public function getFailureHandlers()
     {
         return array(
-            array('security.authentication.failure_handler.foo.abstract_factory', null, true),
-            array('custom_failure_handler_default', 'custom_failure_handler_default', true),
-            array('custom_failure_handler', 'custom_failure_handler', false),
+            array(null, true),
+            array('custom_failure_handler', false),
         );
     }
 
     /**
      * @dataProvider getSuccessHandlers
      */
-    public function testDefaultSuccessHandler($handlerId, $serviceId, $defaultHandlerInjection)
+    public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection)
     {
         $options = array(
             'remember_me' => true,
@@ -104,7 +102,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('abstract_listener.foo');
         $arguments = $definition->getArguments();
-        $this->assertEquals(new Reference($handlerId), $arguments['index_5']);
+        $this->assertEquals(new Reference('security.authentication.success_handler.foo.abstract_factory'), $arguments['index_5']);
         $successHandler = $container->findDefinition((string) $arguments['index_5']);
         $methodCalls = $successHandler->getMethodCalls();
 
@@ -121,9 +119,8 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
     public function getSuccessHandlers()
     {
         return array(
-            array('security.authentication.success_handler.foo.abstract_factory', null, true),
-            array('custom_success_handler_default', 'custom_success_handler_default', true),
-            array('custom_success_handler', 'custom_success_handler', false),
+            array(null, true),
+            array('custom_success_handler', false),
         );
     }
 
@@ -151,8 +148,6 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $container->register('auth_provider');
         $container->register('custom_success_handler');
         $container->register('custom_failure_handler');
-        $container->setDefinition('custom_success_handler_default', new DefinitionDecorator('security.authentication.success_handler'));
-        $container->setDefinition('custom_failure_handler_default', new DefinitionDecorator('security.authentication.failure_handler'));
 
         list($authProviderId, $listenerId, $entryPointId) = $factory->create($container, $id, $config, $userProviderId, $defaultEntryPointId);
 

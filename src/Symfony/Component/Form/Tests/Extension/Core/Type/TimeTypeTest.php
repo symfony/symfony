@@ -523,7 +523,7 @@ class TimeTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('time', null, array(
             'widget' => 'single_text',
-            'allow_html5' => false,
+            'html5' => false,
         ));
 
         $view = $form->createView();

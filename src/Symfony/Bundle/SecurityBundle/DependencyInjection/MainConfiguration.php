@@ -79,8 +79,29 @@ class MainConfiguration implements ConfigurationInterface
         $this->addFirewallsSection($rootNode, $this->factories);
         $this->addAccessControlSection($rootNode);
         $this->addRoleHierarchySection($rootNode);
+        $this->addSessionRegistrySection($rootNode);
 
         return $tb;
+    }
+
+    private function addSessionRegistrySection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('session_registry')
+                    ->children()
+                        ->scalarNode('connection')->end()
+                        ->arrayNode('tables')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('session_information')->defaultValue('cs_session_information')->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('session_registry_storage')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addAclSection(ArrayNodeDefinition $rootNode)
@@ -286,6 +307,13 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
+                ->end()
+            ->end()
+            ->arrayNode('session_concurrency')
+                ->canBeUnset()
+                ->children()
+                    ->scalarNode('max_sessions')->defaultNull()->end()
+                    ->scalarNode('expiration_url')->defaultValue('/')->end()
                 ->end()
             ->end()
         ;

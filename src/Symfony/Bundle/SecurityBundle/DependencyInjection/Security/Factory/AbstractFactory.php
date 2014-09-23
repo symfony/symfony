@@ -47,13 +47,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'failure_path_parameter' => '_failure_path',
     );
 
-    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
+    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId, $sessionStrategy)
     {
         // authentication provider
         $authProviderId = $this->createAuthProvider($container, $id, $config, $userProviderId);
 
         // authentication listener
-        $listenerId = $this->createListener($container, $id, $config, $userProviderId);
+        $listenerId = $this->createListener($container, $id, $config, $userProviderId, $sessionStrategy);
 
         // add remember-me aware tag if requested
         if ($this->isRememberMeAware($config)) {
@@ -153,10 +153,11 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return $config['remember_me'];
     }
 
-    protected function createListener($container, $id, $config, $userProvider)
+    protected function createListener($container, $id, $config, $userProvider, $sessionStrategy)
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
+        $listener->replaceArgument(2, $sessionStrategy);
         $listener->replaceArgument(4, $id);
         $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(6, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));

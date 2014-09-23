@@ -71,6 +71,10 @@ class SecurityExtension extends Extension
             $container->removeDefinition('security.access.expression_voter');
         }
 
+        if (isset($config['session_registry'])) {
+            $this->sessionRegistryLoad($config['session_registry'], $container, $loader);
+        }
+
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
@@ -157,6 +161,30 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+    }
+
+    private function sessionRegistryLoad($config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_session_registry.xml');
+
+        if (isset($config['session_registry_storage'])) {
+            $container->setAlias('security.authentication.session_registry_storage', $config['session_registry_storage']);
+
+            return;
+        }
+
+        $this->configureDbalSessionRegistryStorage($config, $container, $loader);
+    }
+
+    private function configureDbalSessionRegistryStorage($config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_session_registry_dbal.xml');
+
+        if (isset($config['connection'])) {
+            $container->setAlias('security.session_registry.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        }
+
+        $container->setParameter('security.session_registry.dbal.session_information_table_name', $config['tables']['session_information']);
     }
 
     /**
@@ -364,6 +392,11 @@ class SecurityExtension extends Extension
         // Access listener
         $listeners[] = new Reference('security.access_listener');
 
+        // Concurrent session listener
+        if (isset($firewall['session_concurrency'])) {
+            $listeners[] = new Reference($this->createConcurrentSessionListener($container, $id, $firewall['session_concurrency']));
+        }
+
         // Determine default entry point
         if (isset($firewall['entry_point'])) {
             $defaultEntryPoint = $firewall['entry_point'];
@@ -394,6 +427,16 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
+        if (isset($firewall['session_concurrency']['max_sessions'])) {
+            $sessionStrategyId = 'security.authentication.concurrent_session_strategy.'.$id;
+            $container->setDefinition($sessionStrategyId, new DefinitionDecorator('security.authentication.concurrent_session_strategy'))
+                ->replaceArgument(1, $firewall['session_concurrency']['max_sessions']);
+
+            $sessionStrategy = new Reference($sessionStrategyId);
+        } else {
+            $sessionStrategy = $container->get('security.authentication.session_strategy');
+        }
+
         foreach ($this->listenerPositions as $position) {
             foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
@@ -401,7 +444,7 @@ class SecurityExtension extends Extension
                 if (isset($firewall[$key])) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
+                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint, $sessionStrategy);
 
                     $listeners[] = new Reference($listenerId);
                     $authenticationProviders[] = $provider;
@@ -625,6 +668,16 @@ class SecurityExtension extends Extension
         ;
 
         return $this->expressions[$id] = new Reference($id);
+    }
+
+    private function createConcurrentSessionListener($container, $id, $config)
+    {
+        $concurrentSessionListenerId = 'security.authentication.concurrentsession_listener.'.$id;
+        $listener = $container->setDefinition($concurrentSessionListenerId, new DefinitionDecorator('security.authentication.concurrentsession_listener'));
+        $listener->replaceArgument(3, $config['expiration_url']);
+        $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+
+        return $concurrentSessionListenerId;
     }
 
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())

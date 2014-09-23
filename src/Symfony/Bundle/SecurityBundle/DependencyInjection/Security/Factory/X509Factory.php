@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class X509Factory implements SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint, $sessionStrategy)
     {
         $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
         $container

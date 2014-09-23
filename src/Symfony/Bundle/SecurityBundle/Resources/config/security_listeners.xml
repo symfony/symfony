@@ -123,6 +123,7 @@
         <service id="security.authentication.success_handler" class="%security.authentication.success_handler.class%" abstract="true" public="false">
             <argument type="service" id="security.http_utils" />
             <argument type="collection" /> <!-- Options -->
+            <argument type="service" id="http_kernel" />
         </service>
 
         <service id="security.authentication.failure_handler" class="%security.authentication.failure_handler.class%" abstract="true" public="false">

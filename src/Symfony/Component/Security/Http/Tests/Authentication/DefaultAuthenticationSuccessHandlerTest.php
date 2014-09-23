@@ -12,9 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    private $httpKernel = null;
+
     private $httpUtils = null;
 
     private $request = null;
@@ -23,6 +26,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
+        $this->httpKernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $this->httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
@@ -33,7 +37,30 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
     {
         $response = $this->expectRedirectResponse('/');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array(), $this->httpKernel);
+        $result = $handler->onAuthenticationSuccess($this->request, $this->token);
+
+        $this->assertSame($response, $result);
+    }
+
+    public function testForward()
+    {
+        $options = array(
+            'target_forward' => true,
+            'default_target_path' => '/dashboard'
+        );
+
+        $subRequest = $this->getRequest();
+        $this->httpUtils->expects($this->once())
+            ->method('createRequest')->with($this->request, '/dashboard')
+            ->will($this->returnValue($subRequest));
+
+        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $this->httpKernel->expects($this->once())
+            ->method('handle')->with($subRequest, HttpKernelInterface::SUB_REQUEST)
+            ->will($this->returnValue($response));
+
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options, $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -48,7 +75,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/dashboard');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options, $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -62,7 +89,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/dashboard');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array(), $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -78,7 +105,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/dashboard');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options, $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -99,7 +126,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/admin/dashboard');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array(), $this->httpKernel);
         $handler->setProviderKey('admin');
 
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
@@ -117,7 +144,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/dashboard');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options, $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -137,7 +164,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options);
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, $options, $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -149,7 +176,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
         $response = $this->expectRedirectResponse('/');
 
-        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array());
+        $handler = new DefaultAuthenticationSuccessHandler($this->httpUtils, array(), $this->httpKernel);
         $result = $handler->onAuthenticationSuccess($this->request, $this->token);
 
         $this->assertSame($response, $result);
@@ -165,5 +192,13 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
             ->will($this->returnValue($response));
 
         return $response;
+    }
+
+    private function getRequest()
+    {
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->attributes = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+
+        return $request;
     }
 }

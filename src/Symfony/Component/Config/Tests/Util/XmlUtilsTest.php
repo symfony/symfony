@@ -58,6 +58,16 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile($fixtures.'valid.xml', array($mock, 'validate')));
+        $this->assertSame(array(), libxml_get_errors());
+    }
+
+    public function testLoadFileWithInternalErrorsEnabled()
+    {
+        libxml_use_internal_errors(true);
+
+        $this->assertSame(array(), libxml_get_errors());
+        $this->assertInstanceOf('DOMDocument', XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/invalid_schema.xml'));
+        $this->assertSame(array(), libxml_get_errors());
     }
 
     /**

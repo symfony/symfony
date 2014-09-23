@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by zefrog at 2014-04-12T11:16:59Z
+
+Thank you for your comments. I think I have fixed these issues.
+
+---------------------------------------------------------------------------
+
+by zefrog at 2014-04-14T19:00:04Z
+
+The Travis error does not seem to be related to my PR... Can someone from the core tell me if this has any chance to be accepted? Do I need to prepare a documentation PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-06T03:48:20Z
+
+@zefrog Looks good to me. Can you create a doc PR?
+
+---------------------------------------------------------------------------
+
+by zefrog at 2014-06-06T12:44:01Z
+
+I've added the firewall entry in the configuration reference and made a cookbook page describing how to use pre authenticated listeners. Is that ok?
+
+---------------------------------------------------------------------------
+
+by zefrog at 2014-06-25T09:51:30Z
+
+@fabpot will this feature be integrated in the next 2.6 release ?
+
+Thx.
+
+---------------------------------------------------------------------------
+
+by zefrog at 2014-09-22T15:48:42Z
+
+No thoughts on this PR ? It's been around since april...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T16:27:18Z
+
+:+1:

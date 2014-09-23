@@ -458,10 +458,13 @@ abstract class AbstractDoctrineExtension extends Extension
     abstract protected function getMappingResourceExtension();
 
     /**
-     * Search for a manager that is declared as 'auto_mapping' = true
+     * Search for a manager that is declared as 'auto_mapping' = true.
+     *
      * @param array $managerConfigs
+     *
+     * @return null|string The name of the manager. If no one manager is found, returns null
+     *
      * @throws \LogicException
-     * @return null|string The name of the manager. If no one manager is found, returns null.
      */
     private function validateAutoMapping(array $managerConfigs)
     {

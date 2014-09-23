@@ -264,7 +264,7 @@ class Router implements RouterInterface, RequestMatcherInterface
                 $this->matcher->setExpressionLanguage($this->expressionLanguage);
             }
 
-            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            return $this->matcher;
         }
 
         $class = $this->options['matcher_cache_class'];

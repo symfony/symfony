@@ -1,0 +1,216 @@
+---------------------------------------------------------------------------
+
+by rybakit at 2014-06-20T11:49:23Z
+
+:+1:
+
+How about going a bit further — replace `voteOnAttribute()` with `isGranted()` which will just return true or false? Then you don't need to bother about  `ACCESS_GRANTED` and `ACCESS_DENIED` constants in a concrete voter implementation.
+
+`vote()` could look like:
+```php
+public function vote(TokenInterface $token, $object, array $attributes)
+{
+    $result = self::ACCESS_ABSTAIN;
+
+    if (!$this->supportsClass(get_class($object))) {
+        return $result;
+    }
+
+    $user = $token->getUser();
+
+    foreach ($attributes as $attribute) {
+        if (!$this->supportsAttribute($attribute)) {
+            continue;
+        }
+
+        if ($this->isGranted($object, $attribute, $user)) {
+            return self::ACCESS_GRANTED;
+        }
+
+        $result = self::ACCESS_DENIED;
+    }
+
+    return $result;
+}
+```
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-06-20T12:49:58Z
+
+It still needs a test obviously, but I really like the implementation!
+
+About @rybakit's comment, I thought about this too, and I like it, but I'm not sure. I suppose the `ACCESS_GRANTED` constants are pretty explicit, which I like. And since they live in the parent interface, it doesn't involve needing to add a `use` statement to use them, which I also like. So, I *think* I'm ok with leaving it with returning `ACCESS_GRANTED`, but if a bunch of other people like @rybakit's suggestion, then we should consider it :).
+
+Such a great *win* imo - I hope this gets accepted - I'd be very happy to see how much more clear the documentation articles about voters become.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2014-06-22T16:53:16Z
+
+I've created something really similar to this recently and have tests more or less ready to go, so let me know if I can help out with the tests or if you just want to see them or anything. :+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-08-05T17:41:32Z
+
+I really love this idea to simplify the voters. Thanks @Inoryy.
+
+My question is: does anyone know what is needed to finish this PR? How can we help with that?
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-08-05T17:50:06Z
+
+oops, for some reason I was sure I wrapped it up. My bad, I'll put this on top of my todo list.
+
+/cc @javiereguiluz @weaverryan
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-08-23T07:08:18Z
+
+@weaverryan @javiereguiluz this should be good to go.
+
+I've fixed inconsistencies, implemented the recommended ideas where they wouldn't cause conflicts with API & added test coverage.
+
+The build failed, but I think it's unrelated to the PR (something about Stopwatch on PHP 5.6?)
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-08-23T07:36:19Z
+
+... and now the build passed as well :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-23T07:39:49Z
+
+:+1: great job @Inoryy !
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-08-23T09:03:02Z
+
+:+1: Great work Roman! Thanks a lot for helping us improve Symfony.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-23T14:43:52Z
+
+:thumbsup: Awesome - one of my favorite features for 2.6!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-01T13:05:32Z
+
+I'd like to write a *"New in Symfony 2.6"* post about this great feature. @Inoryy do you know what's left to finish this PR? I think that you've done a terrific job so far and probably we only need a final effort. Do you think we could help you with anything? Thanks!
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-01T14:37:14Z
+
+@javiereguiluz I see two minor blocks:
+
+* Minor changes/corrections (mainly in docs) that I'll wrap up today.
+* Some arguable spots that could probably use your opinion to resolve (I've pinged on them)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-01T15:41:05Z
+
+Fwiw, we've weighed in on the arguable spots - I think we're all set there. Thanks for the fast response on this Roman!
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-01T17:02:42Z
+
+@weaverryan @javiereguiluz I've made the necessary changes, so it should be good to go as far as I know.
+
+However, the test suite seems to be failing now for some reason. The only difference since last build success are doc entries and added a newline, so it seems it's not relevant to this PR?
+Here's the error: https://travis-ci.org/symfony/symfony/jobs/34116312#L612
+```
+Symfony\Component\Process\Test\SigchildDisabledProcessTest::testIdleTimeoutNotExceededWhenOutputIsSent
+```
+
+P.S. @javiereguiluz I'm flattered that you're planning to feature this in "New in Symfony 2.6", but I also want to give credit where it's due - @weaverryan came up with the idea originally, I just implemented it :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-01T17:55:20Z
+
+@Inoryy the process timeout tests are volatile. They are failing from time to time depending on the load of the Travis servers
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-22T14:40:04Z
+
+ping @javiereguiluz @weaverryan
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-22T14:46:04Z
+
+In my opinion this can be safely merged. As @stof mentioned, the error reported by Travis has nothing to do with this code and it's caused by a volatile test.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T14:50:30Z
+
+@Inoryy You can rebase on current master as the volatile tests have been fixed now. Also, we need at least a PR on the docs for this new feature.
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-23T05:02:33Z
+
+@fabpot I've rebased, but it still fails due to failures on master itself (failures are unrelated to this PR).
+I've also added a doc PR: https://github.com/symfony/symfony-docs/issues/4257
+
+/cc @weaverryan @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T05:36:51Z
+
+I've just read the new documentation and I think this implementation has one drawback: it's not possible anymore to return `ACCESS_ABSTAIN` from the user code. It's not a big deal but that means we are loosing some flexibility. As the constant values are `0`, `1`, and `-1`, they don't conflict with Booleans `true` and `false`. So, what about supporting "everything"? The developer can return a Boolean, but he can also return the constants if he wants to.
+
+Another idea if you think the constants are too cumbersome: instead of returning a Boolean, the developer can just return `0`, `1`, and `-1` instead of using the constant. The value are pretty self describing and everyone can understand their meaning.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T06:02:10Z
+
+Thinking about it more, I think we should supports the constants/numbers and remove the Booleans. That way, the abstract voter is closer to custom voters and this is still as easy as Boolean. `true`, `false` vs `0`, `1`, `-1`. Using constants or numbers is up to the developer and the documentation can favor numbers over constants.
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-23T06:30:20Z
+
+@fabpot I'm not sure I see the benefit of the added flexibility?
+Can you provide an example use case where `isGranted` is called with supported attribute & object, but would still return `ACCESS_ABSTAIN`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T06:34:29Z
+
+As I said, it's a small benefit, but more important, using numbers is not more "difficult" to understand and adds consistency across the board. So, I don't see any drawback here.
+
+---------------------------------------------------------------------------
+
+by Inoryy at 2014-09-23T06:47:18Z
+
+@fabpot but how to implement this considering multiple attributes?
+Currently as soon as attribute and object are supported, we default to `ACCESS_DENIED` (`-1`) [on this line](https://github.com/Inoryy/symfony/blob/abstract-voter/src/Symfony/Component/Security/Core/Authorization/Voter/AbstractVoter.php#L73-L74) and return `ACCESS_GRANTED` (`1`) as soon as at least one attribute grants access.
+By supporting the "flexibility" on `isGranted` level, we'll have to respect `ACCESS_ABSTAIN` (`0`) vote as well (i.e. it would take priority over default `ACCESS_DENIED`), but then another attribute might cause `ACCESS_DENIED` as well, which would.. take priority over previous vote?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T09:50:30Z
+
+@Inoryy Indeed.
+
+:+1:

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-07-29T14:54:09Z
+
+@DraCzris What's turbolinks? It looks like a ruby on rails feature? Is it something else? How does it relate to Symfony?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-07-29T15:09:08Z
+
+more info on turbolinks and how those could be used with Symfony: #7410
+
+---------------------------------------------------------------------------
+
+by hason at 2014-07-31T12:49:05Z
+
+@weaverryan PHP port of ruby on rails turbolinks - https://github.com/helthe/Turbolinks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-05T07:19:54Z
+
+I'm not a big fan of adding things that seems very specific and not widespread/standard.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:44:44Z
+
+What do we do here? I can see two options here: merge as is or close it (I'm not a big fan of adding yet another configuration point.)

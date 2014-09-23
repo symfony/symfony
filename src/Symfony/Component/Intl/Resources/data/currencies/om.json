@@ -1,0 +1,41 @@
+{
+    "Version": "2.1.6.69",
+    "Names": {
+        "BRL": [
+            "R$",
+            "Brazilian Real"
+        ],
+        "CNY": [
+            "CN¥",
+            "Chinese Yuan Renminbi"
+        ],
+        "ETB": [
+            "Br",
+            "Itoophiyaa Birrii"
+        ],
+        "EUR": [
+            "€",
+            "Euro"
+        ],
+        "GBP": [
+            "£",
+            "British Pound Sterling"
+        ],
+        "INR": [
+            "₹",
+            "Indian Rupee"
+        ],
+        "JPY": [
+            "JP¥",
+            "Japanese Yen"
+        ],
+        "RUB": [
+            "RUB",
+            "Russian Ruble"
+        ],
+        "USD": [
+            "US$",
+            "US Dollar"
+        ]
+    }
+}

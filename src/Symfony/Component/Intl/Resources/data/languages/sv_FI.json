@@ -1,0 +1,18 @@
+{
+    "Version": "2.1.8.19",
+    "Names": {
+        "chm": "mari",
+        "fj": "fiji",
+        "km": "khmer",
+        "ks": "kashmiri",
+        "ky": "kirgiziska",
+        "lo": "lao",
+        "nb": "bokmål",
+        "pa": "panjabi",
+        "ps": "pashto",
+        "te": "telugu",
+        "th": "thai",
+        "ti": "tigrinska",
+        "und": "okänt språk"
+    }
+}

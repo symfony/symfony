@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.8.22",
+    "Names": {
+        "EUR": [
+            "€",
+            "ewro"
+        ],
+        "MTL": [
+            "MTL",
+            "Lira Maltija"
+        ]
+    }
+}

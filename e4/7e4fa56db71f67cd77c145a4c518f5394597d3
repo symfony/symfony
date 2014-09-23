@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by ymc-dabe at 2014-09-23T04:09:05Z
+
+@phazei May you close the other pull requests? I kind of find it hard now to get the best one - thinks this one here, is.
+An other suggestion: Taking a look to [msdn](http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29) it really is * and ? what windows does not allow. A valid name with regex special chars under windows thus would be: r+e.g-e$x[c]a(r)s
+And you might want to update this PR with the nice [PR template](http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request).

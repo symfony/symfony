@@ -705,7 +705,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         usleep(500000);
         $process->signal(SIGUSR1);
 
-        while ($process->isRunning() && false === strpos($process->getoutput(), 'Caught SIGUSR1')) {
+        while ($process->isRunning() && false === strpos($process->getOutput(), 'Caught SIGUSR1')) {
             usleep(10000);
         }
 

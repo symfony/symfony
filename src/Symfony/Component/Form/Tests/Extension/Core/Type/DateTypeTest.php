@@ -709,7 +709,7 @@ class DateTypeTest extends TypeTestCase
     {
         $form = $this->factory->create('date', null, array(
             'widget' => 'single_text',
-            'allow_html5' => false,
+            'html5' => false,
         ));
 
         $view = $form->createView();

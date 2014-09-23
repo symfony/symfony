@@ -18,16 +18,4 @@ namespace Symfony\Component\Config\Definition\Exception;
  */
 class InvalidTypeException extends InvalidConfigurationException
 {
-    protected $hint;
-    protected $containsHints = false;
-
-    public function addHint($hint)
-    {
-        if (!$this->containsHints) {
-            $this->message .= "\nHint: ".$hint;
-            $this->containsHints = true;
-        } else {
-            $this->message .= ', '.$hint;
-        }
-    }
 }

@@ -272,7 +272,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         if (!$cache->isFresh()) {
             $dumper = $this->getMatcherDumperInstance();
             if (method_exists($dumper, 'setExpressionLanguage')) {
-                 $dumper->setExpressionLanguage($this->expressionLanguage);
+                $dumper->setExpressionLanguage($this->expressionLanguage);
             }
 
             $options = array(
@@ -287,7 +287,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
         $this->matcher = new $class($this->context);
         if (method_exists($this->matcher, 'setExpressionLanguage')) {
-             $this->matcher->setExpressionLanguage($this->expressionLanguage);
+            $this->matcher->setExpressionLanguage($this->expressionLanguage);
         }
 
         return $this->matcher;

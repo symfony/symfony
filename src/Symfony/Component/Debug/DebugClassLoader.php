@@ -30,6 +30,7 @@ class DebugClassLoader
     private $isFinder;
     private $wasFinder;
     private static $caseCheck;
+    private static $typoCheck = false;
 
     /**
      * Constructor.
@@ -136,6 +137,11 @@ class DebugClassLoader
         }
     }
 
+    public static function setTypoCheck($check)
+    {
+        self::$typoCheck = (bool) $check;
+    }
+
     /**
      * Loads the given class or interface.
      *
@@ -178,6 +184,14 @@ class DebugClassLoader
 
             if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
+            }
+
+            if (self::$typoCheck
+                && $refl->hasMethod('_construct')
+                && $refl->getMethod('_construct')->getDeclaringClass()->getName() === $name
+                && false === strpos($refl->getFileName(), DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR)
+            ) {
+                throw new \RuntimeException(sprintf('You define a "_construct" method. Did you mean "__construct"? in %s', $class));
             }
         }
 

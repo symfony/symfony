@@ -51,6 +51,12 @@ abstract class Constraint
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
+     * Domain-specific data attached to a constraint
+     * @var mixed
+     */
+    public $payload;
+
+    /**
      * Initializes the constraint with options.
      *
      * You should pass an associative array. The keys should be the names of

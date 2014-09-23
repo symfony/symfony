@@ -141,15 +141,23 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsNotModifiedLastModified()
     {
+        $before   = 'Sun, 25 Aug 2013 18:32:31 GMT';
         $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+        $after    = 'Sun, 25 Aug 2013 19:33:31 GMT';
 
         $request = new Request();
         $request->headers->set('If-Modified-Since', $modified);
 
         $response = new Response();
-        $response->headers->set('Last-Modified', $modified);
 
+        $response->headers->set('Last-Modified', $modified);
         $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', $before);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('Last-Modified', $after);
+        $this->assertFalse($response->isNotModified($request));
 
         $response->headers->set('Last-Modified', '');
         $this->assertFalse($response->isNotModified($request));
@@ -172,6 +180,50 @@ class ResponseTest extends ResponseTestCase
         $this->assertTrue($response->isNotModified($request));
 
         $response->headers->set('ETag', '');
+        $this->assertFalse($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedLastModifiedAndEtag()
+    {
+        $before   = 'Sun, 25 Aug 2013 18:32:31 GMT';
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+        $after    = 'Sun, 25 Aug 2013 19:33:31 GMT';
+        $etag     = 'randomly_generated_etag';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $response->headers->set('Last-Modified', $after);
+        $this->assertFalse($response->isNotModified($request));
+
+        $response->headers->set('ETag', 'non-existent-etag');
+        $response->headers->set('Last-Modified', $before);
+        $this->assertFalse($response->isNotModified($request));
+
+        $response->headers->set('ETag', $etag);
+        $response->headers->set('Last-Modified', $modified);
+        $this->assertTrue($response->isNotModified($request));
+    }
+
+    public function testIsNotModifiedIfModifiedSinceAndEtagWithoutLastModified()
+    {
+        $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
+        $etag     = 'randomly_generated_etag';
+
+        $request = new Request();
+        $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
+        $request->headers->set('If-Modified-Since', $modified);
+
+        $response = new Response();
+
+        $response->headers->set('ETag', $etag);
+        $this->assertTrue($response->isNotModified($request));
+
+        $response->headers->set('ETag', 'non-existent-etag');
         $this->assertFalse($response->isNotModified($request));
     }
 

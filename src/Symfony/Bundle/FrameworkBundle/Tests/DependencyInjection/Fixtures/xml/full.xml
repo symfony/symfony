@@ -22,7 +22,7 @@
                 <framework:mime-type>application/pdf</framework:mime-type>
             </framework:format>
         </framework:request>
-        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" >
+        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>

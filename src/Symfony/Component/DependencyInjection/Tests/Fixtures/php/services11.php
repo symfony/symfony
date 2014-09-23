@@ -39,12 +39,20 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException("You cannot compile a dumped frozen container");
+    }
+
+    /**
      * Gets the 'foo' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance.
      */
     protected function getFooService()
     {

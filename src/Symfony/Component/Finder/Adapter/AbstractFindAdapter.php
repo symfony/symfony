@@ -16,7 +16,6 @@ use Symfony\Component\Finder\Iterator;
 use Symfony\Component\Finder\Shell\Shell;
 use Symfony\Component\Finder\Expression\Expression;
 use Symfony\Component\Finder\Shell\Command;
-use Symfony\Component\Finder\Iterator\SortableIterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 
@@ -217,7 +216,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
             // Fixes 'not search' regex problems.
             if ($expr->isRegex()) {
                 $regex = $expr->getRegex();
-                $regex->prepend($regex->hasStartFlag() ? $dir.DIRECTORY_SEPARATOR : '.*')->setEndJoker(!$regex->hasEndFlag());
+                $regex->prepend($regex->hasStartFlag() ? preg_quote($dir).DIRECTORY_SEPARATOR : '.*')->setEndJoker(!$regex->hasEndFlag());
             } else {
                 $expr->prepend('*')->append('*');
             }
@@ -248,7 +247,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
                     $command->add('-size -'.($size->getTarget() + 1).'c');
                     break;
                 case '>=':
-                    $command->add('-size +'. ($size->getTarget() - 1).'c');
+                    $command->add('-size +'.($size->getTarget() - 1).'c');
                     break;
                 case '>':
                     $command->add('-size +'.$size->getTarget().'c');
@@ -256,6 +255,7 @@ abstract class AbstractFindAdapter extends AbstractAdapter
                 case '!=':
                     $command->add('-size -'.$size->getTarget().'c');
                     $command->add('-size +'.$size->getTarget().'c');
+                    break;
                 case '<':
                 default:
                     $command->add('-size -'.$size->getTarget().'c');

@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -72,7 +73,7 @@ class ObjectsProvider
         $builder->setParameter('database_name', 'symfony');
 
         return array(
-            'parameter' =>  $builder
+            'parameter' =>  $builder,
         );
     }
 
@@ -120,5 +121,49 @@ class ObjectsProvider
             'alias_1' => new Alias('service_1', true),
             'alias_2' => new Alias('service_2', false),
         );
+    }
+
+    public static function getEventDispatchers()
+    {
+        $eventDispatcher = new EventDispatcher();
+
+        $eventDispatcher->addListener('event1', 'global_function');
+        $eventDispatcher->addListener('event1', function () { return 'Closure'; });
+        $eventDispatcher->addListener('event2', new CallableClass());
+
+        return array('event_dispatcher_1' => $eventDispatcher);
+    }
+
+    public static function getCallables()
+    {
+        return array(
+            'callable_1' => 'array_key_exists',
+            'callable_2' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'),
+            'callable_3' => array(new CallableClass(), 'method'),
+            'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
+            'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
+            'callable_6' => function () { return 'Closure'; },
+            'callable_7' => new CallableClass(),
+        );
+    }
+}
+
+class CallableClass
+{
+    public function __invoke()
+    {
+    }
+    public static function staticMethod()
+    {
+    }
+    public function method()
+    {
+    }
+}
+
+class ExtendedCallableClass extends CallableClass
+{
+    public static function staticMethod()
+    {
     }
 }

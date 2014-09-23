@@ -15,6 +15,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 
 /**
  * Recursive implementation of {@link ValidatorInterface}.
@@ -40,21 +41,28 @@ class RecursiveValidator implements ValidatorInterface
     protected $validatorFactory;
 
     /**
+     * @var ObjectInitializerInterface[]
+     */
+    protected $objectInitializers;
+
+    /**
      * Creates a new validator.
      *
-     * @param ExecutionContextFactoryInterface    $contextFactory   The factory for
-     *                                                              creating new contexts
-     * @param MetadataFactoryInterface            $metadataFactory  The factory for
-     *                                                              fetching the metadata
-     *                                                              of validated objects
-     * @param ConstraintValidatorFactoryInterface $validatorFactory The factory for creating
-     *                                                              constraint validators
+     * @param ExecutionContextFactoryInterface    $contextFactory     The factory for
+     *                                                                creating new contexts
+     * @param MetadataFactoryInterface            $metadataFactory    The factory for
+     *                                                                fetching the metadata
+     *                                                                of validated objects
+     * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating
+     *                                                                constraint validators
+     * @param ObjectInitializerInterface[]        $objectInitializers The object initializers
      */
-    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory)
+    public function __construct(ExecutionContextFactoryInterface $contextFactory, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, array $objectInitializers = array())
     {
         $this->contextFactory = $contextFactory;
         $this->metadataFactory = $metadataFactory;
         $this->validatorFactory = $validatorFactory;
+        $this->objectInitializers = $objectInitializers;
     }
 
     /**
@@ -65,7 +73,8 @@ class RecursiveValidator implements ValidatorInterface
         return new RecursiveContextualValidator(
             $this->contextFactory->createContext($this, $root),
             $this->metadataFactory,
-            $this->validatorFactory
+            $this->validatorFactory,
+            $this->objectInitializers
         );
     }
 
@@ -77,7 +86,8 @@ class RecursiveValidator implements ValidatorInterface
         return new RecursiveContextualValidator(
             $context,
             $this->metadataFactory,
-            $this->validatorFactory
+            $this->validatorFactory,
+            $this->objectInitializers
         );
     }
 
@@ -120,10 +130,11 @@ class RecursiveValidator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null)
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null)
     {
-        return $this->startContext($object)
-            ->validatePropertyValue($object, $propertyName, $value, $groups)
+        // If a class name is passed, take $value as root
+        return $this->startContext(is_object($objectOrClass) ? $objectOrClass : $value)
+            ->validatePropertyValue($objectOrClass, $propertyName, $value, $groups)
             ->getViolations();
     }
 }

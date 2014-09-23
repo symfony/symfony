@@ -270,7 +270,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         return array(
             array('f', 'Command "f" is not defined.'),
             array('a', 'Command "a" is ambiguous (afoobar, afoobar1 and 1 more).'),
-            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1 and 1 more).')
+            array('foo:b', 'Command "foo:b" is ambiguous (foo:bar, foo:bar1 and 1 more).'),
         );
     }
 
@@ -317,7 +317,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foo3:baR'),
-            array('foO3:bar')
+            array('foO3:bar'),
         );
     }
 
@@ -891,6 +891,22 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('before.foo.after.caught.', $tester->getDisplay());
     }
 
+    public function testRunWithDispatcherSkippingCommand()
+    {
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher(true));
+        $application->setAutoExit(false);
+
+        $application->register('foo')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('foo.');
+        });
+
+        $tester = new ApplicationTester($application);
+        $exitCode = $tester->run(array('command' => 'foo'));
+        $this->assertContains('before.after.', $tester->getDisplay());
+        $this->assertEquals(ConsoleCommandEvent::RETURN_CODE_DISABLED, $exitCode);
+    }
+
     public function testTerminalDimensions()
     {
         $application = new Application();
@@ -906,16 +922,22 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($width, 80), $application->getTerminalDimensions());
     }
 
-    protected function getDispatcher()
+    protected function getDispatcher($skipCommand = false)
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) {
+        $dispatcher->addListener('console.command', function (ConsoleCommandEvent $event) use ($skipCommand) {
             $event->getOutput()->write('before.');
+
+            if ($skipCommand) {
+                $event->disableCommand();
+            }
         });
-        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) {
+        $dispatcher->addListener('console.terminate', function (ConsoleTerminateEvent $event) use ($skipCommand) {
             $event->getOutput()->write('after.');
 
-            $event->setExitCode(128);
+            if (!$skipCommand) {
+                $event->setExitCode(113);
+            }
         });
         $dispatcher->addListener('console.exception', function (ConsoleExceptionEvent $event) {
             $event->getOutput()->writeln('caught.');

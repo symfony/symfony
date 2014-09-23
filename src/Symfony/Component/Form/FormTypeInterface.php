@@ -21,7 +21,7 @@ interface FormTypeInterface
     /**
      * Builds the form.
      *
-     * This method is called for each type in the hierarchy starting form the
+     * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the form.
      *
      * @see FormTypeExtensionInterface::buildForm()
@@ -34,7 +34,7 @@ interface FormTypeInterface
     /**
      * Builds the form view.
      *
-     * This method is called for each type in the hierarchy starting form the
+     * This method is called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the view.
      *
      * A view of a form is built before the views of the child forms are built.
@@ -43,16 +43,16 @@ interface FormTypeInterface
      *
      * @see FormTypeExtensionInterface::buildView()
      *
-     * @param FormView $view    The view
-     * @param FormInterface     $form    The form
-     * @param array             $options The options
+     * @param FormView      $view    The view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
     public function buildView(FormView $view, FormInterface $form, array $options);
 
     /**
      * Finishes the form view.
      *
-     * This method gets called for each type in the hierarchy starting form the
+     * This method gets called for each type in the hierarchy starting from the
      * top most type. Type extensions can further modify the view.
      *
      * When this method is called, views of the form's children have already
@@ -62,9 +62,9 @@ interface FormTypeInterface
      *
      * @see FormTypeExtensionInterface::finishView()
      *
-     * @param FormView $view    The view
-     * @param FormInterface     $form    The form
-     * @param array             $options The options
+     * @param FormView      $view    The view
+     * @param FormInterface $form    The form
+     * @param array         $options The options
      */
     public function finishView(FormView $view, FormInterface $form, array $options);
 

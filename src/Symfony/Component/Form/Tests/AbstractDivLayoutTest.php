@@ -526,7 +526,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $form = $this->factory->createNamed('name', 'repeated', null, array(
             // the global required value cannot be overridden
             'first_options'  => array('label' => 'Test', 'required' => false),
-            'second_options' => array('label' => 'Test2')
+            'second_options' => array('label' => 'Test2'),
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -588,7 +588,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testLabelIsNotRenderedWhenSetToFalse()
     {
         $form = $this->factory->createNamed('name', 'text', null, array(
-            'label' => false
+            'label' => false,
         ));
         $html = $this->renderRow($form->createView());
 
@@ -699,7 +699,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $html = $this->renderEnd($view);
 
         // Insert the start tag, the end tag should be rendered by the helper
-        $this->assertMatchesXpath('<form>' . $html,
+        $this->assertMatchesXpath('<form>'.$html,
 '/form
     [
         ./div
@@ -755,17 +755,5 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         // foo="foo"
         $this->assertContains('<div id="form" foo="foo">', $html);
-    }
-
-    public function testWidgetContainerAttributeHiddenIfFalse()
-    {
-        $form = $this->factory->createNamed('form', 'form', null, array(
-            'attr' => array('foo' => false),
-        ));
-
-        $html = $this->renderWidget($form->createView());
-
-        // no foo
-        $this->assertContains('<div id="form">', $html);
     }
 }

@@ -24,7 +24,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
         $cookie = new Cookie('rememberme');
 
         $request = $this->getRequest(array(
-            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie
+            RememberMeServicesInterface::COOKIE_ATTR_NAME => $cookie,
         ));
 
         $response = $this->getResponse();

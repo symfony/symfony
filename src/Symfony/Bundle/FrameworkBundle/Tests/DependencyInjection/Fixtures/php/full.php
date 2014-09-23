@@ -54,8 +54,9 @@ $container->loadFromExtension('framework', array(
             ),
         ),
         'form'              => array(
-            'resources'     => array('theme1', 'theme2')
+            'resources'     => array('theme1', 'theme2'),
         ),
+        'hinclude_default_template' => 'global_hinclude_template',
     ),
     'translator' => array(
         'enabled'  => true,
@@ -77,7 +78,7 @@ $container->loadFromExtension('framework', array(
                 'text/csv',
                 'text/plain',
             ),
-            'pdf' => 'application/pdf'
-        )
-    )
+            'pdf' => 'application/pdf',
+        ),
+    ),
 ));

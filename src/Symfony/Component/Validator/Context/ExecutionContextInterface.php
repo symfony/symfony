@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Context;
 
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -66,7 +67,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      * Call {@link ConstraintViolationBuilderInterface::addViolation()} to
      * add the violation when you're done with the configuration:
      *
-     *     $context->buildViolation('Please enter a number between %min% and %max.')
+     *     $context->buildViolation('Please enter a number between %min% and %max%.')
      *         ->setParameter('%min%', 3)
      *         ->setParameter('%max%', 10)
      *         ->setTranslationDomain('number_validation')
@@ -116,15 +117,15 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Sets the currently validated value.
      *
-     * @param mixed             $value        The validated value
-     * @param object|null       $object       The currently validated object
-     * @param MetadataInterface $metadata     The validation metadata
-     * @param string            $propertyPath The property path to the current value
+     * @param mixed                  $value        The validated value
+     * @param object|null            $object       The currently validated object
+     * @param MetadataInterface|null $metadata     The validation metadata
+     * @param string                 $propertyPath The property path to the current value
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
      */
-    public function setNode($value, $object, MetadataInterface $metadata, $propertyPath);
+    public function setNode($value, $object, MetadataInterface $metadata = null, $propertyPath);
 
     /**
      * Sets the currently validated group.
@@ -135,6 +136,16 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      *           code.
      */
     public function setGroup($group);
+
+    /**
+     * Sets the currently validated constraint.
+     *
+     * @param Constraint $constraint The validated constraint
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     */
+    public function setConstraint(Constraint $constraint);
 
     /**
      * Marks an object as validated in a specific validation group.
@@ -186,4 +197,30 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
      *           code.
      */
     public function isConstraintValidated($cacheKey, $constraintHash);
+
+    /**
+     * Marks that an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function markObjectAsInitialized($cacheKey);
+
+    /**
+     * Returns whether an object was initialized.
+     *
+     * @param string $cacheKey The hash of the object
+     *
+     * @return bool Whether the object was already initialized
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
+     *
+     * @see ObjectInitializerInterface
+     */
+    public function isObjectInitialized($cacheKey);
 }

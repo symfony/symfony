@@ -50,19 +50,6 @@ class FragmentListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    public function testAccessDeniedWithNonLocalIps()
-    {
-        $request = Request::create('http://example.com/_fragment', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));
-
-        $listener = new FragmentListener(new UriSigner('foo'));
-        $event = $this->createGetResponseEvent($request);
-
-        $listener->onKernelRequest($event);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
     public function testAccessDeniedWithWrongSignature()
     {
         $request = Request::create('http://example.com/_fragment', 'GET', array(), array(), array(), array('REMOTE_ADDR' => '10.0.0.1'));

@@ -212,4 +212,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($process->isOutputDisabled());
     }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings or stream resources.
+     */
+    public function testInvalidInput()
+    {
+        $builder = ProcessBuilder::create();
+        $builder->setInput(array());
+    }
 }

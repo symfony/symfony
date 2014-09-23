@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the language bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class LanguageBundleTransformationRule implements TransformationRuleInterface
 {
@@ -38,10 +40,10 @@ class LanguageBundleTransformationRule implements TransformationRuleInterface
     {
         // The language data is contained in the locales bundle in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
-            return $context->getSourceDir() . '/locales';
+            return $context->getSourceDir().'/locales';
         }
 
-        return $context->getSourceDir() . '/lang';
+        return $context->getSourceDir().'/lang';
     }
 
     /**

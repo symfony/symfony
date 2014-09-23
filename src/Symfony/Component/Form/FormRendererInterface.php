@@ -29,8 +29,8 @@ interface FormRendererInterface
      * Sets the theme(s) to be used for rendering a view and its children.
      *
      * @param FormView $view   The view to assign the theme(s) to.
-     * @param mixed             $themes The theme(s). The type of these themes
-     *                                  is open to the implementation.
+     * @param mixed    $themes The theme(s). The type of these themes
+     *                         is open to the implementation.
      */
     public function setTheme(FormView $view, $themes);
 

@@ -270,7 +270,7 @@ class FullTransformer
 
             $ret[$key[0]] = array(
                 'value' => $value,
-                'pattern' => $key
+                'pattern' => $key,
             );
         }
 

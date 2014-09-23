@@ -23,7 +23,7 @@
         "symfony/property-access": "~2.3"
     },
     "require-dev": {
-        "symfony/validator": "~2.2",
+        "symfony/validator": "~2.4",
         "symfony/http-foundation": "~2.2",
         "symfony/http-kernel": "~2.4",
         "symfony/security-csrf": "~2.4",
@@ -42,7 +42,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.6-dev"
         }
     }
 }

@@ -20,6 +20,8 @@ use Symfony\Component\Intl\Util\IcuVersion;
  * The rule for compiling the region bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class RegionBundleTransformationRule implements TransformationRuleInterface
 {
@@ -38,10 +40,10 @@ class RegionBundleTransformationRule implements TransformationRuleInterface
     {
         // The region data is contained in the locales bundle in ICU <= 4.2
         if (IcuVersion::compare($context->getIcuVersion(), '4.2', '<=', 1)) {
-            return $context->getSourceDir() . '/locales';
+            return $context->getSourceDir().'/locales';
         }
 
-        return $context->getSourceDir() . '/region';
+        return $context->getSourceDir().'/region';
     }
 
     /**

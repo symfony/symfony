@@ -11,26 +11,31 @@
 
 namespace Symfony\Component\Intl\ResourceBundle\Writer;
 
+use Symfony\Component\Intl\Exception\UnexpectedTypeException;
+
 /**
  * Writes .txt resource bundles.
  *
- * The resulting files can be converted to binary .res files using the
- * {@link \Symfony\Component\Intl\ResourceBundle\Transformer\BundleCompiler}.
+ * The resulting files can be converted to binary .res files using a
+ * {@link \Symfony\Component\Intl\ResourceBundle\Compiler\BundleCompilerInterface}
+ * implementation.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
+ *
+ * @internal
  */
 class TextBundleWriter implements BundleWriterInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function write($path, $locale, $data)
+    public function write($path, $locale, $data, $fallback = true)
     {
         $file = fopen($path.'/'.$locale.'.txt', 'w');
 
-        $this->writeResourceBundle($file, $locale, $data);
+        $this->writeResourceBundle($file, $locale, $data, $fallback);
 
         fclose($file);
     }
@@ -41,14 +46,16 @@ class TextBundleWriter implements BundleWriterInterface
      * @param resource $file       The file handle to write to.
      * @param string   $bundleName The name of the bundle.
      * @param mixed    $value      The value of the node.
+     * @param bool     $fallback   Whether the resource bundle should be merged
+     *                             with the fallback locale.
      *
      * @see http://source.icu-project.org/repos/icu/icuhtml/trunk/design/bnf_rb.txt
      */
-    private function writeResourceBundle($file, $bundleName, $value)
+    private function writeResourceBundle($file, $bundleName, $value, $fallback)
     {
         fwrite($file, $bundleName);
 
-        $this->writeTable($file, $value, 0);
+        $this->writeTable($file, $value, 0, $fallback);
 
         fwrite($file, "\n");
     }
@@ -72,16 +79,25 @@ class TextBundleWriter implements BundleWriterInterface
             return;
         }
 
+        if ($value instanceof \Traversable) {
+            $value = iterator_to_array($value);
+        }
+
         if (is_array($value)) {
-            if (count($value) === count(array_filter($value, 'is_int'))) {
+            $intValues = count($value) === count(array_filter($value, 'is_int'));
+
+            $keys = array_keys($value);
+
+            // check that the keys are 0-indexed and ascending
+            $intKeys = $keys === range(0, count($keys) - 1);
+
+            if ($intValues && $intKeys) {
                 $this->writeIntVector($file, $value, $indentation);
 
                 return;
             }
 
-            $keys = array_keys($value);
-
-            if (count($keys) === count(array_filter($keys, 'is_int'))) {
+            if ($intKeys) {
                 $this->writeArray($file, $value, $indentation);
 
                 return;
@@ -180,16 +196,35 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "table" node.
      *
-     * @param resource $file        The file handle to write to.
-     * @param array    $value       The value of the node.
-     * @param int      $indentation The number of levels to indent.
+     * @param resource           $file        The file handle to write to.
+     * @param array|\Traversable $value       The value of the node.
+     * @param int                $indentation The number of levels to indent.
+     * @param bool               $fallback    Whether the table should be merged
+     *                                        with the fallback locale.
+     *
+     * @throws UnexpectedTypeException When $value is not an array and not a
+     *                                 \Traversable instance.
      */
-    private function writeTable($file, array $value, $indentation)
+    private function writeTable($file, $value, $indentation, $fallback = true)
     {
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array or \Traversable');
+        }
+
+        if (!$fallback) {
+            fwrite($file, ":table(nofallback)");
+        }
+
         fwrite($file, "{\n");
 
         foreach ($value as $key => $entry) {
             fwrite($file, str_repeat('    ', $indentation + 1));
+
+            // escape colons, otherwise they are interpreted as resource types
+            if (false !== strpos($key, ':') || false !== strpos($key, ' ')) {
+                $key = '"'.$key.'"';
+            }
+
             fwrite($file, $key);
 
             $this->writeResource($file, $entry, $indentation + 1);

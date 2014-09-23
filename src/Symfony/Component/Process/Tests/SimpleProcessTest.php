@@ -147,12 +147,63 @@ class SimpleProcessTest extends AbstractProcessTest
         parent::testSignalWithWrongNonIntSignal();
     }
 
+    public function testStopTerminatesProcessCleanly()
+    {
+        try {
+            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process->run(function () use ($process) {
+                $process->stop();
+            });
+        } catch (RuntimeException $e) {
+            $this->fail('A call to stop() is not expected to cause wait() to throw a RuntimeException');
+        }
+    }
+
+    public function testKillSignalTerminatesProcessCleanly()
+    {
+        $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
+
+        try {
+            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process->run(function () use ($process) {
+                if ($process->isRunning()) {
+                    $process->signal(defined('SIGKILL') ? SIGKILL : 9);
+                }
+            });
+        } catch (RuntimeException $e) {
+            $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
+        }
+    }
+
+    public function testTermSignalTerminatesProcessCleanly()
+    {
+        $this->expectExceptionIfPHPSigchild('Symfony\Component\Process\Exception\RuntimeException', 'This PHP has been compiled with --enable-sigchild. The process can not be signaled.');
+
+        try {
+            $process = $this->getProcess('php -r "echo \'foo\'; sleep(1); echo \'bar\';"');
+            $process->run(function () use ($process) {
+                if ($process->isRunning()) {
+                    $process->signal(defined('SIGTERM') ? SIGTERM : 15);
+                }
+            });
+        } catch (RuntimeException $e) {
+            $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
+        }
+    }
+
+    public function testStopWithTimeoutIsActuallyWorking()
+    {
+        $this->skipIfPHPSigchild();
+
+        parent::testStopWithTimeoutIsActuallyWorking();
+    }
+
     /**
      * {@inheritdoc}
      */
-    protected function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
     {
-        return new Process($commandline, $cwd, $env, $stdin, $timeout, $options);
+        return new Process($commandline, $cwd, $env, $input, $timeout, $options);
     }
 
     private function skipIfPHPSigchild()

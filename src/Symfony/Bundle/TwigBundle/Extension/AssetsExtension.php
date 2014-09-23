@@ -24,7 +24,7 @@ class AssetsExtension extends \Twig_Extension
     private $container;
     private $context;
 
-    public function __construct(ContainerInterface $container, RequestContext $requestContext)
+    public function __construct(ContainerInterface $container, RequestContext $requestContext = null)
     {
         $this->container = $container;
         $this->context = $requestContext;
@@ -94,11 +94,16 @@ class AssetsExtension extends \Twig_Extension
      * @param string $url The URL that has to be absolute
      *
      * @return string The absolute URL
+     * @throws \RuntimeException
      */
     private function ensureUrlIsAbsolute($url)
     {
         if (false !== strpos($url, '://') || 0 === strpos($url, '//')) {
             return $url;
+        }
+
+        if (!$this->context) {
+            throw new \RuntimeException('To generate an absolute URL for an asset, the Symfony Routing component is required.');
         }
 
         if ('' === $host = $this->context->getHost()) {

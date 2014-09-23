@@ -21,6 +21,8 @@ use Symfony\Component\Intl\ResourceBundle\Writer\TextBundleWriter;
  * The rule for compiling the locale bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class LocaleBundleTransformationRule implements TransformationRuleInterface
 {
@@ -53,7 +55,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     public function beforeCompile(CompilationContextInterface $context)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales';
+        $tempDir = sys_get_temp_dir().'/icu-data-locales';
 
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir($tempDir);
@@ -68,7 +70,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
      */
     public function afterCompile(CompilationContextInterface $context)
     {
-        $context->getFilesystem()->remove(sys_get_temp_dir() . '/icu-data-locales');
+        $context->getFilesystem()->remove(sys_get_temp_dir().'/icu-data-locales');
     }
 
     /**
@@ -90,17 +92,17 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
 
     private function scanLocales(CompilationContextInterface $context)
     {
-        $tempDir = sys_get_temp_dir() . '/icu-data-locales-source';
+        $tempDir = sys_get_temp_dir().'/icu-data-locales-source';
 
         $context->getFilesystem()->remove($tempDir);
         $context->getFilesystem()->mkdir($tempDir);
 
         // Temporarily generate the resource bundles
-        $context->getCompiler()->compile($context->getSourceDir() . '/locales', $tempDir);
+        $context->getCompiler()->compile($context->getSourceDir().'/locales', $tempDir);
 
         // Discover the list of supported locales, which are the names of the resource
         // bundles in the "locales" directory
-        $locales = glob($tempDir . '/*.res');
+        $locales = glob($tempDir.'/*.res');
 
         // Remove file extension and sort
         array_walk($locales, function (&$locale) { $locale = basename($locale, '.res'); });
@@ -110,7 +112,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
         foreach ($locales as $key => $locale) {
             // Delete all aliases from the list
             // i.e., "az_AZ" is an alias for "az_Latn_AZ"
-            $content = file_get_contents($context->getSourceDir() . '/locales/' . $locale . '.txt');
+            $content = file_get_contents($context->getSourceDir().'/locales/'.$locale.'.txt');
 
             // The key "%%ALIAS" is not accessible through the \ResourceBundle class,
             // so look in the original .txt file instead
@@ -127,7 +129,7 @@ class LocaleBundleTransformationRule implements TransformationRuleInterface
             }
 
             if (null === $bundle) {
-                throw new RuntimeException('The resource bundle for locale ' . $locale . ' could not be loaded from directory ' . $tempDir);
+                throw new RuntimeException('The resource bundle for locale '.$locale.' could not be loaded from directory '.$tempDir);
             }
 
             // There seems to be no other way for identifying all keys in this specific

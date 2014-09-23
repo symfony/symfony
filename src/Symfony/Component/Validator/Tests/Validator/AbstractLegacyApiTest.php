@@ -38,7 +38,7 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
      *
      * @return LegacyValidatorInterface
      */
-    abstract protected function createValidator(MetadataFactoryInterface $metadataFactory);
+    abstract protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array());
 
     protected function setUp()
     {
@@ -120,8 +120,19 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context->validate($value->reference, 'subpath');
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
@@ -167,8 +178,19 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) {
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+            $previousValue = $context->getValue();
+            $previousMetadata = $context->getMetadata();
+            $previousPath = $context->getPropertyPath();
+            $previousGroup = $context->getGroup();
+
             $context->validate(array('key' => $value->reference), 'subpath');
+
+            // context changes shouldn't leak out of the validate() call
+            $test->assertSame($previousValue, $context->getValue());
+            $test->assertSame($previousMetadata, $context->getMetadata());
+            $test->assertSame($previousPath, $context->getPropertyPath());
+            $test->assertSame($previousGroup, $context->getGroup());
         };
 
         $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
@@ -236,6 +258,52 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->assertSame('Invalid value', $violations[0]->getInvalidValue());
         $this->assertSame(2, $violations[0]->getMessagePluralization());
         $this->assertSame('Code', $violations[0]->getCode());
+    }
+
+    public function testInitializeObjectsOnFirstValidation()
+    {
+        $test = $this;
+        $entity = new Entity();
+        $entity->initialized = false;
+
+        // prepare initializers that set "initialized" to true
+        $initializer1 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
+        $initializer2 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
+
+        $initializer1->expects($this->once())
+            ->method('initialize')
+            ->with($entity)
+            ->will($this->returnCallback(function ($object) {
+                $object->initialized = true;
+            }));
+
+        $initializer2->expects($this->once())
+            ->method('initialize')
+            ->with($entity);
+
+        $this->validator = $this->createValidator($this->metadataFactory, array(
+            $initializer1,
+            $initializer2,
+        ));
+
+        // prepare constraint which
+        // * checks that "initialized" is set to true
+        // * validates the object again
+        $callback = function ($object, ExecutionContextInterface $context) use ($test) {
+            $test->assertTrue($object->initialized);
+
+            // validate again in same group
+            $context->validate($object);
+
+            // validate again in other group
+            $context->validate($object, '', 'SomeGroup');
+        };
+
+        $this->metadata->addConstraint(new Callback($callback));
+
+        $this->validate($entity);
+
+        $this->assertTrue($entity->initialized);
     }
 
     public function testGetMetadataFactory()

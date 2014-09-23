@@ -1,12 +1,18 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added possibility to cache catalogues
+
 2.5.0
 -----
 
  * added relative file path template to the file dumpers
  * added optional backup to the file dumpers
  * changed IcuResFileDumper to extend FileDumper
+ * added Translator::getMessages() for retrieving the message catalogue as an array
 
 2.3.0
 -----

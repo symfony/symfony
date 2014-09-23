@@ -22,7 +22,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
  */
 class SerializerPassTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testThrowExceptionWhenNoNormalizers()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
@@ -72,16 +71,16 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testServicesAreOrderedAccordingToPriority()
     {
-       $services = array(
+        $services = array(
             'n3' => array('tag' => array()),
             'n1' => array('tag' => array('priority' => 200)),
-            'n2' => array('tag' => array('priority' => 100))
+            'n2' => array('tag' => array('priority' => 100)),
         );
 
-       $expected = array(
+        $expected = array(
            new Reference('n1'),
            new Reference('n2'),
-           new Reference('n3')
+           new Reference('n3'),
        );
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
@@ -96,7 +95,7 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
           'Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass',
           'findAndSortTaggedServices'
         );
-        $method->setAccessible(TRUE);
+        $method->setAccessible(true);
 
         $actual = $method->invoke($serializerPass, 'tag', $container);
 

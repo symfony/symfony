@@ -35,12 +35,12 @@
                 <target>Једна или више вредности је невалидна.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Поља {{ fields }} нису била очекивана.</target>
+                <source>This field was not expected.</source>
+                <target>Ово поље не очекује.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Поља {{ fields }} недостају.</target>
+                <source>This field is missing.</source>
+                <target>Ово поље недостаје.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -175,7 +175,7 @@
                 <target>Висина слике је премала ({{ height }}px). Најмања дозвољена висина је {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Вредност треба да буде тренутна корисничка лозинка.</target>
             </trans-unit>
             <trans-unit id="48">

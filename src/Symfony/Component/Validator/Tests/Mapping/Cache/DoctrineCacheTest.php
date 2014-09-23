@@ -79,6 +79,6 @@ class DoctrineCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cache = new DoctrineCache(new ArrayCache);
+        $this->cache = new DoctrineCache(new ArrayCache());
     }
 }

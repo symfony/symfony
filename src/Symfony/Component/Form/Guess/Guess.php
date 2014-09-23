@@ -86,7 +86,7 @@ abstract class Guess
     /**
      * Constructor.
      *
-     * @param int     $confidence The confidence
+     * @param int $confidence The confidence
      *
      * @throws InvalidArgumentException if the given value of confidence is unknown
      */
@@ -103,8 +103,8 @@ abstract class Guess
     /**
      * Returns the confidence that the guessed value is correct.
      *
-     * @return int     One of the constants VERY_HIGH_CONFIDENCE,
-     *                 HIGH_CONFIDENCE, MEDIUM_CONFIDENCE and LOW_CONFIDENCE
+     * @return int One of the constants VERY_HIGH_CONFIDENCE, HIGH_CONFIDENCE,
+     *             MEDIUM_CONFIDENCE and LOW_CONFIDENCE
      */
     public function getConfidence()
     {

@@ -116,7 +116,7 @@ abstract class FileDumper implements DumperInterface
         return strtr($this->relativePathTemplate, array(
             '%domain%' => $domain,
             '%locale%' => $locale,
-            '%extension%' => $this->getExtension()
+            '%extension%' => $this->getExtension(),
         ));
     }
 }

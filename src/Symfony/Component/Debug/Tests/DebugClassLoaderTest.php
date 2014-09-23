@@ -99,18 +99,18 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
                 class ChildTestingStacking extends TestingStacking { function foo($bar) {} }
             ');
             $this->fail('ContextErrorException expected');
-        } catch (ContextErrorException $exception) {
+        } catch (\ErrorException $exception) {
             // if an exception is thrown, the test passed
             restore_error_handler();
             restore_exception_handler();
             $this->assertEquals(E_STRICT, $exception->getSeverity());
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
             $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             restore_error_handler();
             restore_exception_handler();
 
-            throw $e;
+            throw $exception;
         }
     }
 
@@ -150,6 +150,11 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testNotPsr0Bis()
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
+    }
+
+    public function testClassAlias()
+    {
+        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\ClassAlias', true));
     }
 }
 

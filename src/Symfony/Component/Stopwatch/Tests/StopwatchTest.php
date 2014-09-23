@@ -63,7 +63,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
                 'foo' =>
                 $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
                     ->setConstructorArgs(array(microtime(true) * 1000))
-                    ->getMock())
+                    ->getMock(),)
         );
 
         $this->assertFalse($stopwatch->isStarted('foo'));
@@ -75,19 +75,6 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
         $stopwatch->start('foo', 'cat');
         usleep(200000);
         $event = $stopwatch->stop('foo');
-
-        $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
-        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
-    }
-
-    public function testLap()
-    {
-        $stopwatch = new Stopwatch();
-        $stopwatch->start('foo', 'cat');
-        usleep(100000);
-        $event = $stopwatch->lap('foo');
-        usleep(100000);
-        $stopwatch->stop('foo');
 
         $this->assertInstanceof('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);

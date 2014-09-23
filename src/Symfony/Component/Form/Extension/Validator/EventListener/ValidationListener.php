@@ -13,7 +13,8 @@ namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
@@ -35,8 +36,16 @@ class ValidationListener implements EventSubscriberInterface
         return array(FormEvents::POST_SUBMIT => 'validateForm');
     }
 
-    public function __construct(ValidatorInterface $validator, ViolationMapperInterface $violationMapper)
+    /**
+     * @param ValidatorInterface|LegacyValidatorInterface $validator
+     * @param ViolationMapperInterface                    $violationMapper
+     */
+    public function __construct($validator, ViolationMapperInterface $violationMapper)
     {
+        if (!$validator instanceof ValidatorInterface && !$validator instanceof LegacyValidatorInterface) {
+            throw new \InvalidArgumentException('Validator must be instance of Symfony\Component\Validator\Validator\ValidatorInterface or Symfony\Component\Validator\ValidatorInterface');
+        }
+
         $this->validator = $validator;
         $this->violationMapper = $violationMapper;
     }

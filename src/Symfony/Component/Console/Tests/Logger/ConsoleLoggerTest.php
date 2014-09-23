@@ -44,7 +44,7 @@ class ConsoleLoggerTest extends LoggerInterfaceTest
             LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
             LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
-            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
         ));
     }
 

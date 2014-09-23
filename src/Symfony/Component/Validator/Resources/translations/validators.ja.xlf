@@ -35,12 +35,12 @@
                 <target>無効な選択肢が含まれています。</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>フィールド{{ fields }}は無効です。</target>
+                <source>This field was not expected.</source>
+                <target>このフィールドは予期されていませんでした。</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>フィールド{{ fields }}は必須です。</target>
+                <source>This field is missing.</source>
+                <target>このフィールドは、欠落しています。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -297,6 +297,10 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>画像が縦向きになっています({{ width }}x{{ height }}ピクセル)。縦向きの画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>空のファイルは許可されていません。</target>
             </trans-unit>
         </body>
     </file>

@@ -1,21 +1,27 @@
 language: php
 
 php:
-  - 5.3.3
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
-  - hhvm-nightly
+    - 5.3.3
+    - 5.3
+    - 5.4
+    - 5.5
+    - 5.6
+    - hhvm-nightly
 
 matrix:
     allow_failures:
-        - php: 5.6
         - php: hhvm-nightly
+    include:
+        - php: 5.5
+          env: components=yes
 
 services: mongodb
 
-before_script:
+env:
+    global:
+        - components=no
+
+before_install:
     - travis_retry sudo apt-get install parallel
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini; fi;'
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
@@ -23,9 +29,12 @@ before_script:
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
-    - COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install
-    - wget https://phar.phpunit.de/phpunit.phar && rm `which phpunit` && sudo cp phpunit.phar /usr/local/bin/phpunit && sudo chmod +x /usr/local/bin/phpunit
+#    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;'
+
+install:
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install"; fi;'
 
 script:
-    - ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark {};' || exit 1
-    - echo "Running tests requiring tty"; phpunit --group tty
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "ls -d src/Symfony/*/* | parallel --gnu --keep-order '\''echo \"Running {} tests\"; phpunit --exclude-group tty,benchmark {};'\''"; fi;'
+    - sh -c 'if [ "$components" = "no" ]; then sh -c "echo "\""Running tests requiring tty"\""; phpunit --group tty"; fi;'
+    - sh -c 'if [ "$components" = "yes" ]; then sh -c "find src/Symfony -mindepth 3 -type f -name '\''phpunit.xml.dist'\'' | sed '\''s#\(.*\)/.*#\1#'\'' | parallel --gnu --keep-order '\''echo \"Running {} tests\"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; phpunit --exclude-group tty,benchmark;'\''"; fi;'

@@ -52,13 +52,7 @@ abstract class FormField
     {
         $this->node = $node;
         $this->name = $node->getAttribute('name');
-
-        $this->document = new \DOMDocument('1.0', 'UTF-8');
-        $this->node = $this->document->importNode($this->node, true);
-
-        $root = $this->document->appendChild($this->document->createElement('_root'));
-        $root->appendChild($this->node);
-        $this->xpath = new \DOMXPath($this->document);
+        $this->xpath = new \DOMXPath($node->ownerDocument);
 
         $this->initialize();
     }

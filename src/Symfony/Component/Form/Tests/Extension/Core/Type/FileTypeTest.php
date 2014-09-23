@@ -47,7 +47,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testSubmitMultiple()
     {
         $form = $this->factory->createBuilder('file', null, array(
-            'multiple' => true
+            'multiple' => true,
         ))->getForm();
 
         $data = array(
@@ -78,7 +78,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array(__DIR__.'/../../../Fixtures/foo', 'foo'))
             ->getMock()
         ;
         $file

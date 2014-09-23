@@ -35,12 +35,12 @@
                 <target>Une ou plusieurs des valeurs soumises sont invalides.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Les champs {{ fields }} n'ont pas été prévus.</target>
+                <source>This field was not expected.</source>
+                <target>Ce champ n'a pas été prévu.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>Les champs {{ fields }} sont manquants.</target>
+                <source>This field is missing.</source>
+                <target>Ce champ est manquant.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -175,7 +175,7 @@
                 <target>La hauteur de l'image est trop petite ({{ height }}px). La hauteur minimale attendue est de {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Cette valeur doit être le mot de passe actuel de l'utilisateur.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,6 +297,10 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>L'image est au format portrait ({{ width }}x{{ height }}px). Les images au format portrait ne sont pas autorisées.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Un fichier vide n'est pas autorisé.</target>
             </trans-unit>
         </body>
     </file>

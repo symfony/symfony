@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -137,6 +138,22 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    {
+        $this->writeData($this->getEventDispatcherListenersData($eventDispatcher, array_key_exists('event', $options) ? $options['event'] : null), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeCallable($callable, array $options = array())
+    {
+        $this->writeData($this->getCallableData($callable, $options), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function describeContainerParameter($parameter, array $options = array())
     {
         $key = isset($options['parameter']) ? $options['parameter'] : '';
@@ -221,5 +238,97 @@ class JsonDescriptor extends Descriptor
             'service' => (string) $alias,
             'public'  => $alias->isPublic(),
         );
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param string|null $event
+     *
+     * @return array
+     */
+    private function getEventDispatcherListenersData(EventDispatcherInterface $eventDispatcher, $event = null)
+    {
+        $data = array();
+
+        $registeredListeners = $eventDispatcher->getListeners($event);
+        if (null !== $event) {
+            foreach ($registeredListeners as $listener) {
+                $data[] = $this->getCallableData($listener);
+            }
+        } else {
+            ksort($registeredListeners);
+
+            foreach ($registeredListeners as $eventListened => $eventListeners) {
+                foreach ($eventListeners as $eventListener) {
+                    $data[$eventListened][] = $this->getCallableData($eventListener);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param callable $callable
+     * @param array $options
+     *
+     * @return array
+     */
+    private function getCallableData($callable, array $options = array())
+    {
+        $data = array();
+
+        if (is_array($callable)) {
+            $data['type'] = 'function';
+
+            if (is_object($callable[0])) {
+                $data['name'] = $callable[1];
+                $data['class'] = get_class($callable[0]);
+            } else {
+                if (0 !== strpos($callable[1], 'parent::')) {
+                    $data['name'] = $callable[1];
+                    $data['class'] = $callable[0];
+                    $data['static'] = true;
+                } else {
+                    $data['name'] = substr($callable[1], 8);
+                    $data['class'] = $callable[0];
+                    $data['static'] = true;
+                    $data['parent'] = true;
+                }
+            }
+
+            return $data;
+        }
+
+        if (is_string($callable)) {
+            $data['type'] = 'function';
+
+            if (false === strpos($callable, '::')) {
+                $data['name'] = $callable;
+            } else {
+                $callableParts = explode('::', $callable);
+
+                $data['name'] = $callableParts[1];
+                $data['class'] = $callableParts[0];
+                $data['static'] = true;
+            }
+
+            return $data;
+        }
+
+        if ($callable instanceof \Closure) {
+            $data['type'] = 'closure';
+
+            return $data;
+        }
+
+        if (method_exists($callable, '__invoke')) {
+            $data['type'] = 'object';
+            $data['name'] = get_class($callable);
+
+            return $data;
+        }
+
+        throw new \InvalidArgumentException('Callable is not describable.');
     }
 }

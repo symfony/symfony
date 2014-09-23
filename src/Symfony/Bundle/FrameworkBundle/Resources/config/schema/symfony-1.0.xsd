@@ -30,6 +30,7 @@
             <xsd:element name="translator" type="translator" minOccurs="0" maxOccurs="1" />
             <xsd:element name="validation" type="validation" minOccurs="0" maxOccurs="1" />
             <xsd:element name="annotations" type="annotations" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="property-access" type="property_access" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -136,6 +137,7 @@
         <xsd:attribute name="assets-version" type="xsd:string" />
         <xsd:attribute name="assets-version-format" type="xsd:string" />
         <xsd:attribute name="cache" type="xsd:string" />
+        <xsd:attribute name="hinclude-default-template" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="form-resources">
@@ -175,5 +177,10 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="file-cache-dir" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="property_access">
+        <xsd:attribute name="magic-call" type="xsd:boolean" />
+        <xsd:attribute name="throw-exception-on-invalid-index" type="xsd:boolean" />
     </xsd:complexType>
 </xsd:schema>

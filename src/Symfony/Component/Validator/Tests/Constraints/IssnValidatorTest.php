@@ -13,20 +13,21 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Issn;
 use Symfony\Component\Validator\Constraints\IssnValidator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @see https://en.wikipedia.org/wiki/Issn
  */
-class IssnValidatorTest extends \PHPUnit_Framework_TestCase
+class IssnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    public function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new IssnValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new IssnValidator();
     }
 
     public function getValidLowerCasedIssn()
@@ -83,7 +84,7 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(0),
             array('1539'),
-            array('2156-537A')
+            array('2156-537A'),
         );
     }
 
@@ -96,7 +97,6 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
             array('1684-537X'),
             array('1996-0795'),
         );
-
     }
 
     public function getInvalidIssn()
@@ -110,21 +110,19 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testNullIsValid()
     {
         $constraint = new Issn();
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
         $constraint = new Issn();
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate('', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -141,13 +139,16 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCaseSensitiveIssns($issn)
     {
-        $constraint = new Issn(array('caseSensitive' => true));
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message);
+        $constraint = new Issn(array(
+            'caseSensitive' => true,
+            'message' => 'myMessage',
+        ));
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -155,13 +156,16 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testRequireHyphenIssns($issn)
     {
-        $constraint = new Issn(array('requireHyphen' => true));
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message);
+        $constraint = new Issn(array(
+            'requireHyphen' => true,
+            'message' => 'myMessage',
+        ));
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -170,11 +174,10 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidIssn($issn)
     {
         $constraint = new Issn();
-        $this->context
-            ->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -182,13 +185,15 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidFormatIssn($issn)
     {
-        $constraint = new Issn();
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message);
+        $constraint = new Issn(array(
+            'message' => 'myMessage',
+        ));
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -196,13 +201,15 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValueIssn($issn)
     {
-        $constraint = new Issn();
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message);
+        $constraint = new Issn(array(
+            'message' => 'myMessage',
+        ));
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 
     /**
@@ -210,11 +217,14 @@ class IssnValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidIssn($issn)
     {
-        $constraint = new Issn();
-        $this->context
-            ->expects($this->once())
-            ->method('addViolation');
+        $constraint = new Issn(array(
+            'message' => 'myMessage',
+        ));
 
         $this->validator->validate($issn, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$issn.'"',
+        ));
     }
 }

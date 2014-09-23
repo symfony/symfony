@@ -212,16 +212,15 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($bag->filter('dec', '', false, FILTER_VALIDATE_INT, array(
             'flags'   => FILTER_FLAG_ALLOW_HEX,
-            'options' => array('min_range' => 1, 'max_range' => 0xff))
+            'options' => array('min_range' => 1, 'max_range' => 0xff),)
                 ), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertFalse($bag->filter('hex', '', false, FILTER_VALIDATE_INT, array(
             'flags'   => FILTER_FLAG_ALLOW_HEX,
-            'options' => array('min_range' => 1, 'max_range' => 0xff))
+            'options' => array('min_range' => 1, 'max_range' => 0xff),)
                 ), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
-
     }
 
     /**
@@ -250,5 +249,18 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new ParameterBag($parameters);
 
         $this->assertEquals(count($parameters), count($bag));
+    }
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\ParameterBag::getBoolean
+     */
+    public function testGetBoolean()
+    {
+        $parameters = array('string_true' => 'true', 'string_false' => 'false');
+        $bag = new ParameterBag($parameters);
+
+        $this->assertTrue($bag->getBoolean('string_true'), '->getBoolean() gets the string true as boolean true');
+        $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
+        $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
     }
 }

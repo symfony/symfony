@@ -13,7 +13,13 @@ namespace Symfony\Bridge\Monolog\Tests\Handler;
 
 use Monolog\Logger;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Tests the ConsoleHandler and also the ConsoleFormatter.
@@ -64,10 +70,10 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             array(OutputInterface::VERBOSITY_DEBUG, Logger::DEBUG, true),
             array(OutputInterface::VERBOSITY_DEBUG, Logger::EMERGENCY, true),
             array(OutputInterface::VERBOSITY_NORMAL, Logger::NOTICE, true, array(
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE
+                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
             )),
             array(OutputInterface::VERBOSITY_DEBUG, Logger::NOTICE, true, array(
-                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE
+                OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
             )),
         );
     }
@@ -155,5 +161,43 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue($handler->handle($errorRecord), 'The handler finished handling the log as bubble is false.');
+    }
+
+    public function testLogsFromListeners()
+    {
+        $output = new BufferedOutput();
+        $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+
+        $handler = new ConsoleHandler(null, false);
+
+        $logger = new Logger('app');
+        $logger->pushHandler($handler);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+            $logger->addInfo('Before command message.');
+        });
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+            $logger->addInfo('Before terminate message.');
+        });
+
+        $dispatcher->addSubscriber($handler);
+
+        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+            $logger->addInfo('After command message.');
+        });
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+            $logger->addInfo('After terminate message.');
+        });
+
+        $event = new ConsoleCommandEvent(new Command('foo'), $this->getMock('Symfony\Component\Console\Input\InputInterface'), $output);
+        $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+        $this->assertContains('Before command message.', $out = $output->fetch());
+        $this->assertContains('After command message.', $out);
+
+        $event = new ConsoleTerminateEvent(new Command('foo'), $this->getMock('Symfony\Component\Console\Input\InputInterface'), $output, 0);
+        $dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
+        $this->assertContains('Before terminate message.', $out = $output->fetch());
+        $this->assertContains('After terminate message.', $out);
     }
 }

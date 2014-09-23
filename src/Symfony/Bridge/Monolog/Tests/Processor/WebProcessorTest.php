@@ -24,7 +24,7 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
             'REMOTE_ADDR'    => 'B',
             'REQUEST_METHOD' => 'C',
             'SERVER_NAME'    => 'D',
-            'HTTP_REFERER'   => 'E'
+            'HTTP_REFERER'   => 'E',
         );
 
         $request = new Request();

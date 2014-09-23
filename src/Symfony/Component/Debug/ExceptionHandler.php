@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\OutOfMemoryException;
 
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);
@@ -28,16 +29,18 @@ if (!defined('ENT_SUBSTITUTE')) {
  * available, the Response content is always HTML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Nicolas Grekas <p@tchwork.com>
  */
-class ExceptionHandler implements ExceptionHandlerInterface
+class ExceptionHandler
 {
     private $debug;
-    private $charset;
+    private $handler;
+    private $caughtBuffer;
+    private $caughtLength;
 
-    public function __construct($debug = true, $charset = 'UTF-8')
+    public function __construct($debug = true)
     {
         $this->debug = $debug;
-        $this->charset = $charset;
     }
 
     /**
@@ -51,14 +54,75 @@ class ExceptionHandler implements ExceptionHandlerInterface
     {
         $handler = new static($debug);
 
-        set_exception_handler(array($handler, 'handle'));
+        $prev = set_exception_handler(array($handler, 'handle'));
+        if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
+            restore_exception_handler();
+            $prev[0]->setExceptionHandler(array($handler, 'handle'));
+        }
 
         return $handler;
     }
 
     /**
-     * {@inheritdoc}
+     * Sets a user exception handler.
      *
+     * @param callable $handler An handler that will be called on Exception
+     *
+     * @return callable|null The previous exception handler if any
+     */
+    public function setHandler($handler)
+    {
+        if (null !== $handler && !is_callable($handler)) {
+            throw new \LogicException('The exception handler must be a valid PHP callable.');
+        }
+        $old = $this->handler;
+        $this->handler = $handler;
+
+        return $old;
+    }
+
+    /**
+     * Sends a response for the given Exception.
+     *
+     * To be as fail-safe as possible, the exception is first handled
+     * by our simple exception handler, then by the user exception handler.
+     * The latter takes precedence and any output from the former is cancelled,
+     * if and only if nothing bad happens in this handling path.
+     */
+    public function handle(\Exception $exception)
+    {
+        if (null === $this->handler || $exception instanceof OutOfMemoryException) {
+            $this->failSafeHandle($exception);
+
+            return;
+        }
+
+        $caughtLength = $this->caughtLength = 0;
+
+        ob_start(array($this, 'catchOutput'));
+        $this->failSafeHandle($exception);
+        while (null === $this->caughtBuffer && ob_end_flush()) {
+            // Empty loop, everything is in the condition
+        }
+        if (isset($this->caughtBuffer[0])) {
+            ob_start(array($this, 'cleanOutput'));
+            echo $this->caughtBuffer;
+            $caughtLength = ob_get_length();
+        }
+        $this->caughtBuffer = null;
+
+        try {
+            call_user_func($this->handler, $exception);
+            $this->caughtLength = $caughtLength;
+        } catch (\Exception $e) {
+            if (!$caughtLength) {
+                // All handlers failed. Let PHP handle that now.
+                throw $exception;
+            }
+        }
+    }
+
+    /**
      * Sends a response for the given Exception.
      *
      * If you have the Symfony HttpFoundation component installed,
@@ -68,9 +132,9 @@ class ExceptionHandler implements ExceptionHandlerInterface
      * @see sendPhpResponse
      * @see createResponse
      */
-    public function handle(\Exception $exception)
+    private function failSafeHandle(\Exception $exception)
     {
-        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+        if (class_exists('Symfony\Component\HttpFoundation\Response', false)) {
             $response = $this->createResponse($exception);
             $response->sendHeaders();
             $response->sendContent();
@@ -143,29 +207,26 @@ class ExceptionHandler implements ExceptionHandlerInterface
                 $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
-                    $class = $this->abbrClass($e['class']);
-                    $message = nl2br($e['message']);
+                    $class = $this->formatClass($e['class']);
+                    $message = nl2br(self::utf8Htmlize($e['message']));
                     $content .= sprintf(<<<EOF
-                        <div class="block_exception clear_fix">
-                            <h2><span>%d/%d</span> %s: %s</h2>
-                        </div>
+                        <h2 class="block_exception clear_fix">
+                            <span class="exception_counter">%d/%d</span>
+                            <span class="exception_title">%s%s:</span>
+                            <span class="exception_message">%s</span>
+                        </h2>
                         <div class="block">
                             <ol class="traces list_exception">
 
 EOF
-                        , $ind, $total, $class, $message);
+                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
                     foreach ($e['trace'] as $trace) {
                         $content .= '       <li>';
                         if ($trace['function']) {
-                            $content .= sprintf('at %s%s%s(%s)', $this->abbrClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
+                            $content .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
                         }
                         if (isset($trace['file']) && isset($trace['line'])) {
-                            if ($linkFormat = ini_get('xdebug.file_link_format')) {
-                                $link = str_replace(array('%f', '%l'), array($trace['file'], $trace['line']), $linkFormat);
-                                $content .= sprintf(' in <a href="%s" title="Go to source">%s line %s</a>', $link, $trace['file'], $trace['line']);
-                            } else {
-                                $content .= sprintf(' in %s line %s', $trace['file'], $trace['line']);
-                            }
+                            $content .= $this->formatPath($trace['file'], $trace['line']);
                         }
                         $content .= "</li>\n";
                     }
@@ -210,12 +271,14 @@ EOF;
             .sf-reset abbr { border-bottom: 1px dotted #000; cursor: help; }
             .sf-reset p { font-size:14px; line-height:20px; color:#868686; padding-bottom:20px }
             .sf-reset strong { font-weight:bold; }
-            .sf-reset a { color:#6c6159; }
+            .sf-reset a { color:#6c6159; cursor: default; }
             .sf-reset a img { border:none; }
             .sf-reset a:hover { text-decoration:underline; }
             .sf-reset em { font-style:italic; }
             .sf-reset h1, .sf-reset h2 { font: 20px Georgia, "Times New Roman", Times, serif }
-            .sf-reset h2 span { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; }
+            .sf-reset .exception_counter { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; float: left; display: block; }
+            .sf-reset .exception_title { margin-left: 3em; margin-bottom: 0.7em; display: block; }
+            .sf-reset .exception_message { margin-left: 3em; display: block; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
                 -webkit-border-bottom-right-radius: 16px;
@@ -241,8 +304,8 @@ EOF;
                 overflow: hidden;
                 word-wrap: break-word;
             }
-            .sf-reset li a { background:none; color:#868686; text-decoration:none; }
-            .sf-reset li a:hover { background:none; color:#313131; text-decoration:underline; }
+            .sf-reset a { background:none; color:#868686; text-decoration:none; }
+            .sf-reset a:hover { background:none; color:#313131; text-decoration:underline; }
             .sf-reset ol { padding: 10px 0; }
             .sf-reset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
                 -webkit-border-radius: 10px;
@@ -278,11 +341,25 @@ EOF;
 EOF;
     }
 
-    private function abbrClass($class)
+    private function formatClass($class)
     {
         $parts = explode('\\', $class);
 
         return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+    }
+
+    private function formatPath($path, $line)
+    {
+        $path = self::utf8Htmlize($path);
+        $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
+
+        if ($linkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) {
+            $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
+
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+        }
+
+        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
     }
 
     /**
@@ -297,11 +374,11 @@ EOF;
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
+                $formattedValue = sprintf("<em>object</em>(%s)", $this->formatClass($item[1]));
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string'  === $item[0]) {
-                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
+                $formattedValue = sprintf("'%s'", self::utf8Htmlize($item[1]));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -309,12 +386,57 @@ EOF;
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), true));
+                $formattedValue = str_replace("\n", '', var_export(self::utf8Htmlize((string) $item[1]), true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
         }
 
         return implode(', ', $result);
+    }
+
+    /**
+     * Returns an UTF-8 and HTML encoded string
+     */
+    protected static function utf8Htmlize($str)
+    {
+        if (!preg_match('//u', $str) && function_exists('iconv')) {
+            set_error_handler('var_dump', 0);
+            $charset = ini_get('default_charset');
+            if ('UTF-8' === $charset || $str !== @iconv($charset, $charset, $str)) {
+                $charset = 'CP1252';
+            }
+            restore_error_handler();
+
+            $str = iconv($charset, 'UTF-8', $str);
+        }
+
+        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * @internal
+     */
+    public function catchOutput($buffer)
+    {
+        $this->caughtBuffer = $buffer;
+
+        return '';
+    }
+
+    /**
+     * @internal
+     */
+    public function cleanOutput($buffer)
+    {
+        if ($this->caughtLength) {
+            // use substr_replace() instead of substr() for mbstring overloading resistance
+            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
+            if (isset($cleanBuffer[0])) {
+                $buffer = $cleanBuffer;
+            }
+        }
+
+        return $buffer;
     }
 }

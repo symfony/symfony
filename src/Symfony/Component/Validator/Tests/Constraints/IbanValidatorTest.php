@@ -13,31 +13,32 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\IbanValidator;
+use Symfony\Component\Validator\Validation;
 
-class IbanValidatorTest extends \PHPUnit_Framework_TestCase
+class IbanValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new IbanValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new IbanValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate(null, new Iban());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate('', new Iban());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -45,15 +46,16 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIbans($iban)
     {
-        $this->context->expects($this->never())->method('addViolation');
-
         $this->validator->validate($iban, new Iban());
+
+        $this->assertNoViolation();
     }
 
     public function getValidIbans()
     {
         return array(
             array('CH9300762011623852957'), // Switzerland without spaces
+            array('CH93  0076 2011 6238 5295 7'), // Switzerland with multiple spaces
 
             //Country list
             //http://www.rbs.co.uk/corporate/international/g0/guide-to-international-business/regulatory-information/iban/iban-example.ashx
@@ -157,16 +159,14 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidIbans($iban)
     {
         $constraint = new Iban(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $iban,
-            ));
-
         $this->validator->validate($iban, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$iban.'"',
+        ));
     }
 
     public function getInvalidIbans()
@@ -182,10 +182,11 @@ class IbanValidatorTest extends \PHPUnit_Framework_TestCase
             array('foo'),
             array('123'),
             array('0750447346'),
+            array('CH930076201162385295]'),
 
             //Ibans with lower case values are invalid
             array('Ae260211000000230064016'),
-            array('ae260211000000230064016')
+            array('ae260211000000230064016'),
         );
     }
 }

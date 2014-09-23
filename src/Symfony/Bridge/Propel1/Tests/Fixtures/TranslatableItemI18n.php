@@ -94,7 +94,6 @@ class TranslatableItemI18n implements \Persistent
 
     public function setLocale($locale)
     {
-
         $this->locale = $locale;
     }
 
@@ -115,7 +114,6 @@ class TranslatableItemI18n implements \Persistent
 
     public function setValue($value)
     {
-
         $this->value = $value;
     }
 
@@ -126,7 +124,6 @@ class TranslatableItemI18n implements \Persistent
 
     public function setValue2($value2)
     {
-
         $this->value2 = $value2;
     }
 

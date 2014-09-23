@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Colin Frei <colin@colinfrei.com>
  * @author Konstantin Myakshin <koc-dp@yandex.ru>
+ *
+ * @deprecated since 2.6, to be removed in 3.0. Use DebugHandlersListener instead.
  */
 class ErrorsLoggerListener implements EventSubscriberInterface
 {

@@ -177,7 +177,7 @@ class TimeType extends AbstractType
             return array(
                 'hour' => $emptyValue,
                 'minute' => $emptyValue,
-                'second' => $emptyValue
+                'second' => $emptyValue,
             );
         };
 

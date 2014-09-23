@@ -114,7 +114,6 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($exception->getMessage(), $flattened->getMessage(), 'The message is copied from the original exception.');
         $this->assertEquals($exception->getCode(), $flattened->getCode(), 'The code is copied from the original exception.');
         $this->assertInstanceOf($flattened->getClass(), $exception, 'The class is set to the class of the original exception');
-
     }
 
     /**
@@ -160,13 +159,13 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             array(
-                'message'=> 'test',
-                'class'=>'Exception',
-                'trace'=>array(array(
+                'message' => 'test',
+                'class' => 'Exception',
+                'trace' => array(array(
                     'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php', 'line' => 123,
-                    'args'        => array()
+                    'args'        => array(),
                 )),
-            )
+            ),
         ), $flattened->toArray());
     }
 
@@ -202,7 +201,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                     'line' => 123,
                     'function' => 'test',
                     'args' => array(
-                        unserialize('O:14:"BogusTestClass":0:{}')
+                        unserialize('O:14:"BogusTestClass":0:{}'),
                     ),
                 ),
             ),
@@ -211,9 +210,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             array(
-                'message'=> 'test',
-                'class'=>'Exception',
-                'trace'=>array(
+                'message' => 'test',
+                'class' => 'Exception',
+                'trace' => array(
                     array(
                         'namespace'   => '', 'short_class' => '', 'class' => '','type' => '','function' => '',
                         'file'        => 'foo.php', 'line' => 123,
@@ -224,12 +223,12 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                         'file'        => __FILE__, 'line' => 123,
                         'args'        => array(
                             array(
-                                'incomplete-object', 'BogusTestClass'
+                                'incomplete-object', 'BogusTestClass',
                             ),
                         ),
-                    )
+                    ),
                 ),
-            )
+            ),
         ), $flattened->toArray());
     }
 }

@@ -47,21 +47,10 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
         if (false !== $namespaceSeparatorIndex = strrpos($fullyQualifiedFunctionName, '\\')) {
             $functionName = substr($fullyQualifiedFunctionName, $namespaceSeparatorIndex + 1);
             $namespacePrefix = substr($fullyQualifiedFunctionName, 0, $namespaceSeparatorIndex);
-            $message = sprintf(
-                'Attempted to call function "%s" from namespace "%s" in %s line %d.',
-                $functionName,
-                $namespacePrefix,
-                $error['file'],
-                $error['line']
-            );
+            $message = sprintf('Attempted to call function "%s" from namespace "%s".', $functionName, $namespacePrefix);
         } else {
             $functionName = $fullyQualifiedFunctionName;
-            $message = sprintf(
-                'Attempted to call function "%s" from the global namespace in %s line %d.',
-                $functionName,
-                $error['file'],
-                $error['line']
-            );
+            $message = sprintf('Attempted to call function "%s" from the global namespace.', $functionName);
         }
 
         $candidates = array();
@@ -81,9 +70,13 @@ class UndefinedFunctionFatalErrorHandler implements FatalErrorHandlerInterface
 
         if ($candidates) {
             sort($candidates);
-            $message .= ' Did you mean to call: '.implode(', ', array_map(function ($val) {
-                return '"'.$val.'"';
-            }, $candidates)).'?';
+            $last = array_pop($candidates).'"?';
+            if ($candidates) {
+                $candidates = 'e.g. "'.implode('", "', $candidates).'" or "'.$last;
+            } else {
+                $candidates = '"'.$last;
+            }
+            $message .= "\nDid you mean to call ".$candidates;
         }
 
         return new UndefinedFunctionException($message, $exception);

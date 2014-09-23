@@ -20,7 +20,7 @@ namespace Symfony\Component\Debug\Exception;
  */
 class FatalErrorException extends \ErrorException
 {
-    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null)
+    public function __construct($message, $code, $severity, $filename, $lineno, $traceOffset = null, $traceArgs = true)
     {
         parent::__construct($message, $code, $severity, $filename, $lineno);
 
@@ -28,28 +28,32 @@ class FatalErrorException extends \ErrorException
             if (function_exists('xdebug_get_function_stack')) {
                 $trace = xdebug_get_function_stack();
                 if (0 < $traceOffset) {
-                    $trace = array_slice($trace, 0, -$traceOffset);
+                    array_splice($trace, -$traceOffset);
                 }
-                $trace = array_reverse($trace);
 
-                foreach ($trace as $i => $frame) {
+                foreach ($trace as &$frame) {
                     if (!isset($frame['type'])) {
                         //  XDebug pre 2.1.1 doesn't currently set the call type key http://bugs.xdebug.org/view.php?id=695
                         if (isset($frame['class'])) {
-                            $trace[$i]['type'] = '::';
+                            $frame['type'] = '::';
                         }
                     } elseif ('dynamic' === $frame['type']) {
-                        $trace[$i]['type'] = '->';
+                        $frame['type'] = '->';
                     } elseif ('static' === $frame['type']) {
-                        $trace[$i]['type'] = '::';
+                        $frame['type'] = '::';
                     }
 
                     // XDebug also has a different name for the parameters array
-                    if (isset($frame['params']) && !isset($frame['args'])) {
-                        $trace[$i]['args'] = $frame['params'];
-                        unset($trace[$i]['params']);
+                    if (!$traceArgs) {
+                        unset($frame['params'], $frame['args']);
+                    } elseif (isset($frame['params']) && !isset($frame['args'])) {
+                        $frame['args'] = $frame['params'];
+                        unset($frame['params']);
                     }
                 }
+
+                unset($frame);
+                $trace = array_reverse($trace);
             } else {
                 $trace = array();
             }

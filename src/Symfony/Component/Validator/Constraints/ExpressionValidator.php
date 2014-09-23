@@ -60,10 +60,6 @@ class ExpressionValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Expression');
         }
 
-        if (null === $value || '' === $value) {
-            return;
-        }
-
         $variables = array();
 
         // Symfony 2.5+
@@ -74,14 +70,18 @@ class ExpressionValidator extends ConstraintValidator
             $variables['value'] = $value;
             $variables['this'] = $value;
         } else {
-            // Extract the object that the property belongs to from the object
-            // graph
-            $path = new PropertyPath($this->context->getPropertyPath());
-            $parentPath = $path->getParent();
             $root = $this->context->getRoot();
-
             $variables['value'] = $value;
-            $variables['this'] = $parentPath ? $this->getPropertyAccessor()->getValue($root, $parentPath) : $root;
+
+            if (is_object($root)) {
+                // Extract the object that the property belongs to from the object
+                // graph
+                $path = new PropertyPath($this->context->getPropertyPath());
+                $parentPath = $path->getParent();
+                $variables['this'] = $parentPath ? $this->getPropertyAccessor()->getValue($root, $parentPath) : $root;
+            } else {
+                $variables['this'] = null;
+            }
         }
 
         if (!$this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {

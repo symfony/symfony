@@ -17,7 +17,6 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ExpressionLanguage\Expression;
 
 abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -82,6 +81,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.form.secure',
                 'security.authentication.listener.basic.secure',
                 'security.authentication.listener.digest.secure',
+                'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
                 'security.access_listener',
                 'security.authentication.switchuser_listener.secure',
@@ -217,6 +217,20 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($container->hasDefinition('security.acl.dbal.provider'));
         $this->assertEquals('foo', (string) $container->getAlias('security.acl.provider'));
+    }
+
+    public function testRememberMeThrowExceptionsDefault()
+    {
+        $container = $this->getContainer('container1');
+        $this->assertTrue($container->getDefinition('security.authentication.listener.rememberme.secure')->getArgument(5));
+    }
+
+    public function testRememberMeThrowExceptions()
+    {
+        $container = $this->getContainer('remember_me_options');
+        $service = $container->getDefinition('security.authentication.listener.rememberme.main');
+        $this->assertEquals('security.authentication.rememberme.services.persistent.main', $service->getArgument(1));
+        $this->assertFalse($service->getArgument(5));
     }
 
     protected function getContainer($file)

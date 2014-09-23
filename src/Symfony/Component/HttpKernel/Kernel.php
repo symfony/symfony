@@ -32,7 +32,6 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -60,10 +59,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION         = '2.5.0-DEV';
-    const VERSION_ID      = '20500';
+    const VERSION         = '2.6.0-DEV';
+    const VERSION_ID      = '20600';
     const MAJOR_VERSION   = '2';
-    const MINOR_VERSION   = '5';
+    const MINOR_VERSION   = '6';
     const RELEASE_VERSION = '0';
     const EXTRA_VERSION   = 'DEV';
 
@@ -210,6 +209,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * {@inheritdoc}
      *
      * @api
+     *
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function isClassInActiveBundle($class)
     {
@@ -518,7 +519,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 array_pop($bundleMap);
             }
         }
-
     }
 
     /**
@@ -715,45 +715,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $content = static::stripComments($content);
         }
 
-        $content = $this->removeAbsolutePathsFromContainer($content);
-
         $cache->write($content, $container->getResources());
-    }
-
-    /**
-     * Converts absolute paths to relative ones in the dumped container.
-     */
-    private function removeAbsolutePathsFromContainer($content)
-    {
-        if (!class_exists('Symfony\Component\Filesystem\Filesystem')) {
-            return $content;
-        }
-
-        // find the "real" root dir (by finding the composer.json file)
-        $rootDir = $this->getRootDir();
-        $previous = $rootDir;
-        while (!file_exists($rootDir.'/composer.json')) {
-            if ($previous === $rootDir = realpath($rootDir.'/..')) {
-                // unable to detect the project root, give up
-                return $content;
-            }
-
-            $previous = $rootDir;
-        }
-
-        $rootDir = rtrim($rootDir, '/');
-        $cacheDir = $this->getCacheDir();
-        $filesystem = new Filesystem();
-
-        return preg_replace_callback("{'([^']*)(".preg_quote($rootDir)."[^']*)'}", function ($match) use ($filesystem, $cacheDir) {
-            $prefix = isset($match[1]) && $match[1] ? "'$match[1]'.__DIR__" : "__DIR__";
-
-            if ('.' === $relativePath = rtrim($filesystem->makePathRelative($match[2], $cacheDir), '/')) {
-                return $prefix;
-            }
-
-            return $prefix.".'/".$relativePath."'";
-        }, $content);
     }
 
     /**

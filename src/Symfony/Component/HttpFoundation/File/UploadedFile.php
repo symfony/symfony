@@ -291,7 +291,7 @@ class UploadedFile extends File
     public function getErrorMessage()
     {
         static $errors = array(
-            UPLOAD_ERR_INI_SIZE   => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d kb).',
+            UPLOAD_ERR_INI_SIZE   => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',
             UPLOAD_ERR_FORM_SIZE  => 'The file "%s" exceeds the upload limit defined in your form.',
             UPLOAD_ERR_PARTIAL    => 'The file "%s" was only partially uploaded.',
             UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',

@@ -66,7 +66,7 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
             if (count($data) == 2) {
                 $messages[$data[0]] = $data[1];
             } else {
-                 continue;
+                continue;
             }
         }
 

@@ -78,7 +78,8 @@ class DebugClassLoader
     public static function enable()
     {
         // Ensures we don't hit https://bugs.php.net/42098
-        class_exists(__NAMESPACE__.'\ErrorHandler', true);
+        class_exists('Symfony\Component\Debug\ErrorHandler');
+        class_exists('Psr\Log\LogLevel');
 
         if (!is_array($functions = spl_autoload_functions())) {
             return;
@@ -175,7 +176,7 @@ class DebugClassLoader
             $refl = new \ReflectionClass($class);
             $name = $refl->getName();
 
-            if ($name !== $class) {
+            if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
         }

@@ -34,6 +34,23 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('%form.type_extension.csrf.field_name%', $def->getArgument(2));
     }
 
+    public function testPropertyAccessWithDefaultValue()
+    {
+        $container = $this->createContainerFromFile('full');
+
+        $def = $container->getDefinition('property_accessor');
+        $this->assertFalse($def->getArgument(0));
+        $this->assertFalse($def->getArgument(1));
+    }
+
+    public function testPropertyAccessWithOverriddenValues()
+    {
+        $container = $this->createContainerFromFile('property_accessor');
+        $def = $container->getDefinition('property_accessor');
+        $this->assertTrue($def->getArgument(0));
+        $this->assertTrue($def->getArgument(1));
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage CSRF protection needs sessions to be enabled.
@@ -169,8 +186,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
 
-        $this->assertEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() sets request scope on assets helper if one or more packages are request-scoped');
-
         // default package should have one HTTP base URL and path package SSL URL
         $this->assertTrue($container->hasDefinition('templating.asset.default_package.http'));
         $package = $container->getDefinition('templating.asset.default_package.http');
@@ -198,6 +213,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('php', 'twig'), $container->getParameter('templating.engines'), '->registerTemplatingConfiguration() sets a templating.engines parameter');
 
         $this->assertEquals(array('FrameworkBundle:Form', 'theme1', 'theme2'), $container->getParameter('templating.helper.form.resources'), '->registerTemplatingConfiguration() registers the theme and adds the base theme');
+        $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
     public function testTemplatingAssetsHelperScopeDependsOnPackageArgumentScopes()
@@ -264,7 +280,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(7, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals(array(new Reference('validator.validator_factory')), $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
@@ -274,9 +290,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame(array($xmlMappings), $calls[3][1]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
+        $this->assertSame('setApiVersion', $calls[6][0]);
+
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->assertEquals(array(Validation::API_VERSION_2_4), $calls[6][1]);
+        } else {
+            $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
+        }
     }
 
     public function testFullyConfiguredValidationService()
@@ -318,11 +341,11 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(7, $calls);
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
         $this->assertEquals(array(new Reference('annotation_reader')), $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[5][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[5][1]);
         // no cache this time
     }
 
@@ -336,12 +359,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
+        $this->assertCount(8, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[6][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[6][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(2, $xmlMappings);
@@ -359,12 +382,12 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(4, $calls);
+        $this->assertCount(5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         // no cache, no annotations, no static methods
     }
 
-    public function testValidationApiVersion()
+    public function testValidation2Dot4Api()
     {
         $container = $this->createContainerFromFile('validation_2_4_api');
 
@@ -373,10 +396,84 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(6, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadClassMetadata'), $calls[4][1]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setApiVersion', $calls[5][0]);
         $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
         // no cache, no annotations
+    }
+
+    public function testValidation2Dot5Api()
+    {
+        $container = $this->createContainerFromFile('validation_2_5_api');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertCount(6, $calls);
+        $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertSame('addMethodMapping', $calls[4][0]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
+        $this->assertSame('setApiVersion', $calls[5][0]);
+        $this->assertSame(array(Validation::API_VERSION_2_5), $calls[5][1]);
+        // no cache, no annotations
+    }
+
+    public function testValidation2Dot5BcApi()
+    {
+        $container = $this->createContainerFromFile('validation_2_5_bc_api');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertCount(6, $calls);
+        $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertSame('addMethodMapping', $calls[4][0]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
+        $this->assertSame('setApiVersion', $calls[5][0]);
+        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
+        // no cache, no annotations
+    }
+
+    public function testValidationImplicitApi()
+    {
+        $container = $this->createContainerFromFile('validation_implicit_api');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertCount(6, $calls);
+        $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertSame('addMethodMapping', $calls[4][0]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
+        $this->assertSame('setApiVersion', $calls[5][0]);
+        // no cache, no annotations
+
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
+        } else {
+            $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
+        }
+    }
+
+    /**
+     * This feature is equivalent to the implicit api, only that the "api"
+     * key is explicitly set to "auto".
+     */
+    public function testValidationAutoApi()
+    {
+        $container = $this->createContainerFromFile('validation_auto_api');
+
+        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
+
+        $this->assertCount(6, $calls);
+        $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertSame('addMethodMapping', $calls[4][0]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
+        $this->assertSame('setApiVersion', $calls[5][0]);
+        // no cache, no annotations
+
+        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+            $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
+        } else {
+            $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
+        }
     }
 
     public function testFormsCanBeEnabledWithoutCsrfProtection()
@@ -400,6 +497,25 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
         $this->assertEquals('_custom_form', $container->getParameter('form.type_extension.csrf.field_name'));
+    }
+
+    public function testStopwatchEnabledWithDebugModeEnabled()
+    {
+        $container = $this->createContainerFromFile('default_config', array(
+            'kernel.container_class' => 'foo',
+            'kernel.debug' => true,
+        ));
+
+        $this->assertTrue($container->has('debug.stopwatch'));
+    }
+
+    public function testStopwatchEnabledWithDebugModeDisabled()
+    {
+        $container = $this->createContainerFromFile('default_config', array(
+            'kernel.container_class' => 'foo',
+        ));
+
+        $this->assertTrue($container->has('debug.stopwatch'));
     }
 
     protected function createContainer(array $data = array())

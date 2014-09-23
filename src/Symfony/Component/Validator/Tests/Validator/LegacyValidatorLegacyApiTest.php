@@ -28,10 +28,11 @@ class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
         parent::setUp();
     }
 
-    protected function createValidator(MetadataFactoryInterface $metadataFactory)
+    protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {
         $contextFactory = new LegacyExecutionContextFactory($metadataFactory, new DefaultTranslator());
+        $validatorFactory = new ConstraintValidatorFactory();
 
-        return new LegacyValidator($contextFactory, $metadataFactory, new ConstraintValidatorFactory());
+        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $objectInitializers);
     }
 }

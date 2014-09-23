@@ -68,16 +68,16 @@ interface ContextualValidatorInterface
      * Validates a value against the constraints specified for an object's
      * property.
      *
-     * @param object     $object       The object
-     * @param string     $propertyName The name of the property
-     * @param mixed      $value        The value to validate against the
-     *                                 property's constraints
-     * @param array|null $groups       The validation groups to validate. If
-     *                                 none is given, "Default" is assumed
+     * @param object|string $objectOrClass The object or its class name
+     * @param string        $propertyName  The name of the property
+     * @param mixed         $value         The value to validate against the
+     *                                     property's constraints
+     * @param array|null    $groups        The validation groups to validate. If
+     *                                     none is given, "Default" is assumed
      *
      * @return ContextualValidatorInterface This validator
      */
-    public function validatePropertyValue($object, $propertyName, $value, $groups = null);
+    public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = null);
 
     /**
      * Returns the violations that have been generated so far in the context

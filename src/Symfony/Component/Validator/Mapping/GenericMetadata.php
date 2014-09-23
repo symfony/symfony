@@ -180,9 +180,7 @@ class GenericMetadata implements MetadataInterface
     }
 
     /**
-     * Returns all constraints of this element.
-     *
-     * @return Constraint[] A list of Constraint instances
+     * {@inheritdoc}
      */
     public function getConstraints()
     {
@@ -200,12 +198,9 @@ class GenericMetadata implements MetadataInterface
     }
 
     /**
-     * Returns the constraints of the given group and global ones (* group).
+     * {@inheritdoc}
      *
-     * @param string $group The group name
-     *
-     * @return Constraint[] An list of all the Constraint instances belonging
-     *                      to the group
+     * Aware of the global group (* group).
      */
     public function findConstraints($group)
     {

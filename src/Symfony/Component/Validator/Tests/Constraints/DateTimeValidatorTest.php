@@ -13,47 +13,39 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\DateTimeValidator;
+use Symfony\Component\Validator\Validation;
 
-class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
+class DateTimeValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function getApiVersion()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new DateTimeValidator();
-        $this->validator->initialize($this->context);
+        return Validation::API_VERSION_2_5;
     }
 
-    protected function tearDown()
+    protected function createValidator()
     {
-        $this->context = null;
-        $this->validator = null;
+        return new DateTimeValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new DateTime());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new DateTime());
+
+        $this->assertNoViolation();
     }
 
     public function testDateTimeClassIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(new \DateTime(), new DateTime());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -69,10 +61,9 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidDateTimes($dateTime)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($dateTime, new DateTime());
+
+        $this->assertNoViolation();
     }
 
     public function getValidDateTimes()
@@ -90,16 +81,14 @@ class DateTimeValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidDateTimes($dateTime)
     {
         $constraint = new DateTime(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $dateTime,
-            ));
-
         $this->validator->validate($dateTime, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$dateTime.'"',
+        ));
     }
 
     public function getInvalidDateTimes()

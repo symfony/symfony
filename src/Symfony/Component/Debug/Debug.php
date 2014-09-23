@@ -39,14 +39,22 @@ class Debug
 
         static::$enabled = true;
 
-        error_reporting(-1);
+        if (null !== $errorReportingLevel) {
+            error_reporting($errorReportingLevel);
+        } else {
+            error_reporting(-1);
+        }
 
-        ErrorHandler::register($errorReportingLevel, $displayErrors);
         if ('cli' !== php_sapi_name()) {
+            ini_set('display_errors', 0);
             ExceptionHandler::register();
-        // CLI - display errors only if they're not already logged to STDERR
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
+            // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);
+        }
+        $handler = ErrorHandler::register();
+        if (!$displayErrors) {
+            $handler->throwAt(0, true);
         }
 
         DebugClassLoader::enable();

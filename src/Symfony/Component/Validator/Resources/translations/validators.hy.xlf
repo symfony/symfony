@@ -35,12 +35,12 @@
                 <target>Մեկ կամ ավելի տրված արժեքները անթույլատրելի են.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>{{ fields }} տողերը չէին սպասվում.</target>
+                <source>This field was not expected.</source>
+                <target>Այս դաշտը չի սպասվում.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>{{ fields }} տողերը բացակայում են.</target>
+                <source>This field is missing.</source>
+                <target>Այս դաշտը բացակայում է.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -175,7 +175,7 @@
                 <target>Նկարի բարձրությունը չափազանց փոքր է ({{ height }}px). Մինիմալ չափն է {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Այս արժեքը պետք է լինի օգտագործողի ներկա ծածկագիրը.</target>
             </trans-unit>
             <trans-unit id="48">

@@ -11,10 +11,9 @@
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Icu\IcuData;
-use Symfony\Component\Intl\Intl;
 
-require_once __DIR__ . '/common.php';
-require_once __DIR__ . '/autoload.php';
+require_once __DIR__.'/common.php';
+require_once __DIR__.'/autoload.php';
 
 if (1 !== $GLOBALS['argc']) {
     bailout(<<<MESSAGE
@@ -32,7 +31,7 @@ MESSAGE
 }
 
 echo LINE;
-echo centered("ICU Resource Bundle Stub Update") . "\n";
+echo centered("ICU Resource Bundle Stub Update")."\n";
 echo LINE;
 
 if (!class_exists('\Symfony\Component\Icu\IcuData')) {
@@ -47,7 +46,7 @@ if (!IcuData::isStubbed()) {
 
 $filesystem = new Filesystem();
 
-$sourceDir = sys_get_temp_dir() . '/icu-stubs';
+$sourceDir = sys_get_temp_dir().'/icu-stubs';
 $targetDir = IcuData::getResourceDirectory();
 
 if (!$filesystem->exists($sourceDir)) {

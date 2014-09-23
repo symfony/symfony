@@ -26,12 +26,10 @@ class FileValidatorPathTest extends FileValidatorTest
             'notFoundMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ file }}' => 'foobar',
-            ));
-
         $this->validator->validate('foobar', $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ file }}' => '"foobar"',
+        ));
     }
 }

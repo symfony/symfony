@@ -194,14 +194,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     public static function themeBlockInheritanceProvider()
     {
         return array(
-            array(array('theme.html.twig'))
+            array(array('theme.html.twig')),
         );
     }
 
     public static function themeInheritanceProvider()
     {
         return array(
-            array(array('parent_label.html.twig'), array('child_label.html.twig'))
+            array(array('parent_label.html.twig'), array('child_label.html.twig')),
         );
     }
 }

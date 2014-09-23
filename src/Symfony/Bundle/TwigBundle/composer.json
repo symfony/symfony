@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/twig-bridge": "~2.5",
+        "symfony/http-foundation": "~2.5",
         "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
@@ -25,7 +26,8 @@
         "symfony/dependency-injection": "~2.0",
         "symfony/config": "~2.2",
         "symfony/routing": "~2.1",
-        "symfony/templating": "~2.1"
+        "symfony/templating": "~2.1",
+        "symfony/framework-bundle": "~2.1"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }
@@ -34,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.6-dev"
         }
     }
 }

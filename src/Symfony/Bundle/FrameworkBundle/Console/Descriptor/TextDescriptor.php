@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -202,7 +203,7 @@ class TextDescriptor extends Descriptor
 
         $table = new TableHelper();
         $table->setLayout(TableHelper::LAYOUT_COMPACT);
-        $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Scope', 'Class name')));
+        $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
             $definition = $this->resolveServiceDefinition($builder, $serviceId);
@@ -214,20 +215,20 @@ class TextDescriptor extends Descriptor
                             $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
                         }
                         if (0 === $key) {
-                            $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getScope(), $definition->getClass())));
+                            $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getClass())));
                         } else {
-                            $table->addRow(array_merge(array('  "'), $tagValues, array('', '')));
+                            $table->addRow(array_merge(array('  "'), $tagValues, array('')));
                         }
                     }
                 } else {
-                    $table->addRow(array($serviceId, $definition->getScope(), $definition->getClass()));
+                    $table->addRow(array($serviceId, $definition->getClass()));
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $table->addRow(array_merge(array($serviceId, 'n/a', sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
             } else {
                 // we have no information (happens with "service_container")
-                $table->addRow(array_merge(array($serviceId, '', get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
             }
         }
 
@@ -273,7 +274,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerAlias(Alias $alias, array $options = array())
     {
-        $this->writeText(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias), $options);
+        $this->writeText(sprintf("This service is an alias for the service <info>%s</info>\n", (string) $alias), $options);
     }
 
     /**
@@ -282,6 +283,58 @@ class TextDescriptor extends Descriptor
     protected function describeContainerParameter($parameter, array $options = array())
     {
         $this->writeText($this->formatParameter($parameter), $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array())
+    {
+        $event = array_key_exists('event', $options) ? $options['event'] : null;
+
+        $label = 'Registered listeners';
+        if (null !== $event) {
+            $label .= sprintf(' for event <info>%s</info>', $event);
+        } else {
+            $label .= ' by event';
+        }
+
+        $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
+
+        $registeredListeners = $eventDispatcher->getListeners($event);
+        if (null !== $event) {
+            $this->writeText("\n");
+            $table = new TableHelper();
+            $table->setHeaders(array('Order', 'Callable'));
+
+            foreach ($registeredListeners as $order => $listener) {
+                $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
+            }
+
+            $this->renderTable($table);
+        } else {
+            ksort($registeredListeners);
+            foreach ($registeredListeners as $eventListened => $eventListeners) {
+                $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
+
+                $table = new TableHelper();
+                $table->setHeaders(array('Order', 'Callable'));
+
+                foreach ($eventListeners as $order => $eventListener) {
+                    $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
+                }
+
+                $this->renderTable($table);
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function describeCallable($callable, array $options = array())
+    {
+        $this->writeText($this->formatCallable($callable), $options);
     }
 
     /**
@@ -309,6 +362,36 @@ class TextDescriptor extends Descriptor
     private function formatSection($section, $message)
     {
         return sprintf('<info>[%s]</info> %s', $section, $message);
+    }
+
+    /**
+     * @param callable $callable
+     *
+     * @return string
+     */
+    private function formatCallable($callable)
+    {
+        if (is_array($callable)) {
+            if (is_object($callable[0])) {
+                return sprintf('%s::%s()', get_class($callable[0]), $callable[1]);
+            }
+
+            return sprintf('%s::%s()', $callable[0], $callable[1]);
+        }
+
+        if (is_string($callable)) {
+            return sprintf('%s()', $callable);
+        }
+
+        if ($callable instanceof \Closure) {
+            return '\Closure()';
+        }
+
+        if (method_exists($callable, '__invoke')) {
+            return sprintf('%s::__invoke()', get_class($callable));
+        }
+
+        throw new \InvalidArgumentException('Callable is not describable.');
     }
 
     /**

@@ -35,12 +35,12 @@
                 <target>A megadott értékek közül legalább egy érvénytelen.</target>
             </trans-unit>
             <trans-unit id="9">
-                <source>The fields {{ fields }} were not expected.</source>
-                <target>Váratlan mezők: {{ fields }}.</target>
+                <source>This field was not expected.</source>
+                <target>Ez a mező nem számítottak.</target>
             </trans-unit>
             <trans-unit id="10">
-                <source>The fields {{ fields }} are missing.</source>
-                <target>A következő mezők hiányoznak: {{ fields }}.</target>
+                <source>This field is missing.</source>
+                <target>Ez a mező hiányzik.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -175,7 +175,7 @@
                 <target>A kép magassága túl kicsi ({{ height }}px). Az elvárt legkisebb magasság {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Ez az érték a felhasználó jelenlegi jelszavával kell megegyezzen.</target>
             </trans-unit>
             <trans-unit id="48">
@@ -297,7 +297,11 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>A kép álló tájolású ({{ width }}x{{ height }}px). Az álló tájolású képek nem engedélyezettek.</target>
-            </trans-unit>            
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Üres fájl nem megengedett.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

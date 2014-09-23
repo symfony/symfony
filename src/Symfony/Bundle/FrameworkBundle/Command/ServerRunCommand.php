@@ -82,6 +82,14 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $documentRoot = $input->getOption('docroot');
+
+        if (!is_dir($documentRoot)) {
+            $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
+
+            return 1;
+        }
+
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         if ('prod' === $env) {
@@ -90,20 +98,28 @@ EOF
 
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
 
-        $router = $input->getOption('router') ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
-        ;
-
         $builder = $this->createPhpProcessBuilder($input, $output, $env);
-        $builder->setWorkingDirectory($input->getOption('docroot'));
+        $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
-        $builder->getProcess()->run(function ($type, $buffer) use ($output) {
-            if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-                $output->write($buffer);
+        $process = $builder->getProcess();
+
+        if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
+            $process->disableOutput();
+        }
+
+        $this
+            ->getHelper('process')
+            ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
+
+        if (!$process->isSuccessful()) {
+            $output->writeln('<error>Built-in server terminated unexpectedly</error>');
+
+            if ($process->isOutputDisabled()) {
+                $output->writeln('<error>Run the command again with -v option for more details</error>');
             }
-        });
+        }
+
+        return $process->getExitCode();
     }
 
     private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)
@@ -113,6 +129,14 @@ EOF
             ->get('kernel')
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
+
+        if (!file_exists($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+
+            return 1;
+        }
+
+        $router = realpath($router);
 
         return new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
     }

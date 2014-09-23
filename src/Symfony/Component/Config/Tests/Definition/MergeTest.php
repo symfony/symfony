@@ -115,14 +115,14 @@ class MergeTest extends \PHPUnit_Framework_TestCase
 
         $a = array(
             'test' => array(
-                'a' => array('value' => 'foo')
-            )
+                'a' => array('value' => 'foo'),
+            ),
         );
 
         $b = array(
             'test' => array(
-                'b' => array('value' => 'foo')
-            )
+                'b' => array('value' => 'foo'),
+            ),
         );
 
         $tree->merge($a, $b);
@@ -157,13 +157,13 @@ class MergeTest extends \PHPUnit_Framework_TestCase
         $b = array(
             'no_deep_merging' => array(
                 'c' => 'd',
-            )
+            ),
         );
 
         $this->assertEquals(array(
             'no_deep_merging' => array(
                 'c' => 'd',
-            )
+            ),
         ), $tree->merge($a, $b));
     }
 

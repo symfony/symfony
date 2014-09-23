@@ -863,7 +863,6 @@ UPGRADE FROM 2.x to 3.0
        ->atPath('property')
        ->setParameter('{{ value }}', $invalidValue)
        ->addViolation();
-   ));
    ```
 
    The methods `validate()` and `validateValue()` were removed. You should use
@@ -966,4 +965,9 @@ UPGRADE FROM 2.x to 3.0
 
    ```
    Yaml::parse(file_get_contents($fileName));
-   ```
+
+### Process
+
+ * Process::setStdin() and Process::getStdin() have been removed. Use
+   Process::setInput() and Process::getInput() that works the same way.
+ * Process::setInput() and ProcessBuilder::setInput() do not accept non-scalar types.

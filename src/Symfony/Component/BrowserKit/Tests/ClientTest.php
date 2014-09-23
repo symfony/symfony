@@ -210,6 +210,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://www.example.com/foo/bar', $client->getRequest()->getUri(), '->request() uses the previous request for relative URLs');
     }
 
+    public function testRequestURIConversionByServerHost()
+    {
+        $client = new TestClient();
+
+        $server = array('HTTP_HOST' => 'www.exampl+e.com:8000');
+        $parameters = array();
+        $files = array();
+
+        $client->request('GET', 'http://exampl+e.com', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to add port');
+
+        $client->request('GET', 'http://exampl+e.com:8888', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST to modify existing port');
+
+        $client->request('GET', 'http://exampl+e.com:8000', $parameters, $files, $server);
+        $this->assertEquals('http://www.exampl+e.com:8000', $client->getRequest()->getUri(), '->request() uses HTTP_HOST respects correct set port');
+    }
+
     public function testRequestReferer()
     {
         $client = new TestClient();
@@ -349,6 +367,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFollowRelativeRedirect()
+    {
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => '/redirected')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect if any');
+
+        $client = new TestClient();
+        $client->setNextResponse(new Response('', 302, array('Location' => '/redirected:1234')));
+        $client->request('GET', 'http://www.example.com/foo/foobar');
+        $this->assertEquals('http://www.example.com/redirected:1234', $client->getRequest()->getUri(), '->followRedirect() follows relative urls');
+    }
+
     public function testFollowRedirectWithMaxRedirects()
     {
         $client = new TestClient();
@@ -434,11 +465,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $headers = array(
             'HTTP_HOST'       => 'www.example.com:8080',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
-            'HTTPS'           => false
+            'HTTPS'           => false,
+            'HTTP_REFERER'    => 'http://www.example.com:8080/',
         );
 
         $client = new TestClient();
-        $client->followRedirects(false);
         $client->setNextResponse(new Response('', 302, array(
             'Location'    => 'http://www.example.com:8080/redirected',
         )));
@@ -569,7 +600,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'HTTP_HOST'       => 'testhost',
             'HTTP_USER_AGENT' => 'testua',
             'HTTPS'           => false,
-            'NEW_SERVER_KEY'  => 'new-server-key-value'
+            'NEW_SERVER_KEY'  => 'new-server-key-value',
         ));
 
         $this->assertEquals('localhost', $client->getServerParameter('HTTP_HOST'));

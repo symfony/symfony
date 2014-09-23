@@ -23,7 +23,6 @@ use Symfony\Component\Translation\Extractor\ExtractorInterface;
 class PhpExtractor implements ExtractorInterface
 {
     const MESSAGE_TOKEN = 300;
-    const IGNORE_TOKEN = 400;
 
     /**
      * Prefix for new found message.
@@ -39,15 +38,16 @@ class PhpExtractor implements ExtractorInterface
      */
     protected $sequences = array(
         array(
-            '$view',
-            '[',
-            '\'translator\'',
-            ']',
             '->',
             'trans',
             '(',
             self::MESSAGE_TOKEN,
-            ')',
+        ),
+        array(
+            '->',
+            'transChoice',
+            '(',
+            self::MESSAGE_TOKEN,
         ),
     );
 
@@ -76,6 +76,7 @@ class PhpExtractor implements ExtractorInterface
      * Normalizes a token.
      *
      * @param mixed $token
+     *
      * @return string
      */
     protected function normalizeToken($token)
@@ -88,6 +89,56 @@ class PhpExtractor implements ExtractorInterface
     }
 
     /**
+     * Seeks to a non-whitespace token.
+     */
+    private function seekToNextReleventToken(\Iterator $tokenIterator)
+    {
+        for (; $tokenIterator->valid(); $tokenIterator->next()) {
+            $t = $tokenIterator->current();
+            if (!is_array($t) || ($t[0] !== T_WHITESPACE)) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Extracts the message from the iterator while the tokens
+     * match allowed message tokens
+     */
+    private function getMessage(\Iterator $tokenIterator)
+    {
+        $message = '';
+        $docToken = '';
+
+        for (; $tokenIterator->valid(); $tokenIterator->next()) {
+            $t = $tokenIterator->current();
+            if (!is_array($t)) {
+                break;
+            }
+
+            switch ($t[0]) {
+                case T_START_HEREDOC:
+                    $docToken = $t[1];
+                    break;
+                case T_ENCAPSED_AND_WHITESPACE:
+                case T_CONSTANT_ENCAPSED_STRING:
+                    $message .= $t[1];
+                    break;
+                case T_END_HEREDOC:
+                    return PhpStringTokenParser::parseDocString($docToken, $message);
+                default:
+                    break 2;
+            }
+        }
+
+        if ($message) {
+            $message = PhpStringTokenParser::parse($message);
+        }
+
+        return $message;
+    }
+
+    /**
      * Extracts trans message from PHP tokens.
      *
      * @param array            $tokens
@@ -95,23 +146,26 @@ class PhpExtractor implements ExtractorInterface
      */
     protected function parseTokens($tokens, MessageCatalogue $catalog)
     {
-        foreach ($tokens as $key => $token) {
+        $tokenIterator = new \ArrayIterator($tokens);
+
+        for ($key = 0; $key < $tokenIterator->count(); $key++) {
             foreach ($this->sequences as $sequence) {
                 $message = '';
+                $tokenIterator->seek($key);
 
-                foreach ($sequence as $id => $item) {
-                    if ($this->normalizeToken($tokens[$key + $id]) == $item) {
+                foreach ($sequence as $item) {
+                    $this->seekToNextReleventToken($tokenIterator);
+
+                    if ($this->normalizeToken($tokenIterator->current()) == $item) {
+                        $tokenIterator->next();
                         continue;
                     } elseif (self::MESSAGE_TOKEN == $item) {
-                        $message = $this->normalizeToken($tokens[$key + $id]);
-                    } elseif (self::IGNORE_TOKEN == $item) {
-                        continue;
+                        $message = $this->getMessage($tokenIterator);
+                        break;
                     } else {
                         break;
                     }
                 }
-
-                $message = trim($message, '\'"');
 
                 if ($message) {
                     $catalog->set($message, $this->prefix.$message);

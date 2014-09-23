@@ -35,45 +35,30 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             return;
         }
 
-        if (!$this->compareValues($value, $constraint->value)) {
+        $comparedValue = $constraint->value;
+
+        // Convert strings to DateTimes if comparing another DateTime
+        // This allows to compare with any date/time value supported by
+        // the DateTime constructor:
+        // http://php.net/manual/en/datetime.formats.php
+        if (is_string($comparedValue)) {
+            if ($value instanceof \DatetimeImmutable) {
+                // If $value is immutable, convert the compared value to a
+                // DateTimeImmutable too
+                $comparedValue = new \DatetimeImmutable($comparedValue);
+            } elseif ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+                // Otherwise use DateTime
+                $comparedValue = new \DateTime($comparedValue);
+            }
+        }
+
+        if (!$this->compareValues($value, $comparedValue)) {
             $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->valueToString($constraint->value),
-                '{{ compared_value }}' => $this->valueToString($constraint->value),
-                '{{ compared_value_type }}' => $this->valueToType($constraint->value)
+                '{{ value }}' => $this->formatValue($value, self::OBJECT_TO_STRING | self::PRETTY_DATE),
+                '{{ compared_value }}' => $this->formatValue($comparedValue, self::OBJECT_TO_STRING | self::PRETTY_DATE),
+                '{{ compared_value_type }}' => $this->formatTypeOf($comparedValue),
             ));
         }
-    }
-
-    /**
-     * Returns a string representation of the type of the value.
-     *
-     * @param  mixed $value
-     *
-     * @return string
-     */
-    private function valueToType($value)
-    {
-        return is_object($value) ? get_class($value) : gettype($value);
-    }
-
-    /**
-     * Returns a string representation of the value.
-     *
-     * @param  mixed  $value
-     *
-     * @return string
-     */
-    private function valueToString($value)
-    {
-        if (is_object($value) && method_exists($value, '__toString')) {
-            return (string) $value;
-        }
-
-        if ($value instanceof \DateTime) {
-            return $value->format('Y-m-d H:i:s');
-        }
-
-        return var_export($value, true);
     }
 
     /**

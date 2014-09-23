@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler;
 
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
@@ -146,9 +147,11 @@ class Form extends Link implements \ArrayAccess
         $values = array();
         foreach ($this->getValues() as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
-            parse_str($qs, $expandedValue);
-            $varName = substr($name, 0, strlen(key($expandedValue)));
-            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            if (!empty($qs)) {
+                parse_str($qs, $expandedValue);
+                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            }
         }
 
         return $values;
@@ -169,9 +172,11 @@ class Form extends Link implements \ArrayAccess
         $values = array();
         foreach ($this->getFiles() as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
-            parse_str($qs, $expandedValue);
-            $varName = substr($name, 0, strlen(key($expandedValue)));
-            $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            if (!empty($qs)) {
+                parse_str($qs, $expandedValue);
+                $varName = substr($name, 0, strlen(key($expandedValue)));
+                $values = array_replace_recursive($values, array($varName => current($expandedValue)));
+            }
         }
 
         return $values;
@@ -404,9 +409,7 @@ class Form extends Link implements \ArrayAccess
     {
         $this->fields = new FormFieldRegistry();
 
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        $xpath = new \DOMXPath($document);
-        $root = $document->appendChild($document->createElement('_root'));
+        $xpath = new \DOMXPath($this->node->ownerDocument);
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
@@ -416,38 +419,32 @@ class Form extends Link implements \ArrayAccess
 
                 // temporarily change the name of the input node for the x coordinate
                 $this->button->setAttribute('name', $name.'.x');
-                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+                $this->set(new Field\InputFormField($this->button));
 
                 // temporarily change the name of the input node for the y coordinate
                 $this->button->setAttribute('name', $name.'.y');
-                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+                $this->set(new Field\InputFormField($this->button));
 
                 // restore the original name of the input node
                 $this->button->setAttribute('name', $name);
             } else {
-                $this->set(new Field\InputFormField($document->importNode($this->button, true)));
+                $this->set(new Field\InputFormField($this->button));
             }
         }
 
         // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
-            // traverse through the whole document
-            $node = $document->importNode($this->node->ownerDocument->documentElement, true);
-            $root->appendChild($node);
-
             // corresponding elements are either descendants or have a matching HTML5 form attribute
             $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
-            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId), $root);
+
+            $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
-            // parent form has no id, add descendant elements only
-            $node = $document->importNode($this->node, true);
-            $root->appendChild($node);
-
-            // descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $root);
+            // do the xpath query with $this->node as the context node, to only find descendant elements
+            // however, descendant elements with form attribute are not part of this form
+            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->node);
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
@@ -464,7 +461,9 @@ class Form extends Link implements \ArrayAccess
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
             $this->set(new Field\ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
-            if ($this->has($node->getAttribute('name'))) {
+            // there may be other fields with the same name that are no choice
+            // fields already registered (see https://github.com/symfony/symfony/issues/11689)
+            if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
                 $this->set(new Field\ChoiceFormField($node));

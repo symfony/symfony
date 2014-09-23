@@ -103,7 +103,7 @@ class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
                     'ignoreAttributes' => array('attr_a', 'attr_b'),
                     '_controller' => 'FrameworkBundle:Redirect:redirect',
                     '_route' => 'product_view',
-                )
+                ),
             ),
             array(
                 'REDIRECT_ envs',
@@ -146,7 +146,7 @@ class ApacheUrlMatcherTest extends \PHPUnit_Framework_TestCase
                     'name' => 'world',
                     '_route' => 'hello',
                 ),
-            )
+            ),
         );
     }
 }

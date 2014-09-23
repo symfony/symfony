@@ -28,7 +28,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'blue'      => array('set' => 34, 'unset' => 39),
         'magenta'   => array('set' => 35, 'unset' => 39),
         'cyan'      => array('set' => 36, 'unset' => 39),
-        'white'     => array('set' => 37, 'unset' => 39)
+        'white'     => array('set' => 37, 'unset' => 39),
     );
     private static $availableBackgroundColors = array(
         'black'     => array('set' => 40, 'unset' => 49),
@@ -38,14 +38,14 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         'blue'      => array('set' => 44, 'unset' => 49),
         'magenta'   => array('set' => 45, 'unset' => 49),
         'cyan'      => array('set' => 46, 'unset' => 49),
-        'white'     => array('set' => 47, 'unset' => 49)
+        'white'     => array('set' => 47, 'unset' => 49),
     );
     private static $availableOptions = array(
-        'bold'          => array('set' => 1, 'unset' => 21),
+        'bold'          => array('set' => 1, 'unset' => 22),
         'underscore'    => array('set' => 4, 'unset' => 24),
         'blink'         => array('set' => 5, 'unset' => 25),
         'reverse'       => array('set' => 7, 'unset' => 27),
-        'conceal'       => array('set' => 8, 'unset' => 28)
+        'conceal'       => array('set' => 8, 'unset' => 28),
     );
 
     private $foreground;
@@ -202,7 +202,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     public function apply($text)
     {
         $setCodes = array();
-        $unsetCode = array();
+        $unsetCodes = array();
 
         if (null !== $this->foreground) {
             $setCodes[] = $this->foreground['set'];

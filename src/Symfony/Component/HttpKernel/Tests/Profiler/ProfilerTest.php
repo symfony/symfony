@@ -79,9 +79,11 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $this->storage->purge();
-        $this->storage = null;
+        if (null !== $this->storage) {
+            $this->storage->purge();
+            $this->storage = null;
 
-        @unlink($this->tmp);
+            @unlink($this->tmp);
+        }
     }
 }

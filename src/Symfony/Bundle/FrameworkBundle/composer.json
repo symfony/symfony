@@ -21,7 +21,7 @@
         "symfony/config" : "~2.4",
         "symfony/event-dispatcher": "~2.5",
         "symfony/http-foundation": "~2.4",
-        "symfony/http-kernel": "~2.5",
+        "symfony/http-kernel": "~2.6",
         "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.2",
         "symfony/security-core": "~2.4",
@@ -32,17 +32,22 @@
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
+        "symfony/browser-kit": "~2.3",
+        "symfony/console": "~2.0",
         "symfony/finder": "~2.0",
         "symfony/security": "~2.4",
-        "symfony/form": "~2.3",
+        "symfony/form": "~2.4",
         "symfony/class-loader": "~2.1",
-        "symfony/validator": "~2.1"
+        "symfony/process": "~2.0",
+        "symfony/validator": "~2.1",
+        "symfony/yaml": "~2.0"
     },
     "suggest": {
         "symfony/console": "For using the console commands",
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
+        "symfony/yaml": "For using the config:debug and yaml:lint commands",
         "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {
@@ -52,7 +57,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.6-dev"
         }
     }
 }

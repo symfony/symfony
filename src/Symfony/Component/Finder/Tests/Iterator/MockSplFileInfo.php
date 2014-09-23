@@ -50,7 +50,7 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function isFile()
     {
-        if ($this->type === null) {
+        if (null === $this->type) {
             return preg_match('/file/', $this->getFilename());
         };
 
@@ -59,7 +59,7 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function isDir()
     {
-        if ($this->type === null) {
+        if (null === $this->type) {
             return preg_match('/directory/', $this->getFilename());
         }
 
@@ -68,7 +68,7 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function isReadable()
     {
-        if ($this->mode === null) {
+        if (null === $this->mode) {
             return preg_match('/r\+/', $this->getFilename());
         }
 

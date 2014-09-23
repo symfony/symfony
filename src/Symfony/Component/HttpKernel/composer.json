@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": "~2.4",
-        "symfony/debug": "~2.5",
+        "symfony/event-dispatcher": "~2.5",
+        "symfony/http-foundation": "~2.5",
+        "symfony/debug": "~2.6",
         "psr/log": "~1.0"
     },
     "require-dev": {
@@ -29,7 +29,6 @@
         "symfony/console": "~2.2",
         "symfony/dependency-injection": "~2.0",
         "symfony/finder": "~2.0",
-        "symfony/filesystem": "~2.4",
         "symfony/process": "~2.0",
         "symfony/routing": "~2.2",
         "symfony/stopwatch": "~2.2",
@@ -41,8 +40,7 @@
         "symfony/config": "",
         "symfony/console": "",
         "symfony/dependency-injection": "",
-        "symfony/finder": "",
-        "symfony/filesystem": ""
+        "symfony/finder": ""
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel\\": "" }
@@ -51,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5-dev"
+            "dev-master": "2.6-dev"
         }
     }
 }

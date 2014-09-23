@@ -49,7 +49,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1000.12, 'BRL', '1,000.12'),
             array(1000.12, 'CRC', '1,000.12'),
             array(1000.12, 'JPY', '1,000.12'),
-            array(1000.12, 'CHF', '1,000.12')
+            array(1000.12, 'CHF', '1,000.12'),
         );
     }
 
@@ -126,7 +126,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1000.127, 'BRL', 'R', '%s$1,000.13'),
             array(1000.129, 'BRL', 'R', '%s$1,000.13'),
             array(11.50999, 'BRL', 'R', '%s$11.51'),
-            array(11.9999464, 'BRL', 'R', '%s$12.00')
+            array(11.9999464, 'BRL', 'R', '%s$12.00'),
         );
     }
 
@@ -159,7 +159,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1200000.00, 'CHF', 'CHF', '%s1,200,000.00'),
             array(1200000.1, 'CHF', 'CHF', '%s1,200,000.10'),
             array(1200000.10, 'CHF', 'CHF', '%s1,200,000.10'),
-            array(1200000.101, 'CHF', 'CHF', '%s1,200,000.10')
+            array(1200000.101, 'CHF', 'CHF', '%s1,200,000.10'),
         );
     }
 
@@ -227,7 +227,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array($formatter, 1, '¤1.00'),
             array($formatter, 1.1, '¤1.00'),
             array($formatter, 2147483648, '(¤2,147,483,648.00)', $message),
-            array($formatter, -2147483649, '¤2,147,483,647.00', $message)
+            array($formatter, -2147483649, '¤2,147,483,647.00', $message),
         );
     }
 
@@ -270,7 +270,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array($formatter, 1, '¤1.00'),
             array($formatter, 1.1, '¤1.00'),
             array($formatter, 2147483648, '¤2,147,483,648.00'),
-            array($formatter, -2147483649, '(¤2,147,483,649.00)')
+            array($formatter, -2147483649, '(¤2,147,483,649.00)'),
         );
     }
 
@@ -369,7 +369,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array(1.123, '1.1', 1, 1),
             array(1.123, '1.12', 2, 2),
             array(1.123, '1', -1, 0),
-            array(1.123, '1', 'abc', 0)
+            array(1.123, '1', 'abc', 0),
         );
     }
 
@@ -671,7 +671,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
             array('2,147,483,647', 2147483647),
             array('-2,147,483,648', -2147483647 - 1),
             array('2,147,483,648', false, '->parse() TYPE_INT32 returns false when the number is greater than the integer positive range.'),
-            array('-2,147,483,649', false, '->parse() TYPE_INT32 returns false when the number is greater than the integer negative range.')
+            array('-2,147,483,649', false, '->parse() TYPE_INT32 returns false when the number is greater than the integer negative range.'),
         );
     }
 

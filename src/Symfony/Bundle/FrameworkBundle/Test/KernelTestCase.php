@@ -45,14 +45,14 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
         }
 
         $dir = static::getPhpUnitCliConfigArgument();
-        if ($dir === null &&
+        if (null === $dir &&
             (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
             is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
         // Can't continue
-        if ($dir === null) {
+        if (null === $dir) {
             throw new \RuntimeException('Unable to guess the Kernel directory.');
         }
 
@@ -90,7 +90,7 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Attempts to guess the Kernel location.
+     * Attempts to guess the kernel location.
      *
      * When the Kernel is located, the file is required.
      *
@@ -100,21 +100,24 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
      */
     protected static function getKernelClass()
     {
-        $dir = $phpUnitDir = static::getPhpUnitXmlDir();
-
         if (isset($_SERVER['KERNEL_DIR'])) {
             $dir = $_SERVER['KERNEL_DIR'];
 
-            if (!is_dir($dir) && is_dir("$phpUnitDir/$dir")) {
-                $dir = "$phpUnitDir/$dir";
+            if (!is_dir($dir)) {
+                $phpUnitDir = static::getPhpUnitXmlDir();
+                if (is_dir("$phpUnitDir/$dir")) {
+                    $dir = "$phpUnitDir/$dir";
+                }
             }
+        } else {
+            $dir = static::getPhpUnitXmlDir();
         }
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the KernelTestCase::createKernel() method.');
+            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 
         $file = current($results);
@@ -138,7 +141,7 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
         static::$kernel->boot();
     }
 
-    /**
+   /**
      * Creates a Kernel.
      *
      * Available options:

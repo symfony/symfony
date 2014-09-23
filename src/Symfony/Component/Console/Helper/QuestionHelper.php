@@ -208,11 +208,12 @@ class QuestionHelper extends Helper
 
                 // Pop the last character off the end of our string
                 $ret = substr($ret, 0, $i);
-            } elseif ("\033" === $c) { // Did we read an escape sequence?
+            } elseif ("\033" === $c) {
+                // Did we read an escape sequence?
                 $c .= fread($inputStream, 2);
 
                 // A = Up Arrow. B = Down Arrow
-                if ('A' === $c[2] || 'B' === $c[2]) {
+                if (isset($c[2]) && ('A' === $c[2] || 'B' === $c[2])) {
                     if ('A' === $c[2] && -1 === $ofs) {
                         $ofs = 0;
                     }

@@ -77,6 +77,12 @@ class DateType extends AbstractType
                 $calendar,
                 $pattern
             );
+
+            // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/bug.php?id=66323
+            if (!$formatter) {
+                throw new InvalidOptionsException(intl_get_error_message(), intl_get_error_code());
+            }
+
             $formatter->setLenient(false);
 
             if ('choice' === $options['widget']) {
@@ -181,7 +187,7 @@ class DateType extends AbstractType
             return array(
                 'year' => $emptyValue,
                 'month' => $emptyValue,
-                'day' => $emptyValue
+                'day' => $emptyValue,
             );
         };
 

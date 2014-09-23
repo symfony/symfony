@@ -38,7 +38,7 @@ class PropertyPath
     public static function append($basePath, $subPath)
     {
         if ('' !== (string) $subPath) {
-            if ('[' === $subPath{1}) {
+            if ('[' === $subPath{0}) {
                 return $basePath.$subPath;
             }
 

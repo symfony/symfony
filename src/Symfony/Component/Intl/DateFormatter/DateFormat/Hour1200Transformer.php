@@ -56,7 +56,7 @@ class Hour1200Transformer extends HourTransformer
     {
         return array(
             'hour' => (int) $matched,
-            'hourInstance' => $this
+            'hourInstance' => $this,
         );
     }
 }

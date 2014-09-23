@@ -110,7 +110,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'a string',
                 array('foo', 'bar'),
             ),
-            'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
             'constant' => PHP_EOL,
         );
@@ -147,12 +146,11 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 'a string',
                 array('foo', 'bar'),
             ),
-            'foo_bar' => new Reference('foo_bar'),
             'mixedcase' => array('MixedCaseKey' => 'value'),
             'constant' => PHP_EOL,
             'bar' => '%foo%',
             'imported_from_ini' => true,
-            'imported_from_yaml' => true
+            'imported_from_yaml' => true,
         );
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
@@ -184,6 +182,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $args[0]];
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
 
         // anonymous service as a property
         $properties = $services['foo']->getProperties();

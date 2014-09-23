@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\ResourceBundle\Compiler;
  * Compiles a resource bundle.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 interface BundleCompilerInterface
 {

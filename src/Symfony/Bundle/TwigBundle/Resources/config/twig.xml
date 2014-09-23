@@ -66,7 +66,7 @@
         <service id="twig.extension.assets" class="%twig.extension.assets.class%" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="service_container" />
-            <argument type="service" id="router.request_context" />
+            <argument type="service" id="router.request_context" on-invalid="null" />
         </service>
 
         <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
@@ -92,6 +92,7 @@
         <service id="twig.extension.debug.stopwatch" class="%twig.extension.debug.stopwatch.class%" public="false">
             <tag name="twig.extension" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+            <argument>%kernel.debug%</argument>
         </service>
 
         <service id="twig.extension.expression" class="%twig.extension.expression.class%" public="false">

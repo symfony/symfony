@@ -55,7 +55,7 @@ class DumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->dumper->setIndentation(7);
 
-$expected = <<<EOF
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -108,10 +108,10 @@ EOF;
         $expected = <<<EOF
 { '': bar, foo: '#bar', 'foo''bar': {  }, bar: [1, foo], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
 EOF;
-$this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
-$this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($this->array, -10), '->dump() takes an inline level argument');
+        $this->assertEquals($expected, $this->dumper->dump($this->array, 0), '->dump() takes an inline level argument');
 
-$expected = <<<EOF
+        $expected = <<<EOF
 '': bar
 foo: '#bar'
 'foo''bar': {  }
@@ -198,6 +198,37 @@ EOF;
     public function testObjectSupportDisabledWithExceptions()
     {
         $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true, false);
+    }
+
+    /**
+     * @dataProvider getEscapeSequences
+     */
+    public function testEscapedEscapeSequencesInQuotedScalar($input, $expected)
+    {
+        $this->assertEquals($expected, $this->dumper->dump($input));
+    }
+
+    public function getEscapeSequences()
+    {
+        return array(
+            'null' => array("\t\\0", '"\t\\\\0"'),
+            'bell' => array("\t\\a", '"\t\\\\a"'),
+            'backspace' => array("\t\\b", '"\t\\\\b"'),
+            'horizontal-tab' => array("\t\\t", '"\t\\\\t"'),
+            'line-feed' => array("\t\\n", '"\t\\\\n"'),
+            'vertical-tab' => array("\t\\v", '"\t\\\\v"'),
+            'form-feed' => array("\t\\f", '"\t\\\\f"'),
+            'carriage-return' => array("\t\\r", '"\t\\\\r"'),
+            'escape' => array("\t\\e", '"\t\\\\e"'),
+            'space' => array("\t\\ ", '"\t\\\\ "'),
+            'double-quote' => array("\t\\\"", '"\t\\\\\\""'),
+            'slash' => array("\t\\/", '"\t\\\\/"'),
+            'backslash' => array("\t\\\\", '"\t\\\\\\\\"'),
+            'next-line' => array("\t\\N", '"\t\\\\N"'),
+            'non-breaking-space' => array("\t\\�", '"\t\\\\�"'),
+            'line-separator' => array("\t\\L", '"\t\\\\L"'),
+            'paragraph-separator' => array("\t\\P", '"\t\\\\P"'),
+        );
     }
 }
 

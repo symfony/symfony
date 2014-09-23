@@ -14,41 +14,39 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
+use Symfony\Component\Validator\Validation;
 
-class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
+class LanguageValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected $context;
-    protected $validator;
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
+    protected function createValidator()
+    {
+        return new LanguageValidator();
+    }
 
     protected function setUp()
     {
         IntlTestHelper::requireFullIntl($this);
 
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new LanguageValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        parent::setUp();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Language());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Language());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -64,10 +62,9 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidLanguages($language)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($language, new Language());
+
+        $this->assertNoViolation();
     }
 
     public function getValidLanguages()
@@ -85,16 +82,14 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
     public function testInvalidLanguages($language)
     {
         $constraint = new Language(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $language,
-            ));
-
         $this->validator->validate($language, $constraint);
+
+        $this->assertViolation('myMessage', array(
+            '{{ value }}' => '"'.$language.'"',
+        ));
     }
 
     public function getInvalidLanguages()
@@ -109,11 +104,11 @@ class LanguageValidatorTest extends \PHPUnit_Framework_TestCase
     {
         \Locale::setDefault('fr_FR');
         $existingLanguage = 'en';
-        $this->context->expects($this->never())
-            ->method('addViolation');
 
         $this->validator->validate($existingLanguage, new Language(array(
-            'message' => 'aMessage'
+            'message' => 'aMessage',
         )));
+
+        $this->assertNoViolation();
     }
 }

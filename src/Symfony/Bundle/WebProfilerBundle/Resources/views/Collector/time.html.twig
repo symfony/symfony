@@ -193,7 +193,6 @@
                     x = request.left * ratio + space, // position
                     canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
                     ctx    = canvas.getContext("2d"),
-                    backingStoreRatio,
                     scaleRatio,
                     devicePixelRatio;
 
@@ -206,10 +205,7 @@
 
                 // For retina displays so text and boxes will be crisp
                 devicePixelRatio  = window.devicePixelRatio          == "undefined" ? 1 : window.devicePixelRatio;
-                backingStoreRatio = ctx.webkitBackingStorePixelRatio == "undefined" ? 1 : ctx.webkitBackingStorePixelRatio;
                 scaleRatio        = devicePixelRatio / 1;
-
-                canvasHeight += gapPerEvent * drawableEvents.length;
 
                 canvas.width  = width * scaleRatio;
                 canvas.height = canvasHeight * scaleRatio;
@@ -363,14 +359,14 @@
                 var self = this;
 
                 _requests.forEach(function(request) {
-                    self.drawOne(request, maxRequestTime, threshold, width);
+                    self.drawOne(request, _maxRequestTime, threshold, width);
                 });
             };
 
             this.getThreshold = function() {
                 var threshold = Sfjs.getPreference(_storagePrefix + 'threshold');
 
-                if (threshold === null) {
+                if (null === threshold) {
                     return _threshold;
                 }
 

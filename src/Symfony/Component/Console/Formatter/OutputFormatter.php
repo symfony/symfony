@@ -215,7 +215,11 @@ class OutputFormatter implements OutputFormatterInterface
             } elseif ('bg' == $match[0]) {
                 $style->setBackground($match[1]);
             } else {
-                $style->setOption($match[1]);
+                try {
+                    $style->setOption($match[1]);
+                } catch (\InvalidArgumentException $e) {
+                    return false;
+                }
             }
         }
 

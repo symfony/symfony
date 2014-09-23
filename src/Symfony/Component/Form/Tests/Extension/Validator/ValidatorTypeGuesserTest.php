@@ -71,7 +71,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
             array('double'),
             array('float'),
             array('numeric'),
-            array('real')
+            array('real'),
         );
     }
 }

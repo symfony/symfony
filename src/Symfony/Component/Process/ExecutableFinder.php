@@ -53,14 +53,13 @@ class ExecutableFinder
     public function find($name, $default = null, array $extraDirs = array())
     {
         if (ini_get('open_basedir')) {
-            $searchPath = explode(PATH_SEPARATOR, getenv('open_basedir'));
+            $searchPath = explode(PATH_SEPARATOR, ini_get('open_basedir'));
             $dirs = array();
             foreach ($searchPath as $path) {
                 if (is_dir($path)) {
                     $dirs[] = $path;
                 } else {
-                    $file = str_replace(dirname($path), '', $path);
-                    if ($file == $name && is_executable($path)) {
+                    if (basename($path) == $name && is_executable($path)) {
                         return $path;
                     }
                 }

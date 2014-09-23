@@ -82,6 +82,28 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
+    public function testReverseTransformEmptyArray()
+    {
+        $input = array(
+            'a' => array(),
+            'b' => array(),
+            'c' => array(),
+        );
+
+        $this->assertNull($this->transformer->reverseTransform($input));
+    }
+
+    public function testReverseTransformZeroString()
+    {
+        $input = array(
+            'a' => '0',
+            'b' => '0',
+            'c' => '0',
+        );
+
+        $this->assertSame('0', $this->transformer->reverseTransform($input));
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */

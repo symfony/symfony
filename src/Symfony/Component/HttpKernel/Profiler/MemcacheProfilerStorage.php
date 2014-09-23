@@ -91,7 +91,6 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
         $memcache = $this->getMemcache();
 
         if (method_exists($memcache, 'append')) {
-
             // Memcache v3.0
             if (!$result = $memcache->append($key, $value, false, $expiration)) {
                 return $memcache->set($key, $value, false, $expiration);

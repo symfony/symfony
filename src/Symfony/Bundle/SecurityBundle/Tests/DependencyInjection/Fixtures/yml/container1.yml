@@ -53,6 +53,8 @@ security:
             switch_user: true
             x509: true
             logout: true
+            remember_me:
+                key: TheKey
         host:
             pattern: /test
             host: foo\.example\.org

@@ -62,7 +62,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             'concatenation from the start value' => '\'\'.',
             '.' => 'dot as a key',
             '.\'\'.' => 'concatenation as a key',
-            '\'\'.' =>'concatenation from the start key',
+            '\'\'.' => 'concatenation from the start key',
             'optimize concatenation' => "string1%some_string%string2",
             'optimize concatenation with empty string' => "string1%empty_value%string2",
             'optimize concatenation from the start' => '%empty_value%start',
@@ -140,7 +140,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Aliases')));
 
         $container = new \Symfony_DI_PhpDumper_Test_Aliases();
-        $container->set('foo', $foo = new \stdClass);
+        $container->set('foo', $foo = new \stdClass());
         $this->assertSame($foo, $container->get('foo'));
         $this->assertSame($foo, $container->get('alias_for_foo'));
         $this->assertSame($foo, $container->get('alias_for_alias'));

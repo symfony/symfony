@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-11T20:37:10Z
+
+Actually, I think it's solved in a wrong place. The errors are coming from [`XmlUtils::loadFile()`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Config/Util/XmlUtils.php#L41). That's where `libxml_clear_errors()` should be called.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T12:05:29Z
+
+I agree with @jakzal that XmlUtils needs the same fix.
+
+However, the fix is indeed needed in this loader as it also performs some additional XML formatting
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2014-09-12T12:10:49Z
+
+Thank you @jakzal @stof. I will create another PR to fix XmlUtils, too.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T12:11:17Z
+
+@pulzarraider you can put it in the same PR
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2014-09-12T12:11:43Z
+
+@stof ok
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-12T12:50:22Z
+
+@pulzarraider can you standarize the order of calling `libxml_use_internal_errors($internalErrors);` and      `libxml_clear_errors();`? These two are called in two places in a different order. Call me pedantic, but it bothers me a bit :P
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T15:43:33Z
+
+@pulzarraider Do you have some time in the coming days to finish this PR?
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2014-09-22T16:10:49Z
+
+@fabpot yes, I will finish it today evening.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T16:14:04Z
+
+@pulzarraider Great! Thank you very much.
+
+---------------------------------------------------------------------------
+
+by pulzarraider at 2014-09-22T18:54:29Z
+
+@fabpot Glad I could help.
+
+@jakzal @stof @xabbuh Thank you for your comments to make this PR better.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T19:17:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-22T21:19:07Z
+
+:+1:

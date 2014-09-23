@@ -65,7 +65,7 @@ class Command
         $this->configure();
 
         if (!$this->name) {
-            throw new \LogicException('The command name cannot be empty.');
+            throw new \LogicException(sprintf('The command name cannot be empty in [%s]', get_class($this)));
         }
     }
 

@@ -20,6 +20,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -676,8 +678,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
         $application->setAutoExit(false);
         $application->expects($this->once())
-             ->method('doRun')
-             ->will($this->throwException($exception));
+            ->method('doRun')
+            ->will($this->throwException($exception));
 
         $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
 
@@ -691,8 +693,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application = $this->getMock('Symfony\Component\Console\Application', array('doRun'));
         $application->setAutoExit(false);
         $application->expects($this->once())
-             ->method('doRun')
-             ->will($this->throwException($exception));
+            ->method('doRun')
+            ->will($this->throwException($exception));
 
         $exitCode = $application->run(new ArrayInput(array()), new NullOutput());
 
@@ -968,6 +970,32 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array());
 
         $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
+    }
+
+    public function testRunWithCommandInterface()
+    {
+        $input = new StringInput('symfony:command-interface');
+        $output = new BufferedOutput();
+        $command = $this->getMock('Symfony\Component\Console\Command\CommandInterface');
+        $command->expects($this->any())->method('getName')->will($this->returnValue('symfony:command-interface'));
+        $command->expects($this->any())->method('isEnabled')->will($this->returnValue(true));
+        $command->expects($this->any())->method('getAliases')->will($this->returnValue(array()));
+        $command->expects($this->any())->method('getHelperSet')->will($this->returnValue(new HelperSet()));
+
+        $definition = new InputDefinition();
+        $command->expects($this->any())->method('getDefinition')->will($this->returnValue($definition));
+        $command->
+            expects($this->once())->
+            method('run')->
+            with($input, $output)->
+            will($this->returnCallback(function ($input, $output) { $output->write('meh'); } ));
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->run($input, $output);
+
+        $this->assertEquals('meh', $output->fetch());
     }
 }
 

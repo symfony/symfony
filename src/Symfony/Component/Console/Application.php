@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandInterface;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -392,13 +393,13 @@ class Application
      *
      * If a command with the same name already exists, it will be overridden.
      *
-     * @param Command $command A Command object
+     * @param CommandInterface $command A Command object
      *
-     * @return Command The registered command
+     * @return CommandInterface The registered command
      *
      * @api
      */
-    public function add(Command $command)
+    public function add(CommandInterface $command)
     {
         $command->setApplication($this);
 
@@ -426,7 +427,7 @@ class Application
      *
      * @param string $name The command name or alias
      *
-     * @return Command A Command object
+     * @return CommandInterface A Command
      *
      * @throws \InvalidArgumentException When command name given does not exist
      *
@@ -871,15 +872,15 @@ class Application
      * If an event dispatcher has been attached to the application,
      * events are also dispatched during the life-cycle of the command.
      *
-     * @param Command         $command A Command instance
-     * @param InputInterface  $input   An Input instance
-     * @param OutputInterface $output  An Output instance
+     * @param CommandInterface $command A Command instance
+     * @param InputInterface   $input   An Input instance
+     * @param OutputInterface  $output  An Output instance
      *
      * @return int 0 if everything went fine, or an error code
      *
      * @throws \Exception when the command being run threw an exception
      */
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    protected function doRunCommand(CommandInterface $command, InputInterface $input, OutputInterface $output)
     {
         foreach ($command->getHelperSet() as $helper) {
             if ($helper instanceof InputAwareInterface) {

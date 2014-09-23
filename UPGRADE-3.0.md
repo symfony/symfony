@@ -86,6 +86,34 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+ * `Application` requires a `CommandInterface` instead of a `Command`. ```Command``` implements this interface.
+
+   Before:
+
+   ```
+   public function add(Command $command)
+   ```
+
+   After:
+
+   ```
+   public function add(CommandInterface $command)
+   ```
+
+   This also applies for the `doRunCommand` method.
+
+   Before:
+
+   ```
+   protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+   ```
+
+   After:
+
+   ```
+   protected function doRunCommand(CommandInterface $command, InputInterface $input, OutputInterface $output)
+   ```
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

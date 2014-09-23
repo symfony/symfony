@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,11 +48,11 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param Command $command
+     * @param CommandInterface $command
      *
      * @return \DOMDocument
      */
-    public function getCommandDocument(Command $command)
+    public function getCommandDocument(CommandInterface $command)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($commandXML = $dom->createElement('command'));
@@ -158,7 +158,7 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeCommand(Command $command, array $options = array())
+    protected function describeCommand(CommandInterface $command, array $options = array())
     {
         $this->writeDocument($this->getCommandDocument($command));
     }

@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\VarDumper\VarDumper;

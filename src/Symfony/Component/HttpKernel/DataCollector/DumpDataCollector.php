@@ -53,7 +53,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function dump(Data $data)
     {
         if ($this->stopwatch) {
-           $this->stopwatch->start('dump');
+            $this->stopwatch->start('dump');
         }
         if ($this->isCollected) {
             $this->isCollected = false;
@@ -160,7 +160,6 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $dumper = new JsonDumper();
         } else {
             throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
-
         }
         $dumps = array();
 

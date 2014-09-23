@@ -31,8 +31,7 @@ class DumpNode extends \Twig_Node
     {
         $compiler
             ->write("if (\$this->env->isDebug()) {\n")
-            ->indent()
-        ;
+            ->indent();
 
         $values = $this->getNode('values');
 
@@ -50,43 +49,36 @@ class DumpNode extends \Twig_Node
                 ->outdent()
                 ->write("}\n")
                 ->addDebugInfo($this)
-                ->write(sprintf('\Symfony\Component\VarDumper\VarDumper::dump($%svars);'."\n", $this->varPrefix))
-            ;
+                ->write(sprintf('\Symfony\Component\VarDumper\VarDumper::dump($%svars);'."\n", $this->varPrefix));
         } elseif (1 === $values->count()) {
             $compiler
                 ->addDebugInfo($this)
                 ->write('\Symfony\Component\VarDumper\VarDumper::dump(')
                 ->subcompile($values->getNode(0))
-                ->raw(");\n")
-            ;
+                ->raw(");\n");
         } else {
             $compiler
                 ->addDebugInfo($this)
                 ->write('\Symfony\Component\VarDumper\VarDumper::dump(array('."\n")
-                ->indent()
-            ;
+                ->indent();
             foreach ($values as $node) {
                 $compiler->addIndentation();
                 if ($node->hasAttribute('name')) {
                     $compiler
                         ->string($node->getAttribute('name'))
-                        ->raw(' => ')
-                    ;
+                        ->raw(' => ');
                 }
                 $compiler
                     ->subcompile($node)
-                    ->raw(",\n")
-                ;
+                    ->raw(",\n");
             }
             $compiler
                 ->outdent()
-                ->write("));\n")
-            ;
+                ->write("));\n");
         }
 
         $compiler
             ->outdent()
-            ->raw("}\n")
-        ;
+            ->raw("}\n");
     }
 }

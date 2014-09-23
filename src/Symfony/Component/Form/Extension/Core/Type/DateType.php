@@ -136,7 +136,8 @@ class DateType extends AbstractType
         // Change the input to a HTML5 date input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
-        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+        //  * the allow_html5 is set to true
+        if ($options['allow_html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'date';
         }
 
@@ -205,6 +206,7 @@ class DateType extends AbstractType
             'model_timezone' => null,
             'view_timezone'  => null,
             'empty_value'    => $emptyValue,
+            'allow_html5'   => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
             'by_reference'   => false,

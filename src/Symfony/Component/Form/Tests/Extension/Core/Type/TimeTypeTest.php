@@ -519,6 +519,17 @@ class TimeTypeTest extends TypeTestCase
         $this->assertEquals(30, $view->vars['attr']['step']);
     }
 
+    public function testDontPassHtml5TypeIfHtml5NotAllowed()
+    {
+        $form = $this->factory->create('time', null, array(
+            'widget' => 'single_text',
+            'allow_html5' => false,
+        ));
+
+        $view = $form->createView();
+        $this->assertFalse(isset($view->vars['type']));
+    }
+
     public function testPassDefaultEmptyValueToViewIfNotRequired()
     {
         $form = $this->factory->create('time', null, array(

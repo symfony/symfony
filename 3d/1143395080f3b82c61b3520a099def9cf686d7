@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-07-17T09:16:31Z
+
+I think your change also fixes  #10857. could you add a testcase covering it ?
+
+---------------------------------------------------------------------------
+
+by skolodyazhnyy at 2014-07-17T09:35:19Z
+
+@stof Done. If I understand it right, the problem with #10857 appears when there is both request headers specified, but response has only `etag`. If response has non - logic was fine.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-17T13:58:45Z
+
+once the issue I reported is fixed, :+1:
+
+---------------------------------------------------------------------------
+
+by skolodyazhnyy at 2014-07-17T14:35:51Z
+
+@stof Thanks, it's fixed

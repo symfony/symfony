@@ -1,0 +1,645 @@
+---------------------------------------------------------------------------
+
+by Koc at 2014-04-05T21:32:05Z
+
+Awesome bulk of work was done! Very interesting component. I hope it will be part of Symfony.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-05T23:15:19Z
+
+The root composer.json file needs to be updated:
+
+- adding the ``replace`` clause for the new component
+- handling the loading of the ``debug()`` function when using the fullstack repo.
+
+The FrameworkBundle composer.json also needs to be updated to requrie the var-debug component (it is a mandatory dependency).
+
+and the Travis config needs to be updated to run the tests of the C extension as well. It would be easier to run them in the CI if it was a separate repo for the C extension than the PHP code, which would also benefit the installation btw (installing the extension is not done by Composer, and even if it was done in the future, it would not take it from the middle of another package but from PECL). Thus, having the extension in a separate repo will make it easier to handle its versionning (we will be able to have a 1.0 tag for its 1.0 version, which is not the case currently) and will allow to submit it to PECL with its own versionning (having it on PECL mean that Windows users will be able to download the compiled build directly thanks to the PECL infrastructure).
+What do you think about split the C extension outside the VarDebug component ? Keeping it in the symfony organization but as a separate repo also mean that the extension can be officially maintained by you (contributors to a C extension are not the same than PHP developers)
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-04-06T08:56:00Z
+
+Should this component respect accepted recently `__debugInfo` RFC https://wiki.php.net/rfc/debug-info ?
+
+---------------------------------------------------------------------------
+
+by damienalexandre at 2014-04-06T10:01:45Z
+
+Cool stuffs :neckbeard:
+
+Maybe the DoctrineCaster could be improved to be more like the [native Doctrine dump function](https://github.com/doctrine/common/blob/master/lib/Doctrine/Common/Util/Debug.php#L34)?
+
+They have a great export function doing some transformations on entities Proxy.
+
+---------------------------------------------------------------------------
+
+by realityking at 2014-04-06T12:49:53Z
+
+Great concept but two concerns:
+
+1. ``debug()`` might be a rather common name for a non-namespaced function which might cause conflicts with other libraries.
+
+2. The PHP implementation would be significantly easier with a class with static methods, simply because there would be no need to use Reflection.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-06T15:37:08Z
+
+the fatal error in the testsuite is because the autoloading of the var_debug functions is missing in the root composer.json
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-08T13:29:58Z
+
+Some commits added, see above.
+
+If you want to try now, please use: https://github.com/nicolas-grekas/Patchwork-Dumper
+
+I'll keep it in sync with this PR so you can enjoy debug() right now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-08T13:32:09Z
+
+Pour les lecteurs français, consultez également la présentation faite hier au Symfony Live Paris :
+https://speakerdeck.com/nicolasgrekas/debug-plus-symfony
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-08T13:53:02Z
+
+After thinking a bit more about the `debug` function, rather than a *debug* function, the behaviour looks like a *snapshoter*, a *screenshoter*, a *polaroid* camera.
+We discussed with Nicolas about taking lots of "snapshots" of an object during the lifecycle of a program would naturally lead to data visualisation and diffs.
+One of the powerful features of this component is to understand and visualize very quickly what's going on in the code.
+
+---------------------------------------------------------------------------
+
+by Taluu at 2014-04-08T15:05:39Z
+
+Even if this looks promising, I'm not sure that this should be in a new component rather than plain old Debug component (as it is a tool to debug things)...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-10T10:34:31Z
+
+Update:
+- @Koc commit https://github.com/nicolas-grekas/symfony/commit/92b150223a6e35c5714c8bc4551db47dd5d74425 is for you,
+- I also did a first round of fixes for composer/components/bundles dependencies,
+- Many thanks to @ruian who implemented a Twig tag, so you can use `{% debug var %}` instead of `{{ debug(var) }}`. For the moment, I've kept both syntax enabled, to gather more feedback before final decision,
+- https://github.com/nicolas-grekas/Patchwork-Dumper is up to date with these updates so you can test right now.
+
+Positive and/or negative feedback welcomed!
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-04-10T10:48:56Z
+
+@nicolas-grekas nice, thanx. But it looks too complicated comparing to add just another function for inline dumping.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-12T12:10:49Z
+
+@stof thanks for your review!
+Do you see anything else for the todo above?
+Anyone else?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-04-12T12:55:19Z
+
+@nicolas-grekas can you past some screen-shots  (especially the icon ;))
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-12T13:20:23Z
+
+Can we not merge the "VarDebug" and "Debug" component? I find it rather strange to have 2 components with almost identical naming and semantic.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-12T18:09:45Z
+
+![capture du 2014-04-12 20 08 09](https://cloud.githubusercontent.com/assets/243674/2687805/8ec838ce-c26d-11e3-9990-4e940a95c73e.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-15T09:26:00Z
+
+For comments in the extension folder, @jpauli  wants to keep them for future enhancement.
+About the proposition of a `debug_collect()` function, I prefer not: the cognitive cost of requiring every dev to choose daily between `debug()` vs `debug_collect()` is far higher than writing a generic code that frees devs from even learning about the subject and then afterwards deciding which version should be used in this or that context.
+
+Do someone use debug() now? How do you feel about it?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-04-15T11:56:05Z
+
+Note: to test this component in your project, simply run
+
+```
+composer require patchwork/dumper:~1.1
+```
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-04-22T15:02:29Z
+
+Any reason why this is not part of Debug component?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-22T16:20:46Z
+
+Currently, we have three main namespaces:
+
+- VarDebug\Caster
+- VarDebug\Collector
+- VarDebug\Dumper
+
+Merging with Debug component could mean moving to:
+- Debug\VarCaster
+- Debug\VarCollector
+- Debug\VarDumper
+
+Anyone with better name ideas?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2014-04-22T16:30:21Z
+
+How about using a "Var" namespace, inside the Debug component ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-04-22T16:31:05Z
+
+@nicolas-grekas Actually, if we move to the Debug component, it would make more sense to have all this avr debugging in a single subnamespace of the component, like we did for ``Config\Definition`` and ``Config\Loader``.
+
+However, I'm -1 for such move. Putting several independant features in the same component hurts the proper definition of dependencies for other libraries. We suffer of it for the Config definition for instance.
+And this would go against the current move of Symfony:
+
+- the security component was split into 3 components in 2.4 (this was easy as it was already organized as 3 subnamespaces), with ``symfony/security`` replacing them all.
+- there is a WIP about extracting the profiler from HttpKernel for Symfony 2.6 to make HttpKernel smaller (and more splitting work in the 3.0 roadmap)
+
+Splitting a component by moving code to a new location is a pain to preserve BC, so I would prefer keeping it as a new component from the start
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-04-22T16:33:30Z
+
+@Taluu var is reserved keyword http://us3.php.net/manual/en/reserved.keywords.php
+
+---------------------------------------------------------------------------
+
+by Taluu at 2014-04-22T16:36:59Z
+
+Mmh, true, forgot about that. Then how about "Dumper" ? As it comes from "Patchwrok-Dumper" anyway..
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-22T19:16:05Z
+
+Agree with @stof especially since code here has no technical relationship with Debug component. That's also my rational for a new component.
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-04-22T19:27:10Z
+
+I would at least like to come up with better name for this component, but nothing comes to my mind.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-04-22T19:37:43Z
+
+I agree having individual components makes sense when they are not related. But having a component named "Debug" and another "VarDebug" is pretty silly for a user who doesn't know the details, it's like having "WebBrowser" and "Browser" components.
+
+---------------------------------------------------------------------------
+
+by pyrech at 2014-04-22T19:39:58Z
+
+Agreed with @umpirsky and @Tobion. And as @Taluu, I find Dumper is a good name for this component.
+
+---------------------------------------------------------------------------
+
+by umpirsky at 2014-04-22T19:40:09Z
+
+Maybe it should be named Dump.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-22T20:00:20Z
+
+Let's find a better name.
+Here are some though:
+
+Even if it will be first used for that, the code in VarDebug is not technically related to debugging.
+What the code really does is implementing an algorithm that creates a deep copy of any PHP variable, with casters for extracting data/metadata from objects/resources and a limiter to stop copying too heavy structures. Dumping is for me only one possible use of this copy, with more to be invented if that applies to some problem.
+
+So, "VarDumper" might be better than "VarDebug", but IMHO it would still be too much a description of the *intended* use of the code rather than what it *does* in itself.
+
+What do you think of these arguments?
+
+Any love for VarFrezzer? VarSnapshotter? VarFacsimile? VarCopier?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-29T10:35:29Z
+
+What about `Symfony\Component\VarDump`? I prefer it over VarDebug, and can't find better... Anyone else?
+
+---------------------------------------------------------------------------
+
+by Taluu at 2014-04-29T10:42:41Z
+
+This is a bit better, but having `Var` as  a prefix is kinda troublesome I think, and will lead to confusion (and isn't it the same as `Dumper` anyway ?). If its goal is to extract the information contained in the variable (or something else if we extend the possibilities), why not `Extractor` or something like that then ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-04-30T11:48:22Z
+
+Not "Dumper", because in Symfony we have many dumpers: a container dumper, a class map dumper, a route dumper, a data collector dumper, a yaml dumper, etc.
+So VarDump, because this dumps vars :)
+An other idea: `Repr`, modeled after python `repr`, which is how they call their `var_dump` (but then, let's stay PHPish and call it VarDump again?)
+If we agree that VarDump is better than VarDebug, I propose changing now, until an even better alternative is found?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-09T09:25:51Z
+
+Just to let you know that this PR might be in a merge-able state by the end of the week or the week after:
+I updated the TODO above. For the naming concern, after talking with some of you, I refactored the code around a new VarDumper component that holds all the dumping logic, and a new DebugBundle that holds all the Symfony required glue. After merging this PR, most debug related concerns that are currently scattered in other bundles/components could be put together in the new bundle.
+
+Remaining todos are:
+- integrate with FrameworkBundle / Standard edition
+- tests for the DebugBundle
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-13T16:43:23Z
+
+IMHO, the twig part could be move the a bridge to be able to re-use it in silex and drupal and ...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-18T23:40:00Z
+
+IIRC, The twig tag does not output the value in the HTML. But I think we need something for that.
+Use case: The controller give you an array, you just want to dump it to see what value you can use. And you want everything in the same place. I mean, I don't want to open a new tab to do that. WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-18T23:42:52Z
+
+@lyrixx the purpose of this dumper is precisely to avoid putting the dump in the HTML, which tends to break it. Putting the dump in the HTML is already possible with ``var_dump``, which can be used in Twig.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-18T23:48:35Z
+
+@stof Thanks. But I know ;) I think the new component is more powerful than var_dump, so I could prefer to use the new tag / function than `debug` (and not `var_dump` ;))
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-19T05:50:29Z
+
+Do you ever sleep guys?
+BTW, I came up with an other use case of VarDumper yesterday: unit testing.
+I wrote an assertion that verifies that some structure is correct according to its expected dump.
+A lot easier to check and still accurate. Works well with phpunit's strings diff on failure also.
+Generalizing this use case would need a dumper with a guaranteed stable output format.
+
+---------------------------------------------------------------------------
+
+by hice3000 at 2014-06-19T06:40:31Z
+
+Ever thought about time lag? :D
+BTW: Using this for unit testing is a great example of this components usefulness.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-19T07:56:34Z
+
+@lyrixx a dump excerpt is displayed on hovering the "debug()" icon toolbar. This still preserves the original HTML and prevents extra jumps/clicks to the "debug()" panel. The excerpt is very short currently, but we can work on making it more useful if what is currently displayed is not enough (btw, I suggest postponing these enhancements until this PR is merged).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-19T07:59:35Z
+
+> Do you ever sleep guys?
+
+I'm not on your TZ ;)
+
+An what about my last comment?
+
+About unit testing, I think you can do it in your own project but this is not a good practice IMHO. For example, if you add a new property to one of your object, it will break your tests, and it should not. I mean, I don't know your project, But in most of projects, It should not break tests. It's a bit like doing functional tests and to compare HTML vs HTML. HTML change, so it's dangerous...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-06-19T08:10:00Z
+
+@lyrixx you need practicing this idea before saying it's not a good practice :)
+They are many solutions to the problem you suggest (e.g. assertStringMatchesFormat).
+Having a new tool for writing assertions does not replace the other ways of doing assertions.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-06-19T08:21:45Z
+
+@nicolas-grekas Yeah of course ;) I like the idead. Anyway this is not the right place to discuss this ;)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-22T18:39:44Z
+
+Wow, two tasks left! That's nice. You should add a "open doc PR". It would be awesome that this new component would be documented ;)
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2014-06-23T09:03:02Z
+
+stumbled across this bundle: https://github.com/raulfraile/LadybugBundle
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-09T15:16:01Z
+
+@nicolas-grekas what is the needed work to integrate with FrameworkBundle ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-07-23T18:33:44Z
+
+I just released released Patchwork-Dumper v1.2.1 and have now to update this PR accordingly.
+The change log is:
+- fixes
+- theme-able web profiler panel (with two dump renderer, thanks @OwlyCode )
+- enhanced output precision for CLI dumper
+- simplified symfony glue (less services)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-24T10:02:34Z
+
+Just synced this PR with [latest progress](https://github.com/nicolas-grekas/Patchwork-Dumper/commits/master):
+- fix refs to nulls, floats representation and others
+- better handling of Doctrine, Spl and DOM objects
+
+Tests and doc apart, I'm still unsure about the DebugBundle and the debug() function:
+- about `debug()` drupal reported a collision with the name debug they are also using. Also, I'm not sure this name is the best for DX (think discoverability/immediate comprehension of the feature). RIght now, I'd prefer `dump()`.
+- about the DebugBundle, I'd prefer to defer it for an other PR and get back to more traditional scattered glue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-26T19:54:07Z
+
+This PR is ready for review! It still misses tests, but at least I finally understood how I should glue things with the other parts of Symfony.
+So: I moved things as much as possible out of the DebugBundle (which is fine keeping now IMHO).
+I also renamed ~~debug()~~ to `dump()` (followed by many related renaming).
+To give proper credit to the people that helped me get to this point, I added empty commits when their contributions had been squashed with mines. I hope they can be preserved in the git history.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T22:06:00Z
+
+why is there OwlyCode and Patchwork folders in the Profiler templates of the DebugBundle ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-26T22:48:24Z
+
+@fabpot how do you want to handle the symfony_debug C extension ?
+It is a dedicated codebase, which is not a drop-in replacement of a PHP implementation like in Twig. This means that it could have a separate release cycle than the component. It is not installed at the same time anyway (meaning there is no guarantee that the installed extension corresponds to the code cloned with the Symfony codebase)
+IMO, to make it usable, the extension clearly needs to be available on pecl.php.net Having a dedicated repo with its own version numbers might make it much easier.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-08-27T20:28:35Z
+
+Comments addressed or answered, I also added tests for the Twig extension and for the DebugBundle extension. I still have to prefix the CSS classes, and write a test for the data collector and an other one for the even listener.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-08-28T17:43:53Z
+
+Hi Nico! You were asking people for a better name for  your component, I was thinking of `VarInspector`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-09T19:51:16Z
+
+Notice the "nodeType" property and how child objects are displayed
+
+dump():
+![capture du 2014-09-09 11 23 26](https://cloud.githubusercontent.com/assets/243674/4207795/2d9a5fe2-385a-11e4-943d-06172e98b85a.png)
+
+VS var_dump():
+
+![capture du 2014-09-09 11 31 44](https://cloud.githubusercontent.com/assets/243674/4207801/347bc526-385a-11e4-966f-7f7eb3f5cea3.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-12T13:02:24Z
+
+ping @symfony/deciders :
+I addressed all remaining technical points: mainly adding tests and prefixes to CSS.
+I also refactored a bit the resources related to the profiler panel,
+and added a feature for better cutting while dumping.
+Except for the doc PR I still have to open, this is ready for merge on my side.
+Can you please vote and/or tell me if you see anything that could block a merge before 2.6 is frozen?
+Many thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-17T16:59:51Z
+
+I moved the auto-required file to an inline in the standard-edition: https://github.com/symfony/symfony-standard/pull/710/files
+I also opened a doc PR: https://github.com/symfony/symfony-docs/pull/4243
+And I added a dump() function in Twig.
+This is all green on my side.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-18T01:17:24Z
+
+I think the Bundle name should be DumpBundle to make it in sync really with what is behind this.
+I wonder if this same extension would work with hhvm, in that case I guess we will just fallback to the php implementation. Good job @ruian! I also agree with @stof in creating a separate repo for the extension.
+And I agree with @stof that the docu PR is not very well fed :blush: it needs a revamp of what truly this piece of work is. I may try to practice with a blog post, thanks! great component!
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-18T01:39:15Z
+
+also on cli would be nice to have a command ```php app/console dump:legend``` to output a colorful legend to understand the color code :flushed: this can be perhaps output also on demand dump($var, 'legend') or something.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-18T09:00:39Z
+
+Hi @nicolas-grekas, this is a really awesome piece of code! I did a quick review, the code looks good. I'll try to do a more thorough review when I have more time.
+
+I tried the dumper in a test project and have some feedback regarding the output styling in the web debugger. All of the below is obviously my humble opinion.
+
+* I think you should replace FQCNs by `<abbr title="FQCN">ShortName</abbr>`. The output is much easier to read this way.
+* I don't like the mixture of monospace/sans-serif. Could you use monospace everywhere?
+* The colors are quite hard to read with a white background. Could you increase the contrast?
+* Could you use the +/- icons we use in the rest of the profiler? See the Form debbuger for example.
+* Reference targets (`#1`) should be displayed behind the class name. This is what `var_debug()` does, and I can't think of a good reason to change that.
+* Also references (`@1`) should be prefixed by the class name as well, for clarity.
+* I think the contents of collapsed objects should be hidden. For example, right now the output is:
+
+```
+FooClass#1{
+   [+] ref => BarClass#2{ prop => value, ref2 => BazClass#3{...
+}
+```
+
+When collapsed, this should be reduced to:
+
+```
+FooClass#1{
+   [+] ref => BarClass#2{ ... }
+}
+```
+
+When people want to see the contents, they can click "+".
+
+* The same goes for arrays. There we have to options: Either we hide the contents of the collapsed array itself:
+
+```
+FooClass#1{
+   [+] array => [ ... ]
+}
+```
+
+Or we hide the contents of the values of the collapsed array:
+
+```
+FooClass#1{
+   [+] array => [ key1 => val1, key2 => [ ... ], key3 => BarClass#2{ ... } ]
+}
+```
+
+In the second case, it would probably be wise to display `...` after a fixed number of key-value pairs (3?).
+
+Nice to have:
+
+* When hovering over a class name/reference, all other class names/references referring to the same object could be highlighted. E.g., I hover over `FooClass#1`, both `FooClass#1` and all `FooClass@1` are highlighted with a yellow (or whatever) background.
+
+I hacked together a quick example in Chrome.
+
+**Before**
+
+![before](https://cloud.githubusercontent.com/assets/176399/4317336/ec8ab100-3f11-11e4-8105-4547c0190c26.png)
+
+**After**
+
+![after](https://cloud.githubusercontent.com/assets/176399/4317339/ff037ff6-3f11-11e4-8a25-8ed25e214c69.png)
+
+(imagine the cursor hovering over one of the two highlighted pieces. Also, I left the + and - unchanged; see my comment above. The line break before the first `{` was not intentional, just ignore it.)
+
+Thanks for your great work! :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-18T12:11:23Z
+
+> I moved the auto-required file to an inline in the standard-edition: https://github.com/symfony/symfony-standard/pull/710/files
+
+What about using the component standalone or if someone isn't using the standard edition?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-18T16:01:26Z
+
+The component has the required autoload file specification, so no pb.
+For people not using the std edition and still relying on the full symfony/symfony package, they will need to inline the function in their code. We should document that somewhere.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-18T16:16:25Z
+
+> I wonder if this same extension would work with hhvm
+
+It won't, as the extension deals with low-level details about the PHP data structures, and HHVM stores values differently
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-18T16:24:38Z
+
+Ah I missed that it was still in the component's composer.json.
+
+Is there a reason for not including the file autoload in the main composer.json?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-18T16:25:12Z
+
+@kbond Mainly performance
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-09-18T16:26:22Z
+
+OK fair enough.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-18T16:28:36Z
+
+For HHVM, the tests show that the PhpCloner works well, so we won't miss anything feature wise.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T08:56:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-22T09:26:25Z
+
+@webmozart thanks for your suggestions!
+In fact the "dump visualization" subject has many room for improvement, and I'd prefer enhancing this part in later minor versions. It's "only" JS and/or CSS :)
+
+Currently, there are already 3 "dumper engines" which you can choose by changing the `debug.profiler_template` config param:
+
+- `'@Debug/Profiler/Patchwork/dump.html.twig'` is the current default you experienced
+- `'@Debug/Profiler/Base/dump.html.twig'` is a pure HTML visu, with no expand/collapse button
+- `'@Debug/Profiler/OwlyCode/dump.html.twig'` is a new JS engine developed by @OwlyCode that paves the way for a better rendering engine (e.g. highlight on hover), but that need more work to become the default one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T09:47:47Z
+
+@nicolas-grekas I'm not sure we need more than one dumper engines.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2014-09-22T14:21:32Z
+
+Why not use https://github.com/raulfraile/LadybugBundle for dumping? It also is nicely integrated in Twig and the Symfony Profiler.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-22T15:38:19Z
+
+@Rvanlaak besides the fact that ladybug is based on types https://github.com/raulfraile/ladybug/tree/master/src/Ladybug/Type and this PR uses a more native PHP function to introspect references etc, this has also a C extension which makes it faster.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-23T13:28:54Z
+
+Here is the new default rendering:
+![capture du 2014-09-23 14 59 13](https://cloud.githubusercontent.com/assets/243674/4372185/8fc9c096-4321-11e4-88bd-24e40a20b78e.png)
+![capture du 2014-09-23 14 58 57](https://cloud.githubusercontent.com/assets/243674/4372184/8fc9166e-4321-11e4-9bce-98d771680174.png)
+
+I removed the option for several rendering engines and choose to keep the "base" one. This removes the Patchwork and @OwlyCode renderer. As the JsonDumper is not used anymore, I also removed it and its related tests+doc from the git history of this PR. I kept them in patchwork/dumper so they can come back again later.
+
+I also enhanced the base rendering engine with some JS. This should match some of your suggestions @webmozart .
+The main benefit of this approach is that enhancing the HtmlDumper not only enhances the profiler panel, but also inline dumps (the twig function and dump()+exit in your code).
+
+(the remaining fabbot error is intentional)

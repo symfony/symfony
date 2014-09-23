@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by goetas at 2014-09-01T09:41:31Z
+
+The changes proposed by http://fabbot.io/report/symfony/symfony/11815/16f637fa3f3c75eaab23982b7704b46664913870 are not related to my PR...
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-01T12:00:02Z
+
+the drawback about putting these methods in the bridge is that it would require maintaining 2 branches of each bundle (for Symfony 2.3 to 2.5, and Symfony 2.6+), or to redefine the methods in the bundles (making these methods in Symfony useless)
+
+---------------------------------------------------------------------------
+
+by goetas at 2014-09-01T13:23:02Z
+
+@stof if the policy about "auto mapping" in Doctrine ORM and ODM has to be ALWAYS the same, then this should remain here... else, each bundle should have a copy (at the moment) of these methods...
+
+---------------------------------------------------------------------------
+
+by goetas at 2014-09-01T13:44:42Z
+
+@stof But, looking at the source of Doctrine and DoctrineODM, the `Configuration` class of each bundle does not have a common base class, so i can suppose their configurations can change anytime... even the "auto_mapping" policy...
+
+Therefore, these methods should be copied in each bundle... can be a valid solution? What do you think about it?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-09-09T18:30:05Z
+
+@stof: it should be possible to add some marker (interface, method existence check) or something else so that the Bundles will be downwards compatible.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-09-09T19:37:36Z
+
+@symfony/deciders I am proposing to adopt this PR once http://fabbot.io/report/symfony/symfony/11815/16f637fa3f3c75eaab23982b7704b46664913870 is addressed. this would mean my own PR https://github.com/symfony/symfony/pull/11650 should be killed
+
+pros of this PR vs. #11650:
+* the changes needed to Bundles are minimal as there is no new parameter to pass around (note that the Bundles will need some BC logic similar to what I did in my DoctrineBundle PR https://github.com/doctrine/DoctrineBundle/pull/322/files#diff-8f3578ddca2c59937b37c3331b2ab336R335)
+
+cons of this PR vs. #11650:
+* this PR basically makes the handled for ``auto_mapping`` superfluous inside ``loadMappingInformation()``. ie. we essentially have duplicate logic we need to keep for BC reasons
+
+the net effect of all of this is that with minimal effort all Doctrine bundles can be updated to support this new functionality while maintaining BC with previous versions of the DoctrineBridge.
+
+---------------------------------------------------------------------------
+
+by goetas at 2014-09-10T06:57:41Z
+
+Hi, i have removed the auto_mapping check inside `loadMappingInformation` and integrated it in `fixManagersAutoMappings`.
+
+Added some tests too.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-09-22T19:02:50Z
+
+@goetas please move that private method to the end of the class and squash your commits.
+
+@symfony/deciders ping
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T19:15:45Z
+
+@lsmith77 If the only changes before merging are moving the private method and squashing, I can easily take care of them... I just need a plus one.

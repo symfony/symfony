@@ -60,7 +60,7 @@ class ProjectServiceContainer extends Container
      */
     public function compile()
     {
-        throw new LogicException("You cannot compile a dumped frozen container");
+        throw new LogicException('You cannot compile a dumped frozen container.');
     }
 
     /**

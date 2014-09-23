@@ -1,0 +1,145 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T11:14:45Z
+
+IMO, the static API of the component should not live in the same class than the container of options being resolved. These are 2 different responsibilities which are better left to separate classes
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T11:30:36Z
+
+this would require finding a good name for the class holding the static API (``Options`` is indeed a nice one. It is too sad we already use it for the container)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-20T11:37:43Z
+
+@stof I thought so too in the beginning. But then again, it doesn't really matter where we put some static methods which are independent of the surrounding class.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-20T11:54:13Z
+
+An alternative to the `required()` method could be to add a constant `Options::REQUIRED` holding a UUID which can be passed to `resolve()`, sparing one additional method call:
+
+```php
+$options = Options::resolve($options, array(
+    'format' => Options::REQUIRED,
+    'calendar' => \IntlDateFormatter::GREGORIAN,
+));
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-20T12:25:15Z
+
+@webmozart but this would be confusing IMO, because it would give 2 different meanings to the content of the array (and would forbid one value as default)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-20T15:27:48Z
+
+I renamed `required()` to `validateRequired()` now. It's not the most beautiful name, but at least it's in line with the other `validate*()` methods.
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-08-21T07:52:57Z
+
+> this would require finding a good name for the class holding the static API
+
+What about converting static methods into functions?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-21T08:29:25Z
+
+> What about converting static methods into functions?
+
+functions are not autoloadable in PHP, which requires loading them eagerly. This is why we put our utility funcitons as static mehtods in PHP
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-21T10:55:44Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2014-08-21T11:04:01Z
+
+What is the reason for splitting Resolver into 2 classes?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-21T11:06:47Z
+
+@shoomyth The reason is that I don't think that we actually *need* `OptionsResolver` and `OptionsResolverInterface` (this could be removed in Symfony 3.0). Every additional class loaded/created for this low-level utility functionality is a waste of resources. In the updated README you'll see that that class isn't mentioned anymore.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-21T12:42:19Z
+
+@webmozart all the documentation you added in the README belongs to symfony-docs IMO rather than the README for consistency with other components (I know this component is already inconsistent before this PR). The advantages of having it in the doc repo are:
+
+- the doc team works on improving these explanations (while they don't come looking at readme files of components as most of them just link to the online doc) and does a great job at making things easy to understand
+- people are used to looking at the symfony.com website to get the doc (all other components have their doc there)
+- given that the OptionsResolver already has a doc in symfony-docs, it duplicates the maintenance work if you have it in the README as well
+- (minor) the explanations get translated into other languages for maintained translations (not a killer advantage given tht maintaining translations is very hard though, and Fabien even thought about removing them from the website)
+
+Regarding the code changes, I think it makes sense to decouple the OptionsConfig from the class doing the resolution itself. For instance, form types are currently getting an OptionsResolver instance, but they are not expected to ever resolve options.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-21T12:44:57Z
+
+@stof You are right. We can port the README over to symfony-docs when we're done here.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-21T17:46:38Z
+
+I added a documentation PR now: symfony/symfony-docs#4159 ([rendered documentation](https://github.com/webmozart/symfony-docs/blob/issue11705/components/options_resolver.rst)). Feedback welcome!
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-29T09:24:58Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-12T10:08:26Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T10:16:41Z
+
+:+1: for this, but I would like to simplify the README to avoid duplicating the documentation in it (see my previous comment for the arguments).
+
+@webmozart could you rebase your branch to fix conflicts ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-12T10:24:51Z
+
+@stof Thanks! I forgot that after submitting the docs PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-12T12:49:32Z
+
+I've just read the new documentation. It's a nice addition but I'm wondering if the new `OptionsConfig` is not enough. Using the static methods makes the code a bit shorter, but not that much.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-12T19:37:40Z
+
+@fabpot In many cases the creation of an `OptionsConfig` object is not necessary. Using just the static methods performs much better. That means that we can use the component in places now where `OptionsResolver` would have been too slow.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-14T18:05:59Z
+
+@webmozart I'm not talking about the implementation but about the user point of view. There is no other place in Symfony with such static methods.

@@ -12,31 +12,21 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface;
 
 /**
  * Adds some function to the default ExpressionLanguage.
  *
- * To get a service, use service('request').
- * To get a parameter, use parameter('kernel.debug').
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @see ExpressionLanguageProvider
  */
 class ExpressionLanguage extends BaseExpressionLanguage
 {
-    protected function registerFunctions()
+    public function __construct(ParserCacheInterface $cache = null, array $providers = array())
     {
-        parent::registerFunctions();
+        $providers[] = new ExpressionLanguageProvider();
 
-        $this->register('service', function ($arg) {
-            return sprintf('$this->get(%s)', $arg);
-        }, function (array $variables, $value) {
-            return $variables['container']->get($value);
-        });
-
-        $this->register('parameter', function ($arg) {
-            return sprintf('$this->getParameter(%s)', $arg);
-        }, function (array $variables, $value) {
-            return $variables['container']->getParameter($value);
-        });
+        parent::__construct($cache, $providers);
     }
 }

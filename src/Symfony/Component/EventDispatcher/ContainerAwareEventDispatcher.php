@@ -30,6 +30,12 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     private $container;
 
     /**
+     * A list of proxy closures indexed by eventName, serviceId, method.
+     * @var ContainerInterface
+     */
+    private $proxies;
+
+    /**
      * Constructor.
      *
      * @param ContainerInterface $container A ContainerInterface instance
@@ -45,7 +51,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      * @param string $eventName Event for which the listener is added
      * @param array  $callback  The service ID of the listener service & the method
      *                            name that has to be called
-     * @param integer $priority The higher this value, the earlier an event listener
+     * @param int     $priority The higher this value, the earlier an event listener
      *                            will be triggered in the chain.
      *                            Defaults to 0.
      *
@@ -60,12 +66,38 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         $container = $this->container;
         list($serviceId, $method) = $callback;
 
-        $listener = function ($event, $eventName, $dispatcher) use ($container, $serviceId, $method) {
-          $service = $container->get($serviceId);
-          call_user_func(array($service, $method), $event, $eventName, $dispatcher);
+        if (isset($this->proxies[$eventName][$serviceId][$method])) {
+            $proxy = $this->proxies[$eventName][$serviceId][$method];
+            unset($this->proxies[$eventName][$serviceId][$method]);
+            parent::removeListener($eventName, $proxy);
+        }
+
+        $proxy = function ($event, $eventName, $dispatcher) use ($container, $serviceId, $method) {
+            call_user_func(array($container->get($serviceId), $method), $event, $eventName, $dispatcher);
         };
 
-        parent::addListener($eventName, $listener, $priority);
+        $this->proxies[$eventName][$serviceId][$method] = $proxy;
+        parent::addListener($eventName, $proxy, $priority);
+    }
+
+    /**
+     * @see EventDispatcherInterface::removeListener
+     */
+    public function removeListener($eventName, $listener)
+    {
+        if (isset($this->proxies[$eventName])) {
+            foreach ($this->proxies[$eventName] as $serviceId => $methods) {
+                foreach ($methods as $method => $proxy) {
+                    if ($listener === array($this->container->get($serviceId), $method)) {
+                        unset($this->proxies[$eventName][$serviceId][$method]);
+                        parent::removeListener($eventName, $proxy);
+                        return;
+                    }
+                }
+            }
+        }
+
+        parent::removeListener($eventName, $listener);
     }
 
     /**

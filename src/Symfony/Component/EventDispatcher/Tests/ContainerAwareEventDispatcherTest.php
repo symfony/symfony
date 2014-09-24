@@ -218,6 +218,36 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->removeListener('onEvent', array($container->get('service.listener'), 'onEvent'));
         $this->assertFalse($dispatcher->hasListeners('onEvent'));
     }
+
+    public function testLazyInstantiation()
+    {
+        $event = new Event();
+
+        $non_propagating_service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+
+        $non_propagating_service
+            ->expects($this->once())
+            ->method('onEvent')
+            ->with($event)
+            ->will($this->returnCallback(function($event) {
+                $event->stopPropagation();
+            }))
+        ;
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->at(0))
+            ->method('get')
+            ->with('service.listener')
+            ->will($this->returnValue($non_propagating_service))
+        ;
+
+        $dispatcher = new ContainerAwareEventDispatcher($container);
+        $dispatcher->addListenerService('onEvent', array('service.listener', 'onEvent'));
+        $dispatcher->addListenerService('onEvent', array('service.listener.omitted', 'onEvent'));
+
+        $dispatcher->dispatch('onEvent', $event);
+    }
 }
 
 class Service

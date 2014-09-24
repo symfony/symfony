@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-11T15:38:07Z
+
+Probably related to #9083
+
+---------------------------------------------------------------------------
+
+by megazoll at 2014-09-11T15:57:24Z
+
+I'm fully agreed with @stof. Removed ``$_format`` parameter.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-11T22:41:44Z
+
+big :+1: should probably be merged into older branches. it fixes #9083
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T10:24:22Z
+
+looks good to me
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-12T11:24:25Z
+
+@stof which branch should it be merged?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-12T11:26:16Z
+
+given that it is a bug fix, I would vote for 2.3. Let's see whether @fabpot agrees with that
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T07:14:16Z
+
+Except for the BC break that should be reverted, I'm :+1:

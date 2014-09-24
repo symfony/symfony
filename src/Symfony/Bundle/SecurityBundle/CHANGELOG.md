@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * Deprecated the `security.context` service for the `security.token_storage` and 
+   `security.authorization_checker` services.
+
 2.4.0
 -----
 

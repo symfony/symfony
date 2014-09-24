@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
@@ -27,8 +28,8 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->securityContext = new SecurityContext(
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+            new TokenStorage(),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
         );
     }
 

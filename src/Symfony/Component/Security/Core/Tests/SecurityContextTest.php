@@ -11,82 +11,109 @@
 
 namespace Symfony\Component\Security\Core\Tests;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class SecurityContextTest extends \PHPUnit_Framework_TestCase
 {
-    public function testVoteAuthenticatesTokenIfNecessary()
+    private $tokenStorage;
+    private $authorizationChecker;
+    private $securityContext;
+
+    public function setUp()
     {
-        $authManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $decisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
+        $this->tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $this->authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        $this->securityContext = new SecurityContext($this->tokenStorage, $this->authorizationChecker);
+    }
 
-        $context = new SecurityContext($authManager, $decisionManager);
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+    public function testGetTokenDelegation()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $authManager
+        $this->tokenStorage
             ->expects($this->once())
-            ->method('authenticate')
-            ->with($this->equalTo($token))
-            ->will($this->returnValue($newToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
-        ;
+            ->method('getToken')
+            ->will($this->returnValue($token));
 
-        $decisionManager
+        $this->assertTrue($token === $this->securityContext->getToken());
+    }
+
+    public function testSetTokenDelegation()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->tokenStorage
             ->expects($this->once())
-            ->method('decide')
-            ->will($this->returnValue(true))
-        ;
+            ->method('setToken')
+            ->with($token);
 
-        $this->assertTrue($context->isGranted('foo'));
-        $this->assertSame($newToken, $context->getToken());
+        $this->securityContext->setToken($token);
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException
+     * @dataProvider isGrantedDelegationProvider
      */
-    public function testVoteWithoutAuthenticationToken()
+    public function testIsGrantedDelegation($attributes, $object, $return)
     {
-        $context = new SecurityContext(
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
-        );
+        $this->authorizationChecker
+            ->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $object)
+            ->will($this->returnValue($return));
 
-        $context->isGranted('ROLE_FOO');
+        $this->assertEquals($return, $this->securityContext->isGranted($attributes, $object));
     }
 
-    public function testIsGranted()
+    public function isGrantedDelegationProvider()
     {
-        $manager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
-        $manager->expects($this->once())->method('decide')->will($this->returnValue(false));
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'), $manager);
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-        $token
-            ->expects($this->once())
-            ->method('isAuthenticated')
-            ->will($this->returnValue(true))
-        ;
-        $this->assertFalse($context->isGranted('ROLE_FOO'));
-
-        $manager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
-        $manager->expects($this->once())->method('decide')->will($this->returnValue(true));
-        $context = new SecurityContext($this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'), $manager);
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-        $token
-            ->expects($this->once())
-            ->method('isAuthenticated')
-            ->will($this->returnValue(true))
-        ;
-        $this->assertTrue($context->isGranted('ROLE_FOO'));
+        return array(
+            array(array(), new \stdClass(), true),
+            array(array('henk'), new \stdClass(), false),
+            array(null, new \stdClass(), false),
+            array('henk', null, true),
+            array(array(1), 'henk', true),
+        );
     }
 
-    public function testGetSetToken()
+    /**
+     * Test dedicated to check if the backwards compatibility is still working
+     */
+    public function testOldConstructorSignature()
     {
-        $context = new SecurityContext(
-            $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
-        );
-        $this->assertNull($context->getToken());
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+        $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
+        new SecurityContext($authenticationManager, $accessDecisionManager);
+    }
 
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-        $this->assertSame($token, $context->getToken());
+    /**
+     * @dataProvider oldConstructorSignatureFailuresProvider
+     * @expectedException \BadMethodCallException
+     */
+    public function testOldConstructorSignatureFailures($first, $second)
+    {
+        new SecurityContext($first, $second);
+    }
+
+    public function oldConstructorSignatureFailuresProvider()
+    {
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
+        $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
+
+        return array(
+            array(new \stdClass(), new \stdClass()),
+            array($tokenStorage, $accessDecisionManager),
+            array($accessDecisionManager, $tokenStorage),
+            array($authorizationChecker, $accessDecisionManager),
+            array($accessDecisionManager, $authorizationChecker),
+            array($tokenStorage, $accessDecisionManager),
+            array($authenticationManager, $authorizationChecker),
+            array('henk', 'hans'),
+            array(null, false),
+            array(true, null),
+        );
     }
 }

@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Security\Core;
 
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * SecurityContext is the main entry point of the Security component.
@@ -23,63 +26,76 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @deprecated Deprecated since version 2.6, to be removed in 3.0.
  */
 class SecurityContext implements SecurityContextInterface
 {
-    private $token;
-    private $accessDecisionManager;
-    private $authenticationManager;
-    private $alwaysAuthenticate;
+    /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
 
     /**
-     * Constructor.
-     *
-     * @param AuthenticationManagerInterface      $authenticationManager An AuthenticationManager instance
-     * @param AccessDecisionManagerInterface|null $accessDecisionManager An AccessDecisionManager instance
-     * @param bool                                $alwaysAuthenticate
+     * @var AuthorizationCheckerInterface
      */
-    public function __construct(AuthenticationManagerInterface $authenticationManager, AccessDecisionManagerInterface $accessDecisionManager, $alwaysAuthenticate = false)
+    private $authorizationChecker;
+
+    /**
+     * For backwords compatibility, the signature of sf <2.6 still works
+     *
+     * @param TokenStorageInterface|AuthenticationManagerInterface         $tokenStorage
+     * @param AuthorizationCheckerInterface|AccessDecisionManagerInterface $authorizationChecker
+     * @param bool                                                         $alwaysAuthenticate   only applicable with old signature
+     */
+    public function __construct($tokenStorage, $authorizationChecker, $alwaysAuthenticate = false)
     {
-        $this->authenticationManager = $authenticationManager;
-        $this->accessDecisionManager = $accessDecisionManager;
-        $this->alwaysAuthenticate = $alwaysAuthenticate;
+        $oldSignature = $tokenStorage instanceof AuthenticationManagerInterface && $authorizationChecker instanceof AccessDecisionManagerInterface;
+        $newSignature = $tokenStorage instanceof TokenStorageInterface && $authorizationChecker instanceof AuthorizationCheckerInterface;
+
+        // confirm possible signatures
+        if (!$oldSignature && !$newSignature) {
+            throw new \BadMethodCallException('Unable to construct SecurityContext, please provide the correct arguments');
+        }
+
+        if ($oldSignature) {
+            // renamed for clearity
+            $authenticationManager = $tokenStorage;
+            $accessDecisionManager = $authorizationChecker;
+            $tokenStorage = new TokenStorage();
+            $authorizationChecker = new AuthorizationChecker($tokenStorage, $authenticationManager, $accessDecisionManager, $alwaysAuthenticate);
+        }
+
+        $this->tokenStorage = $tokenStorage;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::getToken() instead.
      *
-     * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
-     */
-    final public function isGranted($attributes, $object = null)
-    {
-        if (null === $this->token) {
-            throw new AuthenticationCredentialsNotFoundException('The security context contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
-        }
-
-        if ($this->alwaysAuthenticate || !$this->token->isAuthenticated()) {
-            $this->token = $this->authenticationManager->authenticate($this->token);
-        }
-
-        if (!is_array($attributes)) {
-            $attributes = array($attributes);
-        }
-
-        return $this->accessDecisionManager->decide($this->token, $attributes, $object);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getToken()
     {
-        return $this->token;
+        return $this->tokenStorage->getToken();
     }
 
     /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::setToken() instead.
+     *
      * {@inheritdoc}
      */
     public function setToken(TokenInterface $token = null)
     {
-        $this->token = $token;
+        return $this->tokenStorage->setToken($token);
+    }
+
+    /**
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use AuthorizationCheckerInterface::isGranted() instead.
+     *
+     * {@inheritdoc}
+     */
+    public function isGranted($attributes, $object = null)
+    {
+        return $this->authorizationChecker->isGranted($attributes, $object);
     }
 }

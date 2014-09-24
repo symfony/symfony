@@ -91,12 +91,12 @@
                             rows.appendChild(row);
 
                             var methodCell = document.createElement('td');
-                            methodCell.innerHTML = request.method;
+                            methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 
                             var pathCell = document.createElement('td');
                             pathCell.className = 'sf-ajax-request-url';
-                            pathCell.innerHTML = request.url;
+                            pathCell.textContent = request.url;
                             pathCell.setAttribute('title', request.url);
                             row.appendChild(pathCell);
 
@@ -104,9 +104,9 @@
                             durationCell.className = 'sf-ajax-request-duration';
 
                             if (request.duration) {
-                                durationCell.innerText = request.duration + "ms";
+                                durationCell.textContent = request.duration + "ms";
                             } else {
-                                durationCell.innerText = '-';
+                                durationCell.textContent = '-';
                             }
                             row.appendChild(durationCell);
 
@@ -116,10 +116,10 @@
                             if (request.profilerUrl) {
                                 var profilerLink = document.createElement('a');
                                 profilerLink.setAttribute('href', request.profilerUrl);
-                                profilerLink.innerText = request.profile;
+                                profilerLink.textContent = request.profile;
                                 profilerCell.appendChild(profilerLink);
                             } else {
-                                profilerCell.innerText = 'n/a';
+                                profilerCell.textContent = 'n/a';
                             }
 
                             row.appendChild(profilerCell);
@@ -145,19 +145,19 @@
                         var infoSpans = document.getElementsByClassName("sf-toolbar-ajax-info");
                         if (infoSpans.length) {
                             var text = firstItem == 0 ? requestStack.length + ' calls' : 'Last 20 calls out of ' + requestStack.length;
-                            infoSpans[0].innerText = text;
+                            infoSpans[0].textContent = text;
                         }
                     } else {
                         var cell = document.createElement('td');
                         cell.setAttribute('colspan', '4');
-                        cell.innerText = "No AJAX requests yet.";
+                        cell.textContent = "No AJAX requests yet.";
                         var row = document.createElement('tr');
                         row.appendChild(cell);
                         tbody.appendChild(row);
                     }
                 }
 
-                requestCounter[0].innerText = requestStack.length;
+                requestCounter[0].textContent = requestStack.length;
 
                 var className = 'sf-toolbar-ajax-requests sf-toolbar-status';
                 if (state == 'ok') {
@@ -171,7 +171,7 @@
                 requestCounter[0].className = className;
             };
 
-        {% if (excluded_ajax_paths is defined) %}
+        {% if excluded_ajax_paths is defined %}
             var proxied = XMLHttpRequest.prototype.open;
 
             XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {

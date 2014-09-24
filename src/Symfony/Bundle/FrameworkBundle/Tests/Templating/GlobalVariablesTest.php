@@ -56,24 +56,4 @@ class GlobalVariablesTest extends TestCase
 
         $this->assertSame($user, $this->globals->getUser());
     }
-
-    public function testGetRequest()
-    {
-        $this->markTestIncomplete();
-    }
-
-    public function testGetSession()
-    {
-        $this->markTestIncomplete();
-    }
-
-    public function testGetEnvironment()
-    {
-        $this->markTestIncomplete();
-    }
-
-    public function testGetDubug()
-    {
-        $this->markTestIncomplete();
-    }
 }

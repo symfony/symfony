@@ -56,9 +56,11 @@ class GlobalVariables
      */
     public function getUser()
     {
-        if (!$tokenStorage = $this->container->get('security.token_storage')) {
+        if (!$this->container->has('security.token_storage')) {
             return;
         }
+
+        $tokenStorage = $this->container->get('security.token_storage');
 
         if (!$token = $tokenStorage->getToken()) {
             return;

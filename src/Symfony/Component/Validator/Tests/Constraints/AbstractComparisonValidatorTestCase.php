@@ -84,11 +84,11 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 
         $this->validator->validate($dirtyValue, $constraint);
 
-        $this->assertViolation('Constraint Message', array(
-            '{{ value }}' => $dirtyValueAsString,
-            '{{ compared_value }}' => $comparedValueString,
-            '{{ compared_value_type }}' => $comparedValueType,
-        ));
+        $this->buildViolation('Constraint Message')
+            ->setParameter('{{ value }}', $dirtyValueAsString)
+            ->setParameter('{{ compared_value }}', $comparedValueString)
+            ->setParameter('{{ compared_value_type }}', $comparedValueType)
+            ->assertRaised();
     }
 
     /**

@@ -158,9 +158,9 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($iban, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$iban.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$iban.'"')
+            ->assertRaised();
     }
 
     public function getInvalidIbans()

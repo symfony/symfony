@@ -170,9 +170,9 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$isbn.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->assertRaised();
     }
 
     /**
@@ -199,9 +199,9 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$isbn.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->assertRaised();
     }
 
     /**
@@ -232,8 +232,8 @@ class IsbnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($isbn, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$isbn.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$isbn.'"')
+            ->assertRaised();
     }
 }

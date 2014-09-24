@@ -81,10 +81,10 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->image, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ width }}' => '2',
-            '{{ min_width }}' => '3',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', '2')
+            ->setParameter('{{ min_width }}', '3')
+            ->assertRaised();
     }
 
     public function testWidthTooBig()
@@ -96,10 +96,10 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->image, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ width }}' => '2',
-            '{{ max_width }}' => '1',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ width }}', '2')
+            ->setParameter('{{ max_width }}', '1')
+            ->assertRaised();
     }
 
     public function testHeightTooSmall()
@@ -111,10 +111,10 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->image, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ height }}' => '2',
-            '{{ min_height }}' => '3',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ min_height }}', '3')
+            ->assertRaised();
     }
 
     public function testHeightTooBig()
@@ -126,10 +126,10 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->image, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ height }}' => '2',
-            '{{ max_height }}' => '1',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ height }}', '2')
+            ->setParameter('{{ max_height }}', '1')
+            ->assertRaised();
     }
 
     /**

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T05:50:13Z
+
+Isn't it a BC break?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-24T08:07:16Z
+
+@fabpot I don't think so. Before, when a field had no constraint, the "required" option was set to `true` by default, validating it on the client side (but not server side). I can't think of a situation where this behavior makes sense. Most people probably set "required" to `false` explicitly in such cases.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T08:12:20Z
+
+Got it now. :+1:

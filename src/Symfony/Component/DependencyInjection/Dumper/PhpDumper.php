@@ -529,7 +529,7 @@ class PhpDumper extends Dumper
             if (is_string($factory)) {
                 $return[] = sprintf('@return object An instance returned by %s().', $factory);
             } elseif (is_array($factory) && (is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
-                if (is_string($factory[0] || $factory[0] instanceof Reference)) {
+                if (is_string($factory[0]) || $factory[0] instanceof Reference) {
                     $return[] = sprintf('@return object An instance returned by %s::%s().', (string) $factory[0], $factory[1]);
                 } elseif ($factory[0] instanceof Definition) {
                     $return[] = sprintf('@return object An instance returned by %s::%s().', $factory[0]->getClass(), $factory[1]);
@@ -731,7 +731,6 @@ EOF;
             }
 
             return sprintf("        $return{$instantiation}%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
-
         } elseif (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
                 $class = $this->dumpValue($definition->getFactoryClass());

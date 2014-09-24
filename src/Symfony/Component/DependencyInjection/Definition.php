@@ -58,13 +58,11 @@ class Definition
     }
 
     /**
-     * Sets a factory
+     * Sets a factory.
      *
-     * @param callable $factory The PHP callable to call or an array containing a Reference and a method to call
+     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
      *
      * @return Definition The current instance
-     *
-     * @api
      */
     public function setFactory($factory)
     {
@@ -74,11 +72,9 @@ class Definition
     }
 
     /**
-     * Gets the factory .
+     * Gets the factory.
      *
-     * @return callable|array The PHP callable to call or an array containing a Reference and a method to call
-     *
-     * @api
+     * @return string|array The PHP function or an array containing a class/Reference and a method to call
      */
     public function getFactory()
     {
@@ -94,7 +90,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryClass($factoryClass)
     {
@@ -109,7 +105,7 @@ class Definition
      * @return string|null The factory class name
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryClass()
     {
@@ -124,7 +120,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryMethod($factoryMethod)
     {
@@ -174,7 +170,7 @@ class Definition
      * @return string|null The factory method name
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryMethod()
     {
@@ -189,7 +185,7 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryService($factoryService)
     {
@@ -204,7 +200,7 @@ class Definition
      * @return string|null The factory service id
      *
      * @api
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryService()
     {

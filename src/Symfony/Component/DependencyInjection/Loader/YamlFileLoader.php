@@ -196,7 +196,7 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
-               if (strpos($service['factory'], ':')) {
+                if (strpos($service['factory'], ':')) {
                     $parts = explode(':', $service['factory']);
                     $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
                 } else {

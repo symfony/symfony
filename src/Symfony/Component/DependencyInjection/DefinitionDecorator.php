@@ -78,8 +78,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setFactory($callable)
     {
@@ -89,7 +87,7 @@ class DefinitionDecorator extends Definition
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @api
      */

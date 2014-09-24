@@ -88,8 +88,10 @@ UPGRADE FROM 2.x to 3.0
 
 ### DependencyInjection
 
- * The methods `setFactoryClass()`, `setFactoryMethod()` and `setFactoryService()` have been removed in favor of `setFactory()`.
-   Services defined using YAML or XML use the same syntax as configurators.
+ * The methods `Definition::setFactoryClass()`,
+   `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
+   been removed in favor of `Definition::setFactory()`. Services defined using
+   YAML or XML use the same syntax as configurators.
 
 ### EventDispatcher
 

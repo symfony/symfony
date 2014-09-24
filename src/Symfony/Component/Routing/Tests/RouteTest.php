@@ -234,6 +234,20 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $serialized = serialize($route);
         $unserialized = unserialize($serialized);
 
+        $this->assertAttributeEmpty('compiled', $route);
+        $this->assertEquals($route, $unserialized);
+        $this->assertNotSame($route, $unserialized);
+    }
+
+    public function testSerializedWithCompiled()
+    {
+        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
+        $route->compile();
+
+        $serialized = serialize($route);
+        $unserialized = unserialize($serialized);
+
+        $this->assertAttributeNotEmpty('compiled', $route);
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }

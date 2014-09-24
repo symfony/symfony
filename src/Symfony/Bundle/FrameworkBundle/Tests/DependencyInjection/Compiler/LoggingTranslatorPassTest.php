@@ -28,6 +28,10 @@ class LoggingTranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $container->expects($this->once())
+            ->method('hasParameter')
+            ->will($this->returnValue(true));
+
+        $container->expects($this->once())
             ->method('getParameter')
             ->will($this->returnValue(true));
 

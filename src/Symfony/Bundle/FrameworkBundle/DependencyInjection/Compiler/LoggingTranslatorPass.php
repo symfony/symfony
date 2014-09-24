@@ -25,15 +25,21 @@ class LoggingTranslatorPass implements CompilerPassInterface
             return;
         }
 
-        if ($container->getParameter('translator.logging')) {
-            $translatorAlias = $container->getAlias('translator');
-            $definition = $container->getDefinition((string) $translatorAlias);
-            $class = $container->getParameterBag()->resolveValue($definition->getClass());
+        if (!$container->hasParameter('translator.logging')) {
+            return;
+        }
 
-            $refClass = new \ReflectionClass($class);
-            if ($refClass->implementsInterface('Symfony\Component\Translation\TranslatorInterface') && $refClass->implementsInterface('Symfony\Component\Translation\TranslatorBagInterface')) {
-                $container->getDefinition('translator.logging')->setDecoratedService('translator');
-            }
+        if (!$container->getParameter('translator.logging')) {
+            return;
+        }
+
+        $translatorAlias = $container->getAlias('translator');
+        $definition = $container->getDefinition((string) $translatorAlias);
+        $class = $container->getParameterBag()->resolveValue($definition->getClass());
+
+        $refClass = new \ReflectionClass($class);
+        if ($refClass->implementsInterface('Symfony\Component\Translation\TranslatorInterface') && $refClass->implementsInterface('Symfony\Component\Translation\TranslatorBagInterface')) {
+            $container->getDefinition('translator.logging')->setDecoratedService('translator');
         }
     }
 }

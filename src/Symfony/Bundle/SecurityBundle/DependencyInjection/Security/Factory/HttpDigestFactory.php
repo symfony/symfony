@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class HttpDigestFactory implements SecurityFactoryInterface
 {
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint, $sessionStrategy)
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container

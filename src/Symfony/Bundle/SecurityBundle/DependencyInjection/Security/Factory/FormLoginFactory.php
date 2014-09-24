@@ -71,9 +71,9 @@ class FormLoginFactory extends AbstractFactory
         return $provider;
     }
 
-    protected function createListener($container, $id, $config, $userProvider, $sessionStrategy)
+    protected function createListener($container, $id, $config, $userProvider)
     {
-        $listenerId = parent::createListener($container, $id, $config, $userProvider, $sessionStrategy);
+        $listenerId = parent::createListener($container, $id, $config, $userProvider);
 
         $container
             ->getDefinition($listenerId)

@@ -29,7 +29,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         'remember_me_parameter' => '_remember_me',
     );
 
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint, $sessionStrategy)
+    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;

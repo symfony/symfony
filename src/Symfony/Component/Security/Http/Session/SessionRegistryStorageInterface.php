@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,44 +17,39 @@ namespace Symfony\Component\Security\Http\Session;
  * Stores the SessionInformation instances maintained in the SessionRegistry.
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
+ * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
 interface SessionRegistryStorageInterface
 {
     /**
-     * Obtains all the users for which session information is stored.
-     *
-     * @return array An array of UserInterface objects.
-     */
-    function getUsers();
-
-    /**
      * Obtains the session information for the specified sessionId.
      *
-     * @param string $sessionId the session identifier key.
+     * @param  string             $sessionId the session identifier key.
      * @return SessionInformation $sessionInformation
      */
-    function getSessionInformation($sessionId);
+    public function getSessionInformation($sessionId);
 
     /**
-     * Obtains the maintained information for one user.
+     * Obtains the maintained information for one user ordered from newest to
+     *  oldest
      *
-     * @param string $username The user identifier.
-     * @param boolean $includeExpiredSessions.
-     * @return array An array of SessionInformation objects.
+     * @param  string $username               The user identifier.
+     * @param  bool   $includeExpiredSessions
+     * @return array  An array of SessionInformation objects.
      */
-    function getSessionInformations($username, $includeExpiredSessions);
+    public function getSessionInformations($username, $includeExpiredSessions = false);
 
     /**
      * Sets a SessionInformation object.
      *
      * @param SessionInformation $sessionInformation
      */
-    function setSessionInformation(SessionInformation $sessionInformation);
+    public function setSessionInformation(SessionInformation $sessionInformation);
 
     /**
      * Deletes the maintained information of one session.
      *
      * @param string $sessionId the session identifier key.
      */
-    function removeSessionInformation($sessionId);
+    public function removeSessionInformation($sessionId);
 }

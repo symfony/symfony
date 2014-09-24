@@ -6,19 +6,14 @@
 
     <parameters>
         <parameter key="security.authentication.session_registry_storage.class">Symfony\Bridge\Doctrine\Security\SessionRegistry\SessionRegistryStorage</parameter>
-        <parameter key="security.authentication.session_information.class">Symfony\Bridge\Doctrine\Security\SessionRegistry\SessionInformation</parameter>
     </parameters>
 
     <services>
         <service id="security.session_registry.dbal.connection" alias="database_connection" />
 
-
         <service id="security.authentication.session_registry_storage" class="%security.authentication.session_registry_storage.class%" public="true">
             <argument type="service" id="security.session_registry.dbal.connection" />
-            <argument type="collection">
-                <argument key="session_information_table_name">%security.session_registry.dbal.session_information_table_name%</argument>
-                <argument key="session_information_class_name">%security.authentication.session_information.class%</argument>
-            </argument>
+            <argument>%security.session_registry.dbal.session_information_table_name%</argument>
         </service>
 
     </services>

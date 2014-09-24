@@ -47,13 +47,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         'failure_path_parameter' => '_failure_path',
     );
 
-    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId, $sessionStrategy)
+    public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
     {
         // authentication provider
         $authProviderId = $this->createAuthProvider($container, $id, $config, $userProviderId);
 
         // authentication listener
-        $listenerId = $this->createListener($container, $id, $config, $userProviderId, $sessionStrategy);
+        $listenerId = $this->createListener($container, $id, $config, $userProviderId);
 
         // add remember-me aware tag if requested
         if ($this->isRememberMeAware($config)) {
@@ -153,11 +153,17 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         return $config['remember_me'];
     }
 
-    protected function createListener($container, $id, $config, $userProvider, $sessionStrategy)
+    protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
-        $listener->replaceArgument(2, $sessionStrategy);
+
+        //Check for custom session authentication strategy
+        $sessionAuthenticationStrategyId = 'security.authentication.session_strategy.'.$id;
+        if ($container->hasDefinition($sessionAuthenticationStrategyId) || $container->hasAlias($sessionAuthenticationStrategyId)) {
+            $listener->replaceArgument(2, new Reference($sessionAuthenticationStrategyId));
+        }
+
         $listener->replaceArgument(4, $id);
         $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(6, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));

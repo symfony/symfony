@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,10 +25,15 @@ class SessionInformation
     protected $expired;
     protected $lastRequest;
 
-    public function __construct($sessionId, $username)
+    public function __construct($sessionId, $username, \DateTime $lastRequest, \DateTime $expired = null)
     {
         $this->setSessionId($sessionId);
         $this->setUsername($username);
+        $this->setLastRequest($lastRequest);
+
+        if (null !== $expired) {
+            $this->setExpired($expired);
+        }
     }
 
     /**
@@ -73,11 +78,11 @@ class SessionInformation
     /**
      * Return wether this session is expired.
      *
-     * @return boolean
+     * @return bool
      */
     public function isExpired()
     {
-        return $this->getExpired() && $this->getExpired()->getTimestamp() < time();
+        return null !== $this->getExpired() && $this->getExpired()->getTimestamp() < microtime(true);
     }
 
     /**

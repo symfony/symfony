@@ -17,27 +17,28 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
  * The schema used for the ACL system.
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
+ * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
 final class Schema extends BaseSchema
 {
     /**
      * Constructor
      *
-     * @param array $options the names for tables
+     * @param string $table
      */
-    public function __construct(array $options)
+    public function __construct($table)
     {
         parent::__construct();
 
-        $this->addSessionInformationTable($options);
+        $this->addSessionInformationTable($table);
     }
 
     /**
      * Adds the session_information table to the schema
      */
-    protected function addSessionInformationTable(array $options)
+    protected function addSessionInformationTable($table)
     {
-        $table = $this->createTable($options['session_information_table_name']);
+        $table = $this->createTable($table);
         $table->addColumn('session_id', 'string');
         $table->addColumn('username', 'string');
         $table->addColumn('expired', 'datetime', array('unsigned' => true, 'notnull' => false));

@@ -165,7 +165,7 @@ class SecurityExtension extends Extension
 
     private function sessionRegistryLoad($config, ContainerBuilder $container, $loader)
     {
-        $loader->load('security_session_registry.xml');
+        $loader->load('security_session_concurrency.xml');
 
         if (isset($config['session_registry_storage'])) {
             $container->setAlias('security.authentication.session_registry_storage', $config['session_registry_storage']);
@@ -184,7 +184,7 @@ class SecurityExtension extends Extension
             $container->setAlias('security.session_registry.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
         }
 
-        $container->setParameter('security.session_registry.dbal.session_information_table_name', $config['tables']['session_information']);
+        $container->setParameter('security.session_registry.dbal.session_information_table_name', $config['table']);
     }
 
     /**
@@ -332,14 +332,7 @@ class SecurityExtension extends Extension
             ));
             $listeners[] = new Reference($listenerId);
 
-            // add logout success handler
-            if (isset($firewall['logout']['success_handler'])) {
-                $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
-            } else {
-                $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
-                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
-                $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
-            }
+            $logoutSuccessHandlerId = $this->createLogoutSuccessHandler($container, $id, $firewall['logout']);
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
@@ -347,24 +340,7 @@ class SecurityExtension extends Extension
                 $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
-            // add session logout handler
-            if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
-                $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
-            }
-
-            // add cookie logout handler
-            if (count($firewall['logout']['delete_cookies']) > 0) {
-                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
-                $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
-                $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
-
-                $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
-            }
-
-            // add custom handlers
-            foreach ($firewall['logout']['handlers'] as $handlerId) {
-                $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
-            }
+            $this->addLogoutHandlers($container, $listenerId, $id, $firewall);
 
             // register with LogoutUrlHelper
             $container
@@ -392,9 +368,9 @@ class SecurityExtension extends Extension
         // Access listener
         $listeners[] = new Reference('security.access_listener');
 
-        // Concurrent session listener
+        // Expired session listener
         if (isset($firewall['session_concurrency'])) {
-            $listeners[] = new Reference($this->createConcurrentSessionListener($container, $id, $firewall['session_concurrency']));
+            $listeners[] = new Reference($this->createExpiredSessionListener($container, $id, $firewall));
         }
 
         // Determine default entry point
@@ -427,14 +403,8 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
-        if (isset($firewall['session_concurrency']['max_sessions'])) {
-            $sessionStrategyId = 'security.authentication.concurrent_session_strategy.'.$id;
-            $container->setDefinition($sessionStrategyId, new DefinitionDecorator('security.authentication.concurrent_session_strategy'))
-                ->replaceArgument(1, $firewall['session_concurrency']['max_sessions']);
-
-            $sessionStrategy = new Reference($sessionStrategyId);
-        } else {
-            $sessionStrategy = $container->get('security.authentication.session_strategy');
+        if (isset($firewall['session_concurrency'])) {
+            $this->createConcurrentSessionAuthenticationStrategy($container, $id, $firewall['session_concurrency']);
         }
 
         foreach ($this->listenerPositions as $position) {
@@ -444,7 +414,7 @@ class SecurityExtension extends Extension
                 if (isset($firewall[$key])) {
                     $userProvider = isset($firewall[$key]['provider']) ? $this->getUserProviderId($firewall[$key]['provider']) : $defaultProvider;
 
-                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint, $sessionStrategy);
+                    list($provider, $listenerId, $defaultEntryPoint) = $factory->create($container, $id, $firewall[$key], $userProvider, $defaultEntryPoint);
 
                     $listeners[] = new Reference($listenerId);
                     $authenticationProviders[] = $provider;
@@ -670,14 +640,20 @@ class SecurityExtension extends Extension
         return $this->expressions[$id] = new Reference($id);
     }
 
-    private function createConcurrentSessionListener($container, $id, $config)
+    private function createExpiredSessionListener($container, $id, $config)
     {
-        $concurrentSessionListenerId = 'security.authentication.concurrentsession_listener.'.$id;
-        $listener = $container->setDefinition($concurrentSessionListenerId, new DefinitionDecorator('security.authentication.concurrentsession_listener'));
-        $listener->replaceArgument(3, $config['expiration_url']);
-        $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+        $expiredSessionListenerId = 'security.authentication.expiredsession_listener.'.$id;
+        $listener = $container->setDefinition($expiredSessionListenerId, new DefinitionDecorator('security.authentication.expiredsession_listener'));
 
-        return $concurrentSessionListenerId;
+        $listener->replaceArgument(3, $config['session_concurrency']['expiration_url']);
+
+        if (isset($config['logout'])) {
+            $logoutSuccessHandlerId = $this->createLogoutSuccessHandler($container, $id, $config);
+            $listener->replaceArgument(4, new Reference($logoutSuccessHandlerId));
+            $this->addLogoutHandlers($container, $expiredSessionListenerId, $id, $config);
+        }
+
+        return $expiredSessionListenerId;
     }
 
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
@@ -749,5 +725,95 @@ class SecurityExtension extends Extension
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function createConcurrentSessionAuthenticationStrategy($container, $id, $config)
+    {
+        $sessionStrategyId = 'security.authentication.session_strategy.'.$id;
+
+        if (isset($config['max_sessions'])) {
+            $concurrentSessionControlStrategyId = 'security.authentication.session_strategy.concurrent_control.'.$id;
+            $container->setDefinition(
+                $concurrentSessionControlStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.concurrent_control'
+                )
+            )->replaceArgument(1, $config['max_sessions'])
+            ->replaceArgument(2, $config['error_if_maximum_exceeded']);
+
+            $fixationSessionStrategyId = 'security.authentication.session_strategy.fixation.'.$id;
+            $container->setAlias(
+                $fixationSessionStrategyId,
+                'security.authentication.session_strategy'
+            );
+
+            $registerSessionStrategyId = 'security.authentication.session_strategy.register.'.$id;
+            $container->setDefinition(
+                $registerSessionStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.register'
+                )
+            );
+
+            $container->setDefinition(
+                $sessionStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.composite'
+                )
+            )->replaceArgument(
+                0,
+                array(
+                    new Reference($concurrentSessionControlStrategyId),
+                    new Reference($fixationSessionStrategyId),
+                    new Reference($registerSessionStrategyId)
+                )
+            );
+        } else {
+            $container->setAlias(
+                $sessionStrategyId,
+                'security.authentication.session_strategy'
+            );
+        }
+
+        return $sessionStrategyId;
+    }
+
+    private function createLogoutSuccessHandler($container, $id, $config)
+    {
+        // add logout success handler
+        if (isset($config['success_handler'])) {
+            $logoutSuccessHandlerId = $config['success_handler'];
+        } else {
+            $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
+            if (!$container->hasDefinition($logoutSuccessHandlerId)) {
+                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
+                $logoutSuccessHandler->replaceArgument(1, $config['target']);
+            }
+        }
+        return $logoutSuccessHandlerId;
+    }
+
+    private function addLogoutHandlers($container, $listenerId, $id, $config)
+    {
+        $listener = $container->findDefinition($listenerId);
+
+        // add session logout handler
+        if (true === $config['logout']['invalidate_session'] && false === $config['stateless']) {
+            $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+        }
+
+        // add cookie logout handler
+        if (count($config['logout']['delete_cookies']) > 0) {
+            $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
+            $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
+            $cookieHandler->addArgument($config['logout']['delete_cookies']);
+
+            $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
+        }
+
+        // add custom handlers
+        foreach ($config['logout']['handlers'] as $handlerId) {
+            $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
+        }
     }
 }

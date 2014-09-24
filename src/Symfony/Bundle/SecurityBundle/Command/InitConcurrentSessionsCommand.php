@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Installs the database schema required by the concurrent session Doctrine implementation
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
+ * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
 class InitConcurrentSessionsCommand extends ContainerAwareCommand
 {
@@ -28,8 +29,6 @@ class InitConcurrentSessionsCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        parent::configure();
-
         $this
             ->setName('init:concurrent-session')
             ->setDescription('Executes the SQL needed to generate the database schema required by the concurrent sessions feature.')
@@ -38,10 +37,6 @@ The <info>init:concurrent-session</info> command executes the SQL needed to
 generate the database schema required by the concurrent session Doctrine implementation:
 
 <info>./app/console init:concurrent-session</info>
-
-You can also output the SQL instead of executing it:
-
-<info>./app/console init:concurrent-session --dump-sql</info>
 EOT
         );
     }
@@ -54,23 +49,19 @@ EOT
         $connection = $this->getContainer()->get('security.session_registry.dbal.connection');
         $sm = $connection->getSchemaManager();
         $tableNames = $sm->listTableNames();
-        $tables = array(
-            'session_information_table_name' => $this->getContainer()->getParameter('security.session_registry.dbal.session_information_table_name'),
-        );
+        $table = $this->getContainer()->getParameter('security.session_registry.dbal.session_information_table_name');
 
-        foreach ($tables as $table) {
-            if (in_array($table, $tableNames, true)) {
-                $output->writeln(sprintf('The table "%s" already exists. Aborting.', $table));
+        if (in_array($table, $tableNames, true)) {
+            $output->writeln(sprintf('The table "%s" already exists. Aborting.', $table));
 
-                return;
-            }
+            return;
         }
 
-        $schema = new Schema($tables);
+        $schema = new Schema($table);
         foreach ($schema->toSql($connection->getDatabasePlatform()) as $sql) {
             $connection->exec($sql);
         }
 
-        $output->writeln('concurrent session tables have been initialized successfully.');
+        $output->writeln('concurrent session table have been initialized successfully.');
     }
 }

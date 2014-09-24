@@ -28,7 +28,7 @@
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
 
-        <parameter key="security.authentication.concurrentsession_listener.class">Symfony\Component\Security\Http\Firewall\ConcurrentSessionListener</parameter>
+        <parameter key="security.authentication.expiredsession_listener.class">Symfony\Component\Security\Http\Firewall\ExpiredSessionListener</parameter>
 
         <parameter key="security.logout_listener.class">Symfony\Component\Security\Http\Firewall\LogoutListener</parameter>
         <parameter key="security.logout.handler.session.class">Symfony\Component\Security\Http\Logout\SessionLogoutHandler</parameter>
@@ -259,13 +259,13 @@
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
-        <service id="security.authentication.concurrentsession_listener" class="%security.authentication.concurrentsession_listener.class%" public="false" abstract="true">
+        <service id="security.authentication.expiredsession_listener" class="%security.authentication.expiredsession_listener.class%" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.http_utils" />
             <argument type="service" id="security.authentication.session_registry" />
             <argument /> <!-- Target-URL Path -->
-            <argument type="service" id="security.logout.success_handler" on-invalid="null" />
+            <argument type="service" on-invalid="null"/> <!-- Logout success handler -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

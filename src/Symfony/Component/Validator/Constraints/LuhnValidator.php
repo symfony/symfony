@@ -55,9 +55,9 @@ class LuhnValidator extends ConstraintValidator
         $value = (string) $value;
 
         if (!ctype_digit($value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
 
             return;
         }
@@ -85,9 +85,9 @@ class LuhnValidator extends ConstraintValidator
         }
 
         if (0 === $checkSum || 0 !== $checkSum % 10) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
         }
     }
 }

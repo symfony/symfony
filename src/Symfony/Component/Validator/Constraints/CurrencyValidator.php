@@ -46,9 +46,9 @@ class CurrencyValidator extends ConstraintValidator
         $currencies = Intl::getCurrencyBundle()->getCurrencyNames();
 
         if (!isset($currencies[$value])) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
         }
     }
 }

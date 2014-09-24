@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface as ExecutionContextInterface2Dot5;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Violation\LegacyConstraintViolationBuilder;
+
 /**
  * Base class for constraint validators
  *
@@ -24,14 +28,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Whether to format {@link \DateTime} objects as RFC-3339 dates
      * ("Y-m-d H:i:s").
      *
-     * @var integer
+     * @var int
      */
     const PRETTY_DATE = 1;
 
     /**
      * Whether to cast objects with a "__toString()" method to strings.
      *
-     * @var integer
+     * @var int
      */
     const OBJECT_TO_STRING = 2;
 
@@ -46,6 +50,47 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     public function initialize(ExecutionContextInterface $context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
+     * supports the 2.4 context API.
+     *
+     * @param string $message    The violation message
+     * @param array  $parameters The message parameters
+     *
+     * @return ConstraintViolationBuilderInterface The violation builder
+     *
+     * @deprecated This method will be removed in Symfony 3.0.
+     */
+    protected function buildViolation($message, array $parameters = array())
+    {
+        if ($this->context instanceof ExecutionContextInterface2Dot5) {
+            return $this->context->buildViolation($message, $parameters);
+        }
+
+        return new LegacyConstraintViolationBuilder($this->context, $message, $parameters);
+    }
+
+    /**
+     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
+     * supports the 2.4 context API.
+     *
+     * @param ExecutionContextInterface $context    The context to use
+     * @param string                          $message    The violation message
+     * @param array                           $parameters The message parameters
+     *
+     * @return ConstraintViolationBuilderInterface The violation builder
+     *
+     * @deprecated This method will be removed in Symfony 3.0.
+     */
+    protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
+    {
+        if ($context instanceof ExecutionContextInterface2Dot5) {
+            return $context->buildViolation($message, $parameters);
+        }
+
+        return new LegacyConstraintViolationBuilder($context, $message, $parameters);
     }
 
     /**
@@ -82,7 +127,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * confused by the violation message.
      *
      * @param mixed   $value  The value to format as string
-     * @param integer $format A bitwise combination of the format
+     * @param int     $format A bitwise combination of the format
      *                        constants in this class
      *
      * @return string The string representation of the passed value
@@ -142,7 +187,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * {@link formatValue()}. The values are then concatenated with commas.
      *
      * @param array   $values A list of values
-     * @param integer $format A bitwise combination of the format
+     * @param int     $format A bitwise combination of the format
      *                        constants in this class
      *
      * @return string The string representation of the value list

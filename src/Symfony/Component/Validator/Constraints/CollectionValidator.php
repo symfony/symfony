@@ -70,36 +70,22 @@ class CollectionValidator extends ConstraintValidator
                     }
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                if ($context instanceof ExecutionContextInterface) {
-                    $context->buildViolation($constraint->missingFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $this->formatValue($field))
-                        ->setInvalidValue(null)
-                        ->addViolation();
-                } else {
-                    // 2.4 API
-                    $context->addViolationAt('['.$field.']', $constraint->missingFieldsMessage, array(
-                        '{{ field }}' => $this->formatValue($field),
-                    ), null);
-                }
+                $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
+                    ->atPath('['.$field.']')
+                    ->setParameter('{{ field }}', $this->formatValue($field))
+                    ->setInvalidValue(null)
+                    ->addViolation();
             }
         }
 
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    if ($context instanceof ExecutionContextInterface) {
-                        $context->buildViolation($constraint->extraFieldsMessage)
-                            ->atPath('['.$field.']')
-                            ->setParameter('{{ field }}', $this->formatValue($field))
-                            ->setInvalidValue($fieldValue)
-                            ->addViolation();
-                    } else {
-                        // 2.4 API
-                        $context->addViolationAt('['.$field.']', $constraint->extraFieldsMessage, array(
-                            '{{ field }}' => $this->formatValue($field),
-                        ), $fieldValue);
-                    }
+                    $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue($fieldValue)
+                        ->addViolation();
                 }
             }
         }

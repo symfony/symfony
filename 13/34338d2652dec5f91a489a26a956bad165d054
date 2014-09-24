@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T08:44:27Z
+
+To be BC, we would actually need to introduce 2 new interface (for each of the responsibilities) with their implementation, and have the SecurityContext be implemented on top of these 2 dependencies to provide the existing API. Otherwise we would not be able to introduce such refactoring until 3.0
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-18T08:47:53Z
+
+I'm sorry, I forgot to mention something from my chat with WouterJ, this proposal is for `3.*`, we can only make a forward compatible solution in `2.*` but not fix the actual problem. If desired I can add it so people can already call it directly. In this case I would make it a delegator and mark isGranted as deprecated.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T08:58:37Z
+
+@iltar if we introduce 2 new interface rather than only one, and make the existing SecurityContextInterface be implemented on top of them, the issue will be fixed: you would depend on the interface about managing the token only the one called SecurityContextInterface in your current PR but which would get a different name) and this would not create your circular dependency anymore, while maintaining BC for all code using the SecurityContextInterface currently (which is not the case for your PR)
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-18T09:03:08Z
+
+The reason I've put the getToken and setToken in SecurityContext, was due to feedback from the chat. Ideally, I would have just taken out those 2 methods and put them in a TokenStorage(Interface). The SecurityContext could use that storage and have getToken, setToken be delegated to the TokenStorage(Interface). This would be a new service. This is what you suggest I think? That was part of my initial idea as well.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T09:06:00Z
+
+@iltar do you have the logs of this chat somewhere ? If yes, could you post them in a gist ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-18T09:07:04Z
+
+Yes, I've put them in the PR as well, here's the link http://pastebin.com/8kSvVZtj
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T09:20:55Z
+
+@iltar I agree about splitting the class. So IMO, we need 2 classes:
+
+- one storing the token (SecurityContext would indeed be a good name for it, but it is already used so we need to find something else), without any dependency.
+- one checking authorization (I would call it ``AuthorizationChecker`` rather than ``AuthorizationManager`` though. It does not manage anything), which would depend on the previous one
+
+The SecurityContext would then be marked as deprecated, and be implemented as a proxy to these 2 classes (so that all existing code continues working).
+
+Your Doctrine listener would then depend on the first service, solving the circular dependency.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-22T15:24:56Z
+
+@stof, I have patched according to your feedback. I was unable to fix the unit/functional tests after I've changed the services.xml. Is this what you had in mind?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-22T16:23:49Z
+
+The existing tests of the SecurityContext needs to be kept, moving them to the tests of the new classes you implemented (which are currently untested)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-08-22T16:46:29Z
+
+Very nice move. I do think too that the the security context should not contains statefull value.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-25T10:10:57Z
+
+@stof I have updated the PR. What's the regulation concerning Symfony2 code using the SecurityContext(Interface) at the moment? Should I typehint/inject everything correctly already or is this something for a later stage?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-08-29T15:24:28Z
+
+It appears there are some faulty (or random failing) unit-tests. I try to keep the master up-to-date and I keep merging but no luck. The unit-tests related to this PR are all successful.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-29T15:59:10Z
+
+@iltar you can simply ignore these failures. Tests with the stopwatch component and such are known to fail randomly, the mergers will not be distracted by those tests failing.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-30T08:59:10Z
+
+You should add a deprecation annotation and update the related changelog files for the `Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables::getSecurity()` method, don't you?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-01T09:36:14Z
+
+It seems like there are some issues with fabbot. It tells me to remove the following use statement (but it's required)
+```php
+Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+```
+It also tells me that I need to replace `array()` by `[]`. I was under the impression that we should maintain php 5.3 compatibility. @stof is this is a bug in fabbot?
+
+Currently having some merge issues, can I squash everything or would you prefer me to update the feedback until it's approved?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-01T12:03:20Z
+
+The short array syntax change has been removed from fabbot. It was indeed a bug to enable it for this repo. The next run will not show it anymore
+
+For the use statement, it is right. Your SecurityContext class does not use this exception anymore, so there is no need for the use statement
+
+and yes, you can squash the commits when rebasing if you want (if you don't do it, we will do it before merging)
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-02T12:06:22Z
+
+@stof I have removed the [WiP] from the PR, I think it's ready to be merged if there's not further changes required. I have squashed all the commits together.
+
+Based on the latest changes, I have also updated the UPGRADE(-2.6).md files in the Security Bundle, Security Component and Framework Bundle regarding the deprecations and changes.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-20T18:17:24Z
+
+@stof This PR has not been merged yet for 2.6 and I got a mail that 2.6 ends its development phase. Should I update this for 2.7?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T17:31:22Z
+
+@iltar I'm going to look at this PR tonight and see if we can merge it in 2.6.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T17:46:03Z
+
+This looks good to me. @iltar Can you fix the small comments I've made before merging?
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-24T07:33:44Z
+
+@fabpot merge should be corrected now

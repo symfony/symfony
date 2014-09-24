@@ -10,6 +10,7 @@ CHANGELOG
  * Added `Controller::addFlash` helper
  * Added `Controller::isGranted` helper
  * Added `Controller::denyAccessUnlessGranted` helper
+ * Deprecated `app.security` in twig as `app.user` and `is_granted()` are already available
 
 2.5.0
 -----

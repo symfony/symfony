@@ -77,3 +77,27 @@ Validator
    ```
    value == null or (YOUR_EXPRESSION)
    ```
+
+Security
+--------
+
+ * The `SecurityContextInterface` is marked as deprecated in favor of the 
+   `Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface` and 
+   `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface`.
+   ```
+   isGranted  => AuthorizationCheckerInterface
+   getToken   => TokenStorageInterface
+   setToken   => TokenStorageInterface
+   ```
+   The Implementations have moved too, The `SecurityContext` is marked as 
+   deprecated and has been split to use the `AuthorizationCheckerInterface` 
+   and `TokenStorage`. This change is 100% Backwards Compatible as the SecurityContext 
+   delegates the methods.
+
+ * The service `security.context` is deprecated along with the above change. Recommended 
+   to use instead:
+   ```
+   @security.authorization_checker => isGranted()
+   @security.token_storage         => getToken()
+   @security.token_storage         => setToken()
+   ```

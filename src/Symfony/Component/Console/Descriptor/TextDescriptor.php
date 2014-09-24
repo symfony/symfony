@@ -157,16 +157,16 @@ class TextDescriptor extends Descriptor
                 $this->writeText("\n");
             }
         } else {
-            if (($help = $application->getHelp()) != '') {
-                $this->writeText("{$help}\n\n", $options);
+            if ('' != $help = $application->getHelp()) {
+                $this->writeText("$help\n\n", $options);
             }
-            
+
             $this->writeText("<comment>Usage:</comment>\n", $options);
             $this->writeText(" [options] command [arguments]\n\n", $options);
             $this->writeText('<comment>Options:</comment>', $options);
-            
+
             $inputOptions = $application->getDefinition()->getOptions();
-            
+
             $width = 0;
             foreach ($inputOptions as $option) {
                 $nameLength = strlen($option->getName()) + 2;
@@ -181,7 +181,7 @@ class TextDescriptor extends Descriptor
                 $this->writeText("\n", $options);
                 $this->describeInputOption($option, array_merge($options, array('name_width' => $width)));
             }
-            
+
             $this->writeText("\n\n", $options);
 
             $width = $this->getColumnWidth($description->getCommands());

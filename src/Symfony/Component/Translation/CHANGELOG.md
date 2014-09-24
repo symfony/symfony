@@ -7,6 +7,7 @@ CHANGELOG
  * added possibility to cache catalogues
  * added TranslatorBagInterface
  * added LoggingTranslator
+ * added Translator::getMessages() for retrieving the message catalogue as an array
 
 2.5.0
 -----
@@ -14,7 +15,6 @@ CHANGELOG
  * added relative file path template to the file dumpers
  * added optional backup to the file dumpers
  * changed IcuResFileDumper to extend FileDumper
- * added Translator::getMessages() for retrieving the message catalogue as an array
 
 2.3.0
 -----

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by odolbeau at 2014-06-05T09:57:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by MattKetmo at 2014-06-30T14:55:00Z
+
++1 to merge this fix asap (which could be seen as a security issue)
+
+---------------------------------------------------------------------------
+
+by cvasseur at 2014-07-01T09:28:42Z
+
++1
+
+---------------------------------------------------------------------------
+
+by cmodijk at 2014-07-08T10:09:50Z
+
+Any  updates on this?
+
+---------------------------------------------------------------------------
+
+by glutamatt at 2014-07-09T14:57:01Z
+
+Nothing :'(
+
+---------------------------------------------------------------------------
+
+by gredin at 2014-07-30T13:39:56Z
+
+:+1: Fix an issue I had.
+Hope it'll be merged soon enough.
+
+---------------------------------------------------------------------------
+
+by odolbeau at 2014-09-02T16:24:30Z
+
+Any update?
+
+---------------------------------------------------------------------------
+
+by cestcri at 2014-09-02T16:28:35Z
+
++1
+
+---------------------------------------------------------------------------
+
+by MattKetmo at 2014-09-17T14:01:21Z
+
+Ping @stof for the review (I don't know who's the best member from the [core team](http://symfony.com/doc/current/contributing/code/core_team.html) in charge of the security component)
+
+I don't think this could be seen as a [security issue](http://symfony.com/doc/current/contributing/code/security.html) (well… sort of), but it's could be quite critical in some case and the PR stands for a few month now.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by dschenk at 2014-09-19T15:37:48Z
+
++1
+
+I think its a pretty severe security issue. If a user gets disabled he can still login with the remember-me cookie. If such a user is an admin (and there were certain reasons to disable the account), he can wreak havoc on the system...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T15:01:15Z
+
+Looks good to me.

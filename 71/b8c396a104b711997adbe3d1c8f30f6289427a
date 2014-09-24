@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by aeoris at 2014-09-23T15:55:18Z
+
+@webmozart given that you closed/replaced the PR I made (#7276) over a year and half ago after 6+ months on revision, would you mind answering me one question?
+
+How could I use this new PR to assign a code to a ConstraintViolation? The problem still exists imho, as you can't use the `code` property that *still* can be found on [ConstraintViolation.php][1]
+
+[1]: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/ConstraintViolation.php#L64
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T15:56:58Z
+
+@aeoris You shouldn't. The `code` property is internal and meant for another purpose (namely internal validation codes).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T16:01:31Z
+
+@aeoris In fact, your PR contained two different things:
+
+1. it exposed the "code" property so a user could override it
+2. it set the internal violation codes I was talking about
+
+The first point is solved by the generic "payload" property. The second point is partially solved by the new `$violation->getConstraint()` accessor. Now there are cases where a constraint validator can fail due to multiple reasons (see `Length` for example). In those cases, `getCode()` should return an appropriate error code - which you implemented in your PR.
+
+I'll reapply your PR so that we can merge the interesting parts of it. :) Thanks again for your work!
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-23T17:46:44Z
+
+This needs to be covered by some tests (to ensure that all mapping loaders are supporting it properly for instance).
+Otherwise, this is a great idea
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T18:21:17Z
+
+@stof Sure? Isn't passing options to constraints covered sufficiently already?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-24T07:14:39Z
+
+hmm, yeah, indeed.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-24T11:20:44Z
+
+The test fail is unrelated.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T11:25:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-24T11:44:24Z
+
+:+1:

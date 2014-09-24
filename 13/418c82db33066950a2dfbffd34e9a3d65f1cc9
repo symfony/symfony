@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2014-05-10T23:10:01Z
+
+This is a much better approach than previous attempts to solve the problem.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-06-08T11:52:35Z
+
+To enable logger in config (default value is %kernel.debug%):
+
+```yaml
+framework:
+    #esi:             ~
+    translator:      { fallback: "%locale%", logging: true }
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T08:26:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:48:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T03:03:26Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-08-28T08:40:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-28T09:32:36Z
+
+I think `LoggingTranslator` is a more correct name
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-22T14:06:40Z
+
+@aitboudad Can you also rename the class to `LoggingTranslator` as suggested by @Tobion? That should be the last change before the final merge.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-09-22T14:08:18Z
+
+@fabian ok :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-22T14:41:10Z
+
+Maybe its better to use inheritance for LoggingTranslator instead of composition. This would at least solve both the interface problem and the magic `__call`.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-09-22T14:43:19Z
+
+@Tobion https://github.com/symfony/symfony/pull/10014#issuecomment-38778691
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-22T14:53:41Z
+
+I don't understand stofs argument because a new interface would require adaptions of other bunldes translators anyway when they dont extend symfony translator as they don't implment the new interface as well.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-09-23T07:57:15Z
+
+@fabpot done, except keep the new interface or not ??
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T10:09:54Z
+
+@aitboudad I would keep the interface.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T07:23:39Z
+
+@aitboudad There is still one problem. You merge the master branch which makes history looks ugly. Can you rebase to get rid of this merge commit? Thanks.

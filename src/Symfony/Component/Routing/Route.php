@@ -110,6 +110,7 @@ class Route implements \Serializable
             'schemes'      => $this->schemes,
             'methods'      => $this->methods,
             'condition'    => $this->condition,
+            'compiled'     => $this->compiled,
         ));
     }
 
@@ -124,6 +125,7 @@ class Route implements \Serializable
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
         $this->condition = $data['condition'];
+        $this->compiled = $data['compiled'];
     }
 
     /**

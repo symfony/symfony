@@ -216,6 +216,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($services['factory_service']->getClass());
         $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
+        $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
+        $this->assertEquals(array(new Reference('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
+        $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
 
         $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
         $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');

@@ -86,6 +86,13 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+### DependencyInjection
+
+ * The methods `Definition::setFactoryClass()`,
+   `Definition::setFactoryMethod()`, and `Definition::setFactoryService()` have
+   been removed in favor of `Definition::setFactory()`. Services defined using
+   YAML or XML use the same syntax as configurators.
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

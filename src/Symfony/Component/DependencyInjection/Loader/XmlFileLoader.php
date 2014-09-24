@@ -167,6 +167,21 @@ class XmlFileLoader extends FileLoader
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
 
+        if ($factories = $this->getChildren($service, 'factory')) {
+            $factory = $factories[0];
+            if ($function = $factory->getAttribute('function')) {
+                $definition->setFactory($function);
+            } else {
+                if ($childService = $factory->getAttribute('service')) {
+                    $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
+                } else {
+                    $class = $factory->getAttribute('class');
+                }
+
+                $definition->setFactory(array($class, $factory->getAttribute('method')));
+            }
+        }
+
         if ($configurators = $this->getChildren($service, 'configurator')) {
             $configurator = $configurators[0];
             if ($function = $configurator->getAttribute('function')) {

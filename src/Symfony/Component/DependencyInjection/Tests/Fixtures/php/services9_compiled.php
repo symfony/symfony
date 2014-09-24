@@ -46,6 +46,7 @@ class ProjectServiceContainer extends Container
             'foo_bar' => 'getFooBarService',
             'foo_with_inline' => 'getFooWithInlineService',
             'method_call1' => 'getMethodCall1Service',
+            'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
         );
         $this->aliases = array(
@@ -265,6 +266,26 @@ class ProjectServiceContainer extends Container
         $instance->setBar($this->get('foo'));
         $instance->setBar(NULL);
         $instance->setBar(($this->get("foo")->foo() . $this->getParameter("foo")));
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'new_factory_service' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \FooBarBaz A FooBarBaz instance.
+     */
+    protected function getNewFactoryServiceService()
+    {
+        $a = new \FactoryClass();
+        $a->foo = 'bar';
+
+        $this->services['new_factory_service'] = $instance = $a->getInstance();
+
+        $instance->foo = 'bar';
 
         return $instance;
     }

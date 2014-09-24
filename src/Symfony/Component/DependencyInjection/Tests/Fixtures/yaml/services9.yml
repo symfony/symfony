@@ -88,5 +88,13 @@ services:
         class: stdClass
         decorates: decorated
         decoration_inner_name: decorated.pif-pouf
+    new_factory:
+        class: FactoryClass
+        public: false
+        properties: { foo: bar }
+    new_factory_service:
+        class: FooBarBaz
+        properties: { foo: bar }
+        factory: ['@new_factory', getInstance]
     alias_for_foo: @foo
     alias_for_alias: @foo

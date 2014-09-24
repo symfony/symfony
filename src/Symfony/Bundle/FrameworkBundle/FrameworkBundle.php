@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingAssetH
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslatorPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\LoggingTranslatorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheClearerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
@@ -77,6 +78,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
+        $container->addCompilerPass(new LoggingTranslatorPass());
         $container->addCompilerPass(new AddCacheWarmerPass());
         $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new TranslationExtractorPass());

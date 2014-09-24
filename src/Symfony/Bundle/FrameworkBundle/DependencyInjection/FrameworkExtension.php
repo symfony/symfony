@@ -170,6 +170,14 @@ class FrameworkExtension extends Extension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        return new Configuration($container->getParameter('kernel.debug'));
+    }
+
+    /**
      * Loads Form configuration.
      *
      * @param array            $config    A configuration array
@@ -626,6 +634,8 @@ class FrameworkExtension extends Extension
             $config['fallback'] = array($config['fallback']);
         }
         $translator->addMethodCall('setFallbackLocales', array($config['fallback']));
+
+        $container->setParameter('translator.logging', $config['logging']);
 
         // Discover translation directories
         $dirs = array();

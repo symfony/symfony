@@ -22,6 +22,16 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    private $debug;
+
+    /**
+     * @param bool $debug Whether debugging is enabled or not
+     */
+    public function __construct($debug)
+    {
+        $this->debug = (bool) $debug;
+    }
+
     /**
      * Generates the configuration tree builder.
      *
@@ -441,6 +451,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->scalarNode('fallback')->defaultValue('en')->end()
+                        ->booleanNode('logging')->defaultValue($this->debug)->end()
                     ->end()
                 ->end()
             ->end()

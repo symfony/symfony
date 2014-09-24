@@ -5,6 +5,8 @@ CHANGELOG
 -----
 
  * added possibility to cache catalogues
+ * added TranslatorBagInterface
+ * added LoggingTranslator
 
 2.5.0
 -----

@@ -18,7 +18,6 @@ use Symfony\Component\Security\Http\Session\SessionRegistry;
  */
 class SessionRegistryTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetAllSessions()
     {
         $storage = $this->getSessionRegistryStorage();

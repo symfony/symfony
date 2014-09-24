@@ -83,8 +83,7 @@ class SecurityExtension extends Extension
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])
             ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
-        ;
+            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
@@ -151,8 +150,7 @@ class SecurityExtension extends Extension
                 'connection' => $config['connection'],
                 'event' => 'postGenerateSchema',
                 'lazy' => true,
-            ))
-        ;
+            ));
 
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
@@ -264,8 +262,7 @@ class SecurityExtension extends Extension
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
                 ->replaceArgument(0, $listeners)
-                ->replaceArgument(1, $exceptionListener)
-            ;
+                ->replaceArgument(1, $exceptionListener);
             $map[$contextId] = $matcher;
         }
         $mapDef->replaceArgument(1, $map);
@@ -276,8 +273,7 @@ class SecurityExtension extends Extension
         }, array_values(array_unique($authenticationProviders)));
         $container
             ->getDefinition('security.authentication.manager')
-            ->replaceArgument(0, $authenticationProviders)
-        ;
+            ->replaceArgument(0, $authenticationProviders);
     }
 
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
@@ -351,8 +347,7 @@ class SecurityExtension extends Extension
                     $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
                     isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
-                ))
-            ;
+                ));
         }
 
         // Authentication listeners
@@ -428,16 +423,14 @@ class SecurityExtension extends Extension
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['key'])
-            ;
+                ->replaceArgument(1, $firewall['anonymous']['key']);
 
             $listeners[] = new Reference($listenerId);
 
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['key'])
-            ;
+                ->replaceArgument(0, $firewall['anonymous']['key']);
 
             $authenticationProviders[] = $providerId;
             $hasListeners = true;
@@ -459,8 +452,7 @@ class SecurityExtension extends Extension
 
         $container
             ->getDefinition('security.encoder_factory.generic')
-            ->setArguments(array($encoderMap))
-        ;
+            ->setArguments(array($encoderMap));
     }
 
     private function createEncoder($config, ContainerBuilder $container)
@@ -555,8 +547,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-                ->addArgument($providers)
-            ;
+                ->addArgument($providers);
 
             return $name;
         }
@@ -566,8 +557,7 @@ class SecurityExtension extends Extension
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
                 ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
+                ->addArgument($provider['entity']['property']);
 
             return $name;
         }
@@ -579,8 +569,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
-            ;
+                ->setArguments(array($username, (string) $user['password'], $user['roles']));
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
         }
@@ -678,8 +667,7 @@ class SecurityExtension extends Extension
         $container
             ->register($id, '%security.matcher.class%')
             ->setPublic(false)
-            ->setArguments($arguments)
-        ;
+            ->setArguments($arguments);
 
         return $this->requestMatchers[$id] = new Reference($id);
     }
@@ -765,7 +753,7 @@ class SecurityExtension extends Extension
                 array(
                     new Reference($concurrentSessionControlStrategyId),
                     new Reference($fixationSessionStrategyId),
-                    new Reference($registerSessionStrategyId)
+                    new Reference($registerSessionStrategyId),
                 )
             );
         } else {
@@ -790,6 +778,7 @@ class SecurityExtension extends Extension
                 $logoutSuccessHandler->replaceArgument(1, $config['target']);
             }
         }
+
         return $logoutSuccessHandlerId;
     }
 

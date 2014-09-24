@@ -150,19 +150,19 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     {
         switch ($this->connection->getDriver()->getName()) {
             case 'pdo_mysql':
-                return "INSERT INTO $this->table (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) " .
+                return "INSERT INTO $this->table (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                     "ON DUPLICATE KEY UPDATE username = VALUES(username), last_request = VALUES(last_request), expired = VALUES(expired)";
             case 'pdo_oracle':
                 // DUAL is Oracle specific dummy table
-                return "MERGE INTO $this->table USING DUAL ON (session_id= :session_id) " .
-                    "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) " .
+                return "MERGE INTO $this->table USING DUAL ON (session_id= :session_id) ".
+                    "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                     "WHEN MATCHED THEN UPDATE SET username = :username, last_request = :last_request, expired = :expired";
             case 'pdo_sqlsrv':
                 if (version_compare($this->connection->getWrappedConnection()->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>=')) {
                     // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                     // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
-                    return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON (session_id = :session_id) " .
-                        "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) " .
+                    return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON (session_id = :session_id) ".
+                        "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                         "WHEN MATCHED THEN UPDATE SET username = :username, last_request = :last_request, expired = :expired;";
                 }
             case 'pdo_sqlite':

@@ -23,7 +23,7 @@ class CompositeSessionAuthenticationStrategyTest extends \PHPUnit_Framework_Test
         $strategies = array(
             $this->getDelegateAuthenticationStrategy(),
             $this->getDelegateAuthenticationStrategy(),
-            $this->getDelegateAuthenticationStrategy()
+            $this->getDelegateAuthenticationStrategy(),
         );
 
         $request = $this->getRequest();

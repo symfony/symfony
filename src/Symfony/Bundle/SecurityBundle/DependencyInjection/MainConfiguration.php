@@ -70,8 +70,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->booleanNode('allow_if_equal_granted_denied')->defaultTrue()->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
         $this->addAclSection($rootNode);
         $this->addEncodersSection($rootNode);
@@ -95,8 +94,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->scalarNode('session_registry_storage')->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 
     private function addAclSection(ArrayNodeDefinition $rootNode)
@@ -135,8 +133,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 
     private function addRoleHierarchySection(ArrayNodeDefinition $rootNode)
@@ -156,8 +153,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 
     private function addAccessControlSection(ArrayNodeDefinition $rootNode)
@@ -196,8 +192,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 
     private function addFirewallsSection(ArrayNodeDefinition $rootNode, array $factories)
@@ -211,8 +206,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->disallowNewKeysInSubsequentConfigs()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->children()
-        ;
+                        ->children();
 
         $firewallNodeBuilder
             ->scalarNode('pattern')->end()
@@ -311,16 +305,14 @@ class MainConfiguration implements ConfigurationInterface
                     ->booleanNode('error_if_maximum_exceeded')->defaultTrue()->end()
                     ->scalarNode('expiration_url')->defaultValue('/')->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
         $abstractFactoryKeys = array();
         foreach ($factories as $factoriesAtPosition) {
             foreach ($factoriesAtPosition as $factory) {
                 $name = str_replace('-', '_', $factory->getKey());
                 $factoryNode = $firewallNodeBuilder->arrayNode($name)
-                    ->canBeUnset()
-                ;
+                    ->canBeUnset();
 
                 if ($factory instanceof AbstractFactory) {
                     $abstractFactoryKeys[] = $name;
@@ -350,8 +342,7 @@ class MainConfiguration implements ConfigurationInterface
 
                     return $firewall;
                 })
-            ->end()
-        ;
+            ->end();
     }
 
     private function addProvidersSection(ArrayNodeDefinition $rootNode)
@@ -375,8 +366,7 @@ class MainConfiguration implements ConfigurationInterface
                     ->isRequired()
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
-                    ->prototype('array')
-        ;
+                    ->prototype('array');
 
         $providerNodeBuilder
             ->children()
@@ -393,8 +383,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
         foreach ($this->userProviderFactories as $factory) {
             $name = str_replace('-', '_', $factory->getKey());
@@ -411,8 +400,7 @@ class MainConfiguration implements ConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) {return count($v) === 0;})
                 ->thenInvalid('You must set a provider definition for the provider.')
-            ->end()
-        ;
+            ->end();
     }
 
     private function addEncodersSection(ArrayNodeDefinition $rootNode)
@@ -451,7 +439,6 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
     }
 }

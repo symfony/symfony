@@ -24,15 +24,13 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(false))
-        ;
+            ->will($this->returnValue(false));
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+            ->will($this->returnValue($request));
 
         $listener = new ExpiredSessionListener(
             $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
@@ -51,27 +49,23 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true))
-        ;
+            ->will($this->returnValue(true));
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session))
-        ;
+            ->will($this->returnValue($session));
 
         $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(null))
-        ;
+            ->will($this->returnValue(null));
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+            ->will($this->returnValue($request));
 
         $listener = new ExpiredSessionListener(
             $securityContext,
@@ -88,49 +82,42 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
         $session
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('foo'))
-        ;
+            ->will($this->returnValue('foo'));
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true))
-        ;
+            ->will($this->returnValue(true));
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session))
-        ;
+            ->will($this->returnValue($session));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->any())
             ->method('getUsername')
-            ->will($this->returnValue('foobar'))
-        ;
+            ->will($this->returnValue('foobar'));
 
         $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token))
-        ;
+            ->will($this->returnValue($token));
 
         $sessionInformation = $this->getSessionInformation();
         $sessionInformation
             ->expects($this->once())
             ->method('isExpired')
-            ->will($this->returnValue(true))
-        ;
+            ->will($this->returnValue(true));
 
         $sessionRegistry = $this->getSessionRegistry();
         $sessionRegistry
             ->expects($this->once())
             ->method('getSessionInformation')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue($sessionInformation))
-        ;
+            ->will($this->returnValue($sessionInformation));
 
         $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
 
@@ -139,20 +126,17 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('createRedirectResponse')
             ->with($this->identicalTo($request), $this->equalTo('/'))
-            ->will($this->returnValue($response))
-        ;
+            ->will($this->returnValue($response));
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+            ->will($this->returnValue($request));
         $event
             ->expects($this->once())
             ->method('setResponse')
-            ->with($this->identicalTo($response))
-        ;
+            ->with($this->identicalTo($response));
 
         $listener = new ExpiredSessionListener(
             $securityContext,
@@ -169,61 +153,52 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
         $session
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('foo'))
-        ;
+            ->will($this->returnValue('foo'));
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true))
-        ;
+            ->will($this->returnValue(true));
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session))
-        ;
+            ->will($this->returnValue($session));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->any())
             ->method('getUsername')
-            ->will($this->returnValue('foobar'))
-        ;
+            ->will($this->returnValue('foobar'));
 
         $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($token))
-        ;
+            ->will($this->returnValue($token));
 
         $sessionInformation = $this->getSessionInformation();
         $sessionInformation
             ->expects($this->once())
             ->method('isExpired')
-            ->will($this->returnValue(false))
-        ;
+            ->will($this->returnValue(false));
 
         $sessionRegistry = $this->getSessionRegistry();
         $sessionRegistry
             ->expects($this->once())
             ->method('getSessionInformation')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue($sessionInformation))
-        ;
+            ->will($this->returnValue($sessionInformation));
         $sessionRegistry
             ->expects($this->once())
             ->method('refreshLastRequest')
-            ->with($this->equalTo('foo'))
-        ;
+            ->with($this->equalTo('foo'));
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+            ->will($this->returnValue($request));
 
         $listener = new ExpiredSessionListener(
             $securityContext,
@@ -240,54 +215,46 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
         $session
             ->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('foo'))
-        ;
+            ->will($this->returnValue('foo'));
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->will($this->returnValue(true))
-        ;
+            ->will($this->returnValue(true));
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->will($this->returnValue($session))
-        ;
+            ->will($this->returnValue($session));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('foobar'))
-        ;
+            ->will($this->returnValue('foobar'));
 
         $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $securityContext
             ->expects($this->any())
             ->method('getToken')
-            ->will($this->returnValue($token))
-        ;
+            ->will($this->returnValue($token));
 
         $sessionRegistry = $this->getSessionRegistry();
         $sessionRegistry
             ->expects($this->once())
             ->method('getSessionInformation')
             ->with($this->equalTo('foo'))
-            ->will($this->returnValue(null))
-        ;
+            ->will($this->returnValue(null));
         $sessionRegistry
             ->expects($this->once())
             ->method('registerNewSession')
-            ->with($this->equalTo('foo'), $this->equalTo('foobar'))
-        ;
+            ->with($this->equalTo('foo'), $this->equalTo('foobar'));
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->will($this->returnValue($request))
-        ;
+            ->will($this->returnValue($request));
 
         $listener = new ExpiredSessionListener(
             $securityContext,

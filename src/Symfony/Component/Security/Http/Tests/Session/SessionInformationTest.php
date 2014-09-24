@@ -55,5 +55,4 @@ class SessionInformationTest extends \PHPUnit_Framework_TestCase
     {
         return new SessionInformation('foo', 'bar', new \DateTime());
     }
-
 }

@@ -27,7 +27,7 @@ class ConcurrentSessionControlAuthenticationStrategyTest extends \PHPUnit_Framew
             ->method('getAllSessions')
             ->will($this->returnValue(array(
                 $this->getSessionInformation(),
-                $this->getSessionInformation()
+                $this->getSessionInformation(),
             )));
 
         $strategy = new ConcurrentSessionControlAuthenticationStrategy($registry, 3);
@@ -43,7 +43,7 @@ class ConcurrentSessionControlAuthenticationStrategyTest extends \PHPUnit_Framew
             ->method('getAllSessions')
             ->will($this->returnValue(array(
                 $this->getSessionInformation('bar'),
-                $this->getSessionInformation('foo')
+                $this->getSessionInformation('foo'),
             )));
 
         $strategy = new ConcurrentSessionControlAuthenticationStrategy($registry, 2);
@@ -63,7 +63,7 @@ class ConcurrentSessionControlAuthenticationStrategyTest extends \PHPUnit_Framew
             ->method('getAllSessions')
             ->will($this->returnValue(array(
                 $this->getSessionInformation('bar'),
-                $this->getSessionInformation('foo')
+                $this->getSessionInformation('foo'),
             )));
 
         $strategy = new ConcurrentSessionControlAuthenticationStrategy($registry, 2);
@@ -80,17 +80,15 @@ class ConcurrentSessionControlAuthenticationStrategyTest extends \PHPUnit_Framew
             ->will($this->returnValue(array(
                 $this->getSessionInformation('foo'),
                 $this->getSessionInformation('bar'),
-                $this->getSessionInformation('barfoo')
+                $this->getSessionInformation('barfoo'),
             )));
 
         $registry->expects($this->at(1))
             ->method('expireNow')
-            ->with($this->equalTo('bar'))
-        ;
+            ->with($this->equalTo('bar'));
         $registry->expects($this->at(2))
             ->method('expireNow')
-            ->with($this->equalTo('barfoo'))
-        ;
+            ->with($this->equalTo('barfoo'));
 
         $strategy = new ConcurrentSessionControlAuthenticationStrategy($registry, 2, false);
         $this->assertNull($strategy->onAuthentication($request, $this->getToken()));

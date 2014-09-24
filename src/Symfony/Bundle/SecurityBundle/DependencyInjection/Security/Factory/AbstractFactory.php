@@ -59,8 +59,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         if ($this->isRememberMeAware($config)) {
             $container
                 ->getDefinition($listenerId)
-                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId))
-            ;
+                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId));
         }
 
         // create entry point if applicable (optional)
@@ -77,8 +76,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             ->scalarNode('provider')->end()
             ->booleanNode('remember_me')->defaultTrue()->end()
             ->scalarNode('success_handler')->end()
-            ->scalarNode('failure_handler')->end()
-        ;
+            ->scalarNode('failure_handler')->end();
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
             if (is_bool($default)) {

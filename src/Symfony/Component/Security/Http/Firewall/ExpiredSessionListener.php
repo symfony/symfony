@@ -73,7 +73,6 @@ class ExpiredSessionListener implements ListenerInterface
 
         if ($sessionInformation = $this->sessionRegistry->getSessionInformation($session->getId())) {
             if ($sessionInformation->isExpired()) {
-
                 if (null !== $this->logger) {
                     $this->logger->info(sprintf("Logging out expired session for username '%s'", $token->getUsername()));
                 }

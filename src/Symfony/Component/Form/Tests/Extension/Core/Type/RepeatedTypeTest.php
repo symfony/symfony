@@ -36,7 +36,8 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testSetOptions()
     {
         $form = $this->factory->create('repeated', null, array(
-            'type'    => 'text',
+            'required' => true,
+            'type' => 'text',
             'options' => array('label' => 'Global'),
         ));
 
@@ -50,6 +51,7 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $form = $this->factory->create('repeated', null, array(
             // the global required value cannot be overridden
+            'required'       => true,
             'type'           => 'text',
             'first_options'  => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2'),
@@ -117,8 +119,6 @@ class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertEquals('Label', $form['first']->getConfig()->getOption('label'));
         $this->assertEquals('Second label', $form['second']->getConfig()->getOption('label'));
-        $this->assertTrue($form['first']->isRequired());
-        $this->assertTrue($form['second']->isRequired());
     }
 
     public function testSubmitUnequal()

@@ -49,6 +49,25 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         $this->assertMatchesXpath($html,
 '/div
     [
+        ./label[@for="name"][@class="my&label&class"][.="[trans]foo&bar[/trans]"]
+        /following-sibling::input[@id="name"][@class="my&class"]
+    ]
+'
+        );
+    }
+
+    public function testRowOverrideVariablesRequiredField()
+    {
+        $view = $this->factory->createNamed('name', 'text', null, array('required' => true))->createView();
+        $html = $this->renderRow($view, array(
+            'attr' => array('class' => 'my&class'),
+            'label' => 'foo&bar',
+            'label_attr' => array('class' => 'my&label&class'),
+        ));
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
         ./label[@for="name"][@class="my&label&class required"][.="[trans]foo&bar[/trans]"]
         /following-sibling::input[@id="name"][@class="my&class"]
     ]
@@ -525,7 +544,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'repeated', null, array(
             // the global required value cannot be overridden
-            'first_options'  => array('label' => 'Test', 'required' => false),
+            'first_options'  => array('label' => 'Test', 'required' => true),
             'second_options' => array('label' => 'Test2'),
         ));
 
@@ -535,12 +554,12 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./div
             [
                 ./label[@for="name_first"][.="[trans]Test[/trans]"]
-                /following-sibling::input[@type="text"][@id="name_first"][@required="required"]
+                /following-sibling::input[@type="text"][@id="name_first"]
             ]
         /following-sibling::div
             [
                 ./label[@for="name_second"][.="[trans]Test2[/trans]"]
-                /following-sibling::input[@type="text"][@id="name_second"][@required="required"]
+                /following-sibling::input[@type="text"][@id="name_second"]
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]

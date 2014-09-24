@@ -401,7 +401,7 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     {
         $form = $this->factory->createNamed('name', 'repeated', 'foobar', array(
             'type'           => 'password',
-            'first_options'  => array('label' => 'Test', 'required' => false),
+            'first_options'  => array('label' => 'Test', 'required' => true),
             'second_options' => array('label' => 'Test2'),
         ));
 
@@ -413,14 +413,14 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
                 ./td
                     [./label[@for="name_first"][.="[trans]Test[/trans]"]]
                 /following-sibling::td
-                    [./input[@type="password"][@id="name_first"][@required="required"]]
+                    [./input[@type="password"][@id="name_first"]]
             ]
         /following-sibling::tr
             [
                 ./td
                     [./label[@for="name_second"][.="[trans]Test2[/trans]"]]
                 /following-sibling::td
-                    [./input[@type="password"][@id="name_second"][@required="required"]]
+                    [./input[@type="password"][@id="name_second"]]
             ]
         /following-sibling::tr[@style="display: none"]
             [./td[@colspan="2"]/input

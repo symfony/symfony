@@ -146,6 +146,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
@@ -162,6 +163,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
             ->setInvalidValue('baz')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
@@ -184,6 +186,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 2)
             ->setInvalidValue($value)
             ->setPlural(2)
+            ->setCode(Choice::TOO_FEW_ERROR)
             ->assertRaised();
     }
 
@@ -206,6 +209,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 2)
             ->setInvalidValue($value)
             ->setPlural(2)
+            ->setCode(Choice::TOO_MANY_ERROR)
             ->assertRaised();
     }
 
@@ -246,6 +250,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"2"')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 
@@ -276,6 +281,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
             ->setInvalidValue('3')
+            ->setCode(Choice::NO_SUCH_CHOICE_ERROR)
             ->assertRaised();
     }
 }

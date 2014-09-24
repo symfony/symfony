@@ -82,14 +82,14 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
     public function getInvalidIssn()
     {
         return array(
-            array(0),
-            array('1539'),
-            array('2156-537A'),
-            array('1119-0231'),
-            array('1684-5312'),
-            array('1996-0783'),
-            array('1684-537X'),
-            array('1996-0795'),
+            array(0, Issn::TOO_SHORT_ERROR),
+            array('1539', Issn::TOO_SHORT_ERROR),
+            array('2156-537A', Issn::INVALID_CHARACTERS_ERROR),
+            array('1119-0231', Issn::CHECKSUM_FAILED_ERROR),
+            array('1684-5312', Issn::CHECKSUM_FAILED_ERROR),
+            array('1996-0783', Issn::CHECKSUM_FAILED_ERROR),
+            array('1684-537X', Issn::CHECKSUM_FAILED_ERROR),
+            array('1996-0795', Issn::CHECKSUM_FAILED_ERROR),
         );
     }
 
@@ -134,6 +134,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setCode(Issn::INVALID_CASE_ERROR)
             ->assertRaised();
     }
 
@@ -151,6 +152,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setCode(Issn::MISSING_HYPHEN_ERROR)
             ->assertRaised();
     }
 
@@ -169,7 +171,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidIssn
      */
-    public function testInvalidIssn($issn)
+    public function testInvalidIssn($issn, $code)
     {
         $constraint = new Issn(array(
             'message' => 'myMessage',
@@ -179,6 +181,7 @@ class IssnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$issn.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 }

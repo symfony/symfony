@@ -66,7 +66,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getConstraintViolation($code = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code);
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new Form());
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -109,7 +109,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testMapViolationAllowsNonSyncIfInvalid()
     {
-        $violation = $this->getConstraintViolation(Form::ERR_INVALID);
+        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())

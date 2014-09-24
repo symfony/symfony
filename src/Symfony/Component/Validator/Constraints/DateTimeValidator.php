@@ -45,6 +45,7 @@ class DateTimeValidator extends DateValidator
         if (!preg_match(static::PATTERN, $value, $matches)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_FORMAT_ERROR)
                 ->addViolation();
 
             return;
@@ -53,12 +54,14 @@ class DateTimeValidator extends DateValidator
         if (!DateValidator::checkDate($matches[1], $matches[2], $matches[3])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_DATE_ERROR)
                 ->addViolation();
         }
 
         if (!TimeValidator::checkTime($matches[4], $matches[5], $matches[6])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(DateTime::INVALID_TIME_ERROR)
                 ->addViolation();
         }
     }

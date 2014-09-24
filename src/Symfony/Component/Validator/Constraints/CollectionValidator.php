@@ -73,6 +73,7 @@ class CollectionValidator extends ConstraintValidator
                     ->atPath('['.$field.']')
                     ->setParameter('{{ field }}', $this->formatValue($field))
                     ->setInvalidValue(null)
+                    ->setCode(Collection::MISSING_FIELD_ERROR)
                     ->addViolation();
             }
         }
@@ -84,6 +85,7 @@ class CollectionValidator extends ConstraintValidator
                         ->atPath('['.$field.']')
                         ->setParameter('{{ field }}', $this->formatValue($field))
                         ->setInvalidValue($fieldValue)
+                        ->setCode(Collection::NO_SUCH_FIELD_ERROR)
                         ->addViolation();
                 }
             }

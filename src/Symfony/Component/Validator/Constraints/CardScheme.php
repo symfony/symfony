@@ -20,9 +20,18 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Tim Nagel <t.nagel@infinite.net.au>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class CardScheme extends Constraint
 {
+    const NOT_NUMERIC_ERROR = 1;
+    const INVALID_FORMAT_ERROR = 2;
+
+    protected static $errorNames = array(
+        self::NOT_NUMERIC_ERROR => 'NOT_NUMERIC_ERROR',
+        self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',
+    );
+
     public $message = 'Unsupported card type or invalid card number.';
     public $schemes;
 

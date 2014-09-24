@@ -78,7 +78,7 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidDates
      */
-    public function testInvalidDates($date)
+    public function testInvalidDates($date, $code)
     {
         $constraint = new Date(array(
             'message' => 'myMessage',
@@ -88,18 +88,19 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$date.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 
     public function getInvalidDates()
     {
         return array(
-            array('foobar'),
-            array('foobar 2010-13-01'),
-            array('2010-13-01 foobar'),
-            array('2010-13-01'),
-            array('2010-04-32'),
-            array('2010-02-29'),
+            array('foobar', Date::INVALID_FORMAT_ERROR),
+            array('foobar 2010-13-01', Date::INVALID_FORMAT_ERROR),
+            array('2010-13-01 foobar', Date::INVALID_FORMAT_ERROR),
+            array('2010-13-01', Date::INVALID_DATE_ERROR),
+            array('2010-04-32', Date::INVALID_DATE_ERROR),
+            array('2010-02-29', Date::INVALID_DATE_ERROR),
         );
     }
 }

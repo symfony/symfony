@@ -62,6 +62,7 @@ class DateValidator extends ConstraintValidator
         if (!preg_match(static::PATTERN, $value, $matches)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Date::INVALID_FORMAT_ERROR)
                 ->addViolation();
 
             return;
@@ -70,6 +71,7 @@ class DateValidator extends ConstraintValidator
         if (!self::checkDate($matches[1], $matches[2], $matches[3])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Date::INVALID_DATE_ERROR)
                 ->addViolation();
         }
     }

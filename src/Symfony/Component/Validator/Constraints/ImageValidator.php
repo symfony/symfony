@@ -54,6 +54,7 @@ class ImageValidator extends FileValidator
 
         if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {
             $this->buildViolation($constraint->sizeNotDetectedMessage)
+                ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
                 ->addViolation();
 
             return;
@@ -71,6 +72,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->minWidthMessage)
                     ->setParameter('{{ width }}', $width)
                     ->setParameter('{{ min_width }}', $constraint->minWidth)
+                    ->setCode(Image::TOO_NARROW_ERROR)
                     ->addViolation();
 
                 return;
@@ -86,6 +88,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->maxWidthMessage)
                     ->setParameter('{{ width }}', $width)
                     ->setParameter('{{ max_width }}', $constraint->maxWidth)
+                    ->setCode(Image::TOO_WIDE_ERROR)
                     ->addViolation();
 
                 return;
@@ -101,6 +104,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->minHeightMessage)
                     ->setParameter('{{ height }}', $height)
                     ->setParameter('{{ min_height }}', $constraint->minHeight)
+                    ->setCode(Image::TOO_LOW_ERROR)
                     ->addViolation();
 
                 return;
@@ -116,6 +120,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->maxHeightMessage)
                     ->setParameter('{{ height }}', $height)
                     ->setParameter('{{ max_height }}', $constraint->maxHeight)
+                    ->setCode(Image::TOO_HIGH_ERROR)
                     ->addViolation();
             }
         }
@@ -131,6 +136,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->minRatioMessage)
                     ->setParameter('{{ ratio }}', $ratio)
                     ->setParameter('{{ min_ratio }}', $constraint->minRatio)
+                    ->setCode(Image::RATIO_TOO_SMALL_ERROR)
                     ->addViolation();
             }
         }
@@ -144,6 +150,7 @@ class ImageValidator extends FileValidator
                 $this->buildViolation($constraint->maxRatioMessage)
                     ->setParameter('{{ ratio }}', $ratio)
                     ->setParameter('{{ max_ratio }}', $constraint->maxRatio)
+                    ->setCode(Image::RATIO_TOO_BIG_ERROR)
                     ->addViolation();
             }
         }
@@ -152,6 +159,7 @@ class ImageValidator extends FileValidator
             $this->buildViolation($constraint->allowSquareMessage)
                 ->setParameter('{{ width }}', $width)
                 ->setParameter('{{ height }}', $height)
+                ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
                 ->addViolation();
         }
 
@@ -159,6 +167,7 @@ class ImageValidator extends FileValidator
             $this->buildViolation($constraint->allowLandscapeMessage)
                 ->setParameter('{{ width }}', $width)
                 ->setParameter('{{ height }}', $height)
+                ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
                 ->addViolation();
         }
 
@@ -166,6 +175,7 @@ class ImageValidator extends FileValidator
             $this->buildViolation($constraint->allowPortraitMessage)
                 ->setParameter('{{ width }}', $width)
                 ->setParameter('{{ height }}', $height)
+                ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
                 ->addViolation();
         }
     }

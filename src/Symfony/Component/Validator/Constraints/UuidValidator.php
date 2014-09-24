@@ -26,28 +26,49 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class UuidValidator extends ConstraintValidator
 {
+    // The strict pattern matches UUIDs like this:
+    // xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+
+    // Roughly speaking:
+    // x = any hexadecimal character
+    // M = any allowed version {1..5}
+    // N = any allowed variant {9, 9, a, b}
+
+    const STRICT_LENGTH = 36;
+    const STRICT_FIRST_HYPHEN_POSITION = 8;
+    const STRICT_LAST_HYPHEN_POSITION = 23;
+    const STRICT_VERSION_POSITION = 14;
+    const STRICT_VARIANT_POSITION = 19;
+
+    // The loose pattern validates similar yet non-compliant UUIDs.
+    // Hyphens are completely optional. If present, they should only appear
+    // between every fourth character:
+    // xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx
+    // xxxxxxxxxxxx-xxxx-xxxx-xxxx-xxxx-xxxx
+    // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    // The value can also be wrapped with characters like []{}:
+    // {xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx}
+
+    // Neither the version nor the variant is validated by this pattern.
+
+    const LOOSE_MAX_LENGTH = 39;
+    const LOOSE_FIRST_HYPHEN_POSITION = 4;
+
     /**
-     * Regular expression which verifies allowed characters and the proper format.
-     *
-     * The strict pattern matches UUIDs like this: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
-     * Roughly speaking: x = any hexadecimal character, M = any allowed version, N = any allowed variant.
+     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
      */
     const STRICT_PATTERN = '/^[a-f0-9]{8}-[a-f0-9]{4}-[%s][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i';
 
     /**
-     * The loose pattern validates similar yet non-compliant UUIDs.
-     *
-     * Dashes are completely optional.  If present, they should only appear between every fourth character.
-     * The value can also be wrapped with characters like []{} for backwards-compatibility with other systems.
-     * Neither the version nor the variant is validated by this pattern.
+     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
      */
     const LOOSE_PATTERN = '/^[a-f0-9]{4}(?:-?[a-f0-9]{4}){7}$/i';
 
     /**
-     * Properly-formatted UUIDs contain 32 hex digits, separated by 4 dashes.
-     * We can use this fact to avoid performing a preg_match on strings of other sizes.
+     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
      */
-    const STRICT_UUID_LENGTH = 36;
+    const STRICT_UUID_LENGTH = self::STRICT_LENGTH;
 
     /**
      * {@inheritdoc}
@@ -65,42 +86,178 @@ class UuidValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->strict) {
-            $length = strlen($value);
-
-            if ($length < static::STRICT_UUID_LENGTH) {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-
-                return;
-            }
-
-            if ($length > static::STRICT_UUID_LENGTH) {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-
-                return;
-            }
-
-            // Insert the allowed versions into the regular expression
-            $pattern = sprintf(static::STRICT_PATTERN, implode('', $constraint->versions));
-
-            if (!preg_match($pattern, $value)) {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-            }
+            $this->validateStrict($value, $constraint);
 
             return;
         }
 
-        // Trim any wrapping characters like [] or {} used by some legacy systems
-        $value = trim($value, '[]{}');
+        $this->validateLoose($value, $constraint);
+    }
 
-        if (!preg_match(static::LOOSE_PATTERN, $value)) {
+    private function validateLoose($value, Uuid $constraint)
+    {
+        // Error priority:
+        // 1. ERROR_INVALID_CHARACTERS
+        // 2. ERROR_INVALID_HYPHEN_PLACEMENT
+        // 3. ERROR_TOO_SHORT/ERROR_TOO_LONG
+
+        // Trim any wrapping characters like [] or {} used by some legacy systems
+        $trimmed = trim($value, '[]{}');
+
+        // Position of the next expected hyphen
+        $h = self::LOOSE_FIRST_HYPHEN_POSITION;
+
+        // Expected length
+        $l = self::LOOSE_MAX_LENGTH;
+
+        for ($i = 0; $i < $l; ++$i) {
+            // Check length
+            if (!isset($trimmed{$i})) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::TOO_SHORT_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+
+            // Hyphens must occur every fifth position
+            // xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx
+            //     ^    ^    ^    ^    ^    ^    ^
+            if ('-' === $trimmed{$i}) {
+                if ($i !== $h) {
+                    $this->buildViolation($constraint->message)
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                        ->addViolation();
+
+                    return;
+                }
+
+                $h += 5;
+
+                continue;
+            }
+
+            // Missing hyphens are ignored
+            if ($i === $h) {
+                $h += 4;
+                --$l;
+            }
+
+            // Check characters
+            if (!ctype_xdigit($trimmed{$i})) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+        }
+
+        // Check length again
+        if (isset($trimmed{$i})) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::TOO_LONG_ERROR)
+                ->addViolation();
+        }
+    }
+
+    private function validateStrict($value, Uuid $constraint)
+    {
+        // Error priority:
+        // 1. ERROR_INVALID_CHARACTERS
+        // 2. ERROR_INVALID_HYPHEN_PLACEMENT
+        // 3. ERROR_TOO_SHORT/ERROR_TOO_LONG
+        // 4. ERROR_INVALID_VERSION
+        // 5. ERROR_INVALID_VARIANT
+
+        // Position of the next expected hyphen
+        $h = self::STRICT_FIRST_HYPHEN_POSITION;
+
+        for ($i = 0; $i < self::STRICT_LENGTH; ++$i) {
+            // Check length
+            if (!isset($value{$i})) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::TOO_SHORT_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+
+            // Check hyphen placement
+            // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            //         ^    ^    ^    ^
+            if ('-' === $value{$i}) {
+                if ($i !== $h) {
+                    $this->buildViolation($constraint->message)
+                         ->setParameter(
+                             '{{ value }}',
+                             $this->formatValue($value)
+                         )
+                         ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                         ->addViolation();
+
+                    return;
+                }
+
+                // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                //                        ^
+                if ($h < self::STRICT_LAST_HYPHEN_POSITION) {
+                    $h += 5;
+                }
+
+                continue;
+            }
+
+            // Check characters
+            if (!ctype_xdigit($value{$i})) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_CHARACTERS_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+
+            // Missing hyphen
+            if ($i === $h) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+        }
+
+        // Check length again
+        if (isset($value{$i})) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::TOO_LONG_ERROR)
+                ->addViolation();
+        }
+
+        // Check version
+        if (!in_array($value{self::STRICT_VERSION_POSITION}, $constraint->versions)) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::INVALID_VERSION_ERROR)
+                ->addViolation();
+        }
+
+        // Check variant - first two bits must equal "10"
+        //   0b10xx
+        // & 0b1100 (12)
+        // = 0b1000 (8)
+        if ((hexdec($value{self::STRICT_VARIANT_POSITION}) & 12) !== 8) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Uuid::INVALID_VARIANT_ERROR)
                 ->addViolation();
         }
     }

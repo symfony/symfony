@@ -83,7 +83,7 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
      */
     public function setMaximumSessions($maximumSessions)
     {
-        $this->maximumSessions = (integer) $maximumSessions;
+        $this->maximumSessions = (int) $maximumSessions;
     }
 
     /**
@@ -91,7 +91,7 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
      *
      * @param array           $orderedSessions   Array of SessionInformation ordered from
      *                                           newest to oldest
-     * @param integer         $allowableSessions
+     * @param int             $allowableSessions
      * @param SessionRegistry $registry
      */
     protected function allowableSessionsExceeded($orderedSessions, $allowableSessions, SessionRegistry $registry)
@@ -111,7 +111,7 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
      * Method intended for use by subclasses to override the maximum number of sessions that are permitted for a particular authentication.
      *
      * @param  string  $username
-     * @return integer
+     * @return int
      */
     protected function getMaximumSessionsForThisUser($username)
     {

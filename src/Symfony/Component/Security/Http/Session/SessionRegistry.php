@@ -32,7 +32,7 @@ class SessionRegistry
      * Obtains all the known sessions for the specified user.
      *
      * @param  string  $username               the specified user.
-     * @param  boolean $includeExpiredSessions
+     * @param  bool    $includeExpiredSessions
      * @return array   An array of SessionInformation objects.
      */
     public function getAllSessions($username, $includeExpiredSessions = false)

@@ -43,7 +43,7 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
      * Obtains the maintained information for one user.
      *
      * @param  string  $username                The user identifier.
-     * @param  boolean $includeExpiredSessions.
+     * @param  bool    $includeExpiredSessions.
      * @return array   An array of SessionInformation objects.
      */
     public function getSessionInformations($username, $includeExpiredSessions = false)

@@ -137,15 +137,16 @@
                             row.className = 'sf-ajax-request sf-ajax-request-' + requestState;
                         }
 
-                        while (tbody.firstChild) {
-                            tbody.removeChild(tbody.firstChild);
+                        var infoSpan = document.getElementsByClassName("sf-toolbar-ajax-info")[0];
+                        var children = Array.prototype.slice.call(tbody.children);
+                        for (var i = 0; i < children.length; i++) {
+                            tbody.removeChild(children[i]);
                         }
                         tbody.appendChild(rows);
 
-                        var infoSpans = document.getElementsByClassName("sf-toolbar-ajax-info");
-                        if (infoSpans.length) {
+                        if (infoSpan) {
                             var text = firstItem == 0 ? requestStack.length + ' calls' : 'Last 20 calls out of ' + requestStack.length;
-                            infoSpans[0].textContent = text;
+                            infoSpan.textContent = text;
                         }
                     } else {
                         var cell = document.createElement('td');

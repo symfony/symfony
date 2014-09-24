@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T11:13:44Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T11:17:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-23T12:15:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-23T12:24:17Z
+
+Oh wait, this is for 2.3? So I don't agree to deprecate `Form/Extension/Validator/Util/ServerParams` in a maintainance branch. Why is that necessary?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T12:26:26Z
+
+@Tobion Good point, thanks! I'll remove the deprecation note.
+
+I moved `ServerParams` to the global `Util` namespace since it's not just used for the `ValidatorExtension` now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-23T12:27:36Z
+
+Updated.

@@ -939,7 +939,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
-        if (null !== $definition->getFactoryMethod()) {
+        if ($definition->getFactoryMethod() instanceof \Closure) {
+            if (null !== $definition->getFactoryService() || null !== $definition->getFactoryClass()) {
+                throw new RuntimeException(sprintf('Definition of service "%s" is inconsistent (mixing of closure and factory service/class)', $id));
+            }
+
+            $service = call_user_func_array($definition->getFactoryMethod(), $arguments ? $arguments : array($this));
+        } elseif (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
                 $factory = $parameterBag->resolveValue($definition->getFactoryClass());
             } elseif (null !== $definition->getFactoryService()) {

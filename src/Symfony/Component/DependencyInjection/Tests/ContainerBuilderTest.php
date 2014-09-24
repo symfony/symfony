@@ -381,6 +381,68 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceByClosureWithPassedContainerAsAnArgument()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo', 'Bar\FooClass')->setFactoryMethod(function (ContainerInterface $container) {
+            $foo = new \Bar\FooClass();
+            $foo->setBar($container->get('bar'));
+
+            return $foo;
+        });
+
+        $this->assertSame($builder->get('bar'), $builder->get('foo')->bar, '->createService() creates service from a closure with passed container as an argument');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceByClosureWithPassedServiceAsAnArgument()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo', 'Bar\FooClass')->setFactoryMethod(function (\stdClass $bar) {
+            $foo = new \Bar\FooClass();
+            $foo->setBar($bar);
+
+            return $foo;
+        })->addArgument(new Reference('bar'));
+
+        $this->assertSame($builder->get('bar'), $builder->get('foo')->bar, '->createService() creates service from a closure with passed service as an argument');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceWithInconsistentDefinition()
+    {
+        $expectedMessage = 'Definition of service "%s" is inconsistent (mixing of closure and factory service/class)';
+        $assertionMessage = '->createService() does not allow mixing of closure and factory service/class';
+
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass');
+        $builder->register('bar', 'stdClass')->setFactoryService('foo')->setFactoryMethod(function () {});
+        $builder->register('baz', 'stdClass')->setFactoryClass('stdClass')->setFactoryMethod(function () {});
+
+        try {
+            $builder->get('bar');
+            $this->fail($assertionMessage);
+        } catch (RuntimeException $e) {
+            $this->assertEquals(sprintf($expectedMessage, 'bar'), $e->getMessage());
+        }
+
+        try {
+            $builder->get('baz');
+            $this->fail($assertionMessage);
+        } catch (RuntimeException $e) {
+            $this->assertEquals(sprintf($expectedMessage, 'baz'), $e->getMessage());
+        }
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      * @expectedException \RuntimeException
      */
     public function testCreateSyntheticService()

@@ -88,7 +88,7 @@ class Definition
     /**
      * Sets the factory method able to create an instance of this class.
      *
-     * @param string $factoryMethod The factory method name
+     * @param string|\Closure $factoryMethod The factory method name or closure
      *
      * @return Definition The current instance
      *
@@ -109,7 +109,7 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
+     * @throws \InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
      */
     public function setDecoratedService($id, $renamedId = null)
     {
@@ -139,7 +139,7 @@ class Definition
     /**
      * Gets the factory method.
      *
-     * @return string|null The factory method name
+     * @return string|\Closure|null The factory method name or closure
      *
      * @api
      */

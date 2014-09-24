@@ -29,6 +29,8 @@
                     document.getElementById('sfToolbarClearer-{{ token }}').style.display = 'block';
                     document.getElementById('sfMiniToolbar-{{ token }}').style.display = 'none';
                 }
+
+                Sfjs.renderAjaxRequests();
             },
             function(xhr) {
                 if (xhr.status !== 0) {

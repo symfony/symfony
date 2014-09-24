@@ -283,6 +283,55 @@
     line-height: 19px;
 }
 
+table.sf-toolbar-ajax-requests {
+    border-collapse: collapse;
+}
+.sf-toolbar-ajax-requests th, .sf-toolbar-ajax-requests td {
+    border-bottom: 1px solid #ddd;
+    padding: 0 4px;
+}
+.sf-toolbar-ajax-requests th {
+    background-color: #eee;
+}
+.sf-ajax-request-url {
+    max-width: 300px;
+    line-height: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sf-ajax-request-duration {
+    text-align: right;
+}
+.sf-ajax-request-error {
+    color: #a33;
+}
+.sf-ajax-request-loading {
+    -webkit-animation: sf-blink .5s ease-in-out infinite;
+    -o-animation: sf-blink .5s ease-in-out infinite;
+    -moz-animation: sf-blink .5s ease-in-out infinite;
+    animation: sf-blink .5s ease-in-out infinite;
+}
+@-webkit-keyframes sf-blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+@-moz-keyframes sf-blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+@-o-keyframes sf-blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+@keyframes sf-blink {
+    0% { color: black; }
+    50% { color: #bbb; }
+    100% { color: black; }
+}
+
 /***** Override the setting when the toolbar is on the top *****/
 {% if position == 'top' %}
     .sf-minitoolbar {

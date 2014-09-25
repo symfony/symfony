@@ -243,6 +243,7 @@ class EntityTypeTest extends TypeTestCase
     public function testSubmitSingleExpandedNull()
     {
         $field = $this->factory->createNamed('name', 'entity', null, array(
+            'required' => true,
             'multiple' => false,
             'expanded' => true,
             'em' => 'default',
@@ -257,6 +258,7 @@ class EntityTypeTest extends TypeTestCase
     public function testSubmitSingleNonExpandedNull()
     {
         $field = $this->factory->createNamed('name', 'entity', null, array(
+            'required' => true,
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -271,6 +273,7 @@ class EntityTypeTest extends TypeTestCase
     public function testSubmitMultipleNull()
     {
         $field = $this->factory->createNamed('name', 'entity', null, array(
+            'required' => true,
             'multiple' => true,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,

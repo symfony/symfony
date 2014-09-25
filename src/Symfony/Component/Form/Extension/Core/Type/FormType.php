@@ -190,7 +190,7 @@ class FormType extends BaseType
             'data_class'         => $dataClass,
             'empty_data'         => $emptyData,
             'trim'               => true,
-            'required'           => true,
+            'required'           => false,
             'read_only'          => false,
             'max_length'         => null,
             'pattern'            => null,

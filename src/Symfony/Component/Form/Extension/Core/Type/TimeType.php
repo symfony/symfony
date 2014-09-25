@@ -84,18 +84,18 @@ class TimeType extends AbstractType
                     $secondOptions['choices'] = $seconds;
                     $secondOptions['placeholder'] = $options['placeholder']['second'];
                 }
+            }
 
-                // Append generic carry-along options
-                foreach (array('required', 'translation_domain') as $passOpt) {
-                    $hourOptions[$passOpt] = $options[$passOpt];
+            // Append generic carry-along options
+            foreach (array('required', 'translation_domain') as $passOpt) {
+                $hourOptions[$passOpt] = $options[$passOpt];
 
-                    if ($options['with_minutes']) {
-                        $minuteOptions[$passOpt] = $options[$passOpt];
-                    }
+                if ($options['with_minutes']) {
+                    $minuteOptions[$passOpt] = $options[$passOpt];
+                }
 
-                    if ($options['with_seconds']) {
-                        $secondOptions[$passOpt] = $options[$passOpt];
-                    }
+                if ($options['with_seconds']) {
+                    $secondOptions[$passOpt] = $options[$passOpt];
                 }
             }
 

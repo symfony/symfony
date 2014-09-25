@@ -94,8 +94,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testExpandedChoicesOptionsTurnIntoChildren()
     {
         $form = $this->factory->create('choice', null, array(
-            'expanded'  => true,
-            'choices'   => $this->choices,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
         ));
 
         $this->assertCount(count($this->choices), $form, 'Each choice should become a new field');
@@ -104,10 +105,10 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice()
     {
         $form = $this->factory->create('choice', null, array(
-            'multiple'  => false,
-            'expanded'  => true,
-            'required'  => false,
-            'choices'   => $this->choices,
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
         ));
 
         $this->assertTrue(isset($form['placeholder']));
@@ -117,10 +118,10 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPlaceholderNotPresentIfRequired()
     {
         $form = $this->factory->create('choice', null, array(
-            'multiple'  => false,
-            'expanded'  => true,
-            'required'  => true,
-            'choices'   => $this->choices,
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->choices,
         ));
 
         $this->assertFalse(isset($form['placeholder']));
@@ -130,10 +131,10 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPlaceholderNotPresentIfMultiple()
     {
         $form = $this->factory->create('choice', null, array(
-            'multiple'  => true,
-            'expanded'  => true,
-            'required'  => false,
-            'choices'   => $this->choices,
+            'multiple' => true,
+            'expanded' => true,
+            'required' => false,
+            'choices' => $this->choices,
         ));
 
         $this->assertFalse(isset($form['placeholder']));
@@ -143,9 +144,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPlaceholderNotPresentIfEmptyChoice()
     {
         $form = $this->factory->create('choice', null, array(
-            'multiple'  => false,
-            'expanded'  => true,
-            'required'  => false,
+            'multiple' => false,
+            'expanded' => true,
+            'required' => false,
             'choices' => array(
                 '' => 'Empty',
                 1 => 'Not empty',
@@ -159,8 +160,9 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testExpandedChoicesOptionsAreFlattened()
     {
         $form = $this->factory->create('choice', null, array(
-            'expanded'  => true,
-            'choices'   => $this->groupedChoices,
+            'expanded' => true,
+            'required' => true,
+            'choices' => $this->groupedChoices,
         ));
 
         $flattened = array();
@@ -971,6 +973,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPassRequiredToView()
     {
         $form = $this->factory->create('choice', null, array(
+            'required' => true,
             'choices' => $this->choices,
         ));
         $view = $form->createView();

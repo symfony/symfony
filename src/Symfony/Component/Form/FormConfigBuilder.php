@@ -110,7 +110,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * @var bool
      */
-    private $required = true;
+    private $required = false;
 
     /**
      * @var bool

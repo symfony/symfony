@@ -6,6 +6,7 @@ CHANGELOG
 
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
+ * the default value of the "required" option was changed to false
 
 2.5.0
 ------

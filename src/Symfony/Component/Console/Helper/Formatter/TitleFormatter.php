@@ -37,7 +37,7 @@ class TitleFormatter implements FormatterInterface
             '',
             sprintf('<fg=blue>%s</fg=blue>', $this->title),
             sprintf('<fg=blue>%s</fg=blue>', str_repeat('=', strlen($this->title))),
-            ''
+            '',
         ));
     }
 }

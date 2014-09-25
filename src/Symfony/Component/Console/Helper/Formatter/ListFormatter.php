@@ -39,6 +39,6 @@ class ListFormatter implements FormatterInterface
             $this->messages
         );
 
-        return implode("\n\n", $messages) . "\n";
+        return implode("\n\n", $messages)."\n";
     }
 }

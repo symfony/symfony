@@ -269,6 +269,7 @@ class ChoiceType extends AbstractType
                     'value' => $choiceView->value,
                     'label' => $choiceView->label,
                     'translation_domain' => $options['translation_domain'],
+                    'block_name' => 'entry',
                 );
 
                 if ($options['multiple']) {

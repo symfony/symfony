@@ -284,7 +284,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testCollection()
     {
-        $form = $this->factory->createNamed('name', 'collection', array('a', 'b'), array(
+        $form = $this->factory->createNamed('names', 'collection', array('a', 'b'), array(
             'type' => 'text',
         ));
 
@@ -306,7 +306,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             array('title' => 'a'),
             array('title' => 'b'),
         );
-        $form = $this->factory->createNamed('name', 'collection', $data, array(
+        $form = $this->factory->createNamed('names', 'collection', $data, array(
             'type' => new AlternatingRowType(),
         ));
 
@@ -324,13 +324,13 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
     public function testEmptyCollection()
     {
-        $form = $this->factory->createNamed('name', 'collection', array(), array(
+        $form = $this->factory->createNamed('names', 'collection', array(), array(
             'type' => 'text',
         ));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
-    [./input[@type="hidden"][@id="name__token"]]
+    [./input[@type="hidden"][@id="names__token"]]
     [count(./div)=0]
 '
         );
@@ -671,7 +671,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
     public function testCollectionRowWithCustomBlock()
     {
         $collection = array('one', 'two', 'three');
-        $form = $this->factory->createNamedBuilder('name', 'collection', $collection)
+        $form = $this->factory->createNamedBuilder('names', 'collection', $collection)
             ->getForm();
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
@@ -680,6 +680,28 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         ./div[./label[.="Custom label: [trans]0[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]1[/trans]"]]
         /following-sibling::div[./label[.="Custom label: [trans]2[/trans]"]]
+    ]
+'
+        );
+    }
+
+    /**
+     * The block "_name_c_entry_label" should be overridden in the theme of the
+     * implemented driver.
+     */
+    public function testChoiceRowWithCustomBlock()
+    {
+        $form = $this->factory->createNamedBuilder('name_c', 'choice', 'a', array(
+                'choices' => array('a' => 'ChoiceA', 'b' => 'ChoiceB'),
+                'expanded' => true,
+            ))
+            ->getForm();
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./label[.="Custom name label: [trans]ChoiceA[/trans]"]
+        /following-sibling::label[.="Custom name label: [trans]ChoiceB[/trans]"]
     ]
 '
         );

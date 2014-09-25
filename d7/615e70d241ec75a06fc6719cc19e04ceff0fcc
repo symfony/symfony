@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-24T12:41:02Z
+
+this will help for the core, but not for other bundles as they will still need to support Symfony 2.3 LTS
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-24T12:48:35Z
+
+Given the few places where you changed the constraint validators to split adding violations, I suspect this is done to simplify the addition of violation codes.
+
+So :+1: once you fix the tests (there is a fatal error currently)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-24T13:26:11Z
+
+@stof In 2.3 we didn't have ConstraintViolationBuilders yet, so there's no point in adding it there.
+
+Yes, I split the code where I'm going to add error codes in 2.6. Doing the structural changes in 2.5 already, we facilitate merges from 2.5 to 2.6 when we change 2.5 in the future.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T10:27:01Z
+
+This is ready to merge from my side. The fabbot failures are due to fabbot bugs.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T11:31:11Z
+
+The remaining failing tests are due to #12034.

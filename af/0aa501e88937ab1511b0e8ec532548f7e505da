@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T09:02:57Z
+
+This implementation does not work as we need to introspect the custom handler definition, which we cannot as we are in the security bundle extension at this point without any access to externally defined services. The only option would be to move some code to a compiler pass.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T09:17:51Z
+
+I'm going to rewrite this PR with a different approach. Stay tuned.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2014-09-23T09:28:23Z
+
+@fabpot : This ties my previous suggestion and should cover all cases :+1:
+Thank you for spending some time on this issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T09:44:21Z
+
+@ogizanagi The new implementation I've just merged should work properly now and there is no ugly hacks/conventions anymore.
+
+There is one slight side-effect: as we are passing options and the provider key, you **must** not use the same custom handler in two different firewalls. It was not a problem in the current implementation as the handler was independent of the firewall, but that's not the case anymore. The documentation should mention this to avoid hard to debug problems.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T06:09:14Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-09-24T10:26:44Z
+
+Seems ok to me, not very symfonish as we usually don't call custom things custom_lala but just lala but BC is BC so I'd guess :+1:

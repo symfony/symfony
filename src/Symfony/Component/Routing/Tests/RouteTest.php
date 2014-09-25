@@ -204,7 +204,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testCondition()
     {
         $route = new Route('/');
-        $this->assertEquals(null, $route->getCondition());
+        $this->assertSame('', $route->getCondition());
         $route->setCondition('context.getMethod() == "GET"');
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
@@ -234,6 +234,20 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $serialized = serialize($route);
         $unserialized = unserialize($serialized);
 
+        $this->assertAttributeEmpty('compiled', $route);
+        $this->assertEquals($route, $unserialized);
+        $this->assertNotSame($route, $unserialized);
+    }
+
+    public function testSerializedWithCompiled()
+    {
+        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
+        $route->compile();
+
+        $serialized = serialize($route);
+        $unserialized = unserialize($serialized);
+
+        $this->assertAttributeNotEmpty('compiled', $route);
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
     }

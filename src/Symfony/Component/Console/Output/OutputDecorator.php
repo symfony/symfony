@@ -162,6 +162,16 @@ class OutputDecorator implements OutputInterface
     }
 
     /**
+     * Add newline(s)
+     *
+     * @param int $count The number of newlines
+     */
+    public function ln($count = 1)
+    {
+        $this->output->write(str_repeat(PHP_EOL, $count));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)

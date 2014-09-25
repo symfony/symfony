@@ -203,7 +203,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
 
     protected function getRequestHandler()
     {
-        return new NativeRequestHandler();
+        return new NativeRequestHandler($this->serverParams);
     }
 
     protected function getMockFile()

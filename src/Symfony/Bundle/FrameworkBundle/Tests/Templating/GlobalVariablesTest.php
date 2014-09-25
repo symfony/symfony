@@ -35,25 +35,55 @@ class GlobalVariablesTest extends TestCase
         $this->assertSame($securityContext, $this->globals->getSecurity());
     }
 
-    public function testGetUser()
+    public function testGetUserNoTokenStorage()
     {
-        // missing test cases to return null, only happy flow tested
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $this->assertNull($this->globals->getUser());
+    }
 
-        $this->container->set('security.token_storage', $securityContext);
+    public function testGetUserNoToken()
+    {
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $this->container->set('security.token_storage', $tokenStorage);
+        $this->assertNull($this->globals->getUser());
+    }
+
+    /**
+     * @dataProvider getUserProvider
+     */
+    public function testGetUser($user, $expectedUser)
+    {
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->container->set('security.token_storage', $tokenStorage);
 
         $token
             ->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
 
-        $securityContext
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $this->assertSame($user, $this->globals->getUser());
+        $this->assertSame($expectedUser, $this->globals->getUser());
+    }
+
+    public function getUserProvider()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $std = new \stdClass();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        return array(
+            array($user, $user),
+            array($std, $std),
+            array($token, $token),
+            array('Anon.', null),
+            array(null, null),
+            array(10, null),
+            array(true, null),
+        );
     }
 }

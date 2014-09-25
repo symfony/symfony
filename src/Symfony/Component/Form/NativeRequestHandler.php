@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Util\ServerParams;
 
 /**
  * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
@@ -20,6 +21,19 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class NativeRequestHandler implements RequestHandlerInterface
 {
+    /**
+     * @var ServerParams
+     */
+    private $serverParams;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(ServerParams $params = null)
+    {
+        $this->serverParams = $params ?: new ServerParams();
+    }
+
     /**
      * The allowed keys of the $_FILES array.
      *
@@ -62,6 +76,25 @@ class NativeRequestHandler implements RequestHandlerInterface
                 $data = $_GET[$name];
             }
         } else {
+            // Mark the form with an error if the uploaded size was too large
+            // This is done here and not in FormValidator because $_POST is
+            // empty when that error occurs. Hence the form is never submitted.
+            $contentLength = $this->serverParams->getContentLength();
+            $maxContentLength = $this->serverParams->getPostMaxSize();
+
+            if (!empty($maxContentLength) && $contentLength > $maxContentLength) {
+                // Submit the form, but don't clear the default values
+                $form->submit(null, false);
+
+                $form->addError(new FormError(
+                    $form->getConfig()->getOption('post_max_size_message'),
+                    null,
+                    array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
+                ));
+
+                return;
+            }
+
             $fixedFiles = array();
             foreach ($_FILES as $name => $file) {
                 $fixedFiles[$name] = self::stripEmptyFiles(self::fixPhpFilesArray($file));

@@ -56,8 +56,7 @@ class FormType extends BaseType
             ->setDataLocked($isDataOptionSet)
             ->setDataMapper($options['compound'] ? new PropertyPathMapper($this->propertyAccessor) : null)
             ->setMethod($options['method'])
-            ->setAction($options['action'])
-        ;
+            ->setAction($options['action']);
 
         if ($options['trim']) {
             $builder->addEventSubscriber(new TrimListener());
@@ -187,26 +186,27 @@ class FormType extends BaseType
         };
 
         $resolver->setDefaults(array(
-            'data_class'         => $dataClass,
-            'empty_data'         => $emptyData,
-            'trim'               => true,
-            'required'           => true,
-            'read_only'          => false,
-            'max_length'         => null,
-            'pattern'            => null,
-            'property_path'      => null,
-            'mapped'             => true,
-            'by_reference'       => true,
-            'error_bubbling'     => $errorBubbling,
-            'label_attr'         => array(),
-            'virtual'            => null,
-            'inherit_data'       => $inheritData,
-            'compound'           => true,
-            'method'             => 'POST',
+            'data_class'            => $dataClass,
+            'empty_data'            => $emptyData,
+            'trim'                  => true,
+            'required'              => true,
+            'read_only'             => false,
+            'max_length'            => null,
+            'pattern'               => null,
+            'property_path'         => null,
+            'mapped'                => true,
+            'by_reference'          => true,
+            'error_bubbling'        => $errorBubbling,
+            'label_attr'            => array(),
+            'virtual'               => null,
+            'inherit_data'          => $inheritData,
+            'compound'              => true,
+            'method'                => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
-            'action'             => '',
-            'attr'               => $defaultAttr,
+            'action'                => '',
+            'attr'                  => $defaultAttr,
+            'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
         $resolver->setAllowedTypes(array(

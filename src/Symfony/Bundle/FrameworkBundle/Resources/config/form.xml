@@ -151,11 +151,8 @@
         </service>
 
         <!-- FormTypeHttpFoundationExtension -->
-        <service id="form.server_params" class="Symfony\Component\Form\Util\ServerParams" public="false"/>
-
         <service id="form.type_extension.form.http_foundation" class="Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension">
             <tag name="form.type_extension" alias="form" />
-            <argument type="service" id="form.server_params"/>
         </service>
 
         <!-- FormTypeValidatorExtension -->

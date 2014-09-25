@@ -251,24 +251,7 @@ class Application
      */
     public function getHelp()
     {
-        $messages = array(
-            $this->getLongVersion(),
-            '',
-            '<comment>Usage:</comment>',
-            '  [options] command [arguments]',
-            '',
-            '<comment>Options:</comment>',
-        );
-
-        foreach ($this->getDefinition()->getOptions() as $option) {
-            $messages[] = sprintf('  %-29s %s %s',
-                '<info>--'.$option->getName().'</info>',
-                $option->getShortcut() ? '<info>-'.$option->getShortcut().'</info>' : '  ',
-                $option->getDescription()
-            );
-        }
-
-        return implode(PHP_EOL, $messages);
+        return $this->getLongVersion();
     }
 
     /**

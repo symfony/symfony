@@ -157,10 +157,34 @@ class TextDescriptor extends Descriptor
                 $this->writeText("\n");
             }
         } else {
-            $width = $this->getColumnWidth($description->getCommands());
+            if ('' != $help = $application->getHelp()) {
+                $this->writeText("$help\n\n", $options);
+            }
 
-            $this->writeText($application->getHelp(), $options);
-            $this->writeText("\n\n");
+            $this->writeText("<comment>Usage:</comment>\n", $options);
+            $this->writeText(" [options] command [arguments]\n\n", $options);
+            $this->writeText('<comment>Options:</comment>', $options);
+
+            $inputOptions = $application->getDefinition()->getOptions();
+
+            $width = 0;
+            foreach ($inputOptions as $option) {
+                $nameLength = strlen($option->getName()) + 2;
+                if ($option->getShortcut()) {
+                    $nameLength += strlen($option->getShortcut()) + 3;
+                }
+                $width = max($width, $nameLength);
+            }
+            ++$width;
+
+            foreach ($inputOptions as $option) {
+                $this->writeText("\n", $options);
+                $this->describeInputOption($option, array_merge($options, array('name_width' => $width)));
+            }
+
+            $this->writeText("\n\n", $options);
+
+            $width = $this->getColumnWidth($description->getCommands());
 
             if ($describedNamespace) {
                 $this->writeText(sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $describedNamespace), $options);
@@ -177,7 +201,7 @@ class TextDescriptor extends Descriptor
 
                 foreach ($namespace['commands'] as $name) {
                     $this->writeText("\n");
-                    $this->writeText(sprintf("  <info>%-${width}s</info> %s", $name, $description->getCommand($name)->getDescription()), $options);
+                    $this->writeText(sprintf(" <info>%-${width}s</info> %s", $name, $description->getCommand($name)->getDescription()), $options);
                 }
             }
 

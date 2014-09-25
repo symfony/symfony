@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T04:59:58Z
+
+Not sure we need this. So, I'm +0 on this one.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-28T02:20:44Z
+
+Any other opinions from @symfony/deciders?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-08-28T07:01:56Z
+
+I thought we already added a way to add docs to the validation a few releases ago? anyway, imho this is useful.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-08-28T07:02:02Z
+
+ie. +1
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-15T18:53:31Z
+
+@WouterJ What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T10:38:46Z
+
+So, I want to close/merge as many PRs as possible before 2.6. This one looks like a good candidate. @WouterJ Can you have a look at comments from @stof?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-09-23T14:44:08Z
+
+@fabpot of course, I was already working on it (after you last ping) but didn't finish it (as it seems). It's ready now
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T18:06:11Z
+
+:+1:

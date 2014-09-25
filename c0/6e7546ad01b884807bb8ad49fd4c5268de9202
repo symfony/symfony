@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2013-02-21T08:52:00Z
+
+In which case does this happen ?
+
+---------------------------------------------------------------------------
+
+by datibbaw at 2013-02-21T08:57:49Z
+
+@stof In my case, I would use it like this:
+
+````
+    switch ($request->getContentType()) {
+        case 'form':
+            // use custom parser for posted body
+        case 'json':
+            // use json_decode() for posted body
+    }
+```
+Currently it would return null.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2013-03-25T21:11:51Z
+
+It does not look like something that is widespread enough to be included into the code (and you can call `Request:: setFormat()` in your code, so there is no need to have it in code anyway).
+
+---------------------------------------------------------------------------
+
+by datibbaw at 2014-09-22T13:17:49Z
+
+This issue went under the radar for while. @fabpot Are you seriously claiming that the (arguably) most used POST Content-Type is not widespread enough?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T18:46:11Z
+
+hmm, this would indeed make sense for cases checking the content type of the request (it is indeed useless for ``$request->getFormat()`` as you won't use it for the response content-type.
+
+@fabpot I suggest reopening this PR
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T19:15:53Z
+
+:+1:

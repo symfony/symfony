@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-17T18:48:37Z
+
+Okay, I found how to fix the broken tests. I now just have to write new tests for my change.
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-09-17T18:57:55Z
+
+Btw @bschussek what do you think about this change ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2013-10-01T08:03:26Z
+
+Does it work just like this? Can you add a test case? We also need to check the performance implications. I think they shouldn't be too bad though, because expanded choice fields are not usually used for long choice lists.
+
+---------------------------------------------------------------------------
+
+by adrienbrault at 2013-10-03T22:57:54Z
+
+I've added a test.
+
+Tests are broken but it does not seem to come from my changes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T06:36:12Z
+
+@webmozart Looks like it's mergeable, no?

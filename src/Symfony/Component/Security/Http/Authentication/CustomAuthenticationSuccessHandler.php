@@ -34,7 +34,7 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
         if (method_exists($handler, 'setOptions')) {
             $this->handler->setOptions($options);
         }
-        if (method_exists($providerKey, 'setProviderKey')) {
+        if (method_exists($handler, 'setProviderKey')) {
             $this->handler->setProviderKey($providerKey);
         }
     }

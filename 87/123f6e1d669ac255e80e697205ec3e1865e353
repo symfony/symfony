@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-24T11:52:54Z
+
+IMO, instead of building a class with an ``assertNow`` method, it would be better to implement a PHPUnit constraint and then passing it to ``assertThat`` (``assertViolation`` could be kept as a shortcut for it btw).
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-24T12:10:59Z
+
+@stof `assertThat()` is usually not called directly, but through a facade method such as `assertEquals()`. The facade makes it impossible to use the builder pattern though.
+
+However, let's give better names to `assertViolation()` and `assertNow()`, if you have any suggestions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T14:23:12Z
+
+What about:
+
+```php
+$this->withViolation('invalid_message_key')
+            ->assertParameter('{{ value }}', 'foo')
+            ->assertParameter('{{ foo }}', 'bar')
+            ->assertInvalidValue('foo')
+            ->assertCode(Form::ERR_INVALID)
+            ->done();
+```
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T09:19:24Z
+
+I changed it to
+
+```php
+$this->buildViolation('invalid_message_key')
+    ->setParameter('{{ value }}', 'foo')
+    ->setParameter('{{ foo }}', 'bar')
+    ->setInvalidValue('foo')
+    ->setCode(Form::ERR_INVALID)
+    ->assertRaised();
+```
+
+This way the API is equivalent to the violation builder API. Also, "raise" is the proper verb to go with violations.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T09:20:38Z
+
+The fabbot issues are due to a bug in fabbot. Unless Travis fails, this is good to merge from my side.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-25T09:21:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T09:35:49Z
+
+:+1:

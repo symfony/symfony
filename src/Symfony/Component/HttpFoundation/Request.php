@@ -1823,6 +1823,7 @@ class Request
             'rdf'  => array('application/rdf+xml'),
             'atom' => array('application/atom+xml'),
             'rss'  => array('application/rss+xml'),
+            'form' => array('application/x-www-form-urlencoded'),
         );
     }
 

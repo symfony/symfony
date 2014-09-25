@@ -50,9 +50,9 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(null, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => 'null',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'null')
+            ->assertRaised();
     }
 
     public function testBlankIsInvalid()
@@ -63,9 +63,9 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('', $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '""',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '""')
+            ->assertRaised();
     }
 
     public function testFalseIsInvalid()
@@ -76,9 +76,9 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(false, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => 'false',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'false')
+            ->assertRaised();
     }
 
     public function testEmptyArrayIsInvalid()
@@ -89,8 +89,8 @@ class NotBlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(array(), $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => 'array',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'array')
+            ->assertRaised();
     }
 }

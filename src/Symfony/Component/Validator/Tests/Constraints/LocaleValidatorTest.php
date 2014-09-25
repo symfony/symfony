@@ -83,9 +83,9 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($locale, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$locale.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->assertRaised();
     }
 
     public function getInvalidLocales()

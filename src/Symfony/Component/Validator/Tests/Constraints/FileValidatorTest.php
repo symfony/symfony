@@ -162,12 +162,12 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ limit }}'   => $limitAsString,
-            '{{ size }}'    => $sizeAsString,
-            '{{ suffix }}'  => $suffix,
-            '{{ file }}'    => '"'.$this->path.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', $limitAsString)
+            ->setParameter('{{ size }}', $sizeAsString)
+            ->setParameter('{{ suffix }}', $suffix)
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->assertRaised();
     }
 
     public function provideMaxSizeNotExceededTests()
@@ -231,18 +231,15 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
             ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
-            ->getMock()
-        ;
+            ->getMock();
         $file
             ->expects($this->once())
             ->method('getPathname')
-            ->will($this->returnValue($this->path))
-        ;
+            ->will($this->returnValue($this->path));
         $file
             ->expects($this->once())
             ->method('getMimeType')
-            ->will($this->returnValue('image/jpg'))
-        ;
+            ->will($this->returnValue('image/jpg'));
 
         $constraint = new File(array(
             'mimeTypes' => array('image/png', 'image/jpg'),
@@ -258,18 +255,15 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
             ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
-            ->getMock()
-        ;
+            ->getMock();
         $file
             ->expects($this->once())
             ->method('getPathname')
-            ->will($this->returnValue($this->path))
-        ;
+            ->will($this->returnValue($this->path));
         $file
             ->expects($this->once())
             ->method('getMimeType')
-            ->will($this->returnValue('image/jpg'))
-        ;
+            ->will($this->returnValue('image/jpg'));
 
         $constraint = new File(array(
             'mimeTypes' => array('image/*'),
@@ -285,18 +279,15 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
             ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
-            ->getMock()
-        ;
+            ->getMock();
         $file
             ->expects($this->once())
             ->method('getPathname')
-            ->will($this->returnValue($this->path))
-        ;
+            ->will($this->returnValue($this->path));
         $file
             ->expects($this->once())
             ->method('getMimeType')
-            ->will($this->returnValue('application/pdf'))
-        ;
+            ->will($this->returnValue('application/pdf'));
 
         $constraint = new File(array(
             'mimeTypes' => array('image/png', 'image/jpg'),
@@ -305,11 +296,11 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($file, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ type }}'    => '"application/pdf"',
-            '{{ types }}'   => '"image/png", "image/jpg"',
-            '{{ file }}'    => '"'.$this->path.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ type }}', '"application/pdf"')
+            ->setParameter('{{ types }}', '"image/png", "image/jpg"')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->assertRaised();
     }
 
     public function testInvalidWildcardMimeType()
@@ -317,18 +308,15 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         $file = $this
             ->getMockBuilder('Symfony\Component\HttpFoundation\File\File')
             ->setConstructorArgs(array(__DIR__.'/Fixtures/foo'))
-            ->getMock()
-        ;
+            ->getMock();
         $file
             ->expects($this->once())
             ->method('getPathname')
-            ->will($this->returnValue($this->path))
-        ;
+            ->will($this->returnValue($this->path));
         $file
             ->expects($this->once())
             ->method('getMimeType')
-            ->will($this->returnValue('application/pdf'))
-        ;
+            ->will($this->returnValue('application/pdf'));
 
         $constraint = new File(array(
             'mimeTypes' => array('image/*', 'image/jpg'),
@@ -337,11 +325,11 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($file, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ type }}'    => '"application/pdf"',
-            '{{ types }}'   => '"image/*", "image/jpg"',
-            '{{ file }}'    => '"'.$this->path.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ type }}', '"application/pdf"')
+            ->setParameter('{{ types }}', '"image/*", "image/jpg"')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->assertRaised();
     }
 
     /**
@@ -358,7 +346,9 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($file, $constraint);
 
-        $this->assertViolation('myMessage', $params);
+        $this->buildViolation('myMessage')
+            ->setParameters($params)
+            ->assertRaised();
     }
 
     public function uploadedFileErrorProvider()

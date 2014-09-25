@@ -150,10 +150,12 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$value.'"',
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     /**
@@ -172,10 +174,12 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$value.'"',
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     /**
@@ -195,10 +199,12 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$value.'"',
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     public function testConstraintGetDefaultOption()

@@ -121,10 +121,12 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ count }}' => count($value),
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     /**
@@ -139,10 +141,12 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ count }}' => count($value),
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     /**
@@ -158,10 +162,12 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ count }}' => count($value),
-            '{{ limit }}' => 4,
-        ), 'property.path', $value, 4);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ count }}', count($value))
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->assertRaised();
     }
 
     public function testDefaultOption()

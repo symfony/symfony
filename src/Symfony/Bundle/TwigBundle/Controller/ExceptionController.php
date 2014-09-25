@@ -51,14 +51,35 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
+        $originalRequest = $request->attributes->get('original_request');
+
+        // allow the developer to see the real template with ?_real_template=1
+        $debug = $this->debug;
+        if ($debug && $originalRequest && $originalRequest->query->get('_real_template')) {
+            $debug = false;
+        }
+
+        // determine if we're able to show the link to view the true error template
+        $showErrorTemplateLink = false;
+        $errorTemplateParams = array();
+        if ($originalRequest && $originalRequest->isMethod('GET')) {
+            $showErrorTemplateLink = true;
+            $errorTemplateParams = array_merge(
+                $request->query->all(),
+                array('_real_template' => 1)
+            );
+        }
+
         return new Response($this->twig->render(
-            $this->findTemplate($request, $_format, $code, $this->debug),
+            $this->findTemplate($request, $_format, $code, $debug),
             array(
                 'status_code'    => $code,
                 'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
                 'exception'      => $exception,
                 'logger'         => $logger,
                 'currentContent' => $currentContent,
+                'showErrorTemplateLink' => $showErrorTemplateLink,
+                'errorTemplateParams'   => $errorTemplateParams,
             )
         ));
     }

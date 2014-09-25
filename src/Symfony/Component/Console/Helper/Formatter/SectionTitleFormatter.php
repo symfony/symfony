@@ -31,10 +31,10 @@ class SectionTitleFormatter implements FormatterInterface
      */
     public function format()
     {
-        return array(
+        return implode("\n", array(
             sprintf('<fg=blue>%s</fg=blue>', $this->title),
             sprintf('<fg=blue>%s</fg=blue>', str_repeat('-', strlen($this->title))),
             ''
-        );
+        ));
     }
 }

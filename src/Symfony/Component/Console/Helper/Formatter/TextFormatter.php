@@ -33,10 +33,10 @@ class TextFormatter implements FormatterInterface
      */
     public function format()
     {
-        return array_map(function ($value) {
+        return implode("\n", array_map(function ($value) {
                 return sprintf(' // %s', $value);
             },
             (array) $this->messages
-        );
+        ));
     }
 }

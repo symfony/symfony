@@ -71,7 +71,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($object, $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'object')
+            ->assertRaised();
     }
 
     public function testSucceedingExpressionAtPropertyLevel()
@@ -106,7 +108,10 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('2', $constraint);
 
-        $this->assertViolation('myMessage', array(), 'data');
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2"')
+            ->atPath('data')
+            ->assertRaised();
     }
 
     public function testSucceedingExpressionAtNestedPropertyLevel()
@@ -147,7 +152,10 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('2', $constraint);
 
-        $this->assertViolation('myMessage', array(), 'reference.data');
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2"')
+            ->atPath('reference.data')
+            ->assertRaised();
     }
 
     /**
@@ -184,6 +192,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('2', $constraint);
 
-        $this->assertViolation('myMessage', array(), '');
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2"')
+            ->atPath('')
+            ->assertRaised();
     }
 }

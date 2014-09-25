@@ -18,9 +18,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 /**
  * Validates that a card number belongs to a specified scheme.
  *
+ * @author Tim Nagel <t.nagel@infinite.net.au>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @see http://en.wikipedia.org/wiki/Bank_card_number
  * @see http://www.regular-expressions.info/creditcard.html
- * @author Tim Nagel <t.nagel@infinite.net.au>
  */
 class CardSchemeValidator extends ConstraintValidator
 {
@@ -113,9 +115,9 @@ class CardSchemeValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
 
             return;
         }
@@ -131,8 +133,8 @@ class CardSchemeValidator extends ConstraintValidator
             }
         }
 
-        $this->context->addViolation($constraint->message, array(
-            '{{ value }}' => $this->formatValue($value),
-        ));
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', $this->formatValue($value))
+            ->addViolation();
     }
 }

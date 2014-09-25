@@ -83,9 +83,9 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($uuid, $constraint);
 
-        $this->assertViolation('testMessage', array(
-            '{{ value }}' => $uuid,
-        ));
+        $this->buildViolation('testMessage')
+            ->setParameter('{{ value }}', '"'.$uuid.'"')
+            ->assertRaised();
     }
 
     public function getInvalidStrictUuids()
@@ -130,9 +130,9 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($uuid, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => $uuid,
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$uuid.'"')
+            ->assertRaised();
     }
 
     /**
@@ -177,9 +177,9 @@ class UuidValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($uuid, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => $uuid,
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$uuid.'"')
+            ->assertRaised();
     }
 
     public function getInvalidNonStrictUuids()

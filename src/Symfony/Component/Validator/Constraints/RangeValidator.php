@@ -34,27 +34,27 @@ class RangeValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value)) {
-            $this->context->addViolation($constraint->invalidMessage, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+            $this->buildViolation($constraint->invalidMessage)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
 
             return;
         }
 
         if (null !== $constraint->max && $value > $constraint->max) {
-            $this->context->addViolation($constraint->maxMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->max,
-            ));
+            $this->buildViolation($constraint->maxMessage)
+                ->setParameter('{{ value }}', $value)
+                ->setParameter('{{ limit }}', $constraint->max)
+                ->addViolation();
 
             return;
         }
 
         if (null !== $constraint->min && $value < $constraint->min) {
-            $this->context->addViolation($constraint->minMessage, array(
-                '{{ value }}' => $value,
-                '{{ limit }}' => $constraint->min,
-            ));
+            $this->buildViolation($constraint->minMessage)
+                ->setParameter('{{ value }}', $value)
+                ->setParameter('{{ limit }}', $constraint->min)
+                ->addViolation();
         }
     }
 }

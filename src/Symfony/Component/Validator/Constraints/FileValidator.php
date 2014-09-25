@@ -66,38 +66,46 @@ class FileValidator extends ConstraintValidator
                         $limitInBytes = UploadedFile::getMaxFilesize();
                     }
 
-                    $this->context->addViolation($constraint->uploadIniSizeErrorMessage, array(
-                        '{{ limit }}' => $limitInBytes,
-                        '{{ suffix }}' => 'bytes',
-                    ));
+                    $this->buildViolation($constraint->uploadIniSizeErrorMessage)
+                        ->setParameter('{{ limit }}', $limitInBytes)
+                        ->setParameter('{{ suffix }}', 'bytes')
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_FORM_SIZE:
-                    $this->context->addViolation($constraint->uploadFormSizeErrorMessage);
+                    $this->buildViolation($constraint->uploadFormSizeErrorMessage)
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_PARTIAL:
-                    $this->context->addViolation($constraint->uploadPartialErrorMessage);
+                    $this->buildViolation($constraint->uploadPartialErrorMessage)
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_FILE:
-                    $this->context->addViolation($constraint->uploadNoFileErrorMessage);
+                    $this->buildViolation($constraint->uploadNoFileErrorMessage)
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_TMP_DIR:
-                    $this->context->addViolation($constraint->uploadNoTmpDirErrorMessage);
+                    $this->buildViolation($constraint->uploadNoTmpDirErrorMessage)
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_CANT_WRITE:
-                    $this->context->addViolation($constraint->uploadCantWriteErrorMessage);
+                    $this->buildViolation($constraint->uploadCantWriteErrorMessage)
+                        ->addViolation();
 
                     return;
                 case UPLOAD_ERR_EXTENSION:
-                    $this->context->addViolation($constraint->uploadExtensionErrorMessage);
+                    $this->buildViolation($constraint->uploadExtensionErrorMessage)
+                        ->addViolation();
 
                     return;
                 default:
-                    $this->context->addViolation($constraint->uploadErrorMessage);
+                    $this->buildViolation($constraint->uploadErrorMessage)
+                        ->setCode($value->getError())
+                        ->addViolation();
 
                     return;
             }
@@ -110,17 +118,17 @@ class FileValidator extends ConstraintValidator
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
         if (!is_file($path)) {
-            $this->context->addViolation($constraint->notFoundMessage, array(
-                '{{ file }}' => $this->formatValue($path),
-            ));
+            $this->buildViolation($constraint->notFoundMessage)
+                ->setParameter('{{ file }}', $this->formatValue($path))
+                ->addViolation();
 
             return;
         }
 
         if (!is_readable($path)) {
-            $this->context->addViolation($constraint->notReadableMessage, array(
-                '{{ file }}' => $this->formatValue($path),
-            ));
+            $this->buildViolation($constraint->notReadableMessage)
+                ->setParameter('{{ file }}', $this->formatValue($path))
+                ->addViolation();
 
             return;
         }
@@ -161,12 +169,12 @@ class FileValidator extends ConstraintValidator
                     $sizeAsString = (string) round($sizeInBytes / $coef, 2);
                 }
 
-                $this->context->addViolation($constraint->maxSizeMessage, array(
-                    '{{ size }}' => $sizeAsString,
-                    '{{ limit }}' => $limitAsString,
-                    '{{ suffix }}' => self::$suffices[$coef],
-                    '{{ file }}' => $this->formatValue($path),
-                ));
+                $this->buildViolation($constraint->maxSizeMessage)
+                    ->setParameter('{{ file }}', $this->formatValue($path))
+                    ->setParameter('{{ size }}', $sizeAsString)
+                    ->setParameter('{{ limit }}', $limitAsString)
+                    ->setParameter('{{ suffix }}', self::$suffices[$coef])
+                    ->addViolation();
 
                 return;
             }
@@ -179,29 +187,24 @@ class FileValidator extends ConstraintValidator
 
             $mimeTypes = (array) $constraint->mimeTypes;
             $mime = $value->getMimeType();
-            $valid = false;
 
             foreach ($mimeTypes as $mimeType) {
                 if ($mimeType === $mime) {
-                    $valid = true;
-                    break;
+                    return;
                 }
 
                 if ($discrete = strstr($mimeType, '/*', true)) {
                     if (strstr($mime, '/', true) === $discrete) {
-                        $valid = true;
-                        break;
+                        return;
                     }
                 }
             }
 
-            if (false === $valid) {
-                $this->context->addViolation($constraint->mimeTypesMessage, array(
-                    '{{ type }}' => $this->formatValue($mime),
-                    '{{ types }}' => $this->formatValues($mimeTypes),
-                    '{{ file }}' => $this->formatValue($path),
-                ));
-            }
+            $this->buildViolation($constraint->mimeTypesMessage)
+                ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setParameter('{{ type }}', $this->formatValue($mime))
+                ->setParameter('{{ types }}', $this->formatValues($mimeTypes))
+                ->addViolation();
         }
     }
 

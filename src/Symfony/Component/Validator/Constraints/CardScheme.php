@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraint;
  *
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ *
+ * @author Tim Nagel <t.nagel@infinite.net.au>
  */
 class CardScheme extends Constraint
 {

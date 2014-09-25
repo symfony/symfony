@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * Validates whether the value is a valid UUID per RFC 4122.
  *
  * @author Colin O'Dell <colinodell@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see http://tools.ietf.org/html/rfc4122
  * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
@@ -64,19 +65,43 @@ class UuidValidator extends ConstraintValidator
         $value = (string) $value;
 
         if ($constraint->strict) {
+            $length = strlen($value);
+
+            if ($length < static::STRICT_UUID_LENGTH) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+
+                return;
+            }
+
+            if ($length > static::STRICT_UUID_LENGTH) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+
+                return;
+            }
+
             // Insert the allowed versions into the regular expression
             $pattern = sprintf(static::STRICT_PATTERN, implode('', $constraint->versions));
 
-            if (strlen($value) !== static::STRICT_UUID_LENGTH || !preg_match($pattern, $value)) {
-                $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+            if (!preg_match($pattern, $value)) {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
             }
-        } else {
-            // Trim any wrapping characters like [] or {} used by some legacy systems
-            $value = trim($value, '[]{}');
 
-            if (!preg_match(static::LOOSE_PATTERN, $value)) {
-                $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
-            }
+            return;
+        }
+
+        // Trim any wrapping characters like [] or {} used by some legacy systems
+        $value = trim($value, '[]{}');
+
+        if (!preg_match(static::LOOSE_PATTERN, $value)) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
         }
     }
 }

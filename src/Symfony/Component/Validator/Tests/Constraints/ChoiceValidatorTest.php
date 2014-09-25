@@ -161,6 +161,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
+            ->setInvalidValue('baz')
             ->assertRaised();
     }
 
@@ -274,6 +275,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
+            ->setInvalidValue('3')
             ->assertRaised();
     }
 }

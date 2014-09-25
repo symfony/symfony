@@ -64,7 +64,8 @@ class BlockFormatter implements FormatterInterface
         }
 
         foreach ($messages as &$message) {
-            $message = sprintf('<%s>%s</%s>', $this->style, str_pad($message, $this->padLength), $this->style);
+            $padding = $this->padLength - Helper::strlen($message);
+            $message = sprintf('<%s>%s</%s>', $this->style, $message.str_repeat(' ', $padding > 0 ? $padding : 0), $this->style);
         }
 
         return implode("\n", $messages);

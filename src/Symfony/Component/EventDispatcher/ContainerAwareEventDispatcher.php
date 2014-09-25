@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 /**
  * Lazily loads listeners and subscribers from the dependency injection
@@ -85,13 +86,17 @@ class ContainerAwareEventDispatcher extends EventDispatcher
      */
     public function removeListener($eventName, $listener)
     {
+        $introspect = ($this->container instanceof IntrospectableContainerInterface);
         if (isset($this->proxies[$eventName])) {
             foreach ($this->proxies[$eventName] as $serviceId => $methods) {
                 foreach ($methods as $method => $proxy) {
-                    if ($listener === array($this->container->get($serviceId), $method)) {
-                        unset($this->proxies[$eventName][$serviceId][$method]);
-                        parent::removeListener($eventName, $proxy);
-                        return;
+                    if (!$introspect || $this->container->initialized($serviceId)) {
+                        if ($listener === array($this->container->get($serviceId), $method)) {
+                            unset($this->proxies[$eventName][$serviceId][$method]);
+                            parent::removeListener($eventName, $proxy);
+
+                            return;
+                        }
                     }
                 }
             }

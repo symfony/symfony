@@ -42,16 +42,19 @@ class StyledBlockFormatter extends BlockFormatter
     {
         $messages = array_values((array) $this->messages);
         $prefix = $this->prefix;
+        $ret = array();
 
         $messages[0] = sprintf('[%s] %s', $this->type, $messages[0]);
 
-        $messages = array_map(function ($value) use ($prefix) {
-                return sprintf('%s%s', $prefix, $value);
-            },
-            $messages
-        );
+        foreach ($messages as $key => &$message) {
+            $ret[] = sprintf('%s%s', $prefix, $message);
 
-        $this->messages = $messages;
+            if (count($messages) > 1 && $key < count($message)) {
+                $ret[] = $prefix;
+            }
+        }
+
+        $this->messages = $ret;
 
         return array(
             parent::format(),

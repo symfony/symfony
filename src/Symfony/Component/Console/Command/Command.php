@@ -65,7 +65,7 @@ class Command
         $this->configure();
 
         if (!$this->name) {
-            throw new \LogicException('The command name cannot be empty.');
+            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
         }
     }
 
@@ -213,16 +213,6 @@ class Command
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
-        if (null !== $this->processTitle) {
-            if (function_exists('cli_set_process_title')) {
-                cli_set_process_title($this->processTitle);
-            } elseif (function_exists('setproctitle')) {
-                setproctitle($this->processTitle);
-            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
-                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
-            }
-        }
-
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis();
 
@@ -239,6 +229,16 @@ class Command
         }
 
         $this->initialize($input, $output);
+
+        if (null !== $this->processTitle) {
+            if (function_exists('cli_set_process_title')) {
+                cli_set_process_title($this->processTitle);
+            } elseif (function_exists('setproctitle')) {
+                setproctitle($this->processTitle);
+            } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
+                $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
+            }
+        }
 
         if ($input->isInteractive()) {
             $this->interact($input, $output);

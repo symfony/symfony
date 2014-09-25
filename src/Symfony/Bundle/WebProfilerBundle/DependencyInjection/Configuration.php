@@ -45,6 +45,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->booleanNode('intercept_redirects')->defaultFalse()->end()
+                ->scalarNode('excluded_ajax_paths')->defaultValue('^/bundles|^/_wdt')->end()
             ->end()
         ;
 

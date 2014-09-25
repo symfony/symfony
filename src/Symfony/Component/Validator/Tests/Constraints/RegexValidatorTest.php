@@ -82,9 +82,9 @@ class RegexValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$value.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->assertRaised();
     }
 
     public function getInvalidValues()

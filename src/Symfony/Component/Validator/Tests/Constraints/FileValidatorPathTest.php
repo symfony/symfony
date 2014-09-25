@@ -28,8 +28,8 @@ class FileValidatorPathTest extends FileValidatorTest
 
         $this->validator->validate('foobar', $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ file }}' => '"foobar"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ file }}', '"foobar"')
+            ->assertRaised();
     }
 }

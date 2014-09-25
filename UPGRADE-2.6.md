@@ -1,6 +1,55 @@
 ﻿UPGRADE FROM 2.5 to 2.6
 =======================
 
+Form
+----
+
+ * The "empty_value" option in the types "choice", "date", "datetime" and "time"
+   was deprecated and replaced by a new option "placeholder". You should use
+   the option "placeholder" together with the view variables "placeholder" and
+   "placeholder_in_choices" now.
+
+   The option "empty_value" and the view variables "empty_value" and
+   "empty_value_in_choices" will be removed in Symfony 3.0.
+
+   Before:
+
+   ```php
+   $form->add('category', 'choice', array(
+       'choices' => array('politics', 'media'),
+       'empty_value' => 'Select a category...',
+   ));
+   ```
+
+   After:
+
+   ```php
+   $form->add('category', 'choice', array(
+       'choices' => array('politics', 'media'),
+       'placeholder' => 'Select a category...',
+   ));
+   ```
+
+   Before:
+
+   ```
+   {{ form.vars.empty_value }}
+
+   {% if form.vars.empty_value_in_choices %}
+       ...
+   {% endif %}
+   ```
+
+   After:
+
+   ```
+   {{ form.vars.placeholder }}
+
+   {% if form.vars.placeholder_in_choices %}
+       ...
+   {% endif %}
+   ```
+
 Validator
 ---------
 
@@ -27,4 +76,28 @@ Validator
 
    ```
    value == null or (YOUR_EXPRESSION)
+   ```
+
+Security
+--------
+
+ * The `SecurityContextInterface` is marked as deprecated in favor of the 
+   `Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface` and 
+   `Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface`.
+   ```
+   isGranted  => AuthorizationCheckerInterface
+   getToken   => TokenStorageInterface
+   setToken   => TokenStorageInterface
+   ```
+   The Implementations have moved too, The `SecurityContext` is marked as 
+   deprecated and has been split to use the `AuthorizationCheckerInterface` 
+   and `TokenStorage`. This change is 100% Backwards Compatible as the SecurityContext 
+   delegates the methods.
+
+ * The service `security.context` is deprecated along with the above change. Recommended 
+   to use instead:
+   ```
+   @security.authorization_checker => isGranted()
+   @security.token_storage         => getToken()
+   @security.token_storage         => setToken()
    ```

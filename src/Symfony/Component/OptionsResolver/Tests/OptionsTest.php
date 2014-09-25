@@ -12,6 +12,7 @@
 namespace Symfony\Component\OptionsResolver\Tests;
 
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsConfig;
 
 class OptionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +24,389 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->options = new Options();
+    }
+
+    public function testResolve()
+    {
+        $defaults = array(
+            'one' => '1',
+            'two' => '2',
+        );
+
+        $options = array(
+            'two' => '20',
+        );
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'two' => '20',
+        ), Options::resolve($options, $defaults));
+    }
+
+    public function testResolveNumericOptions()
+    {
+        $defaults = array(
+            '1' => '1',
+            '2' => '2',
+        );
+
+        $options = array(
+            '2' => '20',
+        );
+
+        $this->assertEquals(array(
+            '1' => '1',
+            '2' => '20',
+        ), Options::resolve($options, $defaults));
+    }
+
+    public function testResolveLazy()
+    {
+        $defaults = new Options(array(
+            'one' => '1',
+            'two' => function (Options $options) {
+                return '20';
+            },
+        ));
+
+        $options = array();
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'two' => '20',
+        ), Options::resolve($options, $defaults));
+    }
+
+    public function testResolveConfig()
+    {
+        $config = new OptionsConfig();
+
+        $config->setDefaults(array(
+            'one' => '1',
+            'two' => '2',
+        ));
+
+        $options = array(
+            'two' => '20',
+        );
+
+        $this->assertEquals(array(
+            'one' => '1',
+            'two' => '20',
+        ), Options::resolve($options, $config));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testResolveFailsIfNonExistingOption()
+    {
+        $defaults = array(
+            'one' => '1',
+        );
+
+        $options = array(
+            'foo' => 'bar',
+        );
+
+        Options::resolve($options, $defaults);
+    }
+
+    public function testValidateNamesSucceedsIfValidOption()
+    {
+        $options = array(
+            'one' => '1',
+        );
+
+        Options::validateNames($options, 'one');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateNamesFailsIfNonExistingOption()
+    {
+        $options = array(
+            'foo' => 'bar',
+        );
+
+        Options::validateNames($options, 'one');
+    }
+
+    public function testValidateNamesSucceedsIfValidOptions()
+    {
+        $options = array(
+            'one' => '1',
+        );
+
+        Options::validateNames($options, array(
+            'one',
+            'two',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateNamesFailsIfNonExistingOptions()
+    {
+        $options = array(
+            'one' => '1',
+            'foo' => 'bar',
+        );
+
+        Options::validateNames($options, array(
+            'one',
+            'two',
+        ));
+    }
+
+    public function testValidateNamesSucceedsIfValidOptionsNamesAsKeys()
+    {
+        $options = array(
+            'one' => '1',
+        );
+
+        Options::validateNames($options, array(
+            'one' => null,
+            'two' => null,
+        ), true);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateNamesFailsIfNonExistingOptionsNamesAsKeys()
+    {
+        $options = array(
+            'one' => '1',
+            'foo' => 'bar',
+        );
+
+        Options::validateNames($options, array(
+            'one' => null,
+            'two' => null,
+        ), true);
+    }
+
+    public function testValidateRequiredSucceedsIfRequiredOptionPresent()
+    {
+        $options = array(
+            'one' => '10',
+        );
+
+        Options::validateRequired($options, 'one');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testValidateRequiredFailsIfMissingRequiredOption()
+    {
+        $options = array(
+            'two' => '20',
+        );
+
+        Options::validateRequired($options, 'one');
+    }
+
+    public function testValidateRequiredSucceedsIfRequiredOptionsPresent()
+    {
+        $options = array(
+            'one' => '10',
+            'two' => '20',
+        );
+
+        Options::validateRequired($options, array(
+            'one',
+            'two',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testValidateRequiredFailsIfMissingRequiredOptions()
+    {
+        $options = array(
+            'two' => '20',
+        );
+
+        Options::validateRequired($options, array(
+            'one',
+            'two',
+        ));
+    }
+
+    public function testValidateRequiredSucceedsIfRequiredOptionsPresentNamesAsKeys()
+    {
+        $options = array(
+            'one' => '10',
+            'two' => '20',
+        );
+
+        Options::validateRequired($options, array(
+            'one' => null,
+            'two' => null,
+        ), true);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     */
+    public function testValidateRequiredFailsIfMissingRequiredOptionsNamesAsKeys()
+    {
+        $options = array(
+            'two' => '20',
+        );
+
+        Options::validateRequired($options, array(
+            'one' => null,
+            'two' => null,
+        ), true);
+    }
+
+    public function testValidateTypesSucceedsIfValidType()
+    {
+        $options = array(
+            'one' => 'one',
+        );
+
+        Options::validateTypes($options, array(
+            'one' => 'string',
+        ));
+    }
+
+    public function testValidateTypesSucceedsIfValidTypePassArray()
+    {
+        $options = array(
+            'one' => 'one',
+        );
+
+        Options::validateTypes($options, array(
+            'one' => array('string', 'bool'),
+        ));
+    }
+
+    public function testValidateTypesSucceedsIfValidTypePassObject()
+    {
+        $object = new \stdClass();
+        $options = array(
+            'one' => $object,
+        );
+
+        Options::validateTypes($options, array(
+            'one' => 'object',
+        ));
+    }
+
+    public function testValidateTypesSucceedsIfValidTypePassClass()
+    {
+        $object = new \stdClass();
+        $options = array(
+            'one' => $object,
+        );
+
+        Options::validateTypes($options, array(
+            'one' => '\stdClass',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateTypesFailsIfInvalidType()
+    {
+        $options = array(
+            'one' => 1.23,
+        );
+
+        Options::validateTypes($options, array(
+            'one' => array('string', 'bool'),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateTypesFailsIfInvalidTypeMultipleOptions()
+    {
+        $options = array(
+            'one' => 'foo',
+            'two' => 1.23,
+        );
+
+        Options::validateTypes($options, array(
+            'one' => 'string',
+            'two' => 'bool',
+        ));
+    }
+
+    public function testValidateValuesSucceedsIfValidValue()
+    {
+        $options = array(
+            'one' => 'one',
+        );
+
+        Options::validateValues($options, array(
+            'one' => array('1', 'one'),
+        ));
+    }
+
+    public function testValidateValuesSucceedsIfValidValueMultipleOptions()
+    {
+        $options = array(
+            'one' => '1',
+            'two' => 'two',
+        );
+
+        Options::validateValues($options, array(
+            'one' => array('1', 'one'),
+            'two' => array('2', 'two'),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateValuesFailsIfInvalidValue()
+    {
+        $options = array(
+            'one' => '2',
+        );
+
+        Options::validateValues($options, array(
+            'one' => array('1', 'one'),
+        ));
+    }
+
+    public function testValidateValuesSucceedsIfValidValueCallback()
+    {
+        $options = array(
+            'test' => true,
+        );
+
+        Options::validateValues($options, array(
+            'test' => function ($value) {
+                return true;
+            },
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateValuesFailsIfInvalidValueCallback()
+    {
+        $options = array(
+            'test' => true,
+        );
+
+        Options::validateValues($options, array(
+            'test' => function ($value) {
+                return false;
+            },
+        ));
     }
 
     public function testArrayAccess()
@@ -91,11 +475,33 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetLazyOption()
     {
-        $test = $this;
-
-        $this->options->set('foo', function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) {
            return 'dynamic';
         });
+
+        $this->assertEquals('dynamic', $this->options->get('foo'));
+    }
+
+    public static function getLazyOptionStatic(Options $options)
+    {
+        return 'dynamic';
+    }
+
+    public function testSetLazyOptionToClassMethod()
+    {
+        $this->options->set('foo', array(__CLASS__, 'getLazyOptionStatic'));
+
+        $this->assertEquals('dynamic', $this->options->get('foo'));
+    }
+
+    public static function getLazyOption(Options $options)
+    {
+        return 'dynamic';
+    }
+
+    public function testSetLazyOptionToInstanceMethod()
+    {
+        $this->options->set('foo', array($this, 'getLazyOption'));
 
         $this->assertEquals('dynamic', $this->options->get('foo'));
     }

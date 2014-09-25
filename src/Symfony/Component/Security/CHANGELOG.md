@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added Symfony\Component\Security\Http\Authentication\AuthenticationUtils
+ * Deprecated the `SecurityContext` class in favor of the `AuthorizationChecker` and `TokenStorage` classes
 
 2.4.0
 -----

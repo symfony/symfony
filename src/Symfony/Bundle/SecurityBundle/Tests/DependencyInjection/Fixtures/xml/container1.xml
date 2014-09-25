@@ -54,6 +54,7 @@
             <anonymous />
             <switch-user />
             <x509 />
+            <remote-user />
             <logout />
             <remember-me key="TheyKey"/>
         </firewall>

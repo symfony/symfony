@@ -57,8 +57,8 @@ class ChoiceType extends AbstractType
 
             // Check if the choices already contain the empty value
             // Only add the empty value option if this is not the case
-            if (null !== $options['empty_value'] && 0 === count($options['choice_list']->getChoicesForValues(array('')))) {
-                $placeholderView = new ChoiceView(null, '', $options['empty_value']);
+            if (null !== $options['placeholder'] && 0 === count($options['choice_list']->getChoicesForValues(array('')))) {
+                $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved index
                 // see also ChoiceListInterface::getIndicesForChoices()
@@ -101,7 +101,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
             'choices'           => $options['choice_list']->getRemainingViews(),
             'separator'         => '-------------------',
-            'empty_value'       => null,
+            'placeholder'       => null,
         ));
 
         // The decision, whether a choice is selected, is potentially done
@@ -119,12 +119,16 @@ class ChoiceType extends AbstractType
         }
 
         // Check if the choices already contain the empty value
-        $view->vars['empty_value_in_choices'] = 0 !== count($options['choice_list']->getChoicesForValues(array('')));
+        $view->vars['placeholder_in_choices'] = 0 !== count($options['choice_list']->getChoicesForValues(array('')));
 
         // Only add the empty value option if this is not the case
-        if (null !== $options['empty_value'] && !$view->vars['empty_value_in_choices']) {
-            $view->vars['empty_value'] = $options['empty_value'];
+        if (null !== $options['placeholder'] && !$view->vars['placeholder_in_choices']) {
+            $view->vars['placeholder'] = $options['placeholder'];
         }
+
+        // BC
+        $view->vars['empty_value'] = $view->vars['placeholder'];
+        $view->vars['empty_value_in_choices'] = $view->vars['placeholder_in_choices'];
 
         if ($options['multiple'] && !$options['expanded']) {
             // Add "[]" to the name in case a select tag with multiple options is
@@ -187,20 +191,25 @@ class ChoiceType extends AbstractType
             return $options['required'] ? null : '';
         };
 
-        $emptyValueNormalizer = function (Options $options, $emptyValue) {
+        // for BC with the "empty_value" option
+        $placeholder = function (Options $options) {
+            return $options['empty_value'];
+        };
+
+        $placeholderNormalizer = function (Options $options, $placeholder) {
             if ($options['multiple']) {
                 // never use an empty value for this case
                 return;
-            } elseif (false === $emptyValue) {
+            } elseif (false === $placeholder) {
                 // an empty value should be added but the user decided otherwise
                 return;
-            } elseif ($options['expanded'] && '' === $emptyValue) {
+            } elseif ($options['expanded'] && '' === $placeholder) {
                 // never use an empty label for radio buttons
                 return 'None';
             }
 
             // empty value has been set explicitly
-            return $emptyValue;
+            return $placeholder;
         };
 
         $compound = function (Options $options) {
@@ -214,7 +223,8 @@ class ChoiceType extends AbstractType
             'choices'           => array(),
             'preferred_choices' => array(),
             'empty_data'        => $emptyData,
-            'empty_value'       => $emptyValue,
+            'empty_value'       => $emptyValue, // deprecated
+            'placeholder'       => $placeholder,
             'error_bubbling'    => false,
             'compound'          => $compound,
             // The view data is always a string, even if the "data" option
@@ -224,7 +234,8 @@ class ChoiceType extends AbstractType
         ));
 
         $resolver->setNormalizers(array(
-            'empty_value' => $emptyValueNormalizer,
+            'empty_value' => $placeholderNormalizer,
+            'placeholder' => $placeholderNormalizer,
         ));
 
         $resolver->setAllowedTypes(array(
@@ -258,6 +269,7 @@ class ChoiceType extends AbstractType
                     'value' => $choiceView->value,
                     'label' => $choiceView->label,
                     'translation_domain' => $options['translation_domain'],
+                    'block_name' => 'entry',
                 );
 
                 if ($options['multiple']) {

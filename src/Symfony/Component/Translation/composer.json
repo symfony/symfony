@@ -21,11 +21,13 @@
     "require-dev": {
         "symfony/config": "~2.0",
         "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.2"
+        "symfony/yaml": "~2.2",
+        "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/config": "",
-        "symfony/yaml": ""
+        "symfony/yaml": "",
+        "psr/log": "To use logging capability in translator"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Translation\\": "" }

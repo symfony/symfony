@@ -22,7 +22,7 @@ use Symfony\Component\Config\ConfigCache;
  *
  * @api
  */
-class Translator implements TranslatorInterface
+class Translator implements TranslatorInterface, TranslatorBagInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -254,6 +254,22 @@ class Translator implements TranslatorInterface
         }
 
         return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCatalogue($locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        return $this->catalogues[$locale];
     }
 
     /**

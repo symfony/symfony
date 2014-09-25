@@ -147,16 +147,12 @@ class YamlDumper extends Dumper
             }
         }
 
-        if ($callable = $definition->getConfigurator()) {
-            if (is_array($callable)) {
-                if ($callable[0] instanceof Reference) {
-                    $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
-                } else {
-                    $callable = array($callable[0], $callable[1]);
-                }
-            }
+        if ($callable = $definition->getFactory()) {
+            $code .= sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+        }
 
-            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($callable, 0));
+        if ($callable = $definition->getConfigurator()) {
+            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
         }
 
         return $code;
@@ -220,6 +216,26 @@ class YamlDumper extends Dumper
         $parameters = $this->prepareParameters($this->container->getParameterBag()->all(), $this->container->isFrozen());
 
         return $this->dumper->dump(array('parameters' => $parameters), 2);
+    }
+
+    /**
+     * Dumps callable to YAML format
+     *
+     * @param callable $callable
+     *
+     * @return callable
+     */
+    private function dumpCallable($callable)
+    {
+        if (is_array($callable)) {
+            if ($callable[0] instanceof Reference) {
+                $callable = array($this->getServiceCall((string) $callable[0], $callable[0]), $callable[1]);
+            } else {
+                $callable = array($callable[0], $callable[1]);
+            }
+        }
+
+        return $callable;
     }
 
     /**

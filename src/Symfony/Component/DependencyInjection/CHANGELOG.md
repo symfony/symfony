@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added new factory syntax and deprecated the old one
+
 2.5.0
 -----
 

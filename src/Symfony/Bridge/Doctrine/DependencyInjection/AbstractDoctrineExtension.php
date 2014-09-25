@@ -397,6 +397,33 @@ abstract class AbstractDoctrineExtension extends Extension
     }
 
     /**
+     * Returns a modified version of $managerConfigs.
+     * The manager called $autoMappedManager will map all bundles that are not mepped by other managers.
+     * @param array $managerConfigs
+     * @param array $bundles
+     * @return array The modified version of $managerConfigs.
+     */
+    protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)
+    {
+        if ($autoMappedManager = $this->validateAutoMapping($managerConfigs)) {
+            foreach (array_keys($bundles) as $bundle) {
+                foreach ($managerConfigs as $manager) {
+                    if (isset($manager['mappings'][$bundle])) {
+                        continue 2;
+                    }
+                }
+                $managerConfigs[$autoMappedManager]['mappings'][$bundle] = array(
+                    'mapping'   => true,
+                    'is_bundle' => true,
+                );
+            }
+            $managerConfigs[$autoMappedManager]['auto_mapping'] = false;
+        }
+
+        return $managerConfigs;
+    }
+
+    /**
      * Prefixes the relative dependency injection container path with the object manager prefix.
      *
      * @example $name is 'entity_manager' then the result would be 'doctrine.orm.entity_manager'
@@ -429,4 +456,31 @@ abstract class AbstractDoctrineExtension extends Extension
      * @return string
      */
     abstract protected function getMappingResourceExtension();
+
+    /**
+     * Search for a manager that is declared as 'auto_mapping' = true.
+     *
+     * @param array $managerConfigs
+     *
+     * @return null|string The name of the manager. If no one manager is found, returns null
+     *
+     * @throws \LogicException
+     */
+    private function validateAutoMapping(array $managerConfigs)
+    {
+        $autoMappedManager = null;
+        foreach ($managerConfigs as $name => $manager) {
+            if (!$manager['auto_mapping']) {
+                continue;
+            }
+
+            if (null !== $autoMappedManager) {
+                throw new \LogicException(sprintf('You cannot enable "auto_mapping" on more than one manager at the same time (found in "%s" and %s").', $autoMappedManager, $name));
+            }
+
+            $autoMappedManager = $name;
+        }
+
+        return $autoMappedManager;
+    }
 }

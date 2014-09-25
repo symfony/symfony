@@ -612,13 +612,13 @@
 
     Before:
 
-    ```html
+    ```php
     <?php echo $view['form']->renderBlock('widget_attributes') ?>
     ```
 
     After:
 
-    ```html
+    ```php
     <?php echo $view['form']->block($form, 'widget_attributes') ?>
     ```
 

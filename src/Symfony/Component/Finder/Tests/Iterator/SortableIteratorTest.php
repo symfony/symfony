@@ -120,10 +120,10 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'test.py',
                 'foo',
                 'toto',
-                'foo bar'
+                'foo bar',
             ),
             // This file was accessed after sleeping for 1 sec
-            array('.bar')
+            array('.bar'),
         );
 
         $sortByChangedTime = array(
@@ -136,10 +136,10 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
-                'foo bar'
+                'foo bar',
             ),
             array('test.php'),
-            array('test.py')
+            array('test.py'),
         );
 
         $sortByModifiedTime = array(
@@ -152,10 +152,10 @@ class SortableIteratorTest extends RealIteratorTestCase
                 'foo',
                 'foo/bar.tmp',
                 'toto',
-                'foo bar'
+                'foo bar',
             ),
             array('test.php'),
-            array('test.py')
+            array('test.py'),
         );
 
         return array(

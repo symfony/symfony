@@ -55,9 +55,9 @@ class SortableIteratorTest extends RealIteratorTestCase
         $iterator = new SortableIterator($inner, $mode);
 
         if (!is_callable($mode) &&
-                ($mode == SortableIterator::SORT_BY_ACCESSED_TIME
-                || $mode == SortableIterator::SORT_BY_CHANGED_TIME
-                || $mode == SortableIterator::SORT_BY_MODIFIED_TIME)) {
+            ($mode === SortableIterator::SORT_BY_ACCESSED_TIME
+            || $mode === SortableIterator::SORT_BY_CHANGED_TIME
+            || $mode === SortableIterator::SORT_BY_MODIFIED_TIME)) {
             $this->assertOrderedIteratorForGroups($expected, $iterator);
         } else {
             $this->assertOrderedIterator($expected, $iterator);
@@ -66,7 +66,6 @@ class SortableIteratorTest extends RealIteratorTestCase
 
     public function getAcceptData()
     {
-
         $sortByName = array(
             '.bar',
             '.foo',

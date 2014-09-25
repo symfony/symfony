@@ -668,6 +668,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         return $this;
     }
 
+    public function setMapTo($propertyPath){
+        return $this->setPropertyPath($propertyPath);
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -40,7 +40,7 @@ abstract class MergeCollectionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $propertyPath = $propertyPath ?: $name;
 
-        return $this->getBuilder($name)->setAttribute('property_path', $propertyPath)->getForm();
+        return $this->getBuilder($name)->setAttribute('map_to', $propertyPath)->getForm();
     }
 
     protected function getMockForm()

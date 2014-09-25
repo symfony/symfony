@@ -34,6 +34,12 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     protected $httpUtils;
     protected $logger;
     protected $options;
+    protected $defaultOptions = array(
+        'failure_path'           => null,
+        'failure_forward'        => false,
+        'login_path'             => '/login',
+        'failure_path_parameter' => '_failure_path',
+    );
 
     /**
      * Constructor.
@@ -43,18 +49,32 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
      * @param array               $options    Options for processing a failed authentication attempt.
      * @param LoggerInterface     $logger     Optional logger
      */
-    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null)
+    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options = array(), LoggerInterface $logger = null)
     {
         $this->httpKernel = $httpKernel;
-        $this->httpUtils  = $httpUtils;
-        $this->logger     = $logger;
+        $this->httpUtils = $httpUtils;
+        $this->logger = $logger;
+        $this->setOptions($options);
+    }
 
-        $this->options = array_merge(array(
-            'failure_path'           => null,
-            'failure_forward'        => false,
-            'login_path'             => '/login',
-            'failure_path_parameter' => '_failure_path',
-        ), $options);
+    /**
+     * Gets the options.
+     *
+     * @return array An array of options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Sets the options.
+     *
+     * @param array $options An array of options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->defaultOptions, $options);
     }
 
     /**

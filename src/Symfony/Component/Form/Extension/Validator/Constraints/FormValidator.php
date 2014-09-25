@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Extension\Validator\Util\ServerParams;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -23,22 +22,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FormValidator extends ConstraintValidator
 {
-    /**
-     * @var ServerParams
-     */
-    private $serverParams;
-
-    /**
-     * Creates a validator with the given server parameters.
-     *
-     * @param ServerParams $params The server parameters. Default
-     *                             parameters are created if null.
-     */
-    public function __construct(ServerParams $params = null)
-    {
-        $this->serverParams = $params ?: new ServerParams();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -149,29 +132,6 @@ class FormValidator extends ConstraintValidator
                     array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),
                     $form->getExtraData()
                 );
-            }
-        }
-
-        // Mark the form with an error if the uploaded size was too large
-        $length = $this->serverParams->getContentLength();
-
-        if ($form->isRoot() && null !== $length) {
-            $max = $this->serverParams->getPostMaxSize();
-
-            if (!empty($max) && $length > $max) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($config->getOption('post_max_size_message'))
-                        ->setParameter('{{ max }}', $this->serverParams->getNormalizedIniPostMaxSize())
-                        ->setInvalidValue($length)
-                        ->addViolation();
-                } else {
-                    // 2.4 API
-                    $this->context->addViolation(
-                        $config->getOption('post_max_size_message'),
-                        array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize()),
-                        $length
-                    );
-                }
             }
         }
     }

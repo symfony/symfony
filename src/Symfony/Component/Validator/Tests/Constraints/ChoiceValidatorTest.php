@@ -144,9 +144,9 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('baz', $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"baz"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"baz"')
+            ->assertRaised();
     }
 
     public function testInvalidChoiceMultiple()
@@ -159,9 +159,9 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(array('foo', 'baz'), $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"baz"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"baz"')
+            ->assertRaised();
     }
 
     public function testTooFewChoices()
@@ -179,9 +179,11 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ limit }}' => 2,
-        ), 'property.path', $value, 2);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', 2)
+            ->setInvalidValue($value)
+            ->setPlural(2)
+            ->assertRaised();
     }
 
     public function testTooManyChoices()
@@ -199,9 +201,11 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ limit }}' => 2,
-        ), 'property.path', $value, 2);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', 2)
+            ->setInvalidValue($value)
+            ->setPlural(2)
+            ->assertRaised();
     }
 
     public function testNonStrict()
@@ -239,9 +243,9 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate('2', $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"2"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"2"')
+            ->assertRaised();
     }
 
     public function testNonStrictWithMultipleChoices()
@@ -268,8 +272,8 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(array(2, '3'), $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"3"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"3"')
+            ->assertRaised();
     }
 }

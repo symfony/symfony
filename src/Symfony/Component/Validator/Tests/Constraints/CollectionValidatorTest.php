@@ -142,9 +142,11 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'extraFieldsMessage' => 'myMessage',
         )));
 
-        $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"baz"',
-        ), 'property.path[baz]', 6);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"baz"')
+            ->atPath('property.path[baz]')
+            ->setInvalidValue(6)
+            ->assertRaised();
     }
 
     // bug fix
@@ -201,9 +203,11 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'missingFieldsMessage' => 'myMessage',
         )));
 
-        $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"foo"',
-        ), 'property.path[foo]', null);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"foo"')
+            ->atPath('property.path[foo]')
+            ->setInvalidValue(null)
+            ->assertRaised();
     }
 
     public function testMissingFieldsAllowed()
@@ -311,9 +315,11 @@ abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
             'missingFieldsMessage' => 'myMessage',
         )));
 
-        $this->assertViolation('myMessage', array(
-            '{{ field }}' => '"foo"',
-        ), 'property.path[foo]', null);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"foo"')
+            ->atPath('property.path[foo]')
+            ->setInvalidValue(null)
+            ->assertRaised();
     }
 
     public function testRequiredFieldSingleConstraint()

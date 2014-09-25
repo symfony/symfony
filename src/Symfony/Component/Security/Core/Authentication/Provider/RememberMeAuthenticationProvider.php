@@ -50,7 +50,7 @@ class RememberMeAuthenticationProvider implements AuthenticationProviderInterfac
         }
 
         $user = $token->getUser();
-        $this->userChecker->checkPostAuth($user);
+        $this->userChecker->checkPreAuth($user);
 
         $authenticatedToken = new RememberMeToken($user, $this->providerKey, $this->key);
         $authenticatedToken->setAttributes($token->getAttributes());

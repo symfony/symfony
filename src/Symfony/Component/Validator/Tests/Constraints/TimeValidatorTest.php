@@ -86,9 +86,9 @@ class TimeValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($time, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$time.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$time.'"')
+            ->assertRaised();
     }
 
     public function getInvalidTimes()

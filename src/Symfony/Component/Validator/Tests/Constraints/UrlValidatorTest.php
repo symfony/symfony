@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\UrlValidator;
-use Symfony\Component\Validator\Validation;
 
 class UrlValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -119,9 +118,9 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($url, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$url.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$url.'"')
+            ->assertRaised();
     }
 
     public function getInvalidUrls()

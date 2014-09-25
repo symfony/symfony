@@ -46,10 +46,9 @@ class BlankValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($value, $constraint);
 
-        $this->assertViolation(
-            'myMessage',
-            array('{{ value }}' => $valueAsString)
-        );
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $valueAsString)
+            ->assertRaised();
     }
 
     public function getInvalidValues()

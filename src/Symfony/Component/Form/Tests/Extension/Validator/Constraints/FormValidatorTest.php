@@ -219,10 +219,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $this->assertViolation('invalid_message_key', array(
-            '{{ value }}' => 'foo',
-            '{{ foo }}' => 'bar',
-        ), 'property.path', 'foo', null, Form::ERR_INVALID);
+        $this->buildViolation('invalid_message_key')
+            ->setParameter('{{ value }}', 'foo')
+            ->setParameter('{{ foo }}', 'bar')
+            ->setInvalidValue('foo')
+            ->setCode(Form::ERR_INVALID)
+            ->assertRaised();
     }
 
     public function testAddInvalidErrorEvenIfNoValidationGroups()
@@ -251,10 +253,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $this->assertViolation('invalid_message_key', array(
-            '{{ value }}' => 'foo',
-            '{{ foo }}' => 'bar',
-        ), 'property.path', 'foo', null, Form::ERR_INVALID);
+        $this->buildViolation('invalid_message_key')
+            ->setParameter('{{ value }}', 'foo')
+            ->setParameter('{{ foo }}', 'bar')
+            ->setInvalidValue('foo')
+            ->setCode(Form::ERR_INVALID)
+            ->assertRaised();
     }
 
     public function testDontValidateConstraintsIfNotSynchronized()
@@ -283,9 +287,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $this->assertViolation('invalid_message_key', array(
-            '{{ value }}' => 'foo',
-        ), 'property.path','foo', null, Form::ERR_INVALID);
+        $this->buildViolation('invalid_message_key')
+            ->setParameter('{{ value }}', 'foo')
+            ->setInvalidValue('foo')
+            ->setCode(Form::ERR_INVALID)
+            ->assertRaised();
     }
 
     // https://github.com/symfony/symfony/issues/4359
@@ -537,9 +543,10 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $this->assertViolation('Extra!', array(
-            '{{ extra_fields }}' => 'foo',
-        ), 'property.path', array('foo' => 'bar'));
+        $this->buildViolation('Extra!')
+            ->setParameter('{{ extra_fields }}', 'foo')
+            ->setInvalidValue(array('foo' => 'bar'))
+            ->assertRaised();
     }
 
     /**

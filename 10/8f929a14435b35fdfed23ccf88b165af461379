@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-18T15:48:46Z
+
+why not just overwriting ``getExtension()`` ?
+
+---------------------------------------------------------------------------
+
+by pyrech at 2014-09-18T16:00:54Z
+
+Because `getContainerExtension` also checks that the alias is ok, throws an exception if not, and store the exception in a property. IMO I thought that it's simpler to have a new method if you just want to move the extension namespace...
+
+---------------------------------------------------------------------------
+
+by mmoreram at 2014-09-18T16:36:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T06:54:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by ikwattro at 2014-09-24T08:23:17Z
+
+:+1: thanks for having insights from my article @pyrech
+
+---------------------------------------------------------------------------
+
+by pyrech at 2014-09-24T14:02:11Z
+
+I changed the `Bundle#getContainerExtensionClass()` method's signature. I don't think Travis errors come from this change.

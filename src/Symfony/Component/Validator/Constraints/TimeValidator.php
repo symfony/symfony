@@ -22,8 +22,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class TimeValidator extends ConstraintValidator
 {
-    const PATTERN = '/^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
-
     /**
      * {@inheritdoc}
      */
@@ -43,10 +41,35 @@ class TimeValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value)) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+        $pattern = $this->getPattern($constraint->withMinutes, $constraint->withSeconds);
+
+        if (!preg_match($pattern, $value)) {
+            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
         }
+    }
+
+    /**
+     * Returns the regex pattern for validating
+     *
+     * @param bool    $withMinutes
+     * @param bool    $withSeconds
+     * @return string
+     */
+    protected function getPattern($withMinutes, $withSeconds)
+    {
+        // pattern for hours
+        $pattern = "(0?[0-9]|1[0-9]|2[0-3])";
+
+        if ($withMinutes) {
+            // pattern for minutes
+            $pattern .= "(:([0-5][0-9]))";
+
+            if ($withSeconds) {
+                // because the pattern for seconds is the same as that for minutes, we repeat it twice
+                $pattern .= "{2}";
+            }
+        }
+
+        return "/^".$pattern."$/";
     }
 }

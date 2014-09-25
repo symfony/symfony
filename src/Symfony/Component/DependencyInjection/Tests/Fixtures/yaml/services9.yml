@@ -38,7 +38,7 @@ services:
             - [setBar, ['@?foo2']]
             - [setBar, ['@?foo3']]
             - [setBar, ['@?foobaz']]
-            - [setBar, ['@=service("foo").foo() ~ parameter("foo")']]
+            - [setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")']]
 
     factory_service:
         class: Bar

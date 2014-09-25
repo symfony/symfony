@@ -17,6 +17,7 @@
             <argument type="service" id="logger" on-invalid="null" />
             <argument /><!-- Log levels map for enabled error levels -->
             <argument>%kernel.debug%</argument>
+            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
         </service>
 
         <service id="debug.stopwatch" class="%debug.stopwatch.class%" />

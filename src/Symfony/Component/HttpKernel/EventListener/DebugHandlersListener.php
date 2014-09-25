@@ -34,13 +34,15 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param LoggerInterface|null $logger           A PSR-3 logger
      * @param array|int            $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param bool                 $debug            Enables/disables debug mode
+     * @param string               $fileLinkFormat   The format for links to source files
      */
-    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $debug = true)
+    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $debug = true, $fileLinkFormat = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
         $this->levels = $levels;
         $this->debug = $debug;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
     public function configure()
@@ -76,6 +78,7 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
             if ($handler instanceof ExceptionHandler) {
                 $handler->setHandler($this->exceptionHandler);
+                $handler->setFileLinkFormat($this->fileLinkFormat);
             }
             $this->exceptionHandler = null;
         }

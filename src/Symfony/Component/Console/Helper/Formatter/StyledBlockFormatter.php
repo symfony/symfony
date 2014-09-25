@@ -56,9 +56,6 @@ class StyledBlockFormatter extends BlockFormatter
 
         $this->messages = $ret;
 
-        return array(
-            parent::format(),
-            ''
-        );
+        return parent::format() . "\n";
     }
 }

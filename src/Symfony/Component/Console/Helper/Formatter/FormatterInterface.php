@@ -17,7 +17,7 @@ namespace Symfony\Component\Console\Helper\Formatter;
 interface FormatterInterface
 {
     /**
-     * @return array|string
+     * @return string
      */
     public function format();
 }

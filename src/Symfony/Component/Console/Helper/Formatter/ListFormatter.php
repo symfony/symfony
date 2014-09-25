@@ -33,13 +33,12 @@ class ListFormatter implements FormatterInterface
      */
     public function format()
     {
-        $ret = array();
+        $messages = array_map(function ($message) {
+                return sprintf(' * %s', $message);
+            },
+            $this->messages
+        );
 
-        foreach ((array) $this->messages as $message) {
-            $ret[] = sprintf(' * %s', $message);
-            $ret[] = '';
-        }
-
-        return $ret;
+        return implode("\n\n", $messages) . "\n";
     }
 }

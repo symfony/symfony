@@ -139,6 +139,18 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Formats an warning result bar
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatWarningResultBar($messages)
+    {
+        return $this->format(new StyledBlockFormatter($messages, 'WARNING', 'fg=black;bg=yellow'));
+    }
+
+    /**
      * Formats a note admonition
      *
      * @param string|array $messages

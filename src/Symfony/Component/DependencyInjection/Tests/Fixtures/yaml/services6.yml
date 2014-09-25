@@ -15,7 +15,7 @@ services:
         calls:
             - [ setBar, [] ]
             - [ setBar ]
-            - [ setBar, ['@=service("foo").foo() ~ parameter("foo")'] ]
+            - [ setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'] ]
     method_call2:
         class: FooClass
         calls:

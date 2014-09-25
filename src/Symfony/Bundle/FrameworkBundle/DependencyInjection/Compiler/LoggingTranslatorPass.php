@@ -21,7 +21,7 @@ class LoggingTranslatorPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasAlias('logger')) {
+        if (!$container->hasAlias('logger') || !$container->hasAlias('translator')) {
             return;
         }
 

@@ -23,7 +23,7 @@ class LoggingTranslatorPassTest extends \PHPUnit_Framework_TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $parameterBag = $this->getMock('Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface');
 
-        $container->expects($this->once())
+        $container->expects($this->exactly(2))
             ->method('hasAlias')
             ->will($this->returnValue(true));
 
@@ -59,6 +59,21 @@ class LoggingTranslatorPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
+            ->method('hasAlias')
+            ->will($this->returnValue(false));
+
+        $pass = new LoggingTranslatorPass();
+        $pass->process($container);
+    }
+
+    public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container->expects($this->at(0))
+            ->method('hasAlias')
+            ->will($this->returnValue(true));
+
+        $container->expects($this->at(0))
             ->method('hasAlias')
             ->will($this->returnValue(false));
 

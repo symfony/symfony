@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Console\Helper;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Formatter\BlockFormatter;
+use Symfony\Component\Console\Helper\Formatter\FormatterInterface;
+use Symfony\Component\Console\Helper\Formatter\ListElementFormatter;
+use Symfony\Component\Console\Helper\Formatter\SectionFormatter;
+use Symfony\Component\Console\Helper\Formatter\SectionTitleFormatter;
+use Symfony\Component\Console\Helper\Formatter\StyledBlockFormatter;
+use Symfony\Component\Console\Helper\Formatter\TextFormatter;
+use Symfony\Component\Console\Helper\Formatter\TitleFormatter;
 
 /**
  * The Formatter class provides helpers to format messages.
@@ -20,6 +27,16 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
  */
 class FormatterHelper extends Helper
 {
+    /**
+     * @param FormatterInterface $formatter
+     *
+     * @return array|string
+     */
+    public function format(FormatterInterface $formatter)
+    {
+        return $formatter->format();
+    }
+
     /**
      * Formats a message within a section.
      *
@@ -31,7 +48,7 @@ class FormatterHelper extends Helper
      */
     public function formatSection($section, $message, $style = 'info')
     {
-        return sprintf('<%s>[%s]</%s> %s', $style, $section, $style, $message);
+        return $this->format(new SectionFormatter($section, $message, $style));
     }
 
     /**
@@ -40,37 +57,13 @@ class FormatterHelper extends Helper
      * @param string|array $messages  The message to write in the block
      * @param string       $style     The style to apply to the whole block
      * @param bool         $large     Whether to return a large block
-     * @param int          $padLength ength to pad the messages
+     * @param int          $padLength Length to pad the messages
      *
      * @return string The formatter message
      */
     public function formatBlock($messages, $style, $large = false, $padLength = 0)
     {
-        if (!is_array($messages)) {
-            $messages = array($messages);
-        }
-
-        $len = 0;
-        $lines = array();
-        foreach ($messages as $message) {
-            $message = OutputFormatter::escape($message);
-            $lines[] = sprintf($large ? '  %s  ' : ' %s ', $message);
-            $len = max($this->strlen($message) + ($large ? 4 : 2), $len);
-        }
-
-        $messages = $large ? array(str_repeat(' ', $len)) : array();
-        for ($i = 0; isset($lines[$i]); ++$i) {
-            $messages[] = $lines[$i].str_repeat(' ', $len - $this->strlen($lines[$i]));
-        }
-        if ($large) {
-            $messages[] = str_repeat(' ', $len);
-        }
-
-        for ($i = 0; isset($messages[$i]); ++$i) {
-            $messages[$i] = sprintf('<%s>%s</%s>', $style, str_pad($messages[$i], $padLength), $style);
-        }
-
-        return implode("\n", $messages);
+        return $this->format(new BlockFormatter($messages, $style, $large, $padLength));
     }
 
     /**
@@ -82,12 +75,7 @@ class FormatterHelper extends Helper
      */
     public function formatTitle($message)
     {
-        return array(
-            '',
-            sprintf('<fg=blue>%s</fg=blue>', $message),
-            sprintf('<fg=blue>%s</fg=blue>', str_repeat('=', strlen($message))),
-            ''
-        );
+        return $this->format(new TitleFormatter($message));
     }
 
     /**
@@ -99,11 +87,7 @@ class FormatterHelper extends Helper
      */
     public function formatSectionTitle($message)
     {
-        return array(
-            sprintf('<fg=blue>%s</fg=blue>', $message),
-            sprintf('<fg=blue>%s</fg=blue>', str_repeat('-', strlen($message))),
-            ''
-        );
+        return $this->format(new SectionTitleFormatter($message));
     }
 
     /**
@@ -115,31 +99,19 @@ class FormatterHelper extends Helper
      */
     public function formatListElement($messages)
     {
-        $messages = array_values((array) $messages);
-
-        $messages[0] = sprintf(' * %s', $messages[0]);
-
-        foreach ($messages as $key => &$message) {
-            if (0 === $key) {
-                continue;
-            }
-
-            $message = sprintf('   %s', $message);
-        }
-
-        return array_merge($messages, array(''));
+        return $this->format(new ListElementFormatter($messages));
     }
 
     /**
      * Formats informational or debug text
      *
-     * @param string $message
+     * @param string|array $messages
      *
      * @return string
      */
-    public function formatText($message)
+    public function formatText($messages)
     {
-        return sprintf(' // %s', $message);
+        return $this->format(new TextFormatter($messages));
     }
 
     /**
@@ -151,7 +123,7 @@ class FormatterHelper extends Helper
      */
     public function formatSuccessResultBar($messages)
     {
-        return $this->formatStyledBlock($messages, 'OK', 'fg=white;bg=green');
+        return $this->format(new StyledBlockFormatter($messages, 'OK', 'fg=white;bg=green'));
     }
 
     /**
@@ -163,7 +135,7 @@ class FormatterHelper extends Helper
      */
     public function formatErrorResultBar($messages)
     {
-        return $this->formatStyledBlock($messages, 'ERROR', 'fg=white;bg=red');
+        return $this->format(new StyledBlockFormatter($messages, 'ERROR', 'fg=white;bg=red'));
     }
 
     /**
@@ -175,7 +147,7 @@ class FormatterHelper extends Helper
      */
     public function formatNoteBlock($messages)
     {
-        return $this->formatStyledBlock($messages, 'NOTE', 'fg=white', '! ');
+        return $this->format(new StyledBlockFormatter($messages, 'NOTE', 'fg=white', '! '));
     }
 
     /**
@@ -187,7 +159,7 @@ class FormatterHelper extends Helper
      */
     public function formatCautionBlock($messages)
     {
-        return $this->formatStyledBlock($messages, 'CAUTION', 'fg=white;bg=red', '! ');
+        return $this->format(new StyledBlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', '! '));
     }
 
     /**
@@ -196,33 +168,5 @@ class FormatterHelper extends Helper
     public function getName()
     {
         return 'formatter';
-    }
-
-    /**
-     * Formats a styled block
-     *
-     * @param string|array $messages
-     * @param string       $type
-     * @param string       $style
-     * @param string $prefix
-     *
-     * @return array
-     */
-    protected function formatStyledBlock($messages, $type, $style, $prefix = '')
-    {
-        $messages = array_values((array) $messages);
-
-        $messages[0] = sprintf('[%s] %s', $type, $messages[0]);
-
-        $messages = array_map(function ($value) use ($prefix) {
-                return sprintf('%s%s', $prefix, $value);
-            },
-            $messages
-        );
-
-        return array(
-            $this->formatBlock($messages, $style, false, 120),
-            ''
-        );
     }
 }

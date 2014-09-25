@@ -26,15 +26,17 @@ use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 class DumpDataCollector extends DataCollector implements DataDumperInterface
 {
     private $stopwatch;
+    private $fileLinkFormat;
     private $dataCount = 0;
     private $isCollected = true;
     private $clonesCount = 0;
     private $clonesIndex = 0;
     private $rootRefs;
 
-    public function __construct(Stopwatch $stopwatch = null)
+    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null)
     {
         $this->stopwatch = $stopwatch;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
 
         // All clones share these properties by reference:
         $this->rootRefs = array(
@@ -213,7 +215,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                     $dump['name'] = htmlspecialchars($dump['name'], ENT_QUOTES, 'UTF-8');
                     $dump['file'] = htmlspecialchars($dump['file'], ENT_QUOTES, 'UTF-8');
                     if ('' !== $dump['file']) {
-                        $dump['name'] = "<abbr title=\"{$dump['file']}\">{$dump['name']}</abbr>";
+                        if ($this->fileLinkFormat) {
+                            $link = strtr($this->fileLinkFormat, array('%f' => $dump['file'], '%l' => $dump['line']));
+                            $dump['name'] = sprintf('<a href="%s" title="%s">%s</a>', $link, $dump['file'], $dump['name']);
+                        } else {
+                            $dump['name'] = sprintf('<abbr title="%s">%s</abbr>', $dump['file'], $dump['name']);
+                        }
                     }
                     echo "\n<span class=\"sf-dump-meta\">{$dump['name']} on line {$dump['line']}:</span>";
                 } else {

@@ -176,7 +176,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
         $successHandlerId = $this->getSuccessHandlerId($id);
 
-        $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
+        $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator($this->getDefaultAuthenticationSuccessHandlerServiceId()));
         $successHandler->replaceArgument(1, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
         $successHandler->addMethodCall('setProviderKey', array($id));
 
@@ -189,12 +189,22 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             return $config['failure_handler'];
         }
 
-        $id = $this->getFailureHandlerId($id);
+        $failureHandlerId = $this->getFailureHandlerId($id);
 
-        $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
+        $failureHandler = $container->setDefinition($failureHandlerId, new DefinitionDecorator($this->getDefaultAuthenticationFailureHandlerServiceId()));
         $failureHandler->replaceArgument(2, array_intersect_key($config, $this->defaultFailureHandlerOptions));
 
-        return $id;
+        return $failureHandlerId;
+    }
+    
+    protected function getDefaultAuthenticationFailureHandlerServiceId()
+    {
+        return 'security.authentication.failure_handler';   
+    }
+    
+    protected function getDefaultAuthenticationSuccessHandlerServiceId()
+    {
+        return 'security.authentication.success_handler';   
     }
 
     protected function getSuccessHandlerId($id)

@@ -225,7 +225,7 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('onEvent')
             ->with($event)
-            ->will($this->returnCallback(function($event) {
+            ->will($this->returnCallback(function ($event) {
                 $event->stopPropagation();
             }));
 
@@ -256,7 +256,6 @@ class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($dispatcher->hasListeners('onEvent'));
         $this->assertFalse($container->initialized('service.listener.second'));
     }
-
 }
 
 class Service

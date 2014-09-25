@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Tests\Validator;
 
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -65,6 +66,13 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
     protected function validatePropertyValue($object, $propertyName, $value, $groups = null)
     {
         return $this->validator->validatePropertyValue($object, $propertyName, $value, $groups);
+    }
+
+    public function testValidateConstraintWithoutGroup()
+    {
+        $violations = $this->validator->validate(null, new NotNull());
+
+        $this->assertCount(1, $violations);
     }
 
     public function testGroupSequenceAbortsAfterFailedGroup()

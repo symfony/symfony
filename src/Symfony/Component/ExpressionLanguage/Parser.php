@@ -75,6 +75,16 @@ class Parser
     /**
      * Converts a token stream to a node tree.
      *
+     * The valid names is an array where the values
+     * are the names that the user can use in an expression.
+     *
+     * If the variable name in the compiled PHP code must be
+     * different, define it as the key.
+     *
+     * For instance, ['this' => 'container'] means that the
+     * variable 'container' can be used in the expression
+     * but the compiled code will use 'this'.
+     *
      * @param TokenStream $stream A token stream instance
      * @param array       $names  An array of valid names
      *
@@ -194,7 +204,13 @@ class Parser
                                 throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
                             }
 
-                            $node = new Node\NameNode($token->value);
+                            // is the name used in the compiled code different
+                            // from the name used in the expression?
+                            if (is_int($name = array_search($token->value, $this->names))) {
+                                $name = $token->value;
+                            }
+
+                            $node = new Node\NameNode($name);
                         }
                 }
                 break;

@@ -37,13 +37,14 @@ class FormatterHelper extends Helper
     /**
      * Formats a message as a block of text.
      *
-     * @param string|array $messages The message to write in the block
-     * @param string       $style    The style to apply to the whole block
-     * @param bool         $large    Whether to return a large block
+     * @param string|array $messages  The message to write in the block
+     * @param string       $style     The style to apply to the whole block
+     * @param bool         $large     Whether to return a large block
+     * @param int          $padLength ength to pad the messages
      *
      * @return string The formatter message
      */
-    public function formatBlock($messages, $style, $large = false)
+    public function formatBlock($messages, $style, $large = false, $padLength = 0)
     {
         if (!is_array($messages)) {
             $messages = array($messages);
@@ -66,10 +67,127 @@ class FormatterHelper extends Helper
         }
 
         for ($i = 0; isset($messages[$i]); ++$i) {
-            $messages[$i] = sprintf('<%s>%s</%s>', $style, $messages[$i], $style);
+            $messages[$i] = sprintf('<%s>%s</%s>', $style, str_pad($messages[$i], $padLength), $style);
         }
 
         return implode("\n", $messages);
+    }
+
+    /**
+     * Formats a command title
+     *
+     * @param string $message
+     *
+     * @return array
+     */
+    public function formatTitle($message)
+    {
+        return array(
+            '',
+            sprintf('<fg=blue>%s</fg=blue>', $message),
+            sprintf('<fg=blue>%s</fg=blue>', str_repeat('=', strlen($message))),
+            ''
+        );
+    }
+
+    /**
+     * Formats a section title
+     *
+     * @param string $message
+     *
+     * @return array
+     */
+    public function formatSectionTitle($message)
+    {
+        return array(
+            sprintf('<fg=blue>%s</fg=blue>', $message),
+            sprintf('<fg=blue>%s</fg=blue>', str_repeat('-', strlen($message))),
+            ''
+        );
+    }
+
+    /**
+     * Formats a list element
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatListElement($messages)
+    {
+        $messages = array_values((array) $messages);
+
+        $messages[0] = sprintf(' * %s', $messages[0]);
+
+        foreach ($messages as $key => &$message) {
+            if (0 === $key) {
+                continue;
+            }
+
+            $message = sprintf('   %s', $message);
+        }
+
+        return array_merge($messages, array(''));
+    }
+
+    /**
+     * Formats informational or debug text
+     *
+     * @param string $message
+     *
+     * @return string
+     */
+    public function formatText($message)
+    {
+        return sprintf(' // %s', $message);
+    }
+
+    /**
+     * Formats a success result bar
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatSuccessResultBar($messages)
+    {
+        return $this->formatStyledBlock($messages, 'OK', 'fg=white;bg=green');
+    }
+
+    /**
+     * Formats an error result bar
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatErrorResultBar($messages)
+    {
+        return $this->formatStyledBlock($messages, 'ERROR', 'fg=white;bg=red');
+    }
+
+    /**
+     * Formats a note admonition
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatNoteBlock($messages)
+    {
+        return $this->formatStyledBlock($messages, 'NOTE', 'fg=white', '! ');
+    }
+
+    /**
+     * Formats a caution admonition
+     *
+     * @param string|array $messages
+     *
+     * @return array
+     */
+    public function formatCautionBlock($messages)
+    {
+        return $this->formatStyledBlock($messages, 'CAUTION', 'fg=white;bg=red', '! ');
     }
 
     /**
@@ -78,5 +196,33 @@ class FormatterHelper extends Helper
     public function getName()
     {
         return 'formatter';
+    }
+
+    /**
+     * Formats a styled block
+     *
+     * @param string|array $messages
+     * @param string       $type
+     * @param string       $style
+     * @param string $prefix
+     *
+     * @return array
+     */
+    protected function formatStyledBlock($messages, $type, $style, $prefix = '')
+    {
+        $messages = array_values((array) $messages);
+
+        $messages[0] = sprintf('[%s] %s', $type, $messages[0]);
+
+        $messages = array_map(function ($value) use ($prefix) {
+                return sprintf('%s%s', $prefix, $value);
+            },
+            $messages
+        );
+
+        return array(
+            $this->formatBlock($messages, $style, false, 120),
+            ''
+        );
     }
 }

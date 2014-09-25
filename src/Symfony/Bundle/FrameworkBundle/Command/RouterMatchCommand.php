@@ -89,7 +89,7 @@ EOF
         }
 
         if (!$matches) {
-            $output->writeln('<fg=red>None of the routes match</>');
+            $output->writeln(sprintf('<fg=red>None of the routes match the path "%s"</>', $input->getArgument('path_info')));
 
             return 1;
         }

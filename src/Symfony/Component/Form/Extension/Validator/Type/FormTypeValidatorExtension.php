@@ -75,7 +75,6 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'invalid_message_parameters' => array(),
             'allow_extra_fields'         => false,
             'extra_fields_message'       => 'This form should not contain extra fields.',
-            'post_max_size_message'      => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
         $resolver->setNormalizers(array(

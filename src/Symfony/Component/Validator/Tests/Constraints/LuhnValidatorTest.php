@@ -86,9 +86,9 @@ class LuhnValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($number, $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ value }}' => '"'.$number.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$number.'"')
+            ->assertRaised();
     }
 
     public function getInvalidNumbers()

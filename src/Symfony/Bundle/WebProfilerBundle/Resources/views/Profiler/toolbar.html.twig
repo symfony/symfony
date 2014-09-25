@@ -1,6 +1,6 @@
 <!-- START of Symfony2 Web Debug Toolbar -->
 {% if 'normal' != position %}
-    <div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar">
+    <div id="sfMiniToolbar-{{ token }}" class="sf-minitoolbar" data-no-turbolink>
         <a href="javascript:void(0);" title="Show Symfony toolbar" onclick="
             var elem = this.parentNode;
             if (elem.style.display == 'none') {
@@ -24,7 +24,7 @@
     <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 38px;"></div>
 {% endif %}
 
-<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset">
+<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset" data-no-turbolink>
     {% for name, template in templates %}
         {{ template.renderblock('toolbar', {
             'collector': profile.getcollector(name),

@@ -16,7 +16,7 @@ namespace Symfony\Component\Console\Helper\Formatter;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class ListElementFormatter implements FormatterInterface
+class ListFormatter implements FormatterInterface
 {
     protected $messages;
 
@@ -33,18 +33,13 @@ class ListElementFormatter implements FormatterInterface
      */
     public function format()
     {
-        $messages = array_values((array) $this->messages);
+        $ret = array();
 
-        $messages[0] = sprintf(' * %s', $messages[0]);
-
-        foreach ($messages as $key => &$message) {
-            if (0 === $key) {
-                continue;
-            }
-
-            $message = sprintf('   %s', $message);
+        foreach ((array) $this->messages as $message) {
+            $ret[] = sprintf(' * %s', $message);
+            $ret[] = '';
         }
 
-        return array_merge($messages, array(''));
+        return $ret;
     }
 }

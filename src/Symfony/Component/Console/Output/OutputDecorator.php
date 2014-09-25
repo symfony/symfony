@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Output;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\Formatter\BlockFormatter;
 use Symfony\Component\Console\Helper\Formatter\FormatterInterface;
-use Symfony\Component\Console\Helper\Formatter\ListElementFormatter;
+use Symfony\Component\Console\Helper\Formatter\ListFormatter;
 use Symfony\Component\Console\Helper\Formatter\SectionFormatter;
 use Symfony\Component\Console\Helper\Formatter\SectionTitleFormatter;
 use Symfony\Component\Console\Helper\Formatter\StyledBlockFormatter;
@@ -92,13 +92,13 @@ class OutputDecorator implements OutputInterface
     }
 
     /**
-     * Formats a list element
+     * Formats a list
      *
-     * @param string|array $messages
+     * @param array $elements
      */
-    public function listElement($messages)
+    public function listing(array $elements)
     {
-        $this->format(new ListElementFormatter($messages));
+        $this->format(new ListFormatter($elements));
     }
 
     /**

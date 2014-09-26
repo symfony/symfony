@@ -473,14 +473,28 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if error.cause is empty %}
-                            <em>Unknown.</em>
-                        {% elseif error.cause.root is defined %}
-                            <strong>Constraint Violation</strong><br/>
-                            <pre>{{ error.cause.root }}{% if error.cause.path is not empty %}{% if error.cause.path|first != '[' %}.{% endif %}{{ error.cause.path }}{% endif %} = {{ error.cause.value }}</pre>
+                        {% for trace in error.trace %}
+                            {% if not loop.first %}
+                                <br/>Caused by:<br/><br/>
+                            {% endif %}
+                            {% if trace.root is defined %}
+                                <strong>{{ trace.class }}</strong><br/>
+                                <pre>
+                                    {{- trace.root -}}
+                                    {%- if trace.path is not empty -%}
+                                        {%- if trace.path|first != '[' %}.{% endif -%}
+                                        {{- trace.path -}}
+                                    {%- endif %} = {{ trace.value -}}
+                                </pre>
+                            {% elseif trace.message is defined %}
+                                <strong>{{ trace.class }}</strong><br/>
+                                <pre>{{ trace.message }}</pre>
+                            {% else %}
+                                <pre>{{ trace }}</pre>
+                            {% endif %}
                         {% else %}
-                            <pre>{{ error.cause }}</pre>
-                        {% endif %}
+                            <em>Unknown.</em>
+                        {% endfor %}
                     </td>
                 </tr>
                 {% endfor %}

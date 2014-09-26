@@ -103,6 +103,7 @@ class FormValidator extends ConstraintValidator
                     ->setParameters(array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')))
                     ->setInvalidValue($form->getViewData())
                     ->setCode(Form::ERR_INVALID)
+                    ->setCause($form->getTransformationFailure())
                     ->addViolation();
             }
         }

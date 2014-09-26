@@ -21,6 +21,7 @@ CHANGELOG
  * ObjectChoiceList now compares choices by their value, if a value path is
    given
  * you can now pass interface names in the "data_class" option
+ * [BC BREAK] added `FormInterface::getTransformationFailure()`
 
 2.4.0
 -----

@@ -21,6 +21,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * A choice list presenting a list of Doctrine entities as choices
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link EntityChoiceLoader} instead.
  */
 class EntityChoiceList extends ObjectChoiceList
 {

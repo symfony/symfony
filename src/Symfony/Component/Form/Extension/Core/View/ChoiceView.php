@@ -16,29 +16,8 @@ namespace Symfony\Component\Form\Extension\Core\View;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ChoiceView
+class ChoiceView extends \Symfony\Component\Form\ChoiceList\View\ChoiceView
 {
-    /**
-     * The original choice value.
-     *
-     * @var mixed
-     */
-    public $data;
-
-    /**
-     * The view representation of the choice.
-     *
-     * @var string
-     */
-    public $value;
-
-    /**
-     * The label displayed to humans.
-     *
-     * @var string
-     */
-    public $label;
-
     /**
      * Creates a new ChoiceView.
      *
@@ -48,8 +27,6 @@ class ChoiceView
      */
     public function __construct($data, $value, $label)
     {
-        $this->data = $data;
-        $this->value = $value;
-        $this->label = $label;
+        parent::__construct($label, $value, $data);
     }
 }

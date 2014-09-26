@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
@@ -318,8 +318,8 @@ class TimeTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView('06', '6', '6'),
+            new ChoiceView('07', '7', '7'),
         ), $view['hour']->vars['choices']);
     }
 
@@ -332,8 +332,8 @@ class TimeTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView('06', '6', '6'),
+            new ChoiceView('07', '7', '7'),
         ), $view['minute']->vars['choices']);
     }
 
@@ -347,8 +347,8 @@ class TimeTypeTest extends TypeTestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView('06', '6', '6'),
+            new ChoiceView('07', '7', '7'),
         ), $view['second']->vars['choices']);
     }
 

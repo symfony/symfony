@@ -21,6 +21,10 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * which should return a ChoiceListInterface instance.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\LazyChoiceList}
+ *             instead.
  */
 abstract class LazyChoiceList implements ChoiceListInterface
 {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -490,8 +490,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView('06', '6', '6'),
+            new ChoiceView('07', '7', '7'),
         ), $view['month']->vars['choices']);
     }
 
@@ -505,8 +505,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jän'),
-            new ChoiceView('4', '4', 'Apr.'),
+            new ChoiceView('Jän', '1', '1'),
+            new ChoiceView('Apr.', '4', '4'),
         ), $view['month']->vars['choices']);
     }
 
@@ -520,8 +520,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jänner'),
-            new ChoiceView('4', '4', 'April'),
+            new ChoiceView('Jänner', '1', '1'),
+            new ChoiceView('April', '4', '4'),
         ), $view['month']->vars['choices']);
     }
 
@@ -535,8 +535,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('1', '1', 'Jänner'),
-            new ChoiceView('4', '4', 'April'),
+            new ChoiceView('Jänner', '1', '1'),
+            new ChoiceView('April', '4', '4'),
         ), $view['month']->vars['choices']);
     }
 
@@ -549,8 +549,8 @@ class DateTypeTest extends TestCase
         $view = $form->createView();
 
         $this->assertEquals(array(
-            new ChoiceView('6', '6', '06'),
-            new ChoiceView('7', '7', '07'),
+            new ChoiceView('06', '6', '6'),
+            new ChoiceView('07', '7', '7'),
         ), $view['day']->vars['choices']);
     }
 

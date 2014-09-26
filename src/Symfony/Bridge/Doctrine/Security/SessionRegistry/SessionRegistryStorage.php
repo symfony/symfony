@@ -3,6 +3,7 @@
 namespace Symfony\Bridge\Doctrine\Security\SessionRegistry;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Symfony\Component\Security\Http\Session\SessionInformation;
 use Symfony\Component\Security\Http\Session\SessionRegistryStorageInterface;
 
@@ -66,6 +67,8 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
             $sessionInformations[] = $this->instantiateSessionInformationFromResultSet($data);
         }
 
+        $statement->closeCursor();
+
         return $sessionInformations;
     }
 
@@ -79,23 +82,30 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
         $mergeSql = $this->getMergeSql();
 
         if (null !== $mergeSql) {
-            $mergeStmt = $this->pdo->prepare($mergeSql);
-            $mergeStmt->bindValue('session_id', $sessionInformation->getSessionId());
-            $mergeStmt->bindValue('username', $sessionInformation->getUsername());
-            $mergeStmt->bindValue('last_request', $sessionInformation->getLastRequest(), 'datetime');
-            $mergeStmt->bindValue('expired', $sessionInformation->getExpired(), 'datetime');
-            $mergeStmt->execute();
+            $this->connection->executeQuery(
+                $mergeSql,
+                array(
+                    'session_id'   => $sessionInformation->getSessionId(),
+                    'username'     => $sessionInformation->getUsername(),
+                    'last_request' => $sessionInformation->getLastRequest(),
+                    'expired'      => $sessionInformation->getExpired()
+                ),
+                array(
+                    'last_request' => 'datetime',
+                    'expired'      => 'datetime'
+                )
+            );
 
             return true;
         }
 
-        $updateStmt = $this->pdo->prepare(
+        $updateStmt = $this->connection->prepare(
             "UPDATE $this->table SET username=:username, last_request=:last_request, expired=:expired WHERE session_id = :session_id"
         );
-        $mergeStmt->bindValue('session_id', $sessionInformation->getSessionId());
-        $mergeStmt->bindValue('username', $sessionInformation->getUsername());
-        $mergeStmt->bindValue('last_request', $sessionInformation->getLastRequest(), 'datetime');
-        $mergeStmt->bindValue('expired', $sessionInformation->getExpired(), 'datetime');
+        $updateStmt->bindValue('session_id', $sessionInformation->getSessionId());
+        $updateStmt->bindValue('username', $sessionInformation->getUsername());
+        $updateStmt->bindValue('last_request', $sessionInformation->getLastRequest(), 'datetime');
+        $updateStmt->bindValue('expired', $sessionInformation->getExpired(), 'datetime');
         $updateStmt->execute();
 
         // When MERGE is not supported, like in Postgres, we have to use this approach that can result in
@@ -105,17 +115,22 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
         // longer gap locking.
         if (!$updateStmt->rowCount()) {
             try {
-                $insertStmt = $this->pdo->prepare(
-                    "INTO $this->table (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired)"
+                $this->connection->insert(
+                    $this->table,
+                    array(
+                        'session_id'   => $sessionInformation->getSessionId(),
+                        'username'     => $sessionInformation->getUsername(),
+                        'last_request' => $sessionInformation->getLastRequest(),
+                        'expired'      => $sessionInformation->getExpired()
+                    ),
+                    array(
+                        'last_request' => 'datetime',
+                        'expired'      => 'datetime'
+                    )
                 );
-                $insertStmt->bindValue('session_id', $sessionInformation->getSessionId());
-                $insertStmt->bindValue('username', $sessionInformation->getUsername());
-                $insertStmt->bindValue('last_request', $sessionInformation->getLastRequest(), 'datetime');
-                $insertStmt->bindValue('expired', $sessionInformation->getExpired(), 'datetime');
-                $insertStmt->execute();
-            } catch (\PDOException $e) {
+            } catch (DBALException $e) {
                 // Handle integrity violation SQLSTATE 23000 (or a subclass like 23505 in Postgres) for duplicate keys
-                if (0 === strpos($e->getCode(), '23')) {
+                if ($e->getPrevious() instanceof \PDOException && 0 === strpos($e->getPrevious()->getCode(), '23')) {
                     $updateStmt->execute();
                 } else {
                     throw $e;
@@ -151,24 +166,24 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
      */
     private function getMergeSql()
     {
-        switch ($this->connection->getDriver()->getName()) {
-            case 'pdo_mysql':
+        switch ($this->connection->getDatabasePlatform()->getName()) {
+            case 'mysql':
                 return "INSERT INTO $this->table (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                     "ON DUPLICATE KEY UPDATE username = VALUES(username), last_request = VALUES(last_request), expired = VALUES(expired)";
-            case 'pdo_oracle':
+            case 'oracle':
                 // DUAL is Oracle specific dummy table
                 return "MERGE INTO $this->table USING DUAL ON (session_id= :session_id) ".
                     "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                     "WHEN MATCHED THEN UPDATE SET username = :username, last_request = :last_request, expired = :expired";
-            case 'pdo_sqlsrv':
-                if (version_compare($this->connection->getWrappedConnection()->getAttribute(\PDO::ATTR_SERVER_VERSION), '10', '>=')) {
+            case 'mssql':
+                if ($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SQLServer2008Platform || $this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SQLServer2012Platform) {
                     // MERGE is only available since SQL Server 2008 and must be terminated by semicolon
                     // It also requires HOLDLOCK according to http://weblogs.sqlteam.com/dang/archive/2009/01/31/UPSERT-Race-Condition-With-MERGE.aspx
                     return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON (session_id = :session_id) ".
                         "WHEN NOT MATCHED THEN INSERT (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired) ".
                         "WHEN MATCHED THEN UPDATE SET username = :username, last_request = :last_request, expired = :expired;";
                 }
-            case 'pdo_sqlite':
+            case 'sqlite':
                 return "INSERT OR REPLACE INTO $this->table (session_id, username, last_request, expired) VALUES (:session_id, :username, :last_request, :expired)";
         }
     }

@@ -44,6 +44,5 @@ final class Schema extends BaseSchema
         $table->addColumn('expired', 'datetime', array('unsigned' => true, 'notnull' => false));
         $table->addColumn('last_request', 'datetime', array('unsigned' => true, 'notnull' => false));
         $table->setPrimaryKey(array('session_id'));
-        $table->addUniqueIndex(array('session_id'));
     }
 }

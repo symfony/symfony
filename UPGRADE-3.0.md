@@ -29,7 +29,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $h = new ProgressHelper();
    $h->start($output, 10);
    for ($i = 1; $i < 5; $i++) {
@@ -41,7 +41,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $bar = new ProgressBar($output, 10);
    $bar->start();
    for ($i = 1; $i < 5; $i++) {
@@ -54,7 +54,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $table = $app->getHelperSet()->get('table');
    $table
        ->setHeaders(array('ISBN', 'Title', 'Author'))
@@ -70,7 +70,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Console\Helper\Table;
 
    $table = new Table($output);
@@ -105,13 +105,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $form->bind(array(...));
    ```
 
    After:
 
-   ```
+   ```php
    $form->submit(array(...));
    ```
 
@@ -122,7 +122,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    if ('POST' === $request->getMethod()) {
        $form->bind($request);
 
@@ -134,7 +134,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $form->handleRequest($request);
 
    if ($form->isValid()) {
@@ -145,7 +145,7 @@ UPGRADE FROM 2.x to 3.0
    If you want to test whether the form was submitted separately, you can use
    the method `isSubmitted()`:
 
-   ```
+   ```php
    $form->handleRequest($request);
 
    if ($form->isSubmitted()) {
@@ -162,7 +162,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $builder->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) {
        // ...
    });
@@ -170,7 +170,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
        // ...
    });
@@ -180,7 +180,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $builder->add('address', 'form', array(
        'virtual' => true,
    ));
@@ -188,7 +188,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $builder->add('address', 'form', array(
        'inherit_data' => true,
    ));
@@ -198,7 +198,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 
    $iterator = new VirtualFormAwareIterator($forms);
@@ -206,7 +206,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Form\Util\InheritDataAwareIterator;
 
    $iterator = new InheritDataAwareIterator($forms);
@@ -216,7 +216,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase
 
    class MyTypeTest extends TypeTestCase
@@ -227,7 +227,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Form\Test\TypeTestCase;
 
    class MyTypeTest extends TypeTestCase
@@ -261,13 +261,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    echo $form->getErrorsAsString();
    ```
 
    After:
 
-   ```
+   ```php
    echo $form->getErrors(true, false);
    ```
 
@@ -280,7 +280,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    namespace Acme\FooBundle\Controller;
 
    class DemoController
@@ -295,7 +295,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    namespace Acme\FooBundle\Controller;
 
    use Symfony\Component\HttpFoundation\Request;
@@ -317,7 +317,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    <form method="post" action="http://example.com" <?php echo $view['form']->enctype($form) ?>>
        ...
    </form>
@@ -325,7 +325,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    <?php echo $view['form']->start($form) ?>
        ...
    <?php echo $view['form']->end($form) ?>
@@ -337,7 +337,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 1:
 
-   ```
+   ```php
    $form = $this->createForm('my_form', $formData, array(
        'method' => 'PUT',
        'action' => $this->generateUrl('target_route'),
@@ -346,7 +346,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 2:
 
-   ```
+   ```php
    $form = $this->createFormBuilder($formData)
        // ...
        ->setMethod('PUT')
@@ -356,7 +356,7 @@ UPGRADE FROM 2.x to 3.0
 
    It is also possible to override the method and the action in the template:
 
-   ```
+   ```php
    <?php echo $view['form']->start($form, array('method' => 'GET', 'action' => 'http://example.com')) ?>
        ...
    <?php echo $view['form']->end($form) ?>
@@ -415,7 +415,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
    $accessor = PropertyAccess::getPropertyAccessor();
@@ -423,7 +423,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
    $accessor = PropertyAccess::createPropertyAccessor();
@@ -438,17 +438,21 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```yaml
    article_edit:
        pattern: /article/{id}
        requirements: { '_method': 'POST|PUT', '_scheme': 'https', 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" pattern="/article/{id}">
        <requirement key="_method">POST|PUT</requirement>
        <requirement key="_scheme">https</requirement>
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPattern('/article/{id}');
    $route->setRequirement('_method', 'POST|PUT');
@@ -457,17 +461,21 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```yaml
    article_edit:
        path: /article/{id}
        methods: [POST, PUT]
        schemes: https
        requirements: { 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" path="/article/{id}" methods="POST PUT" schemes="https">
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPath('/article/{id}');
    $route->setMethods(array('POST', 'PUT'));
@@ -496,7 +504,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```twig
    <form method="post" action="http://example.com" {{ form_enctype(form) }}>
        ...
    </form>
@@ -504,7 +512,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```twig
    {{ form_start(form) }}
        ...
    {{ form_end(form) }}
@@ -516,7 +524,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 1:
 
-   ```
+   ```php
    $form = $this->createForm('my_form', $formData, array(
        'method' => 'PUT',
        'action' => $this->generateUrl('target_route'),
@@ -525,7 +533,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 2:
 
-   ```
+   ```php
    $form = $this->createFormBuilder($formData)
        // ...
        ->setMethod('PUT')
@@ -535,7 +543,7 @@ UPGRADE FROM 2.x to 3.0
 
    It is also possible to override the method and the action in the template:
 
-   ```
+   ```twig
    {{ form_start(form, {'method': 'GET', 'action': 'http://example.com'}) }}
        ...
    {{ form_end(form) }}
@@ -548,7 +556,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
    $cache = new ApcCache('symfony.validator');
@@ -556,7 +564,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
    use Doctrine\Common\Cache\ApcCache;
 
@@ -572,7 +580,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
 
    /**
@@ -586,7 +594,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
 
    /**
@@ -604,14 +612,14 @@ UPGRADE FROM 2.x to 3.0
 
    Before (YAML):
 
-   ```
+   ```yaml
    constraints:
      - Callback: [firstCallback, secondCallback]
    ```
 
    After (YAML):
 
-   ```
+   ```yaml
    constraints:
      - Callback: firstCallback
      - Callback: secondCallback
@@ -622,7 +630,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before (Annotations):
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
    use Symfony\Component\Validator\ExecutionContextInterface;
 
@@ -640,7 +648,7 @@ UPGRADE FROM 2.x to 3.0
 
    After (Annotations):
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
    use Symfony\Component\Validator\ExecutionContextInterface;
 
@@ -664,7 +672,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $validator->validate($object, 'Strict');
 
    $validator->validateValue($value, new NotNull());
@@ -672,7 +680,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $validator->validate($object, null, 'Strict');
 
    $validator->validate($value, new NotNull());
@@ -682,7 +690,7 @@ UPGRADE FROM 2.x to 3.0
    were added. The first of them allows to run multiple validations in the
    same context and aggregate their violations:
 
-   ```
+   ```php
    $violations = $validator->startContext()
        ->atPath('firstName')->validate($firstName, new NotNull())
        ->atPath('age')->validate($age, new Type('integer'))
@@ -693,7 +701,7 @@ UPGRADE FROM 2.x to 3.0
    especially useful when calling the validator from within constraint
    validators:
 
-   ```
+   ```php
    $validator->inContext($context)->validate($object);
    ```
 
@@ -712,13 +720,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\MetadataInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\MetadataInterface;
    ```
 
@@ -729,7 +737,7 @@ UPGRADE FROM 2.x to 3.0
 
    Example:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
    public function getTraversalStrategy()
@@ -743,13 +751,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\PropertyMetadataInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
    ```
 
@@ -758,13 +766,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\PropertyMetadataContainerInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
    ```
 
@@ -782,7 +790,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\ClassBasedInterface;
 
    class MyClassMetadata implements ClassBasedInterface
@@ -793,7 +801,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 
    class MyClassMetadata implements ClassMetadataInterface
@@ -806,7 +814,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ElementMetadata;
 
    class MyMetadata extends ElementMetadata
@@ -816,7 +824,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\GenericMetadata;
 
    class MyMetadata extends GenericMetadata
@@ -829,13 +837,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\ExecutionContextInterface;
    ```
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Context\ExecutionContextInterface;
    ```
 
@@ -857,7 +865,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $context->addViolationAt('property', 'The value {{ value }} is invalid.', array(
        '{{ value }}' => $invalidValue,
    ));
@@ -865,7 +873,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $context->buildViolation('The value {{ value }} is invalid.')
        ->atPath('property')
        ->setParameter('{{ value }}', $invalidValue)
@@ -877,13 +885,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $context->validate($object);
    ```
 
    After:
 
-   ```
+   ```php
    $context->getValidator()
        ->inContext($context)
        ->validate($object);
@@ -899,13 +907,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $metadata = $context->getMetadataFactory()->getMetadataFor($myClass);
    ```
 
    After:
 
-   ```
+   ```php
    $metadata = $context->getValidator()->getMetadataFor($myClass);
    ```
 
@@ -920,7 +928,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 
    $factory = new ClassMetadataFactory($loader);
@@ -928,7 +936,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 
    $factory = new LazyLoadingMetadataFactory($loader);
@@ -946,14 +954,14 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $parameters = $violation->getMessageParameters();
    $plural = $violation->getMessagePluralization();
    ```
 
    After:
 
-   ```
+   ```php
    $parameters = $violation->getParameters();
    $plural = $violation->getPlural();
    ```
@@ -964,13 +972,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    Yaml::parse($fileName);
    ```
 
    After:
 
-   ```
+   ```php
    Yaml::parse(file_get_contents($fileName));
 
 ### Process

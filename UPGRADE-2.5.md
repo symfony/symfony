@@ -17,13 +17,13 @@ Form
 
    Before:
 
-   ```
+   ```php
    $errors = array_map($callback, $form->getErrors());
    ```
 
    After:
 
-   ```
+   ```php
    $errors = array_map($callback, iterator_to_array($form->getErrors()));
    ```
 
@@ -33,27 +33,27 @@ Form
 
    Before:
 
-   ```
+   ```php
    public function getErrors()
    {
    ```
 
    After:
 
-   ```
+   ```php
    public function getErrors($deep = false, $flatten = true)
    {
    ```
 
    Before:
 
-   ```
+   ```twig
    {% if form.vars.errors %}
    ```
 
    After:
 
-   ```
+   ```twig
    {% if form.vars.errors|length %}
    ```
 
@@ -114,7 +114,7 @@ Validator
 
    Strict email validation has to be explicitly activated in the configuration file by adding
 
-   ```
+   ```yaml
    framework:
       //...
       validation:
@@ -125,7 +125,7 @@ Validator
 
    Also you have to add to your composer.json:
 
-   ```
+   ```json
    "egulias/email-validator": "~1.2"
    ```
 
@@ -137,14 +137,14 @@ Validator
 
    Before:
 
-   ```
+   ```php
    $sequence = $metadata->getGroupSequence();
    $result = array_map($callback, $sequence);
    ```
 
    After:
 
-   ```
+   ```php
    $sequence = iterator_to_array($metadata->getGroupSequence());
    $result = array_map($callback, $sequence);
    ```
@@ -155,7 +155,7 @@ Validator
 
    Before:
 
-   ```
+   ```php
    public function setGroupSequence(array $groups)
    {
        // ...
@@ -164,7 +164,7 @@ Validator
 
    After:
 
-   ```
+   ```php
    public function setGroupSequence($groupSequence)
    {
        // ...
@@ -180,7 +180,7 @@ Validator
    You can choose the desired API via the new "api" entry in
    app/config/config.yml:
 
-   ```
+   ```yaml
    framework:
        validation:
            enabled: true
@@ -190,7 +190,7 @@ Validator
    When running PHP 5.3.9 or higher, Symfony will then use an implementation
    that supports both the old API and the new one:
 
-   ```
+   ```yaml
    framework:
        validation:
            enabled: true
@@ -200,7 +200,7 @@ Validator
    When running PHP lower than 5.3.9, that compatibility layer is not supported.
    On those versions, the old implementation will be used instead:
 
-   ```
+   ```yaml
    framework:
        validation:
            enabled: true
@@ -211,7 +211,7 @@ Validator
    also set the API to 2.5. In that case, the backwards compatibility layer
    will not be activated:
 
-   ```
+   ```yaml
    framework:
        validation:
            enabled: true
@@ -221,7 +221,7 @@ Validator
    When using the validator outside of the Symfony full-stack framework, the
    desired API can be selected using `setApiVersion()` on the validator builder:
 
-   ```
+   ```php
    // Previous implementation
    $validator = Validation::createValidatorBuilder()
        ->setApiVersion(Validation::API_VERSION_2_4)
@@ -247,7 +247,7 @@ Yaml Component
 
    Example:
 
-   ```
+   ```yaml
    parentElement:
        firstChild: foo
        secondChild: 123

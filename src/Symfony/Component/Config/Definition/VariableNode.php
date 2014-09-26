@@ -88,6 +88,9 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
                 $this->getPath(),
                 json_encode($value)
             ));
+            if ($hint = $this->getInfo()) {
+                $ex->addHint($hint);
+            }
             $ex->setPath($this->getPath());
 
             throw $ex;

@@ -109,7 +109,7 @@ class Controller extends ContainerAware
             throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
         }
 
-        $this->get('session')->getFlashBag()->add($type, $message);
+        $this->container->get('session')->getFlashBag()->add($type, $message);
     }
 
     /**
@@ -127,7 +127,7 @@ class Controller extends ContainerAware
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        return $this->get('security.context')->isGranted($attributes, $object);
+        return $this->container->get('security.context')->isGranted($attributes, $object);
     }
 
     /**

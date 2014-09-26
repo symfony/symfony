@@ -48,6 +48,8 @@
 
         <parameter key="security.authentication.success_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler</parameter>
         <parameter key="security.authentication.failure_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler</parameter>
+        <parameter key="security.authentication.custom_success_handler.class">Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler</parameter>
+        <parameter key="security.authentication.custom_failure_handler.class">Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler</parameter>
         <parameter key="security.authentication.simple_success_failure_handler.class">Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler</parameter>
     </parameters>
 
@@ -123,8 +125,19 @@
             <argument type="service" id="event_dispatcher" on-invalid="null" />
         </service>
 
+        <service id="security.authentication.custom_success_handler" class="%security.authentication.custom_success_handler.class%" abstract="true" public="false">
+            <argument /> <!-- The custom success handler service id -->
+            <argument type="collection" /> <!-- Options -->
+            <argument /> <!-- Provider-shared Key -->
+        </service>
+
         <service id="security.authentication.success_handler" class="%security.authentication.success_handler.class%" abstract="true" public="false">
             <argument type="service" id="security.http_utils" />
+            <argument type="collection" /> <!-- Options -->
+        </service>
+
+        <service id="security.authentication.custom_failure_handler" class="%security.authentication.custom_failure_handler.class%" abstract="true" public="false">
+            <argument /> <!-- The custom failure handler service id -->
             <argument type="collection" /> <!-- Options -->
         </service>
 

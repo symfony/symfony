@@ -15,6 +15,8 @@ namespace Symfony\Component\Validator\Constraints;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
+ * @author Benjamin Dulau <benjamin.dulau@gmail.com>
+ *
  * @api
  */
 class Image extends File
@@ -30,6 +32,7 @@ class Image extends File
     public $allowLandscape = true;
     public $allowPortrait = true;
 
+    // The constant for a wrong MIME type is taken from the parent class.
     public $mimeTypesMessage = 'This file is not a valid image.';
     public $sizeNotDetectedMessage = 'The size of the image could not be detected.';
     public $maxWidthMessage = 'The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.';

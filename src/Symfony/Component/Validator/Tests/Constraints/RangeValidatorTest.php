@@ -379,38 +379,6 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
-    public function testMinMessageIsSet()
-    {
-        $constraint = new Range(array(
-            'min' => 10,
-            'max' => 20,
-            'minMessage' => 'myMessage',
-        ));
-
-        $this->validator->validate(9, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 9)
-            ->setParameter('{{ limit }}', 10)
-            ->assertRaised();
-    }
-
-    public function testMaxMessageIsSet()
-    {
-        $constraint = new Range(array(
-            'min' => 10,
-            'max' => 20,
-            'maxMessage' => 'myMessage',
-        ));
-
-        $this->validator->validate(21, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 21)
-            ->setParameter('{{ limit }}', 20)
-            ->assertRaised();
-    }
-
     public function testNonNumeric()
     {
         $this->validator->validate('abcd', new Range(array(

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class DateTimeValidator extends DateValidator
 {
-    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/';
+    const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
 
     /**
      * {@inheritdoc}
@@ -42,10 +42,24 @@ class DateTimeValidator extends DateValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value, $matches) || !checkdate($matches[2], $matches[3], $matches[1])) {
-            $this->context->addViolation($constraint->message, array(
-                '{{ value }}' => $this->formatValue($value),
-            ));
+        if (!preg_match(static::PATTERN, $value, $matches)) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
+
+            return;
+        }
+
+        if (!DateValidator::checkDate($matches[1], $matches[2], $matches[3])) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
+        }
+
+        if (!TimeValidator::checkTime($matches[4], $matches[5], $matches[6])) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->addViolation();
         }
     }
 }

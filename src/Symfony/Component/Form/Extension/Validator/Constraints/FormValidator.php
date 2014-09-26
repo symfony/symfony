@@ -99,40 +99,20 @@ class FormValidator extends ConstraintValidator
                     ? (string) $form->getViewData()
                     : gettype($form->getViewData());
 
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($config->getOption('invalid_message'))
-                        ->setParameters(array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')))
-                        ->setInvalidValue($form->getViewData())
-                        ->setCode(Form::ERR_INVALID)
-                        ->addViolation();
-                } else {
-                    // 2.4 API
-                    $this->context->addViolation(
-                        $config->getOption('invalid_message'),
-                        array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')),
-                        $form->getViewData(),
-                        null,
-                        Form::ERR_INVALID
-                    );
-                }
+                $this->buildViolation($config->getOption('invalid_message'))
+                    ->setParameters(array_replace(array('{{ value }}' => $clientDataAsString), $config->getOption('invalid_message_parameters')))
+                    ->setInvalidValue($form->getViewData())
+                    ->setCode(Form::ERR_INVALID)
+                    ->addViolation();
             }
         }
 
         // Mark the form with an error if it contains extra fields
         if (!$config->getOption('allow_extra_fields') && count($form->getExtraData()) > 0) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($config->getOption('extra_fields_message'))
-                    ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
-                    ->setInvalidValue($form->getExtraData())
-                    ->addViolation();
-            } else {
-                // 2.4 API
-                $this->context->addViolation(
-                    $config->getOption('extra_fields_message'),
-                    array('{{ extra_fields }}' => implode('", "', array_keys($form->getExtraData()))),
-                    $form->getExtraData()
-                );
-            }
+            $this->buildViolation($config->getOption('extra_fields_message'))
+                ->setParameter('{{ extra_fields }}', implode('", "', array_keys($form->getExtraData())))
+                ->setInvalidValue($form->getExtraData())
+                ->addViolation();
         }
     }
 

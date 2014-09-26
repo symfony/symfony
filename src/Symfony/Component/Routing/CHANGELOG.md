@@ -87,7 +87,7 @@ CHANGELOG
    So the correct sequence is the following (and not the reverse):
 
    ```php
-   $childCollection->->addCollection($grandchildCollection);
+   $childCollection->addCollection($grandchildCollection);
    $rootCollection->addCollection($childCollection);
    ```
 

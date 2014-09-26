@@ -37,6 +37,8 @@ class RegisterSessionAuthenticationStrategy implements SessionAuthenticationStra
      */
     public function onAuthentication(Request $request, TokenInterface $token)
     {
-        $this->registry->registerNewSession($request->getSession()->getId(), $token->getUsername());
+        if ($session = $request->getSession()) {
+            $this->registry->registerNewSession($session->getId(), $token->getUsername());
+        }
     }
 }

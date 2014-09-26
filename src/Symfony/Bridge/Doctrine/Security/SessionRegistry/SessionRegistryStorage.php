@@ -12,8 +12,8 @@ use Symfony\Component\Security\Http\Session\SessionRegistryStorageInterface;
  */
 class SessionRegistryStorage implements SessionRegistryStorageInterface
 {
-    protected $connection;
-    protected $table;
+    private $connection;
+    private $table;
 
     public function __construct(Connection $connection, $table)
     {

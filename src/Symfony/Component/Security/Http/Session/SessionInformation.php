@@ -20,10 +20,10 @@ namespace Symfony\Component\Security\Http\Session;
  */
 class SessionInformation
 {
-    protected $sessionId;
-    protected $username;
-    protected $expired;
-    protected $lastRequest;
+    private $sessionId;
+    private $username;
+    private $expired;
+    private $lastRequest;
 
     public function __construct($sessionId, $username, \DateTime $lastRequest, \DateTime $expired = null)
     {
@@ -94,17 +94,17 @@ class SessionInformation
         $this->lastRequest = new \DateTime();
     }
 
-    protected function getExpired()
+    private function getExpired()
     {
         return $this->expired;
     }
 
-    protected function setExpired(\DateTime $expired)
+    private function setExpired(\DateTime $expired)
     {
         $this->expired = $expired;
     }
 
-    protected function setLastRequest(\DateTime $lastRequest)
+    private function setLastRequest(\DateTime $lastRequest)
     {
         $this->lastRequest = $lastRequest;
     }

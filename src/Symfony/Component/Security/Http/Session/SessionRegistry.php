@@ -21,7 +21,7 @@ namespace Symfony\Component\Security\Http\Session;
  */
 class SessionRegistry
 {
-    protected $sessionRegistryStorage;
+    private $sessionRegistryStorage;
 
     public function __construct(SessionRegistryStorageInterface $sessionRegistryStorage)
     {

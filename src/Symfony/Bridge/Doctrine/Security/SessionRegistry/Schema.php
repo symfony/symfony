@@ -36,7 +36,7 @@ final class Schema extends BaseSchema
     /**
      * Adds the session_information table to the schema
      */
-    protected function addSessionInformationTable($table)
+    private function addSessionInformationTable($table)
     {
         $table = $this->createTable($table);
         $table->addColumn('session_id', 'string');

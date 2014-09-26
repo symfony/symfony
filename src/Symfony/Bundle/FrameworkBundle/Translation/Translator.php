@@ -63,23 +63,6 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function getLocale()
-    {
-        if (null === $this->locale && $request = $this->container->get('request_stack')->getCurrentRequest()) {
-            $this->locale = $request->getLocale();
-            try {
-                $this->setLocale($request->getLocale());
-            } catch (\InvalidArgumentException $e) {
-                $this->setLocale($request->getDefaultLocale());
-            }
-        }
-
-        return $this->locale;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function initializeCatalogue($locale)
     {
         $this->initialize();

@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Dumper\JsonDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
@@ -158,8 +157,6 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     {
         if ('html' === $format) {
             $dumper = new HtmlDumper();
-        } elseif ('json' === $format) {
-            $dumper = new JsonDumper();
         } else {
             throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
         }

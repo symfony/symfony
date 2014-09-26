@@ -58,8 +58,8 @@
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
             <argument /> <!-- Key -->
-            <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="security.authentication.manager" />
         </service>
 
         <service id="security.authentication.provider.anonymous" class="%security.authentication.provider.anonymous.class%" public="false">

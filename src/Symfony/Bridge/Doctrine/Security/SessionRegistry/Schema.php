@@ -22,9 +22,7 @@ use Doctrine\DBAL\Schema\Schema as BaseSchema;
 final class Schema extends BaseSchema
 {
     /**
-     * Constructor
-     *
-     * @param string $table
+     * @param string $table The name of the table to create.
      */
     public function __construct($table)
     {
@@ -35,6 +33,8 @@ final class Schema extends BaseSchema
 
     /**
      * Adds the session_information table to the schema
+     *
+     * @param string $table The name of the table to create.
      */
     private function addSessionInformationTable($table)
     {

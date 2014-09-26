@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Session;
 /**
  * SessionRegistry.
  *
- * Maintains a registry of SessionInformation instances.
+ * Stores a registry of SessionInformation instances.
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
  * @author Antonio J. García Lagar <aj@garcialagar.es>
@@ -29,11 +29,11 @@ class SessionRegistry
     }
 
     /**
-     * Obtains all the known sessions for the specified user.
+     * Returns all the sessions stored for the given user ordered from newest to oldest.
      *
-     * @param  string  $username               the specified user.
-     * @param  bool    $includeExpiredSessions
-     * @return array   An array of SessionInformation objects.
+     * @param  string               $username               the given user.
+     * @param  bool                 $includeExpiredSessions
+     * @return SessionInformation[] An array of SessionInformation objects.
      */
     public function getAllSessions($username, $includeExpiredSessions = false)
     {
@@ -41,10 +41,10 @@ class SessionRegistry
     }
 
     /**
-     * Obtains the session information for the specified sessionId.
+     * Obtains the session information for the given sessionId.
      *
-     * @param  string             $sessionId the session identifier key.
-     * @return SessionInformation $sessionInformation
+     * @param  string                  $sessionId the session identifier key.
+     * @return SessionInformation|null $sessionInformation
      */
     public function getSessionInformation($sessionId)
     {
@@ -88,22 +88,22 @@ class SessionRegistry
     }
 
     /**
-     * Registers a new session for the specified user.
+     * Registers a new session for the given user.
      *
      * @param string    $sessionId   the session identifier key.
-     * @param string    $username    the specified user.
+     * @param string    $username    the given user.
      * @param \DateTime $lastRequest
      */
     public function registerNewSession($sessionId, $username, \DateTime $lastRequest = null)
     {
-        $lastRequest = ($lastRequest) ?: new \DateTime();
+        $lastRequest = $lastRequest ?: new \DateTime();
         $sessionInformation = new SessionInformation($sessionId, $username, $lastRequest);
 
         $this->setSessionInformation($sessionInformation);
     }
 
     /**
-     * Deletes the maintained information of one session.
+     * Deletes the stored information of one session.
      *
      * @param string $sessionId the session identifier key.
      */

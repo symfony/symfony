@@ -16,17 +16,17 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * A session authentication strategy that accepts multiple
- * SessionAuthenticationStrategyInterface implementations to delegate to. Each
- * SessionAuthenticationStrategyInterface is invoked in turn. The invocations are
- * short circuited if any exception, (i.e. SessionAuthenticationException) is
- * thrown.
+ * SessionAuthenticationStrategyInterface implementations to delegate to.
+ *
+ * Each SessionAuthenticationStrategyInterface is invoked in turn. The
+ * invocations are short circuited if any exception is thrown.
  *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
 class CompositeSessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
     /**
-     * @var array
+     * @var SessionAuthenticationStrategyInterface[]
      */
     private $delegateStrategies = array();
 
@@ -43,7 +43,6 @@ class CompositeSessionAuthenticationStrategy implements SessionAuthenticationStr
     public function onAuthentication(Request $request, TokenInterface $token)
     {
         foreach ($this->delegateStrategies as $strategy) {
-            /* @var $strategy SessionAuthenticationStrategyInterface */
             $strategy->onAuthentication($request, $token);
         }
     }

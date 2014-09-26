@@ -58,7 +58,7 @@ class ExpiredSessionListener implements ListenerInterface
     /**
      * Handles the number of simultaneous sessions for a single user.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
+     * @param  GetResponseEvent  $event A GetResponseEvent instance
      * @throws \RuntimeException if the successHandler exists and do not return a response
      */
     public function handle(GetResponseEvent $event)

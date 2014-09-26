@@ -16,12 +16,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\MaxSessionsExceededException;
 
 /**
- * ConcurrentSessionControlAuthenticationStrategy.
+ * Strategy which handles concurrent session-control.
  *
- * Strategy which handles concurrent session-control, in addition to the functionality provided by the base class.
- * When invoked following an authentication, it will check whether the user in question should be allowed to proceed,
- * by comparing the number of sessions they already have active with the configured maximumSessions value.
- * The SessionRegistry is used as the source of data on authenticated users and session data.
+ * When invoked following an authentication, it will check whether the user in
+ * question should be allowed to proceed, by comparing the number of sessions
+ * they already have active with the configured maximumSessions value.
+ * The SessionRegistry is used as the source of data on authenticated users and
+ * session data.
  *
  * @author Stefan Paschke <stefan.paschke@gmail.com>
  * @author Antonio J. García Lagar <aj@garcialagar.es>
@@ -87,7 +88,7 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
     }
 
     /**
-     * Allows subclasses to customise behaviour when too many sessions are detected.
+     * Allows subclasses to customize behavior when too many sessions are detected.
      *
      * @param array           $orderedSessions   Array of SessionInformation ordered from
      *                                           newest to oldest
@@ -110,7 +111,7 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
     /**
      * Method intended for use by subclasses to override the maximum number of sessions that are permitted for a particular authentication.
      *
-     * @param  string  $username
+     * @param  string $username
      * @return int
      */
     protected function getMaximumSessionsForThisUser($username)

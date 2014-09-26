@@ -264,7 +264,7 @@
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.http_utils" />
             <argument type="service" id="security.authentication.session_registry" />
-            <argument /> <!-- Target-URL Path -->
+            <argument /> <!-- Target-URL -->
             <argument type="service" on-invalid="null"/> <!-- Logout success handler -->
             <argument type="service" id="logger" on-invalid="null" />
         </service>

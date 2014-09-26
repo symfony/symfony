@@ -15,6 +15,10 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     private $connection;
     private $table;
 
+    /**
+     * @param Connection $connection The DB connection
+     * @param string     $table      The table name to store session information
+     */
     public function __construct(Connection $connection, $table)
     {
         $this->connection = $connection;
@@ -22,7 +26,7 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     }
 
     /**
-     * Obtains the maintained information for one session.
+     * Gets the stored information for the given session.
      *
      * @param  string             $sessionId the session identifier key.
      * @return SessionInformation a SessionInformation object.
@@ -40,11 +44,11 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     }
 
     /**
-     * Obtains the maintained information for one user.
+     * Gets the stored sessions information for the given username.
      *
-     * @param  string  $username                The user identifier.
-     * @param  bool    $includeExpiredSessions.
-     * @return array   An array of SessionInformation objects.
+     * @param  string                $username               The user identifier.
+     * @param  bool                  $includeExpiredSessions If true, expired sessions information is included.
+     * @return SessionInformations[] An array of SessionInformation objects.
      */
     public function getSessionInformations($username, $includeExpiredSessions = false)
     {
@@ -68,7 +72,6 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     /**
      * Adds information for one session.
      *
-     * @param string $sessionId the session identifier key.
      * @param SessionInformation a SessionInformation object.
      */
     public function setSessionInformation(SessionInformation $sessionInformation)
@@ -122,7 +125,7 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     }
 
     /**
-     * Deletes the maintained information of one session.
+     * Deletes stored information of one session.
      *
      * @param string $sessionId the session identifier key.
      */

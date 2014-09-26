@@ -37,7 +37,7 @@ class SessionInformation
     }
 
     /**
-     * Sets the session informations expired date to the current date and time.
+     * Sets the session informations expiration date to the current date and time.
      *
      */
     public function expireNow()
@@ -56,7 +56,7 @@ class SessionInformation
     }
 
     /**
-     * Obtains the username.
+     * Gets the username.
      *
      * @return string
      */
@@ -66,7 +66,7 @@ class SessionInformation
     }
 
     /**
-     * Obtain the session identifier.
+     * Gets the session identifier key.
      *
      * @return string $sessionId the session identifier key.
      */
@@ -76,7 +76,7 @@ class SessionInformation
     }
 
     /**
-     * Return wether this session is expired.
+     * Return whether this session is expired.
      *
      * @return bool
      */

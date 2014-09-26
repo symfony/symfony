@@ -95,16 +95,18 @@ class ExtCloner extends AbstractCloner
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;
                             $stub->class = $zval['object_class'];
-                            $stub->value = $h;
-                            $a = $this->castObject($v, $stub, 0 < $i);
-                            if (Stub::TYPE_OBJECT !== $stub->type) {
-                                break;
+                            $stub->value = $v;
+                            $a = $this->castObject($stub, 0 < $i);
+                            if ($v !== $stub->value) {
+                                if (Stub::TYPE_OBJECT !== $stub->type) {
+                                    break;
+                                }
+                                $h = spl_object_hash($stub->value);
                             }
-                            $h = $stub->value;
-                            $stub->value = '';
+                            $stub->value = null;
                             if (0 <= $maxItems && $maxItems <= $pos) {
                                 $stub->cut = count($a);
-                                $a = array();
+                                $a = null;
                             }
                         }
                         if (empty($softRefs[$h])) {
@@ -112,6 +114,7 @@ class ExtCloner extends AbstractCloner
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
+                            $a = null;
                         }
                         break;
 
@@ -120,16 +123,18 @@ class ExtCloner extends AbstractCloner
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_RESOURCE;
                             $stub->class = $zval['resource_type'];
-                            $stub->value = $h;
-                            $a = $this->castResource($v, $stub, 0 < $i);
-                            if (Stub::TYPE_RESOURCE !== $stub->type) {
-                                break;
+                            $stub->value = $v;
+                            $a = $this->castResource($stub, 0 < $i);
+                            if ($v !== $stub->value) {
+                                if (Stub::TYPE_RESOURCE !== $stub->type) {
+                                    break;
+                                }
+                                $h = (int) $stub->value;
                             }
-                            $h = $stub->value;
-                            $stub->value = '';
+                            $stub->value = null;
                             if (0 <= $maxItems && $maxItems <= $pos) {
                                 $stub->cut = count($a);
-                                $a = array();
+                                $a = null;
                             }
                         }
                         if (empty($softRefs[$h])) {
@@ -137,6 +142,7 @@ class ExtCloner extends AbstractCloner
                         } else {
                             $stub = $softRefs[$h];
                             $stub->ref = ++$refs;
+                            $a = null;
                         }
                         break;
                 }

@@ -43,6 +43,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $var['file'] = htmlspecialchars($var['file'], ENT_QUOTES, 'UTF-8');
+        $intMax = PHP_INT_MAX;
 
         $this->assertSame(
             <<<EOTXT
@@ -55,7 +56,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   <span class=sf-dump-meta>3</span> => <span class=sf-dump-num>NAN</span>
   <span class=sf-dump-meta>4</span> => <span class=sf-dump-num>INF</span>
   <span class=sf-dump-meta>5</span> => <span class=sf-dump-num>-INF</span>
-  <span class=sf-dump-meta>6</span> => <span class=sf-dump-num>9223372036854775807</span>
+  <span class=sf-dump-meta>6</span> => <span class=sf-dump-num>{$intMax}</span>
   "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str>déjà</span>"
   <span class=sf-dump-meta>7</span> => b"<span class=sf-dump-str>é</span>"
   "<span class=sf-dump-meta>[]</span>" => []

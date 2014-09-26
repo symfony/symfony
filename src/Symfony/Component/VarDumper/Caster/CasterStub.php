@@ -22,11 +22,13 @@ class CasterStub extends Stub
 {
     public function __construct($value, $class = '')
     {
+        $this->class = $class;
+        $this->value = $value;
+
         switch (gettype($value)) {
             case 'object':
                 $this->type = self::TYPE_OBJECT;
                 $this->class = get_class($value);
-                $this->value = spl_object_hash($value);
                 $this->cut = -1;
                 break;
 
@@ -40,7 +42,6 @@ class CasterStub extends Stub
             case 'unknown type':
                 $this->type = self::TYPE_RESOURCE;
                 $this->class = @get_resource_type($value);
-                $this->value = (int) $value;
                 $this->cut = -1;
                 break;
 
@@ -49,13 +50,8 @@ class CasterStub extends Stub
                     $this->type = self::TYPE_STRING;
                     $this->class = preg_match('//u', $value) ? self::STRING_UTF8 : self::STRING_BINARY;
                     $this->cut = self::STRING_BINARY === $this->class ? strlen($value) : (function_exists('iconv_strlen') ? iconv_strlen($value, 'UTF-8') : -1);
-                    break;
+                    $this->value = '';
                 }
-                // No break;
-
-            default:
-                $this->class = $class;
-                $this->value = $value;
                 break;
         }
     }

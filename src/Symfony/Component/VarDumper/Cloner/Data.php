@@ -200,8 +200,8 @@ class Data
      */
     public static function utf8Encode($s)
     {
-        if (function_exists('iconv')) {
-            return iconv('CP1252', 'UTF-8', $s);
+        if (function_exists('mb_convert_encoding')) {
+            return mb_convert_encoding($s, 'UTF-8', 'CP1252');
         }
 
         $s .= $s;

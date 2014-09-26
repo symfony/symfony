@@ -40,6 +40,7 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         $out = ob_get_clean();
         $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
+        $intMax = PHP_INT_MAX;
 
         $this->assertSame(
             <<<EOTXT
@@ -52,7 +53,7 @@ array:25 [
   3 => NAN
   4 => INF
   5 => -INF
-  6 => 9223372036854775807
+  6 => {$intMax}
   "str" => "déjà"
   7 => b"é"
   "[]" => []

@@ -18,7 +18,7 @@
                     <div class="sf-toolbar-info-piece">
                         in
                         {% if dump.file %}
-                            {% set link = dump.file|file_link(dump.line) }} %}
+                            {% set link = dump.file|file_link(dump.line) %}
                             {% if link %}
                                 <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
                             {% else %}
@@ -76,7 +76,7 @@
         <li class="sf-dump sf-reset">
             in
             {% if dump.line %}
-                {% set link = dump.file|file_link(dump.line) }} %}
+                {% set link = dump.file|file_link(dump.line) %}
                 {% if link %}
                     <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
                 {% else %}

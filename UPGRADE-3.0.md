@@ -25,13 +25,13 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $form->bind(array(...));
    ```
 
    After:
 
-   ```
+   ```php
    $form->submit(array(...));
    ```
 
@@ -42,7 +42,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    if ('POST' === $request->getMethod()) {
        $form->bind($request);
 
@@ -54,7 +54,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $form->handleRequest($request);
 
    if ($form->isValid()) {
@@ -65,7 +65,7 @@ UPGRADE FROM 2.x to 3.0
    If you want to test whether the form was submitted separately, you can use
    the method `isSubmitted()`:
 
-   ```
+   ```php
    $form->handleRequest($request);
 
    if ($form->isSubmitted()) {
@@ -82,7 +82,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $builder->addEventListener(FormEvents::PRE_BIND, function (FormEvent $event) {
        // ...
    });
@@ -90,7 +90,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
        // ...
    });
@@ -100,7 +100,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    $builder->add('address', 'form', array(
        'virtual' => true,
    ));
@@ -108,7 +108,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    $builder->add('address', 'form', array(
        'inherit_data' => true,
    ));
@@ -118,7 +118,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 
    $iterator = new VirtualFormAwareIterator($forms);
@@ -126,17 +126,17 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Form\Util\InheritDataAwareIterator;
 
    $iterator = new InheritDataAwareIterator($forms);
    ```
 
  * The `TypeTestCase` class was moved from the `Symfony\Component\Form\Tests\Extension\Core\Type` namespace to the `Symfony\Component\Form\Test` namespace.
- 
+
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase
 
    class MyTypeTest extends TypeTestCase
@@ -147,7 +147,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Form\Test\TypeTestCase;
 
    class MyTypeTest extends TypeTestCase
@@ -166,7 +166,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    <form method="post" action="http://example.com" <?php echo $view['form']->enctype($form) ?>>
        ...
    </form>
@@ -174,7 +174,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    <?php echo $view['form']->start($form) ?>
        ...
    <?php echo $view['form']->end($form) ?>
@@ -186,7 +186,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 1:
 
-   ```
+   ```php
    $form = $this->createForm('my_form', $formData, array(
        'method' => 'PUT',
        'action' => $this->generateUrl('target_route'),
@@ -195,7 +195,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 2:
 
-   ```
+   ```php
    $form = $this->createFormBuilder($formData)
        // ...
        ->setMethod('PUT')
@@ -205,7 +205,7 @@ UPGRADE FROM 2.x to 3.0
 
    It is also possible to override the method and the action in the template:
 
-   ```
+   ```php
    <?php echo $view['form']->start($form, array('method' => 'GET', 'action' => 'http://example.com')) ?>
        ...
    <?php echo $view['form']->end($form) ?>
@@ -245,7 +245,7 @@ UPGRADE FROM 2.x to 3.0
  * The Locale component was removed and replaced by the Intl component.
    Instead of the methods in `Symfony\Component\Locale\Locale`, you should use
    these equivalent methods in `Symfony\Component\Intl\Intl` now:
-   
+
     * `Locale::getDisplayCountries()` -> `Intl::getRegionBundle()->getCountryNames()`
     * `Locale::getCountries()` -> `array_keys(Intl::getRegionBundle()->getCountryNames())`
     * `Locale::getDisplayLanguages()` -> `Intl::getLanguageBundle()->getLanguageNames()`
@@ -259,7 +259,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
    $accessor = PropertyAccess::getPropertyAccessor();
@@ -267,7 +267,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\PropertyAccess;
 
    $accessor = PropertyAccess::createPropertyAccessor();
@@ -282,17 +282,21 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```yaml
    article_edit:
        pattern: /article/{id}
        requirements: { '_method': 'POST|PUT', '_scheme': 'https', 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" pattern="/article/{id}">
        <requirement key="_method">POST|PUT</requirement>
        <requirement key="_scheme">https</requirement>
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPattern('/article/{id}');
    $route->setRequirement('_method', 'POST|PUT');
@@ -301,17 +305,21 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```yaml
    article_edit:
        path: /article/{id}
        methods: [POST, PUT]
        schemes: https
        requirements: { 'id': '\d+' }
+   ```
 
+   ```xml
    <route id="article_edit" path="/article/{id}" methods="POST PUT" schemes="https">
        <requirement key="id">\d+</requirement>
    </route>
+   ```
 
+   ```php
    $route = new Route();
    $route->setPath('/article/{id}');
    $route->setMethods(array('POST', 'PUT'));
@@ -332,7 +340,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    <form method="post" action="http://example.com" {{ form_enctype(form) }}>
        ...
    </form>
@@ -340,7 +348,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```twig
    {{ form_start(form) }}
        ...
    {{ form_end(form) }}
@@ -352,7 +360,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 1:
 
-   ```
+   ```php
    $form = $this->createForm('my_form', $formData, array(
        'method' => 'PUT',
        'action' => $this->generateUrl('target_route'),
@@ -361,7 +369,7 @@ UPGRADE FROM 2.x to 3.0
 
    Alternative 2:
 
-   ```
+   ```php
    $form = $this->createFormBuilder($formData)
        // ...
        ->setMethod('PUT')
@@ -371,7 +379,7 @@ UPGRADE FROM 2.x to 3.0
 
    It is also possible to override the method and the action in the template:
 
-   ```
+   ```twig
    {{ form_start(form, {'method': 'GET', 'action': 'http://example.com'}) }}
        ...
    {{ form_end(form) }}
@@ -385,7 +393,7 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
 
    /**
@@ -399,7 +407,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Validator\Constraints as Assert;
 
    /**
@@ -417,12 +425,12 @@ UPGRADE FROM 2.x to 3.0
 
    Before:
 
-   ```
+   ```php
    Yaml::parse($fileName);
    ```
 
    After:
 
-   ```
+   ```php
    Yaml::parse(file_get_contents($fileName));
    ```

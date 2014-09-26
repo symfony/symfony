@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-26T09:00:37Z
+
+In my opinion the FrameworkBundle would be a more suitable location. This avoids the dependency on the translator component directly from the http component. This is basically a bit of glue between those 2 packages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-26T09:04:07Z
+
+There is no dep added to the HttpKernel package. I put it here so that it is reusable in Silex, or Drupal for instance.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-26T09:23:19Z
+
+That does make more sense indeed, but not for people that use the http component without the translation component. They now get the translation component while they probably won't need it. The PR seems to be only done so that _if_ you have the translation component, you have this fix. Hence I think it should be in the FrameworkBundle.
+
+I'm missing where this subscriber is added. If this goes into the FrameworkBundle, it would be nice to see a suggests on the translator component, as you probably don't use it by default.
+
+```javascript
+{
+    "suggests": {
+        "symfony/translator": "Required only if you use locales"
+    }
+}
+```
+
+_On a side note, it's a subscriber but the name implies listener. To avoid confusion, would it be an idea to rename it to `TranslatorSubscriber`, or is it standard to follow the `Listener` convention for subscribers?_
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-26T09:39:35Z
+
+@iltar the added dependency is only a `require-dev`, so there is no additional dependencies introduced by this PR.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-26T09:41:30Z
+
+I should have seen that.. :+1: in that case
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-26T13:42:51Z
+
+> On a side note, it's a subscriber but the name implies listener. To avoid confusion, would it be an idea to rename it to TranslatorSubscriber, or is it standard to follow the Listener convention for subscribers?
+
+all our subscribers are named this way in Symfony
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-26T13:44:19Z
+
+:+1:

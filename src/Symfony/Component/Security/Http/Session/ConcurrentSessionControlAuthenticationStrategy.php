@@ -29,14 +29,14 @@ use Symfony\Component\Security\Core\Exception\MaxSessionsExceededException;
 class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
     protected $registry;
-    protected $exceptionIfMaximumExceeded;
+    protected $errorIfMaximumExceeded;
     protected $maximumSessions;
 
-    public function __construct(SessionRegistry $registry, $maximumSessions, $exceptionIfMaximumExceeded = true)
+    public function __construct(SessionRegistry $registry, $maximumSessions, $errorIfMaximumExceeded = true)
     {
         $this->registry = $registry;
         $this->setMaximumSessions($maximumSessions);
-        $this->setExceptionIfMaximumExceeded($exceptionIfMaximumExceeded);
+        $this->setErrorIfMaximumExceeded($errorIfMaximumExceeded);
     }
 
     /**
@@ -63,17 +63,17 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
             }
         }
 
-        $this->allowableSessionsExceeded($sessions, $maxSessions, $this->registry);
+        $this->allowedSessionsExceeded($sessions, $maxSessions, $this->registry);
     }
 
     /**
      * Sets a boolean flag that causes a RuntimeException to be thrown if the number of sessions is exceeded.
      *
-     * @param bool $exceptionIfMaximumExceeded
+     * @param bool $errorIfMaximumExceeded
      */
-    public function setExceptionIfMaximumExceeded($exceptionIfMaximumExceeded)
+    public function setErrorIfMaximumExceeded($errorIfMaximumExceeded)
     {
-        $this->exceptionIfMaximumExceeded = (bool) $exceptionIfMaximumExceeded;
+        $this->errorIfMaximumExceeded = (bool) $errorIfMaximumExceeded;
     }
 
     /**
@@ -94,9 +94,9 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
      * @param int             $allowableSessions
      * @param SessionRegistry $registry
      */
-    protected function allowableSessionsExceeded($orderedSessions, $allowableSessions, SessionRegistry $registry)
+    protected function allowedSessionsExceeded($orderedSessions, $allowableSessions, SessionRegistry $registry)
     {
-        if ($this->exceptionIfMaximumExceeded) {
+        if ($this->errorIfMaximumExceeded) {
             throw new MaxSessionsExceededException(sprintf('Maximum number of sessions (%s) exceeded', $allowableSessions));
         }
 

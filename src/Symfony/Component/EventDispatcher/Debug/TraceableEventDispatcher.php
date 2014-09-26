@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\LazyServiceListener;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Psr\Log\LoggerInterface;
 
@@ -268,6 +269,13 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $info = array(
             'event' => $eventName,
         );
+        // Unpack lazy container service listener.
+        if ($listener instanceof LazyServiceListener) {
+            $container = $listener->getContainer();
+            $method = $listener->getMethod();
+            $serviceId = $listener->getServiceId();
+            $listener = array($container->get($serviceId), $method);
+        }
         if ($listener instanceof \Closure) {
             $info += array(
                 'type' => 'Closure',

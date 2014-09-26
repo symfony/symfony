@@ -73,10 +73,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
             parent::removeListener($eventName, $proxy);
         }
 
-        $proxy = function ($event, $eventName, $dispatcher) use ($container, $serviceId, $method) {
-            call_user_func(array($container->get($serviceId), $method), $event, $eventName, $dispatcher);
-        };
-
+        $proxy = new LazyServiceListener($container, $serviceId, $method);
         $this->proxies[$eventName][$serviceId][$method] = $proxy;
         parent::addListener($eventName, $proxy, $priority);
     }

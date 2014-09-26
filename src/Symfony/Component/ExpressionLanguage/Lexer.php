@@ -81,7 +81,7 @@ class Lexer
                 // punctuation
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
-            } elseif (preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, null, $cursor)) {
+            } elseif (preg_match('/\$?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $expression, $match, null, $cursor)) {
                 // names
                 $tokens[] = new Token(Token::NAME_TYPE, $match[0], $cursor + 1);
                 $cursor += strlen($match[0]);

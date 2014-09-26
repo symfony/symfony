@@ -184,11 +184,18 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (false === isset($this->functions[$token->value])) {
+                            if (0 === strpos($token->value, '$')) {
+                                $tokenValue = substr($token->value, 1);
+                                if (!in_array($tokenValue, $this->names, true)) {
+                                    throw new SyntaxError(sprintf('The closure "%s" does not exist', $tokenValue), $token->cursor);
+                                }
+
+                                $node = new Node\ClosureNode($tokenValue, $this->parseArguments());
+                            } elseif (isset($this->functions[$token->value])) {
+                                $node = new Node\FunctionNode($token->value, $this->parseArguments());
+                            } else {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor);
                             }
-
-                            $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!in_array($token->value, $this->names, true)) {
                                 throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);

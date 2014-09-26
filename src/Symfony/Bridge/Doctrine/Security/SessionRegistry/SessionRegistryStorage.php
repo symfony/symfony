@@ -88,11 +88,11 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
                     'session_id'   => $sessionInformation->getSessionId(),
                     'username'     => $sessionInformation->getUsername(),
                     'last_request' => $sessionInformation->getLastRequest(),
-                    'expired'      => $sessionInformation->getExpired()
+                    'expired'      => $sessionInformation->getExpired(),
                 ),
                 array(
                     'last_request' => 'datetime',
-                    'expired'      => 'datetime'
+                    'expired'      => 'datetime',
                 )
             );
 
@@ -121,11 +121,11 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
                         'session_id'   => $sessionInformation->getSessionId(),
                         'username'     => $sessionInformation->getUsername(),
                         'last_request' => $sessionInformation->getLastRequest(),
-                        'expired'      => $sessionInformation->getExpired()
+                        'expired'      => $sessionInformation->getExpired(),
                     ),
                     array(
                         'last_request' => 'datetime',
-                        'expired'      => 'datetime'
+                        'expired'      => 'datetime',
                     )
                 );
             } catch (DBALException $e) {

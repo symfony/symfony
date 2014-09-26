@@ -14,6 +14,7 @@ CHANGELOG
  * deprecated `ClassMetadata::addMemberMetadata()`
  * [BC BREAK] added `Mapping\MetadataInterface::getConstraints()`
  * added generic "payload" option to all constraints for attaching domain-specific data
+ * [BC BREAK] added `ConstraintViolationBuilderInterface::setCause()`
 
 2.5.0
 -----

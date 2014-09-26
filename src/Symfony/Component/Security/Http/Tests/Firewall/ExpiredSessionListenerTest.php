@@ -33,7 +33,7 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($request));
 
         $listener = new ExpiredSessionListener(
-            $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
             $this->getHttpUtils(),
             $this->getSessionRegistry()
         );
@@ -55,7 +55,7 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getSession')
             ->will($this->returnValue($session));
 
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
@@ -100,7 +100,7 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUsername')
             ->will($this->returnValue('foobar'));
 
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
@@ -171,7 +171,7 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUsername')
             ->will($this->returnValue('foobar'));
 
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $securityContext
             ->expects($this->once())
             ->method('getToken')
@@ -233,7 +233,7 @@ class ExpiredSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUsername')
             ->will($this->returnValue('foobar'));
 
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $securityContext = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $securityContext
             ->expects($this->any())
             ->method('getToken')

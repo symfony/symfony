@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Logout\LogoutHandlerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Session\SessionRegistry;
@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class ExpiredSessionListener implements ListenerInterface
 {
-    private $securityContext;
+    private $tokenStorage;
     private $httpUtils;
     private $sessionRegistry;
     private $targetUrl;
@@ -34,9 +34,9 @@ class ExpiredSessionListener implements ListenerInterface
     private $logger;
     private $handlers;
 
-    public function __construct(SecurityContextInterface $securityContext, HttpUtils $httpUtils, SessionRegistry $sessionRegistry, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, SessionRegistry $sessionRegistry, $targetUrl = '/', LogoutSuccessHandlerInterface $successHandler = null, LoggerInterface $logger = null)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
         $this->sessionRegistry = $sessionRegistry;
         $this->targetUrl = $targetUrl;
@@ -67,7 +67,7 @@ class ExpiredSessionListener implements ListenerInterface
 
         $session = $request->getSession();
 
-        if (null === $session || null === $token = $this->securityContext->getToken()) {
+        if (null === $session || null === $token = $this->tokenStorage->getToken()) {
             return;
         }
 
@@ -90,7 +90,7 @@ class ExpiredSessionListener implements ListenerInterface
                     $handler->logout($request, $response, $token);
                 }
 
-                $this->securityContext->setToken(null);
+                $this->tokenStorage->setToken(null);
 
                 $event->setResponse($response);
             } else {

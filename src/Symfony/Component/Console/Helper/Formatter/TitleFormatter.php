@@ -19,13 +19,19 @@ namespace Symfony\Component\Console\Helper\Formatter;
 class TitleFormatter implements FormatterInterface
 {
     protected $title;
+    protected $underlineChar;
+    protected $newLineBefore;
 
     /**
      * @param string $title
+     * @param string $underlineChar
+     * @param bool   $newLineBefore
      */
-    public function __construct($title)
+    public function __construct($title, $underlineChar = '=', $newLineBefore = false)
     {
         $this->title = $title;
+        $this->underlineChar = $underlineChar;
+        $this->newLineBefore = $newLineBefore;
     }
 
     /**
@@ -33,11 +39,16 @@ class TitleFormatter implements FormatterInterface
      */
     public function format()
     {
-        return implode("\n", array(
-            '',
-            sprintf('<fg=blue>%s</fg=blue>', $this->title),
-            sprintf('<fg=blue>%s</fg=blue>', str_repeat('=', strlen($this->title))),
-            '',
-        ));
+        $ret = array();
+
+        if ($this->newLineBefore) {
+            $ret[] = '';
+        }
+
+        $ret[] = sprintf('<fg=blue>%s</fg=blue>', $this->title);
+        $ret[] = sprintf('<fg=blue>%s</fg=blue>', str_repeat($this->underlineChar, strlen($this->title)));
+        $ret[] = '';
+
+        return implode("\n", $ret);
     }
 }

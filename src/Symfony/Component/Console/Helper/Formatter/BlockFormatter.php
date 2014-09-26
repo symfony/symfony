@@ -21,23 +21,25 @@ use Symfony\Component\Console\Helper\Helper;
  */
 class BlockFormatter implements FormatterInterface
 {
+    const MAX_LENGTH = 120;
+
     protected $messages;
+    protected $type;
     protected $style;
-    protected $large;
-    protected $padLength;
+    protected $prefix;
 
     /**
      * @param string|array $messages  The message to write in the block
-     * @param string       $style     The style to apply to the whole block
-     * @param bool         $large     Whether to return a large block
-     * @param int          $padLength Length to pad the messages
+     * @param string|null  $type      The block type (added in [] on first line)
+     * @param string|null  $style     The style to apply to the whole block
+     * @param string       $prefix    The prefix for the block
      */
-    public function __construct($messages, $style, $large = false, $padLength = 0)
+    public function __construct($messages, $type = null, $style = null, $prefix = ' ')
     {
         $this->messages = $messages;
+        $this->type = $type;
         $this->style = $style;
-        $this->large = $large;
-        $this->padLength = $padLength;
+        $this->prefix = $prefix;
     }
 
     /**
@@ -45,29 +47,33 @@ class BlockFormatter implements FormatterInterface
      */
     public function format()
     {
-        $messages = (array) $this->messages;
-
-        $len = 0;
+        $messages = array_values((array) $this->messages);
         $lines = array();
-        foreach ($messages as $message) {
+
+        // add type
+        if (null !== $this->type) {
+            $messages[0] = sprintf('[%s] %s', $this->type, $messages[0]);
+        }
+
+        // wrap and add newlines for each element
+        foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines[] = sprintf($this->large ? '  %s  ' : ' %s ', $message);
-            $len = max(Helper::strlen($message) + ($this->large ? 4 : 2), $len);
+            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LENGTH - Helper::strlen($this->prefix))));
+
+            if (count($messages) > 1 && $key < count($message)) {
+                $lines[] = '';
+            }
         }
 
-        $messages = $this->large ? array(str_repeat(' ', $len)) : array();
-        foreach ($lines as $line) {
-            $messages[] = $line.str_repeat(' ', $len - Helper::strlen($line));
-        }
-        if ($this->large) {
-            $messages[] = str_repeat(' ', $len);
+        foreach ($lines as &$line) {
+            $line = sprintf('%s%s', $this->prefix, $line);
+            $line .= str_repeat(' ', self::MAX_LENGTH - Helper::strlen($line));
+
+            if ($this->style) {
+                $line = sprintf('<%s>%s</%s>', $this->style, $line, $this->style);
+            }
         }
 
-        foreach ($messages as &$message) {
-            $padding = $this->padLength - Helper::strlen($message);
-            $message = sprintf('<%s>%s</%s>', $this->style, $message.str_repeat(' ', $padding > 0 ? $padding : 0), $this->style);
-        }
-
-        return implode("\n", $messages);
+        return implode("\n", $lines)."\n";
     }
 }

@@ -15,9 +15,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\Formatter\BlockFormatter;
 use Symfony\Component\Console\Helper\Formatter\FormatterInterface;
 use Symfony\Component\Console\Helper\Formatter\ListFormatter;
-use Symfony\Component\Console\Helper\Formatter\SectionFormatter;
-use Symfony\Component\Console\Helper\Formatter\SectionTitleFormatter;
-use Symfony\Component\Console\Helper\Formatter\StyledBlockFormatter;
 use Symfony\Component\Console\Helper\Formatter\TextFormatter;
 use Symfony\Component\Console\Helper\Formatter\TitleFormatter;
 
@@ -47,28 +44,16 @@ class OutputDecorator implements OutputInterface
     }
 
     /**
-     * Formats a message within a section.
-     *
-     * @param string $section The section name
-     * @param string $message The message
-     * @param string $style   The style to apply to the section
-     */
-    public function section($section, $message, $style = 'info')
-    {
-        $this->format(new SectionFormatter($section, $message, $style));
-    }
-
-    /**
      * Formats a message as a block of text.
      *
      * @param string|array $messages  The message to write in the block
-     * @param string       $style     The style to apply to the whole block
-     * @param bool         $large     Whether to return a large block
-     * @param int          $padLength Length to pad the messages
+     * @param string|null  $type      The block type (added in [] on first line)
+     * @param string|null  $style     The style to apply to the whole block
+     * @param string       $prefix    The prefix for the block
      */
-    public function block($messages, $style, $large = false, $padLength = 0)
+    public function block($messages, $type = null, $style = null, $prefix = ' ')
     {
-        $this->format(new BlockFormatter($messages, $style, $large, $padLength));
+        $this->format(new BlockFormatter($messages, $type, $style, $prefix));
     }
 
     /**
@@ -78,7 +63,7 @@ class OutputDecorator implements OutputInterface
      */
     public function title($message)
     {
-        $this->format(new TitleFormatter($message));
+        $this->format(new TitleFormatter($message, '=', true));
     }
 
     /**
@@ -88,7 +73,7 @@ class OutputDecorator implements OutputInterface
      */
     public function subtitle($message)
     {
-        $this->format(new SectionTitleFormatter($message));
+        $this->format(new TitleFormatter($message, '-'));
     }
 
     /**
@@ -118,7 +103,7 @@ class OutputDecorator implements OutputInterface
      */
     public function success($messages)
     {
-        $this->format(new StyledBlockFormatter($messages, 'OK', 'fg=white;bg=green'));
+        $this->format(new BlockFormatter($messages, 'OK', 'fg=white;bg=green'));
     }
 
     /**
@@ -128,7 +113,7 @@ class OutputDecorator implements OutputInterface
      */
     public function error($messages)
     {
-        $this->format(new StyledBlockFormatter($messages, 'ERROR', 'fg=white;bg=red'));
+        $this->format(new BlockFormatter($messages, 'ERROR', 'fg=white;bg=red'));
     }
 
     /**
@@ -138,7 +123,7 @@ class OutputDecorator implements OutputInterface
      */
     public function warning($messages)
     {
-        $this->format(new StyledBlockFormatter($messages, 'WARNING', 'fg=black;bg=yellow'));
+        $this->format(new BlockFormatter($messages, 'WARNING', 'fg=black;bg=yellow'));
     }
 
     /**
@@ -148,7 +133,7 @@ class OutputDecorator implements OutputInterface
      */
     public function note($messages)
     {
-        $this->format(new StyledBlockFormatter($messages, 'NOTE', 'fg=white', '! '));
+        $this->format(new BlockFormatter($messages, 'NOTE', null, ' ! '));
     }
 
     /**
@@ -158,7 +143,7 @@ class OutputDecorator implements OutputInterface
      */
     public function caution($messages)
     {
-        $this->format(new StyledBlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', '! '));
+        $this->format(new BlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', ' ! '));
     }
 
     /**

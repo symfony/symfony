@@ -13,7 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -43,7 +43,7 @@ class ChoiceToValueTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a scalar.');
         }
 
-        // These are now valid ChoiceList values, so we can return null
+        // These are now valid ArrayChoiceList values, so we can return null
         // right away
         if ('' === $value || null === $value) {
             return;

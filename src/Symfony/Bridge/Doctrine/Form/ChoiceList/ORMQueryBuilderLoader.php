@@ -17,7 +17,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Getting Entities through the ORM QueryBuilder.
+ * Loads entities using a {@link QueryBuilder} instance.
+ *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {

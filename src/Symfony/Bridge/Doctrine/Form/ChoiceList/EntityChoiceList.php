@@ -11,17 +11,20 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link EntityChoiceLoader} instead.
  */
 class EntityChoiceList extends ObjectChoiceList
 {

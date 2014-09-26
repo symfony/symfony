@@ -29,10 +29,13 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * <code>
  * $choices = array(true, false);
  * $labels = array('Agree', 'Disagree');
- * $choiceList = new ChoiceList($choices, $labels);
+ * $choiceList = new ArrayChoiceList($choices, $labels);
  * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Form\ArrayChoiceList\ArrayChoiceList} instead.
  */
 class ChoiceList implements ChoiceListInterface
 {

@@ -262,12 +262,19 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($entity1, $constraint);
 
-        $this->assertViolation('myMessage', array(), 'property.path.name', 'Foo');
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->assertRaised();
+
         $this->context->getViolations()->remove(0);
 
         $this->validator->validate($entity2, $constraint);
 
-        $this->assertViolation('myMessage', array(), 'property.path.name', 'Foo');
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name')
+            ->setInvalidValue('Foo')
+            ->assertRaised();
     }
 
     public function testValidateUniquenessUsingCustomRepositoryMethod()

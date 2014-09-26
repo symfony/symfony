@@ -43,16 +43,18 @@ class LazyServiceListener
      * @param string              $serviceId  The service identifier
      * @param string              $method     The method name
      */
-    public function __construct(ContainerInterface $container, $serviceId, $method) {
-      $this->container = $container;
-      $this->serviceId = $serviceId;
-      $this->method = $method;
+    public function __construct(ContainerInterface $container, $serviceId, $method)
+    {
+        $this->container = $container;
+        $this->serviceId = $serviceId;
+        $this->method = $method;
     }
 
     /**
      * Retrieves the service from the container and forwards the method call.
      */
-    public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher) {
+    public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)
+    {
         $service = $this->container->get($this->serviceId);
         $service->{$this->method}($event, $eventName, $dispatcher);
     }

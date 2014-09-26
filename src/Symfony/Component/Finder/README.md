@@ -18,6 +18,9 @@ Finder finds files and directories via an intuitive fluent interface.
         print $file->getRealpath()."\n";
     }
 
+The resulting contents of the iterator are instances of SplFileInfo. You can 
+thus use all of SplFileInfo's methods (getPerms(), getSize(), etc) on them.
+
 But you can also use it to find files stored remotely like in this example where
 we are looking for files on Amazon S3:
 

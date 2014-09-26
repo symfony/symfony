@@ -28,9 +28,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 {
     protected $logger;
     protected $stopwatch;
+    protected $dispatcher;
 
     private $called;
-    private $dispatcher;
 
     /**
      * Constructor.

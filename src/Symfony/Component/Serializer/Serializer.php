@@ -99,6 +99,37 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     }
 
     /**
+     * Deserializes data into an array of the given type.
+     *
+     * @param mixed  $data
+     * @param string $type
+     * @param string $format
+     * @param array  $context
+     *
+     * @return object
+     *
+     * @throws UnexpectedValueException
+     */
+    public function deserializeCollection($data, $type, $format, array $context = array())
+    {
+        if (!$this->supportsDecoding($format)) {
+            throw new UnexpectedValueException(sprintf('Deserialization for the format %s is not supported', $format));
+        }
+
+        $data = $this->decode($data, $format, $context);
+
+        if (!is_array($data)) {
+            throw new UnexpectedValueException(sprintf('Could not deserialize value into array: %s.', $data));
+        }
+
+        foreach ($data as $key => $val) {
+            $data[$key] = $this->denormalizeObject($datum, $type, $format, $context);
+        }
+
+        return $data;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function normalize($data, $format = null, array $context = array())

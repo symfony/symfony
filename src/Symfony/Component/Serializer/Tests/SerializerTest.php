@@ -124,6 +124,23 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $result->toArray());
     }
 
+    public function testDeserializeCollection()
+    {
+        $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));
+        $data = array(array('title' => 'foo', 'numbers' => array(5, 3)), array('title' => 'bar', 'numbers' => array(2, 8)));
+        $result = $this->serializer->deserializeCollection(json_encode($data), '\Symfony\Component\Serializer\Tests\Model', 'json');
+        $this->assertContainsOnlyInstancesOf('\Symfony\Component\Serializer\Tests\Model', $result);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     */
+    public function testDeserializeInvalidCollection()
+    {
+        $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));
+        $this->serializer->deserializeCollection('foo', '\Symfony\Component\Serializer\Tests\Model', 'json');
+    }
+
     public function testDeserializeUseCache()
     {
         $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));

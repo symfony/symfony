@@ -52,7 +52,7 @@ $container->
     addMethodCall('setBar', array(new Reference('foo2', ContainerInterface::NULL_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foo3', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
     addMethodCall('setBar', array(new Reference('foobaz', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))->
-    addMethodCall('setBar', array(new Expression('service("foo").foo() ~ parameter("foo")')))
+    addMethodCall('setBar', array(new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")')))
 ;
 $container->
     register('factory_service', 'Bar')->

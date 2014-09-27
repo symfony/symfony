@@ -31,7 +31,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
     private $authenticationManager;
     private $logger;
 
-    public function __construct(SecurityContextInterface $context, $key, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null)
+    public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
     {
         $this->context               = $context;
         $this->key                   = $key;
@@ -51,7 +51,10 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = $this->authenticationManager->authenticate(new AnonymousToken($this->key, 'anon.', array()));
+            if (null !== $this->authenticationManager) {
+                $token = $this->authenticationManager->authenticate(new AnonymousToken($this->key, 'anon.', array()));
+            }
+
             $this->context->setToken($token);
 
             if (null !== $this->logger) {

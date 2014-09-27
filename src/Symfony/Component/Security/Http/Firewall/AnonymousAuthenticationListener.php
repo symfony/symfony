@@ -51,8 +51,9 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
+            $token = new AnonymousToken($this->key, 'anon.', array());
             if (null !== $this->authenticationManager) {
-                $token = $this->authenticationManager->authenticate(new AnonymousToken($this->key, 'anon.', array()));
+                $token = $this->authenticationManager->authenticate($token);
             }
 
             $this->context->setToken($token);

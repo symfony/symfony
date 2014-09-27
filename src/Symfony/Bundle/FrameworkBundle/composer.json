@@ -36,10 +36,10 @@
         "symfony/console": "~2.0",
         "symfony/finder": "~2.0",
         "symfony/security": "~2.4",
-        "symfony/form": "~2.4",
+        "symfony/form": "~2.4,<2.5.0",
         "symfony/class-loader": "~2.1",
         "symfony/process": "~2.0",
-        "symfony/validator": "~2.1",
+        "symfony/validator": "~2.1,<2.5.0",
         "symfony/yaml": "~2.0"
     },
     "suggest": {

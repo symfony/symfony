@@ -35,7 +35,7 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('authenticate')
         ;
 
-        $listener = new AnonymousAuthenticationListener($context, 'TheKey', $authenticationManager);
+        $listener = new AnonymousAuthenticationListener($context, 'TheKey', null, $authenticationManager);
         $listener->handle($this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false));
     }
 
@@ -67,7 +67,7 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->with($anonymousToken)
         ;
 
-        $listener = new AnonymousAuthenticationListener($context, 'TheKey', $authenticationManager);
+        $listener = new AnonymousAuthenticationListener($context, 'TheKey', null, $authenticationManager);
         $listener->handle($this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false));
     }
 
@@ -86,7 +86,7 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
-        $listener = new AnonymousAuthenticationListener($context, 'TheKey', $authenticationManager, $logger);
+        $listener = new AnonymousAuthenticationListener($context, 'TheKey', $logger, $authenticationManager);
         $listener->handle($this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false));
     }
 }

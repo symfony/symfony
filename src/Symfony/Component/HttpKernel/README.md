@@ -7,6 +7,7 @@ frameworks.
 ``HttpKernelInterface`` is the core interface of the Symfony2 full-stack
 framework:
 
+    ```php
     interface HttpKernelInterface
     {
         /**
@@ -18,6 +19,7 @@ framework:
          */
         function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true);
     }
+    ```
 
 It takes a ``Request`` as an input and should return a ``Response`` as an
 output. Using this interface makes your code compatible with all frameworks
@@ -27,6 +29,7 @@ free.
 Creating a framework based on the Symfony2 components is really easy. Here is
 a very simple, but fully-featured framework based on the Symfony2 components:
 
+    ```php
     $routes = new RouteCollection();
     $routes->add('hello', new Route('/hello', array('_controller' =>
         function (Request $request) {
@@ -49,6 +52,7 @@ a very simple, but fully-featured framework based on the Symfony2 components:
     $kernel = new HttpKernel($dispatcher, $resolver);
 
     $kernel->handle($request)->send();
+    ```
 
 This is all you need to create a flexible framework with the Symfony2
 components.
@@ -56,24 +60,30 @@ components.
 Want to add an HTTP reverse proxy and benefit from HTTP caching and Edge Side
 Includes?
 
+    ```php
     $kernel = new HttpKernel($dispatcher, $resolver);
 
     $kernel = new HttpCache($kernel, new Store(__DIR__.'/cache'));
+    ```
 
 Want to functional test this small framework?
 
+    ```php
     $client = new Client($kernel);
     $crawler = $client->request('GET', '/hello/Fabien');
 
     $this->assertEquals('Fabien', $crawler->filter('p > span')->text());
+    ```
 
 Want nice error pages instead of ugly PHP exceptions?
 
+    ```php
     $dispatcher->addSubscriber(new ExceptionListener(function (Request $request) {
         $msg = 'Something went wrong! ('.$request->get('exception')->getMessage().')';
 
         return new Response($msg, 500);
     }));
+    ```
 
 And that's why the simple looking ``HttpKernelInterface`` is so powerful. It
 gives you access to a lot of cool features, ready to be used out of the box,

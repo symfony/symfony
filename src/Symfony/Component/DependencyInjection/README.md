@@ -6,6 +6,7 @@ Injection Container.
 
 Here is a simple example that shows how to register services and parameters:
 
+    ```php
     use Symfony\Component\DependencyInjection\ContainerBuilder;
     use Symfony\Component\DependencyInjection\Reference;
 
@@ -17,9 +18,11 @@ Here is a simple example that shows how to register services and parameters:
     $sc->setParameter('foo.class', 'Foo');
 
     $sc->get('foo');
+    ```
 
 Method Calls (Setter Injection):
 
+    ```php
     $sc = new ContainerBuilder();
 
     $sc
@@ -29,11 +32,13 @@ Method Calls (Setter Injection):
     $sc->setParameter('bar.class', 'Bar');
 
     $sc->get('bar');
+    ```
 
 Factory Class:
 
 If your service is retrieved by calling a static method:
 
+    ```php
     $sc = new ContainerBuilder();
 
     $sc
@@ -45,6 +50,7 @@ If your service is retrieved by calling a static method:
     $sc->setParameter('bar.class', 'Bar');
 
     $sc->get('bar');
+    ```
 
 File Include:
 
@@ -52,6 +58,7 @@ For some services, especially those that are difficult or impossible to
 autoload, you may need the container to include a file before
 instantiating your class.
 
+    ```php
     $sc = new ContainerBuilder();
 
     $sc
@@ -62,6 +69,7 @@ instantiating your class.
     $sc->setParameter('bar.class', 'Bar');
 
     $sc->get('bar');
+    ```
 
 Resources
 ---------

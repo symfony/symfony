@@ -6,12 +6,15 @@ Debug provides tools to make debugging easier.
 Enabling all debug tools is as easy as calling the `enable()` method on the
 main `Debug` class:
 
+    ```php
     use Symfony\Component\Debug\Debug;
 
     Debug::enable();
+    ```
 
 You can also use the tools individually:
 
+    ```php
     use Symfony\Component\Debug\ErrorHandler;
     use Symfony\Component\Debug\ExceptionHandler;
 
@@ -23,6 +26,7 @@ You can also use the tools individually:
     } elseif (!ini_get('log_errors') || ini_get('error_log')) {
         ini_set('display_errors', 1);
     }
+    ```
 
 Note that the `Debug::enable()` call also registers the debug class loader
 from the Symfony ClassLoader component when available.

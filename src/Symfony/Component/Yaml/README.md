@@ -3,11 +3,13 @@ Yaml Component
 
 YAML implements most of the YAML 1.2 specification.
 
+    ```php
     use Symfony\Component\Yaml\Yaml;
 
     $array = Yaml::parse($file);
 
     print Yaml::dump($array);
+    ```
 
 Resources
 ---------

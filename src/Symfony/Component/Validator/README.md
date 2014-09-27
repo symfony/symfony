@@ -12,12 +12,14 @@ The component provides "validation constraints", which are simple objects
 containing the rules for the validation. Let's validate a simple string
 as an example:
 
+    ```php
     use Symfony\Component\Validator\Validation;
     use Symfony\Component\Validator\Constraints\Length;
 
     $validator = Validation::createValidator();
 
     $violations = $validator->validateValue('Bernhard', new Length(array('min' => 10)));
+    ```
 
 This validation will fail because the given string is shorter than ten
 characters. The precise errors, here called "constraint violations",  are
@@ -26,6 +28,7 @@ If the violation list is empty, validation succeeded.
 
 Validation of arrays is possible using the `Collection` constraint:
 
+    ```php
     use Symfony\Component\Validator\Validation;
     use Symfony\Component\Validator\Constraints as Assert;
 
@@ -44,6 +47,7 @@ Validation of arrays is possible using the `Collection` constraint:
     ));
 
     $violations = $validator->validateValue($input, $constraint);
+    ```
 
 Again, the validator returns the list of violations.
 
@@ -52,6 +56,7 @@ a mapping you can put constraints onto properties and objects of classes.
 Whenever an object of this class is validated, its properties and
 method results are matched against the constraints.
 
+    ```php
     use Symfony\Component\Validator\Validation;
     use Symfony\Component\Validator\Constraints as Assert;
 
@@ -91,6 +96,7 @@ method results are matched against the constraints.
     $user = new User('John Doe', 'john@example.com');
 
     $violations = $validator->validate($user);
+    ```
 
 This example uses the annotation support of Doctrine Common to
 map constraints to properties and methods. You can also map constraints

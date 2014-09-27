@@ -4,6 +4,7 @@ Translation Component
 Translation provides tools for loading translation files and generating
 translated strings from these including support for pluralization.
 
+    ```php
     use Symfony\Component\Translation\Translator;
     use Symfony\Component\Translation\MessageSelector;
     use Symfony\Component\Translation\Loader\ArrayLoader;
@@ -16,6 +17,7 @@ translated strings from these including support for pluralization.
     ), 'fr');
 
     echo $translator->trans('Hello World!')."\n";
+    ```
 
 Resources
 ---------

@@ -5,6 +5,7 @@ Process executes commands in sub-processes.
 
 In this example, we run a simple directory listing and get the result back:
 
+    ```php
     use Symfony\Component\Process\Process;
 
     $process = new Process('ls -lsa');
@@ -15,6 +16,7 @@ In this example, we run a simple directory listing and get the result back:
     }
 
     print $process->getOutput();
+    ```
 
 You can think that this is easy to achieve with plain PHP but it's not especially
 if you want to take care of the subtle differences between the different platforms.
@@ -23,6 +25,7 @@ And if you want to be able to get some feedback in real-time, just pass an
 anonymous function to the ``run()`` method and you will get the output buffer
 as it becomes available:
 
+    ```php
     use Symfony\Component\Process\Process;
 
     $process = new Process('ls -lsa');
@@ -33,6 +36,7 @@ as it becomes available:
             echo 'OUT > '.$buffer;
         }
     });
+    ```
 
 That's great if you want to execute a long running command (like rsync-ing files to a
 remote server) and give feedback to the user in real-time.

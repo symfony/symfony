@@ -5,10 +5,12 @@ Console eases the creation of beautiful and testable command line interfaces.
 
 The Application object manages the CLI application:
 
+    ```php
     use Symfony\Component\Console\Application;
 
     $console = new Application();
     $console->run();
+    ```
 
 The ``run()`` method parses the arguments and options passed on the command
 line and executes the right command.
@@ -16,6 +18,7 @@ line and executes the right command.
 Registering a new command can easily be done via the ``register()`` method,
 which returns a ``Command`` instance:
 
+    ```php
     use Symfony\Component\Console\Input\InputInterface;
     use Symfony\Component\Console\Input\InputArgument;
     use Symfony\Component\Console\Input\InputOption;
@@ -33,6 +36,7 @@ which returns a ``Command`` instance:
             $output->writeln(sprintf('Dir listing for <info>%s</info>', $dir));
         })
     ;
+    ```
 
 You can also register new commands via classes.
 

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests;
+namespace Symfony\Component\Translation\Tests\Formatter;
 
-use Symfony\Component\Translation\Interval;
+use Symfony\Component\Translation\Formatter\Interval;
 
 class IntervalTest extends \PHPUnit_Framework_TestCase
 {

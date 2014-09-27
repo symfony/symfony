@@ -8,7 +8,9 @@
         <parameter key="translator.class">Symfony\Bundle\FrameworkBundle\Translation\Translator</parameter>
         <parameter key="translator.logging.class">Symfony\Component\Translation\LoggingTranslator</parameter>
         <parameter key="translator.identity.class">Symfony\Component\Translation\IdentityTranslator</parameter>
-        <parameter key="translator.selector.class">Symfony\Component\Translation\MessageSelector</parameter>
+        <parameter key="translator.formatter.intl.class">Symfony\Component\Translation\Formatter\IntlMessageFormatter</parameter>
+        <parameter key="translator.formatter.default.class">Symfony\Component\Translation\Formatter\DefaultMessageFormatter</parameter>
+        <parameter key="translator.selector.class">Symfony\Component\Translation\Formatter\MessageSelector</parameter>
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
         <parameter key="translation.loader.yml.class">Symfony\Component\Translation\Loader\YamlFileLoader</parameter>
         <parameter key="translation.loader.xliff.class">Symfony\Component\Translation\Loader\XliffFileLoader</parameter>
@@ -39,7 +41,7 @@
     <services>
         <service id="translator.default" class="%translator.class%">
             <argument type="service" id="service_container" />
-            <argument type="service" id="translator.selector" />
+            <argument type="service" id="translator.formatter" />
             <argument type="collection" /> <!-- translation loaders -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
@@ -54,6 +56,14 @@
         </service>
 
         <service id="translator" class="%translator.identity.class%">
+            <argument type="service" id="translator.formatter" />
+        </service>
+
+        <service id="translator.formatter" alias="translator.formatter.default" />
+
+        <service id="translator.formatter.intl" class="%translator.formatter.intl.class%" public="false" />
+
+        <service id="translator.formatter.default" class="%translator.formatter.default.class%" public="false">
             <argument type="service" id="translator.selector" />
         </service>
 

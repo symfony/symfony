@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 
 class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +33,7 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
             ->with('Translation not found.')
         ;
 
-        $translator = new Translator('ar');
+        $translator = new Translator('ar', new DefaultMessageFormatter());
         $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
         $loggableTranslator->trans('bar');
@@ -46,7 +47,7 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
             ->with('Translation use fallback catalogue.')
         ;
 
-        $translator = new Translator('ar');
+        $translator = new Translator('ar', new DefaultMessageFormatter());
         $translator->setFallbackLocales(array('en'));
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('some_message2' => 'one thing|%count% things'), 'en');

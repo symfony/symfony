@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation;
 
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+
 /**
  * IdentityTranslator does not translate anything.
  *
@@ -20,19 +22,19 @@ namespace Symfony\Component\Translation;
  */
 class IdentityTranslator implements TranslatorInterface
 {
-    private $selector;
+    private $formatter;
     private $locale;
 
     /**
      * Constructor.
      *
-     * @param MessageSelector|null $selector The message selector for pluralization
+     * @param MessageFormatterInterface $formatter The message formatter
      *
      * @api
      */
-    public function __construct(MessageSelector $selector = null)
+    public function __construct(MessageFormatterInterface $formatter)
     {
-        $this->selector = $selector ?: new MessageSelector();
+        $this->formatter = $formatter;
     }
 
     /**
@@ -62,7 +64,11 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr((string) $id, $parameters);
+        if (!$locale) {
+            $locale = $this->getLocale();
+        }
+
+        return $this->formatter->format($locale, (string) $id, null, $parameters);
     }
 
     /**
@@ -72,6 +78,10 @@ class IdentityTranslator implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
+        if (!$locale) {
+            $locale = $this->getLocale();
+        }
+
+        return $this->formatter->format($locale, (string) $id, (integer) $number, $parameters);
     }
 }

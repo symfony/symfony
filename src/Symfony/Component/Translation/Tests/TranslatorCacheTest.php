@@ -13,7 +13,7 @@ namespace Symfony\Component\Translation\Tests;
 
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 
 class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -199,7 +199,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 
     public function getTranslator($loader, $cacheDir = null, $translatorClass = '\Symfony\Component\Translation\Translator')
     {
-        $translator = new $translatorClass('fr', new MessageSelector(), $cacheDir);
+        $translator = new $translatorClass('fr', new DefaultMessageFormatter(), $cacheDir);
 
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'foo', 'fr');

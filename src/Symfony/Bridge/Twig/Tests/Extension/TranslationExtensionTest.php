@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
@@ -34,7 +34,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             print $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-            $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
+            $twig->addExtension(new TranslationExtension(new Translator('en', new DefaultMessageFormatter())));
 
             echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
@@ -136,7 +136,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             ',
         );
 
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator('en', new DefaultMessageFormatter());
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
         $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
@@ -150,7 +150,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     protected function getTemplate($template, $translator = null)
     {
         if (null === $translator) {
-            $translator = new Translator('en', new MessageSelector());
+            $translator = new Translator('en', new DefaultMessageFormatter());
         }
 
         if (is_array($template)) {

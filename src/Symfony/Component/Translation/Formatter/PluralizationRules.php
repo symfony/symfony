@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation;
+namespace Symfony\Component\Translation\Formatter;
 
 /**
  * Returns the plural rules for a given locale.

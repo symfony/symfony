@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests;
+namespace Symfony\Component\Translation\Tests\Formatter;
 
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\MessageSelector;
 
 class MessageSelectorTest extends \PHPUnit_Framework_TestCase
 {

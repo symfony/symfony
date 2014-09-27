@@ -80,7 +80,11 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         if (is_array($files)) {
             $f = array();
             foreach ($files as $file) {
-                $f[] = self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $file);
+                if (is_array($file)) {
+                    $f[] = self::toAbsolute($file);
+                } else {
+                    $f[] = self::$tmpDir.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $file);
+                }
             }
 
             return $f;

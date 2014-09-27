@@ -148,6 +148,12 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'foo.bar().foo().baz[3]',
                 array('foo'),
             ),
+
+            array(
+                new Node\NameNode('foo'),
+                'bar',
+                array('foo' => 'bar'),
+            ),
         );
     }
 

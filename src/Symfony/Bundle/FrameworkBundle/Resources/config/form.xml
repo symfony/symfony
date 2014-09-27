@@ -113,6 +113,9 @@
         <service id="form.type.radio" class="Symfony\Component\Form\Extension\Core\Type\RadioType">
             <tag name="form.type" alias="radio" />
         </service>
+        <service id="form.type.range" class="Symfony\Component\Form\Extension\Core\Type\RangeType">
+            <tag name="form.type" alias="range" />
+        </service>
         <service id="form.type.repeated" class="Symfony\Component\Form\Extension\Core\Type\RepeatedType">
             <tag name="form.type" alias="repeated" />
         </service>

@@ -941,7 +941,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
-        if (null !== $definition->getFactoryMethod()) {
+        if (null !== $definition->getFactory()) {
+            $factory = $definition->getFactory();
+
+            if (is_string($factory)) {
+                $callable = $definition->getFactory();
+            } elseif (is_array($factory)) {
+                $callable = array($this->resolveServices($factory[0]), $factory[1]);
+            } else {
+                throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+            }
+
+            $service = call_user_func_array($callable, $arguments);
+        } elseif (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
                 $factory = $parameterBag->resolveValue($definition->getFactoryClass());
             } elseif (null !== $definition->getFactoryService()) {

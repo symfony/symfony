@@ -114,5 +114,9 @@ $container
     ->setProperty('foo', 'bar')
     ->setFactory(array(new Reference('new_factory'), 'getInstance'))
 ;
+$container
+    ->register('service_from_static_method', 'Bar\FooClass')
+    ->setFactory(array('Bar\FooClass', 'getInstance'))
+;
 
 return $container;

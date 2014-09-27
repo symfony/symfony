@@ -50,6 +50,7 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
+            'service_from_static_method' => 'getServiceFromStaticMethodService',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -303,6 +304,19 @@ class ProjectServiceContainer extends Container
     protected function getRequestService()
     {
         throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
+    }
+
+    /**
+     * Gets the 'service_from_static_method' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Bar\FooClass A Bar\FooClass instance.
+     */
+    protected function getServiceFromStaticMethodService()
+    {
+        return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
     }
 
     /**

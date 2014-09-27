@@ -124,9 +124,15 @@ class ErrorHandler
 
         $handler = new static();
         $levels &= $handler->thrownErrors;
-        set_error_handler(array($handler, 'handleError'), $levels);
+        $prev = set_error_handler(array($handler, 'handleError'), $levels);
+        $prev = is_array($prev) ? $prev[0] : null;
+        if ($prev instanceof self) {
+            restore_error_handler();
+            $handler = $prev;
+        } else {
+            $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
+        }
         $handler->throwAt($throw ? $levels : 0, true);
-        $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
 
         return $handler;
     }

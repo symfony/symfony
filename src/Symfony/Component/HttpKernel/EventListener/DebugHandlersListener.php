@@ -14,8 +14,14 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 /**
  * Configures errors and exceptions handlers.
@@ -28,6 +34,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $logger;
     private $levels;
     private $debug;
+    private $fileLinkFormat;
 
     /**
      * @param callable             $exceptionHandler A handler that will be called on Exception
@@ -45,8 +52,20 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
-    public function configure()
+    /**
+     * Configures the error handler.
+     *
+     * @param Event|null                    $event           The triggering event
+     * @param string|null                   $eventName       The triggering event name
+     * @param EventDispatcherInterface|null $eventDispatcher The dispatcher used to trigger $event
+     */
+    public function configure(Event $event = null, $eventName = null, EventDispatcherInterface $eventDispatcher = null)
     {
+        if (null !== $eventDispatcher) {
+            foreach (array_keys(static::getSubscribedEvents()) as $name) {
+                $eventDispatcher->removeListener($name, array($this, 'configure'));
+            }
+        }
         if ($this->logger) {
             $handler = set_error_handler('var_dump', 0);
             $handler = is_array($handler) ? $handler[0] : null;
@@ -67,6 +86,19 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
             $this->logger = $this->levels = null;
         }
+        if (!$this->exceptionHandler) {
+            if ($event instanceof KernelEvent) {
+                $this->exceptionHandler = array($event->getKernel(), 'terminateWithException');
+            } elseif ($event instanceof ConsoleEvent && $app = $event->getCommand()->getApplication()) {
+                $output = $event->getOutput();
+                if ($output instanceof ConsoleOutputInterface) {
+                    $output = $output->getErrorOutput();
+                }
+                $this->exceptionHandler = function ($e) use ($app, $output) {
+                    $app->renderException($e, $output);
+                };
+            }
+        }
         if ($this->exceptionHandler) {
             $handler = set_exception_handler('var_dump');
             $handler = is_array($handler) ? $handler[0] : null;
@@ -86,6 +118,12 @@ class DebugHandlersListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::REQUEST => array('configure', 2048));
+        $events = array(KernelEvents::REQUEST => array('configure', 2048));
+
+        if (defined('Symfony\Component\Console\ConsoleEvents::COMMAND')) {
+            $events[ConsoleEvents::COMMAND] = array('configure', 2048);
+        }
+
+        return $events;
     }
 }

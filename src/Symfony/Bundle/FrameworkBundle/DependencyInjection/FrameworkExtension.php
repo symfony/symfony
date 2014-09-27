@@ -133,8 +133,6 @@ class FrameworkExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
-            $definition->replaceArgument(0, array(new Reference('http_kernel', ContainerInterface::NULL_ON_INVALID_REFERENCE), 'terminateWithException'));
-
             $definition = $container->findDefinition('http_kernel');
             $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
 
@@ -145,10 +143,14 @@ class FrameworkExtension extends Extension
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         } else {
             $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
+
+            $container->findDefinition('debug.error_handler')->addMethodCall('throwAt', array(0));
         }
 
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\FileLocator',
+
+            'Symfony\\Component\\Debug\\ErrorHandler',
 
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',

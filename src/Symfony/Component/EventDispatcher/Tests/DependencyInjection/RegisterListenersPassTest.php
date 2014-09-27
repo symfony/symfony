@@ -138,5 +138,6 @@ class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubsc
 {
     public static function getSubscribedEvents()
     {
+        return array();
     }
 }

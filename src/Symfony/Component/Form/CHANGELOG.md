@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
 
 2.7.0
 -----

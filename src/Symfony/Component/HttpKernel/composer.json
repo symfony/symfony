@@ -28,6 +28,7 @@
         "symfony/config": "~2.0",
         "symfony/console": "~2.2",
         "symfony/dependency-injection": "~2.0",
+        "symfony/expression-language": "~2.4",
         "symfony/finder": "~2.0",
         "symfony/process": "~2.0",
         "symfony/routing": "~2.2",

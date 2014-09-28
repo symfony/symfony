@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Taluu at 2014-09-23T15:58:08Z
+
+I just needed this not later than this afternoon, so a big :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-23T17:30:36Z
+
+IMO, it would be worth providing a compiler pass registering the providers (we ned a separate tag for the security and the routing), to avoid each bundle to register a compiler pass for that
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T17:54:48Z
+
+@stof I agree. This PR is in the early stages, but I wanted some feedback about this approach before investing too much time on it.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T11:55:16Z
+
+@fabpot this looks good to me. Actually, I already wrapped the functions in an object in my project, to allow registering them with a compiler pass (except that I'm doing ``->addMethodCall('register', array($name, array(new Reference($id), 'compile'), array(new Reference($id), 'evaluate')))`` in my current code instead of having methods returning a callable, but my approach does not allow to write an interface for the classes given that the signature of ``compile`` and ``evaluate`` depend on the function
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-25T15:28:58Z
+
+PR ready now. I've added some more tests and a compiler pass.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-25T15:48:10Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Taluu at 2014-09-25T16:19:56Z
+
+How come is there the commits bc23ee6 & aca9e49 in the commit list ? Shouldn't you do a rebase ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-28T11:20:12Z
+
+Looks good to me :+1:

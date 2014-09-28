@@ -23,6 +23,7 @@
     "require-dev": {
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.0",
+        "symfony/expression-language": "~2.4",
         "symfony/config": "~2.2",
         "symfony/framework-bundle": "~2.1"
     },

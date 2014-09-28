@@ -23,6 +23,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
+require_once __DIR__.'/../../../Constraints/All.php';
+require_once __DIR__.'/../../../Constraints/Callback.php';
+require_once __DIR__.'/../../../Constraints/Choice.php';
+require_once __DIR__.'/../../../Constraints/Collection.php';
+require_once __DIR__.'/../../../Constraints/GroupSequence.php';
+require_once __DIR__.'/../../../Constraints/GroupSequenceProvider.php';
+require_once __DIR__.'/../../../Constraints/NotNull.php';
+require_once __DIR__.'/../../../Constraints/Range.php';
+require_once __DIR__.'/../../Fixtures/ConstraintA.php';
+
 class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadClassMetadataReturnsTrueIfSuccessful()

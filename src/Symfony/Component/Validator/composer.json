@@ -25,6 +25,7 @@
         "symfony/yaml": "~2.0",
         "symfony/config": "~2.2",
         "symfony/property-access": "~2.2",
+        "symfony/expression-language": "~2.4",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
         "egulias/email-validator": "~1.0",

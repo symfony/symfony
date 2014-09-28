@@ -32,25 +32,4 @@ class BundleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($bundle2->registerCommands($app));
     }
-
-    public function testRegisterCommandsIngoreCommandAsAService()
-    {
-        $container = new ContainerBuilder();
-        $commandClass = 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand';
-        $definition = new Definition($commandClass);
-        $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
-        $container->setAlias('console.command.'.strtolower(str_replace('\\', '_', $commandClass)), 'my-command');
-        $container->compile();
-
-        $application = $this->getMock('Symfony\Component\Console\Application');
-        // Never called, because it's the
-        // Symfony\Bundle\FrameworkBundle\Console\Application that register
-        // commands as a service
-        $application->expects($this->never())->method('add');
-
-        $bundle = new ExtensionPresentBundle();
-        $bundle->setContainer($container);
-        $bundle->registerCommands($application);
-    }
 }

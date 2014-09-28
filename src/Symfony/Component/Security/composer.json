@@ -29,7 +29,7 @@
     },
     "require-dev": {
         "symfony/routing": "~2.2",
-        "symfony/validator": "~2.2",
+        "symfony/validator": "~2.2,<2.5.0",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",

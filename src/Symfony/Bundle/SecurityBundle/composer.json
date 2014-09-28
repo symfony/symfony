@@ -23,7 +23,7 @@
     "require-dev": {
         "symfony/browser-kit": "~2.3",
         "symfony/form": "~2.3",
-        "symfony/framework-bundle": "~2.2",
+        "symfony/framework-bundle": "~2.2,<2.6.0",
         "symfony/twig-bundle": "~2.2",
         "symfony/process": "~2.0",
         "symfony/validator": "~2.2",

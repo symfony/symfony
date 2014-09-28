@@ -26,7 +26,7 @@
         "symfony/http-kernel": "~2.2",
         "symfony/security": "~2.2",
         "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.3.0",
+        "symfony/validator": "~2.4",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3"

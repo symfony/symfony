@@ -21,7 +21,7 @@
         "twig/twig": "~1.12"
     },
     "require-dev": {
-        "symfony/form": "~2.2",
+        "symfony/form": "~2.5,<2.6.0",
         "symfony/http-kernel": "~2.2",
         "symfony/routing": "~2.2",
         "symfony/templating": "~2.1",

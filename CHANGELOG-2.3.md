@@ -7,6 +7,37 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.20 (2014-09-28)
+
+ * bug #9453 [Form][DateTime] Propagate invalid_message & invalid_message_parameters to date & time (egeloen)
+ * bug #11058 [Security] bug #10242 Missing checkPreAuth from RememberMeAuthenticationProvider (glutamatt)
+ * bug #12004 [Form] Fixed ValidatorTypeGuesser to guess properties without constraints not to be required (webmozart)
+ * bug #11904 Make twig ExceptionController conformed with ExceptionListener (megazoll)
+ * bug #11924 [Form] Moved POST_MAX_SIZE validation from FormValidator to request handler (rpg600, webmozart)
+ * bug #11079 Response::isNotModified returns true when If-Modified-Since is later than Last-Modified (skolodyazhnyy)
+ * bug #11989 [Finder][Urgent] Remove asterisk and question mark from folder name in test to prevent windows file system issues. (Adam)
+ * bug #11908 [Translation] [Config] Clear libxml errors after parsing xliff file (pulzarraider)
+ * bug #11937 [HttpKernel] Make sure HttpCache is a trusted proxy (thewilkybarkid)
+ * bug #11970 [Finder] Escape location for regex searches (ymc-dabe)
+ * bug #11837 Use getPathname() instead of string casting to get BinaryFileReponse file path (nervo)
+ * bug #11513 [Translation] made XliffFileDumper support CDATA sections. (hhamon)
+ * bug #11907 [Intl] Improved bundle reader implementations (webmozart)
+ * bug #11874 [Console] guarded against non-traversable aliases (thierrymarianne)
+ * bug #11799 [YAML] fix handling of empty sequence items (xabbuh)
+ * bug #11906 [Intl] Fixed a few bugs in TextBundleWriter (webmozart)
+ * bug #11459 [Form][Validator] All index items after children are to be considered grand-children when resolving ViolationPath (Andrew Moore)
+ * bug #11715 [Form] FormBuilder::getIterator() now deals with resolved children (issei-m)
+ * bug #11892 [SwiftmailerBridge] Bump allowed versions of swiftmailer (ymc-dabe)
+ * bug #11918 [DependencyInjection] remove `service` parameter type from XSD (xabbuh)
+ * bug #11905 [Intl] Removed non-working $fallback argument from ArrayAccessibleResourceBundle (webmozart)
+ * bug #11497 Use separated function to resolve command and related arguments (JJK801)
+ * bug #11374 [DI] Added safeguards against invalid config in the YamlFileLoader (stof)
+ * bug #11897 [FrameworkBundle] Remove invalid markup (flack)
+ * bug #11860 [Security] Fix usage of unexistent method in DoctrineAclCache. (mauchede)
+ * bug #11850 [YAML] properly mask escape sequences in quoted strings (xabbuh)
+ * bug #11856 [FrameworkBundle] backport more error information from 2.6 to 2.3 (xabbuh)
+ * bug #11843 [Yaml] improve error message when detecting unquoted asterisks (xabbuh)
+
 * 2.3.19 (2014-09-03)
 
  * security #11832 CVE-2014-6072 (fabpot)

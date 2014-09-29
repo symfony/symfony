@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2014-09-29T09:13:47Z
+
+@unkind Did you find this because your ide reported this? The code might be wrong but removing this entirely is not a good idea imho!
+
+---------------------------------------------------------------------------
+
+by unkind at 2014-09-29T09:58:49Z
+
+I cannot find any case when interpreter hits this code, feel free to correct me if you think it breaks BC somehow.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-09-29T10:00:04Z
+
+After debugging this I think @unkind is right.
+
+3 lines before [`parent::get`](https://github.com/symfony/symfony/blob/1c240067f47244071e65af332f4c2364211c7b10/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L469) is called which does the same check: https://github.com/symfony/symfony/blob/1c240067f47244071e65af332f4c2364211c7b10/src/Symfony/Component/DependencyInjection/Container.php#L295
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-29T11:20:10Z
+
+this indeed looks like dead code. :+1:

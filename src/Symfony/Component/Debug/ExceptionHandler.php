@@ -37,22 +37,24 @@ class ExceptionHandler
     private $handler;
     private $caughtBuffer;
     private $caughtLength;
+    private $fileLinkFormat;
 
-    public function __construct($debug = true)
+    public function __construct($debug = true, $fileLinkFormat = null)
     {
         $this->debug = $debug;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
     /**
      * Registers the exception handler.
      *
-     * @param bool    $debug
+     * @param bool $debug
      *
      * @return ExceptionHandler The registered exception handler
      */
-    public static function register($debug = true)
+    public static function register($debug = true, $fileLinkFormat = null)
     {
-        $handler = new static($debug);
+        $handler = new static($debug, $fileLinkFormat = null);
 
         $prev = set_exception_handler(array($handler, 'handle'));
         if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
@@ -77,6 +79,21 @@ class ExceptionHandler
         }
         $old = $this->handler;
         $this->handler = $handler;
+
+        return $old;
+    }
+
+    /**
+     * Sets the format for links to source files.
+     *
+     * @param string $format The format for links to source files
+     *
+     * @return string The previous file link format.
+     */
+    public function setFileLinkFormat($format)
+    {
+        $old = $this->fileLinkFormat;
+        $this->fileLinkFormat = $format;
 
         return $old;
     }
@@ -353,7 +370,7 @@ EOF;
         $path = self::utf8Htmlize($path);
         $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
-        if ($linkFormat = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) {
+        if ($linkFormat = $this->fileLinkFormat) {
             $link = str_replace(array('%f', '%l'), array($path, $line), $linkFormat);
 
             return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);

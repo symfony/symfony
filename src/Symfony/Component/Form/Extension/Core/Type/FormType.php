@@ -87,7 +87,7 @@ class FormType extends BaseType
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only' => $readOnly,
+            'read_only'  => $readOnly,
             'errors'     => $form->getErrors(),
             'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),
@@ -193,7 +193,7 @@ class FormType extends BaseType
             'empty_data'         => $emptyData,
             'trim'               => true,
             'required'           => true,
-            'read_only'          => false, //Deprecated use attr['readonly'] instead
+            'read_only'          => false, // Deprecated use attr['readonly'] instead
             'max_length'         => null,
             'pattern'            => null,
             'property_path'      => null,

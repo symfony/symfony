@@ -20,6 +20,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @deprecated Deprecated since version 2.6, to be removed in 3.0.
  */
-interface SecurityContextInterface extends TokenStorageInterface, AuthorizationCheckerInterface, SecuritySessionStorageInterface
+interface SecurityContextInterface extends TokenStorageInterface, AuthorizationCheckerInterface
 {
+    const ACCESS_DENIED_ERROR  = Security::ACCESS_DENIED_ERROR;
+    const AUTHENTICATION_ERROR = Security::AUTHENTICATION_ERROR;
+    const LAST_USERNAME        = Security::LAST_USERNAME;
 }

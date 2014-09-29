@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
@@ -20,6 +18,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Encapsulates the logic needed to create sub-requests, redirect the user, and match URLs.
@@ -77,14 +76,14 @@ class HttpUtils
             $newRequest->setSession($request->getSession());
         }
 
-        if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
-            $newRequest->attributes->set(SecurityContextInterface::AUTHENTICATION_ERROR, $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR));
+        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+            $newRequest->attributes->set(Security::AUTHENTICATION_ERROR, $request->attributes->get(Security::AUTHENTICATION_ERROR));
         }
-        if ($request->attributes->has(SecurityContextInterface::ACCESS_DENIED_ERROR)) {
-            $newRequest->attributes->set(SecurityContextInterface::ACCESS_DENIED_ERROR, $request->attributes->get(SecurityContextInterface::ACCESS_DENIED_ERROR));
+        if ($request->attributes->has(Security::ACCESS_DENIED_ERROR)) {
+            $newRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $request->attributes->get(Security::ACCESS_DENIED_ERROR));
         }
-        if ($request->attributes->has(SecurityContextInterface::LAST_USERNAME)) {
-            $newRequest->attributes->set(SecurityContextInterface::LAST_USERNAME, $request->attributes->get(SecurityContextInterface::LAST_USERNAME));
+        if ($request->attributes->has(Security::LAST_USERNAME)) {
+            $newRequest->attributes->set(Security::LAST_USERNAME, $request->attributes->get(Security::LAST_USERNAME));
         }
 
         return $newRequest;

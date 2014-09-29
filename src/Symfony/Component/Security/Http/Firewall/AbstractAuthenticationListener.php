@@ -15,6 +15,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -218,8 +219,8 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
         $this->securityContext->setToken($token);
 
         $session = $request->getSession();
-        $session->remove(SecurityContextInterface::AUTHENTICATION_ERROR);
-        $session->remove(SecurityContextInterface::LAST_USERNAME);
+        $session->remove(Security::AUTHENTICATION_ERROR);
+        $session->remove(Security::LAST_USERNAME);
 
         if (null !== $this->dispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);

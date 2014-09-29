@@ -640,6 +640,9 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('translator.logging', $config['logging']);
 
+        // Modify translator formatter
+        $container->setAlias('translator.formatter', 'translator.formatter.' . $config['formatter']);
+
         // Discover translation directories
         $dirs = array();
         if (class_exists('Symfony\Component\Validator\Validator')) {

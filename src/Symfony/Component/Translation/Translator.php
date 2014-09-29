@@ -11,14 +11,16 @@
 
 namespace Symfony\Component\Translation;
 
-use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Config\ConfigCache;
 
 /**
  * Translator.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  *
  * @api
  */
@@ -50,9 +52,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $resources = array();
 
     /**
-     * @var MessageSelector
+     * @var MessageFormatterInterface
      */
-    private $selector;
+    private $formatter;
 
     /**
      * @var string
@@ -67,19 +69,20 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * Constructor.
      *
-     * @param string               $locale   The locale
-     * @param MessageSelector|null $selector The message selector for pluralization
-     * @param string|null          $cacheDir The directory to use for the cache
-     * @param bool                 $debug    Use cache in debug mode ?
+     * @param string                    $locale    The locale
+     * @param MessageFormatterInterface $formatter The message formatter
+     * @param string|null               $cacheDir  The directory to use for the cache
+     * @param bool                      $debug     Use cache in debug mode ?
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
+    public function __construct($locale, MessageFormatterInterface $formatter, $cacheDir = null, $debug = false)
     {
         $this->setLocale($locale);
-        $this->selector = $selector ?: new MessageSelector();
+
+        $this->formatter = $formatter;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -217,7 +220,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $this->loadCatalogue($locale);
         }
 
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        $id = (string) $id;
+        $messageId = $this->catalogues[$locale]->get($id, $domain);
+
+        return $this->formatter->format($locale, $messageId, null, $parameters);
     }
 
     /**
@@ -253,7 +259,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+        $messageId = $catalogue->get($id, $domain);
+
+        return $this->formatter->format($locale, $messageId, (int) $number, $parameters);
     }
 
     /**

@@ -158,6 +158,7 @@
 
     <xsd:complexType name="translator">
         <xsd:attribute name="enabled" type="xsd:boolean" />
+        <xsd:attribute name="formatter" type="xsd:string" />
         <xsd:attribute name="fallback" type="xsd:string" />
     </xsd:complexType>
 

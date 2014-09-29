@@ -450,6 +450,7 @@ class Configuration implements ConfigurationInterface
                     ->info('translator configuration')
                     ->canBeEnabled()
                     ->children()
+                        ->scalarNode('formatter')->defaultValue('default')->end()
                         ->scalarNode('fallback')->defaultValue('en')->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
                     ->end()

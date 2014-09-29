@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Tests;
+namespace Symfony\Component\Translation\Tests\Formatter;
 
-use Symfony\Component\Translation\PluralizationRules;
+use Symfony\Component\Translation\Formatter\PluralizationRules;
 
 /**
  * Test should cover all languages mentioned on http://translate.sourceforge.net/wiki/l10n/pluralforms

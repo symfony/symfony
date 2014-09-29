@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\DefaultMessageFormatter;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -128,7 +128,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($requestStack))
         ;
 
-        $translator = new Translator($container, new MessageSelector());
+        $translator = new Translator($container, new DefaultMessageFormatter());
 
         if ($inRequestScope) {
             $this->assertSame('en', $translator->getLocale());
@@ -171,7 +171,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($requestStack))
         ;
 
-        $translator = new Translator($container, new MessageSelector());
+        $translator = new Translator($container, new DefaultMessageFormatter());
         $this->assertSame('en-US', $translator->getLocale());
     }
 
@@ -259,7 +259,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $translator = new $translatorClass(
             $this->getContainer($loader),
-            new MessageSelector(),
+            new DefaultMessageFormatter(),
             array('loader' => array('loader')),
             $options
         );

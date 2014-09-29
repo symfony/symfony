@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
 use Symfony\Component\Translation\Translator as BaseTranslator;
-use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -38,14 +38,14 @@ class Translator extends BaseTranslator
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
+     * @param ContainerInterface        $container A ContainerInterface instance
+     * @param MessageFormatterInterface $selector  The message formatter
+     * @param array                     $loaderIds An array of loader Ids
+     * @param array                     $options   An array of options
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageFormatterInterface $formatter, $loaderIds = array(), array $options = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -57,7 +57,7 @@ class Translator extends BaseTranslator
 
         $this->options = array_merge($this->options, $options);
 
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct(null, $formatter, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

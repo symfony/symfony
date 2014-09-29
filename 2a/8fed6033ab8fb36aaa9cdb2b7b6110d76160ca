@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-29T07:48:41Z
+
+I love this proposal. Thanks @iltar for your work. I really can't think of any reason for not merging this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-29T07:48:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-09-29T07:50:24Z
+
+Isnt this a BC break as the constants are now located a new place?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-09-29T07:52:44Z
+
+@henrikbjorn It's a BC break on the master branch only. They have been moved to that interface in my other PR. This change is currently not present in any tag.
+https://github.com/iltar/symfony/blob/b96778718507e520596279954937f75c181efc17/src/Symfony/Component/Security/Core/SecuritySessionStorageInterface.php
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-09-29T08:07:23Z
+
+:+1: I like it :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-29T10:08:34Z
+
+:+1:

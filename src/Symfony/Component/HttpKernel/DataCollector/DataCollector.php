@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
-    protected $data;
+    protected $data = array();
 
     /**
      * @var ValueExporter

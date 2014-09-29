@@ -21,6 +21,10 @@
         "symfony/twig-bridge": "~2.6",
         "symfony/var-dumper": "~2.6"
     },
+    "require-dev": {
+        "symfony/config": "~2.3",
+        "symfony/dependency-injection": "~2.3"
+    },
     "suggest": {
         "symfony/config": "For service container configuration",
         "symfony/dependency-injection": "For using as a service from the container"

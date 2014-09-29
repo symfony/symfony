@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests\Authentication;
 
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCase
@@ -47,7 +47,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
 
         $subRequest = $this->getRequest();
         $subRequest->attributes->expects($this->once())
-            ->method('set')->with(SecurityContextInterface::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')
             ->will($this->returnValue($subRequest));
@@ -79,7 +79,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
     public function testExceptionIsPersistedInSession()
     {
         $this->session->expects($this->once())
-            ->method('set')->with(SecurityContextInterface::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, array(), $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -91,7 +91,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
 
         $subRequest = $this->getRequest();
         $subRequest->attributes->expects($this->once())
-            ->method('set')->with(SecurityContextInterface::AUTHENTICATION_ERROR, $this->exception);
+            ->method('set')->with(Security::AUTHENTICATION_ERROR, $this->exception);
 
         $this->httpUtils->expects($this->once())
             ->method('createRequest')->with($this->request, '/login')

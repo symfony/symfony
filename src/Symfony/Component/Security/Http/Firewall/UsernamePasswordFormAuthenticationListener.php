@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -93,7 +94,7 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
             $password = $request->get($this->options['password_parameter'], null, true);
         }
 
-        $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);
+        $request->getSession()->set(Security::LAST_USERNAME, $username);
 
         return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
     }

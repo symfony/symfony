@@ -12,11 +12,11 @@
 namespace Symfony\Component\Security\Core;
 
 /**
- * The SecuritySessionStorageInterface.
+ * This class holds security information.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-interface SecuritySessionStorageInterface
+final class Security
 {
     const ACCESS_DENIED_ERROR  = '_security.403_error';
     const AUTHENTICATION_ERROR = '_security.last_error';

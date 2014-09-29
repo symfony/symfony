@@ -7,13 +7,13 @@
 
    Before:
 
-   ```twig
+   ```jinja
    {% render 'BlogBundle:Post:list' with { 'limit': 2 }, { 'alt': 'BlogBundle:Post:error' } %}
    ```
 
    After:
 
-   ```twig
+   ```jinja
    {% render controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error' } %}
    {# Or: #}
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'alt': 'BlogBundle:Post:error'}) }}
@@ -29,7 +29,7 @@
 
    Before:
 
-   ```twig
+   ```jinja
    {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': true} %}
    {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': false} %}
    {% render 'BlogBundle:Post:list' with { 'limit': 2 }, {'standalone': 'js'} %}
@@ -37,7 +37,7 @@
 
    After:
 
-   ```twig
+   ```jinja
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'esi'}) }}
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'inline'}) }}
    {{ render(controller('BlogBundle:Post:list', { 'limit': 2 }), { 'strategy': 'hinclude'}) }}
@@ -95,7 +95,7 @@
 
    Before:
 
-   ```twig
+   ```jinja
    {{
        error.messagePluralization is null
            ? error.messageTemplate|trans(error.messageParameters, 'validators')
@@ -105,7 +105,7 @@
 
    After:
 
-   ```twig
+   ```jinja
    {{ error.message }}
    ```
 

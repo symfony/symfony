@@ -455,7 +455,7 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
@@ -466,7 +466,7 @@
 
     After:
 
-    ```twig
+    ```jinja
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
@@ -482,7 +482,7 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {% block form_errors %}
     {% spaceless %}
         ... form code ...
@@ -498,7 +498,7 @@
 
     After:
 
-    ```twig
+    ```jinja
     {% block form_errors %}
     {% spaceless %}
         {% if compound %}
@@ -532,7 +532,7 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {% for choice, label in choices %}
         {% if _form_is_choice_group(label) %}
             <optgroup label="{{ choice|trans }}">
@@ -550,7 +550,7 @@
 
     After:
 
-    ```twig
+    ```jinja
     {% for label, choice in choices %}
         {% if choice is iterable %}
             <optgroup label="{{ label|trans({}, translation_domain) }}">
@@ -571,7 +571,7 @@
     accommodate those cases when the `label` option has not been explicitly
     set.
 
-    ```twig
+    ```jinja
     {% block form_label %}
         {% if label is empty %}
             {% set label = name|humanize %}
@@ -588,7 +588,7 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {% block _author_tags_0_label %}
         {# ... #}
     {% endblock %}
@@ -600,7 +600,7 @@
 
     After:
 
-    ```twig
+    ```jinja
     {% block _author_tags_entry_label %}
         {# ... #}
     {% endblock %}
@@ -705,13 +705,13 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {{ form_label(form.name, 'Your Name', { 'attr': {'class': 'foo'} }) }}
     ```
 
     After:
 
-    ```twig
+    ```jinja
     {{ form_label(form.name, 'Your Name', { 'label_attr': {'class': 'foo'} }) }}
     ```
 
@@ -1349,7 +1349,7 @@
 
     Before:
 
-    ```twig
+    ```jinja
     {% if app.session.hasFlash('notice') %}
         <div class="flash-notice">
             {{ app.session.getFlash('notice') }}
@@ -1358,7 +1358,7 @@
     ```
     After:
 
-    ```twig
+    ```jinja
     {% for flashMessage in app.session.flashbag.get('notice') %}
         <div class="flash-notice">
             {{ flashMessage }}
@@ -1368,7 +1368,7 @@
 
     You can process all flash messages in a single loop with:
 
-    ```twig
+    ```jinja
     {% for type, flashMessages in app.session.flashbag.all() %}
         {% for flashMessage in flashMessages %}
             <div class="flash-{{ type }}">

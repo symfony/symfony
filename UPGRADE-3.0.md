@@ -348,7 +348,7 @@ UPGRADE FROM 2.x to 3.0
 
    After:
 
-   ```twig
+   ```jinja
    {{ form_start(form) }}
        ...
    {{ form_end(form) }}
@@ -379,7 +379,7 @@ UPGRADE FROM 2.x to 3.0
 
    It is also possible to override the method and the action in the template:
 
-   ```twig
+   ```jinja
    {{ form_start(form, {'method': 'GET', 'action': 'http://example.com'}) }}
        ...
    {{ form_end(form) }}

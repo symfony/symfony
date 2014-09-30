@@ -37,7 +37,8 @@ class SimpleAuthenticationHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $this->authenticationException = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        // No methods are invoked on the exception; we just assert on its class
+        $this->authenticationException = new \Symfony\Component\Security\Core\Exception\AuthenticationException();
 
         $this->response = $this->getMock('Symfony\Component\HttpFoundation\Response');
     }

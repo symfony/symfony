@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-29T20:20:11Z
+
+Oh and I also put a `symfony/translation` instead of `symfony/translator` in HttpKernel's composer.json
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-29T20:24:42Z
+
+And a missing `symfony/var-dumper` in require-dev...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-30T07:07:58Z
+
+The doc block change should happen in 2.3, but the other changes are only for master. Can you open another PR for the doc block fix for 2.3?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-30T07:25:00Z
+
+See #12078
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-30T09:48:21Z
+
+:+1:

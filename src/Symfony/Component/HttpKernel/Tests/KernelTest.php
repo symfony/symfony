@@ -723,6 +723,39 @@ EOF;
     }
 
     /**
+     * @dataProvider getRemoveAbsolutePathsFromContainerData
+     */
+    public function testRemoveAbsolutePathsFromContainer($symfonyRootDir, $realRootDir, $replacement, $replaced)
+    {
+        $kernel = new KernelForTest('dev', true);
+        $kernel->setRootDir($symfonyRootDir);
+        if (null !== $realRootDir) {
+            $kernel->setRealRootDir($realRootDir);
+        }
+
+        $content = file_get_contents(__DIR__.'/Fixtures/DumpedContainers/app/cache/dev/withAbsolutePaths.php');
+        $content = str_replace('ROOT_DIR', $replacement, $content);
+
+        $m = new \ReflectionMethod($kernel, 'removeAbsolutePathsFromContainer');
+        $m->setAccessible(true);
+        $newContent = $m->invoke($kernel, $content);
+        if ($replaced) {
+            $this->assertEquals(file_get_contents(__DIR__.'/Fixtures/DumpedContainers/app/cache/dev/withoutAbsolutePaths.php'), $newContent);
+        } else {
+            $this->assertEquals($newContent, $content);
+        }
+    }
+
+    public function getRemoveAbsolutePathsFromContainerData()
+    {
+        return array(
+            array(__DIR__.'/Fixtures/DumpedContainers/app', null, __DIR__.'/Fixtures/DumpedContainers', true),
+            array(sys_get_temp_dir(), null, __DIR__.'/Fixtures/DumpedContainers', false),
+            array('/app/app', '/app', '/app', true),
+        );
+    }
+
+    /**
      * Returns a mock for the BundleInterface
      *
      * @return BundleInterface

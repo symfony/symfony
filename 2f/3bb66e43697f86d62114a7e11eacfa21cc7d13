@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-09-26T11:43:46Z
+
+``getTransformationFailure`` must be implemented in Button too
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-26T13:25:09Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2014-09-26T18:34:29Z
+
+What do you think about deprecating `isSynchronized()` and adding `hasTransformationFailure()` ?
+Or renaming to `isDataSynchronized()`, because it's not obvious what is exactly synchronized in form
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-26T23:13:57Z
+
+@shoomyth `hasTransformationFailure()` is a good suggestion actually! I'll look into it.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-30T12:14:38Z
+
+ping @symfony/deciders
+
+I'd like to merge this PR today.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-30T14:05:37Z
+
+My only concern is the "yet another BC break in the Form component". I think that having interfaces that change in every single Symfony version do not help. Not having those interfaces in the first place would be in fact better.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-30T14:12:38Z
+
+@fabpot we have 2 implementations of the interface in core. And removing it would force breaking BC in all form types (as they typehint the FormInterface in ``buildView`` and ``finishView``).
+If we can find a different way to handle buttons without relying on the interface, I would be in favor of dropping it in 3.0 though.
+
+But the interface is meant for consuming it in userland, not for implementing it. I doubt anyone is crazy enough to reimplement the FormInterface in a different way in their project, and only these crazy people would be affected by this BC break.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-30T14:33:14Z
+
+> But the interface is meant for consuming it in userland, not for implementing it.
+
+Exactly. People are supposed to type-hint against the interface, not implement it. Our benefit is the flexibility to pass any implementation of the interface that we like, be it `Form`, `Button` or any other (some more will probably come in 2.7, because I think we can improve performance if we use simpler implementations than `Form` for simple fields).

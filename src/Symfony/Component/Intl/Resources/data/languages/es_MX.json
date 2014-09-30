@@ -1,0 +1,29 @@
+{
+    "Version": "2.1.8.19",
+    "Names": {
+        "arn": "araucano",
+        "ba": "bashkir",
+        "chr": "cheroki",
+        "ckb": "sorani",
+        "de_CH": "alto alemán suizo",
+        "dsb": "bajo sorbio",
+        "es_419": "español latinoamericano",
+        "gsw": "alemán suizo",
+        "gv": "manés",
+        "hsb": "alto sorbio",
+        "kab": "cabilio",
+        "kln": "halenjin",
+        "luo": "luo",
+        "nd": "sindebele",
+        "nqo": "N’Ko",
+        "pa": "panyabí",
+        "rm": "romanche",
+        "rn": "rundi",
+        "smj": "sami de Lule",
+        "smn": "sami de Inari",
+        "su": "sondanés",
+        "vai": "vai",
+        "vun": "vunjo",
+        "zgh": "tamazight estándar marroquí"
+    }
+}

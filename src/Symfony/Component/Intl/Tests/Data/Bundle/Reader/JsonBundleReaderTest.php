@@ -62,7 +62,7 @@ class JsonBundleReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @ expectedException \Symfony\Component\Intl\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Intl\Exception\RuntimeException
      */
     public function testReadFailsIfInvalidJson()
     {

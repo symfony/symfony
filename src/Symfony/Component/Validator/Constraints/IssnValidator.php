@@ -53,6 +53,7 @@ class IssnValidator extends ConstraintValidator
         } elseif ($constraint->requireHyphen) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::MISSING_HYPHEN_ERROR)
                 ->addViolation();
 
             return;
@@ -63,6 +64,7 @@ class IssnValidator extends ConstraintValidator
         if ($length < 8) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::TOO_SHORT_ERROR)
                 ->addViolation();
 
             return;
@@ -71,6 +73,7 @@ class IssnValidator extends ConstraintValidator
         if ($length > 8) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::TOO_LONG_ERROR)
                 ->addViolation();
 
             return;
@@ -81,6 +84,7 @@ class IssnValidator extends ConstraintValidator
         if (!ctype_digit(substr($canonical, 0, 7))) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::INVALID_CHARACTERS_ERROR)
                 ->addViolation();
 
             return;
@@ -91,6 +95,7 @@ class IssnValidator extends ConstraintValidator
         if (!ctype_digit($canonical{7}) && 'x' !== $canonical{7} && 'X' !== $canonical{7}) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::INVALID_CHARACTERS_ERROR)
                 ->addViolation();
 
             return;
@@ -101,6 +106,7 @@ class IssnValidator extends ConstraintValidator
         if ($constraint->caseSensitive && 'x' === $canonical{7}) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::INVALID_CASE_ERROR)
                 ->addViolation();
 
             return;
@@ -119,6 +125,7 @@ class IssnValidator extends ConstraintValidator
         if (0 !== $checkSum % 11) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Issn::CHECKSUM_FAILED_ERROR)
                 ->addViolation();
         }
     }

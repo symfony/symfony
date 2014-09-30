@@ -153,6 +153,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 
@@ -177,6 +178,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 
@@ -202,6 +204,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 
@@ -227,6 +230,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 

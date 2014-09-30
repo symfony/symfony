@@ -62,36 +62,43 @@ class FileValidator extends ConstraintValidator
                     $this->buildViolation($constraint->uploadIniSizeErrorMessage)
                         ->setParameter('{{ limit }}', $limitInBytes)
                         ->setParameter('{{ suffix }}', 'bytes')
+                        ->setCode(UPLOAD_ERR_INI_SIZE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_FORM_SIZE:
                     $this->buildViolation($constraint->uploadFormSizeErrorMessage)
+                        ->setCode(UPLOAD_ERR_FORM_SIZE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_PARTIAL:
                     $this->buildViolation($constraint->uploadPartialErrorMessage)
+                        ->setCode(UPLOAD_ERR_PARTIAL)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_FILE:
                     $this->buildViolation($constraint->uploadNoFileErrorMessage)
+                        ->setCode(UPLOAD_ERR_NO_FILE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_TMP_DIR:
                     $this->buildViolation($constraint->uploadNoTmpDirErrorMessage)
+                        ->setCode(UPLOAD_ERR_NO_TMP_DIR)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_CANT_WRITE:
                     $this->buildViolation($constraint->uploadCantWriteErrorMessage)
+                        ->setCode(UPLOAD_ERR_CANT_WRITE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_EXTENSION:
                     $this->buildViolation($constraint->uploadExtensionErrorMessage)
+                        ->setCode(UPLOAD_ERR_EXTENSION)
                         ->addViolation();
 
                     return;
@@ -113,6 +120,7 @@ class FileValidator extends ConstraintValidator
         if (!is_file($path)) {
             $this->buildViolation($constraint->notFoundMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setCode(File::NOT_FOUND_ERROR)
                 ->addViolation();
 
             return;
@@ -121,15 +129,24 @@ class FileValidator extends ConstraintValidator
         if (!is_readable($path)) {
             $this->buildViolation($constraint->notReadableMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setCode(File::NOT_READABLE_ERROR)
                 ->addViolation();
 
             return;
         }
 
         $sizeInBytes = filesize($path);
+
         if (0 === $sizeInBytes) {
-            $this->context->addViolation($constraint->disallowEmptyMessage);
-        } elseif ($constraint->maxSize) {
+            $this->buildViolation($constraint->disallowEmptyMessage)
+                ->setParameter('{{ file }}', $this->formatValue($path))
+                ->setCode(File::EMPTY_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
+        if ($constraint->maxSize) {
             $limitInBytes = $constraint->maxSize;
 
             if ($sizeInBytes > $limitInBytes) {
@@ -168,6 +185,7 @@ class FileValidator extends ConstraintValidator
                     ->setParameter('{{ size }}', $sizeAsString)
                     ->setParameter('{{ limit }}', $limitAsString)
                     ->setParameter('{{ suffix }}', self::$suffices[$coef])
+                    ->setCode(File::TOO_LARGE_ERROR)
                     ->addViolation();
 
                 return;
@@ -198,6 +216,7 @@ class FileValidator extends ConstraintValidator
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setParameter('{{ type }}', $this->formatValue($mime))
                 ->setParameter('{{ types }}', $this->formatValues($mimeTypes))
+                ->setCode(File::INVALID_MIME_TYPE_ERROR)
                 ->addViolation();
         }
     }

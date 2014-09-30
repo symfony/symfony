@@ -62,6 +62,7 @@ class TimeValidator extends ConstraintValidator
         if (!preg_match(static::PATTERN, $value, $matches)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Time::INVALID_FORMAT_ERROR)
                 ->addViolation();
 
             return;
@@ -70,6 +71,7 @@ class TimeValidator extends ConstraintValidator
         if (!self::checkTime($matches[1], $matches[2], $matches[3])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Time::INVALID_TIME_ERROR)
                 ->addViolation();
         }
     }

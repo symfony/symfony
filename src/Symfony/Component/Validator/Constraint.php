@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator;
 
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
@@ -51,10 +52,38 @@ abstract class Constraint
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
+     * Maps error codes to the names of their constants
+     * @var array
+     */
+    protected static $errorNames = array();
+
+    /**
      * Domain-specific data attached to a constraint
      * @var mixed
      */
     public $payload;
+
+    /**
+     * Returns the name of the given error code.
+     *
+     * @param int $errorCode The error code
+     *
+     * @return string The name of the error code
+     *
+     * @throws InvalidArgumentException If the error code does not exist
+     */
+    public static function getErrorName($errorCode)
+    {
+        if (!isset(static::$errorNames[$errorCode])) {
+            throw new InvalidArgumentException(sprintf(
+                'The error code "%s" does not exist for constraint of type "%s".',
+                $errorCode,
+                get_called_class()
+            ));
+        }
+
+        return static::$errorNames[$errorCode];
+    }
 
     /**
      * Initializes the constraint with options.

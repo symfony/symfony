@@ -117,6 +117,7 @@ class CardSchemeValidator extends ConstraintValidator
         if (!is_numeric($value)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(CardScheme::NOT_NUMERIC_ERROR)
                 ->addViolation();
 
             return;
@@ -135,6 +136,7 @@ class CardSchemeValidator extends ConstraintValidator
 
         $this->buildViolation($constraint->message)
             ->setParameter('{{ value }}', $this->formatValue($value))
+            ->setCode(CardScheme::INVALID_FORMAT_ERROR)
             ->addViolation();
     }
 }

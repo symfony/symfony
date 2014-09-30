@@ -181,6 +181,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ size }}', $sizeAsString)
             ->setParameter('{{ suffix }}', $suffix)
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::TOO_LARGE_ERROR)
             ->assertRaised();
     }
 
@@ -277,12 +278,13 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
-        $this->assertViolation('myMessage', array(
-            '{{ limit }}'   => $limitAsString,
-            '{{ size }}'    => $sizeAsString,
-            '{{ suffix }}'  => $suffix,
-            '{{ file }}'    => '"'.$this->path.'"',
-        ));
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ limit }}', $limitAsString)
+            ->setParameter('{{ size }}', $sizeAsString)
+            ->setParameter('{{ suffix }}', $suffix)
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::TOO_LARGE_ERROR)
+            ->assertRaised();
     }
 
     public function testValidMimeType()
@@ -359,6 +361,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/png", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
 
@@ -388,6 +391,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ type }}', '"application/pdf"')
             ->setParameter('{{ types }}', '"image/*", "image/jpg"')
             ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
             ->assertRaised();
     }
 
@@ -401,7 +405,10 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
-        $this->assertViolation('myMessage');
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::EMPTY_ERROR)
+            ->assertRaised();
     }
 
     /**
@@ -420,6 +427,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameters($params)
+            ->setCode($error)
             ->assertRaised();
     }
 

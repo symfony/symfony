@@ -231,7 +231,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
             ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
@@ -268,7 +268,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
             ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
@@ -304,7 +304,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
             ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
@@ -558,9 +558,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $this->assertViolation('Extra!', array(
-            '{{ extra_fields }}' => 'foo',
-        ), 'property.path', array('foo' => 'bar'));
+        $this->buildViolation('Extra!')
+            ->setParameter('{{ extra_fields }}', 'foo')
+            ->setInvalidValue(array('foo' => 'bar'))
+            ->setCode(Form::NO_SUCH_FIELD_ERROR)
+            ->assertRaised();
     }
 
     public function testNoViolationIfAllowExtraData()

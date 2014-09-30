@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-09-30T07:56:40Z
+
+Is it safe to change this? There may be implementations outside the framework that rely on the current description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-30T07:58:57Z
+
+The base implementation we provide fails handling arrays as input.
+So if an array compliant implementation exist, it only uses the interface but none of the classes...
+This is more than unlikely to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-30T09:42:58Z
+
+I tend to agree here. :+1:

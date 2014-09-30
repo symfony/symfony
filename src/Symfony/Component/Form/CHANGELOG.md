@@ -6,6 +6,7 @@ CHANGELOG
 
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
+ * added "label_format" option with possible placeholders "%name%" and "%id%"
 
 2.5.0
 ------

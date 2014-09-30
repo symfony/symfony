@@ -283,6 +283,108 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testLabelFormatName()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'text')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, array('label_format' => 'form.%name%'));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]form.myfield[/trans]"]
+'
+        );
+    }
+
+    public function testLabelFormatId()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'text')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, array('label_format' => 'form.%id%'));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]form.myform_myfield[/trans]"]
+'
+        );
+    }
+
+    public function testLabelFormatAsFormOption()
+    {
+        $options = array('label_format' => 'form.%name%');
+
+        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+            ->add('myfield', 'text')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]form.myfield[/trans]"]
+'
+        );
+    }
+
+    public function testLabelFormatOverriddenOption()
+    {
+        $options = array('label_format' => 'form.%name%');
+
+        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+            ->add('myfield', 'text', array('label_format' => 'field.%name%'))
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]field.myfield[/trans]"]
+'
+        );
+    }
+
+    public function testLabelFormatOnButton()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('mybutton', 'button')
+            ->getForm();
+        $view = $form->get('mybutton')->createView();
+        $html = $this->renderWidget($view, array('label_format' => 'form.%name%'));
+
+        $this->assertMatchesXpath($html,
+'/button
+    [@type="button"]
+    [@name="myform[mybutton]"]
+    [.="[trans]form.mybutton[/trans]"]
+'
+        );
+    }
+
+    public function testLabelFormatOnButtonId()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('mybutton', 'button')
+            ->getForm();
+        $view = $form->get('mybutton')->createView();
+        $html = $this->renderWidget($view, array('label_format' => 'form.%id%'));
+
+        $this->assertMatchesXpath($html,
+'/button
+    [@type="button"]
+    [@name="myform[mybutton]"]
+    [.="[trans]form.myform_mybutton[/trans]"]
+'
+        );
+    }
+
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'text');

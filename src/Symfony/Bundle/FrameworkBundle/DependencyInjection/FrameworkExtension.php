@@ -127,11 +127,13 @@ class FrameworkExtension extends Extension
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
         if ($container->hasParameter('templating.helper.code.file_link_format')) {
-            $definition->replaceArgument(4, '%templating.helper.code.file_link_format%');
+            $definition->replaceArgument(5, '%templating.helper.code.file_link_format%');
         }
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
+
+            $definition->replaceArgument(3, E_ALL | E_STRICT);
 
             $definition = $container->findDefinition('http_kernel');
             $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
@@ -143,8 +145,6 @@ class FrameworkExtension extends Extension
             $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         } else {
             $definition->replaceArgument(2, E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR);
-
-            $container->findDefinition('debug.error_handler')->addMethodCall('throwAt', array(0));
         }
 
         $this->addClassesToCompile(array(

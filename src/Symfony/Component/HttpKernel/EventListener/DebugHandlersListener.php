@@ -33,22 +33,25 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $exceptionHandler;
     private $logger;
     private $levels;
-    private $debug;
+    private $throwAt;
+    private $scream;
     private $fileLinkFormat;
 
     /**
-     * @param callable             $exceptionHandler A handler that will be called on Exception
+     * @param callable|null        $exceptionHandler A handler that will be called on Exception
      * @param LoggerInterface|null $logger           A PSR-3 logger
      * @param array|int            $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
-     * @param bool                 $debug            Enables/disables debug mode
+     * @param int|null             $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
+     * @param bool                 $scream           Enables/disables screaming mode, where even silenced errors are logged
      * @param string               $fileLinkFormat   The format for links to source files
      */
-    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $debug = true, $fileLinkFormat = null)
+    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $throwAt = -1, $scream = true, $fileLinkFormat = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
         $this->levels = $levels;
-        $this->debug = $debug;
+        $this->throwAt = is_numeric($throwAt) ? (int) $throwAt : (null === $throwAt ? null : ($throwAt ? -1 : null));
+        $this->scream = (bool) $scream;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
@@ -66,25 +69,28 @@ class DebugHandlersListener implements EventSubscriberInterface
                 $eventDispatcher->removeListener($name, array($this, 'configure'));
             }
         }
-        if ($this->logger) {
-            $handler = set_error_handler('var_dump', 0);
-            $handler = is_array($handler) ? $handler[0] : null;
-            restore_error_handler();
-            if ($handler instanceof ErrorHandler) {
-                if ($this->debug) {
-                    $handler->throwAt(-1);
-                }
+        $handler = set_error_handler('var_dump', 0);
+        $handler = is_array($handler) ? $handler[0] : null;
+        restore_error_handler();
+        if ($handler instanceof ErrorHandler) {
+            if ($this->logger) {
                 $handler->setDefaultLogger($this->logger, $this->levels);
                 if (is_array($this->levels)) {
                     $scream = 0;
                     foreach ($this->levels as $type => $log) {
                         $scream |= $type;
                     }
-                    $this->levels = $scream;
+                } else {
+                    $scream = null === $this->levels ? E_ALL | E_STRICT : $this->levels;
                 }
-                $handler->screamAt($this->levels);
+                if ($this->scream) {
+                    $handler->screamAt($scream);
+                }
+                $this->logger = $this->levels = null;
             }
-            $this->logger = $this->levels = null;
+            if (null !== $this->throwAt) {
+                $handler->throwAt($this->throwAt, true);
+            }
         }
         if (!$this->exceptionHandler) {
             if ($event instanceof KernelEvent) {
@@ -110,7 +116,9 @@ class DebugHandlersListener implements EventSubscriberInterface
             }
             if ($handler instanceof ExceptionHandler) {
                 $handler->setHandler($this->exceptionHandler);
-                $handler->setFileLinkFormat($this->fileLinkFormat);
+                if (null !== $this->fileLinkFormat) {
+                    $handler->setFileLinkFormat($this->fileLinkFormat);
+                }
             }
             $this->exceptionHandler = null;
         }

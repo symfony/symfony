@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by hason at 2014-09-26T10:06:53Z
+
+We should prefer placeholders ``{name}`` and ``{id}`` which are compatible with [MessageFormatter](http://php.net/manual/en/class.messageformatter.php). See #11948 an #6009.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2014-09-26T10:30:49Z
+
++1 for `{name}` and `{id}` which are compatible with MessageFormatter.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-26T12:52:03Z
+
+@hason This has nothing to do with MessageFormatter IMO. They are not translation placeholders here. They are used to build the translation key.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-26T12:54:32Z
+
+I vote for keeping the ``%`` syntax here.
+
+And I'm :+1: for this. It would be useful.
+
+@webmozart it would be great to create the doc PR
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-26T13:43:22Z
+
+We should probably unify the placeholder syntax with 3.0. It doesn't make sense to introduce a *third* syntax (`{var}`) when we already have two.

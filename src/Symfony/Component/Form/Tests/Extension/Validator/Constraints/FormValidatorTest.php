@@ -225,11 +225,14 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
+        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
+
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::ERR_INVALID)
+            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -259,11 +262,14 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
+        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
+
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::ERR_INVALID)
+            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -293,10 +299,13 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
+        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
+
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue('foo')
             ->setCode(Form::ERR_INVALID)
+            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
             ->assertRaised();
     }
 

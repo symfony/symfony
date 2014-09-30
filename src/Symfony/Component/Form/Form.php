@@ -121,12 +121,10 @@ class Form implements \IteratorAggregate, FormInterface
     private $extraData = array();
 
     /**
-     * Whether the data in model, normalized and view format is
-     * synchronized. Data may not be synchronized if transformation errors
-     * occur.
-     * @var bool
+     * Returns the transformation failure generated during submission, if any
+     * @var TransformationFailedException|null
      */
-    private $synchronized = true;
+    private $transformationFailure;
 
     /**
      * Whether the form's data has been initialized.
@@ -634,7 +632,7 @@ class Form implements \IteratorAggregate, FormInterface
                 $viewData = $this->normToView($normData);
             }
         } catch (TransformationFailedException $e) {
-            $this->synchronized = false;
+            $this->transformationFailure = $e;
 
             // If $viewData was not yet set, set it to $submittedData so that
             // the erroneous data is accessible on the form.
@@ -711,7 +709,15 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isSynchronized()
     {
-        return $this->synchronized;
+        return null === $this->transformationFailure;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTransformationFailure()
+    {
+        return $this->transformationFailure;
     }
 
     /**

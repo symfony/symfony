@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by Koc at 2014-09-24T16:54:54Z
+
+What way to determinate what concrete constraint failed? `foreach + instanceof`?
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-09-24T17:05:34Z
+
+Maybe can we use reflection for generation error names from constants name by they values?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T07:47:10Z
+
+@Koc Just check `$violation->getConstraint()`.
+
+Reflection is slow. We won't change the error codes very often, so an explicit mapping should be fine.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T10:08:24Z
+
+@fabpot can you merge older branches into master so that this PR can be rebased ? It will be easier to review it when the diff does not include the changes of previous PRs
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T10:55:56Z
+
+@stof As soon as I have a go on #12016, I'll merge everything and rebase this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T11:36:53Z
+
+I think you used the wrong issue number in your comment
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T13:15:01Z
+
+@stof No I haven't... ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T13:17:24Z
+
+you cheated :smile:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T17:37:11Z
+
+This is rebased now. I also improved the UUID validator to give more helpful error codes.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T17:37:27Z
+
+Ready for review+merge.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T18:05:08Z
+
+@weaverryan Could you check the names of the error constants for linguistic mistakes?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-09-25T18:14:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-25T18:36:40Z
+
+The ISBN validator is now able to distinguish many different error cases. However, we have only 1 constraint message. Should we produce different messages as well for the different failure cases ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T18:54:49Z
+
+@stof I was thinking about that too. In fact, this applies to a few more validators. I would leave this to a future PR though.
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2014-09-25T20:19:30Z
+
+These codes looks too magic. Are they auto_increment?)
+What will you do on codes deprecation?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-25T20:32:07Z
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Validator/Violation/ConstraintViolationBuilderInterface.php#L100 says `setCode` is internal. But now it seems users should be able to use it for adding error codes for custom constraints?!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-26T08:34:40Z
+
+Sorry for being so late in the conversation, but I'd like to comment that the proposed error names are not consistent with the existing ones. Symfony code prefers to put the `ERROR` string at the end of the error name (`AUTHENTICATION_ERROR`, `ACCESS_DENIED_ERROR`), other Symfony ecosystem apps do the same (`TWIG_RUNTIME_ERROR`) and even PHP uses this strategy (`E_COMPILE_ERROR`, `PREG_INTERNAL_ERROR`).
+
+In addition, putting `ERROR` at the beginning looks wrong for some errors: `Uuid::ERROR_INVALID_CHARACTERS`. Here `ERROR` and `INVALID` look redundant, whereas `Uuid::INVALID_CHARACTERS_ERROR` looks OK.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-26T08:41:58Z
+
+@javiereguiluz Thanks for mentioning! I chose this way as it's easier to discover the possible error constants in an IDE this way. But you are right that it's better to remain consistent here.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-26T14:10:17Z
+
+I changed all constant names as suggested. @weaverryan I'd still like to have a check from a native speaker, if possible.
+
+@Tobion I removed the internal flag and changed the type hint to "int" for `setCode()`. One should always use integers as error codes, even though this is not technically enforced at the moment for BC reasons.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-26T19:45:52Z
+
+there are still some `mixed` code references like https://github.com/webmozart/symfony/blob/issue7276-2/src/Symfony/Component/Validator/ConstraintViolationInterface.php#L133 (should probably be `int|null`) and https://github.com/webmozart/symfony/blob/issue7276-2/src/Symfony/Component/Validator/ConstraintViolation.php#L81 and some `@var mixed` code properties. But as the code can also be null, `getErrorName` does not work with this. So your snippet `var_dump($violation->getConstraint()->getErrorName($violation->getCode()));` is not safe to call.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-30T12:13:00Z
+
+@Tobion We can't change those. Since the old `addViolation()` is tagged as API and has the "mixed" type, that must be the same for the ConstraintViolation constructor and the `getCode()`.
+
+```$violation->getConstraint()->getErrorName($violation->getCode())``` is safe to call as long as the constraint is a core constraint (and as long as `$violation->getCode()` is not `null`). The code is guaranteed to be set by `$violation->getConstraint()`, so it also must be known to its `getErrorName()`.
+
+For generic code that must work with userland constraints also, you should wrap the call to `getErrorName()`within a try-catch statement. If no name can be found for a code, an exception will be thrown.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-30T12:14:08Z
+
+ping @symfony/deciders
+
+I'd like to merge this today.

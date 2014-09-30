@@ -428,6 +428,7 @@ class ConstraintViolationAssertion
     private $plural;
     private $code;
     private $constraint;
+    private $cause;
 
     public function __construct(LegacyExecutionContextInterface $context, $message, Constraint $constraint = null, array $assertions = array())
     {
@@ -486,6 +487,13 @@ class ConstraintViolationAssertion
         return $this;
     }
 
+    public function setCause($cause)
+    {
+        $this->cause = $cause;
+
+        return $this;
+    }
+
     public function buildNextViolation($message)
     {
         $assertions = $this->assertions;
@@ -525,7 +533,8 @@ class ConstraintViolationAssertion
             $this->invalidValue,
             $this->plural,
             $this->code,
-            $this->constraint
+            $this->constraint,
+            $this->cause
         );
     }
 }

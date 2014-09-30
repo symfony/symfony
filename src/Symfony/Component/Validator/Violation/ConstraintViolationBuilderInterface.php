@@ -102,6 +102,15 @@ interface ConstraintViolationBuilderInterface
     public function setCode($code);
 
     /**
+     * Sets the cause of the violation.
+     *
+     * @param mixed $cause The cause of the violation
+     *
+     * @return ConstraintViolationBuilderInterface This builder
+     */
+    public function setCause($cause);
+
+    /**
      * Adds the violation to the current execution context.
      */
     public function addViolation();

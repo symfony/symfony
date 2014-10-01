@@ -40,7 +40,7 @@
 
     Before:
 
-    ```
+    ```yaml
     framework:
         session:
             default_locale: fr
@@ -48,7 +48,7 @@
 
     After:
 
-    ```
+    ```yaml
     framework:
         default_locale: fr
     ```
@@ -74,10 +74,10 @@
     ##### Simulate old behavior
 
     You can simulate that the locale for the user is still stored in the session by
-    registering a listener that looks like the following if the parameter which 
+    registering a listener that looks like the following if the parameter which
     handles the locale value in the request is `_locale`:
 
-   ```
+   ```php
    namespace XXX;
 
    use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -138,7 +138,7 @@
 
     Before:
 
-    ```
+    ```php
     class User implements UserInterface
     {
         // ...
@@ -149,7 +149,7 @@
 
     After:
 
-    ```
+    ```php
     class User implements UserInterface, EquatableInterface
     {
         // ...
@@ -165,13 +165,13 @@
 
     Before:
 
-     ``` yaml
+     ```yaml
      security:
        factories:
          - "%kernel.root_dir%/../src/Acme/DemoBundle/Resources/config/security_factories.yml"
      ```
 
-     ``` yaml
+     ```yaml
      # src/Acme/DemoBundle/Resources/config/security_factories.yml
      services:
          security.authentication.factory.custom:
@@ -182,7 +182,7 @@
 
      After:
 
-      ```
+      ```php
       namespace Acme\DemoBundle;
 
       use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -212,7 +212,7 @@
 
      Before:
 
-     ``` yaml
+     ```yaml
      security:
          providers:
              my_chain_provider:
@@ -225,7 +225,7 @@
 
      After:
 
-     ``` yaml
+     ```yaml
      security:
          providers:
              my_chain_provider:
@@ -245,14 +245,14 @@
 
      Before:
 
-     ```
+     ```php
      use Symfony\Bundle\SecurityBundle\Validator\Constraint\UserPassword;
      use Symfony\Bundle\SecurityBundle\Validator\Constraint as SecurityAssert;
      ```
 
      After:
 
-     ```
+     ```php
      use Symfony\Component\Security\Core\Validator\Constraint\UserPassword;
      use Symfony\Component\Security\Core\Validator\Constraint as SecurityAssert;
      ```
@@ -270,7 +270,7 @@
 
     Before:
 
-    ```
+    ```php
     use Symfony\Component\Form\FormBuilder;
 
     public function buildForm(FormBuilder $builder, array $options)
@@ -278,7 +278,7 @@
 
     After:
 
-    ```
+    ```php
     use Symfony\Component\Form\FormBuilderInterface;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -301,7 +301,7 @@
 
     Before:
 
-    ```
+    ```php
     public function getParent(array $options)
     {
         return 'field';
@@ -310,7 +310,7 @@
 
     After:
 
-    ```
+    ```php
     public function getParent()
     {
         return 'form';
@@ -333,7 +333,7 @@
 
     Before:
 
-    ```
+    ```php
     public function getParent(array $options)
     {
         return $options['expanded'] ? 'form' : 'field';
@@ -342,7 +342,7 @@
 
     After:
 
-    ```
+    ```php
     use Symfony\Component\OptionsResolver\OptionsResolverInterface;
     use Symfony\Component\OptionsResolver\Options;
 
@@ -374,7 +374,7 @@
 
     Form mapped to an instance of `Person`:
 
-    ```
+    ```php
     use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -399,7 +399,7 @@
 
     Before:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'property_path' => 'address.street',
     ));
@@ -407,7 +407,7 @@
 
     After (if the address object is an array):
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'property_path' => 'address[street]',
     ));
@@ -427,7 +427,7 @@
     underscores wherever you specify a value for the field's "prototype_name"
     option.
 
-    ```
+    ```php
     $builder->add('tags', 'collection', array('prototype_name' => '__proto__'));
 
     // results in the name "__proto__" in the template
@@ -455,7 +455,7 @@
 
     Before:
 
-    ```
+    ```jinja
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
@@ -466,7 +466,7 @@
 
     After:
 
-    ```
+    ```jinja
     {% block url_widget %}
     {% spaceless %}
         {% set type = type|default('url') %}
@@ -482,7 +482,7 @@
 
     Before:
 
-    ```
+    ```jinja
     {% block form_errors %}
     {% spaceless %}
         ... form code ...
@@ -498,7 +498,7 @@
 
     After:
 
-    ```
+    ```jinja
     {% block form_errors %}
     {% spaceless %}
         {% if compound %}
@@ -526,13 +526,13 @@
 
   * In the choice field type's template, the `_form_is_choice_selected` method
     used to identify a selected choice has been replaced with the `selectedchoice`
-    filter. Similarly, the `_form_is_choice_group` method used to check if a 
-    choice is grouped has been removed and can be checked with the `iterable` 
+    filter. Similarly, the `_form_is_choice_group` method used to check if a
+    choice is grouped has been removed and can be checked with the `iterable`
     test.
 
     Before:
 
-    ```
+    ```jinja
     {% for choice, label in choices %}
         {% if _form_is_choice_group(label) %}
             <optgroup label="{{ choice|trans }}">
@@ -550,7 +550,7 @@
 
     After:
 
-    ```
+    ```jinja
     {% for label, choice in choices %}
         {% if choice is iterable %}
             <optgroup label="{{ label|trans({}, translation_domain) }}">
@@ -571,7 +571,7 @@
     accommodate those cases when the `label` option has not been explicitly
     set.
 
-    ```
+    ```jinja
     {% block form_label %}
         {% if label is empty %}
             {% set label = name|humanize %}
@@ -588,7 +588,7 @@
 
     Before:
 
-    ```
+    ```jinja
     {% block _author_tags_0_label %}
         {# ... #}
     {% endblock %}
@@ -600,7 +600,7 @@
 
     After:
 
-    ```
+    ```jinja
     {% block _author_tags_entry_label %}
         {# ... #}
     {% endblock %}
@@ -612,13 +612,13 @@
 
     Before:
 
-    ```
+    ```php
     <?php echo $view['form']->renderBlock('widget_attributes') ?>
     ```
 
     After:
 
-    ```
+    ```php
     <?php echo $view['form']->block($form, 'widget_attributes') ?>
     ```
 
@@ -631,13 +631,13 @@
 
     Before:
 
-    ```
+    ```php
     $form = $factory->createNamed('text', 'firstName');
     ```
 
     After:
 
-    ```
+    ```php
     $form = $factory->createNamed('firstName', 'text');
     ```
 
@@ -648,7 +648,7 @@
 
     Before:
 
-    ```
+    ```php
     class MyChoiceList extends ArrayChoiceList
     {
         protected function load()
@@ -664,7 +664,7 @@
 
     After:
 
-    ```
+    ```php
     class MyChoiceList extends SimpleChoiceList
     {
         public function __construct()
@@ -680,7 +680,7 @@
     accessed for the first time -- you can extend `LazyChoiceList` instead
     and load the choices by overriding `loadChoiceList()`.
 
-    ```
+    ```php
     class MyChoiceList extends LazyChoiceList
     {
         protected function loadChoiceList()
@@ -705,13 +705,13 @@
 
     Before:
 
-    ```
+    ```jinja
     {{ form_label(form.name, 'Your Name', { 'attr': {'class': 'foo'} }) }}
     ```
 
     After:
 
-    ```
+    ```jinja
     {{ form_label(form.name, 'Your Name', { 'label_attr': {'class': 'foo'} }) }}
     ```
 
@@ -751,7 +751,7 @@
 
     Before:
 
-    ```
+    ```php
     public function getDefaultOptions(array $options)
     {
         return array(
@@ -769,7 +769,7 @@
 
     After:
 
-    ```
+    ```php
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
@@ -786,7 +786,7 @@
 
     Before:
 
-    ```
+    ```php
     public function getDefaultOptions(array $options)
     {
         $defaultOptions = array();
@@ -801,7 +801,7 @@
 
     After:
 
-    ```
+    ```php
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
@@ -832,13 +832,13 @@
 
     Before:
 
-    ```
+    ```php
     $builder->appendClientTransformer(new MyTransformer());
     ```
 
     After:
 
-    ```
+    ```php
     $builder->addViewTransformer(new MyTransformer());
     ```
 
@@ -857,7 +857,7 @@
 
     Before:
 
-    ```
+    ```php
     $builder->addListener(FormEvents::BIND_CLIENT_DATA, function (FilterDataEvent $event) {
         // ...
     });
@@ -865,7 +865,7 @@
 
     After:
 
-    ```
+    ```php
     $builder->addListener(FormEvents::PRE_BIND, function (FormEvent $event) {
         // ...
     });
@@ -886,7 +886,7 @@
 
     Before:
 
-    ```
+    ```php
     public function guessMinLength($class, $property)
     {
         if (/* condition */) {
@@ -897,7 +897,7 @@
 
     After:
 
-    ```
+    ```php
     public function guessPattern($class, $property)
     {
         if (/* condition */) {
@@ -914,7 +914,7 @@
 
     Before:
 
-    ```
+    ```php
     $builder->add('termsAccepted', 'checkbox', array(
         'property_path' => false,
     ));
@@ -922,7 +922,7 @@
 
     After:
 
-    ```
+    ```php
     $builder->add('termsAccepted', 'checkbox', array(
         'mapped' => false,
     ));
@@ -944,13 +944,13 @@
 
     Before:
 
-    ```
+    ```php
     $form->getErrorBubbling()
     ```
 
     After:
 
-    ```
+    ```php
     $form->getConfig()->getErrorBubbling();
     ```
 
@@ -962,13 +962,13 @@
 
     Before:
 
-    ```
+    ```php
     if ($form->hasChildren()) {
     ```
 
     After:
 
-    ```
+    ```php
     if (count($form) > 0) {
     ```
 
@@ -976,13 +976,13 @@
 
     Before:
 
-    ```
+    ```php
     $form->bindRequest($request);
     ```
 
     After:
 
-    ```
+    ```php
     $form->bind($request);
     ```
 
@@ -992,7 +992,7 @@
 
     Before:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'validation_constraint' => new NotBlank(),
     ));
@@ -1000,7 +1000,7 @@
 
     After:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'constraints' => new NotBlank(),
     ));
@@ -1008,7 +1008,7 @@
 
     Unlike previously, you can also pass a list of constraints now:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'constraints' => array(
             new NotBlank(),
@@ -1021,7 +1021,7 @@
     to the validated group! So if you validate a form in group "Custom"
     and previously did:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'validation_constraint' => new NotBlank(),
     ));
@@ -1029,7 +1029,7 @@
 
     Then you need to add the constraint to the group "Custom" now:
 
-    ```
+    ```php
     $builder->add('name', 'text', array(
         'constraints' => new NotBlank(array('groups' => 'Custom')),
     ));
@@ -1041,7 +1041,7 @@
 
     Before:
 
-    ```
+    ```php
     $builder->add('scheduledFor', 'date', array(
         'data_timezone' => 'UTC',
         'user_timezone' => 'America/New_York',
@@ -1050,7 +1050,7 @@
 
     After:
 
-    ```
+    ```php
     $builder->add('scheduledFor', 'date', array(
         'model_timezone' => 'UTC',
         'view_timezone' => 'America/New_York',
@@ -1063,13 +1063,13 @@
 
     Before:
 
-    ```
+    ```php
     $this->get('form.factory')->addType(new MyFormType());
     ```
 
     After:
 
-    ```
+    ```php
     $registry = $this->get('form.registry');
 
     $registry->addType($registry->resolveType(new MyFormType()));
@@ -1098,14 +1098,14 @@
 
     Before:
 
-    ```
+    ```php
     $view->set('help', 'A text longer than six characters');
     $view->set('error_class', 'max_length_error');
     ```
 
     After:
 
-    ```
+    ```php
     $view->vars = array_replace($view->vars, array(
         'help'        => 'A text longer than six characters',
         'error_class' => 'max_length_error',
@@ -1114,25 +1114,25 @@
 
     Before:
 
-    ```
+    ```php
     echo $view->get('error_class');
     ```
 
     After:
 
-    ```
+    ```php
     echo $view->vars['error_class'];
     ```
 
     Before:
 
-    ```
+    ```php
     if ($view->hasChildren()) { ...
     ```
 
     After:
 
-    ```
+    ```php
     if (count($view->children)) { ...
     ```
 
@@ -1147,7 +1147,7 @@
 
     Before:
 
-    ```
+    ```php
     public function isValid($value, Constraint $constraint)
     {
         // ...
@@ -1163,7 +1163,7 @@
 
     After:
 
-    ```
+    ```php
     public function isValid($value, Constraint $constraint)
     {
         // ...
@@ -1185,7 +1185,7 @@
 
     Before:
 
-    ```
+    ```php
     public function isPropertyValid(ExecutionContext $context)
     {
         // ...
@@ -1197,7 +1197,7 @@
 
     After:
 
-    ```
+    ```php
     public function isPropertyValid(ExecutionContext $context)
     {
         // ...
@@ -1216,7 +1216,7 @@
 
     Before:
 
-    ```
+    ```php
     public function isValid($value, Constraint $constraint)
     {
         // ...
@@ -1232,7 +1232,7 @@
 
     After:
 
-    ```
+    ```php
     public function validate($value, Constraint $constraint)
     {
         // ...
@@ -1259,14 +1259,14 @@
 
     Before:
 
-    ```
+    ```php
     /** @Assert\Valid */
     private $recursiveCollection;
     ```
 
     After:
 
-    ```
+    ```php
     /** @Assert\Valid(deep = true) */
     private $recursiveCollection;
     ```
@@ -1276,28 +1276,28 @@
 
     Before:
 
-    ```
+    ```php
     /** @Assert\Size(min = 2, max = 16) */
     private $numberOfCpus;
     ```
 
     After:
 
-    ```
+    ```php
     /** @Assert\Range(min = 2, max = 16) */
     private $numberOfCpus;
     ```
 
     Before:
 
-    ```
+    ```php
     /** @Assert\Min(2) */
     private $numberOfCpus;
     ```
 
     After:
 
-    ```
+    ```php
     /** @Assert\Range(min = 2) */
     private $numberOfCpus;
     ```
@@ -1307,14 +1307,14 @@
 
     Before:
 
-    ```
+    ```php
     /** @Assert\MinLength(8) */
     private $password;
     ```
 
     After:
 
-    ```
+    ```php
     /** @Assert\Length(min = 8) */
     private $password;
     ```
@@ -1325,14 +1325,14 @@
 
     Before:
 
-    ```
+    ```php
     $validator = ValidatorFactory::buildDefault(array('path/to/mapping.xml'))
         ->getValidator();
     ```
 
     After:
 
-    ```
+    ```php
     $validator = Validation::createValidatorBuilder()
         ->addXmlMapping('path/to/mapping.xml')
         ->getValidator();
@@ -1349,7 +1349,7 @@
 
     Before:
 
-    ```
+    ```jinja
     {% if app.session.hasFlash('notice') %}
         <div class="flash-notice">
             {{ app.session.getFlash('notice') }}
@@ -1358,7 +1358,7 @@
     ```
     After:
 
-    ```
+    ```jinja
     {% for flashMessage in app.session.flashbag.get('notice') %}
         <div class="flash-notice">
             {{ flashMessage }}
@@ -1368,7 +1368,7 @@
 
     You can process all flash messages in a single loop with:
 
-    ```
+    ```jinja
     {% for type, flashMessages in app.session.flashbag.all() %}
         {% for flashMessage in flashMessages %}
             <div class="flash-{{ type }}">
@@ -1391,7 +1391,7 @@
 
  * The `item` element is now converted to an array when deserializing XML.
 
-    ``` xml
+    ```xml
     <?xml version="1.0"?>
     <response>
         <item><title><![CDATA[title1]]></title></item><item><title><![CDATA[title2]]></title></item>
@@ -1433,7 +1433,7 @@
 
   Before:
 
-  ```
+  ```yaml
     framework:
         session:
             lifetime:   3600
@@ -1445,7 +1445,7 @@
 
   After:
 
-  ```
+  ```yaml
     framework:
         session:
             cookie_lifetime:   3600
@@ -1457,7 +1457,7 @@
 
 Added `handler_id`, defaults to `session.handler.native_file`.
 
-  ```
+  ```yaml
      framework:
          session:
              storage_id: session.storage.native
@@ -1466,7 +1466,7 @@ Added `handler_id`, defaults to `session.handler.native_file`.
 
 To use mock session storage use the following.  `handler_id` is irrelevant in this context.
 
-  ```
+  ```yaml
      framework:
          session:
              storage_id: session.storage.mock_file

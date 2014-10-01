@@ -1,0 +1,881 @@
+{
+    "Version": "2.1.8.9",
+    "Names": {
+        "ADP": [
+            "ADP",
+            "Andorrskur peseti"
+        ],
+        "AED": [
+            "AED",
+            "Arabískt dírham"
+        ],
+        "AFN": [
+            "AFN",
+            "Afgani"
+        ],
+        "ALL": [
+            "ALL",
+            "Albanskt lek"
+        ],
+        "AMD": [
+            "AMD",
+            "Armenskt dramm"
+        ],
+        "ANG": [
+            "ANG",
+            "Hollenskt Antillugyllini"
+        ],
+        "AOA": [
+            "AOA",
+            "Angólsk kvansa"
+        ],
+        "ARA": [
+            "ARA",
+            "Argentine Austral"
+        ],
+        "ARP": [
+            "ARP",
+            "Argentískur pesi (1983–1985)"
+        ],
+        "ARS": [
+            "ARS",
+            "Argentínskur pesi"
+        ],
+        "ATS": [
+            "ATS",
+            "Austurrískur skildingur"
+        ],
+        "AUD": [
+            "AUD",
+            "Ástralskur dalur"
+        ],
+        "AWG": [
+            "AWG",
+            "Arúbönsk flórína"
+        ],
+        "AZN": [
+            "AZN",
+            "Aserskt manat"
+        ],
+        "BAM": [
+            "BAM",
+            "Skiptanlegt Bosníu og Hersegóvínu-mark"
+        ],
+        "BBD": [
+            "BBD",
+            "Barbadoskur dalur"
+        ],
+        "BDT": [
+            "BDT",
+            "Bangladessk taka"
+        ],
+        "BEF": [
+            "BEF",
+            "Belgískur franki"
+        ],
+        "BGL": [
+            "BGL",
+            "Lef"
+        ],
+        "BGN": [
+            "BGN",
+            "Búlgarskt lef"
+        ],
+        "BHD": [
+            "BHD",
+            "Bareinskur denari"
+        ],
+        "BIF": [
+            "BIF",
+            "Búrúndískur franki"
+        ],
+        "BMD": [
+            "BMD",
+            "Bermúdadalur"
+        ],
+        "BND": [
+            "BND",
+            "Brúneiskur dalur"
+        ],
+        "BOB": [
+            "BOB",
+            "Bólivíani"
+        ],
+        "BOP": [
+            "BOP",
+            "Bólivískur pesi"
+        ],
+        "BOV": [
+            "BOV",
+            "Bolivian Mvdol"
+        ],
+        "BRL": [
+            "BRL",
+            "Brasilískt ríal"
+        ],
+        "BSD": [
+            "BSD",
+            "Bahamadalur"
+        ],
+        "BTN": [
+            "BTN",
+            "Bútanskt núltrum"
+        ],
+        "BUK": [
+            "BUK",
+            "Búrmverskt kjat"
+        ],
+        "BWP": [
+            "BWP",
+            "Botsvönsk púla"
+        ],
+        "BYR": [
+            "BYR",
+            "Hvítrússnesk rúbla"
+        ],
+        "BZD": [
+            "BZD",
+            "Belískur dalur"
+        ],
+        "CAD": [
+            "CAD",
+            "Kanadískur dalur"
+        ],
+        "CDF": [
+            "CDF",
+            "Kongóskur franki"
+        ],
+        "CHF": [
+            "CHF",
+            "Svissneskur franki"
+        ],
+        "CLF": [
+            "CLF",
+            "Chilean Unidades de Fomento"
+        ],
+        "CLP": [
+            "CLP",
+            "Síleskur pesi"
+        ],
+        "CNY": [
+            "CN¥",
+            "Kínverskt júan"
+        ],
+        "COP": [
+            "COP",
+            "Kólumbískur pesi"
+        ],
+        "CRC": [
+            "CRC",
+            "Kostarískt kólon"
+        ],
+        "CSK": [
+            "CSK",
+            "Tékknesk króna, eldri"
+        ],
+        "CUC": [
+            "CUC",
+            "Kúbverskur skiptanlegur pesi"
+        ],
+        "CUP": [
+            "CUP",
+            "Kúbverskur pesi"
+        ],
+        "CVE": [
+            "CVE",
+            "Grænhöfðeyskur skúti"
+        ],
+        "CYP": [
+            "CYP",
+            "Kýpverskt pund"
+        ],
+        "CZK": [
+            "CZK",
+            "Tékknesk króna"
+        ],
+        "DDM": [
+            "DDM",
+            "Austurþýskt mark"
+        ],
+        "DEM": [
+            "DEM",
+            "Þýskt mark"
+        ],
+        "DJF": [
+            "DJF",
+            "Djíbútískur franki"
+        ],
+        "DKK": [
+            "DKK",
+            "Dönsk króna"
+        ],
+        "DOP": [
+            "DOP",
+            "Dóminískur pesi"
+        ],
+        "DZD": [
+            "DZD",
+            "Alsírskur denari"
+        ],
+        "ECS": [
+            "ECS",
+            "Ecuador Sucre"
+        ],
+        "EEK": [
+            "EEK",
+            "Eistnesk króna"
+        ],
+        "EGP": [
+            "EGP",
+            "Egypskt pund"
+        ],
+        "ERN": [
+            "ERN",
+            "Erítresk nakfa"
+        ],
+        "ESP": [
+            "ESP",
+            "Spænskur peseti"
+        ],
+        "ETB": [
+            "ETB",
+            "Eþíópískt birr"
+        ],
+        "EUR": [
+            "EUR",
+            "Evra"
+        ],
+        "FIM": [
+            "FIM",
+            "Finnskt mark"
+        ],
+        "FJD": [
+            "FJD",
+            "Fídjeyskur dalur"
+        ],
+        "FKP": [
+            "FKP",
+            "Falklenskt pund"
+        ],
+        "FRF": [
+            "FRF",
+            "Franskur franki"
+        ],
+        "GBP": [
+            "GBP",
+            "Sterlingspund"
+        ],
+        "GEL": [
+            "GEL",
+            "Georgískur lari"
+        ],
+        "GHS": [
+            "GHS",
+            "Ganverskur sedi"
+        ],
+        "GIP": [
+            "GIP",
+            "Gíbraltarspund"
+        ],
+        "GMD": [
+            "GMD",
+            "Gambískur dalasi"
+        ],
+        "GNF": [
+            "GNF",
+            "Gíneufranki"
+        ],
+        "GRD": [
+            "GRD",
+            "Drakma"
+        ],
+        "GTQ": [
+            "GTQ",
+            "Gvatemalskt kvesal"
+        ],
+        "GWE": [
+            "GWE",
+            "Portúgalskur, gíneskur skúti"
+        ],
+        "GYD": [
+            "GYD",
+            "Gvæjanskur dalur"
+        ],
+        "HKD": [
+            "HK$",
+            "Hong Kong-dalur"
+        ],
+        "HNL": [
+            "HNL",
+            "Hondúrsk lempíra"
+        ],
+        "HRK": [
+            "HRK",
+            "Króatísk kúna"
+        ],
+        "HTG": [
+            "HTG",
+            "Haítískur gúrdi"
+        ],
+        "HUF": [
+            "HUF",
+            "Ungversk fórinta"
+        ],
+        "IDR": [
+            "IDR",
+            "Indónesísk rúpía"
+        ],
+        "IEP": [
+            "IEP",
+            "Írskt pund"
+        ],
+        "ILP": [
+            "ILP",
+            "Ísraelskt pund"
+        ],
+        "ILS": [
+            "₪",
+            "Nýr ísraelskur sikill"
+        ],
+        "INR": [
+            "INR",
+            "Indversk rúpía"
+        ],
+        "IQD": [
+            "IQD",
+            "Írakskur denari"
+        ],
+        "IRR": [
+            "IRR",
+            "Íranskt ríal"
+        ],
+        "ISK": [
+            "ISK",
+            "Íslensk króna"
+        ],
+        "ITL": [
+            "ITL",
+            "Ítölsk líra"
+        ],
+        "JMD": [
+            "JMD",
+            "Jamaískur dalur"
+        ],
+        "JOD": [
+            "JOD",
+            "Jórdanskur denari"
+        ],
+        "JPY": [
+            "JP¥",
+            "Japanskt jen"
+        ],
+        "KES": [
+            "KES",
+            "Kenískur skildingur"
+        ],
+        "KGS": [
+            "KGS",
+            "Kirgiskt som"
+        ],
+        "KHR": [
+            "KHR",
+            "Kambódískt ríal"
+        ],
+        "KMF": [
+            "KMF",
+            "Kómoreyskur franki"
+        ],
+        "KPW": [
+            "KPW",
+            "Norðurkóreskt vonn"
+        ],
+        "KRW": [
+            "KRW",
+            "Suðurkóreskt vonn"
+        ],
+        "KWD": [
+            "KWD",
+            "Kúveiskur denari"
+        ],
+        "KYD": [
+            "KYD",
+            "Caymaneyskur dalur"
+        ],
+        "KZT": [
+            "KZT",
+            "Kasakst tengi"
+        ],
+        "LAK": [
+            "LAK",
+            "Laoskt kip"
+        ],
+        "LBP": [
+            "LBP",
+            "Líbanskt pund"
+        ],
+        "LKR": [
+            "LKR",
+            "Srílönsk rúpía"
+        ],
+        "LRD": [
+            "LRD",
+            "Líberískur dalur"
+        ],
+        "LSL": [
+            "LSL",
+            "Lesotho Loti"
+        ],
+        "LTL": [
+            "LTL",
+            "Litháískt lít"
+        ],
+        "LTT": [
+            "LTT",
+            "Lithuanian Talonas"
+        ],
+        "LUF": [
+            "LUF",
+            "Lúxemborgarfranki"
+        ],
+        "LVL": [
+            "LVL",
+            "Lettneskt lat"
+        ],
+        "LVR": [
+            "LVR",
+            "Lettnesk rúbla"
+        ],
+        "LYD": [
+            "LYD",
+            "Líbískur denari"
+        ],
+        "MAD": [
+            "MAD",
+            "Marokkóskt dírham"
+        ],
+        "MAF": [
+            "MAF",
+            "Marokkóskur franki"
+        ],
+        "MDL": [
+            "MDL",
+            "Moldavískt lei"
+        ],
+        "MGA": [
+            "MGA",
+            "Madagaskararjari"
+        ],
+        "MGF": [
+            "MGF",
+            "Madagaskur franki"
+        ],
+        "MKD": [
+            "MKD",
+            "Makedónskur denari"
+        ],
+        "MLF": [
+            "MLF",
+            "Malískur franki"
+        ],
+        "MMK": [
+            "MMK",
+            "Mjanmarskt kjat"
+        ],
+        "MNT": [
+            "MNT",
+            "Mongólskur túríkur"
+        ],
+        "MOP": [
+            "MOP",
+            "Makaópataka"
+        ],
+        "MRO": [
+            "MRO",
+            "Máritönsk úgía"
+        ],
+        "MTL": [
+            "MTL",
+            "Meltnesk líra"
+        ],
+        "MTP": [
+            "MTP",
+            "Maltneskt pund"
+        ],
+        "MUR": [
+            "MUR",
+            "Máritísk rúpía"
+        ],
+        "MVR": [
+            "MVR",
+            "Maldíveysk rúpía"
+        ],
+        "MWK": [
+            "MWK",
+            "Malavísk kvaka"
+        ],
+        "MXN": [
+            "MXN",
+            "Mexíkóskur pesi"
+        ],
+        "MXP": [
+            "MXP",
+            "Mexíkóskur silfurpesi (1861–1992)"
+        ],
+        "MXV": [
+            "MXV",
+            "Mexíkóskur pesi, UDI"
+        ],
+        "MYR": [
+            "MYR",
+            "Malasískt ringit"
+        ],
+        "MZE": [
+            "MZE",
+            "Mósambískur skúti"
+        ],
+        "MZN": [
+            "MZN",
+            "Mósambískt metikal"
+        ],
+        "NAD": [
+            "NAD",
+            "Namibískur dalur"
+        ],
+        "NGN": [
+            "NGN",
+            "Nígerísk næra"
+        ],
+        "NIO": [
+            "NIO",
+            "Níkarögsk kordóva"
+        ],
+        "NLG": [
+            "NLG",
+            "Hollenskt gyllini"
+        ],
+        "NOK": [
+            "NOK",
+            "Norsk króna"
+        ],
+        "NPR": [
+            "NPR",
+            "Nepölsk rúpía"
+        ],
+        "NZD": [
+            "NZD",
+            "Nýsjálenskur dalur"
+        ],
+        "OMR": [
+            "OMR",
+            "Ómanskt ríal"
+        ],
+        "PAB": [
+            "PAB",
+            "Balbói"
+        ],
+        "PEN": [
+            "PEN",
+            "Perúskt sól"
+        ],
+        "PGK": [
+            "PGK",
+            "Papúsk kína"
+        ],
+        "PHP": [
+            "PHP",
+            "Filippseyskur pesi"
+        ],
+        "PKR": [
+            "PKR",
+            "Pakistönsk rúpía"
+        ],
+        "PLN": [
+            "PLN",
+            "Pólskt slot"
+        ],
+        "PLZ": [
+            "PLZ",
+            "Slot"
+        ],
+        "PTE": [
+            "PTE",
+            "Portúgalskur skúti"
+        ],
+        "PYG": [
+            "PYG",
+            "Paragvæskt gvaraní"
+        ],
+        "QAR": [
+            "QAR",
+            "Katarskt ríal"
+        ],
+        "ROL": [
+            "ROL",
+            "Rúmenskt lei (1952–2006)"
+        ],
+        "RON": [
+            "RON",
+            "Rúmenskt lei"
+        ],
+        "RSD": [
+            "RSD",
+            "Serbneskur denari"
+        ],
+        "RUB": [
+            "RUB",
+            "Rússnesk rúbla"
+        ],
+        "RUR": [
+            "RUR",
+            "Rússnesk rúbla (1991–1998)"
+        ],
+        "RWF": [
+            "RWF",
+            "Rúandskur franki"
+        ],
+        "SAR": [
+            "SAR",
+            "Sádiarabískt ríal"
+        ],
+        "SBD": [
+            "SBD",
+            "Salómonseyskur dalur"
+        ],
+        "SCR": [
+            "SCR",
+            "Seychellesrúpía"
+        ],
+        "SDD": [
+            "SDD",
+            "Súdanskur denari"
+        ],
+        "SDG": [
+            "SDG",
+            "Súdanskt pund"
+        ],
+        "SDP": [
+            "SDP",
+            "Súdanskt pund (1957–1998)"
+        ],
+        "SEK": [
+            "SEK",
+            "Sænsk króna"
+        ],
+        "SGD": [
+            "SGD",
+            "Singapúrskur dalur"
+        ],
+        "SHP": [
+            "SHP",
+            "Helenskt pund"
+        ],
+        "SIT": [
+            "SIT",
+            "Slóvenskur dalur"
+        ],
+        "SKK": [
+            "SKK",
+            "Slóvakísk króna"
+        ],
+        "SLL": [
+            "SLL",
+            "Síerraleónsk ljóna"
+        ],
+        "SOS": [
+            "SOS",
+            "Sómalískur skildingur"
+        ],
+        "SRD": [
+            "SRD",
+            "Súrínamdalur"
+        ],
+        "SRG": [
+            "SRG",
+            "Suriname Guilder"
+        ],
+        "SSP": [
+            "SSP",
+            "Suðursúdanskt pund"
+        ],
+        "STD": [
+            "STD",
+            "Saó Tóme og Prinsípe-dóbra"
+        ],
+        "SUR": [
+            "SUR",
+            "Soviet Rouble"
+        ],
+        "SVC": [
+            "SVC",
+            "El Salvador Colon"
+        ],
+        "SYP": [
+            "SYP",
+            "Sýrlenskt pund"
+        ],
+        "SZL": [
+            "SZL",
+            "Svasílenskur lílangeni"
+        ],
+        "THB": [
+            "THB",
+            "Taílenskt bat"
+        ],
+        "TJR": [
+            "TJR",
+            "Tadsjiksk rúbla"
+        ],
+        "TJS": [
+            "TJS",
+            "Tadsjikskur sómóni"
+        ],
+        "TMM": [
+            "TMM",
+            "Túrkmenskt manat (1993–2009)"
+        ],
+        "TMT": [
+            "TMT",
+            "Túrkmenskt manat"
+        ],
+        "TND": [
+            "TND",
+            "Túniskur denari"
+        ],
+        "TOP": [
+            "TOP",
+            "Tongapanga"
+        ],
+        "TPE": [
+            "TPE",
+            "Tímorskur skúti"
+        ],
+        "TRL": [
+            "TRL",
+            "Tyrknesk líra (1922–2005)"
+        ],
+        "TRY": [
+            "TRY",
+            "Tyrknesk líra"
+        ],
+        "TTD": [
+            "TTD",
+            "Trínidad og Tóbagó-dalur"
+        ],
+        "TWD": [
+            "TWD",
+            "Taívanskur dalur"
+        ],
+        "TZS": [
+            "TZS",
+            "Tansanískur skildingur"
+        ],
+        "UAH": [
+            "UAH",
+            "Úkraínsk hrinja"
+        ],
+        "UAK": [
+            "UAK",
+            "Ukrainian Karbovanetz"
+        ],
+        "UGX": [
+            "UGX",
+            "Úgandskur skildingur"
+        ],
+        "USD": [
+            "USD",
+            "Bandaríkjadalur"
+        ],
+        "USN": [
+            "USN",
+            "Bandaríkjadalur (næsta dag)"
+        ],
+        "USS": [
+            "USS",
+            "Bandaríkjadalur (sama dag)"
+        ],
+        "UYU": [
+            "UYU",
+            "Úrúgvæskur pesi"
+        ],
+        "UZS": [
+            "UZS",
+            "Úsbekskt súm"
+        ],
+        "VEB": [
+            "VEB",
+            "Bolívar í Venesúela (1871–2008)"
+        ],
+        "VEF": [
+            "VEF",
+            "Venesúelskur bólívari"
+        ],
+        "VND": [
+            "VND",
+            "Víetnamskt dong"
+        ],
+        "VUV": [
+            "VUV",
+            "Vanúatúskt vatú"
+        ],
+        "WST": [
+            "WST",
+            "Samóatala"
+        ],
+        "XAF": [
+            "FCFA",
+            "Miðafrískur franki"
+        ],
+        "XCD": [
+            "EC$",
+            "Austurkarabískur dalur"
+        ],
+        "XFO": [
+            "XFO",
+            "Franskur gullfranki"
+        ],
+        "XFU": [
+            "XFU",
+            "Franskur franki, UIC"
+        ],
+        "XOF": [
+            "CFA",
+            "Vesturafrískur franki"
+        ],
+        "XPF": [
+            "CFPF",
+            "Pólinesískur franki"
+        ],
+        "YDD": [
+            "YDD",
+            "Jemenskur denari"
+        ],
+        "YER": [
+            "YER",
+            "Jemenskt ríal"
+        ],
+        "YUM": [
+            "YUM",
+            "Júgóslavneskur denari"
+        ],
+        "ZAL": [
+            "ZAL",
+            "Rand (viðskipta)"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Suðurafrískt rand"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Zambian Kwacha (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Sambísk kvaka"
+        ],
+        "ZWD": [
+            "ZWD",
+            "Simbabveskur dalur"
+        ]
+    }
+}

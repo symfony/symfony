@@ -6,45 +6,51 @@ Injection Container.
 
 Here is a simple example that shows how to register services and parameters:
 
-    use Symfony\Component\DependencyInjection\ContainerBuilder;
-    use Symfony\Component\DependencyInjection\Reference;
+```php
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
-    $sc = new ContainerBuilder();
-    $sc
-        ->register('foo', '%foo.class%')
-        ->addArgument(new Reference('bar'))
-    ;
-    $sc->setParameter('foo.class', 'Foo');
+$sc = new ContainerBuilder();
+$sc
+    ->register('foo', '%foo.class%')
+    ->addArgument(new Reference('bar'))
+;
+$sc->setParameter('foo.class', 'Foo');
 
-    $sc->get('foo');
+$sc->get('foo');
+```
 
 Method Calls (Setter Injection):
 
-    $sc = new ContainerBuilder();
+```php
+$sc = new ContainerBuilder();
 
-    $sc
-        ->register('bar', '%bar.class%')
-        ->addMethodCall('setFoo', array(new Reference('foo')))
-    ;
-    $sc->setParameter('bar.class', 'Bar');
+$sc
+    ->register('bar', '%bar.class%')
+    ->addMethodCall('setFoo', array(new Reference('foo')))
+;
+$sc->setParameter('bar.class', 'Bar');
 
-    $sc->get('bar');
+$sc->get('bar');
+```
 
 Factory Class:
 
 If your service is retrieved by calling a static method:
 
-    $sc = new ContainerBuilder();
+```php
+$sc = new ContainerBuilder();
 
-    $sc
-        ->register('bar', '%bar.class%')
-        ->setFactoryClass('%bar.class%')
-        ->setFactoryMethod('getInstance')
-        ->addArgument('Aarrg!!!')
-    ;
-    $sc->setParameter('bar.class', 'Bar');
+$sc
+    ->register('bar', '%bar.class%')
+    ->setFactoryClass('%bar.class%')
+    ->setFactoryMethod('getInstance')
+    ->addArgument('Aarrg!!!')
+;
+$sc->setParameter('bar.class', 'Bar');
 
-    $sc->get('bar');
+$sc->get('bar');
+```
 
 File Include:
 
@@ -52,16 +58,18 @@ For some services, especially those that are difficult or impossible to
 autoload, you may need the container to include a file before
 instantiating your class.
 
-    $sc = new ContainerBuilder();
+```php
+$sc = new ContainerBuilder();
 
-    $sc
-        ->register('bar', '%bar.class%')
-        ->setFile('/path/to/file')
-        ->addArgument('Aarrg!!!')
-    ;
-    $sc->setParameter('bar.class', 'Bar');
+$sc
+    ->register('bar', '%bar.class%')
+    ->setFile('/path/to/file')
+    ->addArgument('Aarrg!!!')
+;
+$sc->setParameter('bar.class', 'Bar');
 
-    $sc->get('bar');
+$sc->get('bar');
+```
 
 Resources
 ---------

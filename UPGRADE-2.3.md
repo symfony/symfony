@@ -41,7 +41,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\DataMapperInterface;
 
    class MyDataMapper
@@ -60,7 +60,7 @@ Form
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\Form\DataMapperInterface;
 
    class MyDataMapper
@@ -84,7 +84,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\Form\Util\VirtualFormAwareIterator;
 
    public function mapFormsToData(array $forms, $data)
@@ -101,7 +101,7 @@ Form
 
    After:
 
-   ```
+   ```php
    public function mapFormsToData($forms, $data)
    {
        foreach ($forms as $form) {
@@ -121,7 +121,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    $form = $factory->create('form');
    $form->add($factory->createNamed('field', 'text'));
    ```
@@ -135,7 +135,7 @@ Form
 
    After (Alternative 1):
 
-   ```
+   ```php
    $form = $factory->create('form');
    $form->add($factory->createNamed('field', 'text', array(), array(
        'auto_initialize' => false,
@@ -147,7 +147,7 @@ Form
 
    After (Alternative 2):
 
-   ```
+   ```php
    $builder = $factory->createBuilder('form');
    $builder->add($factory->createBuilder('field', 'text'));
    $form = $builder->getForm();
@@ -157,14 +157,14 @@ Form
 
    After (Alternative 3):
 
-   ```
+   ```php
    $form = $factory->create('form');
    $form->add('field', 'text');
    ```
 
    After (Alternative 4):
 
-   ```
+   ```php
    $builder = $factory->createBuilder('form');
    $builder->add('field', 'text');
    $form = $builder->getForm();
@@ -180,7 +180,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    $builder->add('field', 'text', array(
       'data' => $defaultData ?: null,
    ));
@@ -188,7 +188,7 @@ Form
 
    After:
 
-   ```
+   ```php
    $options = array();
    if ($defaultData) {
        $options['data'] = $defaultData;
@@ -203,7 +203,7 @@ PropertyAccess
    even if a non-public match was found. This means that the property "author"
    in the following class will now correctly be found:
 
-   ```
+   ```php
    class Article
    {
        public $author;
@@ -224,7 +224,7 @@ PropertyAccess
 
    Before:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\Exception\PropertyAccessDeniedException;
    use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
@@ -239,7 +239,7 @@ PropertyAccess
 
    After:
 
-   ```
+   ```php
    use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
    try {
@@ -257,7 +257,7 @@ DomCrawler
 
    Before:
 
-   ```
+   ```php
    $data = $crawler->each(function ($node, $i) {
        return $node->nodeValue;
    });
@@ -265,7 +265,7 @@ DomCrawler
 
    After:
 
-   ```
+   ```php
    $data = $crawler->each(function ($crawler, $i) {
        return $crawler->text();
    });
@@ -280,13 +280,13 @@ Console
 
    Before:
 
-   ```
+   ```php
    if (OutputInterface::VERBOSITY_VERBOSE === $output->getVerbosity()) { ... }
    ```
 
    After:
 
-   ```
+   ```php
    if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) { ... }
    ```
 

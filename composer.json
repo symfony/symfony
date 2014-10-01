@@ -17,7 +17,6 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/icu": "~1.0",
         "doctrine/common": "~2.2",
         "twig/twig": "~1.12",
         "psr/log": "~1.0"

@@ -37,7 +37,10 @@ class FragmentRendererPassTest extends \PHPUnit_Framework_TestCase
             ->method('getClass')
             ->will($this->returnValue('stdClass'));
 
-        $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $builder = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
+        );
         $builder->expects($this->any())
             ->method('hasDefinition')
             ->will($this->returnValue(true));
@@ -73,7 +76,10 @@ class FragmentRendererPassTest extends \PHPUnit_Framework_TestCase
             ->method('getClass')
             ->will($this->returnValue('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\RendererService'));
 
-        $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $builder = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
+        );
         $builder->expects($this->any())
             ->method('hasDefinition')
             ->will($this->returnValue(true));

@@ -3,20 +3,22 @@ Finder Component
 
 Finder finds files and directories via an intuitive fluent interface.
 
-    use Symfony\Component\Finder\Finder;
+```php
+use Symfony\Component\Finder\Finder;
 
-    $finder = new Finder();
+$finder = new Finder();
 
-    $iterator = $finder
-      ->files()
-      ->name('*.php')
-      ->depth(0)
-      ->size('>= 1K')
-      ->in(__DIR__);
+$iterator = $finder
+  ->files()
+  ->name('*.php')
+  ->depth(0)
+  ->size('>= 1K')
+  ->in(__DIR__);
 
-    foreach ($iterator as $file) {
-        print $file->getRealpath()."\n";
-    }
+foreach ($iterator as $file) {
+    print $file->getRealpath()."\n";
+}
+```
 
 The iterator returns instances of [Symfony\Component\Finder\SplFileInfo\SplFileInfo][1].
 Besides the build-in methods inherited from [\SplFileInfo][2] (`getPerms()`, `getSize()`, ...),
@@ -26,14 +28,16 @@ you can also use `getRelativePath()` and `getRelativePathname()`. Read the
 But you can also use it to find files stored remotely like in this example where
 we are looking for files on Amazon S3:
 
-    $s3 = new \Zend_Service_Amazon_S3($key, $secret);
-    $s3->registerStreamWrapper("s3");
+```php
+$s3 = new \Zend_Service_Amazon_S3($key, $secret);
+$s3->registerStreamWrapper("s3");
 
-    $finder = new Finder();
-    $finder->name('photos*')->size('< 100K')->date('since 1 hour ago');
-    foreach ($finder->in('s3://bucket-name') as $file) {
-        print $file->getFilename()."\n";
-    }
+$finder = new Finder();
+$finder->name('photos*')->size('< 100K')->date('since 1 hour ago');
+foreach ($finder->in('s3://bucket-name') as $file) {
+    print $file->getFilename()."\n";
+}
+```
 
 Resources
 ---------

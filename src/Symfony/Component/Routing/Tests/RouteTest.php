@@ -34,6 +34,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('POST'), $route->getMethods(), '__construct() takes a single method as its seventh argument');
     }
 
+    public function testName()
+    {
+        $route = new Route('/example-path');
+        $this->assertEquals('', $route->getName());
+
+        $route = new Route('/example-path', array(), array(), array(), '', array(), array(), null, 'test_route.name');
+        $this->assertEquals('test_route.name', $route->getName());
+    }
+
     public function testPath()
     {
         $route = new Route('/{foo}');
@@ -229,7 +238,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'));
+        $route = new Route('/{foo}', array('foo' => 'default'), array('foo' => '\d+'), array('key' => 'value'), 'example-host.com', array('http', 'https'), array('GET', 'POST'), null, 'test-name');
 
         $serialized = serialize($route);
         $unserialized = unserialize($serialized);

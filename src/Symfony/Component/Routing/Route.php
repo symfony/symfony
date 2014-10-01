@@ -24,6 +24,11 @@ class Route implements \Serializable
     /**
      * @var string
      */
+    private $name;
+
+    /**
+     * @var string
+     */
     private $path = '/';
 
     /**
@@ -78,11 +83,13 @@ class Route implements \Serializable
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
      * @param string       $condition    A condition that should evaluate to true for the route to match
+     * @param string       $name         The name of the route.
      *
      * @api
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = null)
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = null, $name = '')
     {
+        $this->name = $name;
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
@@ -102,6 +109,7 @@ class Route implements \Serializable
     public function serialize()
     {
         return serialize(array(
+            'name'         => $this->name,
             'path'         => $this->path,
             'host'         => $this->host,
             'defaults'     => $this->defaults,
@@ -116,6 +124,7 @@ class Route implements \Serializable
     public function unserialize($data)
     {
         $data = unserialize($data);
+        $this->name = $data['name'];
         $this->path = $data['path'];
         $this->host = $data['host'];
         $this->defaults = $data['defaults'];
@@ -124,6 +133,16 @@ class Route implements \Serializable
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
         $this->condition = $data['condition'];
+    }
+
+    /**
+     * Return the name of the route.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**

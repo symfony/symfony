@@ -11,7 +11,14 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+
+require_once __DIR__.'/../../Annotation/Groups.php';
 
 class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,11 +26,16 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
      * @var PropertyNormalizer
      */
     private $normalizer;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     protected function setUp()
     {
+        $this->serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
         $this->normalizer = new PropertyNormalizer();
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\Serializer'));
+        $this->normalizer->setSerializer($this->serializer);
     }
 
     public function testNormalize()
@@ -133,6 +145,63 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
             array(),
             $this->normalizer->normalize($obj, 'any')
         );
+    }
+
+    public function testGroupsNormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setFooBar('fooBar');
+        $obj->setSymfony('symfony');
+        $obj->setKevin('kevin');
+        $obj->setCoopTilleuls('coopTilleuls');
+
+        $this->assertEquals(array(
+            'bar' => 'bar',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('c'))));
+
+        // The PropertyNormalizer is not able to hydrate properties from parent classes
+        $this->assertEquals(array(
+            'symfony' => 'symfony',
+            'foo' => 'foo',
+            'fooBar' => 'fooBar',
+            'bar' => 'bar',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('a', 'c'))));
+    }
+
+    public function testGroupsDenormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new PropertyNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $toNormalize = array('foo' => 'foo', 'bar' => 'bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a'))
+        );
+        $this->assertEquals($obj, $normalized);
+
+        $obj->setBar('bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a', 'b'))
+        );
+        $this->assertEquals($obj, $normalized);
     }
 
     public function provideCallbacks()

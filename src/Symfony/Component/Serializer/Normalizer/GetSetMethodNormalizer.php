@@ -36,13 +36,10 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Nils Adermann <naderman@naderman.de>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GetSetMethodNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class GetSetMethodNormalizer extends AbstractNormalizer
 {
     protected $circularReferenceLimit = 1;
     protected $circularReferenceHandler;
-    protected $callbacks = array();
-    protected $ignoredAttributes = array();
-    protected $camelizedAttributes = array();
 
     /**
      * Set circular reference limit.
@@ -79,55 +76,6 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Set normalization callbacks.
-     *
-     * @param callable[] $callbacks help normalize the result
-     *
-     * @throws InvalidArgumentException if a non-callable callback is set
-     *
-     * @return self
-     */
-    public function setCallbacks(array $callbacks)
-    {
-        foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf('The given callback for attribute "%s" is not callable.', $attribute));
-            }
-        }
-        $this->callbacks = $callbacks;
-
-        return $this;
-    }
-
-    /**
-     * Set ignored attributes for normalization.
-     *
-     * @param array $ignoredAttributes
-     *
-     * @return self
-     */
-    public function setIgnoredAttributes(array $ignoredAttributes)
-    {
-        $this->ignoredAttributes = $ignoredAttributes;
-
-        return $this;
-    }
-
-    /**
-     * Set attributes to be camelized on denormalize.
-     *
-     * @param array $camelizedAttributes
-     *
-     * @return self
-     */
-    public function setCamelizedAttributes(array $camelizedAttributes)
-    {
-        $this->camelizedAttributes = $camelizedAttributes;
-
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function normalize($object, $format = null, array $context = array())
@@ -152,6 +100,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context);
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -159,6 +108,10 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
                 $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
 
                 if (in_array($attributeName, $this->ignoredAttributes)) {
+                    continue;
+                }
+
+                if (false !== $allowedAttributes && !in_array($attributeName, $allowedAttributes)) {
                     continue;
                 }
 
@@ -186,6 +139,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+
         if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
             $normalizedData = $data;
         } elseif (is_object($data)) {
@@ -208,7 +163,9 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
 
-                if (isset($normalizedData[$paramName])) {
+                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+                $ignored = in_array($paramName, $this->ignoredAttributes);
+                if ($allowed && !$ignored && isset($normalizedData[$paramName])) {
                     $params[] = $normalizedData[$paramName];
                     // don't run set for a parameter passed to the constructor
                     unset($normalizedData[$paramName]);
@@ -229,36 +186,19 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
         }
 
         foreach ($normalizedData as $attribute => $value) {
-            $setter = 'set'.$this->formatAttribute($attribute);
+            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
+            $ignored = in_array($attribute, $this->ignoredAttributes);
 
-            if (method_exists($object, $setter)) {
-                $object->$setter($value);
+            if ($allowed && !$ignored) {
+                $setter = 'set'.$this->formatAttribute($attribute);
+
+                if (method_exists($object, $setter)) {
+                    $object->$setter($value);
+                }
             }
         }
 
         return $object;
-    }
-
-    /**
-     * Format attribute name to access parameters or methods
-     * As option, if attribute name is found on camelizedAttributes array
-     * returns attribute name in camelcase format.
-     *
-     * @param string $attributeName
-     *
-     * @return string
-     */
-    protected function formatAttribute($attributeName)
-    {
-        if (in_array($attributeName, $this->camelizedAttributes)) {
-            return preg_replace_callback(
-                '/(^|_|\.)+(.)/', function ($match) {
-                    return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-                }, $attributeName
-            );
-        }
-
-        return $attributeName;
     }
 
     /**

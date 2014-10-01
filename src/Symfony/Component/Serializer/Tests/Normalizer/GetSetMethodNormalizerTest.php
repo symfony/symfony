@@ -11,12 +11,18 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
+
+require_once __DIR__.'/../../Annotation/Groups.php';
 
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +30,10 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
      * @var GetSetMethodNormalizer
      */
     private $normalizer;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     protected function setUp()
     {
@@ -153,6 +163,64 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $obj = $this->normalizer->denormalize($data, __NAMESPACE__.'\GetConstructorDummy', 'any');
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testGroupsNormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+        $obj->setBar('bar');
+        $obj->setFooBar('fooBar');
+        $obj->setSymfony('symfony');
+        $obj->setKevin('kevin');
+        $obj->setCoopTilleuls('coopTilleuls');
+
+        $this->assertEquals(array(
+            'bar' => 'bar',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('c'))));
+
+        $this->assertEquals(array(
+            'symfony' => 'symfony',
+            'foo' => 'foo',
+            'fooBar' => 'fooBar',
+            'bar' => 'bar',
+            'kevin' => 'kevin',
+            'coopTilleuls' => 'coopTilleuls',
+        ), $this->normalizer->normalize($obj, null, array('groups' => array('a', 'c'))));
+    }
+
+    public function testGroupsDenormalize()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $toNormalize = array('foo' => 'foo', 'bar' => 'bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a'))
+        );
+        $this->assertEquals($obj, $normalized);
+
+        $obj->setBar('bar');
+
+        $normalized = $this->normalizer->denormalize(
+            $toNormalize,
+            'Symfony\Component\Serializer\Tests\Fixtures\GroupDummy',
+            null,
+            array('groups' => array('a', 'b'))
+        );
+        $this->assertEquals($obj, $normalized);
     }
 
     /**

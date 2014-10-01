@@ -18,9 +18,10 @@ Finder finds files and directories via an intuitive fluent interface.
         print $file->getRealpath()."\n";
     }
 
-The resulting contents of the iterator are instances of [SplFileInfo][1]. You can 
-thus use all of SplFileInfo's methods (getPerms(), getSize(), etc) on them. See
-[the API documentation][2] or the [web tutorial][3] for more.
+The iterator returns instances of [Symfony\Component\Finder\SplFileInfo\SplFileInfo][1].
+Besides the build-in methods inherited from [\SplFileInfo][2] (`getPerms()`, `getSize()`, ...),
+you can also use `getRelativePath()` and `getRelativePathname()`. Read the
+[official documentation][3] for more information.
 
 But you can also use it to find files stored remotely like in this example where
 we are looking for files on Amazon S3:
@@ -43,6 +44,6 @@ You can run the unit tests with the following command:
     $ composer.phar install
     $ phpunit
 
-[1]: http://php.net/splfileinfo
-[2]: http://api.symfony.com/2.5/Symfony/Component/Finder/SplFileInfo.html
+[1]: http://api.symfony.com/2.5/Symfony/Component/Finder/SplFileInfo.html
+[2]: http://php.net/splfileinfo
 [3]: http://symfony.com/doc/current/components/finder.html#usage

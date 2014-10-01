@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Tests;
 
 use Symfony\Component\Security\Core\Authentication\SimpleAuthenticatorInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler;
@@ -37,7 +38,8 @@ class SimpleAuthenticationHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $this->authenticationException = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        // No methods are invoked on the exception; we just assert on its class
+        $this->authenticationException = new AuthenticationException();
 
         $this->response = $this->getMock('Symfony\Component\HttpFoundation\Response');
     }

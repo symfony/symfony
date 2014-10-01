@@ -1,0 +1,657 @@
+{
+    "Version": "2.1.8.9",
+    "Names": {
+        "AED": [
+            "AED",
+            "dirham ya Falme za Kiarabu"
+        ],
+        "AFN": [
+            "AFN",
+            "Afghani ya Afuganistani"
+        ],
+        "ALL": [
+            "ALL",
+            "Lek ya Albania"
+        ],
+        "AMD": [
+            "AMD",
+            "Dram ya Armenia"
+        ],
+        "ANG": [
+            "ANG",
+            "Guilder ya Antili za Kiholanzi"
+        ],
+        "AOA": [
+            "AOA",
+            "kwanza ya Angola"
+        ],
+        "ARS": [
+            "ARS",
+            "Peso ya Ajentina"
+        ],
+        "AUD": [
+            "A$",
+            "dola ya Australia"
+        ],
+        "AWG": [
+            "AWG",
+            "Florin ya Aruba"
+        ],
+        "AZN": [
+            "AZN",
+            "Manat ya Azebaijani"
+        ],
+        "BAM": [
+            "BAM",
+            "Convertible Mark ya Bosnia na Hezegovina"
+        ],
+        "BBD": [
+            "BBD",
+            "Dola ya Barbados"
+        ],
+        "BDT": [
+            "BDT",
+            "Taka ya Bangladeshi"
+        ],
+        "BGN": [
+            "BGN",
+            "Lev ya Bulgaria"
+        ],
+        "BHD": [
+            "BHD",
+            "dinari ya Bahareni"
+        ],
+        "BIF": [
+            "BIF",
+            "faranga ya Burundi"
+        ],
+        "BMD": [
+            "BMD",
+            "Dola ya Bermuda"
+        ],
+        "BND": [
+            "BND",
+            "Dola ya Brunei"
+        ],
+        "BOB": [
+            "BOB",
+            "Boliviano ya Bolivia"
+        ],
+        "BRL": [
+            "R$",
+            "Real ya Brazil"
+        ],
+        "BSD": [
+            "BSD",
+            "Dola ya Bahamas"
+        ],
+        "BTN": [
+            "BTN",
+            "Ngultrum ya Bhutan"
+        ],
+        "BWP": [
+            "BWP",
+            "pula ya Botswana"
+        ],
+        "BYR": [
+            "BYR",
+            "Ruble ya Belarusi"
+        ],
+        "BZD": [
+            "BZD",
+            "Dola ya Belize"
+        ],
+        "CAD": [
+            "CA$",
+            "dola ya Kanada"
+        ],
+        "CDF": [
+            "CDF",
+            "faranga ya Kongo"
+        ],
+        "CHF": [
+            "CHF",
+            "faranga ya Uswisi"
+        ],
+        "CLP": [
+            "CLP",
+            "Peso ya Chile"
+        ],
+        "CNY": [
+            "CN¥",
+            "yuan ya Uchina"
+        ],
+        "COP": [
+            "COP",
+            "Peso ya Kolombia"
+        ],
+        "CRC": [
+            "CRC",
+            "Colon ya Kostarika"
+        ],
+        "CUC": [
+            "CUC",
+            "Peso ya Cuba Inayoweza Kubadilishwa"
+        ],
+        "CUP": [
+            "CUP",
+            "Peso ya Cuba"
+        ],
+        "CVE": [
+            "CVE",
+            "eskudo ya Kepuvede"
+        ],
+        "CZK": [
+            "CZK",
+            "Koruna ya Jamhuri ya Cheki"
+        ],
+        "DJF": [
+            "DJF",
+            "faranga ya Jibuti"
+        ],
+        "DKK": [
+            "DKK",
+            "Krone ya Denmaki"
+        ],
+        "DOP": [
+            "DOP",
+            "Peso ya Dominika"
+        ],
+        "DZD": [
+            "DZD",
+            "dinari ya Aljeria"
+        ],
+        "EGP": [
+            "EGP",
+            "pauni ya Misri"
+        ],
+        "ERN": [
+            "ERN",
+            "nakfa ya Eritrea"
+        ],
+        "ETB": [
+            "ETB",
+            "birr ya Uhabeshi"
+        ],
+        "EUR": [
+            "€",
+            "yuro"
+        ],
+        "FJD": [
+            "FJD",
+            "Dola ya Fiji"
+        ],
+        "FKP": [
+            "FKP",
+            "Pauni ya Visiwa vya Falkland"
+        ],
+        "GBP": [
+            "£",
+            "pauni ya Uingereza"
+        ],
+        "GEL": [
+            "GEL",
+            "Lari ya Georgia"
+        ],
+        "GHC": [
+            "GHC",
+            "sedi ya Ghana"
+        ],
+        "GHS": [
+            "GHS",
+            "Cedi ya Ghana"
+        ],
+        "GIP": [
+            "GIP",
+            "Pauni ya Gibraltar"
+        ],
+        "GMD": [
+            "GMD",
+            "dalasi ya Gambia"
+        ],
+        "GNF": [
+            "GNF",
+            "faranga ya Guinea"
+        ],
+        "GNS": [
+            "GNS",
+            "faranga ya Gine"
+        ],
+        "GTQ": [
+            "GTQ",
+            "Quetzal ya Guatemala"
+        ],
+        "GYD": [
+            "GYD",
+            "Dola ya Guyana"
+        ],
+        "HKD": [
+            "HK$",
+            "Dola ya Hong Kong"
+        ],
+        "HNL": [
+            "HNL",
+            "Lempira ya Hondurasi"
+        ],
+        "HRK": [
+            "HRK",
+            "Kuna ya Kroeshia"
+        ],
+        "HTG": [
+            "HTG",
+            "Gourde ya Haiti"
+        ],
+        "HUF": [
+            "HUF",
+            "Forint ya Hungaria"
+        ],
+        "IDR": [
+            "IDR",
+            "Rupiah ya Indonesia"
+        ],
+        "ILS": [
+            "₪",
+            "Sheqel Mpya ya Israeli"
+        ],
+        "INR": [
+            "₹",
+            "rupia ya India"
+        ],
+        "IQD": [
+            "IQD",
+            "Dinari ya Iraki"
+        ],
+        "IRR": [
+            "IRR",
+            "Rial ya Iran"
+        ],
+        "ISK": [
+            "ISK",
+            "Krona ya Isilandi"
+        ],
+        "JMD": [
+            "JMD",
+            "Dola ya Jamaica"
+        ],
+        "JOD": [
+            "JOD",
+            "Dinari ya Yordani"
+        ],
+        "JPY": [
+            "JP¥",
+            "Yen ya Japani"
+        ],
+        "KES": [
+            "Ksh",
+            "shilingi ya Kenya"
+        ],
+        "KGS": [
+            "KGS",
+            "Som ya Kirigistani"
+        ],
+        "KHR": [
+            "KHR",
+            "Riel ya Kambodia"
+        ],
+        "KMF": [
+            "KMF",
+            "faranga ya Komoro"
+        ],
+        "KPW": [
+            "KPW",
+            "Won ya Korea Kaskazini"
+        ],
+        "KRW": [
+            "₩",
+            "Won ya Korea Kusini"
+        ],
+        "KWD": [
+            "KWD",
+            "Dinari ya Kuwaiti"
+        ],
+        "KYD": [
+            "KYD",
+            "Dola ya Visiwa vya Cayman"
+        ],
+        "KZT": [
+            "KZT",
+            "Tenge ya Kazakistani"
+        ],
+        "LAK": [
+            "LAK",
+            "Kip ya Laosi"
+        ],
+        "LBP": [
+            "LBP",
+            "Pauni ya Lebanon"
+        ],
+        "LKR": [
+            "LKR",
+            "Rupia ya Sirilanka"
+        ],
+        "LRD": [
+            "LRD",
+            "dola ya Liberia"
+        ],
+        "LSL": [
+            "LSL",
+            "loti ya Lesoto"
+        ],
+        "LTL": [
+            "LTL",
+            "Litas ya Lithuania"
+        ],
+        "LVL": [
+            "LVL",
+            "Lats ya Lativia"
+        ],
+        "LYD": [
+            "LYD",
+            "dinari ya Libya"
+        ],
+        "MAD": [
+            "MAD",
+            "dirham ya Moroko"
+        ],
+        "MDL": [
+            "MDL",
+            "Leu ya Moldova"
+        ],
+        "MGA": [
+            "MGA",
+            "Ariari ya Madagaska"
+        ],
+        "MKD": [
+            "MKD",
+            "Denar ya Masedonia"
+        ],
+        "MMK": [
+            "MMK",
+            "Kyat ya Myama"
+        ],
+        "MNT": [
+            "MNT",
+            "Tugrik ya Mongolia"
+        ],
+        "MOP": [
+            "MOP",
+            "Pataca ya Macau"
+        ],
+        "MRO": [
+            "MRO",
+            "Ouguiya ya Moritania"
+        ],
+        "MUR": [
+            "MUR",
+            "rupia ya Morisi"
+        ],
+        "MVR": [
+            "MVR",
+            "Rufiyaa ya Maldivi"
+        ],
+        "MWK": [
+            "MWK",
+            "kwacha ya Malawi"
+        ],
+        "MXN": [
+            "MX$",
+            "Peso ya Meksiko"
+        ],
+        "MYR": [
+            "MYR",
+            "Ringgit ya Malaysia"
+        ],
+        "MZM": [
+            "MZM",
+            "metikali ya Msumbiji (1980–2006)"
+        ],
+        "MZN": [
+            "MZN",
+            "Metikali ya Msumbiji"
+        ],
+        "NAD": [
+            "NAD",
+            "dola ya Namibia"
+        ],
+        "NGN": [
+            "NGN",
+            "naira ya Nijeria"
+        ],
+        "NIO": [
+            "NIO",
+            "Cordoba ya Nikaragua"
+        ],
+        "NOK": [
+            "NOK",
+            "Krone ya Norwe"
+        ],
+        "NPR": [
+            "NPR",
+            "Rupia ya Nepali"
+        ],
+        "NZD": [
+            "NZ$",
+            "Dola ya Nyuzilandi"
+        ],
+        "OMR": [
+            "OMR",
+            "Rial ya Omani"
+        ],
+        "PAB": [
+            "PAB",
+            "Balboa ya Panama"
+        ],
+        "PEN": [
+            "PEN",
+            "Nuevo Sol ya Peru"
+        ],
+        "PGK": [
+            "PGK",
+            "Kina ya Papua New Guinea"
+        ],
+        "PHP": [
+            "PHP",
+            "Peso ya Ufilipino"
+        ],
+        "PKR": [
+            "PKR",
+            "Rupia ya Pakistani"
+        ],
+        "PLN": [
+            "PLN",
+            "Zloty ya Polandi"
+        ],
+        "PYG": [
+            "PYG",
+            "Guarani ya Paragwai"
+        ],
+        "QAR": [
+            "QAR",
+            "Rial ya Katari"
+        ],
+        "RON": [
+            "RON",
+            "Leu ya Romania"
+        ],
+        "RSD": [
+            "RSD",
+            "Dinar ya Serbia"
+        ],
+        "RUB": [
+            "RUB",
+            "Ruble ya Urusi"
+        ],
+        "RWF": [
+            "RWF",
+            "faranga ya Rwanda"
+        ],
+        "SAR": [
+            "SAR",
+            "riyal ya Saudia"
+        ],
+        "SBD": [
+            "SBD",
+            "Dola ya Visiwa vya Solomon"
+        ],
+        "SCR": [
+            "SCR",
+            "rupia ya Ushelisheli"
+        ],
+        "SDG": [
+            "SDG",
+            "pauni ya Sudani"
+        ],
+        "SDP": [
+            "SDP",
+            "pauni ya Sudani (1957–1998)"
+        ],
+        "SEK": [
+            "SEK",
+            "Krona ya Uswidi"
+        ],
+        "SGD": [
+            "SGD",
+            "Dola ya Singapore"
+        ],
+        "SHP": [
+            "SHP",
+            "pauni ya Santahelena"
+        ],
+        "SLL": [
+            "SLL",
+            "leoni"
+        ],
+        "SOS": [
+            "SOS",
+            "shilingi ya Somalia"
+        ],
+        "SRD": [
+            "SRD",
+            "Dola ya Suriname"
+        ],
+        "SSP": [
+            "SSP",
+            "pauni ya Sudani Kusini"
+        ],
+        "STD": [
+            "STD",
+            "dobra ya Sao Tome na Principe"
+        ],
+        "SYP": [
+            "SYP",
+            "Pauni ya Syria"
+        ],
+        "SZL": [
+            "SZL",
+            "lilangeni"
+        ],
+        "THB": [
+            "฿",
+            "Baht ya Tailandi"
+        ],
+        "TJS": [
+            "TJS",
+            "Somoni ya Tajikistani"
+        ],
+        "TMT": [
+            "TMT",
+            "Manat ya Turukimenistani"
+        ],
+        "TND": [
+            "TND",
+            "dinari ya Tunisia"
+        ],
+        "TOP": [
+            "TOP",
+            "Paʻanga ya Tonga"
+        ],
+        "TRY": [
+            "TRY",
+            "Lira ya Uturuki"
+        ],
+        "TTD": [
+            "TTD",
+            "Dola ya Trinidad na Tobago"
+        ],
+        "TWD": [
+            "NT$",
+            "Dola ya Taiwan"
+        ],
+        "TZS": [
+            "TSh",
+            "shilingi ya Tanzania"
+        ],
+        "UAH": [
+            "UAH",
+            "Hryvnia ya Ukrania"
+        ],
+        "UGX": [
+            "UGX",
+            "shilingi ya Uganda"
+        ],
+        "USD": [
+            "US$",
+            "dola ya Marekani"
+        ],
+        "UYU": [
+            "UYU",
+            "Peso ya Urugwai"
+        ],
+        "UZS": [
+            "UZS",
+            "Som ya Uzibekistani"
+        ],
+        "VEF": [
+            "VEF",
+            "Bolivar ya Venezuela"
+        ],
+        "VND": [
+            "₫",
+            "Dong ya Vietinamu"
+        ],
+        "VUV": [
+            "VUV",
+            "Vatu ya Vanuatu"
+        ],
+        "WST": [
+            "WST",
+            "Tala ya Samoa"
+        ],
+        "XAF": [
+            "FCFA",
+            "CFA faranga ya BEAC"
+        ],
+        "XCD": [
+            "EC$",
+            "Dola ya Karibea ya Mashariki"
+        ],
+        "XOF": [
+            "CFA",
+            "CFA faranga za BCEAO"
+        ],
+        "XPF": [
+            "CFPF",
+            "Faranga ya CFP"
+        ],
+        "YER": [
+            "YER",
+            "Rial ya Yemeni"
+        ],
+        "ZAR": [
+            "ZAR",
+            "randi ya Afrika Kusini"
+        ],
+        "ZMK": [
+            "ZMK",
+            "kwacha ya Zambia (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "kwacha ya Zambia"
+        ],
+        "ZWD": [
+            "ZWD",
+            "dola ya Zimbabwe"
+        ]
+    }
+}

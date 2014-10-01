@@ -24,6 +24,7 @@
     <groups>
         <exclude>
             <group>benchmark</group>
+            <group>intl-data</group>
         </exclude>
     </groups>
 

@@ -1,0 +1,85 @@
+{
+    "Version": "2.1.7.12",
+    "Names": {
+        "AUD": [
+            "A$",
+            "AUD"
+        ],
+        "BRL": [
+            "R$",
+            "BRL"
+        ],
+        "CAD": [
+            "CA$",
+            "CAD"
+        ],
+        "CNY": [
+            "CN¥",
+            "CNY"
+        ],
+        "EUR": [
+            "€",
+            "EUR"
+        ],
+        "GBP": [
+            "£",
+            "GBP"
+        ],
+        "HKD": [
+            "HK$",
+            "HKD"
+        ],
+        "ILS": [
+            "₪",
+            "ILS"
+        ],
+        "INR": [
+            "₹",
+            "INR"
+        ],
+        "JPY": [
+            "JP¥",
+            "JPY"
+        ],
+        "KRW": [
+            "₩",
+            "KRW"
+        ],
+        "MXN": [
+            "MX$",
+            "MXN"
+        ],
+        "NZD": [
+            "NZ$",
+            "NZD"
+        ],
+        "TWD": [
+            "NT$",
+            "TWD"
+        ],
+        "USD": [
+            "US$",
+            "USD"
+        ],
+        "VND": [
+            "₫",
+            "VND"
+        ],
+        "XAF": [
+            "FCFA",
+            "XAF"
+        ],
+        "XCD": [
+            "EC$",
+            "XCD"
+        ],
+        "XOF": [
+            "CFA",
+            "XOF"
+        ],
+        "XPF": [
+            "CFPF",
+            "XPF"
+        ]
+    }
+}

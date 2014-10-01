@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>此字段是没有预料到。</target>
+                <target>此字段是多余的。</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>此字段是失踪。</target>
+                <target>此字段缺失。</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

@@ -12,6 +12,12 @@
         </testsuite>
     </testsuites>
 
+    <groups>
+        <exclude>
+            <group>intl-data</group>
+        </exclude>
+    </groups>
+
     <filter>
         <whitelist>
             <directory>./</directory>

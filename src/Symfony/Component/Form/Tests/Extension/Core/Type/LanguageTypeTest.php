@@ -31,7 +31,7 @@ class LanguageTypeTest extends TypeTestCase
 
         $this->assertContains(new ChoiceView('en', 'en', 'English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('en_GB', 'en_GB', 'British English'), $choices, '', false, false);
-        $this->assertContains(new ChoiceView('en_US', 'en_US', 'U.S. English'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('en_US', 'en_US', 'American English'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('fr', 'fr', 'French'), $choices, '', false, false);
         $this->assertContains(new ChoiceView('my', 'my', 'Burmese'), $choices, '', false, false);
     }

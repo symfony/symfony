@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Helper\Formatter;
+namespace Symfony\Component\Console\Style\Standard;
+
+use Symfony\Component\Console\Style\FormatterInterface;
 
 /**
  * Formats a command title

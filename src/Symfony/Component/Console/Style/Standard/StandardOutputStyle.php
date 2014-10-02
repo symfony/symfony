@@ -9,40 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Output;
+namespace Symfony\Component\Console\Style\Standard;
 
-use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Helper\Formatter\BlockFormatter;
-use Symfony\Component\Console\Helper\Formatter\FormatterInterface;
-use Symfony\Component\Console\Helper\Formatter\ListFormatter;
-use Symfony\Component\Console\Helper\Formatter\TextFormatter;
-use Symfony\Component\Console\Helper\Formatter\TitleFormatter;
+use Symfony\Component\Console\Style\AbstractOutputStyle;
 
 /**
- * Decorates output to add console style guide helper methods
- *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class OutputDecorator implements OutputInterface
+class StandardOutputStyle extends AbstractOutputStyle
 {
-    private $output;
-
-    /**
-     * @param OutputInterface $output
-     */
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
-    }
-
-    /**
-     * @param FormatterInterface $formatter
-     */
-    public function format(FormatterInterface $formatter)
-    {
-        $this->writeln($formatter->format());
-    }
-
     /**
      * Formats a message as a block of text.
      *
@@ -145,78 +120,5 @@ class OutputDecorator implements OutputInterface
     {
         $this->format(new BlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', ' ! '));
     }
-
-    /**
-     * Add newline(s)
-     *
-     * @param int $count The number of newlines
-     */
-    public function ln($count = 1)
-    {
-        $this->output->write(str_repeat(PHP_EOL, $count));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function write($messages, $newline = false, $type = self::OUTPUT_NORMAL)
-    {
-        $this->output->write($messages, $newline, $type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function writeln($messages, $type = self::OUTPUT_NORMAL)
-    {
-        $this->output->writeln($messages, $type);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setVerbosity($level)
-    {
-        $this->output->setVerbosity($level);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVerbosity()
-    {
-        return $this->output->getVerbosity();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDecorated($decorated)
-    {
-        $this->output->setDecorated($decorated);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDecorated()
-    {
-        return $this->output->isDecorated();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFormatter(OutputFormatterInterface $formatter)
-    {
-        $this->output->setFormatter($formatter);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormatter()
-    {
-        return $this->output->getFormatter();
-    }
 }
+

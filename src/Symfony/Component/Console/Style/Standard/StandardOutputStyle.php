@@ -12,6 +12,8 @@
 namespace Symfony\Component\Console\Style\Standard;
 
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableStyle;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -22,6 +24,24 @@ use Symfony\Component\Console\Style\AbstractOutputStyle;
  */
 class StandardOutputStyle extends AbstractOutputStyle
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(OutputInterface $output)
+    {
+        $styleGuideTableStyle = new TableStyle();
+        $styleGuideTableStyle
+            ->setHorizontalBorderChar('-')
+            ->setVerticalBorderChar(' ')
+            ->setCrossingChar(' ')
+            ->setCellHeaderFormat('%s')
+        ;
+
+        Table::setStyleDefinition('symfony-style-guide', $styleGuideTableStyle);
+
+        parent::__construct($output);
+    }
+
     /**
      * Formats a message as a block of text.
      *
@@ -136,6 +156,7 @@ class StandardOutputStyle extends AbstractOutputStyle
         $table = new Table($this);
         $table->setHeaders($headers);
         $table->setRows($rows);
+        $table->setStyle('symfony-style-guide');
 
         $table->render();
         $this->ln();

@@ -20,6 +20,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\AbstractOutputStyle;
 
 /**
+ * Output decorator helpers for the Symfony Style Guide.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 class StandardOutputStyle extends AbstractOutputStyle
@@ -53,7 +55,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a command title
+     * Formats a command title.
      *
      * @param string $message
      */
@@ -63,7 +65,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a section title
+     * Formats a section title.
      *
      * @param string $message
      */
@@ -73,7 +75,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a list
+     * Formats a list.
      *
      * @param array $elements
      */
@@ -83,7 +85,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats informational text
+     * Formats informational text.
      *
      * @param string|array $messages
      */
@@ -93,7 +95,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a success result bar
+     * Formats a success result bar.
      *
      * @param string|array $messages
      */
@@ -103,7 +105,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats an error result bar
+     * Formats an error result bar.
      *
      * @param string|array $messages
      */
@@ -113,7 +115,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats an warning result bar
+     * Formats an warning result bar.
      *
      * @param string|array $messages
      */
@@ -123,7 +125,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a note admonition
+     * Formats a note admonition.
      *
      * @param string|array $messages
      */
@@ -133,7 +135,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a caution admonition
+     * Formats a caution admonition.
      *
      * @param string|array $messages
      */
@@ -143,7 +145,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Formats a table
+     * Formats a table.
      *
      * @param array $headers
      * @param array $rows
@@ -160,7 +162,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a question
+     * Asks a question.
      *
      * @param string          $question
      * @param string|null     $default
@@ -177,7 +179,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a question with the user input hidden
+     * Asks a question with the user input hidden.
      *
      * @param string        $question
      * @param callable|null $validator
@@ -193,7 +195,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks for confirmation
+     * Asks for confirmation.
      *
      * @param string $question
      * @param bool   $default
@@ -206,7 +208,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a choice question
+     * Asks a choice question.
      *
      * @param string          $question
      * @param array           $choices
@@ -225,6 +227,23 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
+     * Asks a choice question.
+     *
+     * @param string $question
+     * @param array  $choices
+     * @param array  $default
+     *
+     * @return string
+     */
+    public function multipleChoice($question, array $choices, array $default = array())
+    {
+        $question = new ChoiceQuestion($question, $choices, $default);
+        $question->setMultiselect(true);
+
+        return $this->askQuestion($question);
+    }
+
+    /**
      * @param Question $question
      *
      * @return string
@@ -238,4 +257,3 @@ class StandardOutputStyle extends AbstractOutputStyle
         return $ret;
     }
 }
-

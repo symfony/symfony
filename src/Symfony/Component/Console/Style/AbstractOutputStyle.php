@@ -15,7 +15,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Decorates output to add console style guide helper methods
+ * Decorates output to add console style guide helpers
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Style\Standard;
 use Symfony\Component\Console\Style\FormatterInterface;
 
 /**
- * Formats informational text
+ * Formats informational text.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

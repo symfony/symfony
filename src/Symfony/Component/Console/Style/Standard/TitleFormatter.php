@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Style\Standard;
 use Symfony\Component\Console\Style\FormatterInterface;
 
 /**
- * Formats a command title
+ * Formats a command title.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

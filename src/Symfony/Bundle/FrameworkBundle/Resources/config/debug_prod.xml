@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
+        <parameter key="debug.error_handler.class">Symfony\Component\Debug\ErrorHandler</parameter>
         <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
     </parameters>
 
@@ -19,6 +20,8 @@
             <argument>%kernel.debug%</argument>
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
         </service>
+
+        <service id="debug.error_handler" class="%debug.error_handler.class%" factory-class="%debug.error_handler.class%" factory-method="register" />
 
         <service id="debug.stopwatch" class="%debug.stopwatch.class%" />
     </services>

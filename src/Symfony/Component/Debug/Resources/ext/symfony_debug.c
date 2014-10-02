@@ -72,10 +72,11 @@ PHP_FUNCTION(symfony_zval_info)
 		add_assoc_stringl(return_value, "object_class", (char *)Z_OBJCE_P(arg)->name, Z_OBJCE_P(arg)->name_length, 1);
 		add_assoc_long(return_value, "object_refcount", EG(objects_store).object_buckets[Z_OBJ_HANDLE_P(arg)].bucket.obj.refcount);
 		add_assoc_string(return_value, "object_hash", hash, 1);
+		add_assoc_long(return_value, "object_handle", Z_OBJ_HANDLE_P(arg));
 	} else if (Z_TYPE_P(arg) == IS_ARRAY) {
 		add_assoc_long(return_value, "array_count", zend_hash_num_elements(Z_ARRVAL_P(arg)));
 	} else if(Z_TYPE_P(arg) == IS_RESOURCE) {
-		add_assoc_long(return_value, "resource_id", Z_LVAL_P(arg));
+		add_assoc_long(return_value, "resource_handle", Z_LVAL_P(arg));
 		add_assoc_string(return_value, "resource_type", (char *)_symfony_debug_get_resource_type(Z_LVAL_P(arg)), 1);
 		add_assoc_long(return_value, "resource_refcount", _symfony_debug_get_resource_refcount(Z_LVAL_P(arg)));
 	} else if (Z_TYPE_P(arg) == IS_STRING) {

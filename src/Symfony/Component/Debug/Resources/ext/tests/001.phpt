@@ -72,7 +72,7 @@ array(5) {
   ["strlen"]=>
   int(6)
 }
-array(7) {
+array(8) {
   ["type"]=>
   string(6) "object"
   ["zval_hash"]=>
@@ -87,6 +87,8 @@ array(7) {
   int(1)
   ["object_hash"]=>
   string(32) "%s"
+  ["object_handle"]=>
+  int(1)
 }
 array(5) {
   ["type"]=>
@@ -109,7 +111,7 @@ array(7) {
   int(2)
   ["zval_isref"]=>
   bool(false)
-  ["resource_id"]=>
+  ["resource_handle"]=>
   int(4)
   ["resource_type"]=>
   string(6) "stream"

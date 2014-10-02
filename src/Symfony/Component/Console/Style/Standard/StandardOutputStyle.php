@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Style\Standard;
 
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -24,10 +25,14 @@ use Symfony\Component\Console\Style\AbstractOutputStyle;
  */
 class StandardOutputStyle extends AbstractOutputStyle
 {
+    private $input;
+    private $questionHelper;
+
     /**
-     * {@inheritdoc}
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      */
-    public function __construct(OutputInterface $output)
+    public function __construct(InputInterface $input, OutputInterface $output)
     {
         $styleGuideTableStyle = new TableStyle();
         $styleGuideTableStyle
@@ -38,6 +43,9 @@ class StandardOutputStyle extends AbstractOutputStyle
         ;
 
         Table::setStyleDefinition('symfony-style-guide', $styleGuideTableStyle);
+
+        $this->input = $input;
+        $this->questionHelper = new StandardQuestionHelper();
 
         parent::__construct($output);
     }
@@ -218,75 +226,9 @@ class StandardOutputStyle extends AbstractOutputStyle
      */
     public function askQuestion(Question $question)
     {
-        $text = $question->getQuestion();
-        $default = $question->getDefault();
-
-        switch (true) {
-            case null === $default:
-                $text = sprintf(' <info>%s</info>:', $text);
-
-                break;
-
-            case $question instanceof ConfirmationQuestion:
-                $text = sprintf(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
-
-                break;
-
-            case $question instanceof ChoiceQuestion:
-                $choices = $question->getChoices();
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
-
-                break;
-
-            default:
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
-        }
-
-        $validator = $question->getValidator();
-        $question->setValidator(function ($value) use ($validator) {
-                if (null !== $validator && is_callable($validator)) {
-                    $value = $validator($value);
-                }
-
-                // make required
-                if (!is_bool($value) && 0 === strlen($value)) {
-                    throw new \Exception('A value is required.');
-                }
-
-                return $value;
-            });
-
-        $ret = null;
-
-        while (null === $ret) {
-            $this->writeln($text);
-
-            if ($question instanceof ChoiceQuestion) {
-                $width = max(array_map('strlen', array_keys($question->getChoices())));
-
-                foreach ($question->getChoices() as $key => $value) {
-                    $this->writeln(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
-                }
-            }
-
-            $this->write(' > ');
-
-            $input = trim(fgets(STDIN, 4096));
-            $input = strlen($input) > 0 ? $input : $default;
-
-            try {
-                $ret = call_user_func($question->getValidator(), $input);
-            } catch (\Exception $e) {
-                $this->ln();
-                $this->error($e->getMessage());
-            }
-        }
+        $ret = $this->questionHelper->ask($this->input, $this, $question);
 
         $this->ln();
-
-        if ($normalizer = $question->getNormalizer()) {
-            return $normalizer($ret);
-        }
 
         return $ret;
     }

@@ -529,7 +529,7 @@ yaml: |
   fixed: 1,230.15
   negative infinity: -.inf
   not a number: .NaN
-  float as whole number: !float 1
+  float as whole number: !!float 1
 php: |
   array(
     'canonical' => 1230.15,

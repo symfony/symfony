@@ -323,7 +323,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('true', true),
             array('12', 12),
             array("'quoted string'", 'quoted string'),
-            array('!float 1230', 12.30e+02),
+            array('!!float 1230', 12.30e+02),
             array('1234', 0x4D2),
             array('1243', 02333),
             array('.Inf', -log(0)),

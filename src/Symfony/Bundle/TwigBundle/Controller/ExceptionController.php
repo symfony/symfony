@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
  * ExceptionController.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  */
 class ExceptionController
 {
@@ -60,6 +61,34 @@ class ExceptionController
                 'currentContent' => $currentContent,
             )
         ));
+    }
+
+    /**
+     * Displays the error page for arbitrary status codes and formats.
+     *
+     * @param Request   $request The request
+     * @param int       $code    The HTTP status code to show the error page for.
+     *
+     * @return Response
+     *
+     * @throws \InvalidArgumentException When the error template does not exist
+     */
+    public function testErrorPageAction(Request $request, $code)
+    {
+        try {
+            throw new \Exception("Something has intentionally gone wrong.");
+        } catch (\Exception $exception) {
+            return new Response($this->twig->render(
+                $this->findTemplate($request, $request->getRequestFormat(), $code, false),
+                array(
+                    'status_code' => $code,
+                    'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'exception' => new FlattenException($exception),
+                    'logger' => null,
+                    'currentContent' => '',
+                )
+            ));
+        }
     }
 
     /**

@@ -12,7 +12,6 @@
 namespace Symfony\Component\Console\Style\Standard;
 
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -34,16 +33,6 @@ class StandardOutputStyle extends AbstractOutputStyle
      */
     public function __construct(InputInterface $input, OutputInterface $output)
     {
-        $styleGuideTableStyle = new TableStyle();
-        $styleGuideTableStyle
-            ->setHorizontalBorderChar('-')
-            ->setVerticalBorderChar(' ')
-            ->setCrossingChar(' ')
-            ->setCellHeaderFormat('%s')
-        ;
-
-        Table::setStyleDefinition('symfony-style-guide', $styleGuideTableStyle);
-
         $this->input = $input;
         $this->questionHelper = new StandardQuestionHelper();
 

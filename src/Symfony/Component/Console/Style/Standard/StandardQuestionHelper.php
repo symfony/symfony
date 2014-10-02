@@ -19,6 +19,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
+ * Symfony Style Guide compliant question helper.
+ *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 class StandardQuestionHelper extends QuestionHelper
@@ -35,7 +37,7 @@ class StandardQuestionHelper extends QuestionHelper
             }
 
             // make required
-            if (!is_bool($value) && 0 === strlen($value)) {
+            if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
                 throw new \Exception('A value is required.');
             }
 

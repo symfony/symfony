@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Style\Standard;
 
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\AbstractOutputStyle;
 
 /**
@@ -119,6 +120,22 @@ class StandardOutputStyle extends AbstractOutputStyle
     public function caution($messages)
     {
         $this->format(new BlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', ' ! '));
+    }
+
+    /**
+     * Formats a table
+     *
+     * @param array $headers
+     * @param array $rows
+     */
+    public function table(array $headers, array $rows)
+    {
+        $table = new Table($this);
+        $table->setHeaders($headers);
+        $table->setRows($rows);
+
+        $table->render();
+        $this->ln();
     }
 }
 

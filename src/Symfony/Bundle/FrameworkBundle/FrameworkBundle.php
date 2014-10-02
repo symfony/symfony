@@ -30,6 +30,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationExtra
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumperPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Scope;
@@ -46,6 +47,8 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
+        ErrorHandler::register($this->container->getParameter('debug.error_handler.throw_at'));
+
         if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
             Request::setTrustedProxies($trustedProxies);
         }

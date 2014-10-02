@@ -133,8 +133,6 @@ class FrameworkExtension extends Extension
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
 
-            $definition->replaceArgument(3, E_ALL | E_STRICT);
-
             $definition = $container->findDefinition('http_kernel');
             $definition->replaceArgument(2, new Reference('debug.controller_resolver'));
 

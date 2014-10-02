@@ -6,8 +6,8 @@
 
     <parameters>
         <parameter key="debug.debug_handlers_listener.class">Symfony\Component\HttpKernel\EventListener\DebugHandlersListener</parameter>
-        <parameter key="debug.error_handler.class">Symfony\Component\Debug\ErrorHandler</parameter>
         <parameter key="debug.stopwatch.class">Symfony\Component\Stopwatch\Stopwatch</parameter>
+        <parameter key="debug.error_handler.throw_at">0</parameter>
     </parameters>
 
     <services>
@@ -17,12 +17,10 @@
             <argument /><!-- Exception handler -->
             <argument type="service" id="logger" on-invalid="null" />
             <argument /><!-- Log levels map for enabled error levels -->
-            <argument>0</argument>
+            <argument>null</argument>
             <argument>true</argument>
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
         </service>
-
-        <service id="debug.error_handler" class="%debug.error_handler.class%" factory-class="%debug.error_handler.class%" factory-method="register" />
 
         <service id="debug.stopwatch" class="%debug.stopwatch.class%" />
     </services>

@@ -162,7 +162,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     /**
      * Asks a question
      *
-     * @param Question|string $question
+     * @param string          $question
      * @param string|null     $default
      * @param callable|null   $validator
      *
@@ -172,6 +172,22 @@ class StandardOutputStyle extends AbstractOutputStyle
     {
         $question = new Question($question, $default);
         $question->setValidator($validator);
+
+        return $this->askQuestion($question, $validator);
+    }
+
+    /**
+     * Asks a question with the user input hidden
+     *
+     * @param string        $question
+     * @param callable|null $validator
+     *
+     * @return string
+     */
+    public function askHidden($question, $validator = null)
+    {
+        $question = new Question($question);
+        $question->setHidden(true);
 
         return $this->askQuestion($question, $validator);
     }

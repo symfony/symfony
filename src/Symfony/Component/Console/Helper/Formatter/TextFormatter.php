@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Helper\Formatter;
 
 /**
- * Formats informational or debug text
+ * Formats informational text
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

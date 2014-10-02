@@ -71,7 +71,7 @@ class OutputDecorator implements OutputInterface
      *
      * @param string $message
      */
-    public function subtitle($message)
+    public function section($message)
     {
         $this->format(new TitleFormatter($message, '-'));
     }
@@ -87,7 +87,7 @@ class OutputDecorator implements OutputInterface
     }
 
     /**
-     * Formats informational or debug text
+     * Formats informational text
      *
      * @param string|array $messages
      */

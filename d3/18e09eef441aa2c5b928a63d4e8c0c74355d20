@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-22T15:59:18Z
+
+I like the approach! It's even easier than I was imagining because it doesn't make you re-run the command to find out more about the service you might be looking for.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-10-01T14:32:22Z
+
+FYI - The PR has been updated after Stof's comment.
+
+---------------------------------------------------------------------------
+
+by agallou at 2014-10-02T07:03:47Z
+
+I've updated the PR to lowercase the searched service name according to @stof comment

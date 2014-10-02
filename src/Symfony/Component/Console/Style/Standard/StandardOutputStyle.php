@@ -12,6 +12,9 @@
 namespace Symfony\Component\Console\Style\Standard;
 
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\AbstractOutputStyle;
 
 /**
@@ -136,6 +139,135 @@ class StandardOutputStyle extends AbstractOutputStyle
 
         $table->render();
         $this->ln();
+    }
+
+    /**
+     * Asks a question
+     *
+     * @param Question|string $question
+     * @param string|null     $default
+     * @param callable|null   $validator
+     *
+     * @return string
+     */
+    public function ask($question, $default = null, $validator = null)
+    {
+        $question = new Question($question, $default);
+        $question->setValidator($validator);
+
+        return $this->askQuestion($question, $validator);
+    }
+
+    /**
+     * Asks for confirmation
+     *
+     * @param string $question
+     * @param bool   $default
+     *
+     * @return bool
+     */
+    public function confirm($question, $default = true)
+    {
+        return $this->askQuestion(new ConfirmationQuestion($question, $default));
+    }
+
+    /**
+     * Asks a choice question
+     *
+     * @param string          $question
+     * @param array           $choices
+     * @param string|int|null $default
+     *
+     * @return string
+     */
+    public function choice($question, array $choices, $default = null)
+    {
+        if (null !== $default) {
+            $values = array_flip($choices);
+            $default = $values[$default];
+        }
+
+        return $this->askQuestion(new ChoiceQuestion($question, $choices, $default));
+    }
+
+    /**
+     * @param Question $question
+     *
+     * @return string
+     */
+    public function askQuestion(Question $question)
+    {
+        $text = $question->getQuestion();
+        $default = $question->getDefault();
+
+        switch (true) {
+            case null === $default:
+                $text = sprintf(' <info>%s</info>:', $text);
+
+                break;
+
+            case $question instanceof ConfirmationQuestion:
+                $text = sprintf(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
+
+                break;
+
+            case $question instanceof ChoiceQuestion:
+                $choices = $question->getChoices();
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
+
+                break;
+
+            default:
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
+        }
+
+        $validator = $question->getValidator();
+        $question->setValidator(function ($value) use ($validator) {
+                if (null !== $validator && is_callable($validator)) {
+                    $value = $validator($value);
+                }
+
+                // make required
+                if (!is_bool($value) && 0 === strlen($value)) {
+                    throw new \Exception('A value is required.');
+                }
+
+                return $value;
+            });
+
+        $ret = null;
+
+        while (null === $ret) {
+            $this->writeln($text);
+
+            if ($question instanceof ChoiceQuestion) {
+                $width = max(array_map('strlen', array_keys($question->getChoices())));
+
+                foreach ($question->getChoices() as $key => $value) {
+                    $this->writeln(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
+                }
+            }
+
+            $this->write(' > ');
+
+            $input = trim(fgets(STDIN, 4096));
+            $input = strlen($input) > 0 ? $input : $default;
+
+            try {
+                $ret = call_user_func($question->getValidator(), $input);
+            } catch (\Exception $e) {
+                $this->ln();
+                $this->error($e->getMessage());
+            }
+        }
+
+        $this->ln();
+
+        if ($normalizer = $question->getNormalizer()) {
+            return $normalizer($ret);
+        }
+
+        return $ret;
     }
 }
 

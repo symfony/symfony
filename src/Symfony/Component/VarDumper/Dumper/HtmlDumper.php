@@ -108,9 +108,9 @@ class HtmlDumper extends CliDumper
 <script>
 Sfjs = window.Sfjs || {};
 Sfjs.dump = Sfjs.dump || {};
-Sfjs.dump.childElts = document.getElementsByName('sf-dump-child');
-Sfjs.dump.childLen = 0;
-Sfjs.dump.instrument = function () {
+Sfjs.dump.childElts = Sfjs.dump.childElts || document.getElementsByName('sf-dump-child');
+Sfjs.dump.childLen = Sfjs.dump.childLen || 0;
+Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
     var elt,
         i = this.childLen,
         aCompact = '▶</a><span class="sf-dump-compact">',
@@ -127,7 +127,7 @@ Sfjs.dump.instrument = function () {
         ++i;
     }
 };
-Sfjs.dump.toggle = function(a) {
+Sfjs.dump.toggle = Sfjs.dump.toggle || function(a) {
     var s = a.nextElementSibling;
 
     if ('sf-dump-compact' == s.className) {
@@ -214,7 +214,7 @@ EOHTML;
         if ('ref' === $style) {
             $ref = substr($val, 1);
             if ('#' === $val[0]) {
-                return "<a class=sf-dump-ref name=\"{$this->dumpId}-ref$ref\">$val</a>";
+                return "<span class=sf-dump-ref id=\"{$this->dumpId}-ref$ref\">$val</span>";
             } else {
                 return "<a class=sf-dump-ref href=\"#{$this->dumpId}-ref$ref\">$val</a>";
             }
@@ -260,6 +260,31 @@ EOHTML;
             parent::dumpLine(0);
         }
         $this->lastDepth = $depth;
+
+        // Replaces non-ASCII UTF-8 chars by numeric HTML entities
+        $this->line = preg_replace_callback(
+            '/[\x80-\xFF]+/',
+            function ($m) {
+                $m = unpack('C*', $m[0]);
+                $i = 1;
+                $entities = '';
+
+                while (isset($m[$i])) {
+                    if (0xF0 <= $m[$i]) {
+                        $c = (($m[$i++] - 0xF0) << 18) + (($m[$i++] - 0x80) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++] - 0x80;
+                    } elseif (0xE0 <= $m[$i]) {
+                        $c = (($m[$i++] - 0xE0) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++]  - 0x80;
+                    } else {
+                        $c = (($m[$i++] - 0xC0) << 6) + $m[$i++] - 0x80;
+                    }
+
+                    $entities .= '&#'.$c.';';
+                }
+
+                return $entities;
+            },
+            $this->line
+        );
 
         parent::dumpLine($depth);
     }

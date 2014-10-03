@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\EventListener;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translator\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Synchronizes the locale between the request and the translator.

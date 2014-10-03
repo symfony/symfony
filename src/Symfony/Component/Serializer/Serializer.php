@@ -21,10 +21,10 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Serializer serializes and deserializes data
+ * Serializer serializes and deserializes data.
  *
- * objects are turned into arrays by normalizers
- * arrays are turned into various output formats by encoders
+ * objects are turned into arrays by normalizers.
+ * arrays are turned into various output formats by encoders.
  *
  * $serializer->serialize($obj, 'xml')
  * $serializer->decode($data, 'xml')
@@ -36,10 +36,25 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  */
 class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
+    /**
+     * @var Encoder\ChainEncoder
+     */
     protected $encoder;
+    /**
+     * @var Encoder\ChainDecoder
+     */
     protected $decoder;
+    /**
+     * @var array
+     */
     protected $normalizers       = array();
+    /**
+     * @var array
+     */
     protected $normalizerCache   = array();
+    /**
+     * @var array
+     */
     protected $denormalizerCache = array();
 
     public function __construct(array $normalizers = array(), array $encoders = array())
@@ -157,7 +172,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching normalizer.
      *
-     * @param object $data The object to get the serializer for
+     * @param object $data   The object to get the serializer for
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return NormalizerInterface|null
@@ -219,11 +234,11 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     }
 
     /**
-     * Normalizes an object into a set of arrays/scalars
+     * Normalizes an object into a set of arrays/scalars.
      *
-     * @param object $object object to normalize
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @param array $context The context data for this particular normalization
+     * @param object $object  object to normalize
+     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context The context data for this particular normalization
      *
      * @return array|scalar
      *
@@ -243,12 +258,12 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     }
 
     /**
-     * Denormalizes data back into an object of the given class
+     * Denormalizes data back into an object of the given class.
      *
-     * @param mixed  $data   data to restore
-     * @param string $class  the expected class to instantiate
-     * @param string $format format name, present to give the option to normalizers to act differently based on formats
-     * @param array $context The context data for this particular denormalization
+     * @param mixed  $data    data to restore
+     * @param string $class   the expected class to instantiate
+     * @param string $format  format name, present to give the option to normalizers to act differently based on formats
+     * @param array  $context The context data for this particular denormalization
      *
      * @return object
      *

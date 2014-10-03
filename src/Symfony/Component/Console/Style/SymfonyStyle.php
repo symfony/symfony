@@ -151,7 +151,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function warning($message)
     {
-        $this->block($message, 'WARNING', 'fg=black;bg=yellow');
+        $this->block($message, 'WARNING', 'fg=white;bg=red');
     }
 
     /**
@@ -159,7 +159,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function note($message)
     {
-        $this->block($message, 'NOTE', null, ' ! ');
+        $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
     }
 
     /**

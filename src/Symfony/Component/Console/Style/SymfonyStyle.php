@@ -28,7 +28,7 @@ use Symfony\Component\Console\Question\Question;
  */
 class SymfonyStyle extends OutputStyle
 {
-    const MAX_LENGTH = 120;
+    const MAX_LINE_LENGTH = 120;
 
     private $input;
     private $questionHelper;
@@ -66,7 +66,7 @@ class SymfonyStyle extends OutputStyle
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LENGTH - Helper::strlen($prefix))));
+            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LINE_LENGTH - Helper::strlen($prefix))));
 
             if (count($messages) > 1 && $key < count($message)) {
                 $lines[] = '';
@@ -80,7 +80,7 @@ class SymfonyStyle extends OutputStyle
 
         foreach ($lines as &$line) {
             $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', self::MAX_LENGTH - Helper::strlen($line));
+            $line .= str_repeat(' ', self::MAX_LINE_LENGTH - Helper::strlen($line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</%s>', $style, $line, $style);
@@ -255,10 +255,10 @@ class SymfonyStyle extends OutputStyle
             $this->questionHelper = new SymfonyQuestionHelper();
         }
 
-        $ret = $this->questionHelper->ask($this->input, $this, $question);
+        $answer = $this->questionHelper->ask($this->input, $this, $question);
 
         $this->ln();
 
-        return $ret;
+        return $answer;
     }
 }

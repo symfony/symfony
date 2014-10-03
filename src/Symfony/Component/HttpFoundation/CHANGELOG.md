@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * PdoSessionHandler changes
+   - implemented different session locking strategies to prevent loss of data by concurrent access to the same session
+   - [BC BREAK] save session data in a binary column without base64_encode
+   - [BC BREAK] added lifetime column to the session table which allows to have different lifetimes for each session
+   - implemented lazy connections that are only opened when a session is used by either passing a dsn string
+     explicitly or falling back to session.save_path ini setting
+   - added a createTable method that initializes a correctly defined table depending on the database vendor
+
 2.5.0
 -----
 

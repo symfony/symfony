@@ -3,6 +3,7 @@ CHANGELOG
 
 2.6.0
 -----
+
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
  * added the html5 "range" FormType

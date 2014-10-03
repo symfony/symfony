@@ -1347,6 +1347,36 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testRange()
+    {
+        $form = $this->factory->createNamed('name', 'range', 42, array('attr' => array('min' => 5)));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value=42]
+    [@min=5]
+'
+        );
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        $form = $this->factory->createNamed('name', 'range', 42, array('attr' => array('min' => 5, 'max' => 57)));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@value=42]
+    [@min=5]
+    [@max=57]
+'
+        );
+    }
+
+
     public function testLocale()
     {
         $form = $this->factory->createNamed('name', 'locale', 'de_AT');

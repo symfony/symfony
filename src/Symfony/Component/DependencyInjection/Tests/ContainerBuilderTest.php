@@ -299,6 +299,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanCreateProxyWithRuntimeServiceInstantiatorAndLazyCalls()
     {
+        if (!interface_exists('ProxyManager\Proxy\ProxyInterface')) {
+            $this->markTestSkipped('The proxy-manager project is not available');   
+        }
+
         $builder = new ContainerBuilder();
         $builder->setProxyInstantiator(new RuntimeInstantiator());
 
@@ -312,6 +316,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertInstanceOf('Bar\FooClass', $foo1);
         
+        $this->assertInstanceOf('ProxyManager\Proxy\LazyLoadingInterface', $foo1);
         $this->assertNotNull($foo1->getProxyInitializer());
     }
 

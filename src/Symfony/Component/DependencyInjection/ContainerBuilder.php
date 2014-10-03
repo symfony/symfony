@@ -926,11 +926,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $definition,
                     $id, function () use ($definition, $id, $container) {
                         $service = $container->createService($definition, $id, false);
+                        $container->callMethods($service, $definition->getMethodCalls());
 
-                        foreach ($definition->getMethodCalls() as $call) {
-                            $container->callMethod($service, $call);
-                        }
-                        
                         return $service;
                     }
                 );
@@ -978,10 +975,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if ($tryProxy || !$definition->isLazy()) {
             // share only if proxying failed, or if not a proxy
             $this->shareService($definition, $service, $id);
-
-            foreach ($definition->getMethodCalls() as $call) {
-                $this->callMethod($service, $call);
-            }
+            $this->callMethods($service, $definition->getMethodCalls());
         }        
 
         $properties = $this->resolveServices($parameterBag->resolveValue($definition->getProperties()));
@@ -1140,6 +1134,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     }
                 }
             }
+        }
+    }
+
+    private function callMethods($service, $calls)
+    {
+        foreach ($calls as $call) {
+            $this->callMethod($service, $call);
         }
     }
 

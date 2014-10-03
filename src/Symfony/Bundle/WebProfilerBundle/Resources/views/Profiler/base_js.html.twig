@@ -83,8 +83,7 @@
                     var rows = document.createDocumentFragment();
 
                     if (requestStack.length) {
-                        var firstItem = requestStack.length > 20 ? requestStack.length - 20 : 0;
-                        for (var i = firstItem; i < requestStack.length; i++) {
+                        for (var i = 0; i < requestStack.length; i++) {
                             var request = requestStack[i];
 
                             var row = document.createElement('tr');
@@ -145,7 +144,7 @@
                         tbody.appendChild(rows);
 
                         if (infoSpan) {
-                            var text = firstItem == 0 ? requestStack.length + ' calls' : 'Last 20 calls out of ' + requestStack.length;
+                            var text = requestStack.length + ' calls';
                             infoSpan.textContent = text;
                         }
                     } else {

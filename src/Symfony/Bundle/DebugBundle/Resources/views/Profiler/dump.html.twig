@@ -10,29 +10,27 @@
         {% endset %}
 
         {% set text %}
-            <div style="width: 450px; overflow: hidden;">
-                <div class="sf-toolbar-info-piece">
-                    <b>dump()</b>
-                </div>
-                {% for dump in collector.getDumps('html') %}
-                    <div class="sf-toolbar-info-piece">
-                        in
-                        {% if dump.file %}
-                            {% set link = dump.file|file_link(dump.line) %}
-                            {% if link %}
-                                <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
-                            {% else %}
-                                <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
-                            {% endif %}
-                        {% else %}
-                            {{ dump.name }}
-                        {% endif %}
-                        line {{ dump.line }}:
-                        {{ dump.data|raw }}
-                    </div>
-                {% endfor %}
-                <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
+            <div class="sf-toolbar-info-piece">
+                <b>dump()</b>
             </div>
+            {% for dump in collector.getDumps('html') %}
+                <div class="sf-toolbar-info-piece">
+                    in
+                    {% if dump.file %}
+                        {% set link = dump.file|file_link(dump.line) %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                        {% else %}
+                            <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                        {% endif %}
+                    {% else %}
+                        {{ dump.name }}
+                    {% endif %}
+                    line {{ dump.line }}:
+                    {{ dump.data|raw }}
+                </div>
+            {% endfor %}
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
         {% endset %}
 
         {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': true } %}

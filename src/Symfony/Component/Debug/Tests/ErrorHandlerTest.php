@@ -46,6 +46,30 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         error_reporting($this->errorReporting);
     }
 
+    public function testRegister()
+    {
+        $handler = ErrorHandler::register();
+
+        try {
+            $this->assertInstanceOf('Symfony\Component\Debug\ErrorHandler', $handler);
+
+            try {
+                $this->assertSame($handler, ErrorHandler::register());
+            } catch (\Exception $e) {
+                restore_error_handler();
+                restore_exception_handler();
+            }
+        } catch (\Exception $e) {
+        }
+
+        restore_error_handler();
+        restore_exception_handler();
+
+        if (isset($e)) {
+            throw $e;
+        }
+    }
+
     public function testNotice()
     {
         ErrorHandler::register();

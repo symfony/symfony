@@ -1376,7 +1376,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
-
     public function testLocale()
     {
         $form = $this->factory->createNamed('name', 'locale', 'de_AT');

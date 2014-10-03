@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -291,6 +292,30 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertSame('Bar\FooClass', get_class($foo1));
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCanCreateProxyWithRuntimeServiceInstantiatorAndLazyCalls()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RuntimeInstantiator());
+
+        $builder->register('foo1', 'Bar\FooClass')->setFile(__DIR__.'/Fixtures/includes/foo.php');
+        $definition = $builder->getDefinition('foo1');
+        $definition->setLazy(true);
+        $definition->addMethodCall('setBar', ['baz']);
+
+        $foo1 = $builder->get('foo1');
+
+        $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
+        $this->assertInstanceOf('Bar\FooClass', $foo1);
+        
+        $reflection = new \ReflectionObject($foo1);
+        $value = $reflection->getProperty('bar')->getValue($foo1);
+        
+        $this->assertNull($value);
     }
 
     /**

@@ -4,15 +4,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="_twig_error_test" pattern="/{code}/">
+    <route id="_twig_error_test" path="/{code}.{_format}">
         <default key="_controller">twig.controller.exception:testErrorPageAction</default>
         <default key="_format">html</default>
         <requirement key="code">\d+</requirement>
     </route>
-
-    <route id="_twig_error_test_format" pattern="/{code}/{_format}/">
-        <default key="_controller">twig.controller.exception:testErrorPageAction</default>
-        <requirement key="code">\d+</requirement>
-    </route>
-
 </routes>

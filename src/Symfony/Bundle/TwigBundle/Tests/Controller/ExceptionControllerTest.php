@@ -81,5 +81,4 @@ class ExceptionControllerTest extends TestCase
 
         $this->assertEquals('html', $request->getRequestFormat());
     }
-
 }

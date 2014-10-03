@@ -147,7 +147,7 @@ class ExceptionController
      *
      * @return Response
      */
-    protected function createResponse(Request $request, FlattenException $exception, $debug, DebugLoggerInterface $logger = null, $currentContent = '')
+    private function createResponse(Request $request, FlattenException $exception, $debug, DebugLoggerInterface $logger = null, $currentContent = '')
     {
         $code = $exception->getStatusCode();
 

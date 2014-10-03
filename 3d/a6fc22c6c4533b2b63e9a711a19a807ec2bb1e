@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-30T12:23:58Z
+
+This PR is ready for review/vote. I updated the patch to have almost no behavioral change but only semantic added-value.
+Instead of replacing an argument, I just added a new one :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-02T12:06:55Z
+
+looks good to me. :+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-02T18:06:41Z
+
+That the console now correctly displays fatal errors is cool. But this will only be working when using the framework bundle. Can this not be handled within the component?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-03T05:44:27Z
+
+Having this in the framework bundle allows configuration flexibility.
+But then doesn't prevent adding fatal error handling right into the console component later in an other PR.

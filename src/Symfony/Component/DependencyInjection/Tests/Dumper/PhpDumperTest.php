@@ -204,4 +204,56 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
+
+    public function testClosureAsFactoryMethod()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')->setFactory(
+            function () {
+                return new \stdClass();
+            }
+        );
+
+        $container->register('bar', 'stdClass')->setFactory(
+            function (\stdClass $foo) {
+                $bar = clone $foo;
+                $bar->bar = 42;
+
+                return $bar;
+            }
+        )->addArgument(new Reference('foo'));
+
+        $closureDumperMock = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\Dumper\ClosureDumper\ClosureDumperInterface');
+
+        $closureDumperMock
+            ->expects($this->at(0))
+            ->method('dump')
+            ->will($this->returnValue(
+                <<<'CODE'
+function (\stdClass $foo) {
+            $bar = clone $foo;
+            $bar->bar = 42;
+
+            return $bar;
+        }
+CODE
+            ));
+
+        $closureDumperMock
+            ->expects($this->at(1))
+            ->method('dump')
+            ->will($this->returnValue(
+                <<<'CODE'
+function () {
+            return new \stdClass();
+        }
+CODE
+            ));
+
+        $dumper = new PhpDumper($container);
+        $dumper->setClosureDumper($closureDumperMock);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services12.php', $dumper->dump());
+    }
 }

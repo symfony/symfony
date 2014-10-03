@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+use Symfony\Bridge\SuperClosure\ClosureDumper\SuperClosureDumper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -708,6 +709,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         if (class_exists('ProxyManager\Configuration')) {
             $dumper->setProxyDumper(new ProxyDumper());
+        }
+
+        if (
+            class_exists('Symfony\Bridge\SuperClosure\ClosureDumper\SuperClosureDumper')
+            && class_exists('Jeremeamia\SuperClosure\ClosureParser')
+        ) {
+            $dumper->setClosureDumper(new SuperClosureDumper());
         }
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));

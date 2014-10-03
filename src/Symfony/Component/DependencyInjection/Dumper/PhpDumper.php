@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Dumper\ClosureDumper\ClosureDumperInterface;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -67,6 +68,11 @@ class PhpDumper extends Dumper
     private $proxyDumper;
 
     /**
+     * @var ClosureDumperInterface
+     */
+    private $closureDumper;
+
+    /**
      * {@inheritdoc}
      *
      * @api
@@ -86,6 +92,16 @@ class PhpDumper extends Dumper
     public function setProxyDumper(ProxyDumper $proxyDumper)
     {
         $this->proxyDumper = $proxyDumper;
+    }
+
+    /**
+     * Sets the dumper of closures
+     *
+     * @param ClosureDumperInterface $closureDumper
+     */
+    public function setClosureDumper(ClosureDumperInterface $closureDumper)
+    {
+        $this->closureDumper = $closureDumper;
     }
 
     /**
@@ -721,6 +737,7 @@ EOF;
 
         if (null !== $definition->getFactory()) {
             $callable = $definition->getFactory();
+
             if (is_array($callable)) {
                 if ($callable[0] instanceof Reference
                     || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))) {
@@ -734,6 +751,12 @@ EOF;
                 }
 
                 return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
+            }
+
+            if ($callable instanceof \Closure) {
+                $closureCode = $this->getClosureDumper()->dump($callable);
+
+                return sprintf("        $return{$instantiation}call_user_func(%s%s);\n", $closureCode, $arguments ? ', '.implode(', ', $arguments) : '');
             }
 
             return sprintf("        $return{$instantiation}\\%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
@@ -1262,12 +1285,18 @@ EOF;
                     }
 
                     if ($factory[0] instanceof Definition) {
-                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factory[1], count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factory[1], $arguments ? ', '.implode(', ', $arguments) : '');
                     }
 
                     if ($factory[0] instanceof Reference) {
                         return sprintf('%s->%s(%s)', $this->dumpValue($factory[0]), $factory[1], implode(', ', $arguments));
                     }
+                }
+
+                if ($factory instanceof \Closure) {
+                    $closureCode = $this->getClosureDumper()->dump($factory);
+
+                    return sprintf('call_user_func(%s%s)', $closureCode, $arguments ? ', '.implode(', ', $arguments) : '');
                 }
 
                 throw new RuntimeException('Cannot dump definition because of invalid factory');
@@ -1444,5 +1473,14 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function getClosureDumper()
+    {
+        if ($this->closureDumper === null) {
+            throw new RuntimeException('PhpDumper requires a ClosureParserInterface implementation set in order to dump closures');
+        }
+
+        return $this->closureDumper;
     }
 }

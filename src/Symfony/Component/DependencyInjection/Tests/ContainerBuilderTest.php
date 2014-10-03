@@ -398,6 +398,23 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceByClosure()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo', 'Bar\FooClass')->setFactory(function (\stdClass $bar) {
+            $foo = new \Bar\FooClass();
+            $foo->setBar($bar);
+
+            return $foo;
+        })->addArgument(new Reference('bar'));
+
+        $this->assertSame($builder->get('bar'), $builder->get('foo')->bar, '->createService() creates service from a closure with passed service as an argument');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      * @expectedException \RuntimeException
      */
     public function testCreateSyntheticService()

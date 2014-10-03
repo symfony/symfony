@@ -60,7 +60,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
+     * @param string|array|\Closure $factory A PHP function/closure or an array containing a class/Reference and a method to call
      *
      * @return Definition The current instance
      */
@@ -78,7 +78,7 @@ class Definition
     /**
      * Gets the factory.
      *
-     * @return string|array The PHP function or an array containing a class/Reference and a method to call
+     * @return string|array|\Closure The PHP function/closure or an array containing a class/Reference and a method to call
      */
     public function getFactory()
     {
@@ -141,7 +141,7 @@ class Definition
      *
      * @return Definition The current instance
      *
-     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
+     * @throws \InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
      */
     public function setDecoratedService($id, $renamedId = null)
     {

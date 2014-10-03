@@ -75,20 +75,18 @@ class ExceptionController
      */
     public function testErrorPageAction(Request $request, $code)
     {
-        try {
-            throw new \Exception("Something has intentionally gone wrong.");
-        } catch (\Exception $exception) {
-            return new Response($this->twig->render(
-                $this->findTemplate($request, $request->getRequestFormat(), $code, false),
-                array(
-                    'status_code' => $code,
-                    'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                    'exception' => new FlattenException($exception),
-                    'logger' => null,
-                    'currentContent' => '',
-                )
-            ));
-        }
+        $exception = new \Exception("Something has intentionally gone wrong.");
+
+        return new Response($this->twig->render(
+            $this->findTemplate($request, $request->getRequestFormat(), $code, false),
+            array(
+                'status_code' => $code,
+                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'exception' => new FlattenException($exception),
+                'logger' => null,
+                'currentContent' => '',
+            )
+        ));
     }
 
     /**

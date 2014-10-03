@@ -64,4 +64,22 @@ class ExceptionControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode()); // successful request
         $this->assertEquals('OK', $response->getContent());  // content of the error404.html template
     }
+
+    public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
+    {
+        $twig = new \Twig_Environment(
+            new \Twig_Loader_Array(array(
+                'TwigBundle:Exception:error.html.twig' => 'html',
+            ))
+        );
+
+        $request = Request::create('whatever');
+        $request->setRequestFormat('txt');
+
+        $controller = new ExceptionController($twig, false);
+        $response = $controller->testErrorPageAction($request, 42);
+
+        $this->assertEquals('html', $request->getRequestFormat());
+    }
+
 }

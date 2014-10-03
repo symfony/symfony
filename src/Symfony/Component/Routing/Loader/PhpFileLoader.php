@@ -44,7 +44,7 @@ class PhpFileLoader extends FileLoader
         $path = $this->locator->locate($file);
         $this->setCurrentDir(dirname($path));
 
-        $collection = include $path;
+        $collection = $this->includeFile($path);
         $collection->addResource(new FileResource($path));
 
         return $collection;
@@ -58,5 +58,17 @@ class PhpFileLoader extends FileLoader
     public function supports($resource, $type = null)
     {
         return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION) && (!$type || 'php' === $type);
+    }
+
+    /**
+     * Safe include. Used for scope isolation.
+     *
+     * @param string $file File to include
+     *
+     * @return RouteCollection
+     */
+    private function includeFile($file)
+    {
+        return include $file;
     }
 }

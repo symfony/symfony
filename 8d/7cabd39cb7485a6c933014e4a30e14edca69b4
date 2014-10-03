@@ -1,0 +1,232 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-05-17T18:43:06Z
+
+I suspect your meant to open the PR against 2.3
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-17T18:56:19Z
+
+No since it's a bc break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-17T19:35:03Z
+
+@Tobion But you have a bunch of unrelated commits in this PR.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-17T19:51:26Z
+
+Because 2.3 is not merged in master yet.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-05-17T20:49:25Z
+
+@Tobion 2.3 has now been merged into master.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-19T00:03:13Z
+
+This would be ready. Where should I document the change (depends for which version it gets merged)?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-05-19T11:56:46Z
+
+@Tobion I think similar changes should be done in the DBAL session handler.
+The lazy connection is useless there as DBAL itself is lazy, and the table creation uses the DBAL schema system already, but the switch to BLOB would make sense for consistency
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-21T14:49:08Z
+
+@stof Yes I can do that in a later PR when we know whether #10908 stays in 2.3 or not.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-22T12:23:17Z
+
+@stof you know what fabbot.io is complaining about? http://fabbot.io/report/symfony/symfony/10931/953226bdb666880c61157a42d7839eb42c9c8c9c
+
+---------------------------------------------------------------------------
+
+by venyii at 2014-05-22T12:27:02Z
+
+There are some extra spaces after the ';'
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-25T02:03:24Z
+
+@venyii Thanks for spotting
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-25T12:32:54Z
+
+Reopened against 2.5: #10991
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-27T08:01:49Z
+
+Ok, master 2.6 again.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-27T08:26:46Z
+
+@fabpot ready
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-05-27T08:37:27Z
+
+I'll write a blog post about this soon.
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-05-27T08:48:47Z
+
+@Tobion please cross link your post here
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-15T08:45:10Z
+
+@Tobion This king of changes should really be merged early in the 2.6 process so that we have plenty of time to test it in real-world situations. @Tobion Do you think it can be ready soon?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-06-15T10:00:45Z
+
+@fabpot yes almost done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T10:11:31Z
+
+@Tobion Any news on this one? Any chance we can merge it this week? That would let us 2 months to be sure it works well for everyone before 2.6 final.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-23T11:36:12Z
+
+I don't think I can make it this week because I'm on holiday. But I'll finish it next Monday.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-23T12:08:05Z
+
+Monday would be perfect, thanks.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-29T19:33:40Z
+
+@fabpot this is ready for merge.
+
+I tested the binary data and the different locking strategies with both mysql and sqlite. It works like a charm. But I don't have postgres, oracle, mssql available. So it would be good if the community can test the class with these DBMS. Or I might find time to set it up later.
+I would propose to merge this and then we can still easily fix it if there are problems with binary data for postgres/oracle/mysql.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-29T19:41:49Z
+
+@symfony/deciders ping
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-09-29T19:43:19Z
+
+@Tobion should one of the locking strategies be recommended for the "regular-user"?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-29T19:48:38Z
+
+The default strategy (transactional) is recommended because it's most reliable across dbms.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-29T19:51:21Z
+
+The documentation could enjoy an update in this section: http://symfony.com/doc/current/cookbook/configuration/pdo_session_storage.html#sharing-your-database-connection-information
+
+As it's not recommended anymore to share the doctrine connection, we should deprecate this part
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-29T19:55:28Z
+
+What about an *auto-save* parameter in the framework bundle (in the session section)?
+I mean, we could auto save the session on an event (for example Kernel::REQUEST) to release the lock and prevent locking simultaneous ajax requests.
+This auto-save could be disabled on some route using a annotation.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-29T19:56:13Z
+
+@romainneutron this section is only about sharing the connection __settings__. Not the connection itself. So this part is still ok.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-29T19:57:14Z
+
+>@romainneutron this section is only about sharing the connection settings. Not the connection itself. So this part is still ok.
+
+woops, you're right
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-29T20:15:46Z
+
+I think there are different cases that need to be examined, e.g. an AJAX request to:
+- a non-secured path without firewall and a controller without session access: nothing to do as no blocking is involved
+- a secured path and a controller with session access: we cannot improve anything. users should call session->save() before they do some other heavy stuff (in case they do).
+- a secured path and a controller without session access: AFAIK the security bundle accesses session data. so in theory the session could be closed right after that, so the lock does not cover the time in the controller where the session is not used.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-30T17:20:23Z
+
+> a secured path and a controller with session access: we cannot improve anything. users should call session->save() before they do some other heavy stuff (in case they do).
+
+Maybe we could add a listener on ``kernel.terminate`` with a high priority, to save the session before the actions done after the response sending are processed. This would solve the issue for the common case triggered by the memory spool delaying the session saving for instance
+
+---------------------------------------------------------------------------
+
+by staabm at 2014-09-30T17:23:21Z
+
+What about some sort of debugging mechanism (e.g. A class using ArrayAccess) which will throw exceptions in case a code snippet tries to add/manipulate session data after the session has already been written+closed?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-09-30T17:39:19Z
+
+@stof yes that is what I proposed in #6417 to fix that issue.
+@staabm Zend Session has this feature as far as I remember. But its not related to this PR.
+Please just focus on this PR and discuss other things in other tickets.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-02T14:38:09Z
+
+Any votes?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-02T15:43:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-03T00:25:05Z
+
+I just realize this also fixes #9029

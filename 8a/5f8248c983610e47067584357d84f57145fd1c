@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by unkind at 2014-09-28T18:03:14Z
+
+By the way, are you sure about the following syntax:
+```yml
+services:
+    factory: { class: FooBarClass, factory: baz:getClass}
+```
+Service name without "@". And if you omit ":getClass" then it's a function name. It's not evident, IMHO.
+
+Also, I cannot write "FooFactory::createFoo" in the current implementation.
+
+---------------------------------------------------------------------------
+
+by unkind at 2014-09-28T18:06:23Z
+
+`PhpDumper->addService`:
+```php
+        if ($definition->isSynthetic()) {
+            $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
+        } elseif ($class = $definition->getClass()) {
+            $return[] = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'object' : "\\".$class, $class);
+        } elseif ($definition->getFactory()) {
+            $factory = $definition->getFactory();
+            if (is_string($factory)) {
+                $return[] = sprintf('@return object An instance returned by %s().', $factory);
+            } elseif (is_array($factory) && (is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
+                if (is_string($factory[0]) || $factory[0] instanceof Reference) {
+                    $return[] = sprintf('@return object An instance returned by %s::%s().', (string) $factory[0], $factory[1]);
+                } elseif ($factory[0] instanceof Definition) {
+                    $return[] = sprintf('@return object An instance returned by %s::%s().', $factory[0]->getClass(), $factory[1]);
+                }
+            }
+        } elseif ($definition->getFactoryClass()) {
+            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
+        } elseif ($definition->getFactoryService()) {
+            $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryService(), $definition->getFactoryMethod());
+        }
+```
+I thought it is not allowed to define service without `class`, any real case for this code?
+
+---------------------------------------------------------------------------
+
+by unkind at 2014-09-28T19:15:27Z
+
+I'll fix tests later.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-09-29T16:37:27Z
+
+:+1: once tests are fixed
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-29T16:48:07Z
+
+Please also add a test instantiating a service with a factory in the ContainerBuilder (well, several to cover the different cases)
+
+---------------------------------------------------------------------------
+
+by unkind at 2014-10-01T20:25:52Z
+
+Sorry for delay, tests have been updated.
+
+---------------------------------------------------------------------------
+
+by unkind at 2014-10-02T23:26:44Z
+
+@fabpot @stof please, check it, I think it is possible to finish #11968 for 2.6.

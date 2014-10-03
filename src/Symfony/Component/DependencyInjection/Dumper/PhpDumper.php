@@ -730,13 +730,13 @@ EOF;
                 $class = $this->dumpValue($callable[0]);
                 // If the class is a string we can optimize call_user_func away
                 if (strpos($class, "'") === 0) {
-                    return sprintf("        $return{$instantiation}\%s::%s(%s);\n", substr($class, 1, -1), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                    return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '');
                 }
 
-                return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s'), %s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
+                return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
             }
 
-            return sprintf("        $return{$instantiation}%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
+            return sprintf("        $return{$instantiation}\\%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
         } elseif (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
                 $class = $this->dumpValue($definition->getFactoryClass());
@@ -1212,7 +1212,7 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param array   $value
+     * @param mixed   $value
      * @param bool    $interpolate
      *
      * @return string
@@ -1247,6 +1247,30 @@ EOF;
 
             if (false !== strpos($class, '$')) {
                 throw new RuntimeException('Cannot dump definitions which have a variable class name.');
+            }
+
+            if (null !== $value->getFactory()) {
+                $factory = $value->getFactory();
+
+                if (is_string($factory)) {
+                    return sprintf('\\%s(%s)', $factory, implode(', ', $arguments));
+                }
+
+                if (is_array($factory)) {
+                    if (is_string($factory[0])) {
+                        return sprintf('\\%s::%s(%s)', $factory[0], $factory[1], implode(', ', $arguments));
+                    }
+
+                    if ($factory[0] instanceof Definition) {
+                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factory[1], count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                    }
+
+                    if ($factory[0] instanceof Reference) {
+                        return sprintf('%s->%s(%s)', $this->dumpValue($factory[0]), $factory[1], implode(', ', $arguments));
+                    }
+                }
+
+                throw new RuntimeException('Cannot dump definition because of invalid factory');
             }
 
             if (null !== $value->getFactoryMethod()) {

@@ -98,6 +98,9 @@
       <property name="foo">bar</property>
       <factory service="new_factory" method="getInstance"/>
     </service>
+    <service id="service_from_static_method" class="Bar\FooClass">
+      <factory class="Bar\FooClass" method="getInstance"/>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

@@ -120,6 +120,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testServicesWithAnonymousFactories()
+    {
+        $container = include self::$fixturesPath.'/containers/container19.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.

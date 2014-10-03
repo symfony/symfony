@@ -169,7 +169,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services14.yml');
         $services = $container->getDefinitions();
 
-        $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['factory']->getFactory(), '->load() parses the factory tag');
+        $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['factory']->getFactory(), '->load() parses the factory tag with service:method');
+        $this->assertEquals(array('FooBacFactory', 'createFooBar'), $services['factory_with_static_call']->getFactory(), '->load() parses the factory tag with Class::method');
     }
 
     public function testExtensions()

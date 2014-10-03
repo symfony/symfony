@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Encodes XML data
+ * Encodes XML data.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
@@ -146,7 +146,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      }
 
     /**
-     * Sets the root node name
+     * Sets the root node name.
      *
      * @param string $name root node name
      */
@@ -156,7 +156,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Returns the root node name
+     * Returns the root node name.
+     *
      * @return string
      */
     public function getRootNodeName()
@@ -229,7 +230,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Checks the name is a valid xml element name
+     * Checks the name is a valid xml element name.
      *
      * @param string $name
      *
@@ -279,7 +280,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the input DOMNode attributes into an array
+     * Parse the input DOMNode attributes into an array.
      *
      * @param \DOMNode $node xml to parse
      *
@@ -305,7 +306,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the input DOMNode value (content and children) into an array or a string
+     * Parse the input DOMNode value (content and children) into an array or a string.
      *
      * @param \DOMNode $node xml to parse
      *
@@ -347,7 +348,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Parse the data and convert it to DOMElements
+     * Parse the data and convert it to DOMElements.
      *
      * @param \DOMNode     $parentNode
      * @param array|object $data
@@ -452,7 +453,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     }
 
     /**
-     * Tests the value being passed and decide what sort of element to create
+     * Tests the value being passed and decide what sort of element to create.
      *
      * @param \DOMNode $node
      * @param mixed    $val
@@ -488,6 +489,10 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * Get real XML root node name, taking serializer options into account.
+     *
+     * @param array $context
+     *
+     * @return string
      */
     private function resolveXmlRootName(array $context = array())
     {

@@ -47,7 +47,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      *
      * @throws InvalidArgumentException if a non-callable callback is set
      *
-     * @return GetSetMethodNormalizer
+     * @return self
      */
     public function setCallbacks(array $callbacks)
     {
@@ -62,11 +62,11 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Set ignored attributes for normalization
+     * Set ignored attributes for normalization.
      *
      * @param array $ignoredAttributes
      *
-     * @return GetSetMethodNormalizer
+     * @return self
      */
     public function setIgnoredAttributes(array $ignoredAttributes)
     {
@@ -76,11 +76,11 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Set attributes to be camelized on denormalize
+     * Set attributes to be camelized on denormalize.
      *
      * @param array $camelizedAttributes
      *
-     * @return GetSetMethodNormalizer
+     * @return self
      */
     public function setCamelizedAttributes(array $camelizedAttributes)
     {
@@ -185,9 +185,10 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * Format attribute name to access parameters or methods
      * As option, if attribute name is found on camelizedAttributes array
-     * returns attribute name in camelcase format
+     * returns attribute name in camelcase format.
      *
-     * @param string $attributeName
+     * @param  string $attributeName
+     *
      * @return string
      */
     protected function formatAttribute($attributeName)

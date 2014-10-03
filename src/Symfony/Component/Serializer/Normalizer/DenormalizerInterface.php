@@ -19,11 +19,11 @@ namespace Symfony\Component\Serializer\Normalizer;
 interface DenormalizerInterface
 {
     /**
-     * Denormalizes data back into an object of the given class
+     * Denormalizes data back into an object of the given class.
      *
-     * @param mixed  $data   data to restore
-     * @param string $class  the expected class to instantiate
-     * @param string $format format the given data was extracted from
+     * @param mixed  $data    data to restore
+     * @param string $class   the expected class to instantiate
+     * @param string $format  format the given data was extracted from
      * @param array  $context options available to the denormalizer
      *
      * @return object
@@ -31,7 +31,7 @@ interface DenormalizerInterface
     public function denormalize($data, $class, $format = null, array $context = array());
 
     /**
-     * Checks whether the given class is supported for denormalization by this normalizer
+     * Checks whether the given class is supported for denormalization by this normalizer.
      *
      * @param mixed  $data   Data to denormalize from.
      * @param string $type   The class to which the data should be denormalized.

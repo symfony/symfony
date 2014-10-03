@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Dumper;
 
 use Symfony\Component\VarDumper\Cloner\Cursor;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * HtmlDumper dumps variables as HTML.
@@ -23,8 +24,9 @@ class HtmlDumper extends CliDumper
     public static $defaultOutputStream = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre id=sf-dump>';
+    protected $dumpPrefix = '<pre id=%id%>';
     protected $dumpSuffix = '</pre><script>Sfjs.dump.instrument()</script>';
+    protected $dumpId = 'sf-dump';
     protected $colors = true;
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
@@ -83,6 +85,15 @@ class HtmlDumper extends CliDumper
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function dump(Data $data, $lineDumper = null)
+    {
+        $this->dumpId = 'sf-dump-'.mt_rand();
+        parent::dump($data, $lineDumper);
+    }
+
+    /**
      * Dumps the HTML header.
      */
     protected function getDumpHeader()
@@ -90,7 +101,7 @@ class HtmlDumper extends CliDumper
         $this->headerIsDumped = true;
 
         if (null !== $this->dumpHeader) {
-            return $this->dumpHeader;
+            return str_replace('%id%', $this->dumpId, $this->dumpHeader);
         }
 
         $line = <<<'EOHTML'
@@ -129,7 +140,7 @@ Sfjs.dump.toggle = function(a) {
 };
 </script>
 <style>
-#sf-dump {
+#%id% {
     display: block;
     background-color: #300a24;
     white-space: pre;
@@ -138,31 +149,33 @@ Sfjs.dump.toggle = function(a) {
     font: 12px monospace, sans-serif;
     padding: 5px;
 }
-#sf-dump span {
+#%id% span {
     display: inline;
 }
-#sf-dump .sf-dump-compact {
+#%id% .sf-dump-compact {
     display: none;
 }
-#sf-dump abbr {
+#%id% abbr {
     text-decoration: none;
     border: none;
     cursor: help;
 }
-#sf-dump a {
+#%id% a {
     text-decoration: none;
     cursor: pointer;
 }
-#sf-dump a:hover {
+#%id% a:hover {
     text-decoration: underline;
 }
 EOHTML;
 
         foreach ($this->styles as $class => $style) {
-            $line .= "#sf-dump .sf-dump-$class {{$style}}";
+            $line .= "#%id% .sf-dump-$class {{$style}}";
         }
 
-        return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+        $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+
+        return str_replace('%id%', $this->dumpId, $this->dumpHeader);
     }
 
     /**
@@ -201,9 +214,9 @@ EOHTML;
         if ('ref' === $style) {
             $ref = substr($val, 1);
             if ('#' === $val[0]) {
-                return "<a class=sf-dump-ref name=\"sf-dump-ref$ref\">$val</a>";
+                return "<a class=sf-dump-ref name=\"{$this->dumpId}-ref$ref\">$val</a>";
             } else {
-                return "<a class=sf-dump-ref href=\"#sf-dump-ref$ref\">$val</a>";
+                return "<a class=sf-dump-ref href=\"#{$this->dumpId}-ref$ref\">$val</a>";
             }
         }
 
@@ -236,14 +249,14 @@ EOHTML;
         }
 
         if (-1 === $this->lastDepth) {
-            $this->line = $this->dumpPrefix.$this->line;
+            $this->line = str_replace('%id%', $this->dumpId, $this->dumpPrefix).$this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;
         }
 
         if (-1 === $depth) {
-            $this->line .= $this->dumpSuffix;
+            $this->line .= str_replace('%id%', $this->dumpId, $this->dumpSuffix);
             parent::dumpLine(0);
         }
         $this->lastDepth = $depth;

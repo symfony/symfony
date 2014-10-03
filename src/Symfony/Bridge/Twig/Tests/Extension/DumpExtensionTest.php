@@ -77,6 +77,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
         if ($debug) {
             $this->assertStringStartsWith('<script>', $dump);
             $dump = preg_replace('/^.*?<pre/', '<pre', $dump);
+            $dump = preg_replace('/sf-dump-\\d{2,}/', 'sf-dump', $dump);
         }
         $this->assertEquals($expectedOutput, $dump);
     }

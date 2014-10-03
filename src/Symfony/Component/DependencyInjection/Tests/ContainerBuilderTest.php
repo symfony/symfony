@@ -312,10 +312,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo1, $builder->get('foo1'), 'The same proxy is retrieved on multiple subsequent calls');
         $this->assertInstanceOf('Bar\FooClass', $foo1);
         
-        $reflection = new \ReflectionObject($foo1);
-        $value = $reflection->getProperty('bar')->getValue($foo1);
-        
-        $this->assertNull($value);
+        $this->assertNotNull($foo1->getProxyInitializer());
     }
 
     /**

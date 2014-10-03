@@ -119,6 +119,88 @@ array(3) {
 */
 ```
 
+symfony_debug_object_tracer_set_logger(Psr\Log\LoggerInterface $logger)
+---------------------------------------------------------
+
+Collector for object traces. Object traces is a tracer - enabled when a logger object is passed to symfony_debug_set_logger() - that traces objects creation / cloning and destruction from a PHP instance.
+The PSR3 Logger is used to log object traces, the debug() method is used, receiving a general message, and as context, the object class, the object handle, the filename and line where happening (except in shutdown sequence) and the type of event beeing logged : SYMFONY_DEBUG_OBJECT_TRACE_TYPE_NEW (object creation), SYMFONY_DEBUG_OBJECT_TRACE_TYPE_CLONE (object clone) or SYMFONY_DEBUG_OBJECT_TRACE_TYPE_DESTROY (object destruction).
+
+```php
+class TestLog implements Psr\Log\LoggerInterface {
+    public function emergency($message, array $context = array()) { }
+    public function alert($message, array $context = array()) { }
+    public function critical($message, array $context = array()) { }
+    public function error($message, array $context = array()) { }
+    public function warning($message, array $context = array()) { }
+    public function notice($message, array $context = array()) { }
+    public function info($message, array $context = array()) { }
+    public function debug($message, array $context = array()) { printf("$message \n"); }
+    public function log($level, $message, array $context = array()) { }
+}
+
+/* Exemple filtering only on object destruction */
+class LogFilter extends TestLog
+{
+	public function debug($message, array $context = array())
+	{ 
+		if($context['trace_type'] & SYMFONY_DEBUG_OBJECT_TRACE_TYPE_DESTROY) {
+			printf('destroying');
+		}
+	}
+}
+
+$log = new TestLog;
+symfony_debug_object_tracer_set_logger($log); 
+
+$a = new StdClass;
+
+$b = clone $a;
+
+unset($b);
+
+/* This will output :
+Creating an object of class stdClass in foo.php:15 
+Cloning object #2 of class stdClass in foo.php:17 
+Destroying object #3 of class stdClass at foo.php:19 
+Destroying object #2 of class stdClass at [no active file]:0
+*/
+```
+
+symfony_debug_get_error_handler() - symfony_debug_get_error_handlers()
+----------------------------------------------------------
+
+Simply dumps the current user error handler(s).
+
+```php
+
+function my_eh() { }
+
+set_error_handler(function () { });
+set_error_handler('my_eh');
+
+var_dump(symfony_debug_get_error_handler());
+var_dump(symfony_debug_get_error_handlers());
+
+/*
+string(5) "my_eh"
+
+array(2) {
+  [0]=>
+  object(Closure)#1 (0) {
+  }
+  [1]=>
+  string(5) "my_eh"
+}
+*/
+
+```
+
+symfony_debug_enable_var_dumper_dump()
+--------------------------------------
+
+Replaces PHP's var_dump() function by Symfony\\Component\\VarDumper\\VarDumper::dump();
+Supports Xdebug.
+
 Usage
 -----
 

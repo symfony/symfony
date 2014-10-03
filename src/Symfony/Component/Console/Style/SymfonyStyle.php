@@ -9,23 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Console\Style\Standard;
+namespace Symfony\Component\Console\Style;
 
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Style\AbstractOutputStyle;
 
 /**
  * Output decorator helpers for the Symfony Style Guide.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-class StandardOutputStyle extends AbstractOutputStyle
+class SymfonyStyle extends OutputStyle
 {
+    const MAX_LENGTH = 120;
+
     private $input;
     private $questionHelper;
 
@@ -36,7 +40,6 @@ class StandardOutputStyle extends AbstractOutputStyle
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
-        $this->questionHelper = new StandardQuestionHelper();
 
         parent::__construct($output);
     }
@@ -51,104 +54,124 @@ class StandardOutputStyle extends AbstractOutputStyle
      */
     public function block($messages, $type = null, $style = null, $prefix = ' ')
     {
-        $this->format(new BlockFormatter($messages, $type, $style, $prefix));
+        $messages = array_values((array) $messages);
+        $lines = array();
+
+        // add type
+        if (null !== $type) {
+            $messages[0] = sprintf('[%s] %s', $type, $messages[0]);
+        }
+
+        // wrap and add newlines for each element
+        foreach ($messages as $key => $message) {
+            $message = OutputFormatter::escape($message);
+            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LENGTH - Helper::strlen($prefix))));
+
+            if (count($messages) > 1 && $key < count($message)) {
+                $lines[] = '';
+            }
+        }
+
+        foreach ($lines as &$line) {
+            $line = sprintf('%s%s', $prefix, $line);
+            $line .= str_repeat(' ', self::MAX_LENGTH - Helper::strlen($line));
+
+            if ($style) {
+                $line = sprintf('<%s>%s</%s>', $style, $line, $style);
+            }
+        }
+
+        $this->writeln(implode("\n", $lines)."\n");
     }
 
     /**
-     * Formats a command title.
-     *
-     * @param string $message
+     * {@inheritdoc}
      */
     public function title($message)
     {
-        $this->format(new TitleFormatter($message, '=', true));
+        $this->writeln(sprintf("\n<fg=blue>%s</fg=blue>\n<fg=blue>%s</fg=blue>\n", $message, str_repeat('=', strlen($message))));
     }
 
     /**
-     * Formats a section title.
-     *
-     * @param string $message
+     * {@inheritdoc}
      */
     public function section($message)
     {
-        $this->format(new TitleFormatter($message, '-'));
+        $this->writeln(sprintf("<fg=blue>%s</fg=blue>\n<fg=blue>%s</fg=blue>\n", $message, str_repeat('-', strlen($message))));
     }
 
     /**
-     * Formats a list.
-     *
-     * @param array $elements
+     * {@inheritdoc}
      */
     public function listing(array $elements)
     {
-        $this->format(new ListFormatter($elements));
+        $elements = array_map(function ($element) {
+                return sprintf(' * %s', $element);
+            },
+            $elements
+        );
+
+        $this->writeln(implode("\n\n", $elements)."\n");
     }
 
     /**
-     * Formats informational text.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function text($messages)
+    public function text($message)
     {
-        $this->format(new TextFormatter($messages));
+        if (!is_array($message)) {
+            $this->writeln(sprintf(' // %s', $message));
+
+            return;
+        }
+
+        foreach ($message as $element) {
+            $this->text($element);
+        }
     }
 
     /**
-     * Formats a success result bar.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function success($messages)
+    public function success($message)
     {
-        $this->format(new BlockFormatter($messages, 'OK', 'fg=white;bg=green'));
+        $this->block($message, 'OK', 'fg=white;bg=green');
     }
 
     /**
-     * Formats an error result bar.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function error($messages)
+    public function error($message)
     {
-        $this->format(new BlockFormatter($messages, 'ERROR', 'fg=white;bg=red'));
+        $this->block($message, 'ERROR', 'fg=white;bg=red');
     }
 
     /**
-     * Formats an warning result bar.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function warning($messages)
+    public function warning($message)
     {
-        $this->format(new BlockFormatter($messages, 'WARNING', 'fg=black;bg=yellow'));
+        $this->block($message, 'WARNING', 'fg=black;bg=yellow');
     }
 
     /**
-     * Formats a note admonition.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function note($messages)
+    public function note($message)
     {
-        $this->format(new BlockFormatter($messages, 'NOTE', null, ' ! '));
+        $this->block($message, 'NOTE', null, ' ! ');
     }
 
     /**
-     * Formats a caution admonition.
-     *
-     * @param string|array $messages
+     * {@inheritdoc}
      */
-    public function caution($messages)
+    public function caution($message)
     {
-        $this->format(new BlockFormatter($messages, 'CAUTION', 'fg=white;bg=red', ' ! '));
+        $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ');
     }
 
     /**
-     * Formats a table.
-     *
-     * @param array $headers
-     * @param array $rows
+     * {@inheritdoc}
      */
     public function table(array $headers, array $rows)
     {
@@ -162,13 +185,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a question.
-     *
-     * @param string          $question
-     * @param string|null     $default
-     * @param callable|null   $validator
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function ask($question, $default = null, $validator = null)
     {
@@ -179,12 +196,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a question with the user input hidden.
-     *
-     * @param string        $question
-     * @param callable|null $validator
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function askHidden($question, $validator = null)
     {
@@ -195,12 +207,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks for confirmation.
-     *
-     * @param string $question
-     * @param bool   $default
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function confirm($question, $default = true)
     {
@@ -208,13 +215,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a choice question.
-     *
-     * @param string          $question
-     * @param array           $choices
-     * @param string|int|null $default
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function choice($question, array $choices, $default = null)
     {
@@ -227,13 +228,7 @@ class StandardOutputStyle extends AbstractOutputStyle
     }
 
     /**
-     * Asks a choice question.
-     *
-     * @param string $question
-     * @param array  $choices
-     * @param array  $default
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function multipleChoice($question, array $choices, array $default = array())
     {
@@ -250,6 +245,10 @@ class StandardOutputStyle extends AbstractOutputStyle
      */
     public function askQuestion(Question $question)
     {
+        if (!$this->questionHelper) {
+            $this->questionHelper = new SymfonyQuestionHelper();
+        }
+
         $ret = $this->questionHelper->ask($this->input, $this, $question);
 
         $this->ln();

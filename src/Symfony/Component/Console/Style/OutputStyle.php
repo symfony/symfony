@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-abstract class AbstractOutputStyle implements OutputInterface
+abstract class OutputStyle implements OutputInterface, StyleInterface
 {
     private $output;
 
@@ -32,17 +32,7 @@ abstract class AbstractOutputStyle implements OutputInterface
     }
 
     /**
-     * @param FormatterInterface $formatter
-     */
-    public function format(FormatterInterface $formatter)
-    {
-        $this->writeln($formatter->format());
-    }
-
-    /**
-     * Add newline(s)
-     *
-     * @param int $count The number of newlines
+     * {@inheritdoc}
      */
     public function ln($count = 1)
     {

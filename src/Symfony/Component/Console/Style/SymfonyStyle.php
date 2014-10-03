@@ -51,8 +51,9 @@ class SymfonyStyle extends OutputStyle
      * @param string|null  $type      The block type (added in [] on first line)
      * @param string|null  $style     The style to apply to the whole block
      * @param string       $prefix    The prefix for the block
+     * @param bool         $padding   Whether to add vertical padding
      */
-    public function block($messages, $type = null, $style = null, $prefix = ' ')
+    public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
     {
         $messages = array_values((array) $messages);
         $lines = array();
@@ -70,6 +71,11 @@ class SymfonyStyle extends OutputStyle
             if (count($messages) > 1 && $key < count($message)) {
                 $lines[] = '';
             }
+        }
+
+        if ($padding && $this->isDecorated()) {
+            array_unshift($lines, '');
+            $lines[] = '';
         }
 
         foreach ($lines as &$line) {
@@ -135,7 +141,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function success($message)
     {
-        $this->block($message, 'OK', 'fg=white;bg=green');
+        $this->block($message, 'OK', 'fg=white;bg=green', ' ', true);
     }
 
     /**
@@ -143,7 +149,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function error($message)
     {
-        $this->block($message, 'ERROR', 'fg=white;bg=red');
+        $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
 
     /**
@@ -151,7 +157,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function warning($message)
     {
-        $this->block($message, 'WARNING', 'fg=white;bg=red');
+        $this->block($message, 'WARNING', 'fg=white;bg=red', ' ', true);
     }
 
     /**
@@ -167,7 +173,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function caution($message)
     {
-        $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ');
+        $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
 
     /**

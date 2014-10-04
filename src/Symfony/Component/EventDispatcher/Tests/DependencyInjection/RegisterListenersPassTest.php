@@ -74,7 +74,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $builder = $this->getMock(
             'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
+            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition', 'findDefinition')
         );
         $builder->expects($this->any())
             ->method('hasDefinition')

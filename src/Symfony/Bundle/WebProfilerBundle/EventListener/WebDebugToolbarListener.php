@@ -115,7 +115,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
                 array(
                     'position' => $this->position,
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                    'excluded_ajax_paths' => addslashes($this->excludedAjaxPaths),
                     'token' => $response->headers->get('X-Debug-Token'),
                 )
             ))."\n";

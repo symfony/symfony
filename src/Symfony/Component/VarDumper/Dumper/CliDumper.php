@@ -224,7 +224,7 @@ class CliDumper extends AbstractDumper
      */
     public function enterResource(Cursor $cursor, $res, $hasChild)
     {
-        $this->enterHash($cursor, 'resource:'.$this->style('note', $res).' {', $hasChild);
+        $this->enterHash($cursor, $this->style('note', ':'.$res).' {', $hasChild);
     }
 
     /**

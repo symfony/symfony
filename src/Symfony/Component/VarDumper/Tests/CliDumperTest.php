@@ -57,7 +57,7 @@ array:25 [
   "str" => "déjà"
   7 => b"é"
   "[]" => []
-  "res" => resource:stream {
+  "res" => :stream {
     wrapper_type: "plainfile"
     stream_type: "STDIO"
     mode: "r"
@@ -68,7 +68,7 @@ array:25 [
     eof: false
     options: []
   }
-  8 => resource:Unknown {}
+  8 => :Unknown {}
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo { #2
     foo: "foo"
     "bar": "bar"

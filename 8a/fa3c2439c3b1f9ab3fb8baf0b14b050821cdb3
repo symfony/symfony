@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-03T15:59:09Z
+
+This makes the output of the HTML dumper independant of the page encoding (previously, it required an UTF-8 encoding context).
+The "UTF-8 to numeric HTML entity" code is borowed from [patchwork/utf8](https://github.com/nicolas-grekas/Patchwork-UTF8/blob/2e98a87caf5bcef78a369e03fac0ae806060196e/class/Patchwork/Utf8.php#L353).
+Calling `mb_convert_encoding($str, 'html-entities', 'utf8');` would do the job, but requires mbstring.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-04T01:07:14Z
+
+note that using something else than UTF-8 in your page already creates issues in other places. All translations shipped in symfony (and shared bundles) are using UTF-8 for instance.

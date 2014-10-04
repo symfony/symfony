@@ -80,10 +80,13 @@ EOT
         $bundlesDir = $targetArg.'/bundles/';
         $filesystem->mkdir($bundlesDir, 0777);
 
-        if ($input->getOption('symlink')) {
-            $output->writeln('Trying to install assets as symbolic links.');
+        // relative implies symlink
+        $symlink = $input->getOption('symlink') || $input->getOption('relative');
+
+        if ($symlink) {
+            $output->writeln('Trying to install assets as <comment>symbolic links</comment>.');
         } else {
-            $output->writeln('Installing assets as <comment>hard copies</comment>');
+            $output->writeln('Installing assets as <comment>hard copies</comment>.');
         }
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
@@ -94,7 +97,7 @@ EOT
 
                 $filesystem->remove($targetDir);
 
-                if ($input->getOption('symlink')) {
+                if ($symlink) {
                     if ($input->getOption('relative')) {
                         $relativeOriginDir = $filesystem->makePathRelative($originDir, realpath($bundlesDir));
                     } else {
@@ -105,8 +108,19 @@ EOT
                         $filesystem->symlink($relativeOriginDir, $targetDir);
                         $output->writeln('The assets were installed using symbolic links.');
                     } catch (IOException $e) {
-                        $this->hardCopy($originDir, $targetDir);
-                        $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                        if (!$input->getOption('relative')) {
+                            $this->hardCopy($originDir, $targetDir);
+                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                        }
+
+                        // try again without the relative option
+                        try {
+                            $filesystem->symlink($originDir, $targetDir);
+                            $output->writeln('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
+                        } catch (IOException $e) {
+                            $this->hardCopy($originDir, $targetDir);
+                            $output->writeln('It looks like your system doesn\'t support symbolic links, so the assets were installed by copying them.');
+                        }
                     }
                 } else {
                     $this->hardCopy($originDir, $targetDir);

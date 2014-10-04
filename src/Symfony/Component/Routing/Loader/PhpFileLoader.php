@@ -38,13 +38,10 @@ class PhpFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        // the loader variable is exposed to the included file below
-        $loader = $this;
-
         $path = $this->locator->locate($file);
         $this->setCurrentDir(dirname($path));
 
-        $collection = $this->includeFile($path);
+        $collection = $this->includeFile($path, $this);
         $collection->addResource(new FileResource($path));
 
         return $collection;
@@ -64,10 +61,11 @@ class PhpFileLoader extends FileLoader
      * Safe include. Used for scope isolation.
      *
      * @param string $file File to include
+     * @param PhpFileLoader $loader the loader variable is exposed to the included file below
      *
      * @return RouteCollection
      */
-    private function includeFile($file)
+    private static function includeFile($file, $loader)
     {
         return include $file;
     }

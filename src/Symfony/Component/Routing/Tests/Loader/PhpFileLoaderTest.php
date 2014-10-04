@@ -45,4 +45,28 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(array('https'), $route->getSchemes());
         }
     }
+
+    public function testLoaderVariableAvailable()
+    {
+        $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $routeCollection = $loader->load('loader_variable_usage.php');
+        $routes = $routeCollection->all();
+        $this->assertCount(2, $routes, 'Two routes are loaded');
+        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+    }
+
+    public function testThatDefiningVariableInConfigFileHasNoSideEffects()
+    {
+        $locator = new FileLocator(array(__DIR__.'/../Fixtures'));
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('with_define_path_variable.php');
+        $resources = $routeCollection->getResources();
+        $this->assertCount(1, $resources);
+        $this->assertContainsOnly('Symfony\Component\Config\Resource\ResourceInterface', $resources);
+        $fileResource = reset($resources);
+        $this->assertSame(
+            realpath($locator->locate('with_define_path_variable.php')),
+            (string) $fileResource
+        );
+    }
 }

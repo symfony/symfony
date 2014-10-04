@@ -71,7 +71,7 @@ class JsonEncode implements EncoderInterface
     /**
      * Merge default json encode options with context.
      *
-     * @param  array $context
+     * @param array $context
      *
      * @return array
      */

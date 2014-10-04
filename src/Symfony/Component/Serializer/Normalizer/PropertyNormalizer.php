@@ -130,7 +130,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
                     unset($data[$paramName]);
                 } elseif (!$constructorParameter->isOptional()) {
                     throw new RuntimeException(sprintf(
-                        'Cannot create an instance of %s from serialized data because ' .
+                        'Cannot create an instance of %s from serialized data because '.
                         'its constructor requires parameter "%s" to be present.',
                         $class,
                         $constructorParameter->name
@@ -140,7 +140,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
 
             $object = $reflectionClass->newInstanceArgs($params);
         } else {
-            $object = new $class;
+            $object = new $class();
         }
 
         foreach ($data as $propertyName => $value) {
@@ -162,7 +162,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -170,7 +170,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -181,6 +181,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
      * Format an attribute name, for example to convert a snake_case name to camelCase.
      *
      * @param  string $attributeName
+     *
      * @return string
      */
     protected function formatAttribute($attributeName)
@@ -199,7 +200,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
      *
      * @param string $class
      *
-     * @return Boolean
+     * @return bool
      */
     private function supports($class)
     {

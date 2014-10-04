@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-04T08:56:23Z
+
+:+1: I think it's good now. :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-04T08:59:39Z
+
+I don't understand how these spaces appeared. I've used PHPStorm to generate some docblocks and php-cs-fixer for fixing existing ones and now I cannot reproduce the problem. Strange.

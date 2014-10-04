@@ -187,7 +187,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * As option, if attribute name is found on camelizedAttributes array
      * returns attribute name in camelcase format.
      *
-     * @param  string $attributeName
+     * @param string $attributeName
      *
      * @return string
      */

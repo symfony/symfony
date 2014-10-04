@@ -461,6 +461,13 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
                 '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
                 '{{ suffix }}' => 'MiB',
             ), '1000M');
+
+            // it correctly parses the maxSize option and not only uses simple string comparison
+            // 1000M should be bigger than the ini value
+            $tests[] = array(UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', array(
+                '{{ limit }}' => '0.1',
+                '{{ suffix }}' => 'MB',
+            ), '100K');
         }
 
         return $tests;

@@ -53,13 +53,16 @@ class FileValidator extends ConstraintValidator
         if ($value instanceof UploadedFile && !$value->isValid()) {
             switch ($value->getError()) {
                 case UPLOAD_ERR_INI_SIZE:
-                    if ($constraint->maxSize) {
-                        $limitInBytes = min(UploadedFile::getMaxFilesize(), $constraint->maxSize);
+                    $iniLimitSize = UploadedFile::getMaxFilesize();
+                    if ($constraint->maxSize && $constraint->maxSize < $iniLimitSize) {
+                        $limitInBytes = $constraint->maxSize;
+                        $binaryFormat = $constraint->binaryFormat;
                     } else {
-                        $limitInBytes = UploadedFile::getMaxFilesize();
+                        $limitInBytes = $iniLimitSize;
+                        $binaryFormat = true;
                     }
 
-                    list($sizeAsString, $limitAsString, $suffix) = $this->factorizeSizes(0, $limitInBytes, true);
+                    list($sizeAsString, $limitAsString, $suffix) = $this->factorizeSizes(0, $limitInBytes, $binaryFormat);
                     $this->buildViolation($constraint->uploadIniSizeErrorMessage)
                         ->setParameter('{{ limit }}', $limitAsString)
                         ->setParameter('{{ suffix }}', $suffix)

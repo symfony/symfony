@@ -135,6 +135,53 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
+    public function testReadConvertsStreamToString()
+    {
+        $pdo = new MockPdo('pgsql');
+        $pdo->prepareResult = $this->getMock('PDOStatement');
+
+        $content = 'foobar';
+        $stream = $this->createStream($content);
+
+        $pdo->prepareResult->expects($this->once())->method('fetchAll')
+            ->will($this->returnValue(array(array($stream, 42, time()))));
+
+        $storage = new PdoSessionHandler($pdo);
+        $result = $storage->read('foo');
+
+        $this->assertSame($content, $result);
+    }
+
+    public function testReadLockedConvertsStreamToString()
+    {
+        $pdo = new MockPdo('pgsql');
+        $selectStmt = $this->getMock('PDOStatement');
+        $insertStmt = $this->getMock('PDOStatement');
+
+        $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
+            return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;
+        };
+
+        $content = 'foobar';
+        $stream = $this->createStream($content);
+        $exception = null;
+
+        $selectStmt->expects($this->atLeast(2))->method('fetchAll')
+            ->will($this->returnCallback(function () use (&$exception, $stream) {
+                return $exception ? array(array($stream, 42, time())) : array();
+            }));
+
+        $insertStmt->expects($this->once())->method('execute')
+            ->will($this->returnCallback(function () use (&$exception) {
+                throw $exception = new \PDOException('', '23');
+            }));
+
+        $storage = new PdoSessionHandler($pdo);
+        $result = $storage->read('foo');
+
+        $this->assertSame($content, $result);
+    }
+
     public function testReadingRequiresExactlySameId()
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
@@ -262,5 +309,51 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
 
         $this->assertInstanceOf('\PDO', $method->invoke($storage));
+    }
+
+    private function createStream($content)
+    {
+        $stream = tmpfile();
+        fwrite($stream, $content);
+        fseek($stream, 0);
+
+        return $stream;
+    }
+}
+
+class MockPdo extends \PDO
+{
+    public $prepareResult;
+    private $driverName;
+    private $errorMode;
+
+    public function __construct($driverName = null, $errorMode = null)
+    {
+        $this->driverName = $driverName;
+        $this->errorMode = null !== $errorMode ?: \PDO::ERRMODE_EXCEPTION;
+    }
+
+    public function getAttribute($attribute)
+    {
+        if (\PDO::ATTR_ERRMODE === $attribute) {
+            return $this->errorMode;
+        }
+
+        if (\PDO::ATTR_DRIVER_NAME === $attribute) {
+            return $this->driverName;
+        }
+
+        return parent::getAttribute($attribute);
+    }
+
+    public function prepare($statement, $driverOptions = array())
+    {
+        return is_callable($this->prepareResult)
+            ? call_user_func($this->prepareResult, $statement, $driverOptions)
+            : $this->prepareResult;
+    }
+
+    public function beginTransaction()
+    {
     }
 }

@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-02T13:31:38Z
+
+@weaverryan Can you have a look at this PR. It would be great if we can accept it today or tomorrow for inclusion in 2.6. Thanks.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2014-10-02T13:48:15Z
+
+When do you need PRs for symfony/symfony-standard and or -docs at the latest?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-02T14:10:57Z
+
+@mpdude before the end of the week (Sunday.)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-10-02T21:20:40Z
+
+@mpdude Thanks for this!
+
+First, everything works exactly as advertised and I only spotted one change I can see to make.
+
+Second - about your **to be discussed**: I understand your point about custom exception messages. In this PR, we just create a generic `\Exception` with a generic message. So you're right that if someone is doing something in the template with their custom Exception class or message, then they can't really replicate that here.
+
+Do we fix this? As you said, adding a `setDebug` method to `ExceptionController` (or maybe you call it `->forceProductErrorPage()`), then you could call this in your controller temporarily to test your custom error message. But that seems hacky enough and enough of an edge case that I'm -1 on it.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-03T11:20:15Z
+
+:+1: Looks good to me. Can you submit a PR on symfony/symfony-standard?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2014-10-03T11:33:18Z
+
+Thanks! See symfony/symfony-standard#720.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-10-03T11:36:19Z
+
+Yeah, this is very simple ! Nice contributions !
+
+---------------------------------------------------------------------------
+
+by mpdude at 2014-10-03T11:51:13Z
+
+I will need another 24h for a docs PR. Can also write up something for the Symfony blog of you like.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-04T06:15:01Z
+
+@mpdude If you can write the blog post the the Symfony blog as well, that would be wonderful. Thanks.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2014-10-04T10:54:59Z
+
+Doc PR at symfony/symfony-docs#4293.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2014-10-04T21:30:31Z
+
+Here's a suggestion for the blog article: https://gist.github.com/mpdude/ffa505570858e674c62b.

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-10-04T10:42:49Z
+
+:+1:
+
+This should be applied to 2.3 as well, right ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-04T10:50:11Z
+
+@stof In 2.3, the handling in ``findAlternatives()`` is slightly different and doesn't suffer from this. But I can backport the test to ensure that this doesn't break in the future. What do you think?

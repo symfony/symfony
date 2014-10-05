@@ -60,12 +60,12 @@ class PhpFileLoader extends FileLoader
     /**
      * Safe include. Used for scope isolation.
      *
-     * @param string $file File to include
+     * @param string        $file   File to include
      * @param PhpFileLoader $loader the loader variable is exposed to the included file below
      *
      * @return RouteCollection
      */
-    private static function includeFile($file, $loader)
+    private static function includeFile($file, PhpFileLoader $loader)
     {
         return include $file;
     }

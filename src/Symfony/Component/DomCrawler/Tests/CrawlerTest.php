@@ -836,6 +836,24 @@ HTML;
         $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
     }
 
+    /**
+     * @dataProvider getFormWithBaseTagData
+     */
+    public function testFormWithBaseTag($baseValue)
+    {
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form action=""><input type="submit" value="submit"></form></html>', 'http://domain.com/some/form.php');
+
+        $this->assertEquals('http://domain.com/some/form.php', $crawler->selectButton('submit')->form()->getUri());
+    }
+
+    public function getFormWithBaseTagData()
+    {
+        return array(
+            array('/'),
+            array('http://domain.com/'),
+        );
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();

@@ -1,0 +1,1362 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-02-15T19:39:36Z
+
+I don't think it be a good idea,
+there is many good bundles like https://github.com/phiamo/MopaBootstrapBundle for TB3.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-15T20:55:50Z
+
+@aitboudad I'm working on a simple integration of TB3. Therefore, as TW is almost a standard, IMHO we can add some **optional** layout into the twig bridge.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-02-15T21:12:46Z
+
+@lyrixx well if we will add TB3, I propose also to add:
+* [HTML Boilerplate](http://html5boilerplate.com/)
+* [Zurb Foundation](http://foundation.zurb.com/)
+
+But the problem is that there are many versions, for example TB2.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-15T21:16:23Z
+
+@aitboudad Feel free to open a PR ;)
+
+---------------------------------------------------------------------------
+
+by tadcka at 2014-02-15T21:19:40Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-02-15T21:48:25Z
+
++1
+
+---------------------------------------------------------------------------
+
+by romqin at 2014-02-15T21:52:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-16T10:35:12Z
+
+@aitboudad BTW, this code should not belong to a bundle, because it is not re-usable (in a silex application for instance).
+
+---------------------------------------------------------------------------
+
+by Renrhaf at 2014-02-16T13:06:41Z
+
++1
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2014-02-16T13:21:14Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-16T13:34:35Z
+
+-1, this is something the community should be doing in contributed bundles, it does not belong into core imo
+
+---------------------------------------------------------------------------
+
+by norzechowicz at 2014-02-16T13:39:16Z
+
+Like @WouterJ said, I think this such implementation should be done by community in separated bundle (or something like that). It's not a twig bridge task to integrate Twitter Bootstrap with symfony form.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-02-16T14:30:34Z
+
+I dont get the negativity for adding this, how many are going to install a Bundle to get a template for the form component?
+
+Currently there is two layouts, table and div adding theese are good usecases on how to customize the form layouts. Which IMO is a part of forms that are not documented that good.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-16T14:41:53Z
+
+Adding an opinionated thing to the core just because the docs are not good is a no-go imo. Then the docs should be improved instead.
+
+And indeed, a package would be a better fit instead of a bundle. The core just needs to be as less opinionated as possible, which did go pretty well until this PR :)
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-02-16T15:06:11Z
+
+Well i would not see a Bridge as a core thing. It is an extension for other libraries, none said it had to be php libraries, that is the same as saying we cant have a Doctrine bridge because we are opiniated about using Doctrine over Propel.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-16T15:15:06Z
+
+@henrikbjorn if we created a BootstrapBridge, you would not see me commenting with -1. This bridge is about implementing *twig* into Symfony, not *twitter bootstrap*.
+
+---------------------------------------------------------------------------
+
+by garak at 2014-02-16T15:16:50Z
+
++1
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-16T17:04:57Z
+
+:+1:
+
+Deciding if something like this belongs to the core is always tricky. But please, consider the following two pro-core arguments:
+
+  * There are 44 public Symfony2 bundles related to Bootstrap. If something is that **popular** and that **needed** in real-world applications, I guess it could go in the core (in my opinion, if there are more than 30 bundles to do something, then Symfony is lacking that feature).
+
+  * If Bootstrap theme is included in the core, there is no obligation to include themes for other CSS frameworks (as suggested by @aitboudad). Bootstrap is, by a huge distance, the most used and most popular framework (just look at the GitHub stars, watchs and forks). In practice, Bootstrap has become as standard as designing with `<div>` and `<table>`, the other two existing form themes.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-02-16T18:05:44Z
+
+:+1:
+
+Can't agree more with Javier!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-02-16T18:17:23Z
+
+@lyrixx you should add "twbs/bootstrap" in composer suggested packages.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-02-16T18:52:33Z
+
+@aitboudad ohh please no. There are already waaayyy too many suggested packages and it have no value (only the very first time a package is installed).
+
+---------------------------------------------------------------------------
+
+by lmcd at 2014-02-16T20:21:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by L0rD59 at 2014-02-16T21:43:53Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-16T21:56:22Z
+
+@javiereguiluz as a matter of facts, there are 33 bundles related to jQuery, 32 about payment,  67 about admin generators/interfaces, 38 about caching, 39 are shop/cart related, etc. Symfony core will get pretty big this way :wink:
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-02-17T00:51:20Z
+
+-1
+
+For the same reasons @WouterJ mentioned (and more useful/general things have been rejected to keep the core clean).
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-02-17T07:20:46Z
+
+@lyrixx well, bundle templates/resources/code are reusable into silex. They just aren't auto discovered and you can't register its bundle.
+
+@henrikbjorn there is aslo a propel1 bridge because it has been decided to officially support it.
+
+So the question is to know if symfony officially supports bootstrap, in which case having a form theme as a bridge makes sense.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-17T07:27:14Z
+
+@WouterJ yes, there are a lot of bundles for a lot of things: if jQuery bundles are just for including it, they are unnecessary (thanks to grunt, bower, requireJS); payments/cart/shop bundles are too specific (useful only for e-ecommerce sites); caching bundles are non-essential because Symfony resolves this problem well; 67 admin generator bundles is a clear proof that Symfony lacks a real generator, which is needed by everyone.
+
+@hacfi the core isn't *clean* and it provides a lot of things that nobody needs, such as the [percent](http://symfony.com/doc/current/reference/forms/types/percent.html) and [birthday](http://symfony.com/doc/current/reference/forms/types/birthday.html) fields and the [IP](http://symfony.com/doc/current/reference/constraints/Ip.html) and [ISSN](http://symfony.com/doc/current/reference/constraints/Issn.html) validators.
+
+This discussion about Bootstrap reminds me the Apache discussion. A few years ago, Symfony decided to include a `.htaccess` file. It wasn't strictly necessary, but it was a nice addition for real developers solving real-world problems. And Symfony only included an `.htaccess` because Apache was at the moment the indisputable leader. A few years later Symfony is now evaluating if it's necessary to keep that file in the coming versions.
+
+It would be nice to support Bootstrap-theme forms out-of-the-box without the need to install or configure anything.
+
+---------------------------------------------------------------------------
+
+by MaksBaum at 2014-02-17T08:18:39Z
+
+-1
+Adding support for only one css framework isn't good idea.
+It's not a problem to add one file by developer to use bootstrap.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-17T09:04:20Z
+
+@MaksBaum Bootstrap is not *"one CSS framework"* but the most popular framework by a huge distance, the most popular project in GitHub history, and one of the projects that have revolutionized the frontend.
+
+And don't forget that Symfony already has a lot of features aimed for only one product, service, or vendor:
+
+* Symfony clearly prioritizes Doctrine over Propel and completely ignores any other ORM or ActiveRecord library.
+* Symfony provides a `.htaccess` for Apache and provides nothing for Nginx and other web servers.
+* Symfony only cares about PHP and Twig template engines and forgets about Smarty, Blade, etc.
+* The credit card validator only validates a few selected card issuers.
+* SwiftMailer provides a nice shortcut to send emails easily with Gmail, while ignoring any other web email provider.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-02-17T09:32:38Z
+
+I'm slightly in favor of adding this, for the reasons outlined by @javiereguiluz. However, why are you building a completely new Bootstrap theme here instead of building upon a tried and proven one from one of the various Bootstrap bundles out there?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2014-02-17T10:13:54Z
+
+The thing that bothers me  the most is that this adds support for now obsolete twbs 2.3 and not for the new 3.x one which is officially supported by the twbs
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T10:38:40Z
+
+@mvrhov lot of site/libs are still using 2.X. like sonata admin ;)
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-17T11:54:25Z
+
+As long as its optional, there is no harm in including it, and this discussion only shows that clearly a lot of people would welcome such a feature. However, it could very well go into a seperate bundle, and probably I'd be happier if it went there.
+
+@lyrixx lot of site/libs/bundles already use 3.X and those that use 2.X - they somehow manage to work without this PR so far, so I wouldnt consider this a valid pro argument
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2014-02-17T12:43:16Z
+
++1
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T12:50:01Z
+
+@loostro as said, this code does not fit on a bundle. It should be a bridge. See previous comments
+
+---------------------------------------------------------------------------
+
+by MaksBaum at 2014-02-17T13:29:14Z
+
+@javiereguiluz
+1. Much more project uses Apache with Symfony than bootstrap,
+2. Symfony includes Twig - look at owner :>
+3. Who forbids you to use Smarty?
+4. Write additional code to card validator
+5. Shortcut to use gmail via SwiftMailer is just shortcut for dumb script kiddies who doesn't know what is smtp server :]
+6. Bundles bundles bundles - symfony should use bundles or again lets pack everything into core :>
+And tell me - which version should of bootstrap should be in use in core of symfony? current of bootstrap? or one which is most popular?
+
+---------------------------------------------------------------------------
+
+by ahilles107 at 2014-02-17T13:40:28Z
+
+@MaksBaum
+
+1. I wouldn't be so sure
+2. that not prove anything
+3. try to use it with forms
+4. true
+5. dumb script writers would like also yahoo shortcut
+6. register bundle for 2 files - that's stupid. In my opinion it should be >= 3.0
+
+Again :+1: from me for 3.0 template layout in bridge.
+
+---------------------------------------------------------------------------
+
+by dariuszz123 at 2014-02-17T13:43:46Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by MaksBaum at 2014-02-17T13:52:55Z
+
+Apache with symfony over ngix with symfony vs symfony without bootstrap over symfony with bootstrap.
+
+---------------------------------------------------------------------------
+
+by egils at 2014-02-17T13:53:51Z
+
+:-1: Makes no sense to add CSS framework dependency into Twig bridge IMO. Especially a single framework. Since CSS framework is only app related thing... The fact it is the most popular one does not convince me. If you need it for your applications, separated bridge could be created and used - not integrated into Twig one. Or use a community bundle. CSS frameworks have nothing to do with Twig's integration into Symfony2 IMO.
+
+---------------------------------------------------------------------------
+
+by garak at 2014-02-17T13:59:25Z
+
+But we are not adding any dependency here. You could also use this templates without using bootstrap at all. I know, it would be unuseful, but you could just do it.
+We are just talking about adding some **HTML**, to make use with bootstrap easier.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-17T14:07:57Z
+
+@egils @MaksBaum let me put it in another way:
+
+Symfony already includes, through Monolog, special handlers for New Relic, GetSentry (Raven), HipChat, Loggly, etc. Why does Symfony include those handles designed for private services run by independent companies and it doesn't include other handlers for other services? The answer is simple: those are ultra-popular services used by almost every developer and for that reason they are included in the core.
+
+Another example: Why does the Monolog bridge include ChromePHP and FirePhp handlers? Why are those handlers included in the core and why it doesn't include handlers for Internet Explorer or other browsers? Again the answer is simple: this must be included in the core because most developers use Chrome and Firefox.
+
+Similarly, Bootstrap is the most popular CSS framework (just look at GitHub stats: it's more popular than all the other frameworks combined) and it shouldn't be strange to add one small .twig file to the core to provide a form theme for developers that use Bootstrap.
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-17T14:22:38Z
+
+@lyrixx i do think that belongs to a bundle becouse:
+
+1. haveing that in a bundle would allow to make seperate branches/tags for 2.X and 3.X
+2. bundle can have compiler pass auto-registering new templates
+3. noone would bitch about "that does not belong to the core!"
+4. other bundles could add dependency on certain branch/tags (eg. use 2.3.2)
+5. foundation (and other css frameworks) could easily create their own bundles, again - no flame war over "include foundation/any other css framework too!"
+
+But then again, it does not do any harm to have it in the core, so.. whatever :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T14:29:43Z
+
+@loostro => you can not add a bundle with a silex application. Then @javiereguiluz give **very** good arguments.
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-17T14:32:18Z
+
+@lyrixx I'm not doing Silex, so I wouldn't know.
+
+---------------------------------------------------------------------------
+
+by Szpadel at 2014-02-17T14:33:57Z
+
+I think it can be in dedicated composer package.
+It can be suggested by TwigBundle.
+path to layout can be added by paths option in config.yml
+
+---------------------------------------------------------------------------
+
+by egils at 2014-02-17T14:34:31Z
+
+@javiereguiluz I completely agree with everything you stated and see a point you are trying to make there. Yet I do not see the necessity to have 3rd party helpers. Yes, it is nice to have them, they do help a lot and do not do too much of a damage. Yet I see them as extra and making whole component a bit heavy since more and more helpers might be requested to implement later, all the versions handling, etc. I'm not against having this feature at all, I just agree with @loostro on this being some place else. That's all I'm saying.
+
+---------------------------------------------------------------------------
+
+by liuggio at 2014-02-17T14:40:45Z
+
+-1 why coupling 2 frameworks?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T15:13:15Z
+
+@liuggio There is no coupling. Where did you see that ?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-02-17T15:41:01Z
+
+:+1: for this PR merged here
+:-1: for any change in composer.json (not even suggest)
+:+1: for a future form_twitter_bootstrap_3.0.x_layout.html.twig
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T15:57:16Z
+
+@pborreli Actually, I did not the 3.1.X with 3.0.X. I guess it works, but I have to test.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T16:01:53Z
+
+@webmozart
+
+> However, why are you building a completely new Bootstrap theme here instead of building upon a tried and proven one from one of the various Bootstrap bundles out there?
+
+For the V2. (I guess) I create it and opened source it [2.5 year ago](https://github.com/lyrixx/Silex-Kitchen-Edition/commit/3365bde3e3e67e9368daa23ed142c6968cf670ab#diff-19). I guess I was the first one ;) So you can ask this question to other guys ;)
+
+For the V3, I took the V2, and adapt it. I very quickly look at the different bootstrap bundle, and their layout are not flexible, and/or lot of thing are hardcoded and/or need a dependency to some twig extensions.
+
+---------------------------------------------------------------------------
+
+by lmcd at 2014-02-17T16:06:30Z
+
+I can't really see how something like this couples Symfony to Bootstrap, or introduces any new dependancies:
+
+    <div class="form-group">
+        (widget)
+    </div>
+
+It's just HTML/CSS classnames guys!
+
+---------------------------------------------------------------------------
+
+by donce96 at 2014-02-17T16:10:47Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by inalgnu at 2014-02-17T16:13:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Zeichen32 at 2014-02-17T16:14:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-02-17T16:23:19Z
+
+@lyrixx yes I guess a 3.x would be enough
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T16:26:23Z
+
+@lmcd theses layouts are **optional** and are **not** the default one.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-02-17T16:28:43Z
+
+@lyrixx I think that @lmcd is on your side and he just doesn't understand this long discussion about just a few HTML tags and CSS classes.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-17T16:50:21Z
+
+@javiereguiluz your examples don't really fit this discussion, as they are almost all about things *other 3rd party libs* used by Symfony2 has decided to support. Symfony2 itself has decided to keep as agnostic as possible: The Symfony core is what is in this repo, the MonologBundle/DoctrineBundle/PropelBundle/SwiftMailerBundle are all *not* the core, they are only supported by the Symfony community.
+But I see your point, and you mine, let's agree on this disagree and see what @fabpot thinks about this...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T17:04:42Z
+
+@WouterJ actually, @fabbot asked me to open this pr ;)
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-02-17T17:15:13Z
+
+@WouterJ I totally understand your point of view, just remember that the framework is composed of:
+- "Bridge" where the bridges of Doctrine, Monolog, Propel, Proxymanager, Swiftmailer and Twig are there in order to help the integration of non-symfony2 standalone libraries to be Symfony2-compliant
+- "Component" where all the standalone are and are the most agnostic as possible.
+- "Bundle" where base bundles resides in order to help the integration in real Symfony2 project, as real Bundles
+
+This PR is "just" about adding a non default form twig template inside the Bridge, it is not breaking any BC, it won't affect frameworks or libs using only some Component.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-02-17T17:16:18Z
+
+@lyrixx you mean @fabpot right ? I really hope so..
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-17T17:25:08Z
+
+@pborreli yes. autocomplete.....
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-17T17:40:42Z
+
+@pborreli I know that, but adding this makes it pretty difficult to reject other 3th party integration is Symfony's core bridges. Why can this be added, but can't I add Topcoat? And what about Inuit.css? And maybe jQuery for the profiler? And ...?
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-17T17:41:02Z
+
+@lyrixx ... or did @fabbot become self-aware like Skynet? ;)
+
+---------------------------------------------------------------------------
+
+by egils at 2014-02-17T17:47:26Z
+
+My thoughts on this issue is exactly the same as @WouterJ . It just doesn't seem to be fair and may open new discussions and problems with versions and other 3rd party helpers in the future. It is definitely a nice to have feature, yet I disagree it should be in this bridge.
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-02-17T17:49:21Z
+
+@WouterJ again, this is not about adding bootstrap itself, just its form html (only a small part of bootstrap btw) as a twig layout. If you want to make a form_topcoat_layout.html.twig, why not :)
+About the "jQuery for the profiler", I guess you are just over-reacting :angel:
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-17T18:20:22Z
+
+@pborreli adding only plain html forms is useless - they won't work without twitter bootstrap... users will have to add twitter bootstrap on their own anyways... in that case they can add html forms themselves too
+
+on the other hand, adding twitter bootstrap dependency would be really wrong - thats why this should belong to a seperate bundle - which can have it's own dependencies and does not belong to the core
+
+---------------------------------------------------------------------------
+
+by egils at 2014-02-17T18:20:30Z
+
+Ok, how do you suggest to maintain the situation where are different versions of 3rd party helper layouts? Like keep bootstrap_2.3.x, bootstrap_3.0.x, bootstrap_3.1.x, later someone decides they need foundation_4 and foundation_5. If there comes a new superb (hypothetically)  framework which is globally used and have couple of equally used versions. How would you decide when to discontinue any of them (BC)? Or just drag all these different layouts with you for every Symfony project even tho you don't need them? This PR has 2 files in it already. These two files don't do much harm. But having like 5-10-15 of them could get annoying since they would be most garbage for projects build on Symfony. That's what concerns me most. :)
+
+If these practices get spread, there would be one big PHP framework with trash files in it for various helpers on different bridges. From my point of view this should not be there. :) Unless you suggest a viable solution to this likely to happen unpleasant situation. I have nothing against this feature but about the outcome it may cause. Yet I'm interested to see what @fabpot decides to do and how to solve this case
+
+---------------------------------------------------------------------------
+
+by pbowyer at 2014-02-18T14:54:10Z
+
+-1. The version of the frontend framework I use should not be tied to the Symfony forms version I install.
+
+As others have said this would be convenient, but as the bundle authors know it's not easy to stay on top of Bootstrap versions. Not only will you need to support Bootstrap 2.3, but 3.0 and 3.1, and whichever minor versions affect the markup styles. And this isn't even considering other frameworks...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T14:56:21Z
+
+> -1. The version of the frontend framework I use should not be tied to the Symfony forms version I install.
+
+Nothing is tied. Where did you see that ?
+
+---------------------------------------------------------------------------
+
+by dewos at 2014-02-18T15:28:43Z
+
+Why not a semi-official, optional TwigExtraBundle?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T16:34:20Z
+
+again: **This code could not be in a bundle**. And it is not 100% related to twig.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-18T16:38:16Z
+
+if it's not related to twig, why is it placed in the TwigBridge? It does make as much sense to put this in a bundle as it is to place it in a Twig library
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-02-18T16:39:31Z
+
+@lyrixx why "could not" ? Again, a bundle is nothing more than a set of classes and assets in a directory, 'fabulously suffixed with "bundle". Can you explain how it could block its usage in silex (f.e) ?
+
+Does twig/silex/whatever has a built-in rule forbidding twig assets placed in a folder named "*Bundle" ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T16:42:50Z
+
+@WouterJ You miss the **100%**. And it's a bridge, not a bundle ;)
+
+@docteurklein Technically, yes it can fits in the bundle. But it is very weird to include a bundle inside a silex application. It does not make sense©
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-02-18T16:45:24Z
+
+please add the documentation PR to test thoroughly how this will look :baby:
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-02-18T16:49:38Z
+
+if you say so :)
+I don't see how a working set of TB specific form types and twig form themes would not beneficiate someone who works with TB and silex, but anyway.
+
+Having some symfony (full stack) code inside a package does not mean it's not reusable in a silex app.
+
+Okay, there is a useless DependencyInjection folder and a useless Bundle class.
+
+BTW, I see nothing wrong in putting this in the core :)
+I just hate wrong arguments.
+
+Again, the only question is:
+
+    does symfony want to officially support a tb form theme ?
+
+If yes, then go and the PR will be merged, otherwise, it fits very well in a bundle (mopa f.e).
+(And if you don't think so, separate the bundle agnostic assets into a separate package).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T16:54:33Z
+
+@cordoval I added doc in the PR header. Btw their is a cookbook for that ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-18T16:55:51Z
+
+@docteurklein
+
+> Having some symfony (full stack) code inside a package does not mean it's not reusable in a silex app.
+
+Yes, you are right. But it's weird. for exemple, the profilerBundle is used by silex...
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-02-18T17:01:28Z
+
+because it contains useful code.
+I agree it could be separated into smaller packages though, but at what cost?
+
+Anyway, I see nothing wrong in having a TB form theme here.
+
+---------------------------------------------------------------------------
+
+by elnur at 2014-02-24T19:41:22Z
+
+:-1:
+
+I don't like the idea of adding Bootstrap support to the core even though I use Bootstrap in all of the projects I'm working on. This should be done in a separate project.
+
+BTW, check out [my *unobtrusive* bundle for Bootstrap 3](https://packagist.org/packages/elnur/bootstrap-bundle).
+
+---------------------------------------------------------------------------
+
+by solocommand at 2014-02-27T00:32:43Z
+
+I have to agree with @elnur. I also use bootstrap in almost all projects, but that doesn't mean that I always will.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-27T09:32:01Z
+
+@solocommand it's not because this is an **optional** form theme in Symfony vendors, that you must use it
+
+---------------------------------------------------------------------------
+
+by solocommand at 2014-02-27T13:31:48Z
+
+@lyrixx  I understand that. The point I meant to make is if I'm going to include bootstrap (which I don't always do), having this as part of the bundle I install for bootstrap or creating it myself makes more sense to me.
+
+It's not because adding one file to core for bootstrap is going to cause a problem if I do or don't decide to use bootstrap in my project, it's the precedent it sets, as others have mentioned above as well.
+
+If we allow a bootstrap form template in core, why not add navigation and layouts? Why not include the entire bootstrap lib as a dep? What happens when someone else wants to use Foundation, or some new hot framework comes along?
+
+I realize this is mostly just rehashing some of the same points brought up above, but I just wanted to voice my dissent on the topic. :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-27T14:17:10Z
+
+> If we allow a bootstrap form template in core, why not add navigation and layouts?
+
+Because their is nothing about navigation or layouts in symfony.
+
+> Why not include the entire bootstrap lib as a dep?
+
+Because it creates an hard dependency. More over: which version should be included ?
+That does not make sens at all.
+
+> What happens when someone else wants to use Foundation, or some new hot framework comes along?
+
+it is exactly the same as now:
+
+* The user creates a new form theme
+* He adds it to its config or he uses it with `form_theme` twig tag.
+
+See the dedicated cookbook, please.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-02-27T14:30:05Z
+
+> it is exactly the same as now:
+
+And why should someone using Foundation or a new hot framework include the file in every bundle that uses it and should the Bootstrap live in the core? That's exactly the problem with this PR: Why should Bootstrap get official Symfony support, and Foundation and other frameworks not?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-27T14:49:03Z
+
+> Foundation and other frameworks not
+
+Acuatally, someone can open a PR for that.
+
+And as @javiereguiluz stated, bootstrap is **very** more popular than foundation.
+See its comments
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2014-02-27T15:05:33Z
+
+I don't see the point of bootstrap vs foundation or others ...
+
+for exemple, i don't see any alternative for hinclude (http://symfony.com/doc/current/book/templating.html#asynchronous-content-with-hinclude-js) and nobody's making a problem of it. If you want to use it, fine, it is integrated in the framework. If you want to use something else then you have to do the job yourself of find an existing bundle
+(BTW using hinclude is not even compatible with the isXmlHttpRequest method from the Request class!!)
+
+I would make no sense to integrate foundation but not bootsrap because of the audience, but as bootstrap is the most used, its integration would be an opinionated choice but a reasonnable choice
+
+---------------------------------------------------------------------------
+
+by yguedidi at 2014-02-27T15:12:07Z
+
+@WouterJ [this above comment](https://github.com/symfony/symfony/pull/10272#issuecomment-35239078) may give you some reasons.
+I'm :+1:, I think it's better for the form Twig template, a Symfony related file, even if it's for Bootstrap or another CSS framework, to be maintained by the Symfony community, to have only one place for contributions and enhancements.
+
+---------------------------------------------------------------------------
+
+by egils at 2014-02-27T15:13:33Z
+
+@lyrixx I'm still waiting for your answer on https://github.com/symfony/symfony/pull/10272#issuecomment-35309699. It has mostly same concerns that @WouterJ and @solocommand try to make. So would be nice if you look at it, think a bit a bout this bundle future development in a good manner and suggest a viable solution. Keep in mind that you multiple times suggested to open new PR for other framework layouts...
+
+---------------------------------------------------------------------------
+
+by elnur at 2014-02-27T15:24:21Z
+
+And why the horizontal layout only? When I first started with Bootstrap, I liked the horizontal layout and used it often; lately, I almost never use it. Actually, the horizontal layout is not even the default one in Bootstrap.
+
+The same goes to `btn-primary`.
+
+Take a look at [my bundle][1]. It uses the default layout and default context for buttons by default. That makes sense, but this PR doesn't.
+
+And why Bootstrap 2? For instance, I've migrated to Bootstrap 3 long ago.
+
+Anyway, this PR is opinionated and adds stuff for an older version of Bootstrap. And even if it wasn't, it still doesn't make sense to have this in the core. Even though my bundle is just a bundle, it's less opinionated than this PR *for the core*.
+
+[1]: https://github.com/elnur/ElnurBootstrapBundle#elnurbootstrapbundle
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-02-27T15:50:04Z
+
+@elnur Your feedback is interesting. Actually, I would like to "purge" the "rage" against this PR, and after I will fix my code (if and only if this pr could me merged)
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-02-27T20:09:09Z
+
+@lyrixx it's not  about "rage" towards you or this PR, i think everyone here can appreciate your work and the intention to make things easier for us all
+
+simply, some of us have reasonable doubts if that's the best way, in the end it's up to @fabpot to decide wheather or not: he shares our concerns
+
+so relax and have a :beer: :)
+
+---------------------------------------------------------------------------
+
+by kbond at 2014-02-27T20:49:18Z
+
+Maybe we can have a community poll for controversial PR's like this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-06-16T07:56:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-06-17T00:09:48Z
+
+:+1: I'm okay once a documentation PR would be opened
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-08-08T02:39:45Z
+
+i'm not sure why don't make a 3rd party repository semi blessed by symfony project  (same way as assetic) with directories for frameworks like bootstrap 2 boostrap 3, foundation, ratchet (also from twitter).  and whatever else.
+
+With some rules to keep all standardized by directory structure, filenames, and twig block names, as much as possible.
+
+Then separate repos (for composer/bower/whatever packaging purposes) could be made in a similiar way to symfony with git subtree split.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-08T03:29:08Z
+
+minor :thumbsup: from me, because I think Bootstrap is special in its popularity. But I also think we could accomplish this by "blessing" one of the existing Bootstrap bundles (actually, they are a bit bloated, so we'd probably need to split one of them into a smaller, form-theme only bridge).
+
+Regardless, I'd like to see this smooth for 2.6. So if this is *not* going to get in, we should decide that now and get to work on making that *small* 3rd party library. I *do* like @jrobeson's idea of a library that has nothing more than form themes for whatever people dream up.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-08-08T03:59:37Z
+
+I'd love to see something that includes a full stack of templates. a bootstrapified ::base.html.twig , form themes and the exception template.
+
+I'd also like to see blessed based templates for bundles like knpmenubundle and fosuserbundle too.. but perhaps those can go elsewhere.
+
+If folks are interested to see how rails simple_form gem manages their form templates for bootstrap
+
+Example App: https://github.com/rafaelfranca/simple_form-bootstrap
+Demo: http://simple-form-bootstrap.plataformatec.com.br/
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2014-08-08T07:24:57Z
+
+@jrobeson :+1: for the idea of the "blessed" 3rd party bundle
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-08-08T07:27:00Z
+
+We are talking about one file here for a massive winner in its space. Creating a bundle for it is just a waste of time, a waste of resources, and more "difficult" for everyone.
+
+I'm still in favor of merging this into Symfony.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-08-08T07:27:50Z
+
+another reason for such a repository.
+I was wondering the internet and came across this:
+https://github.com/PUGX/PUGXGeneratorBundle
+
+It makes me think that the official generator bundle should allow you to generate app templates based on the repository i mentioned .   so when you say generate:crud  you could choose  --layout-style=bootstrap.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-08-08T07:32:12Z
+
+bootstrap 2 is unmaintained now isn't it? is there any reason for a 2.x version?
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-08-08T07:33:08Z
+
+@weaverryan : did you look at elnur's bundle? https://github.com/elnur/ElnurBootstrapBundle
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-08-08T13:18:57Z
+
+If we merge this in here, nothing stops us from running with @jrobeson's idea for everything else (things beyond Bootstrap, templates for things beyond forms, etc).
+
+So to be more clear, +1 for merge from me, and then we can ask "what else" and do that in the community-space.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-08T13:29:45Z
+
+Including it in core is OK for me if it is based on the 3.x version of Bootstrap. 2.x is unmaintained since 1 year, so adding it in core for a release in a few months would be weird. If some people are stuck on a 2.x Bootstrap codebase, they are probably already using a third-party form theme anyway.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-09T12:05:22Z
+
+* I dropped the support for bootstrap 2.X
+* I  renamed `form_twitter_bootstrap_3` into `form_bootstrap_3...`
+* I completely reword the theme to work everywhere
+* I added a new theme: `form_bootstrap_3.2.x_horizontal_layout.html.twig`
+
+Code sample I used:
+
+```php
+        $builder = $this->createFormBuilder();
+        $choices = array('choice a', 'choice b', 'choice c');
+        $form = $builder
+            ->add('text1', 'text', array(
+                'constraints' => new Assert\NotBlank(),
+                'attr' => array('placeholder' => 'not blank constraints')
+            ))
+            ->add('textarea', 'textarea')
+            ->add('email', 'email')
+            ->add('integer', 'integer')
+            ->add('money', 'money', array(
+                'currency' => 'EUR',
+            ))
+            ->add('money2', 'money', array(
+                'currency' => 'USD',
+            ))
+            ->add(
+                $builder->create('sub-form', 'form')
+                    ->add('subformemail1', 'email', array(
+                        'constraints' => array(new Assert\NotBlank(), new Assert\Email()),
+                        'attr' => array('placeholder' => 'email constraints'),
+                        'label' => 'A custom label : ',
+                    ))
+                    ->add('subformtext1', 'text')
+            )
+
+            ->add('number', 'number')
+            ->add('password', 'password')
+            ->add('percent', 'percent')
+            ->add('search', 'search')
+            ->add('url', 'url')
+
+            ->add('choice1', 'choice', array(
+                'choices' => $choices,
+                'multiple' => true,
+                'expanded' => true,
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('choice1B', 'choice', array(
+                'choices' => $choices,
+                'multiple' => true,
+                'expanded' => true,
+                'label_attr' => array('class' => 'checkbox-inline'),
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('choice1C', 'choice', array(
+                'choices' => $choices,
+                'multiple' => true,
+                'expanded' => true,
+                'label' => false,
+                'label_attr' => array('class' => 'checkbox-inline'),
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('choice2', 'choice', array(
+                'choices' => $choices,
+                'multiple' => false,
+                'expanded' => true,
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('choice3', 'choice', array(
+                'choices' => $choices,
+                'multiple' => true,
+                'expanded' => false,
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('choice4', 'choice', array(
+                'choices' => $choices,
+                'multiple' => false,
+                'expanded' => false,
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('checkbox', 'checkbox', array(
+                'constraints' => new Assert\True(),
+            ))
+            ->add('radio', 'radio', array(
+                'constraints' => new Assert\True(),
+            ))
+
+            ->add('country', 'country')
+            ->add('language', 'language')
+            ->add('locale', 'locale')
+            ->add('timezone', 'timezone', array(
+                // I know, this do not make sens, but I want an error
+                'constraints' => new Assert\True(),
+            ))
+            ->add('date', 'date', array(
+                // I know, this do not make sens, but I want an error
+                'constraints' => new Assert\True(),
+            ))
+            ->add('date_single_text', 'date', array(
+                'widget' => 'single_text',
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('datetime', 'datetime', array(
+                // I know, this do not make sens, but I want an error
+                'constraints' => new Assert\True(),
+            ))
+            ->add('datetime_single_text', 'datetime', array(
+                'widget' => 'single_text',
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('time', 'time', array(
+                // I know, this do not make sens, but I want an error
+                'constraints' => new Assert\True(),
+            ))
+            ->add('time_single_text', 'time', array(
+                'widget' => 'single_text',
+                'constraints' => new Assert\NotBlank(),
+            ))
+            ->add('birthday', 'birthday', array(
+                // I know, this do not make sens, but I want an error
+                'constraints' => new Assert\True(),
+            ))
+            ->add('file', 'file')
+            ->add('password_repeated', 'repeated', array(
+                'type' => 'password',
+                'invalid_message' => 'The password fields must match.',
+                'options' => array('required' => true),
+                'first_options' => array('label' => 'Password'),
+                'second_options' => array('label' => 'Repeat Password'),
+            ))
+            ->add('submit', 'submit', array('attr' => array('formnovalidate' => true)))
+            ->getForm()
+        ;
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $this->redirect($this->generateUrl('_form'));
+            } else {
+                $form->addError(new FormError('This is a global error'));
+            }
+        }
+
+        return array('form' => $form->createView());
+```
+
+```jinja
+{% extends "base.html.twig" %}
+
+{% block title "Symfony - Form sample" %}
+
+{#
+{% form_theme form 'form_bootstrap_3.2.x_horizontal_layout.html.twig' %}
+#}
+
+{% block stylesheets %}
+    <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="all" />
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <h1>Twitter bootstrap form</h1>
+
+        {{ form(form) }}
+    </div>
+{% endblock %}
+```
+---
+Horizontal:
+
+![symfony - form sample - horizontal](https://cloud.githubusercontent.com/assets/408368/4201026/2f063f7c-3819-11e4-84b3-c47be5d7e3a8.png)
+![symfony - form sample - horizontal and errors](https://cloud.githubusercontent.com/assets/408368/4201031/386e5d24-3819-11e4-84d5-9a78e69e9ddb.png)
+
+Vertical
+
+![symfony - form sample - vertical](https://cloud.githubusercontent.com/assets/408368/4201037/43393454-3819-11e4-9499-06e6e472d76f.png)
+![symfony - form sample - vertical and errors](https://cloud.githubusercontent.com/assets/408368/4201038/4708491c-3819-11e4-9f3d-0a197947a536.png)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-09T13:51:51Z
+
+I removed the `[WIP]` prefix on the PR title, as it's not a WIP anymore.
+
+---------------------------------------------------------------------------
+
+by rufinus at 2014-09-09T21:06:27Z
+
++1
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-09-13T11:52:20Z
+
+How about naming them simply `form_bootstrap_horizontal_layout.html.twig` and `form_bootstrap_layout.html.twig`?
+
+I'm :+1: for this feature btw.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-17T10:53:50Z
+
+@lyrixx Thanks for the great work here! I need to look into this in more detail and try to use it myself, but I'm positive this will make it into 2.6 or 2.7.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-17T10:54:44Z
+
+I think that naming the themes `bootstrap_3_layout.html.twig`, `bootstrap_3_horizontal_layout.html.twig` etc. is sufficient.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-17T10:56:10Z
+
+@webmozart I would really like to get this one in 2.6. if possible.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-17T10:56:48Z
+
+@lyrixx The `collection` type seems to be missing from your examples? What about rendering a collection with rows using "inline" layouts?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-17T12:10:33Z
+
+I think it would be a failure if we couldn't get this form theme in for 2.6 - the PR has been open for 7 months and will be used by a large number of developers. If there are ways that the community can help out lyrixx with the pending issues, let's make those clear. Let's get this in 2.6!
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-17T12:29:09Z
+
+@weaverryan I think the most critical part is that people use it and report problems/limitations. It's really hard to fix broken themes without breaking BC, so I want to be really sure that this works for many use-cases.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-09-17T13:02:20Z
+
+I'll see if I can drum up some testing support :).
+
+---------------------------------------------------------------------------
+
+by Maxooo at 2014-09-17T14:16:02Z
+
+:+1:  @weaverryan
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-09-17T15:00:50Z
+
+:+1: The template itself seems good.
+
+:-1: I feel this shouldn't be part of TwigBridge and actually have its own Bridge. TB leverages more than only forms which could be reused. That's why community always release a new bundle, and it'll continue to be no different until we implement a library internally (Bridge would be perfect in this case).
+My suggestion is to start small, create the Bridge and only implement the form layout for now. This will prevent possible BC breaks if we decide to move the layout later.
+Is it possible to do this before it gets merged? There will be no difference in the actual code/template testability at all, but it's already future proof.
+
+---------------------------------------------------------------------------
+
+by Garfield-fr at 2014-09-22T12:44:54Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by mprizmic at 2014-09-22T17:29:33Z
+
+Can't agree more with Javier!
++1!
+
+---------------------------------------------------------------------------
+
+by dirkluijk at 2014-09-22T17:36:00Z
+
+A big +1 for Bootstrap support. It improves the developer experience, because it is a popular CSS framework and it allows new Symfony users to prototype more easily.
+
++1 for adding another Twig bridge for Bootstrap integration. This makes it easier for example to handle different versions and to add integration for other Bootstrap features in the future, like flash message helpers, etc. Besides that, it will keep the core clean. Separation of concerns.
+
+-1 for adding other CSS frameworks, unless they will get their own bridges/bundles. In that case a big +1.
+It's only good to provide integration with other popular tools/libraries/frameworks.
+
+---------------------------------------------------------------------------
+
+by jamesisaac at 2014-09-22T22:31:35Z
+
+Surprised to see this being lined up to become part of Symfony.  Yes, this is just one file - but imo it's setting a confusing precedent for what concerns Symfony should be responsible for.
+
+As far as I was aware, Symfony dealt with backend, plus some semantic html.  That stuff is relatively timeless, and makes little direct impact on the user experience.
+
+Design and frontend, on the other hand (via CSS and JS) opens a whole new can of worms.
+1. It follows fast-moving trends - personally I think BS3 has gone way over the top with the current "flat" trend, at the expense of usability.
+2. The CSS hacks of today may seem silly tomorrow.
+3. It introduces a whole naming convention which contradicts with more carefully planned standards (OOCSS/BEM etc).
+
+I just don't think there should be a tie between what Symfony version you're using, and how the frontend of your site looks.  Backend has very different concerns (business logic, security, caching) from frontend (device support, latest CSS/JS browser tricks, aesthetics).
+
+If anything, maybe thinking about better integration/workflow for JS/CSS package management (so there aren't 40 bootstrap bundles) and writing clear guides for beginners would be a more appropriate and scaleable solution.  I've been using the "RobLoach Component Installer", but it seems to be unmaintained.
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2014-09-22T23:16:12Z
+
+@jamesisaac :+1: x 1000
+
+---------------------------------------------------------------------------
+
+by weengs at 2014-09-23T04:26:06Z
+
+@jamesisaac pinned it right.
+I use bootstrap for almost every single project I do. But I still can't get why this feature is going into Symfony2.
+
+---------------------------------------------------------------------------
+
+by egils at 2014-09-23T05:36:38Z
+
+100% agree with @jamesisaac. As a possible solution I could only agree this being a part of separate bridge as @guilhermeblanco @dirkluijk and few other mentioned.
+
+---------------------------------------------------------------------------
+
+by burki94 at 2014-09-23T08:35:28Z
+
+I also agree with @jamesisaac and @weengs.
+I use bootstrap extensively but I don't see the need to put it into symfony.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-23T09:12:12Z
+
+@burki94 a minor comment: we are not going to put Bootstrap into Symfony. We are going to add a very small Twig file to save tens of hours for thousands of Symfony developers. In addition, this small (and optional) file will (slightly) improve performance for lots of applications, since you won't have to install and enable a third-party bundle just for this.
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-09-23T09:27:52Z
+
+@javiereguiluz what if bootstrap 3.2.1 comes out? or 3.3.0? what if they change some CSS which would require changes in the template file? what if I want to use symfony 2.6 but with bootstrap 2? or 2.2 or 3.1.0?
+
+and how exacly does this imrove performance?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-23T09:32:38Z
+
+@loostro if a new Bootstrap version comes out, we'll deal with it in the same way we deal with new XLIFF versions (the 2 version has just been published), the new HTML versions (right now we support HTML 5, but who knows what will happen in the future), the new Yaml versions (we support 1.2 spec right now), etc.
+
+The slight improvement gain comes from not having to enable a third-party bundle just for this.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2014-09-23T09:33:05Z
+
+i think it's ok for it not to be a third party bundle/package, but it could be a first party one vs merging it directly.
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-09-23T09:41:32Z
+
+@javiereguiluz what about when I want symfony 2.6 + not-the-latest version of bootstrap?
+
+---------------------------------------------------------------------------
+
+by pierredup at 2014-09-23T09:44:10Z
+
+@loostro Then you include the version of bootstrap you want to use, and create your own template file, and don't use the build-in template. That is the why it is optional
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-23T09:45:31Z
+
+As @pierredup said, in that case you'll have to ignore this file and develop your own theme.
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-09-23T10:16:08Z
+
+OK, so I do what I did until now - use one of many bundles avaliable. However I can't say this solution is satisfying. I'd expect a more flexible solution for official bootstrap support.
+
+---------------------------------------------------------------------------
+
+by jamesisaac at 2014-09-23T14:06:36Z
+
+@javiereguiluz In what way does it currently take tens of hours to get Bootstrap set up?  If it's that popular, add a link in the docs to a recommended bundle -> should take no more than a few minutes to follow the readme, no?  Plus that way newcomers are getting a proper understanding of frontend/backend workflow via bundles, rather than getting the impression that Symfony should also include out-of-the-box support for their CSS framework of choice.
+
+Not sure why performance gain is being used as an argument - it would almost be negligible, surely?  I'd imagine registering a bundle to be a few order of magnitudes lower in cost than the most expensive operations.    Even if it were a significant saving, there are many commonly used things which could be packaged with Symfony - doesn't mean they should be though - imo in situations like this, consistent separation of concerns should trump convenience.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-23T14:14:59Z
+
+> In what way does it currently take tens of hours to get Bootstrap set up?
+
+Excuse me for the confusion. I wasn't talking about setting up Bootstrap. My comment was about spending tens of hours creating your own Bootstrap theme.
+
+---------------------------------------------------------------------------
+
+by jamesisaac at 2014-09-23T14:25:36Z
+
+I don't think anyone's suggesting that developers should be expected to create their own theme, just that it shouldn't be packaged with Symfony.  If this just became a third-party bundle, it could well be linked to in the docs or given a cookbook recipe (which, again, would give newcomers a better understanding of how to find bundles for other CSS frameworks).
+
+---------------------------------------------------------------------------
+
+by AveVlad at 2014-09-24T03:10:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by LockerDC at 2014-09-24T03:14:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by BorodinDemid at 2014-09-24T04:33:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by boetech at 2014-09-24T16:02:11Z
+
+-10 if bootstap code is included with the generated code for forms by default then that's code we're going to have to remove. We use foundation - anything that we 'always' need for a given form element we override in the template. We went with foundation because it's lighter than bootstrap and easier to override for our own needs. I'm all for having a bundle / add on for this but don't force it on all of us with all the extra bloat
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T16:07:10Z
+
+I think there is a big misunderstanding here. We will not package bootstrap into Symfony. We will only include a form theme optimized for bootstrap.
+
+---------------------------------------------------------------------------
+
+by liverbool at 2014-09-24T16:17:55Z
+
+-1
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2014-09-24T16:23:17Z
+
+@fabpot @javiereguiluz @webmozart @henrikbjorn Create a Symfony Bridge for Bootstrap (not inside Twig) and I'm sure half of the complains are gonna disappear.
+
+---------------------------------------------------------------------------
+
+by dirkluijk at 2014-09-24T16:53:44Z
+
+@guilhermeblanco :+1:
+
+---------------------------------------------------------------------------
+
+by loostro at 2014-09-24T18:19:21Z
+
+@guilhermeblanco :+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T10:10:51Z
+
+> The `collection` type seems to be missing from your examples? What about rendering a collection with rows using "inline" layouts?
+
+@lyrixx Any feedback to that?
+
+---------------------------------------------------------------------------
+
+by AveVlad at 2014-09-25T10:13:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by messfromspace at 2014-09-25T10:14:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-25T10:16:06Z
+
+> The collection type seems to be missing from your examples? What about rendering a collection with rows using "inline" layouts?
+
+@webmozart  by inline, you mean horizontal ?
+
+Anyway, indeed I forgot the collection type, But I added a sub-form. This is quit similar ;)
+
+I will add more sample.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-25T10:22:17Z
+
+@lyrixx Cool, thanks! :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-10-01T15:10:43Z
+
+@webmozart
+
+vertical:
+![vertical](https://cloud.githubusercontent.com/assets/408368/4477274/b7c3b85c-497c-11e4-9502-04a8aa062d9f.png)
+horizontal
+![horizontal](https://cloud.githubusercontent.com/assets/408368/4477276/b7c66322-497c-11e4-94d7-9b5f6904afbf.png)
+main vertical collection horizontal
+![main vertical collection horizontal](https://cloud.githubusercontent.com/assets/408368/4477273/b7bf76a2-497c-11e4-94ff-84e41edf078d.png)
+main vertical collection inline
+![main vertical collection inline](https://cloud.githubusercontent.com/assets/408368/4477272/b7be2af4-497c-11e4-8eaf-af8017af9bf6.png)
+main horizontal collection vertical
+![main horizontal collection vertical](https://cloud.githubusercontent.com/assets/408368/4477275/b7c43822-497c-11e4-8ff5-1f140abc6da3.png)
+main horizontal collection inline
+![main horizontal collection inline](https://cloud.githubusercontent.com/assets/408368/4477277/b7c7363a-497c-11e4-9b2c-4221cd7c3a4e.png)

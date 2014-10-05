@@ -86,20 +86,20 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array(), array(), '', false),
-            array(array(), array(), "<pre id=sf-dump><span class=sf-dump-0>[]\n</span></pre><script>Sfjs.dump.instrument()</script>\n"),
+            array(array(), array(), "<pre class=sf-dump>[]\n</pre><script>Sfjs.dump.instrument()</script>\n"),
             array(
                 array(),
                 array(123, 456),
-                "<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-num>123</span>\n</span></pre><script>Sfjs.dump.instrument()</script>\n"
-                ."<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-num>456</span>\n</span></pre><script>Sfjs.dump.instrument()</script>\n",
+                "<pre class=sf-dump><span class=sf-dump-num>123</span>\n</pre><script>Sfjs.dump.instrument()</script>\n"
+                ."<pre class=sf-dump><span class=sf-dump-num>456</span>\n</pre><script>Sfjs.dump.instrument()</script>\n",
             ),
             array(
                 array('foo' => 'bar'),
                 array(),
-                "<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-note>array:1</span> [<span name=sf-dump-child>\n"
-                ."  <span class=sf-dump-1>\"<span class=sf-dump-meta>foo</span>\" => \"<span class=sf-dump-str>bar</span>\"\n"
-                ."</span></span>]\n"
-                ."</span></pre><script>Sfjs.dump.instrument()</script>\n",
+                "<pre class=sf-dump><span class=sf-dump-note>array:1</span> [<span name=sf-dump-child>\n"
+                ."  \"<span class=sf-dump-meta>foo</span>\" => \"<span class=sf-dump-str>bar</span>\"\n"
+                ."</span>]\n"
+                ."</pre><script>Sfjs.dump.instrument()</script>\n",
             ),
         );
     }

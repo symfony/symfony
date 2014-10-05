@@ -128,8 +128,17 @@ class Inline
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, 'C');
                 }
-                $repr = is_string($value) ? "'$value'" : (is_infinite($value) ? str_ireplace('INF', '.Inf', strval($value)) : strval($value));
-
+                if (is_float($value)) {
+                    $repr = strval($value);
+                    if (is_infinite($value)) {
+                        $repr = str_ireplace('INF', '.Inf', $repr);
+                    } elseif (floor($value) == $value && $repr == $value) {
+                        // Preserve float data type since storing a whole number will result in integer value.
+                        $repr = '!!float '.$repr;
+                    }
+                } else {
+                    $repr = is_string($value) ? "'$value'" : strval($value);
+                }
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, $locale);
                 }
@@ -470,6 +479,8 @@ class Inline
                         }
 
                         return;
+                    case 0 === strpos($scalar, '!!float '):
+                        return (float) substr($scalar, 8);
                     case ctype_digit($scalar):
                         $raw = $scalar;
                         $cast = intval($scalar);

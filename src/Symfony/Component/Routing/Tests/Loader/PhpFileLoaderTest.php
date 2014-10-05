@@ -46,13 +46,23 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testLoaderVariableAvailable()
+    public function testLoadWithImport()
     {
         $loader = new PhpFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('loader_variable_usage.php');
+        $routeCollection = $loader->load('validresource.php');
         $routes = $routeCollection->all();
+
         $this->assertCount(2, $routes, 'Two routes are loaded');
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+
+        foreach ($routes as $route) {
+            $this->assertSame('/prefix/blog/{slug}', $route->getPath());
+            $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
+            $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
+            $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
+            $this->assertEquals(array('https'), $route->getSchemes());
+        }
     }
 
     public function testThatDefiningVariableInConfigFileHasNoSideEffects()

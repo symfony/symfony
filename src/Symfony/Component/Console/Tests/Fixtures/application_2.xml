@@ -42,7 +42,7 @@
           <description>Do not output any message.</description>
         </option>
         <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.</description>
         </option>
         <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display this application version.</description>
@@ -115,7 +115,7 @@
           <description>Do not output any message.</description>
         </option>
         <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.</description>
         </option>
         <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display this application version.</description>
@@ -153,7 +153,7 @@
           <description>Do not output any message.</description>
         </option>
         <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
-          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.</description>
         </option>
         <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
           <description>Display this application version.</description>

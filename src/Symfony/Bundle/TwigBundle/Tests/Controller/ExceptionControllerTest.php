@@ -41,4 +41,44 @@ class ExceptionControllerTest extends TestCase
         $controller = new ExceptionController($twig, false);
         $controller->showAction($request, $flatten);
     }
+
+    public function testErrorPagesInDebugMode()
+    {
+        $twig = new \Twig_Environment(
+            new \Twig_Loader_Array(array(
+                'TwigBundle:Exception:error404.html.twig' => '
+                    {%- if exception is defined and status_text is defined and status_code is defined -%}
+                        OK
+                    {%- else -%}
+                        "exception" variable is missing
+                    {%- endif -%}
+                ',
+            ))
+        );
+
+        $request = Request::create('whatever');
+
+        $controller = new ExceptionController($twig, /* "debug" set to --> */ true);
+        $response = $controller->testErrorPageAction($request, 404);
+
+        $this->assertEquals(200, $response->getStatusCode()); // successful request
+        $this->assertEquals('OK', $response->getContent());  // content of the error404.html template
+    }
+
+    public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
+    {
+        $twig = new \Twig_Environment(
+            new \Twig_Loader_Array(array(
+                'TwigBundle:Exception:error.html.twig' => 'html',
+            ))
+        );
+
+        $request = Request::create('whatever');
+        $request->setRequestFormat('txt');
+
+        $controller = new ExceptionController($twig, false);
+        $response = $controller->testErrorPageAction($request, 42);
+
+        $this->assertEquals('html', $request->getRequestFormat());
+    }
 }

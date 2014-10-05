@@ -35,12 +35,10 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $dump = $collector->getDumps('html');
         $this->assertTrue(isset($dump[0]['data']));
         $dump[0]['data'] = preg_replace('/^.*?<pre/', '<pre', $dump[0]['data']);
-        preg_match('/sf-dump-(\\d{2,})/', $dump[0]['data'], $matches);
-        $dumpId = $matches[1];
 
         $xDump = array(
             array(
-                'data' => "<pre id=sf-dump-{$dumpId}><span class=sf-dump-0><span class=sf-dump-num>123</span>\n</span></pre><script>Sfjs.dump.instrument()</script>\n",
+                'data' => "<pre class=sf-dump><span class=sf-dump-num>123</span>\n</pre><script>Sfjs.dump.instrument()</script>\n",
                 'name' => 'DumpDataCollectorTest.php',
                 'file' => __FILE__,
                 'line' => $line,

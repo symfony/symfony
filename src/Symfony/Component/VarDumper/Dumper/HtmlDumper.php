@@ -24,7 +24,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutputStream = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre id=%id%>';
+    protected $dumpPrefix = '<pre class=sf-dump>';
     protected $dumpSuffix = '</pre><script>Sfjs.dump.instrument()</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
@@ -101,7 +101,7 @@ class HtmlDumper extends CliDumper
         $this->headerIsDumped = true;
 
         if (null !== $this->dumpHeader) {
-            return str_replace('%id%', $this->dumpId, $this->dumpHeader);
+            return $this->dumpHeader;
         }
 
         $line = <<<'EOHTML'
@@ -110,19 +110,81 @@ Sfjs = window.Sfjs || {};
 Sfjs.dump = Sfjs.dump || {};
 Sfjs.dump.childElts = Sfjs.dump.childElts || document.getElementsByName('sf-dump-child');
 Sfjs.dump.childLen = Sfjs.dump.childLen || 0;
+Sfjs.dump.refElts = Sfjs.dump.refElts || document.getElementsByName('sf-dump-ref');
+Sfjs.dump.refLen = Sfjs.dump.refLen || 0;
+if (!Sfjs.dump.refStyle) {
+    Sfjs.dump.refStyle = document.createElement('style');
+    document.documentElement.firstChild.appendChild(Sfjs.dump.refStyle);
+}
 Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
-    var elt,
-        i = this.childLen,
-        aCompact = '▶</a><span class="sf-dump-compact">',
-        aExpanded = '▼</a><span class="sf-dump-expanded">';
+    var elt, i, ref;
 
+    i = this.childLen;
     this.childLen= this.childElts.length;
 
     while (i < this.childLen) {
         elt = this.childElts[i];
         if ("" == elt.className) {
             elt.className = "sf-dump-child";
-            elt.innerHTML = '<a class=sf-dump-ref onclick="Sfjs.dump.toggle(this)">'+('sf-dump-0' == elt.parentNode.className ? aExpanded : aCompact)+elt.innerHTML+'</span>';
+            elt.innerHTML = '<a class=sf-dump-ref onclick="Sfjs.dump.toggle(this)"><span>▼</span></a><span class="sf-dump-expanded">'+elt.innerHTML+'</span>';
+            if ('sf-dump-expanded' == elt.parentNode.className) {
+                if (elt.children[1].firstChild.nextSibling.id) {
+                    elt.firstChild.appendChild(elt.children[1].firstChild);
+                    elt.firstChild.appendChild(elt.children[1].firstChild);
+                }
+                Sfjs.dump.toggle(elt.firstChild);
+            }
+        }
+        ++i;
+    }
+
+    i = this.refLen;
+    this.refLen= this.refElts.length;
+
+    function instrumentRef(elt) {
+        var ref = elt.id;
+
+        if (elt.href) {
+            ref = elt.getAttribute('href').substr(1);
+            if ('@' == elt.innerHTML.charAt(0)) {
+                elt.onclick = function() {
+                    var r = document.getElementById(ref).parentNode.parentNode,
+                        f = r && r.parentNode,
+                        t = elt.parentNode,
+                        c = elt.cloneNode(true);
+                    if (r && r.className == "sf-dump-child") {
+                        f.insertBefore(c, r);
+                        try {
+                            t.replaceChild(r, elt);
+                            f.replaceChild(elt, c);
+                            Sfjs.dump.refStyle.innerHTML = '';
+                            r = r.firstChild;
+                            c = r.nextSibling;
+                            if ('sf-dump-compact' == c.className) {
+                                Sfjs.dump.toggle(r);
+                            }
+
+                            return false;
+                        } catch (e) {
+                            f.removeChild(c);
+                        }
+                    }
+                };
+            }
+        }
+        elt.className += ' '+ref;
+        elt.onmouseover = function() {
+            Sfjs.dump.refStyle.innerHTML = 'pre.sf-dump .'+ref+'{background-color: yellow; border-radius: 2px}';
+        };
+        elt.onmouseout = function() {
+            Sfjs.dump.refStyle.innerHTML = '';
+        };
+    }
+
+    while (i < this.refLen) {
+        elt = this.refElts[i];
+        if ("sf-dump-ref" == elt.className) {
+            instrumentRef(elt);
         }
         ++i;
     }
@@ -131,16 +193,16 @@ Sfjs.dump.toggle = Sfjs.dump.toggle || function(a) {
     var s = a.nextElementSibling;
 
     if ('sf-dump-compact' == s.className) {
-        a.innerHTML = '▼';
+        a.firstChild.innerHTML = '▼';
         s.className = 'sf-dump-expanded';
     } else {
-        a.innerHTML = '▶';
+        a.firstChild.innerHTML = '▶';
         s.className = 'sf-dump-compact';
     }
 };
 </script>
 <style>
-#%id% {
+pre.sf-dump {
     display: block;
     background-color: #300a24;
     white-space: pre;
@@ -148,34 +210,30 @@ Sfjs.dump.toggle = Sfjs.dump.toggle || function(a) {
     color: #eee8d5;
     font: 12px monospace, sans-serif;
     padding: 5px;
+    border-radius: 5px;
 }
-#%id% span {
+pre.sf-dump span {
     display: inline;
 }
-#%id% .sf-dump-compact {
+pre.sf-dump .sf-dump-compact {
     display: none;
 }
-#%id% abbr {
+pre.sf-dump abbr {
     text-decoration: none;
     border: none;
     cursor: help;
 }
-#%id% a {
+pre.sf-dump a {
     text-decoration: none;
     cursor: pointer;
-}
-#%id% a:hover {
-    text-decoration: underline;
 }
 EOHTML;
 
         foreach ($this->styles as $class => $style) {
-            $line .= "#%id% .sf-dump-$class {{$style}}";
+            $line .= "pre.sf-dump .sf-dump-$class {{$style}}";
         }
 
-        $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
-
-        return str_replace('%id%', $this->dumpId, $this->dumpHeader);
+        return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
     }
 
     /**
@@ -214,9 +272,9 @@ EOHTML;
         if ('ref' === $style) {
             $ref = substr($val, 1);
             if ('#' === $val[0]) {
-                return "<span class=sf-dump-ref id=\"{$this->dumpId}-ref$ref\">$val</span>";
+                return "<span class=sf-dump-ref name=sf-dump-ref id=\"{$this->dumpId}-ref$ref\">$val</span>";
             } else {
-                return "<a class=sf-dump-ref href=\"#{$this->dumpId}-ref$ref\">$val</a>";
+                return "<a class=sf-dump-ref name=sf-dump-ref href=\"#{$this->dumpId}-ref$ref\">$val</a>";
             }
         }
 
@@ -231,7 +289,9 @@ EOHTML;
             }
         } elseif ('note' === $style) {
             if (false !== $c = strrpos($val, '\\')) {
-                $val = sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $val, $style, substr($val, $c+1));
+                return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $val, $style, substr($val, $c+1));
+            } elseif (':' === $val[0]) {
+                return sprintf('<abbr title="Resource of type `%s`" class=sf-dump-%s>%s</abbr>', substr($val, 1), $style, $val);
             }
         }
 
@@ -243,20 +303,15 @@ EOHTML;
      */
     protected function dumpLine($depth)
     {
-        switch ($this->lastDepth - $depth) {
-            case +1: $this->line = '</span>'.$this->line; break;
-            case -1: $this->line = "<span class=sf-dump-$depth>$this->line"; break;
-        }
-
         if (-1 === $this->lastDepth) {
-            $this->line = str_replace('%id%', $this->dumpId, $this->dumpPrefix).$this->line;
+            $this->line = $this->dumpPrefix.$this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;
         }
 
         if (-1 === $depth) {
-            $this->line .= str_replace('%id%', $this->dumpId, $this->dumpSuffix);
+            $this->line .= $this->dumpSuffix;
             parent::dumpLine(0);
         }
         $this->lastDepth = $depth;

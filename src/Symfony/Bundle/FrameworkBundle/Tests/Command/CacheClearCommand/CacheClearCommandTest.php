@@ -24,7 +24,7 @@ class CacheClearCommandTest extends TestCase
     {
         $this->fs = new Filesystem();
         $this->kernel = new AppKernel('test', true);
-        $this->rootDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('sf2_cache_');
+        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('sf2_cache_');
         $this->kernel->setRootDir($this->rootDir);
         $this->fs->mkdir($this->rootDir);
     }
@@ -51,7 +51,7 @@ class CacheClearCommandTest extends TestCase
                 $configCache->isFresh(),
                 sprintf(
                     'Meta file "%s" is not fresh',
-                    (string)$file
+                    (string) $file
                 )
             );
         }

@@ -445,6 +445,18 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo:sublong', $application->findNamespace('f:sub'));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Command "foo::bar" is not defined.
+     */
+    public function testFindWithDoubleColonInNameThrowsException()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+        $application->add(new \Foo4Command());
+        $application->find('foo::bar');
+    }
+
     public function testSetCatchExceptions()
     {
         $application = $this->getMock('Symfony\Component\Console\Application', array('getTerminalWidth'));

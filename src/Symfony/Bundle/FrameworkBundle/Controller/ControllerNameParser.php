@@ -47,7 +47,7 @@ class ControllerNameParser
     public function parse($controller)
     {
         $originalController = $controller;
-        if (3 != count($parts = explode(':', $controller))) {
+        if (3 !== count($parts = explode(':', $controller))) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 

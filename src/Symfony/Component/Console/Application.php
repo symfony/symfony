@@ -923,7 +923,7 @@ class Application
 
             new InputOption('--help',           '-h', InputOption::VALUE_NONE, 'Display this help message.'),
             new InputOption('--quiet',          '-q', InputOption::VALUE_NONE, 'Do not output any message.'),
-            new InputOption('--verbose',        '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug'),
+            new InputOption('--verbose',        '-v|vv|vvv', InputOption::VALUE_NONE, 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.'),
             new InputOption('--version',        '-V', InputOption::VALUE_NONE, 'Display this application version.'),
             new InputOption('--ansi',           '',   InputOption::VALUE_NONE, 'Force ANSI output.'),
             new InputOption('--no-ansi',        '',   InputOption::VALUE_NONE, 'Disable ANSI output.'),
@@ -1067,7 +1067,7 @@ class Application
                 }
 
                 $lev = levenshtein($subname, $parts[$i]);
-                if ($lev <= strlen($subname) / 3 || false !== strpos($parts[$i], $subname)) {
+                if ($lev <= strlen($subname) / 3 || '' !== $subname && false !== strpos($parts[$i], $subname)) {
                     $alternatives[$collectionName] = $exists ? $alternatives[$collectionName] + $lev : $lev;
                 } elseif ($exists) {
                     $alternatives[$collectionName] += $threshold;

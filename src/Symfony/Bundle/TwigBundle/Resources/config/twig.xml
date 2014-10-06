@@ -25,6 +25,7 @@
         <parameter key="twig.translation.extractor.class">Symfony\Bridge\Twig\Translation\TwigExtractor</parameter>
         <parameter key="twig.exception_listener.class">Symfony\Component\HttpKernel\EventListener\ExceptionListener</parameter>
         <parameter key="twig.controller.exception.class">Symfony\Bundle\TwigBundle\Controller\ExceptionController</parameter>
+        <parameter key="twig.controller.preview_error.class">Symfony\Bundle\TwigBundle\Controller\PreviewErrorController</parameter>
     </parameters>
 
     <services>
@@ -132,6 +133,11 @@
         <service id="twig.controller.exception" class="%twig.controller.exception.class%">
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="twig.controller.preview_error" class="%twig.controller.preview_error.class%">
+            <argument type="service" id="http_kernel" />
+            <argument>%twig.exception_listener.controller%</argument>
         </service>
     </services>
 </container>

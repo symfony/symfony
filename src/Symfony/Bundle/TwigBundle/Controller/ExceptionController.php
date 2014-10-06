@@ -18,7 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * ExceptionController.
+ * ExceptionController renders error or exception pages for a given
+ * FlattenException.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Matthias Pigulla <mp@webfactory.de>
@@ -26,47 +27,43 @@ use Symfony\Component\HttpFoundation\Response;
 class ExceptionController
 {
     protected $twig;
-    protected $debug;
+    protected $showException;
 
-    public function __construct(\Twig_Environment $twig, $debug)
+    public function __construct(\Twig_Environment $twig, $showException)
     {
         $this->twig = $twig;
-        $this->debug = $debug;
+        $this->showException = $showException;
     }
 
     /**
      * Converts an Exception to a Response.
      *
-     * @param Request              $request   The request
-     * @param FlattenException     $exception A FlattenException instance
-     * @param DebugLoggerInterface $logger    A DebugLoggerInterface instance
+     * @param Request              $request       The request
+     * @param FlattenException     $exception     A FlattenException instance
+     * @param DebugLoggerInterface $logger        A DebugLoggerInterface instance
+     * @param bool|null            $showException Whether an exception or error page shall be displayed. If null, it defaults to the value given in the constructor.
      *
      * @return Response
      *
      * @throws \InvalidArgumentException When the exception template does not exist
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null, $showException = null)
     {
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
+        $showException = ($showException !== null) ? $showException : $this->showException;
 
-        return $this->createResponse($request, $exception, $this->debug, $logger, $currentContent);
-    }
+        $code = $exception->getStatusCode();
 
-    /**
-     * Displays the error page for arbitrary status codes and formats.
-     *
-     * @param Request   $request The request
-     * @param int       $code    The HTTP status code to show the error page for.
-     *
-     * @return Response
-     *
-     * @throws \InvalidArgumentException When the error template does not exist
-     */
-    public function testErrorPageAction(Request $request, $code)
-    {
-        $exception = FlattenException::create(new \Exception("Something has intentionally gone wrong."), $code);
-
-        return $this->createResponse($request, $exception, false);
+        return new Response($this->twig->render(
+            $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
+            array(
+                'status_code' => $code,
+                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'exception' => $exception,
+                'logger' => $logger,
+                'currentContent' => $currentContent,
+            )
+        ));
     }
 
     /**
@@ -89,19 +86,19 @@ class ExceptionController
      * @param Request $request
      * @param string  $format
      * @param int     $code       An HTTP response status code
-     * @param bool    $debug
+     * @param bool    $showException
      *
      * @return TemplateReference
      */
-    protected function findTemplate(Request $request, $format, $code, $debug)
+    protected function findTemplate(Request $request, $format, $code, $showException)
     {
-        $name = $debug ? 'exception' : 'error';
-        if ($debug && 'html' == $format) {
+        $name = $showException ? 'exception' : 'error';
+        if ($showException && 'html' == $format) {
             $name = 'exception_full';
         }
 
-        // when not in debug, try to find a template for the specific HTTP status code and format
-        if (!$debug) {
+        // For error pages, try to find a template for the specific HTTP status code and format
+        if (!$showException) {
             $template = new TemplateReference('TwigBundle', 'Exception', $name.$code, $format, 'twig');
             if ($this->templateExists($template)) {
                 return $template;
@@ -136,30 +133,5 @@ class ExceptionController
         }
 
         return false;
-    }
-
-    /**
-     * @param Request              $request
-     * @param FlattenException     $exception
-     * @param bool                 $debug
-     * @param DebugLoggerInterface $logger
-     * @param string               $currentContent
-     *
-     * @return Response
-     */
-    protected function createResponse(Request $request, FlattenException $exception, $debug, DebugLoggerInterface $logger = null, $currentContent = '')
-    {
-        $code = $exception->getStatusCode();
-
-        return new Response($this->twig->render(
-            $this->findTemplate($request, $request->getRequestFormat(), $code, $debug),
-            array(
-                'status_code' => $code,
-                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception' => $exception,
-                'logger' => $logger,
-                'currentContent' => $currentContent,
-            )
-        ));
     }
 }

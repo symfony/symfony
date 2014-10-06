@@ -25,7 +25,7 @@ class HtmlDumper extends CliDumper
 
     protected $dumpHeader;
     protected $dumpPrefix = '<pre class=sf-dump>';
-    protected $dumpSuffix = '</pre><script>Sfjs.dump.instrument()</script>';
+    protected $dumpSuffix = '</pre><script>Sfdump.instrument()</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
     protected $headerIsDumped = false;
@@ -106,17 +106,16 @@ class HtmlDumper extends CliDumper
 
         $line = <<<'EOHTML'
 <script>
-Sfjs = window.Sfjs || {};
-Sfjs.dump = Sfjs.dump || {};
-Sfjs.dump.childElts = Sfjs.dump.childElts || document.getElementsByName('sf-dump-child');
-Sfjs.dump.childLen = Sfjs.dump.childLen || 0;
-Sfjs.dump.refElts = Sfjs.dump.refElts || document.getElementsByName('sf-dump-ref');
-Sfjs.dump.refLen = Sfjs.dump.refLen || 0;
-if (!Sfjs.dump.refStyle) {
-    Sfjs.dump.refStyle = document.createElement('style');
-    document.documentElement.firstChild.appendChild(Sfjs.dump.refStyle);
+Sfdump = window.Sfdump || {};
+Sfdump.childElts = Sfdump.childElts || document.getElementsByName('sf-dump-child');
+Sfdump.childLen = Sfdump.childLen || 0;
+Sfdump.refElts = Sfdump.refElts || document.getElementsByName('sf-dump-ref');
+Sfdump.refLen = Sfdump.refLen || 0;
+if (!Sfdump.refStyle) {
+    Sfdump.refStyle = document.createElement('style');
+    document.documentElement.firstChild.appendChild(Sfdump.refStyle);
 }
-Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
+Sfdump.instrument = Sfdump.instrument || function () {
     var elt, i, ref;
 
     i = this.childLen;
@@ -126,13 +125,13 @@ Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
         elt = this.childElts[i];
         if ("" == elt.className) {
             elt.className = "sf-dump-child";
-            elt.innerHTML = '<a class=sf-dump-ref onclick="Sfjs.dump.toggle(this)"><span>▼</span></a><span class="sf-dump-expanded">'+elt.innerHTML+'</span>';
+            elt.innerHTML = '<a class=sf-dump-ref onclick="Sfdump.toggle(this)"><span>▼</span></a><span class="sf-dump-expanded">'+elt.innerHTML+'</span>';
             if ('sf-dump-expanded' == elt.parentNode.className) {
                 if (elt.children[1].firstChild.nextSibling.id) {
                     elt.firstChild.appendChild(elt.children[1].firstChild);
                     elt.firstChild.appendChild(elt.children[1].firstChild);
                 }
-                Sfjs.dump.toggle(elt.firstChild);
+                Sfdump.toggle(elt.firstChild);
             }
         }
         ++i;
@@ -157,11 +156,11 @@ Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
                         try {
                             t.replaceChild(r, elt);
                             f.replaceChild(elt, c);
-                            Sfjs.dump.refStyle.innerHTML = '';
+                            Sfdump.refStyle.innerHTML = '';
                             r = r.firstChild;
                             c = r.nextSibling;
                             if ('sf-dump-compact' == c.className) {
-                                Sfjs.dump.toggle(r);
+                                Sfdump.toggle(r);
                             }
 
                             return false;
@@ -174,10 +173,10 @@ Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
         }
         elt.className += ' '+ref;
         elt.onmouseover = function() {
-            Sfjs.dump.refStyle.innerHTML = 'pre.sf-dump .'+ref+'{background-color: yellow; border-radius: 2px}';
+            Sfdump.refStyle.innerHTML = 'pre.sf-dump .'+ref+'{background-color: yellow; border-radius: 2px}';
         };
         elt.onmouseout = function() {
-            Sfjs.dump.refStyle.innerHTML = '';
+            Sfdump.refStyle.innerHTML = '';
         };
     }
 
@@ -189,7 +188,7 @@ Sfjs.dump.instrument = Sfjs.dump.instrument || function () {
         ++i;
     }
 };
-Sfjs.dump.toggle = Sfjs.dump.toggle || function(a) {
+Sfdump.toggle = Sfdump.toggle || function(a) {
     var s = a.nextElementSibling;
 
     if ('sf-dump-compact' == s.className) {

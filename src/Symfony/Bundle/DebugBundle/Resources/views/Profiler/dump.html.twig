@@ -84,7 +84,7 @@
                 {{ dump.name }}
             {% endif %}
             line {{ dump.line }}:
-            <a onclick="Sfjs.dump.toggle(this)">▶</a>
+            <a onclick="Sfdump.toggle(this)">▶</a>
             <span class="sf-dump-compact">
             {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
             </span>

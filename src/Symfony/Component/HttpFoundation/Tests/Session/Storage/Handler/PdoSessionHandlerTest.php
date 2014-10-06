@@ -172,7 +172,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
             }));
 
         $insertStmt->expects($this->once())->method('execute')
-            ->will($this->returnCallback(function() use (&$exception) {
+            ->will($this->returnCallback(function () use (&$exception) {
                 throw $exception = new \PDOException('', '23');
             }));
 

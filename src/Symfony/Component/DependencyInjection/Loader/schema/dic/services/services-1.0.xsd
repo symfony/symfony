@@ -79,6 +79,7 @@
       <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="lazy_call" type="lazy_call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
     </xsd:choice>
@@ -154,6 +155,16 @@
       <xsd:element name="service" type="service" />
     </xsd:choice>
     <xsd:attribute name="method" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="lazy_call" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+    <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="trigger-method" type="xsd:string" />
+    <xsd:attribute name="trigger-property" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:simpleType name="parameter_type">

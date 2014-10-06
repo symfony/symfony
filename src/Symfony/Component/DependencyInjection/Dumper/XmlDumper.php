@@ -102,6 +102,35 @@ class XmlDumper extends Dumper
     }
 
     /**
+     * Adds method lazy calls.
+     *
+     * @param array       $methodcalls
+     * @param \DOMElement $parent
+     */
+    private function addMethodLazyCalls(array $methodcalls, \DOMElement $parent)
+    {
+        foreach ($methodcalls as $methodcall) {
+            $call = $this->document->createElement('lazy_call');
+            $call->setAttribute('method', $methodcall[0]);
+            $trigger = $methodcall[2];
+            if (is_array($trigger)) {
+                if (key($trigger) == 'property') {
+                    $call->setAttribute('trigger-property', current($trigger));
+                }
+                if (key($trigger) == 'method') {
+                    $call->setAttribute('trigger-method', current($trigger));
+                }
+            } else if ($trigger) {
+                $call->setAttribute('trigger-method', $trigger);
+            }
+            if (count($methodcall[1])) {
+                $this->convertParameters($methodcall[1], 'argument', $call);
+            }
+            $parent->appendChild($call);
+        }
+    }
+
+    /**
      * Adds a service.
      *
      * @param Definition  $definition
@@ -175,6 +204,7 @@ class XmlDumper extends Dumper
         }
 
         $this->addMethodCalls($definition->getMethodCalls(), $service);
+        $this->addMethodLazyCalls($definition->getMethodLazyCalls(), $service);
 
         if ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');

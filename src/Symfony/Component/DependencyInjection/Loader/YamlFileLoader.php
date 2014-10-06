@@ -250,6 +250,18 @@ class YamlFileLoader extends FileLoader
             }
         }
 
+        if (isset($service['lazy_calls'])) {
+            $calls = $service['lazy_calls'];
+            if (!is_array($calls)) {
+                throw new InvalidArgumentException(sprintf('Parameter "lazy_calls" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            }
+
+            foreach ($service['lazy_calls'] as $call) {
+                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                $definition->addMethodLazyCall($call[0], $args, isset($call[2]) ? $call[2] : null);
+            }
+        }
+
         if (isset($service['tags'])) {
             if (!is_array($service['tags'])) {
                 throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));

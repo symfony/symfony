@@ -16,6 +16,10 @@ services:
             - [ setBar, [] ]
             - [ setBar ]
             - [ setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'] ]
+        lazy_calls:
+            - [ setBar, [] ]
+            - [ setBar, [ foo], property : foo ]
+            - [ setBar, [ foo], method : foo ]
     method_call2:
         class: FooClass
         calls:

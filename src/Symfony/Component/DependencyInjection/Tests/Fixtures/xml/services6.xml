@@ -35,6 +35,13 @@
       <call method="setBar">
         <argument type="expression">service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")</argument>
       </call>
+      <lazy_call method="setBar" />
+      <lazy_call method="setBar" trigger-property="foo">
+        <argument>foo</argument>
+      </lazy_call>
+      <lazy_call method="setBar" trigger-method="foo">
+          <argument>foo</argument>
+      </lazy_call>
     </service>
     <service id="method_call2" class="FooClass">
       <call method="setBar">

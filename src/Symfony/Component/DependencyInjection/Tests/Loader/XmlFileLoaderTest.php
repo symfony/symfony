@@ -213,6 +213,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(array('setBar', array()), array('setBar', array(new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")')))), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
+        $this->assertEquals(array('setBar', array(), null, null), $services['method_call1']->getMethodLazyCalls()[0], '->load() parses the method_lazy_call tag');
+        $this->assertEquals(array('setBar', array('foo'), ['property' => 'foo'], null), $services['method_call1']->getMethodLazyCalls()[1], '->load() parses the method_lazy_call tag');
+        $this->assertEquals(array('setBar', array('foo'), ['method' => 'foo'], null), $services['method_call1']->getMethodLazyCalls()[2], '->load() parses the method_lazy_call tag');
         $this->assertNull($services['factory_service']->getClass());
         $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());

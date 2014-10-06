@@ -201,6 +201,17 @@ class XmlFileLoader extends FileLoader
             $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'));
         }
 
+        foreach ($this->getChildren($service, 'lazy_call') as $call) {
+            $trigger = null;
+            if ($call->hasAttribute('trigger-property')) {
+                $trigger = ['property' => $call->getAttribute('trigger-property')];
+            }
+            if ($call->hasAttribute('trigger-method')) {
+                $trigger = ['method' => $call->getAttribute('trigger-method')];
+            }
+            $definition->addMethodLazyCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'), $trigger);
+        }
+
         foreach ($this->getChildren($service, 'tag') as $tag) {
             $parameters = array();
             foreach ($tag->attributes as $name => $node) {

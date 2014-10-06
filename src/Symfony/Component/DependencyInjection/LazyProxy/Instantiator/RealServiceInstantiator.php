@@ -28,6 +28,12 @@ class RealServiceInstantiator implements InstantiatorInterface
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, $id, $realInstantiator)
     {
-        return call_user_func($realInstantiator);
+        $service = call_user_func($realInstantiator);
+        
+        foreach ($definition->getMethodLazyCalls() as $call) {
+            call_user_func($call[3]);
+        }
+        
+        return $service;
     }
 }

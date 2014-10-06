@@ -8,7 +8,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
-class AppKernel extends Kernel
+class TestAppKernel extends Kernel
 {
     /**
      * Returns an array of bundles to register.

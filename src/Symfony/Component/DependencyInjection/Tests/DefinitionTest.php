@@ -131,6 +131,25 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Symfony\Component\DependencyInjection\Definition::setMethodLazyCalls
+     * @covers Symfony\Component\DependencyInjection\Definition::addMethodLazyCall
+     * @covers Symfony\Component\DependencyInjection\Definition::hasMethodLazyCall
+     * @covers Symfony\Component\DependencyInjection\Definition::removeMethodLazyCall
+     */
+    public function testMethodLazyCalls()
+    {
+        $def = new Definition('stdClass');
+        $this->assertSame($def, $def->setMethodLazyCalls(array(array('setFoo', array('foo')))), '->setMethodLazyCalls() implements a fluent interface');
+        $this->assertEquals(array(array('setFoo', array('foo'), null, null)), $def->getMethodLazyCalls(), '->getMethodLazyCalls() returns the methods to call');
+        $this->assertSame($def, $def->addMethodLazyCall('bar', array('bar'), ['property' => 'bar']), '->addMethodLazyCall() implements a fluent interface');
+        $this->assertEquals(array(array('setFoo', array('foo'), null, null), array('bar', array('bar'), ['property' => 'bar'], null)), $def->getMethodLazyCalls(), '->addMethodLazyCall() adds a method to call');
+        $this->assertTrue($def->hasMethodLazyCall('bar'), '->hasMethodLazyCall() returns true if first argument is a method to call registered');
+        $this->assertFalse($def->hasMethodLazyCall('no_registered'), '->hasMethodLazyCall() returns false if first argument is not a method to call registered');
+        $this->assertSame($def, $def->removeMethodLazyCall('bar'), '->removeMethodLazyCall() implements a fluent interface');
+        $this->assertEquals(array(array('setFoo', array('foo'), null, null)), $def->getMethodLazyCalls(), '->removeMethodLazyCall() removes a method to call');
+    }
+
+    /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage Method name cannot be empty.
      */

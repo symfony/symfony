@@ -44,13 +44,14 @@ class CrossCheckTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new $dumperClass($container1);
         file_put_contents($tmp, $dumper->dump());
+        file_put_contents($fixture.$type, $dumper->dump());
 
         $container2 = new ContainerBuilder();
         $loader2 = new $loaderClass($container2, new FileLocator());
         $loader2->load($tmp);
 
         unlink($tmp);
-
+        
         $this->assertEquals($container2->getAliases(), $container1->getAliases(), 'loading a dump from a previously loaded container returns the same container');
         $this->assertEquals($container2->getDefinitions(), $container1->getDefinitions(), 'loading a dump from a previously loaded container returns the same container');
         $this->assertEquals($container2->getParameterBag()->all(), $container1->getParameterBag()->all(), '->getParameterBag() returns the same value for both containers');

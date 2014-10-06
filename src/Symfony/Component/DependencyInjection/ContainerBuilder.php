@@ -916,8 +916,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
 
-        if ($tryProxy && $definition->isLazy()) {
-            $container = $this;
+        if ($tryProxy && ($definition->isLazy() || $definition->getMethodLazyCalls())) {
+            $container = $this;            
 
             $proxy = $this
                 ->getProxyInstantiator()
@@ -925,7 +925,18 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $container,
                     $definition,
                     $id, function () use ($definition, $id, $container) {
-                        return $container->createService($definition, $id, false);
+                        $service =  $container->createService($definition, $id, false);
+
+                        if ($calls = $definition->getMethodLazyCalls()) {
+                            foreach ($calls as &$call) {
+                                $call[3] = function() use ($container, $service, $call) {
+                                    $container->callMethod($service, $call);
+                                };
+                            }
+                            $definition->setMethodLazyCalls($calls);
+                        }
+                        
+                        return $service;
                     }
                 );
             $this->shareService($definition, $proxy, $id);

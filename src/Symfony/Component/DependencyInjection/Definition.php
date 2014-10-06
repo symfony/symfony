@@ -32,6 +32,7 @@ class Definition
     private $scope = ContainerInterface::SCOPE_CONTAINER;
     private $properties = array();
     private $calls = array();
+    private $lazyCalls = array();
     private $configurator;
     private $tags = array();
     private $public = true;
@@ -446,6 +447,115 @@ class Definition
     public function getMethodCalls()
     {
         return $this->calls;
+    }
+
+    /**
+     * Sets the methods to call lazily after service initialization.
+     *
+     * @param array $calls An array of method calls
+     *
+     * @return Definition The current instance
+     *
+     * @api
+     */
+    public function setMethodLazyCalls(array $calls = array())
+    {
+        $this->lazyCalls = array();
+        foreach ($calls as $call) {
+            $trigger = isset($call[2]) ? $call[2] : null;
+            $init = isset($call[3]) ? $call[3] : null;
+            $this->addMethodLazyCall($call[0], $call[1], $trigger, $init);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds a method to call lazily after service initialization.
+     *
+     * @param string $method        The method name to call
+     * @param array  $arguments     An array of arguments to pass to the method call
+     * @param array  $trigger       The trigger config
+     * @param array  $initializer   The initialize method name
+     *
+     * @return Definition The current instance
+     *
+     * @throws InvalidArgumentException on empty $method param
+     *
+     * @api
+     */
+    public function addMethodLazyCall($method, array $arguments = array(), $trigger = null, $initializer = null)
+    {
+        if (empty($method)) {
+            throw new InvalidArgumentException(sprintf('Method name cannot be empty.'));
+        }
+
+        if (is_array($trigger)) {
+            if (!in_array(key($trigger), ['property', 'method'])) {
+                throw new InvalidArgumentException(sprintf('Lazy calls trigger must be based a property or a method name.'));
+            }
+        } else if (!$trigger) {
+            if ('set' !== substr($method, 0, 3)) {
+                throw new InvalidArgumentException(sprintf('Lazy calls must defined a trigger or must based on a setter'));
+            }
+        }
+
+        $this->lazyCalls[] = array($method, $arguments, $trigger, $initializer);
+
+        return $this;
+    }
+
+    /**
+     * Removes a method to call lazily after service initialization.
+     *
+     * @param string $method The method name to remove
+     *
+     * @return Definition The current instance
+     *
+     * @api
+     */
+    public function removeMethodLazyCall($method)
+    {
+        foreach ($this->lazyCalls as $i => $call) {
+            if ($call[0] === $method) {
+                unset($this->lazyCalls[$i]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the current definition has a given method to call lazily after service initialization.
+     *
+     * @param string $method The method name to search for
+     *
+     * @return bool
+     *
+     * @api
+     */
+    public function hasMethodLazyCall($method)
+    {
+        foreach ($this->lazyCalls as $call) {
+            if ($call[0] === $method) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the methods to call lazily after service initialization.
+     *
+     * @return array An array of method calls
+     *
+     * @api
+     */
+    public function getMethodLazyCalls()
+    {
+        return $this->lazyCalls;
     }
 
     /**

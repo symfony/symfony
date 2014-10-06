@@ -50,12 +50,35 @@ class RuntimeInstantiator implements InstantiatorInterface
     {
         return $this->factory->createProxy(
             $definition->getClass(),
-            function (&$wrappedInstance, LazyLoadingInterface $proxy) use ($realInstantiator) {
-                $wrappedInstance = call_user_func($realInstantiator);
+            function (&$wrappedInstance, LazyLoadingInterface $proxy, $method, $parameters) use ($realInstantiator, $definition) {
+                if (!$wrappedInstance) {
+                    $wrappedInstance = call_user_func($realInstantiator);
 
-                $proxy->setProxyInitializer(null);
+                    // If there is no lazy calls then we can disable the initializer
+                    if (!$definition->getMethodLazyCalls()) {
+                        $proxy->setProxyInitializer(null);
 
-                return true;
+                        return true;
+                    }
+                }
+
+                if ('__get' === $method) {
+                    $method .= '::' . current($parameters);
+                }
+
+                $calls = $definition->getMethodLazyCalls();
+                foreach ($calls as $call) {
+                    $trigger = $call[2];
+                    if (is_array($trigger)) {
+                        $trigger = ('property' == key($trigger) ? '__get::' : '') . current($trigger);
+                    } else if ('set' === substr($call[0], 0, 3)) {
+                        $trigger = 'get' . substr($call[0], 3);   
+                    }
+                    if ($method == $trigger) {
+                        call_user_func($call[3]);
+                        break;
+                    }
+                }
             }
         );
     }

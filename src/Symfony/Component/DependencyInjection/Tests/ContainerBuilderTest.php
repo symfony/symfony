@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -368,6 +369,48 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->register('foo1', 'Bar\FooClass')->addMethodCall('setBar', array(array('%value%', new Reference('bar'))));
         $builder->setParameter('value', 'bar');
         $this->assertEquals(array('bar', $builder->get('bar')), $builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceMethodLazyCalls()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo1', 'Bar\FooClass')->addMethodLazyCall('setBar', array(array('%value%', new Reference('bar'))));
+        $builder->setParameter('value', 'bar');
+        $this->assertEquals(array('bar', $builder->get('bar')), $builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
+    }
+
+    /**
+     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
+     */
+    public function testCreateServiceMethodLazyCallsWithRuntimeInstanciator()
+    {
+        if (!interface_exists('ProxyManager\Proxy\ProxyInterface')) {
+            $this->markTestSkipped('The proxy-manager project is not available');
+        }
+
+        $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RuntimeInstantiator());
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo1', 'Bar\FooClass')->addMethodLazyCall('setBar', array(array('%value%', new Reference('bar'))));
+        $builder->setParameter('value', 'bar');
+        $this->assertNull($builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
+
+        $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RuntimeInstantiator());
+        $builder->register('baz', 'BazClass');
+        $builder->register('bar1', 'BarClass')->addMethodLazyCall('setBaz', array(new Reference('baz')));
+        $this->assertNotNull($builder->get('bar1')->getBaz(), '->createService() replaces the values in the method calls arguments');
+        
+        $builder = new ContainerBuilder();
+        $builder->setProxyInstantiator(new RuntimeInstantiator());
+        $builder->register('bar', 'stdClass');
+        $builder->register('foo1', 'Bar\FooClass')->addMethodLazyCall('setBar', array(array('%value%', new Reference('bar'))), ['property' => 'bar']);
+        $builder->setParameter('value', 'bar');
+        $this->assertNotNull($builder->get('foo1')->bar, '->createService() replaces the values in the method calls arguments');
     }
 
     /**

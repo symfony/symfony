@@ -135,6 +135,10 @@ class YamlDumper extends Dumper
             $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
 
+        if ($definition->getMethodLazyCalls()) {
+            $code .= sprintf("        lazy_calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodLazyCalls()), 1, 12)); /** TODO check result here */
+        }
+
         if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
             $code .= sprintf("        scope: %s\n", $scope);
         }

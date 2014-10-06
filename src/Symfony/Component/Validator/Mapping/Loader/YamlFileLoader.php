@@ -23,20 +23,18 @@ class YamlFileLoader extends FileLoader
      *
      * @var array
      */
-    protected $classes = null;
+    protected $classes;
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
         if (null === $this->classes) {
             if (!stream_is_local($this->file)) {
                 throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $this->file));
-            }
-
-            if (!file_exists($this->file)) {
-                throw new \InvalidArgumentException(sprintf('File "%s" not found.', $this->file));
             }
 
             if (null === $this->yamlParser) {
@@ -52,6 +50,7 @@ class YamlFileLoader extends FileLoader
 
             // not an array
             if (!is_array($this->classes)) {
+                $this->classes = null;
                 throw new \InvalidArgumentException(sprintf('The file "%s" must contain a YAML array.', $this->file));
             }
 

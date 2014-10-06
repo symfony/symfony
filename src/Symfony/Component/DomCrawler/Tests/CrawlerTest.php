@@ -824,33 +824,22 @@ HTML;
         }
     }
 
-    public function testBaseTag()
-    {
-        $crawler = new Crawler('<html><base href="http://base.com"><a href="link"></a></html>');
-        $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
-
-        $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less URL');
-
-        $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
-    }
-
     /**
-     * @dataProvider getFormWithBaseTagData
+     * @dataProvider getBaseTagData
      */
-    public function testFormWithBaseTag($baseValue)
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form action=""><input type="submit" value="submit"></form></html>', 'http://domain.com/some/form.php');
-
-        $this->assertEquals('http://domain.com/some/form.php', $crawler->selectButton('submit')->form()->getUri());
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
     }
 
-    public function getFormWithBaseTagData()
+    public function getBaseTagData()
     {
         return array(
-            array('/'),
-            array('http://domain.com/'),
+            array('http://base.com', 'link', 'http://base.com/link'),
+            array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
+            array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
+            array('http://base.com', '#', 'http://domain.com/path/link#', 'http://domain.com/path/link', '<base> tag does work with self referencing links'),
         );
     }
 

@@ -725,6 +725,9 @@ class FrameworkExtension extends Extension
                 break;
             case '2.5':
                 $api = Validation::API_VERSION_2_5;
+                // the validation class needs to be changed only for the 2.5 api since the deprecated interface is
+                // set as the default interface
+                $container->setParameter('validator.class', 'Symfony\Component\Validator\Validator\ValidatorInterface');
                 break;
             default:
                 $api = Validation::API_VERSION_2_5_BC;

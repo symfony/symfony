@@ -498,8 +498,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
      * @param string $sessionId Session ID
      *
      * @return string The session data
-     *
-     * @throws \PDOException
      */
     private function doRead($sessionId)
     {

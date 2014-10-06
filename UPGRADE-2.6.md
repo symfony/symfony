@@ -128,3 +128,184 @@ HttpFoundation
      - You would need to migrate the table manually if you want to keep session information of your users.
      - You could use `PdoSessionHandler::createTable` to initialize a correctly defined table depending on
        the used database vendor.
+
+OptionsResolver
+---------------
+
+ * The "array" type hint was removed from the `OptionsResolverInterface` methods
+   `setRequired()`, `setAllowedValues()`, `addAllowedValues()`, 
+   `setAllowedTypes()` and `addAllowedTypes()`. You must remove the type hint
+   from your implementations.
+   
+ * The interface `OptionsResolverInterface` was deprecated, since
+   `OptionsResolver` instances are not supposed to be shared between classes.
+   You should type hint against `OptionsResolver` instead.
+   
+   Before:
+   
+   ```php
+   protected function configureOptions(OptionsResolverInterface $resolver)
+   {
+       // ...
+   }
+   ```
+   
+   After:
+   
+   ```php
+   protected function configureOptions(OptionsResolver $resolver)
+   {
+       // ...
+   }
+   ```
+   
+ * `OptionsResolver::isRequired()` now returns `true` if a required option has
+   a default value set. The new method `isMissing()` exhibits the old
+   functionality of `isRequired()`.
+   
+   Before:
+   
+   ```php
+   $resolver->setRequired(array('port'));
+   
+   $resolver->isRequired('port');
+   // => true
+   
+   $resolver->setDefaults(array('port' => 25));
+   
+   $resolver->isRequired('port');
+   // => false
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->setRequired(array('port'));
+   
+   $resolver->isRequired('port');
+   // => true
+   $resolver->isMissing('port');
+   // => true
+   
+   $resolver->setDefaults(array('port' => 25));
+   
+   $resolver->isRequired('port');
+   // => true
+   $resolver->isMissing('port');
+   // => false
+   ```
+   
+ * `OptionsResolver::replaceDefaults()` was deprecated. Use `clear()` and
+   `setDefaults()` instead.
+   
+   Before:
+   
+   ```php
+   $resolver->replaceDefaults(array(
+       'port' => 25,
+   ));
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->clear();
+   $resolver->setDefaults(array(
+       'port' => 25,
+   ));
+   ```
+   
+ * `OptionsResolver::setOptional()` was deprecated. Use `setDefined()` instead.
+   
+   Before:
+   
+   ```php
+   $resolver->setOptional(array('port'));
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->setDefined('port');
+   ```
+   
+ * `OptionsResolver::isKnown()` was deprecated. Use `isDefined()` instead.
+   
+   Before:
+   
+   ```php
+   if ($resolver->isKnown('port')) {
+       // ...
+   }
+   ```
+   
+   After:
+   
+   ```php
+   if ($resolver->isDefined('port')) {
+       // ...
+   }
+   ```
+   
+ * The methods `setAllowedValues()`, `addAllowedValues()`, `setAllowedTypes()`
+   and `addAllowedTypes()` were changed to modify one option at a time instead
+   of batch processing options. The old API exists for backwards compatibility,
+   but will be removed in Symfony 3.0.
+   
+   Before:
+   
+   ```php
+   $resolver->setAllowedValues(array(
+       'method' => array('POST', 'GET'),
+   ));
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->setAllowedValues('method', array('POST', 'GET'));
+   ```
+   
+ * The class `Options` was merged into `OptionsResolver`. If you instantiated
+   this class manually, you should instantiate `OptionsResolver` now.
+   `Options` is now a marker interface implemented by `OptionsResolver`.
+   
+   Before:
+   
+   ```php
+   $options = new Options();
+   ```
+   
+   After:
+   
+   ```php
+   $resolver = new OptionsResolver();
+   ```
+   
+ * Normalizers for defined but unset options are not executed anymore. If you 
+   want to have them executed, you should define a default value.
+   
+   Before:
+   
+   ```php
+   $resolver->setOptional(array('port'));
+   $resolver->setNormalizers(array(
+       'port' => function ($options, $value) {
+           // return normalized value
+       }
+   ));
+   
+   $options = $resolver->resolve($options);
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->setDefault('port', null);
+   $resolver->setNormalizer('port', function ($options, $value) {
+       // return normalized value
+   });
+   
+   $options = $resolver->resolve($options);
+   ```
+   

@@ -14,6 +14,9 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
+/**
+ * @deprecated Deprecated since Symfony 2.6, to be removed in Symfony 3.0.
+ */
 class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -40,6 +43,23 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'one' => '1',
             'two' => '20',
+        ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveNumericOptions()
+    {
+        $this->resolver->setDefaults(array(
+            '1' => '1',
+            '2' => '2',
+        ));
+
+        $options = array(
+            '2' => '20',
+        );
+
+        $this->assertEquals(array(
+            '1' => '1',
+            '2' => '20',
         ), $this->resolver->resolve($options));
     }
 
@@ -172,7 +192,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
     public function testResolveFailsIfNonExistingOption()
     {
@@ -485,26 +505,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     */
-    public function testSetRequiredFailsIfDefaultIsPassed()
-    {
-        $this->resolver->setRequired(array(
-            'one' => '1',
-        ));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     */
-    public function testSetOptionalFailsIfDefaultIsPassed()
-    {
-        $this->resolver->setOptional(array(
-            'one' => '1',
-        ));
-    }
-
     public function testFluidInterface()
     {
         $this->resolver->setDefaults(array('one' => '1'))
@@ -566,20 +566,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertTrue($this->resolver->isRequired('foo'));
-    }
-
-    public function testNotRequiredIfRequiredAndDefaultValue()
-    {
-        $this->assertFalse($this->resolver->isRequired('foo'));
-
-        $this->resolver->setRequired(array(
-            'foo',
-        ));
-        $this->resolver->setDefaults(array(
-            'foo' => 'bar',
-        ));
-
-        $this->assertFalse($this->resolver->isRequired('foo'));
     }
 
     public function testNormalizersTransformFinalOptions()

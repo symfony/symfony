@@ -12,12 +12,13 @@
 namespace Symfony\Component\OptionsResolver\Exception;
 
 /**
- * Thrown when the value of an option does not match its validation rules.
+ * Exception thrown when an undefined option is passed.
  *
- * You should make sure a valid value is passed to the option.
+ * You should remove the options in question from your code or define them
+ * beforehand.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class InvalidOptionsException extends InvalidArgumentException
+class UndefinedOptionsException extends InvalidArgumentException
 {
 }

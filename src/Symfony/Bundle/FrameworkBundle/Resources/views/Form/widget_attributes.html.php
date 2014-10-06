@@ -1,4 +1,5 @@
-id="<?php echo $view->escape($id) ?>" name="<?php echo $view->escape($full_name) ?>" <?php if ($disabled): ?>disabled="disabled" <?php endif ?>
+id="<?php echo $view->escape($id) ?>" name="<?php echo $view->escape($full_name) ?>"
+<?php if ($disabled): ?>disabled="disabled" <?php endif ?>
 <?php if ($required): ?>required="required" <?php endif ?>
 <?php foreach ($attr as $k => $v): ?>
 <?php if (in_array($v, array('placeholder', 'title'), true)): ?>

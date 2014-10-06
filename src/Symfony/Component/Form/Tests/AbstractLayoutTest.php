@@ -1291,6 +1291,21 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testReadOnlyBc()
+    {
+        $form = $this->factory->createNamed('name', 'text', null, array(
+            'read_only' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+            '/input
+    [@type="text"]
+    [@name="name"]
+    [@readonly="readonly"]
+'
+        );
+    }
+
     public function testReadOnly()
     {
         $form = $this->factory->createNamed('name', 'text', null, array(

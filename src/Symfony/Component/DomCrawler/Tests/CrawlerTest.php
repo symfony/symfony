@@ -839,7 +839,8 @@ HTML;
             array('http://base.com', 'link', 'http://base.com/link'),
             array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
             array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
-            array('http://base.com', '#', 'http://domain.com/path/link#', 'http://domain.com/path/link', '<base> tag does work with self referencing links'),
+            array('http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'),
+            array('http://base.com', '', 'http://domain.com/path/link', 'http://domain.com/path/link', '<base> tag does work with empty links'),
         );
     }
 

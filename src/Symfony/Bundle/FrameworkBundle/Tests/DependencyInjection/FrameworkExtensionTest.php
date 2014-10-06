@@ -384,6 +384,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setApiVersion', $calls[5][0]);
         $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
+        $this->assertSame('Symfony\Component\Validator\ValidatorInterface', $container->getParameter('validator.class'));
         // no cache, no annotations
     }
 
@@ -399,6 +400,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setApiVersion', $calls[5][0]);
         $this->assertSame(array(Validation::API_VERSION_2_5), $calls[5][1]);
+        $this->assertSame('Symfony\Component\Validator\Validator\ValidatorInterface', $container->getParameter('validator.class'));
         // no cache, no annotations
     }
 
@@ -414,6 +416,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setApiVersion', $calls[5][0]);
         $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
+        $this->assertSame('Symfony\Component\Validator\ValidatorInterface', $container->getParameter('validator.class'));
         // no cache, no annotations
     }
 

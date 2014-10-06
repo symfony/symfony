@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T20:09:41Z
+
+:+1:
+
+@symfony/mergers given that volatile tests have been fixed, the Travis status is reliable again, so we need to loose the habit of merging with a red status
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T20:12:36Z
+
+@stof We had some broken tests during the last week which made all Travis builds fail. After this pull request, builds for pending PRs should probably be executed again to get more reliable results (there are still two or three volatile tests which fail from time to time).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-05T20:20:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T20:22:13Z
+
+Hm, the components tests fail.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T20:40:08Z
+
+looks like SecurityBundle is missing a dependency on Console somewhere
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T20:46:52Z
+
+Yes, coming from the test for the ``SetAclCommand``. But the ``FormHelperDivLayoutTest`` is failing too.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T20:50:30Z
+
+for some reason, the 2.5.x-dev branch of the form component has been installed rather than using the 2.6-dev version, and the test expectation has been changed in master in #12050
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T20:55:57Z
+
+The version constraint actually is ``2.5.*``. So, ``2.6-dev`` is not allowed.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T21:00:07Z
+
+in the master branch of Symfony ? WTF
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T21:01:13Z
+
+I updated it to ``~2.6@dev``. Should probably succeed now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T21:05:03Z
+
+Hm, the version constraint was changed in a4217c3ee02eedccea861eac1bbf310d7f065f93 in the ``2.5`` branch. Though I'm not sure about the reason for it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-05T21:16:48Z
+
+The build finally ran successfully.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T22:03:09Z
+
+> Hm, the version constraint was changed in a4217c3 in the 2.5 branch. Though I'm not sure about the reason for it.
+
+for the same reason: to avoid that the 2.5 branch receives the form expectation of 2.6 :smile:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-06T06:49:43Z
+
+Thanks for the patch. This will need a rebase once #12145 is merged (or the other way around): I renamed Sfjs.dump to Sfdump

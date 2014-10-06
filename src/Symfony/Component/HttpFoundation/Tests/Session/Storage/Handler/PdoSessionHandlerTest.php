@@ -323,9 +323,9 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
 class MockPdo extends \PDO
 {
-    public $driverName;
-    public $errorMode;
     public $prepareResult;
+    private $driverName;
+    private $errorMode;
 
     public function __construct($driverName = null, $errorMode = null)
     {

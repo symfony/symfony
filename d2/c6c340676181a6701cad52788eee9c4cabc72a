@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-06T15:25:06Z
+
+:+1: This would also fix #11909.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-06T16:05:22Z
+
+Great, thanks! Could you add the corresponding assertions to `FrameworkExtensionTest::testValidation*Api()`?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-10-06T20:33:10Z
+
+Done. One thing is strange, with each added assertion the count of executed assertions increased by three. If you modify one assertion to fail you will get 3 failed tests.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-06T20:52:47Z
+
+@peterrehm The extension tests are executed three times, once for each format (YAML, XML, PHP).
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-10-07T05:45:06Z
+
+Thanks, expected something like that but had no time left yesterday to investigate. Now this should be good to go. I think this should be merged into the 2.5 branch.

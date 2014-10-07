@@ -74,7 +74,7 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = 301)
     {
         return new RedirectResponse($url, $status);
     }

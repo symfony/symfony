@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-06T08:39:04Z
+
+Did you test this class with a real sqlite connection? If so could you please also test the blocking with https://github.com/Tobion/symfony-standard/tree/session-locking-test ?
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-10-06T09:38:40Z
+
+I didn't test it with a real sqlite connection as I don't use custom session handlers in my project. I've installed your `session-locking-test` branch and was able to read and write session data using  `/write/foo` and `/read` requests. Is it enough or should I do something else to test blocking?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-06T11:53:29Z
+
+Did you update https://github.com/Tobion/symfony-standard/blob/session-locking-test/app/config/config.yml#L46 to use postgres? You can test blocking by loading two pages `/write/foo` and `/read` at the same time. Just refresh write and then read. The read page should block until the write finished (which has a delay of 8 sec). Then do the same test with advisory locks by changing https://github.com/Tobion/symfony-standard/blob/session-locking-test/app/config/config.yml#L29 to `1`. The behavior should be the same as before.
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-10-06T12:24:06Z
+
+@Tobion I've tested `pgsql` driver as you described and it works as expected.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-06T13:00:45Z
+
+Cool thanks. And did pdo_pgsql indeed return a stream for the binary field?
+
+---------------------------------------------------------------------------
+
+by rybakit at 2014-10-06T13:16:22Z
+
+Yes, and it's mentioned in the [manual](http://php.net/manual/en/ref.pdo-pgsql.connection.php):
+
+> Note:
+> The bytea fields are returned as streams.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-06T13:28:29Z
+
+:+1: Thanks for fixing this and doing functional tests.
+In case you also have access to oracle db or mssql, it would be much appreciated to do the same tests for them.

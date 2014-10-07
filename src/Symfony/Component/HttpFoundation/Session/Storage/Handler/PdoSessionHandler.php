@@ -521,11 +521,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return '';
             }
 
-            return $sessionRows[0][0];
+            return is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
         }
 
         if (self::LOCK_TRANSACTIONAL === $this->lockMode && 'sqlite' !== $this->driver) {
-            // Exlusive-reading of non-existent rows does not block, so we need to do an insert to block
+            // Exclusive-reading of non-existent rows does not block, so we need to do an insert to block
             // until other connections to the session are committed.
             try {
                 $insertStmt = $this->pdo->prepare(
@@ -546,7 +546,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     $selectStmt->execute();
                     $sessionRows = $selectStmt->fetchAll(\PDO::FETCH_NUM);
 
-                    return $sessionRows ? $sessionRows[0][0] : '';
+                    if ($sessionRows) {
+                        return is_resource($sessionRows[0][0]) ? stream_get_contents($sessionRows[0][0]) : $sessionRows[0][0];
+                    }
+
+                    return '';
                 }
 
                 throw $e;

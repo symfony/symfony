@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests;
 
-use Symfony\Component\VarDumper\Cloner\PhpCloner;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
@@ -25,13 +25,13 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new CliDumper('php://output');
         $dumper->setColors(false);
-        $cloner = new PhpCloner();
+        $cloner = new VarCloner();
         $cloner->addCasters(array(
             ':stream' => function ($res, $a) {
                 unset($a['uri']);
 
                 return $a;
-            }
+            },
         ));
         $data = $cloner->cloneVar($var);
 

@@ -14,29 +14,37 @@ namespace Symfony\Component\VarDumper\Cloner;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class PhpCloner extends AbstractCloner
+class VarCloner extends AbstractCloner
 {
     /**
      * {@inheritdoc}
      */
     protected function doClone($var)
     {
+        $useExt = extension_loaded('symfony_debug');
         $i = 0;                         // Current iteration position in $queue
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
         $refs = 0;                      // Number of hard+soft references in $var
         $queue = array(array($var));    // This breadth-first queue is the return value
         $arrayRefs = array();           // Map of queue indexes to stub array objects
-        $hardRefs = array();            // By-ref map of stub objects' hashes to original hard `&` references
+        $hardRefs = array();            // Map of original zval hashes to stub objects
         $softRefs = array();            // Map of original object hashes to their stub object couterpart
         $values = array();              // Map of stub objects' hashes to original values
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $cookie = (object) array();     // Unique object used to detect hard references
-        $isRef = false;
         $a = null;                      // Array cast for nested structures
         $stub = null;                   // Stub capturing the main properties of an original item value,
                                         // or null if the original value is used directly
+        $zval = array(                  // Main properties of the current value
+            'type' => null,
+            'zval_isref' => null,
+            'array_count' => null,
+            'object_class' => null,
+            'object_hash' => null,
+            'resource_type' => null,
+        );
 
         for ($i = 0; $i < $len; ++$i) {
             $indexed = true;            // Whether the currently iterated array is numerically indexed or not
@@ -48,20 +56,33 @@ class PhpCloner extends AbstractCloner
                 if ($indexed && $k !== ++$j) {
                     $indexed = false;
                 }
-                $step[$k] = $cookie;
-                if ($queue[$i][$k] === $cookie) {
-                    $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
-                    unset($stub);               // independent from the original structure
-                    if ($v instanceof Stub && isset($hardRefs[spl_object_hash($v)])) {
-                        $v->ref = ++$refs;
-                        $step[$k] = $queue[$i][$k] = $v;
-                        continue;
+                if ($useExt) {
+                    $zval = symfony_zval_info($k, $step);
+                    if ($zval['zval_isref']) {
+                        $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
+                        unset($stub);               // independent from the original structure
+                        if (isset($hardRefs[$h = $zval['zval_hash']])) {
+                            $hardRefs[$h]->ref = ++$refs;
+                            $queue[$i][$k] = $hardRefs[$h];
+                            continue;
+                        }
                     }
-                    $isRef = true;
+                } else {
+                    $step[$k] = $cookie;
+                    if ($zval['zval_isref'] = $queue[$i][$k] === $cookie) {
+                        $queue[$i][$k] =& $stub;    // Break hard references to make $queue completely
+                        unset($stub);               // independent from the original structure
+                        if ($v instanceof Stub && isset($hardRefs[spl_object_hash($v)])) {
+                            $v->ref = ++$refs;
+                            $step[$k] = $queue[$i][$k] = $v;
+                            continue;
+                        }
+                    }
+                    $zval['type'] = gettype($v);
                 }
                 // Create $stub when the original value $v can not be used directly
                 // If $v is a nested structure, put that structure in array $a
-                switch (gettype($v)) {
+                switch ($zval['type']) {
                     case 'string':
                         if (isset($v[0]) && !preg_match('//u', $v)) {
                             $stub = new Stub();
@@ -74,7 +95,7 @@ class PhpCloner extends AbstractCloner
                                 $cut = $v;
                             }
                             $stub->value = Data::utf8Encode($cut);
-                        } elseif (0 <= $maxString && isset($v[1+($maxString>>2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
+                        } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
                             $stub->class = Stub::STRING_UTF8;
@@ -91,16 +112,16 @@ class PhpCloner extends AbstractCloner
                             $stub = $arrayRefs[$len] = new Stub();
                             $stub->type = Stub::TYPE_ARRAY;
                             $stub->class = Stub::ARRAY_ASSOC;
-                            $stub->value = count($v);
+                            $stub->value = $v ? $zval['array_count'] ?: count($v) : 0;
                             $a = $v;
                         }
                         break;
 
                     case 'object':
-                        if (empty($softRefs[$h = spl_object_hash($v)])) {
+                        if (empty($softRefs[$h = $zval['object_hash'] ?: spl_object_hash($v)])) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_OBJECT;
-                            $stub->class = get_class($v);
+                            $stub->class = $zval['object_class'] ?: get_class($v);
                             $stub->value = $v;
                             $a = $this->castObject($stub, 0 < $i);
                             if ($v !== $stub->value) {
@@ -129,7 +150,7 @@ class PhpCloner extends AbstractCloner
                         if (empty($softRefs[$h = (int) $v])) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_RESOURCE;
-                            $stub->class = get_resource_type($v);
+                            $stub->class = $zval['resource_type'] ?: get_resource_type($v);
                             $stub->value = $v;
                             $a = $this->castResource($stub, 0 < $i);
                             if ($v !== $stub->value) {
@@ -155,17 +176,25 @@ class PhpCloner extends AbstractCloner
                 }
 
                 if (isset($stub)) {
-                    if ($isRef) {
-                        if (Stub::TYPE_ARRAY === $stub->type) {
-                            $step[$k] = $stub;
+                    if ($zval['zval_isref']) {
+                        if ($useExt) {
+                            if (Stub::TYPE_ARRAY === $stub->type) {
+                                $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = $stub;
+                            } else {
+                                $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = $v = new Stub();
+                                $v->value = $stub;
+                            }
                         } else {
-                            $step[$k] = new Stub();
-                            $step[$k]->value = $stub;
+                            if (Stub::TYPE_ARRAY === $stub->type) {
+                                $step[$k] = $stub;
+                            } else {
+                                $step[$k] = new Stub();
+                                $step[$k]->value = $stub;
+                            }
+                            $h = spl_object_hash($step[$k]);
+                            $queue[$i][$k] = $hardRefs[$h] =& $step[$k];
+                            $values[$h] = $v;
                         }
-                        $h = spl_object_hash($step[$k]);
-                        $queue[$i][$k] = $hardRefs[$h] =& $step[$k];
-                        $values[$h] = $v;
-                        $isRef = false;
                     } else {
                         $queue[$i][$k] = $stub;
                     }
@@ -193,13 +222,17 @@ class PhpCloner extends AbstractCloner
                         $stub->position = $len++;
                     }
                     $stub = $a = null;
-                } elseif ($isRef) {
-                    $step[$k] = $queue[$i][$k] = new Stub();
-                    $step[$k]->value = $v;
-                    $h = spl_object_hash($step[$k]);
-                    $hardRefs[$h] =& $step[$k];
-                    $values[$h] = $v;
-                    $isRef = false;
+                } elseif ($zval['zval_isref']) {
+                    if ($useExt) {
+                        $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = new Stub();
+                        $queue[$i][$k]->value = $v;
+                    } else {
+                        $step[$k] = $queue[$i][$k] = new Stub();
+                        $step[$k]->value = $v;
+                        $h = spl_object_hash($step[$k]);
+                        $hardRefs[$h] =& $step[$k];
+                        $values[$h] = $v;
+                    }
                 }
             }
 

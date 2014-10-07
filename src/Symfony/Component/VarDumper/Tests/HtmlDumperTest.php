@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests;
 
-use Symfony\Component\VarDumper\Cloner\PhpCloner;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 /**
@@ -27,7 +27,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         $dumper->setColors(false);
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
-        $cloner = new PhpCloner();
+        $cloner = new VarCloner();
         $cloner->addCasters(array(
             ':stream' => function ($res, $a) {
                 unset($a['uri']);

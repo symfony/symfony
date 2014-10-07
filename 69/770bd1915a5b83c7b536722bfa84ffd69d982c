@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-06T09:12:28Z
+
+This surfaced while writting the doc for the component: I also merged ExtCloner and PhpCloner into a new VarCloner class, that dynamically chooses the best available implementation.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-06T12:03:13Z
+
+:+1: for avoiding to make the user choose the implementation

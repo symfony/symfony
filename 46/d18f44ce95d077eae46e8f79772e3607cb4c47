@@ -1,0 +1,198 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-10-03T07:50:20Z
+
+to be exact, this is safer than currently, but it does not isolate the scope entirely. The included file still get access to ``$this``
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-03T08:16:02Z
+
+@stof should it be fixed?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-03T09:09:55Z
+
+Please add a test for this
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-03T09:27:31Z
+
+@Strate @stof I tested something similar to this in php 5.5 as you can't get rid of `$this` in anonymous functions. Downside, `include_scoped()` will become globally available.
+
+```php
+    private function includeFile($file)
+    {
+        function include_scoped($file)
+        {
+            return include $file;
+        }
+        return include_scoped($file);
+    }
+```
+
+edit: to avoid the global namespace, maybe you can play around with the `namespace {}` syntax, haven't tried this.
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-03T14:14:20Z
+
+We can disable access to `$this` by making method `includeFile` static. (private). Is it acceptable?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-03T14:23:13Z
+
+@Strate that still gives access to `self`
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-03T14:25:14Z
+
+@iltar are you sure about that ? ``self::`` is not part of the context, while ``this`` is a variable in the context
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-03T14:29:05Z
+
+@stof in php: 5.5 (can't say anything about others)
+```php
+// test.php
+class Test
+{
+    private static $hi = 'I work';
+
+    public function __construct()
+    {
+        include 'include.php';
+    }
+}
+
+new Test;
+
+// include.php
+<?php
+
+var_dump(self::$hi);
+```
+```
+// result
+16:27:09 {master *+$%=} ~$ php test.php
+string(6) "I work"
+```
+
+edit:
+
+```php
+// yields same result as above
+class Test
+{
+    private static $hi = 'I work';
+
+    public function __construct()
+    {
+        self::includeFile();
+    }
+
+    private static function includeFile()
+    {
+        include 'include.php';
+    }
+}
+
+```
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-03T14:46:22Z
+
+Very funny, php :)
+Also we can call anonymous function with no context, using `bindTo()` method, but it available only in php >= 5.4
+Of course, we can introduce global function.
+But I think current implementation is safe enougth, because `$this` can not be modified, and if developer will use `$this` inside file - it is problem of developer :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-03T15:19:05Z
+
+@iltar we don't have any static state in the loader, so that cannot do any harm with access to ``self`` AFAIK (while ``$this`` technically allows to do some weird stuff with the internals of the loader)
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-03T19:25:57Z
+
+@stof I'm not sure if that matters to php (sadly). You can still call methods statically and have access to `$this`. If the method is declared static, it won't work.  I think making a function and not a method will be the safest solution.
+
+```php
+class Test
+{
+	public function __construct()
+	{
+		self::henk();
+		echo "\n";
+		self::hans();
+	}
+
+	public function henk()
+	{
+		var_dump($this);
+	}
+
+	public static function hans()
+	{
+		var_dump($this);
+	}
+}
+new Test();
+```
+
+Output:
+```
+object(Test)#1 (0) { }
+Notice: Undefined variable: this in /code/kwTyzs on line 19
+NULL PHP Notice: Undefined variable: this in /code/kwTyzs on line 19
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-04T01:03:37Z
+
+making a function creates other sorts of issues, given they cannot be autoloaded
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-04T05:13:53Z
+
+I think that the current code in this PR is "good enough".
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-04T09:13:39Z
+
+1. Converted `includeFile` to private static method
+2. Added passing `$loader` variable to configuration file
+3. Added tests.
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-05T13:14:47Z
+
+@iltar, but in your example accessing to `$this` inside static method, that called statically, didn't give you object's instance. It raises notice and returns `null`.
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-05T14:09:41Z
+
+Composer's class `Composer\Autoload\ClassLoader` already provide global function `includeFile`. Is it ok to use it?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-05T14:13:13Z
+
+no, because Symfony could be used with other autoloaders than composer (or with older versions of composer). Thus, ``Composer\Autoload\includeFile`` is not part of the composer public API. It is an internal function, which could be removed from Composer if the implementation of the ClassLoader changes.
+
+But anyway, the current state of the change is enough IMO.
+
+:+1:

@@ -26,7 +26,7 @@ class RedirectResponse extends Response
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
      * @param string  $url     The URL to redirect to
-     * @param int     $status  The status code (302 by default)
+     * @param int     $status  The status code (301 by default)
      * @param array   $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
@@ -35,7 +35,7 @@ class RedirectResponse extends Response
      *
      * @api
      */
-    public function __construct($url, $status = 302, $headers = array())
+    public function __construct($url, $status = 301, $headers = array())
     {
         if (empty($url)) {
             throw new \InvalidArgumentException('Cannot redirect to an empty URL.');

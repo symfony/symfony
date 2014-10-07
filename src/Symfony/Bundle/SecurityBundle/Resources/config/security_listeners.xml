@@ -24,8 +24,6 @@
 
         <parameter key="security.authentication.listener.x509.class">Symfony\Component\Security\Http\Firewall\X509AuthenticationListener</parameter>
 
-        <parameter key="security.authentication.listener.remote_user.class">Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener</parameter>
-
         <parameter key="security.authentication.listener.anonymous.class">Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener</parameter>
 
         <parameter key="security.authentication.switchuser_listener.class">Symfony\Component\Security\Http\Firewall\SwitchUserListener</parameter>
@@ -48,8 +46,6 @@
 
         <parameter key="security.authentication.success_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler</parameter>
         <parameter key="security.authentication.failure_handler.class">Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler</parameter>
-        <parameter key="security.authentication.custom_success_handler.class">Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler</parameter>
-        <parameter key="security.authentication.custom_failure_handler.class">Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler</parameter>
         <parameter key="security.authentication.simple_success_failure_handler.class">Symfony\Component\Security\Http\Authentication\SimpleAuthenticationHandler</parameter>
     </parameters>
 
@@ -125,7 +121,7 @@
             <argument type="service" id="event_dispatcher" on-invalid="null" />
         </service>
 
-        <service id="security.authentication.custom_success_handler" class="%security.authentication.custom_success_handler.class%" abstract="true" public="false">
+        <service id="security.authentication.custom_success_handler" class="Symfony\Component\Security\Http\Authentication\CustomAuthenticationSuccessHandler" abstract="true" public="false">
             <argument /> <!-- The custom success handler service id -->
             <argument type="collection" /> <!-- Options -->
             <argument /> <!-- Provider-shared Key -->
@@ -136,7 +132,7 @@
             <argument type="collection" /> <!-- Options -->
         </service>
 
-        <service id="security.authentication.custom_failure_handler" class="%security.authentication.custom_failure_handler.class%" abstract="true" public="false">
+        <service id="security.authentication.custom_failure_handler" class="Symfony\Component\Security\Http\Authentication\CustomAuthenticationFailureHandler" abstract="true" public="false">
             <argument /> <!-- The custom failure handler service id -->
             <argument type="collection" /> <!-- Options -->
         </service>
@@ -189,7 +185,7 @@
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
-        <service id="security.authentication.listener.remote_user" class="%security.authentication.listener.remote_user.class%" public="false" abstract="true">
+        <service id="security.authentication.listener.remote_user" class="Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.context" />
             <argument type="service" id="security.authentication.manager" />

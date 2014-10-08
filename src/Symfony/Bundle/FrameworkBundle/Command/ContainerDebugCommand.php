@@ -110,15 +110,8 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
-            $matchedId = $this->findProperServiceName($input, $output, $object, $name);
-            // check to see if nothing was matched
-            if (false === $matchedId) {
-                $output->writeln(sprintf('<error>No services found that match "%s".</error>', $name));
-
-                return;
-            }
-
-            $options = array('id' => $matchedId);
+            $name = $this->findProperServiceName($input, $output, $object, $name);
+            $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();
             $options = array('show_private' => $input->getOption('show-private'));
@@ -193,7 +186,7 @@ EOF
 
         $matchingServices = $this->findServiceIdsContaining($builder, $name);
         if (empty($matchingServices)) {
-            return false;
+            throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
         }
 
         $question = new ChoiceQuestion('Choose a number for more information on the service', $matchingServices);

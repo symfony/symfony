@@ -32,6 +32,7 @@ class ConsoleLogger extends AbstractLogger
      * @var OutputInterface
      */
     private $output;
+
     /**
      * @var array
      */
@@ -45,6 +46,7 @@ class ConsoleLogger extends AbstractLogger
         LogLevel::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
         LogLevel::DEBUG => OutputInterface::VERBOSITY_DEBUG,
     );
+
     /**
      * @var array
      */
@@ -88,7 +90,9 @@ class ConsoleLogger extends AbstractLogger
         }
 
         if ($output->getVerbosity() >= $this->verbosityLevelMap[$level]) {
-            $output->writeln(sprintf('<%1$s>[%2$s] %3$s</%1$s>', $this->formatLevelMap[$level], $level, $this->interpolate($message, $context)));
+            $output->writeln(
+                $this->formatOutput($this->formatLevelMap[$level], $level, $this->interpolate($message, $context))
+            );
         }
     }
 
@@ -112,5 +116,16 @@ class ConsoleLogger extends AbstractLogger
 
         // interpolate replacement values into the message and return
         return strtr($message, $replace);
+    }
+
+    /**
+     * @param $formatLevel
+     * @param $level
+     * @param $message
+     * @return string
+     */
+    protected function formatOutput($formatLevel, $level, $message)
+    {
+        return sprintf('<%1$s>[%2$s] %3$s</%1$s>', $formatLevel, $level, $message);
     }
 }

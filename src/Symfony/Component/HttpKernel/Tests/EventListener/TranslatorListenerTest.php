@@ -41,6 +41,21 @@ class TranslatorListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onKernelRequest($event);
     }
 
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
+    {
+        $this->translator
+            ->expects($this->at(0))
+            ->method('setLocale')
+            ->will($this->throwException(new \InvalidArgumentException()));
+        $this->translator
+            ->expects($this->at(1))
+            ->method('setLocale')
+            ->with($this->equalTo('en'));
+
+        $event = new GetResponseEvent($this->createHttpKernel(), $this->createRequest('fr'), HttpKernelInterface::MASTER_REQUEST);
+        $this->listener->onKernelRequest($event);
+    }
+
     public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists()
     {
         $this->translator
@@ -59,6 +74,22 @@ class TranslatorListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('setLocale');
 
+        $event = new FinishRequestEvent($this->createHttpKernel(), $this->createRequest('de'), HttpKernelInterface::SUB_REQUEST);
+        $this->listener->onKernelFinishRequest($event);
+    }
+
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
+    {
+        $this->translator
+            ->expects($this->at(0))
+            ->method('setLocale')
+            ->will($this->throwException(new \InvalidArgumentException()));
+        $this->translator
+            ->expects($this->at(1))
+            ->method('setLocale')
+            ->with($this->equalTo('en'));
+
+        $this->setMasterRequest($this->createRequest('fr'));
         $event = new FinishRequestEvent($this->createHttpKernel(), $this->createRequest('de'), HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }

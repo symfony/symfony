@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -36,14 +37,16 @@ class TranslatorListener implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $this->translator->setLocale($event->getRequest()->getLocale());
+        $this->setLocale($event->getRequest());
     }
 
     public function onKernelFinishRequest(FinishRequestEvent $event)
     {
-        if (null !== $parentRequest = $this->requestStack->getParentRequest()) {
-            $this->translator->setLocale($parentRequest->getLocale());
+        if (null === $parentRequest = $this->requestStack->getParentRequest()) {
+            return;
         }
+
+        $this->setLocale($parentRequest);
     }
 
     public static function getSubscribedEvents()
@@ -53,5 +56,14 @@ class TranslatorListener implements EventSubscriberInterface
             KernelEvents::REQUEST => array(array('onKernelRequest', 10)),
             KernelEvents::FINISH_REQUEST => array(array('onKernelFinishRequest', 0)),
         );
+    }
+
+    private function setLocale(Request $request)
+    {
+        try {
+            $this->translator->setLocale($request->getLocale());
+        } catch (\InvalidArgumentException $e) {
+            $this->translator->setLocale($request->getDefaultLocale());
+        }
     }
 }

@@ -184,7 +184,12 @@ EOF
             return $name;
         }
 
-        $question = new ChoiceQuestion('Choose a number for more information on the service', $this->findServiceIdsContaining($builder, $name));
+        $matchingServices = $this->findServiceIdsContaining($builder, $name);
+        if (empty($matchingServices)) {
+            throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
+        }
+
+        $question = new ChoiceQuestion('Choose a number for more information on the service', $matchingServices);
         $question->setErrorMessage('Service %s is invalid.');
 
         return $this->getHelper('question')->ask($input, $output, $question);

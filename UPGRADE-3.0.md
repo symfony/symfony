@@ -274,41 +274,6 @@ UPGRADE FROM 2.x to 3.0
 
 ### FrameworkBundle
 
- * The `getRequest` method of the base `Controller` class has been deprecated
-   since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
-   way to get the `Request` object is to inject it in the action method.
-
-   Before:
-
-   ```
-   namespace Acme\FooBundle\Controller;
-
-   class DemoController
-   {
-       public function showAction()
-       {
-           $request = $this->getRequest();
-           // ...
-       }
-   }
-   ```
-
-   After:
-
-   ```
-   namespace Acme\FooBundle\Controller;
-
-   use Symfony\Component\HttpFoundation\Request;
-
-   class DemoController
-   {
-       public function showAction(Request $request)
-       {
-           // ...
-       }
-   }
-   ```
-
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
 

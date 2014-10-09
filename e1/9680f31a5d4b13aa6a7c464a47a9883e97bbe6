@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2013-12-31T18:03:34Z
+
+@Tobion What about this PR? Do you have time to finish it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-01-01T15:26:15Z
+
+@fabpot yes I will. Do you agree with all the points in the description?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-08T21:25:55Z
+
+@fabpot this is ready. IMO this should be merged into 2.3 to reduce the divergence. But lets see what the mergers say.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-09T14:32:39Z
+
+Looks good to me. I'm a bit reluctant to merge it into 2.3 though. What @symfony/deciders think?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-09T14:42:12Z
+
+Well, fixing the inconsistencies in the type of values could go in 2.3 IMO. but turning the API into a fluent one should only be done in master IMO. It is not a bugfix
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-09T14:46:26Z
+
+@stof agreed
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-10-09T14:52:31Z
+
+I agree as well
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-09T15:11:26Z
+
+I would consider the fluent thing a bug fix because one method had this already (probably unintentional). So either the ugly code stays in an LTS version or we make all setters fluent (which is not considered a bc break).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-09T15:14:02Z
+
+If you still want me to split it, I can do it though
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-09T15:15:40Z
+
+I prefer to stay strict on what we do in 2.3. So, the split looks like a better option to me (even if indeed these changes are not a big deal.)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-09T15:33:58Z
+
+Here you go, the one for 2.3: #12190
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-09T15:36:57Z
+
+If #12190 is merged and 2.3 merged into master, I can rebase this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-09T16:00:35Z
+
+#12190 merged and 2.3 merged into master
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-09T16:15:26Z
+
+Adjusted

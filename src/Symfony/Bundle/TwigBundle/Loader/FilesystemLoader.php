@@ -43,21 +43,12 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
 
     /**
      * {@inheritdoc}
+     *
+     * The name parameter might also be a TemplateReferenceInterface.
      */
-    public function exists($template)
+    public function exists($name)
     {
-        if (parent::exists($template)) {
-            return true;
-        }
-
-        // same logic as findTemplate below for the fallback
-        try {
-            $this->cache[(string) $template] = $this->locator->locate($this->parser->parse($template));
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return true;
+        return parent::exists((string) $name);
     }
 
     /**
@@ -84,18 +75,14 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         $file = null;
         $previous = null;
         try {
-            $file = parent::findTemplate($template);
+            $file = parent::findTemplate($logicalName);
         } catch (\Twig_Error_Loader $e) {
             $previous = $e;
 
             // for BC
             try {
                 $template = $this->parser->parse($template);
-                try {
-                    $file = $this->locator->locate($template);
-                } catch (\InvalidArgumentException $e) {
-                    $previous = $e;
-                }
+                $file = $this->locator->locate($template);
             } catch (\Exception $e) {
                 $previous = $e;
             }

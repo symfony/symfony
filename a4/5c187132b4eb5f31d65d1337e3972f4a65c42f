@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-09T14:17:55Z
+
+I wasn't able to create a proper test for this. Setting an error handler with ``set_error_handler()`` to catch the warning doesn't work. I suppose this is due to the exception that was thrown.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-09T14:18:50Z
+
+@xabbuh yeah, this is what I found when trying to debug it as well. Registering an error handler meant to catch this warning makes it disappear because of the exception, while it is still written in the logs otherwise.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-09T14:18:54Z
+
+:+1:

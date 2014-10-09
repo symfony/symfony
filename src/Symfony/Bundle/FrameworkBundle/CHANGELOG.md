@@ -4,6 +4,8 @@ CHANGELOG
 2.6.0
 -----
 
+ * Added helper commands (`server:start`, `server:stop` and `server:status`) to control the built-in web
+   server in the background
  * Added `Controller::isCsrfTokenValid` helper
  * Added configuration for the PropertyAccess component
  * Added `Controller::redirectToRoute` helper

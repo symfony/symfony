@@ -98,4 +98,46 @@ class RequestContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar', $requestContext->getParameter('foo'));
     }
+
+    public function testMethod()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setMethod('post');
+
+        $this->assertSame('POST', $requestContext->getMethod());
+    }
+
+    public function testScheme()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setScheme('HTTPS');
+
+        $this->assertSame('https', $requestContext->getScheme());
+    }
+
+    public function testHost()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setHost('eXampLe.com');
+
+        $this->assertSame('example.com', $requestContext->getHost());
+    }
+
+    public function testQueryString()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setQueryString(null);
+
+        $this->assertSame('', $requestContext->getQueryString());
+    }
+
+    public function testPort()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setHttpPort('123');
+        $requestContext->setHttpsPort('456');
+
+        $this->assertSame(123, $requestContext->getHttpPort());
+        $this->assertSame(456, $requestContext->getHttpsPort());
+    }
 }

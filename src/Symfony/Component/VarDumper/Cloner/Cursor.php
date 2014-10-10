@@ -24,9 +24,13 @@ class Cursor
     const HASH_RESOURCE = Stub::TYPE_RESOURCE;
 
     public $depth = 0;
-    public $refIndex = false;
-    public $softRefTo = false;
-    public $hardRefTo = false;
+    public $refIndex = 0;
+    public $softRefTo = 0;
+    public $softRefCount = 0;
+    public $softRefHandle = 0;
+    public $hardRefTo = 0;
+    public $hardRefCount = 0;
+    public $hardRefHandle = 0;
     public $hashType;
     public $hashKey;
     public $hashIndex = 0;

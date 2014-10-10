@@ -81,14 +81,6 @@ class StreamedResponse extends Response
 
     /**
      * {@inheritdoc}
-     */
-    public function prepare(Request $request)
-    {
-        return parent::prepare($request);
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * This method only sends the content once.
      */

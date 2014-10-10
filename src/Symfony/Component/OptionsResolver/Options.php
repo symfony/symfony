@@ -247,7 +247,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 continue;
             }
 
-            $value       = $options[$option];
+            $value = $options[$option];
             $optionTypes = (array) $optionTypes;
 
             foreach ($optionTypes as $type) {

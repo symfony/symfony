@@ -263,8 +263,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new InvalidOptionsException(sprintf(
                 'The option "%s" with value "%s" is expected to be of type "%s"',
                 $option,
-                self::formatValue($value),
-                implode('", "', self::formatTypesOf($optionTypes))
+                static::formatValue($value),
+                static::formatTypesOf($optionTypes)
             ));
         }
     }
@@ -288,7 +288,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         foreach ($acceptedValues as $option => $optionValues) {
             if (array_key_exists($option, $options)) {
                 if (is_array($optionValues) && !in_array($options[$option], $optionValues, true)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', self::formatValues($optionValues))));
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], static::formatValues($optionValues)));
                 }
 
                 if (is_callable($optionValues) && !call_user_func($optionValues, $options[$option])) {
@@ -311,17 +311,24 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     }
 
     /**
-     * @param array $optionTypes
+     * Returns a string representation of a list of types.
      *
-     * @return array
+     * Each of the types is converted to a string using
+     * {@link formatTypeOf()}. The values are then concatenated with commas.
+     *
+     * @param array $types A list of types
+     *
+     * @return string The string representation of the type list
+     *
+     * @see formatTypeOf()
      */
-    private static function formatTypesOf(array $optionTypes)
+    private static function formatTypesOf(array $types)
     {
-        foreach ($optionTypes as $x => $type) {
-            $optionTypes[$x] = self::formatTypeOf($type);
+        foreach ($types as $key => $value) {
+            $types[$key] = static::formatTypeOf($value);
         }
 
-        return $optionTypes;
+        return implode(', ', $types);
     }
 
     /**
@@ -334,16 +341,14 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * is set to true, {@link \DateTime} objects will be formatted as
      * RFC-3339 dates ("Y-m-d H:i:s").
      *
-     * @param mixed $value  The value to format as string
-     * @param int   $format A bitwise combination of the format
-     *                      constants in this class
+     * @param mixed $value The value to format as string
      *
      * @return string The string representation of the passed value
      */
-    private static function formatValue($value, $format = 0)
+    private static function formatValue($value)
     {
         $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
-        if (($format & self::PRETTY_DATE) && $isDateTime) {
+        if (static::PRETTY_DATE && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {
                 $locale    = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
@@ -363,7 +368,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         if (is_object($value)) {
-            if ($format & self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+            if (static::OBJECT_TO_STRING && method_exists($value, '__toString')) {
                 return $value->__toString();
             }
 
@@ -400,16 +405,22 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     /**
      * Returns a string representation of a list of values.
      *
-     * @param array $values
-     * @param bool  $prettyDateTime
+     * Each of the values is converted to a string using
+     * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @return string
+     * @param array $values A list of values
+     *
+     * @return string The string representation of the value list
+     *
+     * @see formatValue()
      */
-    private static function formatValues(array $values, $prettyDateTime = false)
+    private static function formatValues(array $values)
     {
-        return array_map(function ($value) use ($prettyDateTime) {
-            return self::formatValue($value, $prettyDateTime);
-        }, $values);
+        foreach ($values as $key => $value) {
+            $values[$key] = static::formatValue($value);
+        }
+
+        return implode(', ', $values);
     }
 
     /**

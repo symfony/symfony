@@ -232,6 +232,12 @@ class TimeType extends AbstractType
                 'choice',
             ),
         ));
+
+        $resolver->setAllowedTypes(array(
+            'hours'   => 'array',
+            'minutes' => 'array',
+            'seconds' => 'array',
+        ));
     }
 
     /**

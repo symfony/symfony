@@ -245,6 +245,9 @@ class DateType extends AbstractType
 
         $resolver->setAllowedTypes(array(
             'format' => array('int', 'string'),
+            'years'  => 'array',
+            'months' => 'array',
+            'days'   => 'array',
         ));
     }
 

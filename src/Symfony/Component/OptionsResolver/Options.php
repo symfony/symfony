@@ -520,8 +520,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be replaced anymore once options have been read.');
         }
 
-        $this->options     = array();
-        $this->lazy        = array();
+        $this->options = array();
+        $this->lazy = array();
         $this->normalizers = array();
 
         foreach ($options as $option => $value) {
@@ -562,7 +562,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             $reflClosure = is_array($value)
                 ? new \ReflectionMethod($value[0], $value[1])
                 : new \ReflectionFunction($value);
-            $params      = $reflClosure->getParameters();
+            $params = $reflClosure->getParameters();
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && __CLASS__ === $class->name) {
                 // Initialize the option if no previous value exists
@@ -665,8 +665,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be cleared anymore once options have been read.');
         }
 
-        $this->options     = array();
-        $this->lazy        = array();
+        $this->options = array();
+        $this->lazy = array();
         $this->normalizers = array();
     }
 
@@ -884,7 +884,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         /** @var \Closure $normalizer */
         $normalizer = $this->normalizers[$option];
 
-        $this->lock[$option]    = true;
+        $this->lock[$option] = true;
         $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
         unset($this->lock[$option]);
 

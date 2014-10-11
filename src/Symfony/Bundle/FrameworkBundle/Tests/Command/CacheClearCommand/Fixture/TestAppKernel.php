@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture;
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -10,13 +9,6 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class TestAppKernel extends Kernel
 {
-    /**
-     * Returns an array of bundles to register.
-     *
-     * @return BundleInterface[] An array of bundle instances.
-     *
-     * @api
-     */
     public function registerBundles()
     {
         return array(
@@ -29,13 +21,6 @@ class TestAppKernel extends Kernel
         $this->rootDir = $rootDir;
     }
 
-    /**
-     * Loads the container configuration.
-     *
-     * @param LoaderInterface $loader A LoaderInterface instance
-     *
-     * @api
-     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__.DIRECTORY_SEPARATOR.'config.yml');

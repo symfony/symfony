@@ -2,11 +2,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand;
 
-use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestAppKernel;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
@@ -15,9 +15,9 @@ use Symfony\Component\Finder\Finder;
 class CacheClearCommandTest extends TestCase
 {
     /** @var TestAppKernel */
-    protected $kernel;
+    private $kernel;
     /** @var Filesystem */
-    protected $fs;
+    private $fs;
     private $rootDir;
 
     protected function setUp()
@@ -57,5 +57,22 @@ class CacheClearCommandTest extends TestCase
                 )
             );
         }
+
+        // check that app kernel file present in meta file of container's cache
+        $containerRef = new \ReflectionObject($this->kernel->getContainer());
+        $containerFile = $containerRef->getFileName();
+        $containerMetaFile = $containerFile.'.meta';
+        $kernelRef = new \ReflectionObject($this->kernel);
+        $kernelFile = $kernelRef->getFileName();
+        /** @var ResourceInterface[] $meta */
+        $meta = unserialize(file_get_contents($containerMetaFile));
+        $found = false;
+        foreach ($meta as $resource) {
+            if ((string) $resource === $kernelFile) {
+                $found = true;
+                break;
+            }
+        }
+        $this->assertTrue($found, 'Kernel file should present as resource');
     }
 }

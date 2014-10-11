@@ -29,11 +29,15 @@ class UnixPipes extends AbstractPipes
     /** @var bool */
     private $disableOutput;
 
-    public function __construct($ttyMode, $ptyMode, $input, $disableOutput)
+    /** @var bool */
+    private $interactive;
+
+    public function __construct($ttyMode, $ptyMode, $input, $disableOutput, $interactive = false)
     {
         $this->ttyMode = (bool) $ttyMode;
         $this->ptyMode = (bool) $ptyMode;
         $this->disableOutput = (bool) $disableOutput;
+        $this->interactive = (bool) $interactive;
 
         if (is_resource($input)) {
             $this->input = $input;
@@ -75,6 +79,14 @@ class UnixPipes extends AbstractPipes
                 array('pty'),
                 array('pty'),
                 array('pty'),
+            );
+        }
+
+        if ($this->interactive) {
+            return array(
+                0 => STDIN,
+                1 => STDOUT,
+                2 => STDERR,
             );
         }
 
@@ -209,6 +221,6 @@ class UnixPipes extends AbstractPipes
      */
     public static function create(Process $process, $input)
     {
-        return new static($process->isTty(), $process->isPty(), $input, $process->isOutputDisabled());
+        return new static($process->isTty(), $process->isPty(), $input, $process->isOutputDisabled(), $process->isInteractive());
     }
 }

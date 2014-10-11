@@ -69,6 +69,7 @@ class Process
     private $incrementalErrorOutputOffset = 0;
     private $tty;
     private $pty;
+    private $interactive;
 
     private $useFileHandles = false;
     /** @var PipesInterface */
@@ -977,6 +978,30 @@ class Process
     public function isPty()
     {
         return $this->pty;
+    }
+
+    /**
+     * Sets interactive mode.
+     *
+     * In interactive mode you can for example start an editor.
+     *
+     * @param bool $bool
+     *
+     * @return self
+     */
+    public function setInteractive($bool)
+    {
+        $this->interactive = (bool) $bool;
+        return $this;
+    }
+
+    /**
+     * Returns interactive state.
+     *
+     * @return bool
+     */
+    public function getInteractive() {
+        return $this->interactive;
     }
 
     /**

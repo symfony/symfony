@@ -98,13 +98,13 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     public static function resolve(array $options, $defaults)
     {
         if (is_array($defaults)) {
-            static::validateNames($options, $defaults, true);
+            self::validateNames($options, $defaults, true);
 
             return array_replace($defaults, $options);
         }
 
         if ($defaults instanceof self) {
-            static::validateNames($options, $defaults->options, true);
+            self::validateNames($options, $defaults->options, true);
 
             // Make sure this method can be called multiple times
             $combinedOptions = clone $defaults;
@@ -119,8 +119,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         if ($defaults instanceof OptionsConfig) {
-            static::validateNames($options, $defaults->knownOptions, true);
-            static::validateRequired($options, $defaults->requiredOptions, true);
+            self::validateNames($options, $defaults->knownOptions, true);
+            self::validateRequired($options, $defaults->requiredOptions, true);
 
             // Make sure this method can be called multiple times
             $combinedOptions = clone $defaults->defaultOptions;
@@ -133,8 +133,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             // Resolve options
             $resolvedOptions = $combinedOptions->all();
 
-            static::validateTypes($resolvedOptions, $defaults->allowedTypes);
-            static::validateValues($resolvedOptions, $defaults->allowedValues);
+            self::validateTypes($resolvedOptions, $defaults->allowedTypes);
+            self::validateValues($resolvedOptions, $defaults->allowedValues);
 
             return $resolvedOptions;
         }
@@ -263,8 +263,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new InvalidOptionsException(sprintf(
                 'The option "%s" with value "%s" is expected to be of type "%s"',
                 $option,
-                static::formatValue($value),
-                static::formatTypesOf($optionTypes)
+                self::formatValue($value),
+                self::formatTypesOf($optionTypes)
             ));
         }
     }
@@ -288,7 +288,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         foreach ($acceptedValues as $option => $optionValues) {
             if (array_key_exists($option, $options)) {
                 if (is_array($optionValues) && !in_array($options[$option], $optionValues, true)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], static::formatValues($optionValues)));
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], self::formatValues($optionValues)));
                 }
 
                 if (is_callable($optionValues) && !call_user_func($optionValues, $options[$option])) {
@@ -325,7 +325,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private static function formatTypesOf(array $types)
     {
         foreach ($types as $key => $value) {
-            $types[$key] = static::formatTypeOf($value);
+            $types[$key] = self::formatTypeOf($value);
         }
 
         return implode(', ', $types);
@@ -348,9 +348,9 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private static function formatValue($value)
     {
         $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
-        if (static::PRETTY_DATE && $isDateTime) {
+        if (self::PRETTY_DATE && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {
-                $locale    = \Locale::getDefault();
+                $locale = \Locale::getDefault();
                 $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
                 // neither the native nor the stub IntlDateFormatter support
                 // DateTimeImmutable as of yet
@@ -368,7 +368,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         if (is_object($value)) {
-            if (static::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+            if (self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
                 return $value->__toString();
             }
 
@@ -417,7 +417,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     private static function formatValues(array $values)
     {
         foreach ($values as $key => $value) {
-            $values[$key] = static::formatValue($value);
+            $values[$key] = self::formatValue($value);
         }
 
         return implode(', ', $values);

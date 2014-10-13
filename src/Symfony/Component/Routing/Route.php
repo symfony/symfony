@@ -616,6 +616,19 @@ class Route implements \Serializable
         return $this->compiled = $class::compile($this);
     }
 
+    /**
+     * Sets the compiled route.
+     *
+     * @param CompiledRoute $compiled
+     *   The compiled route.
+     * @return Route
+     */
+    public function setCompiled(CompiledRoute $compiled)
+    {
+        $this->compiled = $compiled;
+        return $this;
+    }
+
     private function sanitizeRequirement($key, $regex)
     {
         if (!is_string($regex)) {

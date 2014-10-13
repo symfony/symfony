@@ -24,25 +24,44 @@ use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 class Options implements \ArrayAccess, \Iterator, \Countable
 {
     /**
+     * Whether to format {@link \DateTime} objects as RFC-3339 dates
+     * during exceptions ("Y-m-d H:i:s").
+     *
+     * @var int
+     */
+    const PRETTY_DATE = 1;
+
+    /**
+     * Whether to cast objects with a "__toString()" method to strings during exceptions.
+     *
+     * @var int
+     */
+    const OBJECT_TO_STRING = 2;
+
+    /**
      * A list of option values.
+     *
      * @var array
      */
     private $options = array();
 
     /**
      * A list of normalizer closures.
+     *
      * @var array
      */
     private $normalizers = array();
 
     /**
      * A list of closures for evaluating lazy options.
+     *
      * @var array
      */
     private $lazy = array();
 
     /**
      * A list containing the currently locked options.
+     *
      * @var array
      */
     private $lock = array();
@@ -79,13 +98,13 @@ class Options implements \ArrayAccess, \Iterator, \Countable
     public static function resolve(array $options, $defaults)
     {
         if (is_array($defaults)) {
-            static::validateNames($options, $defaults, true);
+            self::validateNames($options, $defaults, true);
 
             return array_replace($defaults, $options);
         }
 
         if ($defaults instanceof self) {
-            static::validateNames($options, $defaults->options, true);
+            self::validateNames($options, $defaults->options, true);
 
             // Make sure this method can be called multiple times
             $combinedOptions = clone $defaults;
@@ -100,8 +119,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         if ($defaults instanceof OptionsConfig) {
-            static::validateNames($options, $defaults->knownOptions, true);
-            static::validateRequired($options, $defaults->requiredOptions, true);
+            self::validateNames($options, $defaults->knownOptions, true);
+            self::validateRequired($options, $defaults->requiredOptions, true);
 
             // Make sure this method can be called multiple times
             $combinedOptions = clone $defaults->defaultOptions;
@@ -114,8 +133,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             // Resolve options
             $resolvedOptions = $combinedOptions->all();
 
-            static::validateTypes($resolvedOptions, $defaults->allowedTypes);
-            static::validateValues($resolvedOptions, $defaults->allowedValues);
+            self::validateTypes($resolvedOptions, $defaults->allowedTypes);
+            self::validateValues($resolvedOptions, $defaults->allowedValues);
 
             return $resolvedOptions;
         }
@@ -241,17 +260,11 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
 
-            $printableValue = is_object($value)
-                ? get_class($value)
-                : (is_array($value)
-                    ? 'Array'
-                    : (string) $value);
-
             throw new InvalidOptionsException(sprintf(
                 'The option "%s" with value "%s" is expected to be of type "%s"',
                 $option,
-                $printableValue,
-                implode('", "', $optionTypes)
+                self::formatValue($value),
+                self::formatTypesOf($optionTypes)
             ));
         }
     }
@@ -275,7 +288,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         foreach ($acceptedValues as $option => $optionValues) {
             if (array_key_exists($option, $options)) {
                 if (is_array($optionValues) && !in_array($options[$option], $optionValues, true)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $optionValues)));
+                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], self::formatValues($optionValues)));
                 }
 
                 if (is_callable($optionValues) && !call_user_func($optionValues, $options[$option])) {
@@ -283,6 +296,131 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 }
             }
         }
+    }
+
+    /**
+     * Returns a string representation of the type of the value.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private static function formatTypeOf($value)
+    {
+        return is_object($value) ? get_class($value) : gettype($value);
+    }
+
+    /**
+     * Returns a string representation of a list of types.
+     *
+     * Each of the types is converted to a string using
+     * {@link formatTypeOf()}. The values are then concatenated with commas.
+     *
+     * @param array $types A list of types
+     *
+     * @return string The string representation of the type list
+     *
+     * @see formatTypeOf()
+     */
+    private static function formatTypesOf(array $types)
+    {
+        foreach ($types as $key => $value) {
+            $types[$key] = self::formatTypeOf($value);
+        }
+
+        return implode(', ', $types);
+    }
+
+    /**
+     * Returns a string representation of the value.
+     *
+     * This method returns the equivalent PHP tokens for most scalar types
+     * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
+     * in double quotes ("). Objects, arrays and resources are formatted as
+     * "object", "array" and "resource". If the parameter $prettyDateTime
+     * is set to true, {@link \DateTime} objects will be formatted as
+     * RFC-3339 dates ("Y-m-d H:i:s").
+     *
+     * @param mixed $value The value to format as string
+     *
+     * @return string The string representation of the passed value
+     */
+    private static function formatValue($value)
+    {
+        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        if (self::PRETTY_DATE && $isDateTime) {
+            if (class_exists('IntlDateFormatter')) {
+                $locale = \Locale::getDefault();
+                $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
+                // neither the native nor the stub IntlDateFormatter support
+                // DateTimeImmutable as of yet
+                if (!$value instanceof \DateTime) {
+                    $value = new \DateTime(
+                        $value->format('Y-m-d H:i:s.u e'),
+                        $value->getTimezone()
+                    );
+                }
+
+                return $formatter->format($value);
+            }
+
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        if (is_object($value)) {
+            if (self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+                return $value->__toString();
+            }
+
+            return 'object';
+        }
+
+        if (is_array($value)) {
+            return 'array';
+        }
+
+        if (is_string($value)) {
+            return '"'.$value.'"';
+        }
+
+        if (is_resource($value)) {
+            return 'resource';
+        }
+
+        if (null === $value) {
+            return 'null';
+        }
+
+        if (false === $value) {
+            return 'false';
+        }
+
+        if (true === $value) {
+            return 'true';
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Returns a string representation of a list of values.
+     *
+     * Each of the values is converted to a string using
+     * {@link formatValue()}. The values are then concatenated with commas.
+     *
+     * @param array $values A list of values
+     *
+     * @return string The string representation of the value list
+     *
+     * @see formatValue()
+     */
+    private static function formatValues(array $values)
+    {
+        foreach ($values as $key => $value) {
+            $values[$key] = self::formatValue($value);
+        }
+
+        return implode(', ', $values);
     }
 
     /**
@@ -487,7 +625,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      */
     public function has($option)
     {
@@ -567,7 +705,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
      */

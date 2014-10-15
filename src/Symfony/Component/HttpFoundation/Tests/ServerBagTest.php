@@ -139,6 +139,7 @@ class ServerBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             'AUTHORIZATION' => $headerContent,
+            'PHP_AUTH_BEARER' => $headerContent,
         ), $bag->getHeaders());
     }
 }

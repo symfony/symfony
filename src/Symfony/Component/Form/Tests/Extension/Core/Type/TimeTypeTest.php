@@ -673,4 +673,34 @@ class TimeTypeTest extends TypeTestCase
             'with_seconds' => true,
         ));
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfHoursIsInvalid()
+    {
+        $this->factory->create('time', null, array(
+            'hours' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfMinutesIsInvalid()
+    {
+        $this->factory->create('time', null, array(
+            'minutes' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfSecondsIsInvalid()
+    {
+        $this->factory->create('time', null, array(
+            'seconds' => 'bad value',
+        ));
+    }
 }

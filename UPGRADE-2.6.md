@@ -55,6 +55,45 @@ Form
        ...
    {% endif %}
    ```
+   
+ * The "cascade_validation" option was deprecated. Use the "constraints"
+   option together with the `Valid` constraint instead. Contrary to
+   "cascade_validation", "constraints" must be set on the respective child forms,
+   not the parent form.
+   
+   Before:
+   
+   ```php
+   $form = $this->createForm('form', $article, array('cascade_validation' => true))
+       ->add('author', new AuthorType())
+       ->getForm();
+   ```
+   
+   After:
+   
+   ```php
+   use Symfony\Component\Validator\Constraints\Valid;
+   
+   $form = $this->createForm('form', $article)
+       ->add('author', new AuthorType(), array(
+           'constraints' => new Valid(),
+       ))
+       ->getForm();
+   ```
+   
+   Alternatively, you can set the `Valid` constraint in the model itself:
+   
+   ```php
+   use Symfony\Component\Validator\Constraints as Assert;
+   
+   class Article
+   {
+       /**
+        * @Assert\Valid
+        */
+       private $author;
+   }
+   ```
 
 Validator
 ---------

@@ -23,7 +23,9 @@ class UrlType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+        if (null !== $options['default_protocol']) {
+            $builder->addEventSubscriber(new FixUrlProtocolListener($options['default_protocol']));
+        }
     }
 
     /**

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-08-18T16:39:39Z
+
+note to maintainers: should be merged in 2.3
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-08-18T16:55:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-19T06:52:25Z
+
+I'd like to note that many built-in form types are also prone to this behaviour:
+- [x] `BirthdayType` has `'years'` parameter that's supposed to be an array that gets passed to `DateType`;
+- [ ] `ChoiceType` expects `'preferred_choices'` to be an `array` as this option is then passed to `SimpleChoiceList` constructor without any checks, and before `setAllowedTypes` is called;
+- [ ] `CollectionType` expects `'options'` to be an `array` as `options` are then passed to `$optionsNormalizer` which uses string keys
+- [ ] `CountryType`, `LanguageType`, `LocaleType`, `TimezoneType` and `CurrencyType` could behave strange when a string is passed as `'choices'` value; no checks here, too;
+- [x] `DateType::listMonths`, `listYears` and `listDays` all expect an array (it's typehinted) though the allowed type is not set
+- [x] `TimeType` has lots of logic that could possibly misbehave due to `'hours'`, `'minutes'`, `'seconds'`
+- [ ] `TimeType`could possibly misbehave due to `'emptyValue'` option, though there are some dependencies there.
+- [x] `UrlType` can behave strange when a `'default_protocol'` option is not an `array`.
+
+Could fixing these types improve [DX]?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-19T09:03:13Z
+
+@kix Thanks for your investigation! Do you want to add fixes for these other problems to this PR?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-19T09:05:53Z
+
+@webmozart, sure, I've been doing some testing; currently thinking of a correct way to implement this all (some types are not so easy to figure out, like the `Date`)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-08-19T09:07:56Z
+
+@kix A good approach is to start with the trivial fixes first, and keep the more complicated ones for a later PR where we discuss some more.
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-19T09:16:31Z
+
+@webmozart, sure, basically that's what I intended to do :)
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-19T10:08:34Z
+
+Actually, the problem in `ChoiceType` and its derivatives is caused by `OptionsResolver\OptionsResolver` and `OptionsResolver\Options`.
+The `Options::all()` call in [`OptionsResolver::resolve()`](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L231) leads to [normalization being called](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/OptionsResolver/Options.php#L315), and this happens before options validation, which causes our problems.
+Hence, any `FormType` that needs normalized options is not guaranteed to have valid options passed to the normalizers.
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-19T10:44:12Z
+
+`ChoiceType`, `CollectionType`, `CountryType`, `LanguageType`, `LocaleType`, `TimezoneType`, `TimeType` and `CurrencyType` depend on normalizer logic implemented in `OptionsResolver\Options`.
+Basically, this pull request is complete, and a new issue needs to be created on `OptionsResolver::resolve()` and `Options::all()` behaviour.
+
+---------------------------------------------------------------------------
+
+by kix at 2014-08-20T06:08:03Z
+
+`OptionsResolver` problem is described in #4500, fixing it should open the way for some more form type fixes.

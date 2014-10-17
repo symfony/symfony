@@ -27,8 +27,9 @@ class TranslationExtension extends \Twig_Extension
 {
     private $translator;
     private $translationNodeVisitor;
+    private $safeHtml;
 
-    public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null)
+    public function __construct(TranslatorInterface $translator, \Twig_NodeVisitorInterface $translationNodeVisitor = null, $safeHtml = false)
     {
         if (!$translationNodeVisitor) {
             $translationNodeVisitor = new TranslationNodeVisitor();
@@ -36,6 +37,7 @@ class TranslationExtension extends \Twig_Extension
 
         $this->translator = $translator;
         $this->translationNodeVisitor = $translationNodeVisitor;
+        $this->safeHtml = $safeHtml;
     }
 
     public function getTranslator()
@@ -48,9 +50,11 @@ class TranslationExtension extends \Twig_Extension
      */
     public function getFilters()
     {
+        $options = $this->safeHtml ? array('is_safe' => array('html')) : array();
+
         return array(
-            new \Twig_SimpleFilter('trans', array($this, 'trans')),
-            new \Twig_SimpleFilter('transchoice', array($this, 'transchoice')),
+            new \Twig_SimpleFilter('trans', array($this, 'trans'), $options),
+            new \Twig_SimpleFilter('transchoice', array($this, 'transchoice'), $options),
         );
     }
 

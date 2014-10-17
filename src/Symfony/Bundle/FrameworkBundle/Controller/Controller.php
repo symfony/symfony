@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -198,6 +199,34 @@ class Controller extends ContainerAware
         $response->setCallback($callback);
 
         return $response;
+    }
+
+    /**
+     * Creates and returns a Response object
+     *
+     * @param mixed   $content The response content, see setContent()
+     * @param int     $status  The response status code
+     * @param array   $headers An array of response headers
+     *
+     * @return Response
+     */
+    public function createResponse($content = '', $status = 200, $headers = array())
+    {
+        return new Response($content, $status, $headers);
+    }
+
+    /**
+     * Creates and returns a JSON response
+     *
+     * @param mixed   $data    The response data - commonly an array
+     * @param int     $status  The response status code
+     * @param array   $headers An array of response headers
+     *
+     * @return JsonResponse
+     */
+    public function createJsonResponse($data = null, $status = 200, $headers = array())
+    {
+        return new JsonResponse($data, $status, $headers);
     }
 
     /**

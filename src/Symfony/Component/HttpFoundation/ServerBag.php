@@ -75,6 +75,10 @@ class ServerBag extends ParameterBag
                     // In some circumstances PHP_AUTH_DIGEST needs to be set
                     $headers['PHP_AUTH_DIGEST'] = $authorizationHeader;
                     $this->parameters['PHP_AUTH_DIGEST'] = $authorizationHeader;
+                } elseif (0 === stripos($authorizationHeader, 'bearer ')) {
+                    // The bearer type is Token type from OAuth2 [RFC6750]
+                    $headers['PHP_AUTH_BEARER'] = $authorizationHeader;
+                    $this->parameters['PHP_AUTH_BEARER'] = $authorizationHeader;
                 }
             }
         }
@@ -84,6 +88,8 @@ class ServerBag extends ParameterBag
             $headers['AUTHORIZATION'] = 'Basic '.base64_encode($headers['PHP_AUTH_USER'].':'.$headers['PHP_AUTH_PW']);
         } elseif (isset($headers['PHP_AUTH_DIGEST'])) {
             $headers['AUTHORIZATION'] = $headers['PHP_AUTH_DIGEST'];
+        } elseif (isset($headers['PHP_AUTH_BEARER'])) {
+            $headers['AUTHORIZATION'] = $headers['PHP_AUTH_BEARER'];
         }
 
         return $headers;

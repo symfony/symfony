@@ -26,6 +26,7 @@ class StubCaster
             $stub->type = $c->type;
             $stub->class = $c->class;
             $stub->value = $c->value;
+            $stub->handle = $c->handle;
             $stub->cut = $c->cut;
 
             return array();

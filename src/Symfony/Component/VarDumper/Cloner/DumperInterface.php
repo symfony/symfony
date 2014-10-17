@@ -38,61 +38,23 @@ interface DumperInterface
     public function dumpString(Cursor $cursor, $str, $bin, $cut);
 
     /**
-     * Dumps while entering an array.
+     * Dumps while entering an hash.
      *
      * @param Cursor $cursor   The Cursor position in the dump.
-     * @param int    $count    The number of items in the original array.
-     * @param bool   $indexed  When the array is indexed or associative.
-     * @param bool   $hasChild When the dump of the array has child item.
+     * @param int    $type     A Cursor::HASH_* const for the type of hash.
+     * @param string $class    The object class, resource type or array count.
+     * @param bool   $hasChild When the dump of the hash has child item.
      */
-    public function enterArray(Cursor $cursor, $count, $indexed, $hasChild);
+    public function enterHash(Cursor $cursor, $type, $class, $hasChild);
 
     /**
-     * Dumps while leaving an array.
+     * Dumps while leaving an hash.
      *
      * @param Cursor $cursor   The Cursor position in the dump.
-     * @param int    $count    The number of items in the original array.
-     * @param bool   $indexed  Whether the array is indexed or associative.
-     * @param bool   $hasChild When the dump of the array has child item.
-     * @param int    $cut      The number of items the array has been cut by.
+     * @param int    $type     A Cursor::HASH_* const for the type of hash.
+     * @param string $class    The object class, resource type or array count.
+     * @param bool   $hasChild When the dump of the hash has child item.
+     * @param int    $cut      The number of items the hash has been cut by.
      */
-    public function leaveArray(Cursor $cursor, $count, $indexed, $hasChild, $cut);
-
-    /**
-     * Dumps while entering an object.
-     *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $class    The class of the object.
-     * @param bool   $hasChild When the dump of the object has child item.
-     */
-    public function enterObject(Cursor $cursor, $class, $hasChild);
-
-    /**
-     * Dumps while leaving an object.
-     *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $class    The class of the object.
-     * @param bool   $hasChild When the dump of the object has child item.
-     * @param int    $cut      The number of items the object has been cut by.
-     */
-    public function leaveObject(Cursor $cursor, $class, $hasChild, $cut);
-
-    /**
-     * Dumps while entering a resource.
-     *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $res      The resource type.
-     * @param bool   $hasChild When the dump of the resource has child item.
-     */
-    public function enterResource(Cursor $cursor, $res, $hasChild);
-
-    /**
-     * Dumps while leaving a resource.
-     *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $res      The resource type.
-     * @param bool   $hasChild When the dump of the resource has child item.
-     * @param int    $cut      The number of items the resource has been cut by.
-     */
-    public function leaveResource(Cursor $cursor, $res, $hasChild, $cut);
+    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut);
 }

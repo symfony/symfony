@@ -33,7 +33,8 @@ class CliDumper extends AbstractDumper
         'str'       => '1;38;5;37',
         'cchr'      => '7',
         'note'      => '38;5;178',
-        'ref'       => '38;5;245',
+        'ref'       => '38;5;240',
+        'solo-ref'  => '38;5;240',
         'public'    => '38;5;28',
         'protected' => '38;5;166',
         'private'   => '38;5;160',
@@ -125,7 +126,7 @@ class CliDumper extends AbstractDumper
 
         $this->line .= $this->style($style, $val);
 
-        $this->endLine($cursor);
+        $this->dumpLine($cursor->depth);
     }
 
     /**
@@ -137,7 +138,7 @@ class CliDumper extends AbstractDumper
 
         if ('' === $str) {
             $this->line .= '""';
-            $this->endLine($cursor);
+            $this->dumpLine($cursor->depth);
         } else {
             $str = explode("\n", $str);
             $m = count($str) - 1;
@@ -149,7 +150,7 @@ class CliDumper extends AbstractDumper
 
             if ($m) {
                 $this->line .= '"""';
-                $this->endLine($cursor);
+                $this->dumpLine($cursor->depth);
             } else {
                 $this->line .= '"';
             }
@@ -182,7 +183,7 @@ class CliDumper extends AbstractDumper
                     $lineCut = 0;
                 }
 
-                $this->endLine($cursor, !$m);
+                $this->dumpLine($cursor->depth);
             }
         }
     }
@@ -190,93 +191,63 @@ class CliDumper extends AbstractDumper
     /**
      * {@inheritdoc}
      */
-    public function enterArray(Cursor $cursor, $count, $indexed, $hasChild)
-    {
-        $this->enterHash($cursor, $count ? $this->style('note', 'array:'.$count).' [' : '[', $hasChild);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function leaveArray(Cursor $cursor, $count, $indexed, $hasChild, $cut)
-    {
-        $this->leaveHash($cursor, ']', $hasChild, $cut);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enterObject(Cursor $cursor, $class, $hasChild)
-    {
-        $this->enterHash($cursor, 'stdClass' !== $class ? $this->style('note', $class).' {' : '{', $hasChild);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function leaveObject(Cursor $cursor, $class, $hasChild, $cut)
-    {
-        $this->leaveHash($cursor, '}', $hasChild, $cut);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enterResource(Cursor $cursor, $res, $hasChild)
-    {
-        $this->enterHash($cursor, $this->style('note', ':'.$res).' {', $hasChild);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function leaveResource(Cursor $cursor, $res, $hasChild, $cut)
-    {
-        $this->leaveHash($cursor, '}', $hasChild, $cut);
-    }
-
-    /**
-     * Generic dumper used while entering any hash-style structure.
-     *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $prefix   The string that starts the next dumped line.
-     * @param bool   $hasChild When the dump of the hash has child item.
-     */
-    protected function enterHash(Cursor $cursor, $prefix, $hasChild)
+    public function enterHash(Cursor $cursor, $type, $class, $hasChild)
     {
         $this->dumpKey($cursor);
 
+        if (Cursor::HASH_OBJECT === $type) {
+            $prefix = 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
+        } elseif (Cursor::HASH_RESOURCE === $type) {
+            $prefix = $this->style('note', ':'.$class).' {';
+        } else {
+            $prefix = $class ? $this->style('note', 'array:'.$class).' [' : '[';
+        }
+
+        if (Cursor::HASH_RESOURCE === $type) {
+            $prefix .= $this->style('ref', '@'.$cursor->softRefHandle);
+        } elseif ($cursor->softRefTo) {
+            $prefix .= $this->style('ref', '#'.(0 < $cursor->softRefHandle ? $cursor->softRefHandle : $cursor->softRefTo));
+        } elseif (0 < $cursor->softRefHandle) {
+            $prefix .= $this->style('solo-ref', '#'.$cursor->softRefHandle);
+        } elseif ($cursor->hardRefTo && !$cursor->refIndex && $class) {
+            $prefix .= $this->style('ref', '&'.$cursor->hardRefTo);
+        }
+
         $this->line .= $prefix;
-        if (false !== $cursor->softRefTo) {
-            $this->line .= $this->style('ref', '@'.$cursor->softRefTo);
-        } elseif (false !== $cursor->hardRefTo) {
-            $this->line .= $this->style('ref', '@'.$cursor->hardRefTo);
-        } elseif ($hasChild) {
-            $this->endLine($cursor);
+
+        if ($hasChild) {
+            $this->dumpLine($cursor->depth);
         }
     }
 
     /**
-     * Generic dumper used while leaving any hash-style structure.
+     * {@inheritdoc}
+     */
+    public function leaveHash(Cursor $cursor, $type, $class, $hasChild, $cut)
+    {
+        $this->dumpEllipsis($cursor, $hasChild, $cut);
+        $this->line .= Cursor::HASH_OBJECT === $type || Cursor::HASH_RESOURCE === $type ? '}' : ']';
+        $this->dumpLine($cursor->depth);
+    }
+
+    /**
+     * Dumps an ellipsis for cut children.
      *
      * @param Cursor $cursor   The Cursor position in the dump.
-     * @param string $suffix   The string that ends the next dumped line.
      * @param bool   $hasChild When the dump of the hash has child item.
      * @param int    $cut      The number of items the hash has been cut by.
      */
-    protected function leaveHash(Cursor $cursor, $suffix, $hasChild, $cut)
+    protected function dumpEllipsis(Cursor $cursor, $hasChild, $cut)
     {
-        if ($cut && false === $cursor->softRefTo && false === $cursor->hardRefTo) {
-            $this->line .= '…';
+        if ($cut) {
+            $this->line .= ' …';
             if (0 < $cut) {
                 $this->line .= $cut;
             }
             if ($hasChild) {
-                $this->dumpLine($cursor->depth+1);
+                $this->dumpLine($cursor->depth + 1);
             }
         }
-        $this->line .= $suffix;
-        $this->endLine($cursor, !$hasChild);
     }
 
     /**
@@ -329,24 +300,10 @@ class CliDumper extends AbstractDumper
                     break;
             }
 
-            if (false !== $cursor->hardRefTo) {
-                $this->line .= $this->style('ref', '&'.$cursor->hardRefTo).' ';
+            if ($cursor->hardRefTo) {
+                $this->line .= ($cursor->hardRefCount ? $this->style('ref', '&'.$cursor->hardRefTo) : $this->style('solo-ref', '&')).' ';
             }
         }
-    }
-
-    /**
-     * Finishes a line and dumps it.
-     *
-     * @param Cursor $cursor  The current Cursor position.
-     * @param bool   $showRef Show/hide the current ref index.
-     */
-    protected function endLine(Cursor $cursor, $showRef = true)
-    {
-        if ($showRef && false !== $cursor->refIndex) {
-            $this->line .= ' '.$this->style('ref', '#'.$cursor->refIndex);
-        }
-        $this->dumpLine($cursor->depth);
     }
 
     /**

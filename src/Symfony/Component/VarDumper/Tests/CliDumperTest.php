@@ -41,12 +41,14 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
+        $res1 = (int) $var['res'];
+        $res2 = (int) $var[8];
 
-        $this->assertSame(
+        $this->assertStringMatchesFormat(
             <<<EOTXT
 array:25 [
   "number" => 1
-  0 => null #1
+  0 => &1 null
   "const" => 1.1
   1 => true
   2 => false
@@ -57,7 +59,7 @@ array:25 [
   "str" => "déjà"
   7 => b"é"
   "[]" => []
-  "res" => :stream {
+  "res" => :stream {@{$res1}
     wrapper_type: "plainfile"
     stream_type: "STDIO"
     mode: "r"
@@ -68,12 +70,12 @@ array:25 [
     eof: false
     options: []
   }
-  8 => :Unknown {}
-  "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo { #2
+  8 => :Unknown {@{$res2}}
+  "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
     foo: "foo"
     "bar": "bar"
   }
-  "closure" => Closure {
+  "closure" => Closure {#%d
     reflection: """
       Closure [ <user> {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
         @@ {$var['file']} {$var['line']} - {$var['line']}
@@ -87,15 +89,15 @@ array:25 [
   }
   "line" => {$var['line']}
   "nobj" => array:1 [
-    0 => {} #3
+    0 => &3 {#%d}
   ]
-  "recurs" => array:1 [ #4
-    0 => &4 array:1 [@4]
+  "recurs" => &4 array:1 [
+    0 => &4 array:1 [&4]
   ]
   9 => &1 null
-  "sobj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {@2}
-  "snobj" => &3 {@3}
-  "snobj2" => {@3}
+  "sobj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d}
+  "snobj" => &3 {#%d}
+  "snobj2" => {#%d}
   "file" => "{$var['file']}"
   b"bin-key-é" => ""
 ]

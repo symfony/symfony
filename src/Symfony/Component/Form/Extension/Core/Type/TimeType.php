@@ -113,6 +113,16 @@ class TimeType extends AbstractType
                         $secondOptions[$passOpt] = $options[$passOpt];
                     }
                 }
+            } elseif ('text' === $options['widget']) {
+                $hourOptions['attr']['placeholder'] = $options['placeholder']['hour'];
+
+                if ($options['with_minutes']) {
+                    $minuteOptions['attr']['placeholder'] = $options['placeholder']['minute'];
+                }
+
+                if ($options['with_seconds']) {
+                    $secondOptions['attr']['placeholder'] = $options['placeholder']['second'];
+                }
             }
 
             $builder->add('hour', $options['widget'], $hourOptions);

@@ -211,6 +211,9 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * Types may also be passed as closures which return true or false.
      *
+     * Alternatively, types may be passed as arrays of a certain type, such as
+     * "array<string>", "string[]", or even "array<string, integer>" for keys and values.
+     *
      * @param array $options       A list of option names and values
      * @param array $acceptedTypes A mapping of option names to accepted option
      *                             types. The types may be given as
@@ -237,6 +240,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
                 if (function_exists($isFunction) && $isFunction($value)) {
                     continue 2;
                 } elseif ($value instanceof $type) {
+                    continue 2;
+                } elseif (is_array($value) && true === self::validateNestedType($value, $type)) {
                     continue 2;
                 }
             }
@@ -752,5 +757,78 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         // The option is now normalized
         unset($this->normalizers[$option]);
+    }
+
+    /**
+     * Reproduction of checks during validateTypes(), used by recursive functions.
+     *
+     * @param mixed $value The value to validate.
+     * @param string $type The type to validate the value against.
+     *
+     * @return bool True if the value is of the given type, false otherwise.
+     */
+    private static function validateType($value, $type)
+    {
+        $isFunctionSub = 'is_'.$type;
+        if (function_exists($isFunctionSub) && $isFunctionSub($value)) {
+            return true;
+        }
+
+        if ($value instanceof $type) {
+            return true;
+        }
+
+        if (is_array($value) && true === self::validateNestedType($value, $type)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Validates whether a given array contains values of the indicated type.
+     * Types are given by appending them with brackets, like: "string[]",
+     * or encasing them with "array<...>", like: "array<string>".
+     *
+     * Additionally, you can indicate arrays to have keys and values of certain types,
+     * such as "array<string, int>", which would reflect an array like: array("string_here" => 123).
+     *
+     * @param string $type The type, in a format like "string[]", "stdClass[]", or "array<string>".
+     * @param array $value The array to validate.
+     *
+     * @return bool True fi the value is of the given (nested) type, false otherwise.
+     */
+    private static function validateNestedType(array $value, $type)
+    {
+        if (strlen($type) > 2 && substr($type, -2) === '[]') {
+            $nestedType = substr($type, 0, -2);
+        } elseif (strlen($type) > 7 && substr($type, 0, 6) === 'array<' && substr($type, -1) === '>') {
+            $nestedType = substr($type, 6, -1);
+        } else {
+            return false;
+        }
+
+        if (empty($value) || $nestedType === 'mixed') {
+            return true;
+        }
+
+        $keyType = null;
+        $commaPosition = strpos($nestedType, ',');
+        if ($commaPosition > 1) {
+            $keyType = trim(substr($nestedType, 0, $commaPosition));
+            $nestedType = trim(substr($nestedType, $commaPosition + 1));
+        }
+
+        foreach ($value as $key => $item) {
+            if ($keyType !== null && false === self::validateType($key, $keyType)) {
+                return false;
+            }
+
+            if (false === self::validateType($item, $nestedType)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

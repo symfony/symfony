@@ -60,8 +60,9 @@ class TwigExtractor implements ExtractorInterface
         foreach ($files as $file) {
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
-            } catch (\Exception $e) {
-                throw new \Exception(sprintf('Error parsing template "%s"', $file), $e->getCode(), $e);
+            } catch (\Twig_Error $e) {
+				$e->setTemplateFile($file->getPathname());
+				throw $e;
             }
         }
     }

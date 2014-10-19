@@ -91,6 +91,19 @@ EOF
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
+        $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
+
+            return 1;
+        }
+
+        if ($this->isOtherServerProcessRunning($address)) {
+            $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+
+            return 1;
+        }
 
         if ('prod' === $env) {
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
@@ -103,8 +116,6 @@ EOF
 
             return 1;
         }
-
-        $address = $input->getArgument('address');
 
         if ($pid > 0) {
             $output->writeln(sprintf('<info>Web server listening on http://%s</info>', $address));
@@ -142,6 +153,27 @@ EOF
 
             sleep(1);
         }
+    }
+
+    private function isOtherServerProcessRunning($address)
+    {
+        $lockFile = $this->getLockFile($address);
+
+        if (file_exists($lockFile)) {
+            return true;
+        }
+
+        list($hostname, $port) = explode(':', $address);
+
+        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
+
+        if (false !== $fp) {
+            fclose($fp);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

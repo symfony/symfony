@@ -70,6 +70,13 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!extension_loaded('pcntl')) {
+            $output->writeln('<error>This command needs the pcntl extension to run.</error>');
+            $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');
+
+            return 1;
+        }
+
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         if ('prod' === $env) {

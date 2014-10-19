@@ -27,10 +27,6 @@ abstract class ServerCommand extends ContainerAwareCommand
             return false;
         }
 
-        if (!extension_loaded('pcntl')) {
-            return false;
-        }
-
         return parent::isEnabled();
     }
 

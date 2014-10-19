@@ -18,11 +18,10 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CasterStub extends Stub
+class CutStub extends Stub
 {
-    public function __construct($value, $class = '')
+    public function __construct($value)
     {
-        $this->class = $class;
         $this->value = $value;
 
         switch (gettype($value)) {
@@ -47,12 +46,10 @@ class CasterStub extends Stub
                 break;
 
             case 'string':
-                if ('' === $class) {
-                    $this->type = self::TYPE_STRING;
-                    $this->class = preg_match('//u', $value) ? self::STRING_UTF8 : self::STRING_BINARY;
-                    $this->cut = self::STRING_BINARY === $this->class ? strlen($value) : (function_exists('iconv_strlen') ? iconv_strlen($value, 'UTF-8') : -1);
-                    $this->value = '';
-                }
+                $this->type = self::TYPE_STRING;
+                $this->class = preg_match('//u', $value) ? self::STRING_UTF8 : self::STRING_BINARY;
+                $this->cut = self::STRING_BINARY === $this->class ? strlen($value) : (function_exists('iconv_strlen') ? iconv_strlen($value, 'UTF-8') : -1);
+                $this->value = '';
                 break;
         }
     }

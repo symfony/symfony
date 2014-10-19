@@ -315,36 +315,40 @@ EOHTML;
     /**
      * {@inheritdoc}
      */
-    protected function style($style, $val)
+    protected function style($style, $value, $attr = array())
     {
-        if ('' === $val) {
+        if ('' === $value) {
             return '';
         }
 
-        $v = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+        $v = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        $v = preg_replace_callback(self::$controlCharsRx, function ($r) {
+            return sprintf('<span class=sf-dump-cchr title=\\x%02X>%s</span>', ord($r[0]), "\x7F" === $r[0] ? '?' : chr(64 + ord($r[0])));
+        }, $v);
 
         if ('solo-ref' === $style) {
             return sprintf('<a class=sf-dump-solo-ref>%s</a>', $v);
         }
         if ('ref' === $style) {
-            $r = ('#' !== $v[0] ? 1 - ('@' !== $v[0]) : 2).substr($val, 1);
+            $r = ('#' !== $v[0] ? 1 - ('@' !== $v[0]) : 2).substr($value, 1);
 
-            return sprintf('<a class=sf-dump-ref href=#%s-ref%s>%s</a>', $this->dumpId, $r, $v);
+            return sprintf('<a class=sf-dump-ref href=#%s-ref%s title="%d occurrences">%s</a>', $this->dumpId, $r, 1 + $attr['count'], $v);
         }
 
-        if ('str' === $style || 'meta' === $style || 'public' === $style) {
-            foreach (static::$controlChars as $c) {
-                if (false !== strpos($v, $c)) {
-                    $r = "\x7F" === $c ? '?' : chr(64 + ord($c));
-                    $v = str_replace($c, "<span class=sf-dump-cchr>$r</span>", $v);
-                }
-            }
+        if ('const' === $style && array_key_exists('value', $attr)) {
+            $style .= sprintf(' title="%s"', htmlspecialchars(json_encode($attr['value']), ENT_QUOTES, 'UTF-8'));
+        } elseif ('public' === $style && !empty($attr['dynamic'])) {
+            $style .= ' title="Runtime added dynamic property"';
+        } elseif ('str' === $style && 1 < $attr['length']) {
+            $style .= sprintf(' title="%s%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style) {
             if (false !== $c = strrpos($v, '\\')) {
                 return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c+1));
             } elseif (':' === $v[0]) {
-                return sprintf('<abbr title="Resource of type `%s`" class=sf-dump-%s>%s</abbr>', substr($v, 1), $style, $v);
+                return sprintf('<abbr title="`%s` resource" class=sf-dump-%s>%s</abbr>', substr($v, 1), $style, $v);
             }
+        } elseif ('private' === $style) {
+            $style .= sprintf(' title="%s::%s"', $attr['class'], $v);
         }
 
         return "<span class=sf-dump-$style>$v</span>";

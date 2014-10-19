@@ -21,12 +21,13 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 abstract class AbstractCloner implements ClonerInterface
 {
     public static $defaultCasters = array(
-        'Symfony\Component\VarDumper\Caster\CasterStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
+        'Symfony\Component\VarDumper\Caster\CutStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
+        'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
 
         'Closure'        => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClosure',
         'Reflector'      => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castReflector',
 
-        'Doctrine\Common\Persistence\ObjectManager' => 'Symfony\Component\VarDumper\Caster\StubCaster::castNestedFat',
+        'Doctrine\Common\Persistence\ObjectManager' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Doctrine\Common\Proxy\Proxy'               => 'Symfony\Component\VarDumper\Caster\DoctrineCaster::castCommonProxy',
         'Doctrine\ORM\Proxy\Proxy'                  => 'Symfony\Component\VarDumper\Caster\DoctrineCaster::castOrmProxy',
         'Doctrine\ORM\PersistentCollection'         => 'Symfony\Component\VarDumper\Caster\DoctrineCaster::castPersistentCollection',
@@ -57,7 +58,7 @@ abstract class AbstractCloner implements ClonerInterface
         'ErrorException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castErrorException',
         'Exception'      => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castException',
         'Symfony\Component\DependencyInjection\ContainerInterface'
-                           => 'Symfony\Component\VarDumper\Caster\StubCaster::castNestedFat',
+                           => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Symfony\Component\VarDumper\Exception\ThrowingCasterException'
                            => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castThrowingCasterException',
 

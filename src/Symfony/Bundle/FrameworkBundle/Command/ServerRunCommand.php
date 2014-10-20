@@ -110,6 +110,7 @@ EOF
         $router = realpath($router);
 
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
+        $output->writeln('Quit the server with CONTROL-C.');
 
         $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($documentRoot);

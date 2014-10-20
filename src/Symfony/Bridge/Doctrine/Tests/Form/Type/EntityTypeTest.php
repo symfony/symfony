@@ -119,6 +119,16 @@ class EntityTypeTest extends TypeTestCase
         $this->factory->createNamed('name', 'entity');
     }
 
+    /**
+     * @expectedException Symfony\Component\Form\Exception\RuntimeException
+     */
+    public function testInvalidClassOption()
+    {
+        $this->factory->createNamed('name', 'entity', null, array(
+            'class' => 'foo',
+        ));
+    }
+
     public function testSetDataToUninitializedEntityWithNonRequired()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
@@ -754,6 +764,21 @@ class EntityTypeTest extends TypeTestCase
         $this->factory->createNamed('name', 'entity', null, array(
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
+            'property' => 'name',
+        ));
+    }
+
+    public function testExplicitEm()
+    {
+        $this->emRegistry->expects($this->never())
+            ->method('getManager');
+
+        $this->emRegistry->expects($this->never())
+            ->method('getManagerForClass');
+
+        $this->factory->createNamed('name', 'entity', null, array(
+            'em' => $this->em,
+            'class' => self::SINGLE_IDENT_CLASS,
             'property' => 'name',
         ));
     }

@@ -48,4 +48,26 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame(' pAs5w0rd ', $data);
     }
+
+    public function testAutocompleteOff()
+    {
+        $form = $this->factory->create('password');
+        $form->submit('pAs5w0rd');
+        $view = $form->createView();
+
+        $this->assertArrayHasKey('attr', $view->vars);
+        $this->assertArrayHasKey('autocomplete', $view->vars['attr']);
+        $this->assertEquals('off', $view->vars['attr']['autocomplete']);
+    }
+
+    public function testAutocompleteExplicitlyTurnedOn()
+    {
+        $form = $this->factory->create('password', null, array('attr' => array('autocomplete' => 'on')));
+        $form->submit('pAs5w0rd');
+        $view = $form->createView();
+
+        $this->assertArrayHasKey('attr', $view->vars);
+        $this->assertArrayHasKey('autocomplete', $view->vars['attr']);
+        $this->assertEquals('on', $view->vars['attr']['autocomplete']);
+    }
 }

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by wildlyinaccurate at 2014-10-09T21:10:48Z
+
+What's with the hyphens in the Twig tags?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-10T07:53:49Z
+
+@wildlyinaccurate http://twig.sensiolabs.org/doc/templates.html#whitespace-control
+
+---------------------------------------------------------------------------
+
+by wildlyinaccurate at 2014-10-10T08:01:14Z
+
+Thanks @stof!
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-10-17T17:32:15Z
+
+In case this doesn't get accepted for some reason (or doesn't get accepted for 2.6), I think a good backup plan would be to have this mentioned in the docs. See symfony/symfony-docs#4296.
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-19T16:40:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-19T17:03:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-20T09:23:01Z
+
+@Macsch15 Can you rebase to remove the merge commit? Thanks.
+
+---------------------------------------------------------------------------
+
+by Macsch15 at 2014-10-20T11:43:45Z
+
+@fabpot Done :)

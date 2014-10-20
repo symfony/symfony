@@ -12,17 +12,20 @@
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
-use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
+use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
+use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 abstract class DoctrineType extends AbstractType
@@ -33,19 +36,19 @@ abstract class DoctrineType extends AbstractType
     protected $registry;
 
     /**
-     * @var array
+     * @var ChoiceListFactoryInterface
      */
-    private $choiceListCache = array();
+    private $choiceListFactory;
 
     /**
-     * @var PropertyAccessorInterface
+     * @var EntityChoiceLoader[]
      */
-    private $propertyAccessor;
+    private $choiceLoaders = array();
 
-    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
         $this->registry = $registry;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->choiceListFactory = $choiceListFactory ?: new PropertyAccessDecorator(new DefaultChoiceListFactory(), $propertyAccessor);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -60,84 +63,78 @@ abstract class DoctrineType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
-        $propertyAccessor = $this->propertyAccessor;
+        $choiceListFactory = $this->choiceListFactory;
+        $choiceLoaders = &$this->choiceLoaders;
         $type = $this;
 
-        $loader = function (Options $options) use ($type) {
-            if (null !== $options['query_builder']) {
-                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+        $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
+            // Unless the choices are given explicitly, load them on demand
+            if (null === $options['choices']) {
+                $hash = CachingFactoryDecorator::generateHash(array(
+                    $options['em'],
+                    $options['class'],
+                    $options['query_builder'],
+                    $options['loader'],
+                ));
+
+                if (!isset($choiceLoaders[$hash])) {
+                    if ($options['loader']) {
+                        $loader = $options['loader'];
+                    } elseif (null !== $options['query_builder']) {
+                        $loader = $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                    } else {
+                        $loader = null;
+                    }
+
+                    $choiceLoaders[$hash] = new EntityChoiceLoader(
+                        $choiceListFactory,
+                        $options['em'],
+                        $options['class'],
+                        $loader
+                    );
+                }
+
+                return $choiceLoaders[$hash];
             }
         };
 
-        $choiceList = function (Options $options) use (&$choiceListCache, $propertyAccessor) {
-            // Support for closures
-            $propertyHash = is_object($options['property'])
-                ? spl_object_hash($options['property'])
-                : $options['property'];
-
-            $choiceHashes = $options['choices'];
-
-            // Support for recursive arrays
-            if (is_array($choiceHashes)) {
-                // A second parameter ($key) is passed, so we cannot use
-                // spl_object_hash() directly (which strictly requires
-                // one parameter)
-                array_walk_recursive($choiceHashes, function (&$value) {
-                    $value = spl_object_hash($value);
-                });
-            } elseif ($choiceHashes instanceof \Traversable) {
-                $hashes = array();
-                foreach ($choiceHashes as $value) {
-                    $hashes[] = spl_object_hash($value);
-                }
-
-                $choiceHashes = $hashes;
+        $choiceLabel = function (Options $options) {
+            // BC with the "property" option
+            if ($options['property']) {
+                return $options['property'];
             }
 
-            $preferredChoiceHashes = $options['preferred_choices'];
+            // BC: use __toString() by default
+            return function ($entity) {
+                return (string) $entity;
+            };
+        };
 
-            if (is_array($preferredChoiceHashes)) {
-                array_walk_recursive($preferredChoiceHashes, function (&$value) {
-                    $value = spl_object_hash($value);
-                });
+        $choiceName = function (Options $options) {
+            /** @var ObjectManager $om */
+            $om = $options['em'];
+            $classMetadata = $om->getClassMetadata($options['class']);
+            $ids = $classMetadata->getIdentifierFieldNames();
+            $idType = $classMetadata->getTypeOfField(current($ids));
+
+            // If the entity has a single-column, numeric ID, use that ID as
+            // field name
+            if (1 === count($ids) && in_array($idType, array('integer', 'smallint', 'bigint'))) {
+                return function ($entity, $id) {
+                    return $id;
+                };
             }
 
-            // Support for custom loaders (with query builders)
-            $loaderHash = is_object($options['loader'])
-                ? spl_object_hash($options['loader'])
-                : $options['loader'];
+            // Otherwise, an incrementing integer is used as name automatically
+        };
 
-            // Support for closures
-            $groupByHash = is_object($options['group_by'])
-                ? spl_object_hash($options['group_by'])
-                : $options['group_by'];
-
-            $hash = hash('sha256', json_encode(array(
-                spl_object_hash($options['em']),
-                $options['class'],
-                $propertyHash,
-                $loaderHash,
-                $choiceHashes,
-                $preferredChoiceHashes,
-                $groupByHash,
-            )));
-
-            if (!isset($choiceListCache[$hash])) {
-                $choiceListCache[$hash] = new EntityChoiceList(
-                    $options['em'],
-                    $options['class'],
-                    $options['property'],
-                    $options['loader'],
-                    $options['choices'],
-                    $options['preferred_choices'],
-                    $options['group_by'],
-                    $propertyAccessor
-                );
-            }
-
-            return $choiceListCache[$hash];
+        // The choices are always indexed by ID (see "choices" normalizer
+        // and EntityChoiceLoader), unless the ID is composite. Then they
+        // are indexed by an incrementing integer.
+        // Use the ID/incrementing integer as choice value.
+        $choiceValue = function ($entity, $key) {
+            return $key;
         };
 
         $emNormalizer = function (Options $options, $em) use ($registry) {
@@ -159,20 +156,51 @@ abstract class DoctrineType extends AbstractType
             return $em;
         };
 
+        $choicesNormalizer = function (Options $options, $entities) {
+            if (null === $entities || 0 === count($entities)) {
+                return $entities;
+            }
+
+            // Make sure that the entities are indexed by their ID
+            /** @var ObjectManager $om */
+            $om = $options['em'];
+            $classMetadata = $om->getClassMetadata($options['class']);
+            $ids = $classMetadata->getIdentifierFieldNames();
+
+            // We cannot use composite IDs as indices. In that case, keep the
+            // given indices
+            if (count($ids) > 1) {
+                return $entities;
+            }
+
+            $entitiesById = array();
+
+            foreach ($entities as $entity) {
+                $id = EntityChoiceLoader::getIdValue($om, $classMetadata, $entity);
+                $entitiesById[$id] = $entity;
+            }
+
+            return $entitiesById;
+        };
+
         $resolver->setDefaults(array(
             'em'                => null,
-            'property'          => null,
+            'property'          => null, // deprecated, use "choice_label"
             'query_builder'     => null,
-            'loader'            => $loader,
+            'loader'            => null, // deprecated, use "choice_loader"
             'choices'           => null,
-            'choice_list'       => $choiceList,
-            'group_by'          => null,
+            'flip_choices'      => true,
+            'choice_loader'     => $choiceLoader,
+            'choice_label'      => $choiceLabel,
+            'choice_name'       => $choiceName,
+            'choice_value'      => $choiceValue,
         ));
 
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizers(array(
             'em' => $emNormalizer,
+            'choices' => $choicesNormalizer,
         ));
 
         $resolver->setAllowedTypes(array(

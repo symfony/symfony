@@ -12,8 +12,11 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -270,6 +273,49 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $obj->setObject($object);
 
         $this->normalizer->normalize($obj, 'any');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\CircularReferenceException
+     */
+    public function testUnableToNormalizeCircularReference()
+    {
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+        $this->normalizer->setCircularReferenceLimit(2);
+
+        $obj = new CircularReferenceDummy();
+
+        $this->normalizer->normalize($obj);
+    }
+
+    public function testSiblingReference()
+    {
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+
+        $siblingHolder = new SiblingHolder();
+
+        $expected = array(
+            'sibling0' => array('coopTilleuls' => 'Les-Tilleuls.coop'),
+            'sibling1' => array('coopTilleuls' => 'Les-Tilleuls.coop'),
+            'sibling2' => array('coopTilleuls' => 'Les-Tilleuls.coop'),
+        );
+        $this->assertEquals($expected, $this->normalizer->normalize($siblingHolder));
+    }
+
+    public function testCircularReferenceHandler()
+    {
+        $serializer = new Serializer(array($this->normalizer));
+        $this->normalizer->setSerializer($serializer);
+        $this->normalizer->setCircularReferenceHandler(function ($obj) {
+            return get_class($obj);
+        });
+
+        $obj = new CircularReferenceDummy();
+
+        $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
+        $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
 }
 

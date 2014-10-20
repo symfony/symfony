@@ -312,6 +312,43 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testValidateTypesSucceedsIfValidTypePassArrayOfType()
+    {
+        $intArray = array(1, 2, 3);
+        $stringArray = array('one', 'two', 'three');
+        $stdClassArray = array(new \stdClass(), new \stdClass(), new \stdClass());
+        $mixedArray = array(new \stdClass(), 'foobar', 1.23);
+        $keyValueArray = array('one' => 1, 'two' => 2, 'three' => 3);
+        $deepArray = array('deeper' => $keyValueArray);
+        $options = array(
+            'integer_array' => $intArray,
+            'string_array' => $stringArray,
+            'object_array' => $stdClassArray,
+            'stdclass_array' => $stdClassArray,
+            'mixed_array' => $mixedArray,
+            'keyvalue_array' => $keyValueArray,
+            'deep_array' => $deepArray,
+        );
+
+        Options::validateTypes($options, array(
+            'int_array' => 'int[]',
+            'string_array' => 'string[]',
+            'object_array' => 'object[]',
+            'stdclass_array' => 'stdClass[]',
+            'mixed_array' => 'mixed[]',
+        ));
+
+        Options::validateTypes($options, array(
+            'int_array' => 'array<int>',
+            'string_array' => 'array<string>',
+            'object_array' => 'array<object>',
+            'stdclass_array' => 'array<stdClass>',
+            'mixed_array' => 'array<mixed>',
+            'keyvalue_array' => 'array<string,int>',
+            'deep_array' => 'array<string,array<string,int>>',
+        ));
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
@@ -322,7 +359,23 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
         );
 
         Options::validateTypes($options, array(
-            'one' => array('string', 'bool'),
+            'one' => array('string', 'bool', 'float[]'),
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testValidateTypesFailsIfInvalidArrayOfTypes()
+    {
+        $options = array(
+            'one' => array(
+                1.23,
+            ),
+        );
+
+        Options::validateTypes($options, array(
+            'one' => array('string', 'bool', 'float'),
         ));
     }
 

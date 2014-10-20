@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
@@ -29,6 +30,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             'my_event_subscriber' => array(0 => array()),
         );
 
+        $dispatcherDefinition = new Definition('Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher');
+
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
             ->method('isPublic')
@@ -41,6 +44,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             'Symfony\Component\DependencyInjection\ContainerBuilder',
             array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
         );
+
         $builder->expects($this->any())
             ->method('hasDefinition')
             ->will($this->returnValue(true));
@@ -50,9 +54,14 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             ->method('findTaggedServiceIds')
             ->will($this->onConsecutiveCalls(array(), $services));
 
+        $valueMap = array(
+            array('event_dispatcher', $dispatcherDefinition),
+            array('my_event_subscriber', $definition)
+        );
+
         $builder->expects($this->atLeastOnce())
             ->method('getDefinition')
-            ->will($this->returnValue($definition));
+            ->will($this->returnValueMap($valueMap));
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
@@ -63,6 +72,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $services = array(
             'my_event_subscriber' => array(0 => array()),
         );
+
+        $dispatcherDefinition = new Definition('Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher');
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
@@ -85,13 +96,18 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             ->method('findTaggedServiceIds')
             ->will($this->onConsecutiveCalls(array(), $services));
 
+        $valueMap = array(
+            array('event_dispatcher', $dispatcherDefinition),
+            array('my_event_subscriber', $definition)
+        );
+
         $builder->expects($this->atLeastOnce())
             ->method('getDefinition')
-            ->will($this->returnValue($definition));
+            ->will($this->returnValueMap($valueMap));
 
         $builder->expects($this->atLeastOnce())
             ->method('findDefinition')
-            ->will($this->returnValue($definition));
+            ->will($this->returnValueMap($valueMap));
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($builder);
@@ -105,7 +121,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setPublic(false)->addTag('kernel.event_listener', array());
-        $container->register('event_dispatcher', 'stdClass');
+        $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -119,7 +135,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setPublic(false)->addTag('kernel.event_subscriber', array());
-        $container->register('event_dispatcher', 'stdClass');
+        $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
@@ -133,7 +149,20 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_listener', array());
-        $container->register('event_dispatcher', 'stdClass');
+        $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher');
+
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage RegisterListenersPass requires class "Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher" for the "event_dispatcher" dispatcher.
+     */
+    public function testInvalidEventDispatcherClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);

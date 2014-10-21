@@ -333,9 +333,6 @@ class Response
             return $this;
         }
 
-        //response code
-        http_response_code($this->statusCode);
-
         // headers
         foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {

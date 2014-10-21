@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\OptionsResolver;
 
-use Symfony\Component\OptionsResolver\Exception\InvalidArgumentException;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 
 /**
@@ -58,244 +55,6 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @var bool
      */
     private $reading = false;
-
-    /**
-     * Merges options with an array of default values and throws an exception if
-     * any of the options does not exist.
-     *
-     * @param array                       $options  A list of option names and
-     *                                              values
-     * @param array|Options|OptionsConfig $defaults The accepted options and
-     *                                              their default values
-     *
-     * @return array The merged and validated options
-     *
-     * @throws InvalidOptionsException  If any of the options is not present in
-     *                                  the defaults array
-     * @throws InvalidArgumentException If the defaults are invalid
-     *
-     * @since 2.6
-     */
-    public static function resolve(array $options, $defaults)
-    {
-        if (is_array($defaults)) {
-            static::validateNames($options, $defaults, true);
-
-            return array_replace($defaults, $options);
-        }
-
-        if ($defaults instanceof self) {
-            static::validateNames($options, $defaults->options, true);
-
-            // Make sure this method can be called multiple times
-            $combinedOptions = clone $defaults;
-
-            // Override options set by the user
-            foreach ($options as $option => $value) {
-                $combinedOptions->set($option, $value);
-            }
-
-            // Resolve options
-            return $combinedOptions->all();
-        }
-
-        if ($defaults instanceof OptionsConfig) {
-            static::validateNames($options, $defaults->knownOptions, true);
-            static::validateRequired($options, $defaults->requiredOptions, true);
-
-            // Make sure this method can be called multiple times
-            $combinedOptions = clone $defaults->defaultOptions;
-
-            // Override options set by the user
-            foreach ($options as $option => $value) {
-                $combinedOptions->set($option, $value);
-            }
-
-            // Resolve options
-            $resolvedOptions = $combinedOptions->all();
-
-            static::validateTypes($resolvedOptions, $defaults->allowedTypes);
-            static::validateValues($resolvedOptions, $defaults->allowedValues);
-
-            return $resolvedOptions;
-        }
-
-        throw new InvalidArgumentException('The second argument is expected to be given as array, Options instance or OptionsConfig instance.');
-    }
-
-    /**
-     * Validates that the given option names exist and throws an exception
-     * otherwise.
-     *
-     * @param array        $options         A list of option names and values
-     * @param string|array $acceptedOptions The accepted option(s), either passed
-     *                                      as single string or in the values of
-     *                                      the given array
-     * @param bool         $namesAsKeys     If set to true, the option names
-     *                                      should be passed in the keys of the
-     *                                      accepted options array
-     *
-     * @throws InvalidOptionsException If any of the options is not present in
-     *                                 the accepted options
-     *
-     * @since 2.6
-     */
-    public static function validateNames(array $options, $acceptedOptions, $namesAsKeys = false)
-    {
-        $acceptedOptions = (array) $acceptedOptions;
-
-        if (!$namesAsKeys) {
-            $acceptedOptions = array_flip($acceptedOptions);
-        }
-
-        $diff = array_diff_key($options, $acceptedOptions);
-
-        if (count($diff) > 0) {
-            ksort($acceptedOptions);
-            ksort($diff);
-
-            throw new InvalidOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s"',
-                implode('", "', array_keys($diff)),
-                implode('", "', array_keys($acceptedOptions))
-            ));
-        }
-    }
-
-    /**
-     * Validates that the required options are given and throws an exception
-     * otherwise.
-     *
-     * The option names may be any strings that don't consist exclusively of
-     * digits. For example, "case1" is a valid option name, "1" is not.
-     *
-     * @param array        $options         A list of option names and values
-     * @param string|array $requiredOptions The required option(s), either
-     *                                      passed as single string or in the
-     *                                      values of the given array
-     * @param bool         $namesAsKeys     If set to true, the option names
-     *                                      should be passed in the keys of the
-     *                                      required options array
-     *
-     * @throws MissingOptionsException If a required option is missing
-     *
-     * @since 2.6
-     */
-    public static function validateRequired(array $options, $requiredOptions, $namesAsKeys = false)
-    {
-        $requiredOptions = (array) $requiredOptions;
-
-        if (!$namesAsKeys) {
-            $requiredOptions = array_flip($requiredOptions);
-        }
-
-        $diff = array_diff_key($requiredOptions, $options);
-
-        if (count($diff) > 0) {
-            ksort($diff);
-
-            throw new MissingOptionsException(sprintf(
-                count($diff) > 1 ? 'The required options "%s" are missing.' : 'The required option "%s" is missing.',
-                implode('", "', array_keys($diff))
-            ));
-        }
-    }
-
-    /**
-     * Validates that the given options match the accepted types and
-     * throws an exception otherwise.
-     *
-     * Accepted type names are any types for which a native "is_*()" function
-     * exists. For example, "int" is an acceptable type name and will be checked
-     * with the "is_int()" function.
-     *
-     * Types may also be passed as closures which return true or false.
-     *
-     * @param array $options       A list of option names and values
-     * @param array $acceptedTypes A mapping of option names to accepted option
-     *                             types. The types may be given as
-     *                             string/closure or as array of strings/closures
-     *
-     * @throws InvalidOptionsException If any of the types does not match the
-     *                                 accepted types of the option
-     *
-     * @since 2.6
-     */
-    public static function validateTypes(array $options, array $acceptedTypes)
-    {
-        foreach ($acceptedTypes as $option => $optionTypes) {
-            if (!array_key_exists($option, $options)) {
-                continue;
-            }
-
-            $value = $options[$option];
-            $optionTypes = (array) $optionTypes;
-
-            foreach ($optionTypes as $type) {
-                $isFunction = 'is_'.$type;
-
-                if (function_exists($isFunction) && $isFunction($value)) {
-                    continue 2;
-                } elseif ($value instanceof $type) {
-                    continue 2;
-                }
-            }
-
-            $printableValue = is_object($value)
-                ? get_class($value)
-                : (is_array($value)
-                    ? 'Array'
-                    : (string) $value);
-
-            throw new InvalidOptionsException(sprintf(
-                'The option "%s" with value "%s" is expected to be of type "%s"',
-                $option,
-                $printableValue,
-                implode('", "', $optionTypes)
-            ));
-        }
-    }
-
-    /**
-     * Validates that the given option values match the accepted values and
-     * throws an exception otherwise.
-     *
-     * @param array $options        A list of option names and values
-     * @param array $acceptedValues A mapping of option names to accepted option
-     *                              values. The option values must be given as
-     *                              arrays
-     *
-     * @throws InvalidOptionsException If any of the values does not match the
-     *                                 accepted values of the option
-     *
-     * @since 2.6
-     */
-    public static function validateValues(array $options, array $acceptedValues)
-    {
-        foreach ($acceptedValues as $option => $optionValues) {
-            if (array_key_exists($option, $options)) {
-                if (is_array($optionValues) && !in_array($options[$option], $optionValues, true)) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", but is expected to be one of "%s"', $option, $options[$option], implode('", "', $optionValues)));
-                }
-
-                if (is_callable($optionValues) && !call_user_func($optionValues, $options[$option])) {
-                    throw new InvalidOptionsException(sprintf('The option "%s" has the value "%s", which it is not valid', $option, $options[$option]));
-                }
-            }
-        }
-    }
-
-    /**
-     * Constructs a new object with a set of default options.
-     *
-     * @param array $options A list of option names and values
-     */
-    public function __construct(array $options = array())
-    {
-        foreach ($options as $option => $value) {
-            $this->set($option, $value);
-        }
-    }
 
     /**
      * Sets the value of a given option.
@@ -420,10 +179,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         // If an option is a closure that should be evaluated lazily, store it
         // in the "lazy" property.
-        if (is_callable($value)) {
-            $reflClosure = is_array($value)
-                ? new \ReflectionMethod($value[0], $value[1])
-                : new \ReflectionFunction($value);
+        if ($value instanceof \Closure) {
+            $reflClosure = new \ReflectionFunction($value);
             $params = $reflClosure->getParameters();
 
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && __CLASS__ === $class->name) {
@@ -472,11 +229,11 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         }
 
         if (isset($this->lazy[$option])) {
-            $this->resolveOption($option);
+            $this->resolve($option);
         }
 
         if (isset($this->normalizers[$option])) {
-            $this->normalizeOption($option);
+            $this->normalize($option);
         }
 
         return $this->options[$option];
@@ -549,13 +306,13 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             // Double check, in case the option has already been resolved
             // by cascade in the previous cycles
             if (isset($this->lazy[$option])) {
-                $this->resolveOption($option);
+                $this->resolve($option);
             }
         }
 
         foreach ($this->normalizers as $option => $normalizer) {
             if (isset($this->normalizers[$option])) {
-                $this->normalizeOption($option);
+                $this->normalize($option);
             }
         }
 
@@ -687,7 +444,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If the option has a cyclic dependency
      *                                   on another option.
      */
-    private function resolveOption($option)
+    private function resolve($option)
     {
         // The code duplication with normalize() exists for performance
         // reasons, in order to save a method call.
@@ -707,7 +464,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         $this->lock[$option] = true;
         foreach ($this->lazy[$option] as $closure) {
-            $this->options[$option] = call_user_func($closure, $this, $this->options[$option]);
+            $this->options[$option] = $closure($this, $this->options[$option]);
         }
         unset($this->lock[$option]);
 
@@ -725,7 +482,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      * @throws OptionDefinitionException If the option has a cyclic dependency
      *                                   on another option.
      */
-    private function normalizeOption($option)
+    private function normalize($option)
     {
         // The code duplication with resolve() exists for performance
         // reasons, in order to save a method call.

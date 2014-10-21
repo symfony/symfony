@@ -43,23 +43,6 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $this->resolver->resolve($options));
     }
 
-    public function testResolveNumericOptions()
-    {
-        $this->resolver->setDefaults(array(
-            '1' => '1',
-            '2' => '2',
-        ));
-
-        $options = array(
-            '2' => '20',
-        );
-
-        $this->assertEquals(array(
-            '1' => '1',
-            '2' => '20',
-        ), $this->resolver->resolve($options));
-    }
-
     public function testResolveLazy()
     {
         $this->resolver->setDefaults(array(

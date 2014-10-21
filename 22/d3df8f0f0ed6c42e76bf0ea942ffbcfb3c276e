@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-19T16:25:46Z
+
+``HtmlDumperTest::testGet()`` seems to need some more modifications: https://travis-ci.org/symfony/symfony/jobs/38420159#L832
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-19T20:04:29Z
+
+Fixed thanks
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-20T09:05:45Z
+
+screenshot?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-20T18:53:17Z
+
+![dumper-hover](https://cloud.githubusercontent.com/assets/243674/4707063/57e12d58-588a-11e4-9b4c-c4facada57f4.png)

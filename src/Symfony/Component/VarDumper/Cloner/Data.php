@@ -19,6 +19,7 @@ class Data
     private $data;
     private $maxDepth = -1;
     private $maxItemsPerDepth = -1;
+    private $useRefHandles = -1;
 
     /**
      * @param array $data A array as returned by ClonerInterface::cloneVar().
@@ -39,16 +40,18 @@ class Data
     /**
      * Returns a depth limited clone of $this.
      *
-     * @param int $maxDepth         The max dumped depth level.
-     * @param int $maxItemsPerDepth The max number of items dumped per depth level.
+     * @param int  $maxDepth         The max dumped depth level.
+     * @param int  $maxItemsPerDepth The max number of items dumped per depth level.
+     * @param bool $useRefHandles    False to hide ref. handles.
      *
      * @return self A depth limited clone of $this.
      */
-    public function getLimitedClone($maxDepth, $maxItemsPerDepth)
+    public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
     {
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+        $data->useRefHandles = $useRefHandles ? -1 : 0;
 
         return $data;
     }
@@ -87,7 +90,7 @@ class Data
                     $firstSeen = false;
                 }
                 $cursor->hardRefTo = $refs[$r];
-                $cursor->hardRefHandle = $item->handle;
+                $cursor->hardRefHandle = $this->useRefHandles & $item->handle;
                 $cursor->hardRefCount = $item->refCount;
             }
             $type = $item->class ?: gettype($item->value);
@@ -102,7 +105,7 @@ class Data
                 }
                 $cursor->softRefTo = $refs[$r];
             }
-            $cursor->softRefHandle = $item->handle;
+            $cursor->softRefHandle = $this->useRefHandles & $item->handle;
             $cursor->softRefCount = $item->refCount;
             $cut = $item->cut;
 
@@ -142,6 +145,8 @@ class Data
         } elseif ('array' === $type) {
             $dumper->enterHash($cursor, Cursor::HASH_INDEXED, 0, false);
             $dumper->leaveHash($cursor, Cursor::HASH_INDEXED, 0, false, 0);
+        } elseif ('string' === $type) {
+            $dumper->dumpString($cursor, $item, false, 0);
         } else {
             $dumper->dumpScalar($cursor, $type, $item);
         }
@@ -169,7 +174,9 @@ class Data
                 $cursor->hashIndex = 0;
                 $cursor->hashLength = count($children);
                 $cursor->hashCut = $hashCut;
-                foreach ($children as $cursor->hashKey => $child) {
+                foreach ($children as $key => $child) {
+                    $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
+                    $cursor->hashKey = $cursor->hashKeyIsBinary ? self::utf8Encode($key) : $key;
                     $this->dumpItem($dumper, $cursor, $refs, $child);
                     if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
                         $parentCursor->stop = true;

@@ -33,6 +33,7 @@ class Cursor
     public $hardRefHandle = 0;
     public $hashType;
     public $hashKey;
+    public $hashKeyIsBinary;
     public $hashIndex = 0;
     public $hashLength = 0;
     public $hashCut = 0;

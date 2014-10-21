@@ -14,13 +14,13 @@ namespace Symfony\Component\VarDumper\Caster;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
- * Casts a CasterStub.
+ * Casts a caster's Stub.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class StubCaster
 {
-    public static function castStub(CasterStub $c, array $a, Stub $stub, $isNested)
+    public static function castStub(Stub $c, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {
             $stub->type = $c->type;
@@ -33,7 +33,7 @@ class StubCaster
         }
     }
 
-    public static function castNestedFat($obj, array $a, Stub $stub, $isNested)
+    public static function cutInternals($obj, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {
             $stub->cut += count($a);

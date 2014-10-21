@@ -53,7 +53,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
             <<<EOTXT
 <foo></foo><bar><span class=sf-dump-note>array:25</span> [<samp>
   "<span class=sf-dump-meta>number</span>" => <span class=sf-dump-num>1</span>
-  <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01>&amp;1</a> <span class=sf-dump-const>null</span>
+  <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
   "<span class=sf-dump-meta>const</span>" => <span class=sf-dump-num>1.1</span>
   <span class=sf-dump-meta>1</span> => <span class=sf-dump-const>true</span>
   <span class=sf-dump-meta>2</span> => <span class=sf-dump-const>false</span>
@@ -61,12 +61,12 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   <span class=sf-dump-meta>4</span> => <span class=sf-dump-num>INF</span>
   <span class=sf-dump-meta>5</span> => <span class=sf-dump-num>-INF</span>
   <span class=sf-dump-meta>6</span> => <span class=sf-dump-num>{$intMax}</span>
-  "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str>d&#233;j&#224;</span>"
+  "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str title="4 characters">d&#233;j&#224;</span>"
   <span class=sf-dump-meta>7</span> => b"<span class=sf-dump-str>&#233;</span>"
   "<span class=sf-dump-meta>[]</span>" => []
-  "<span class=sf-dump-meta>res</span>" => <abbr title="Resource of type `stream`" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref1{$res1}>@{$res1}</a><samp>
-    <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str>plainfile</span>"
-    <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str>STDIO</span>"
+  "<span class=sf-dump-meta>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-solo-ref>@{$res1}</a><samp>
+    <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
+    <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str title="5 characters">STDIO</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
     <span class=sf-dump-meta>unread_bytes</span>: <span class=sf-dump-num>0</span>
     <span class=sf-dump-meta>seekable</span>: <span class=sf-dump-const>true</span>
@@ -75,35 +75,35 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
     <span class=sf-dump-meta>eof</span>: <span class=sf-dump-const>false</span>
     <span class=sf-dump-meta>options</span>: []
   </samp>}
-  <span class=sf-dump-meta>8</span> => <abbr title="Resource of type `Unknown`" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref1{$res2}>@{$res2}</a>}
-  "<span class=sf-dump-meta>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d>#%d</a><samp id={$dumpId}-ref2%d>
-    <span class=sf-dump-public>foo</span>: "<span class=sf-dump-str>foo</span>"
-    "<span class=sf-dump-public>bar</span>": "<span class=sf-dump-str>bar</span>"
+  <span class=sf-dump-meta>8</span> => <abbr title="`Unknown` resource" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-solo-ref>@{$res2}</a>}
+  "<span class=sf-dump-meta>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
+    <span class=sf-dump-public>foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
+    "<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
   "<span class=sf-dump-meta>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-solo-ref>#%d</a><samp>
     <span class=sf-dump-meta>reflection</span>: """
-      <span class=sf-dump-str>Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
-      <span class=sf-dump-str>  @@ {$var['file']} {$var['line']} - {$var['line']}</span>
+      <span class=sf-dump-str title="%d characters">Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
+      <span class=sf-dump-str title="%d characters">  @@ {$var['file']} {$var['line']} - {$var['line']}</span>
 
-      <span class=sf-dump-str>  - Parameters [2] {</span>
-      <span class=sf-dump-str>    Parameter #0 [ &lt;required&gt; \$a ]</span>
-      <span class=sf-dump-str>    Parameter #1 [ &lt;optional&gt; PDO or NULL &amp;\$b = NULL ]</span>
-      <span class=sf-dump-str>  }</span>
-      <span class=sf-dump-str>}</span>
+      <span class=sf-dump-str title="%d characters">  - Parameters [2] {</span>
+      <span class=sf-dump-str title="%d characters">    Parameter #0 [ &lt;required&gt; \$a ]</span>
+      <span class=sf-dump-str title="%d characters">    Parameter #1 [ &lt;optional&gt; PDO or NULL &amp;\$b = NULL ]</span>
+      <span class=sf-dump-str title="%d characters">  }</span>
+      <span class=sf-dump-str title="%d characters">}</span>
       """
   </samp>}
   "<span class=sf-dump-meta>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
   "<span class=sf-dump-meta>nobj</span>" => <span class=sf-dump-note>array:1</span> [<samp>
-    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref03>&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d>#%d</a>}
+    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   </samp>]
-  "<span class=sf-dump-meta>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04>&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp id={$dumpId}-ref04>
-    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04>&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04>&amp;4</a>]
+  "<span class=sf-dump-meta>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp id={$dumpId}-ref04>
+    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a>]
   </samp>]
-  <span class=sf-dump-meta>9</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01>&amp;1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-meta>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d>#%d</a>}
-  "<span class=sf-dump-meta>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03>&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d>#%d</a>}
-  "<span class=sf-dump-meta>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d>#%d</a>}
-  "<span class=sf-dump-meta>file</span>" => "<span class=sf-dump-str>{$var['file']}</span>"
+  <span class=sf-dump-meta>9</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
+  "<span class=sf-dump-meta>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
+  "<span class=sf-dump-meta>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
+  "<span class=sf-dump-meta>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
+  "<span class=sf-dump-meta>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
   b"<span class=sf-dump-meta>bin-key-&#233;</span>" => ""
 </samp>]
 </bar>

@@ -65,7 +65,7 @@ class LuhnValidator extends ConstraintValidator
         // digit to the check sum
         // e.g. 7  9  9  2  7  3  9  8  7  1  3
         //      ^     ^     ^     ^     ^     ^
-        // = 7  +  9  +  7  +  9  +  7  +  3
+        //    = 7  +  9  +  7  +  9  +  7  +  3
         for ($i = $length - 1; $i >= 0; $i -= 2) {
             $checkSum += $value{$i};
         }
@@ -75,7 +75,7 @@ class LuhnValidator extends ConstraintValidator
         // For doubles greater than 9, sum the individual digits
         // e.g. 7  9  9  2  7  3  9  8  7  1  3
         //         ^     ^     ^     ^     ^
-        // =    1+8 + 4  +  6  +  1+6 + 2
+        //    =    1+8 + 4  +  6  +  1+6 + 2
         for ($i = $length - 2; $i >= 0; $i -= 2) {
             $checkSum += array_sum(str_split($value{$i} * 2));
         }

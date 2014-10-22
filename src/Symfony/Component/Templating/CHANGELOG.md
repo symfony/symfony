@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.6.0
+-----
+
+ * added EngineAwareInterface
+ * added EngineAwareTrait to add default engine aware behavior to a class
+
 2.5.0
 -----
 

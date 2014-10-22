@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -36,6 +35,7 @@ class DebugHandlersListener implements EventSubscriberInterface
     private $throwAt;
     private $scream;
     private $fileLinkFormat;
+    private $firstCall = true;
 
     /**
      * @param callable|null        $exceptionHandler A handler that will be called on Exception
@@ -58,38 +58,37 @@ class DebugHandlersListener implements EventSubscriberInterface
     /**
      * Configures the error handler.
      *
-     * @param Event|null                    $event           The triggering event
-     * @param string|null                   $eventName       The triggering event name
-     * @param EventDispatcherInterface|null $eventDispatcher The dispatcher used to trigger $event
+     * @param Event|null $event The triggering event
      */
-    public function configure(Event $event = null, $eventName = null, EventDispatcherInterface $eventDispatcher = null)
+    public function configure(Event $event = null)
     {
-        if (null !== $eventDispatcher) {
-            foreach (array_keys(static::getSubscribedEvents()) as $name) {
-                $eventDispatcher->removeListener($name, array($this, 'configure'));
-            }
+        if (!$this->firstCall) {
+            return;
         }
-        $handler = set_error_handler('var_dump', 0);
-        $handler = is_array($handler) ? $handler[0] : null;
-        restore_error_handler();
-        if ($handler instanceof ErrorHandler) {
-            if ($this->logger) {
-                $handler->setDefaultLogger($this->logger, $this->levels);
-                if (is_array($this->levels)) {
-                    $scream = 0;
-                    foreach ($this->levels as $type => $log) {
-                        $scream |= $type;
+        $this->firstCall = false;
+        if ($this->logger || null !== $this->throwAt) {
+            $handler = set_error_handler('var_dump', 0);
+            $handler = is_array($handler) ? $handler[0] : null;
+            restore_error_handler();
+            if ($handler instanceof ErrorHandler) {
+                if ($this->logger) {
+                    $handler->setDefaultLogger($this->logger, $this->levels);
+                    if (is_array($this->levels)) {
+                        $scream = 0;
+                        foreach ($this->levels as $type => $log) {
+                            $scream |= $type;
+                        }
+                    } else {
+                        $scream = null === $this->levels ? E_ALL | E_STRICT : $this->levels;
                     }
-                } else {
-                    $scream = null === $this->levels ? E_ALL | E_STRICT : $this->levels;
+                    if ($this->scream) {
+                        $handler->screamAt($scream);
+                    }
+                    $this->logger = $this->levels = null;
                 }
-                if ($this->scream) {
-                    $handler->screamAt($scream);
+                if (null !== $this->throwAt) {
+                    $handler->throwAt($this->throwAt, true);
                 }
-                $this->logger = $this->levels = null;
-            }
-            if (null !== $this->throwAt) {
-                $handler->throwAt($this->throwAt, true);
             }
         }
         if (!$this->exceptionHandler) {

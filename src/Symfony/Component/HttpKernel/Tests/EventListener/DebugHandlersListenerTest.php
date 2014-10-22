@@ -95,8 +95,6 @@ class DebugHandlersListenerTest extends \PHPUnit_Framework_TestCase
             throw $exception;
         }
 
-        $this->assertSame(array(), $dispatcher->getListeners());
-
         $xHandler = $eHandler->setExceptionHandler('var_dump');
         $this->assertInstanceOf('Closure', $xHandler);
 

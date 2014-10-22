@@ -848,7 +848,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     '"%s", but is of type "%s".',
                     $option,
                     $this->formatValue($value),
-                    implode('", "', $this->allowedTypes[$option]),
+                    implode('" or "', $this->allowedTypes[$option]),
                     $this->formatTypeOf($value)
                 ));
             }
@@ -873,9 +873,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     break;
                 }
 
-                $printableAllowedValues[] = is_object($value)
-                    ? get_class($value)
-                    : (is_array($value) ? 'array' : (string) $value);
+                $printableAllowedValues[] = $allowedValue;
             }
 
             if (!$success) {
@@ -887,7 +885,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
                 if (count($printableAllowedValues) > 0) {
                     $message .= sprintf(
-                        ' Accepted values are: %s',
+                        ' Accepted values are: %s.',
                         $this->formatValues($printableAllowedValues)
                     );
                 }

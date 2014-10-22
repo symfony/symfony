@@ -490,6 +490,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string", but is of type "integer".
      */
     public function testResolveFailsIfInvalidType()
     {
@@ -509,6 +510,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string" or "bool", but is of type "integer".
      */
     public function testResolveFailsIfInvalidTypeMultiple()
     {
@@ -659,6 +661,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar".
      */
     public function testResolveFailsIfInvalidValue()
     {
@@ -689,11 +692,12 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar", false, null.
      */
     public function testResolveFailsIfInvalidValueMultiple()
     {
         $this->resolver->setDefault('foo', 42);
-        $this->resolver->setAllowedValues('foo', array('bar', 'baz'));
+        $this->resolver->setAllowedValues('foo', array('bar', false, null));
 
         $this->resolver->resolve();
     }

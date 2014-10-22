@@ -54,12 +54,12 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
-        $this->parser  = $parser;
-        $this->loader  = $loader;
+        $this->parser = $parser;
+        $this->loader = $loader;
         $this->parents = array();
-        $this->stack   = array();
+        $this->stack = array();
         $this->charset = 'UTF-8';
-        $this->cache   = array();
+        $this->cache = array();
         $this->globals = array();
 
         $this->setHelpers($helpers);

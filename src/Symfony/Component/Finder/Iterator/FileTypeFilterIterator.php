@@ -18,7 +18,7 @@ namespace Symfony\Component\Finder\Iterator;
  */
 class FileTypeFilterIterator extends FilterIterator
 {
-    const ONLY_FILES       = 1;
+    const ONLY_FILES = 1;
     const ONLY_DIRECTORIES = 2;
 
     private $mode;

@@ -30,11 +30,11 @@ class JsonDescriptor extends Descriptor
     protected function describeInputArgument(InputArgument $argument, array $options = array())
     {
         return $this->output(array(
-            'name'        => $argument->getName(),
+            'name' => $argument->getName(),
             'is_required' => $argument->isRequired(),
-            'is_array'    => $argument->isArray(),
+            'is_array' => $argument->isArray(),
             'description' => $argument->getDescription(),
-            'default'     => $argument->getDefault(),
+            'default' => $argument->getDefault(),
         ), $options);
     }
 
@@ -44,13 +44,13 @@ class JsonDescriptor extends Descriptor
     protected function describeInputOption(InputOption $option, array $options = array())
     {
         return $this->output(array(
-            'name'              => '--'.$option->getName(),
-            'shortcut'          => $option->getShortcut() ? '-'.implode('|-', explode('|', $option->getShortcut())) : '',
-            'accept_value'      => $option->acceptValue(),
+            'name' => '--'.$option->getName(),
+            'shortcut' => $option->getShortcut() ? '-'.implode('|-', explode('|', $option->getShortcut())) : '',
+            'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
-            'is_multiple'       => $option->isArray(),
-            'description'       => $option->getDescription(),
-            'default'           => $option->getDefault(),
+            'is_multiple' => $option->isArray(),
+            'description' => $option->getDescription(),
+            'default' => $option->getDefault(),
         ), $options);
     }
 
@@ -81,12 +81,12 @@ class JsonDescriptor extends Descriptor
         $command->mergeApplicationDefinition(false);
 
         return $this->output(array(
-            'name'        => $command->getName(),
-            'usage'       => $command->getSynopsis(),
+            'name' => $command->getName(),
+            'usage' => $command->getSynopsis(),
             'description' => $command->getDescription(),
-            'help'        => $command->getProcessedHelp(),
-            'aliases'     => $command->getAliases(),
-            'definition'  => $this->describeInputDefinition($command->getNativeDefinition(), array('as_array' => true)),
+            'help' => $command->getProcessedHelp(),
+            'aliases' => $command->getAliases(),
+            'definition' => $this->describeInputDefinition($command->getNativeDefinition(), array('as_array' => true)),
         ), $options);
     }
 

@@ -80,9 +80,9 @@ class TimeZoneTransformer extends Transformer
     public static function getEtcTimeZoneId($formattedTimeZone)
     {
         if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
-            $hours   = (int) $matches['hours'];
+            $hours = (int) $matches['hours'];
             $minutes = (int) $matches['minutes'];
-            $signal  = $matches['signal'] == '-' ? '+' : '-';
+            $signal = $matches['signal'] == '-' ? '+' : '-';
 
             if (0 < $minutes) {
                 throw new NotImplementedException(sprintf(

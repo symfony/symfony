@@ -38,11 +38,11 @@ class IntegerType extends AbstractType
     {
         $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
-            'precision'     => null,
-            'grouping'      => false,
+            'precision' => null,
+            'grouping' => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => \NumberFormatter::ROUND_DOWN,
-            'compound'      => false,
+            'compound' => false,
         ));
 
         $resolver->setAllowedValues(array(

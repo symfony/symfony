@@ -21,13 +21,13 @@ namespace Symfony\Component\CssSelector\Parser;
  */
 class Token
 {
-    const TYPE_FILE_END   = 'eof';
-    const TYPE_DELIMITER  = 'delimiter';
+    const TYPE_FILE_END = 'eof';
+    const TYPE_DELIMITER = 'delimiter';
     const TYPE_WHITESPACE = 'whitespace';
     const TYPE_IDENTIFIER = 'identifier';
-    const TYPE_HASH       = 'hash';
-    const TYPE_NUMBER     = 'number';
-    const TYPE_STRING     = 'string';
+    const TYPE_HASH = 'hash';
+    const TYPE_NUMBER = 'number';
+    const TYPE_STRING = 'string';
 
     /**
      * @var int

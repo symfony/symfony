@@ -34,7 +34,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->container = new ContainerBuilder();
-        $this->loader    = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
+        $this->loader = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
     }
 
     /**

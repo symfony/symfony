@@ -2,7 +2,7 @@
 <?xml-stylesheet href="../2008/09/xsd.xsl" type="text/xsl"?>
 <xs:schema targetNamespace="http://www.w3.org/XML/1998/namespace" 
   xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-  xmlns   ="http://www.w3.org/1999/xhtml"
+  xmlns ="http://www.w3.org/1999/xhtml"
   xml:lang="en">
 
  <xs:annotation>

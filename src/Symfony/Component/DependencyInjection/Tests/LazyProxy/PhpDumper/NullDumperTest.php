@@ -25,7 +25,7 @@ class NullDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testNullDumper()
     {
-        $dumper     = new NullDumper();
+        $dumper = new NullDumper();
         $definition = new Definition('stdClass');
 
         $this->assertFalse($dumper->isProxyCandidate($definition));

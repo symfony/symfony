@@ -81,24 +81,24 @@ abstract class BaseType extends AbstractType
         }
 
         $view->vars = array_replace($view->vars, array(
-            'form'                => $view,
-            'id'                  => $id,
-            'name'                => $name,
-            'full_name'           => $fullName,
-            'disabled'            => $form->isDisabled(),
-            'label'               => $options['label'],
-            'multipart'           => false,
-            'attr'                => $options['attr'],
-            'block_prefixes'      => $blockPrefixes,
+            'form' => $view,
+            'id' => $id,
+            'name' => $name,
+            'full_name' => $fullName,
+            'disabled' => $form->isDisabled(),
+            'label' => $options['label'],
+            'multipart' => false,
+            'attr' => $options['attr'],
+            'block_prefixes' => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
-            'translation_domain'  => $translationDomain,
+            'translation_domain' => $translationDomain,
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
             // collection form have different types (dynamically), they should
             // be rendered differently.
             // https://github.com/symfony/symfony/issues/5038
-            'cache_key'           => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
+            'cache_key' => $uniqueBlockPrefix.'_'.$form->getConfig()->getType()->getName(),
         ));
     }
 
@@ -108,16 +108,16 @@ abstract class BaseType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'block_name'         => null,
-            'disabled'           => false,
-            'label'              => null,
-            'attr'               => array(),
+            'block_name' => null,
+            'disabled' => false,
+            'label' => null,
+            'attr' => array(),
             'translation_domain' => null,
-            'auto_initialize'    => true,
+            'auto_initialize' => true,
         ));
 
         $resolver->setAllowedTypes(array(
-            'attr'       => 'array',
+            'attr' => 'array',
         ));
     }
 }

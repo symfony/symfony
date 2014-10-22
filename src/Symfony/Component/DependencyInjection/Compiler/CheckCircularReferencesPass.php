@@ -58,8 +58,8 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     private function checkOutEdges(array $edges)
     {
         foreach ($edges as $edge) {
-            $node      = $edge->getDestNode();
-            $id        = $node->getId();
+            $node = $edge->getDestNode();
+            $id = $node->getId();
 
             if (empty($this->checkedNodes[$id])) {
                 $searchKey = array_search($id, $this->currentPath);

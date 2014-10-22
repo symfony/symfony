@@ -104,7 +104,7 @@ class FormFactory implements FormFactoryInterface
         $type = $typeGuess ? $typeGuess->getType() : 'text';
 
         $maxLength = $maxLengthGuess ? $maxLengthGuess->getValue() : null;
-        $pattern   = $patternGuess ? $patternGuess->getValue() : null;
+        $pattern = $patternGuess ? $patternGuess->getValue() : null;
 
         if (null !== $pattern) {
             $options = array_merge(array('pattern' => $pattern), $options);

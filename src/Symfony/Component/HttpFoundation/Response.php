@@ -1033,8 +1033,8 @@ class Response
             return false;
         }
 
-        $notModified   = false;
-        $lastModified  = $this->headers->get('Last-Modified');
+        $notModified = false;
+        $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
         if ($etags = $request->getEtags()) {

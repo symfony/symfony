@@ -33,12 +33,26 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The option "foo" does not exist. Known options are: "a", "z".
      */
     public function testResolveFailsIfNonExistingOption()
     {
-        $resolver = new OptionsResolver();
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setDefault('a', '2');
 
-        $resolver->resolve(array('foo' => 'bar'));
+        $this->resolver->resolve(array('foo' => 'bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Known options are: "a", "z".
+     */
+    public function testResolveFailsIfMultipleNonExistingOptions()
+    {
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setDefault('a', '2');
+
+        $this->resolver->resolve(array('ping' => 'pong', 'foo' => 'bar', 'baz' => 'bam'));
     }
 
     /**
@@ -1390,10 +1404,13 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @expectedExceptionMessage The option "undefined" does not exist. Known options are: "foo", "lazy".
      */
     public function testFailIfGetNonExisting()
     {
+        $this->resolver->setDefault('foo', 'bar');
+
         $this->resolver->setDefault('lazy', function (Options $options) {
             $options['undefined'];
         });
@@ -1402,7 +1419,8 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @expectedExceptionMessage The optional option "defined" has no value set. You should make sure it is set with "isset" before reading it.
      */
     public function testFailIfGetDefinedButUnset()
     {

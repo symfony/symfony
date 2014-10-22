@@ -14,6 +14,7 @@ namespace Symfony\Component\OptionsResolver;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
@@ -155,7 +156,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
         // options could manipulate the state of the object, leading to
         // inconsistent results.
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Default values cannot be set from a lazy option or normalizer.');
         }
 
         // If an option is a closure that should be evaluated lazily, store it
@@ -248,7 +249,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function setRequired($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be made required from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $key => $option) {
@@ -329,7 +330,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function setDefined($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be defined from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $key => $option) {
@@ -397,12 +398,12 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function setNormalizer($option, \Closure $normalizer)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
         }
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s"',
+                'The option "%s" does not exist. Known options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -452,7 +453,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function setAllowedValues($option, $allowedValues = null)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
         }
 
         // BC
@@ -466,7 +467,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s"',
+                'The option "%s" does not exist. Known options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -506,7 +507,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function addAllowedValues($option, $allowedValues = null)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
         }
 
         // BC
@@ -520,7 +521,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s"',
+                'The option "%s" does not exist. Known options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -558,7 +559,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function setAllowedTypes($option, $allowedTypes = null)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
         }
 
         // BC
@@ -572,7 +573,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s"',
+                'The option "%s" does not exist. Known options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -606,7 +607,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function addAllowedTypes($option, $allowedTypes = null)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
         }
 
         // BC
@@ -620,7 +621,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s"',
+                'The option "%s" does not exist. Known options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -652,7 +653,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function remove($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be removed from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $option) {
@@ -679,7 +680,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     public function clear()
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be cleared from a lazy option or normalizer.');
         }
 
         $this->defined = array();
@@ -715,12 +716,13 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @throws MissingOptionsException   If a required option is missing
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
+     * @throws NoSuchOptionException     If a lazy option reads an unavailable option
      * @throws AccessException           If called from a lazy option or normalizer
      */
     public function resolve(array $options = array())
     {
         if ($this->locked) {
-            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+            throw new AccessException('Options cannot be resolved from a lazy option or normalizer.');
         }
 
         // Allow this method to be called multiple times
@@ -734,7 +736,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ksort($diff);
 
             throw new UndefinedOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s"',
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s".',
                 implode('", "', array_keys($diff)),
                 implode('", "', array_keys($clone->defined))
             ));
@@ -779,8 +781,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @throws AccessException           If accessing this method outside of
      *                                   {@link resolve()}
-     * @throws \OutOfBoundsException     If the option is not set
-     * @throws InvalidOptionsException   If an option doesn't fulfill the
+     * @throws NoSuchOptionException     If the option is not set
+     * @throws InvalidOptionsException   If the option doesn't fulfill the
      *                                   specified validation rules
      * @throws OptionDefinitionException If there is a cyclic dependency between
      *                                   lazy options and/or normalizers
@@ -798,7 +800,18 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         // Check whether the option is set at all
         if (!array_key_exists($option, $this->defaults)) {
-            throw new \OutOfBoundsException(sprintf('The option "%s" was not set.', $option));
+            if (!isset($this->defined[$option])) {
+                throw new NoSuchOptionException(sprintf(
+                    'The option "%s" does not exist. Known options are: "%s".',
+                    $option,
+                    implode('", "', array_keys($this->defined))
+                ));
+            }
+
+            throw new NoSuchOptionException(sprintf(
+                'The optional option "%s" has no value set. You should make sure it is set with "isset" before reading it.',
+                $option
+            ));
         }
 
         $value = $this->defaults[$option];

@@ -145,9 +145,9 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string $option The name of the option
      * @param mixed  $value  The default value of the option
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setDefault($option, $value)
     {
@@ -155,7 +155,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
         // options could manipulate the state of the object, leading to
         // inconsistent results.
         if ($this->locked) {
-            throw new AccessException('Default values cannot be set anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         // If an option is a closure that should be evaluated lazily, store it
@@ -208,9 +208,9 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @param array $defaults The default values to set
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setDefaults(array $defaults)
     {
@@ -241,14 +241,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setRequired($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('Options cannot be made required anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $key => $option) {
@@ -322,14 +322,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function setDefined($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('Options cannot be defined anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $key => $option) {
@@ -389,15 +389,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string   $option     The option name
      * @param \Closure $normalizer The normalizer
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException           If the options are resolved already
      * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function setNormalizer($option, \Closure $normalizer)
     {
         if ($this->locked) {
-            throw new AccessException('Normalizers cannot be added anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         if (!isset($this->defined[$option])) {
@@ -444,16 +444,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string $option        The option name
      * @param mixed  $allowedValues One or more acceptable values/closures
      *
+     * @return OptionsResolver This instance
      *
-     * @return Options This instance
-     *
-     * @throws AccessException           If the options are resolved already
-     * @throws UndefinedOptionsException If an option is undefined
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function setAllowedValues($option, $allowedValues = null)
     {
         if ($this->locked) {
-            throw new AccessException('Allowed values cannot be set anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         // BC
@@ -499,15 +498,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string $option        The option name
      * @param mixed  $allowedValues One or more acceptable values/closures
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException           If the options are resolved already
-     * @throws UndefinedOptionsException If an option is undefined
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function addAllowedValues($option, $allowedValues = null)
     {
         if ($this->locked) {
-            throw new AccessException('Allowed values cannot be added anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         // BC
@@ -551,15 +550,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string          $option       The option name
      * @param string|string[] $allowedTypes One or more accepted types
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException           If the options are resolved already
-     * @throws UndefinedOptionsException If an option is undefined
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function setAllowedTypes($option, $allowedTypes = null)
     {
         if ($this->locked) {
-            throw new AccessException('Allowed types cannot be set anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         // BC
@@ -599,15 +598,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @param string          $option       The option name
      * @param string|string[] $allowedTypes One or more accepted types
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException           If the options are resolved already
-     * @throws UndefinedOptionsException If an option is undefined
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function addAllowedTypes($option, $allowedTypes = null)
     {
         if ($this->locked) {
-            throw new AccessException('Allowed types cannot be added anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         // BC
@@ -646,14 +645,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function remove($optionNames)
     {
         if ($this->locked) {
-            throw new AccessException('Options cannot be removed anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         foreach ((array) $optionNames as $option) {
@@ -673,14 +672,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Removes all options.
      *
-     * @return Options This instance
+     * @return OptionsResolver This instance
      *
-     * @throws AccessException If the options are resolved already
+     * @throws AccessException If called from a lazy option or normalizer
      */
     public function clear()
     {
         if ($this->locked) {
-            throw new AccessException('Options cannot be cleared anymore once resolving has begun.');
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
         }
 
         $this->defined = array();
@@ -714,11 +713,16 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @throws InvalidOptionsException   If an option doesn't fulfill the
      *                                   specified validation rules
      * @throws MissingOptionsException   If a required option is missing
-     * @throws OptionDefinitionException If a cyclic dependency is depended
-     *                                   between lazy options and/or normalizers
+     * @throws OptionDefinitionException If there is a cyclic dependency between
+     *                                   lazy options and/or normalizers
+     * @throws AccessException           If called from a lazy option or normalizer
      */
     public function resolve(array $options = array())
     {
+        if ($this->locked) {
+            throw new AccessException('This method cannot be called from a lazy option or normalizer.');
+        }
+
         // Allow this method to be called multiple times
         $clone = clone $this;
 
@@ -778,8 +782,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      * @throws \OutOfBoundsException     If the option is not set
      * @throws InvalidOptionsException   If an option doesn't fulfill the
      *                                   specified validation rules
-     * @throws OptionDefinitionException If a cyclic dependency is detected
-     *                                   between two lazily evaluated options
+     * @throws OptionDefinitionException If there is a cyclic dependency between
+     *                                   lazy options and/or normalizers
      */
     public function offsetGet($option)
     {

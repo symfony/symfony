@@ -41,6 +41,18 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $resolver->resolve(array('foo' => 'bar'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function testResolveFailsFromLazyOption()
+    {
+        $this->resolver->setDefault('foo', function (Options $options) {
+            $options->resolve(array());
+        });
+
+        $this->resolver->resolve();
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // setDefault()/hasDefault()
     ////////////////////////////////////////////////////////////////////////////

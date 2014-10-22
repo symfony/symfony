@@ -256,14 +256,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setRequired('foo');
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testResolveSucceedsIfRequiredOptionPassed()
     {
         $this->resolver->setRequired('foo');
 
-        $this->resolver->resolve(array('foo' => 'bar'));
+        $this->assertNotEmpty($this->resolver->resolve(array('foo' => 'bar')));
     }
 
     public function testIsRequired()
@@ -504,7 +504,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->setAllowedTypes('foo', 'string');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
@@ -523,7 +523,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', true);
         $this->resolver->setAllowedTypes('foo', array('string', 'bool'));
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
@@ -542,7 +542,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', new \stdClass());
         $this->resolver->setAllowedTypes('foo', '\stdClass');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -587,7 +587,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->addAllowedTypes('foo', 'string');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
@@ -606,7 +606,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->addAllowedTypes('foo', array('string', 'bool'));
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testAddAllowedTypesDoesNotOverwrite()
@@ -617,7 +617,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testAddAllowedTypesDoesNotOverwrite2()
@@ -628,7 +628,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefault('foo', false);
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1078,7 +1078,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
             \PHPUnit_Framework_Assert::fail('Should not be called.');
         });
 
-        $this->resolver->resolve();
+        $this->assertEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1208,7 +1208,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     public function testRemoveUnknownOptionIgnored()
     {
-        $this->resolver->remove('foo');
+        $this->assertNotNull($this->resolver->remove('foo'));
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1427,8 +1427,10 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('lazy1', function () {});
 
         $this->resolver->setDefault('lazy2', function (Options $options) {
-            \PHPUnit_Framework_Assert::assertCount(3, $options);
+            \PHPUnit_Framework_Assert::assertCount(4, $options);
         });
+
+        $this->assertCount(4, $this->resolver->resolve(array('required' => 'value')));
     }
 
     /**

@@ -932,6 +932,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      *
      * @return bool Whether the option is set
      *
+     * @throws AccessException If accessing this method outside of {@link resolve()}
+     *
      * @see \ArrayAccess::offsetExists()
      */
     public function offsetExists($option)
@@ -964,7 +966,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the number of set options.
+     *
+     * This may be only a subset of the defined options.
+     *
+     * @return int Number of options
+     *
+     * @throws AccessException If accessing this method outside of {@link resolve()}
+     *
+     * @see \Countable::count()
      */
     public function count()
     {
@@ -972,7 +982,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new AccessException('Counting is only supported within closures of lazy options and normalizers.');
         }
 
-        return count($this->resolved);
+        return count($this->defaults);
     }
 
     /**

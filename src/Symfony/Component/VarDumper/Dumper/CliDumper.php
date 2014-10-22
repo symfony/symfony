@@ -41,7 +41,7 @@ class CliDumper extends AbstractDumper
         'meta'      => '38;5;27',
     );
 
-    protected static $controlCharsRx = "/\\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x7F/";
+    protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';
 
     /**
      * Enables/disables colored output.
@@ -321,17 +321,13 @@ class CliDumper extends AbstractDumper
             $this->colors = $this->supportsColors($this->outputStream);
         }
 
-        if (!$this->colors || '' === $value) {
-            return $value;
-        }
-
         $style = $this->styles[$style];
-        $cchr = "\033[m\033[{$style};{$this->styles['cchr']}m%s\033[m\033[{$style}m";
+        $cchr = $this->colors ? "\033[m\033[{$style};{$this->styles['cchr']}m%s\033[m\033[{$style}m" : '%s';
         $value = preg_replace_callback(self::$controlCharsRx, function ($r) use ($cchr) {
             return sprintf($cchr, "\x7F" === $r[0] ? '?' : chr(64 + ord($r[0])));
         }, $value);
 
-        return sprintf("\033[%sm%s\033[m", $style, $value);
+        return $this->colors ? sprintf("\033[%sm%s\033[m", $style, $value) : $value;
     }
 
     /**

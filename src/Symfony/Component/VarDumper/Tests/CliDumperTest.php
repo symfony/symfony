@@ -57,7 +57,7 @@ array:25 [
   5 => -INF
   6 => {$intMax}
   "str" => "déjà"
-  7 => b"é"
+  7 => b"é@"
   "[]" => []
   "res" => :stream {@{$res1}
     wrapper_type: "plainfile"

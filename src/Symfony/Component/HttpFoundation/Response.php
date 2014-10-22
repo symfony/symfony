@@ -81,6 +81,85 @@ class Response
     const HTTP_NOT_EXTENDED = 510;                                                // RFC2774
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
 
+    // https://github.com/joho/7XX-rfc
+    const HTTP_MEH = 701;
+    const HTTP_EMACS = 702;
+    const HTTP_EXPLOSION = 703;
+    const HTTP_GOTO_FAIL = 704;
+    const HTTP_I_WROTE_THE_CODE_AND_MISSED_VALIDATION = 705;
+    const HTTP_PHP = 710;
+    const HTTP_CONVENIENCE_STORE = 711;
+    const HTTP_NO_SQL = 712;
+    const HTTP_I_AM_NOT_A_TEAPOT = 719;
+    const HTTP_UNPOSSIBLE = 720;
+    const HTTP_KNOWN_UNKNOWNS = 721;
+    const HTTP_UNKNOWN_UNKNOWNS = 722;
+    const HTTP_TRICKY = 723;
+    const HTTP_THIS_LINE_SHOULD_BE_UNREACHABLE = 724;
+    const HTTP_IT_WORKS_ON_MY_MACHINE = 725;
+    const HTTP_ITS_A_FEATURE_NOT_A_BUG = 726;
+    const HTTP_32_BITS_IS_PLENTY = 727;
+    const HTTP_FUCKING_BOWER = 730;
+    const HTTP_FUCKING_RUBYGEMS = 731;
+    const HTTP_FUCKING_UNICODE = 732;
+    const HTTP_FUCKING_DEADLOCKS = 733;
+    const HTTP_FUCKING_DEFERREDS = 734;
+    const HTTP_FUCKING_IE = 735;
+    const HTTP_FUCKING_RACE_CONDITIONS = 736;
+    const HTTP_FUCKTHREADSING = 737;
+    const HTTP_FUCKING_BUNDLER = 738;
+    const HTTP_FUCKING_WINDOWS = 739;
+    const HTTP_COMPUTER_SAYS_NO = 740;
+    const HTTP_COMPILING = 741;
+    const HTTP_A_KITTEN_DIES = 742;
+    const HTTP_I_THOUGHT_I_KNEW_REGULAR_EXPRESSIONS = 743;
+    const HTTP_Y_U_NO_WRITE_INTEGRATION_TESTS = 744;
+    const HTTP_I_DONT_ALWAYS_TEST_MY_CODE_BUT_WHEN_I_DO_I_DO_IT_IN_PRODUCTION = 745;
+    const HTTP_MISSED_BALLMER_PEAK = 746;
+    const HTTP_MOTHERFUCKING_SNAKES_ON_THE_MOTHERFUCKING_PLANE = 747;
+    const HTTP_CONFOUNDED_BY_PONIES = 748;
+    const HTTP_RESERVED_FOR_CHUCK_NORRIS = 749;
+    const HTTP_DIDNT_BOTHER_TO_COMPILE_IT = 750;
+    const HTTP_SYNTAX_ERROR = 753;
+    const HTTP_TOO_MANY_SEMICOLONS = 754;
+    const HTTP_NOT_ENOUGH_SEMICOLONS = 755;
+    const HTTP_INSUFFICIENT_POLITE = 756;
+    const HTTP_EXCESSIVELY_POLITE = 757;
+    const HTTP_UNEXPECTED_T_PAAMAYIM_NEKUDOTAYIM = 759;
+    const HTTP_HUNGOVER = 761;
+    const HTTP_STONED = 762;
+    const HTTP_UNDER_CAFFEINATED = 763;
+    const HTTP_OVER_CAFFEINATED = 764;
+    const HTTP_RAILSCAMP = 765;
+    const HTTP_SOBER = 766;
+    const HTTP_DRUNK = 767;
+    const HTTP_ACCIDENTALLY_TOOK_SLEEPING_PILLS_INSTEAD_OF_MIGRAINE_PILLS_DURING_CRUNCH_WEEK = 768;
+    const HTTP_QUESTIONABLE_MATURITY_LEVEL = 769;
+    const HTTP_CACHED_FOR_TOO_LONG = 771;
+    const HTTP_NOT_CACHED_LONG_ENOUGH = 772;
+    const HTTP_NOT_CACHED_AT_ALL = 773;
+    const HTTP_WHY_WAS_THIS_CACHED = 774;
+    const HTTP_ERROR_ON_THE_EXCEPTION = 776;
+    const HTTP_COINCIDENCE = 777;
+    const HTTP_OFF_BY_ONE_ERROR = 778;
+    const HTTP_OFF_BY_TOO_MANY_TO_COUNT_ERROR = 779;
+    const HTTP_PROJECT_OWNER_NOT_RESPONDING = 780;
+    const HTTP_OPERATIONS = 781;
+    const HTTP_QA = 782;
+    const HTTP_IT_WAS_A_CUSTOMER_REQUEST_HONESTLY = 783;
+    const HTTP_MANAGEMENT_OBVIOUSLY = 784;
+    const HTTP_TPS_COVER_SHEET_NOT_ATTACHED = 785;
+    const HTTP_TRY_IT_NOW = 786;
+    const HTTP_FURTHER_FUNDING_REQUIRED = 787;
+    const HTTP_DESIGNERS_FINAL_DESIGN_WERENT = 788;
+    const HTTP_THE_INTERNET_SHUT_DOWN_DUE_TO_COPYRIGHT_RESTRICTIONS = 791;
+    const HTTP_CLIMATE_CHANGE_DRIVEN_CATASTROPHIC_WEATHER_EVENT = 792;
+    const HTTP_ZOMBIE_APOCALYPSE = 793;
+    const HTTP_SOMEONE_LET_PG_NEAR_A_REPL = 794;
+    const HTTP_HEARTBLEED = 795;
+    const HTTP_THIS_IS_THE_LAST_PAGE_OF_THE_INTERNET_GO_BACK = 797;
+    const HTTP_END_OF_THE_WORLD = 799;
+
     /**
      * @var \Symfony\Component\HttpFoundation\ResponseHeaderBag
      */
@@ -183,6 +262,83 @@ class Response
         508 => 'Loop Detected',                                               // RFC5842
         510 => 'Not Extended',                                                // RFC2774
         511 => 'Network Authentication Required',                             // RFC6585
+        701 => 'Meh',                                                         // https://github.com/joho/7XX-rfc
+        702 => 'Emacs',
+        703 => 'Explosion',
+        704 => 'Goto Fail',
+        705 => 'I wrote the code and missed the necessary validation by an oversight',
+        710 => 'PHP',
+        711 => 'Convenience Store',
+        712 => 'NoSQL',
+        719 => 'I am not a teapot',
+        720 => 'Unpossible',
+        721 => 'Known Unknowns',
+        722 => 'Unknown Unknowns',
+        723 => 'Tricky',
+        724 => 'This line should be unreachable',
+        725 => 'It works on my machine',
+        726 => 'It\'s a feature, not a bug',
+        727 => '32 bits is plenty',
+        730 => 'Fucking Bower',
+        731 => 'Fucking Rubygems',
+        732 => 'Fucking Unicode',
+        733 => 'Fucking Deadlocks',
+        734 => 'Fucking Deferreds',
+        735 => 'Fucking IE',
+        736 => 'Fucking Race Conditions',
+        737 => 'FuckThreadsing',
+        738 => 'Fucking Bundler',
+        739 => 'Fucking Windows',
+        740 => 'Computer says no',
+        741 => 'Compiling',
+        742 => 'A kitten dies',
+        743 => 'I thought I knew regular expressions',
+        744 => 'Y U NO write integration tests?',
+        745 => 'I don\'t always test my code, but when I do I do it in production',
+        746 => 'Missed Ballmer Peak',
+        747 => 'Motherfucking Snakes on the Motherfucking Plane',
+        748 => 'Confounded by Ponies',
+        749 => 'Reserved for Chuck Norris',
+        750 => 'Didn\'t bother to compile it',
+        753 => 'Syntax Error',
+        754 => 'Too many semi-colons',
+        755 => 'Not enough semi-colons',
+        756 => 'Insufficiently polite',
+        757 => 'Excessively polite',
+        759 => 'Unexpected T_PAAMAYIM_NEKUDOTAYIM',
+        761 => 'Hungover',
+        762 => 'Stoned',
+        763 => 'Under-Caffeinated',
+        764 => 'Over-Caffeinated',
+        765 => 'Railscamp',
+        766 => 'Sober',
+        767 => 'Drunk',
+        768 => 'Accidentally Took Sleeping Pills Instead Of Migraine Pills During Crunch Week',
+        769 => 'Questionable Maturity Level',
+        771 => 'Cached for too long',
+        772 => 'Not cached long enough',
+        773 => 'Not cached at all',
+        774 => 'Why was this cached?',
+        776 => 'Error on the Exception',
+        777 => 'Coincidence',
+        778 => 'Off By One Error',
+        779 => 'Off By Too Many To Count Error',
+        780 => 'Project owner not responding',
+        781 => 'Operations',
+        782 => 'QA',
+        783 => 'It was a customer request, honestly',
+        784 => 'Management, obviously',
+        785 => 'TPS Cover Sheet not attached',
+        786 => 'Try it now',
+        787 => 'Further Funding Required',
+        788 => 'Designer\'s final designs weren\'t',
+        791 => 'The Internet shut down due to copyright restrictions',
+        792 => 'Climate change driven catastrophic weather event',
+        793 => 'Zombie Apocalypse',
+        794 => 'Someone let PG near a REPL',
+        795 => '#heartbleed',
+        797 => 'This is the last page of the Internet. Go back',
+        799 => 'End of the world',
     );
 
     /**
@@ -1106,7 +1262,7 @@ class Response
      */
     public function isInvalid()
     {
-        return $this->statusCode < 100 || $this->statusCode >= 600;
+        return $this->statusCode < 100 || $this->statusCode >= 800;
     }
 
     /**

@@ -155,11 +155,7 @@ class Parser
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         }
 
-                        foreach ($refValue as $key => $value) {
-                            if (!isset($data[$key])) {
-                                $data[$key] = $value;
-                            }
-                        }
+                        $data = array_replace_recursive($data, $refValue);
                     } else {
                         if (isset($values['value']) && $values['value'] !== '') {
                             $value = $values['value'];
@@ -193,11 +189,7 @@ class Parser
                         } else {
                             // If the value associated with the key is a single mapping node, each of its key/value pairs is inserted into the
                             // current mapping, unless the key already exists in it.
-                            foreach ($parsed as $key => $value) {
-                                if (!isset($data[$key])) {
-                                    $data[$key] = $value;
-                                }
-                            }
+                            $data = array_replace_recursive($data, $parsed);
                         }
                     }
                 } elseif (isset($values['value']) && preg_match('#^&(?P<ref>[^ ]+) *(?P<value>.*)#u', $values['value'], $matches)) {
@@ -224,7 +216,11 @@ class Parser
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
-                            $data[$key] = $value;
+                            if (isset($data[$key]) && is_array($data[$key]) && is_array($value)) {
+                                $data[$key] = array_replace_recursive($data[$key], $value);
+                            } else {
+                                $data[$key] = $value;
+                            }
                         }
                     }
                 } else {

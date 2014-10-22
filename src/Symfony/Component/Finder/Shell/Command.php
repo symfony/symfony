@@ -44,7 +44,7 @@ class Command
     public function __construct(Command $parent = null)
     {
         $this->parent = $parent;
-        $this->bits   = array();
+        $this->bits = array();
         $this->labels = array();
     }
 

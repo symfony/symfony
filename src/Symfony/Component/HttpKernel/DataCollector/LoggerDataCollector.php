@@ -39,8 +39,8 @@ class LoggerDataCollector extends DataCollector
     {
         if (null !== $this->logger) {
             $this->data = array(
-                'error_count'       => $this->logger->countErrors(),
-                'logs'              => $this->sanitizeLogs($this->logger->getLogs()),
+                'error_count' => $this->logger->countErrors(),
+                'logs' => $this->sanitizeLogs($this->logger->getLogs()),
                 'deprecation_count' => $this->computeDeprecationCount(),
             );
         }

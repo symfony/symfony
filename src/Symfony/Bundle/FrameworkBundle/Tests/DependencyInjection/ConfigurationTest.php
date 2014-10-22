@@ -35,7 +35,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $configuration = new Configuration();
         $config = $processor->processConfiguration($configuration, array(array(
-            'secret'          => 's3cr3t',
+            'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
         )));
 
@@ -90,44 +90,44 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'http_method_override' => true,
-            'trusted_proxies'     => array(),
-            'ide'                 => null,
-            'default_locale'      => 'en',
-            'form'                => array('enabled' => false),
-            'csrf_protection'     => array(
-                'enabled'    => true,
+            'trusted_proxies' => array(),
+            'ide' => null,
+            'default_locale' => 'en',
+            'form' => array('enabled' => false),
+            'csrf_protection' => array(
+                'enabled' => true,
                 'field_name' => '_token',
             ),
-            'esi'                 => array('enabled' => false),
-            'fragments'           => array(
+            'esi' => array('enabled' => false),
+            'fragments' => array(
                 'enabled' => false,
-                'path'    => '/_fragment',
+                'path' => '/_fragment',
             ),
-            'profiler'            => array(
-                'enabled'              => false,
-                'only_exceptions'      => false,
+            'profiler' => array(
+                'enabled' => false,
+                'only_exceptions' => false,
                 'only_master_requests' => false,
-                'dsn'                  => 'file:%kernel.cache_dir%/profiler',
-                'username'             => '',
-                'password'             => '',
-                'lifetime'             => 86400,
-                'collect'              => true,
+                'dsn' => 'file:%kernel.cache_dir%/profiler',
+                'username' => '',
+                'password' => '',
+                'lifetime' => 86400,
+                'collect' => true,
             ),
-            'translator'          => array(
-                'enabled'  => false,
+            'translator' => array(
+                'enabled' => false,
                 'fallback' => 'en',
             ),
-            'validation'          => array(
-                'enabled'            => false,
+            'validation' => array(
+                'enabled' => false,
                 'enable_annotations' => false,
                 'translation_domain' => 'validators',
             ),
-            'annotations'         => array(
-                'cache'          => 'file',
+            'annotations' => array(
+                'cache' => 'file',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug'          => '%kernel.debug%',
+                'debug' => '%kernel.debug%',
             ),
-            'serializer'          => array(
+            'serializer' => array(
                 'enabled' => false,
             ),
         );

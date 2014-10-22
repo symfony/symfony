@@ -47,8 +47,8 @@ class PropelLogger
      */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
-        $this->logger    = $logger;
-        $this->queries   = array();
+        $this->logger = $logger;
+        $this->queries = array();
         $this->stopwatch = $stopwatch;
         $this->isPrepared = false;
     }

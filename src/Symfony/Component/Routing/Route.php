@@ -98,13 +98,13 @@ class Route implements \Serializable
     public function serialize()
     {
         return serialize(array(
-            'path'         => $this->path,
-            'host'         => $this->host,
-            'defaults'     => $this->defaults,
+            'path' => $this->path,
+            'host' => $this->host,
+            'defaults' => $this->defaults,
             'requirements' => $this->requirements,
-            'options'      => $this->options,
-            'schemes'      => $this->schemes,
-            'methods'      => $this->methods,
+            'options' => $this->options,
+            'schemes' => $this->schemes,
+            'methods' => $this->methods,
         ));
     }
 

@@ -1060,21 +1060,21 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $responses = array(
             array(
-                'status'  => 200,
-                'body'    => '<esi:include src="/foo" /> <esi:include src="/bar" />',
+                'status' => 200,
+                'body' => '<esi:include src="/foo" /> <esi:include src="/bar" />',
                 'headers' => array(
-                    'Cache-Control'     => 's-maxage=300',
+                    'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
                 ),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'Hello World!',
+                'status' => 200,
+                'body' => 'Hello World!',
                 'headers' => array('Cache-Control' => 's-maxage=300'),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'My name is Bobby.',
+                'status' => 200,
+                'body' => 'My name is Bobby.',
                 'headers' => array('Cache-Control' => 's-maxage=100'),
             ),
         );
@@ -1092,21 +1092,21 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $responses = array(
             array(
-                'status'  => 200,
-                'body'    => '<esi:include src="/foo" /> <esi:include src="/bar" />',
+                'status' => 200,
+                'body' => '<esi:include src="/foo" /> <esi:include src="/bar" />',
                 'headers' => array(
-                    'Cache-Control'     => 's-maxage=300',
+                    'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
                 ),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'Hello World!',
+                'status' => 200,
+                'body' => 'Hello World!',
                 'headers' => array('ETag' => 'foobar'),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'My name is Bobby.',
+                'status' => 200,
+                'body' => 'My name is Bobby.',
                 'headers' => array('Cache-Control' => 's-maxage=100'),
             ),
         );
@@ -1125,17 +1125,17 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $responses = array(
             array(
-                'status'  => 200,
-                'body'    => '<esi:include src="/foo" />',
+                'status' => 200,
+                'body' => '<esi:include src="/foo" />',
                 'headers' => array(
-                    'Content-Length'    => 26,
-                    'Cache-Control'     => 's-maxage=300',
+                    'Content-Length' => 26,
+                    'Cache-Control' => 's-maxage=300',
                     'Surrogate-Control' => 'content="ESI/1.0"',
                 ),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'Hello World!',
+                'status' => 200,
+                'body' => 'Hello World!',
                 'headers' => array(),
             ),
         );
@@ -1216,8 +1216,8 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $responses = array(
             array(
-                'status'  => 200,
-                'body'    => '<esi:include src="/hey" />',
+                'status' => 200,
+                'body' => '<esi:include src="/hey" />',
                 'headers' => array(
                     'Surrogate-Control' => 'content="ESI/1.0"',
                     'ETag' => 'hey',
@@ -1225,8 +1225,8 @@ class HttpCacheTest extends HttpCacheTestCase
                 ),
             ),
             array(
-                'status'  => 200,
-                'body'    => 'Hey!',
+                'status' => 200,
+                'body' => 'Hey!',
                 'headers' => array(),
             ),
         );

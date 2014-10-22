@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebDebugToolbarListener implements EventSubscriberInterface
 {
     const DISABLED = 1;
-    const ENABLED  = 2;
+    const ENABLED = 2;
 
     protected $twig;
     protected $interceptRedirects;

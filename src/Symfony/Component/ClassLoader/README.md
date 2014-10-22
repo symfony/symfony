@@ -48,10 +48,10 @@ than one namespace at once:
 
 ```php
 $loader->registerNamespaces(array(
-    'Symfony'          => array(__DIR__.'/src', __DIR__.'/symfony/src'),
+    'Symfony' => array(__DIR__.'/src', __DIR__.'/symfony/src'),
     'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
-    'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
-    'Monolog'          => __DIR__.'/vendor/monolog/src',
+    'Doctrine' => __DIR__.'/vendor/doctrine/lib',
+    'Monolog' => __DIR__.'/vendor/monolog/src',
 ));
 ```
 

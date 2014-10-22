@@ -184,11 +184,11 @@ class NativeRequestHandler implements RequestHandlerInterface
 
         foreach (array_keys($data['name']) as $key) {
             $files[$key] = self::fixPhpFilesArray(array(
-                'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key],
-                'type'     => $data['type'][$key],
+                'error' => $data['error'][$key],
+                'name' => $data['name'][$key],
+                'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
-                'size'     => $data['size'][$key],
+                'size' => $data['size'][$key],
             ));
         }
 

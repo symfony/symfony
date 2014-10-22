@@ -63,7 +63,7 @@ class PropelUserProvider implements UserProviderInterface
     public function loadUserByUsername($username)
     {
         $queryClass = $this->queryClass;
-        $query      = $queryClass::create();
+        $query = $queryClass::create();
 
         if (null !== $this->property) {
             $filter = 'filterBy'.ucfirst($this->property);

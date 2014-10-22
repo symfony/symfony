@@ -87,12 +87,12 @@ class Container implements IntrospectableContainerInterface
     {
         $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
 
-        $this->services       = array();
-        $this->aliases        = array();
-        $this->scopes         = array();
-        $this->scopeChildren  = array();
+        $this->services = array();
+        $this->aliases = array();
+        $this->scopes = array();
+        $this->scopeChildren = array();
         $this->scopedServices = array();
-        $this->scopeStacks    = array();
+        $this->scopeStacks = array();
     }
 
     /**

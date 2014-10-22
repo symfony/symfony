@@ -643,7 +643,7 @@ class ResponseTest extends ResponseTestCase
         }
 
         try {
-            $response->setStatusCode(650);
+            $response->setStatusCode(850);
             $this->fail();
         } catch (\InvalidArgumentException $e) {
             $this->assertTrue($response->isInvalid());

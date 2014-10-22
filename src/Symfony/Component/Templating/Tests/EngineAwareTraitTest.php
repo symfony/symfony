@@ -18,19 +18,19 @@ class EngineAwareTraitTest extends \PHPUnit_Framework_TestCase
 {
     public function testCanSetAndRetrieveEngineFromEngineAwareClass()
     {
-        $engineAware = new EngineAwareClass();
-        $engineAware->setEngine($this->getMock('Symfony\Component\Templating\EngineInterface'));
-        
-        $this->assertInstanceOf('Symfony\Component\Templating\EngineInterface', $engineAware->getEngine());
+        $engineAware = new TemplateEngineAwareClass();
+        $engineAware->setTemplateEngine($this->getMock('Symfony\Component\Templating\EngineInterface'));
+
+        $this->assertInstanceOf('Symfony\Component\Templating\EngineInterface', $engineAware->getTemplateEngine());
     }
 }
 
-class EngineAwareClass implements EngineAwareInterface
+class TemplateEngineAwareClass implements EngineAwareInterface
 {
     use EngineAwareTrait;
 
-    public function getEngine()
+    public function getTemplateEngine()
     {
-        return $this->engine;
+        return $this->templateEngine;
     }
 }

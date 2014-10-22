@@ -21,7 +21,7 @@ interface EngineAwareInterface
     /**
      * Sets the Engine
      *
-     * @param EngineInterface $engine A EngineInterface instance
+     * @param EngineInterface $templateEngine A EngineInterface instance
      */
-    public function setEngine(EngineInterface $engine = null);
+    public function setTemplateEngine(EngineInterface $templateEngine = null);
 }

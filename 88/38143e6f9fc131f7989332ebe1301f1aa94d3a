@@ -1,0 +1,525 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-06T16:35:16Z
+
+I'm not really happy seeing this being static, what's the argument against $options->resolve($defaults)?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-06T16:52:24Z
+
+@iltar having to instantiate a resolver to resolver simple defaults makes it much slower, and also more complex to use. The static call is an enhanced version of ``options = array_merge($defaults, $options)``, allowing to validate options instead of just bring defaults in. AFAIK, nobody has ever complained that merging the defaults in your methods is using procedural code generally.
+
+And as you can see, the usage of an Options instance allows to provide extension points for the definition of the defaults (which is what the component aims to solve for forms)
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-06T17:20:52Z
+
+@stof in both examples provided, the argument passed to `Options::resolve()` is an instance of `Options`. Following the examples, I prefer the api listed below as it's less thinking and makes it more intuitive .
+
+```php
+// Basic option resolving
+$options = $options->resolve(array(
+    'choices' = array(),
+));
+
+// More advanced option configuration
+$defaults = new Options();
+$defaults['choices'] = array();
+$defaults->setRequired('em');
+
+$options = $options->resolve($defaults);
+
+// Form component example (3.0)
+public function setDefaultOptions(Options $options) {
+    $options['choices'] = array();
+
+    $options->setRequired('em');
+}
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-06T17:30:43Z
+
+@iltar the basic usage in @webmozart's comment does not require you to build an object. And ``$options`` is the *array* of values provided by the user of your code
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-06T17:36:04Z
+
+@stof so if I understand it correctly, the idea is to also allow an array. In that case, this is a good solution. I'm still not in favor of static methods in my code, but I supposed this will be behind the scenes. What will be the case when someone implements their own Options implementation?
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-10-07T07:11:36Z
+
+So does this also make it possible to use nested options as described in #4833? :)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-07T07:38:34Z
+
+@iltar As @stof said, `Options::resolve($options, $defaults)` is an enhanced version of `array_replace($defaults, $options)`. This is very low-level code - a static call really shouldn't matter there. Being that low-level, own Options implementations are not anticipated nor supported.
+
+@sstok Not yet.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-07T09:17:35Z
+
+I finished the PR now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-14T10:03:04Z
+
+I'm currently adapting the PR so that we can close #10616. I'm also preparing the implementation of #4833 in 2.7+ without breaking BC. I need some feedback to complete that.
+
+In 2.6, I changed `Options` to allow for two different resolving syntaxes:
+
+The simple syntax without any objects, designed for high performance (`array_replace()` on steroids):
+
+```php
+public function __construct(array $options = array())
+{
+    Options::validateRequired($options, 'em');
+    Options::validateTypes($options, array(
+        'em' => 'Doctrine\ORM\EntityManager',
+    ));
+
+    $this->options = Options::resolve($options, array(
+        'class' => null,
+        'query_builder' => null,
+    ));
+}
+```
+
+And the object-based syntax with the flexibility that we know of the OptionsResolver (lazy options, normalization...):
+
+```php
+public function __construct(array $options = array())
+{
+    $defaults = new Options();
+    $defaults['class'] = null;
+    $defaults['query_builder'] = null;
+    $defaults->setRequired('em');
+    $defaults->setAllowedTypes(array(
+        'em' => 'Doctrine\ORM\EntityManager',
+    ));
+
+    $this->options = Options::resolve($options, $defaults);
+}
+```
+
+My question to you is: Would any of you actually use the first mentioned, static API? Or should we remove it and make `resolve()` an instance method usable like this:
+
+```php
+public function __construct(array $options = array())
+{
+    $defaults = new Options();
+    // ...
+
+    $this->options = $defaults->resolve($options);
+}
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-14T10:16:51Z
+
+The static method syntax was introduced in 2.6 so it can be removed now (or at any time before the first RC version.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-14T10:40:22Z
+
+By the way, I'm all for removing the static API.
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2014-10-14T10:45:41Z
+
+:+1: for removing static API
+
+---------------------------------------------------------------------------
+
+by docteurklein at 2014-10-14T11:16:24Z
+
+same, +1 for removing static api
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-14T11:19:39Z
+
+Less is more, and I'm usually against static. I would definitely use the last example.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-14T12:51:04Z
+
+Good, thanks for the feedback!
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-14T14:36:15Z
+
+I updated the PR and the above description now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-14T15:49:29Z
+
+The documentation is adapted now: https://github.com/webmozart/symfony-docs/blob/issue11705/components/options_resolver.rst
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-14T18:42:52Z
+
+With the new methods introduced, it would probably be a good time to fix #10585. So its not wrong again.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-14T18:52:53Z
+
+Also what I always find irritating is the magic of defining lazy options.
+There is a huge difference between
+```
+$options->set('name', function (Options $options, $previousValue) {
+});
+```
+and
+```
+$options->set('name', function ($options, $previousValue) {
+});
+```
+
+which is non-obvious. Maybe there should be different methods for defining plain options and lazy avaluated options?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-14T19:33:47Z
+
+Also I think Options:resolve should not clone. The OptionsResolver should only clone the options when calling resolve. The semantics are different. It makes sense that one can use one resolver to call resolve multiple times. But for options it makes things so conplicated and confusing. E.g. it's not possible to call the following which is strange from a users perspective. Or am I missing something?
+```
+$options = new Options();
+$options['foo'] = 'bar';
+$options->resolve(array());
+echo $options['foo'];
+```
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-14T21:10:08Z
+
+@Tobion The "problem" about using a separate method for lazy options is that it then isn't obvious anymore how `set()` and - let's call it - `setLazy()` interact:
+
+```php
+$options['foo'] = 'bar';
+$options->setLazy('foo', function (Options $options) {
+    return 'dynamic';
+});
+$options['foo'] = 'baz';
+```
+
+I personally don't find it very clear what the value of the 'foo' option is at the different points in time. With:
+
+```php
+$options['foo'] = 'bar';
+$options['foo'] = function (Options $options) {
+    return 'dynamic';
+};
+$options['foo'] = 'baz';
+```
+
+it's clear that we are always performing the same set operation. Obviously I'm biased here.
+
+About `resolve()`: The point of that method is *not* to change the state of the object, but to resolve the passed options:
+
+```php
+$options = new Options();
+// ...
+$resolvedOptions = $options->resolve($passedOptions);
+echo $resolvedOptions['foo'];
+```
+
+From the user POV, it seems confusing to me if `resolve()` on the one hand turns the input into some output, and on the other hand modifies the internal state of the instance, making it unusable for further `resolve()` calls.
+
+I'll look into fixing #10585 tomorrow, thanks for mentioning that.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-15T08:45:11Z
+
+@Tobion I fixed #10585 now (in a separate commit, to facilitate review).
+
+Contrary to the ticket description, I left InvalidOptionsException and MissingOptionsException extending InvalidArgumentException, because I disagree that they should be RuntimeExceptions. Options are an extended form of method parameters. The developer must make sure that the values match their specification (just like with normal arguments), even if the values are actually provided at runtime.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-15T10:00:26Z
+
+When above things are fixed, it looks good to me :+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-15T15:07:36Z
+
+From my side, this PR is finished now.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-15T22:29:23Z
+
+I think this also fixes #9174.
+That change and also the fact that normalizer are executed after validation should be added to the changelog.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-16T08:55:07Z
+
+Thank you for the thorough review @Tobion. You're right. I adapted the code and the description above.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-20T12:28:46Z
+
+The Options class deals with default values, but we pass it end-user values and it returns resolved values. For this reason (lots of different meaning for "value"), I propose to rename the `values` variables to `defaults` to make things clearer. Also, renaming `get()` to `getDefault()` would help avoid any confusions (the same goes for some other methods.)
+
+Everything else looks good to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T12:34:29Z
+
+@fabpot the `values` variable does not only contain defaults but also resolved values. So I think the naming is correct. And `get` does not return the defaults but resolved option values.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-20T12:35:48Z
+
+@Tobion I agree with @fabpot that a clearer separation between default and resolved values makes sense. I'm implementing that change at the moment.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T12:38:37Z
+
+I'm keen to see that
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-20T14:31:08Z
+
+I pushed new commits now. `set()` et al. were renamed to `setDefault()`, ... There is a clear internal distinction between default values and resolved values. Also, lazy options must now be defined using a separate method `setLazy()`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-20T14:54:00Z
+
+@webmozart Looks better to me except for the `setLazy()` method (see your comment about this above).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T19:56:25Z
+
+I ok with making it more explicit via setDefault, setLazy etc. And I think it's good that there is no `set()/get()` with different semantics anymore. But in my opinion the `offsetSet` array access should still be any alias for `setDefault`. I see it this way: Array access on an object is for people who know what they are doing and is a shortcut and looks natural to me to define defaults using `$options['myoption'] = 'default';`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T20:02:38Z
+
+Edit: Actually I changed my mind, in context of calling the options in subclasses, it might make more sense to just change a default value (and thus removing lazy defaults while keeping normalizers).
+
+<del>Now that setDefault and setLazy are different methods, I think setDefault should NOT overwrite setLazy. There is no need to complicate things when not necessary. Just make</del>
+
+```
+$options->setDefault('option', 'value');
+$options->setLazy('option', function ());
+```
+and
+```
+$options->setLazy('option', function ());
+$options->setDefault('option', 'value');
+```
+<del>equivalent. If somebody really wants to remove a lazy value when setting a default, he can just call `remove()` before `setDefault`.
+I see it this way: both setters are now for different things (according to the name). And of course lazy values are evaluated after defaults. No need to bring more state into this than needed.</del>
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T20:15:48Z
+
+Btw, `overload()` now does not work anymore with magic lazy closures which is a BC break. So either this functionality must be reimplemented for this method to keep BC, or we can remove it completely. Because at the moment it is deprecated and a BC break which makes no sense.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-20T20:18:22Z
+
+And what about renaming `setLazy` to `addLazy` because lazy closures can stack, which is against the semantics of `set`.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T08:07:27Z
+
+I figured from your comments that the split of setDefault()/setLazy() complicates things more than it should. This is reverted now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T08:37:27Z
+
+When adapting the documentation, I figured that the following code sample doesn't make sense anymore:
+
+```php
+use Symfony\Component\OptionsResolver\Options;
+
+class Mailer
+{
+    // ...
+    public function __construct(array $options = array())
+    {
+        $defaultOptions = new Options();
+        $defaultOptions->setDefaults(array(
+            'host'     => 'smtp.example.org',
+            'username' => 'user',
+            'password' => 'pa$$word',
+            'port'     => 25,
+        ));
+
+        $this->options = $defaultOptions->resolve($options);
+    }
+}
+```
+
+It's hard to find a name for `$defaultOptions` that makes sense here. So I thought whether it would be better to merge Options into OptionsResolver completely and make Options a marker interface only. Then the code makes sense again:
+
+```php
+use Symfony\Component\OptionsResolver\Options;
+
+class Mailer
+{
+    // ...
+    public function __construct(array $options = array())
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(array(
+            'host'     => 'smtp.example.org',
+            'username' => 'user',
+            'password' => 'pa$$word',
+            'port'     => 25,
+        ));
+
+        $this->options = $resolver->resolve($options);
+    }
+}
+```
+
+I implemented this change and squashed the commits. Consequences:
+
+* Options is now a marker interface only (BC break for people who instantiated Options manually).
+* OptionsResolver::isRequired() returns `true` for required options with default values (before: `false`, BC break)
+* OptionsResolver::set/add*() throw an UndefinedOptionsException where they threw an InvalidOptionsException before (BC break)
+
+What do you think about this?
+
+I'll adapt the UPGRADE, CHANGELOG and documentation if you agree with this approach.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T09:13:40Z
+
+I reverted #11716 in master and rebased the PR so that the diff to pre-#11716 (=2.5 + small changes) is shown in the diff view.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T09:15:36Z
+
+A remaining question is whether we want to deprecate OptionsResolverInterface or not?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-21T09:16:05Z
+
+- Options should be OptionsInterface to be consistent with symfony
+- As marker interface it makes it "impossible" to call all the hasser and isser methods inside the closure, like `isDefined`. Not sure if there are valid use cases for this.
+- Why deprecate OptionsResolverInterface?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T09:17:31Z
+
+> Options should be OptionsInterface to be consistent with symfony
+
+This is a severe BC break which I'm not going to do.
+
+> As marker interface it makes it "impossible" to call all the hasser and isser methods
+
+They can be called (BC), but it's true that they are not part of the interface.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-21T09:19:45Z
+
+Why should it be a bc break if you do `Options extends OptionsInterface` and just deprecate Options?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-21T09:23:12Z
+
+> They can be called (BC), but it's true that they are not part of the interface.
+
+It basically forbids these use-cases. But I'm not sure if there are use-cases for options that depend on the definition.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T09:26:14Z
+
+> Why deprecate OptionsResolverInterface?
+
+OptionsResolver is a low-level utility which is instantiated in the same class that it is used in most of the time. Interfaces, on the other hand, are contracts helping different classes/components to communicate. What's the point in having an interface for a class which is not supposed to be shared?
+
+> It basically forbids these use-cases.
+
+That's good, because these methods are deprecated. The methods *can* be called, but they shouldn't.
+
+> Why should it be a bc break if you do `Options extends OptionsInterface` and just deprecate Options?
+
+That's a possibility. However this also makes the definition of lazy options unnecessarily longer (and that definition is the sole purpose of the interface's existence):
+
+```php
+$resolver->setDefault('choices', function (OptionsInterface $options) {
+});
+```
+
+I'd rather make Options an empty class if you insist on the "Interface" suffix.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T12:17:13Z
+
+The PR description, [documentation](https://github.com/webmozart/symfony-docs/blob/issue11705/components/options_resolver.rst), CHANGELOG and UPGRADE-2.6 files are up to date now.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-21T15:17:51Z
+
+Please just merge it before it gets reworked again ;)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-21T15:19:13Z
+
+@Tobion @fabpot I'd like to have your +1 first
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-21T15:19:38Z
+
+Apart from this https://github.com/symfony/symfony/pull/12156#discussion_r19151918 typo :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-21T15:45:32Z
+
+:+1:

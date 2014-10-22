@@ -12,12 +12,10 @@
 namespace Symfony\Component\OptionsResolver\Exception;
 
 /**
- * Thrown when the value of an option does not match its validation rules.
- *
- * You should make sure a valid value is passed to the option.
+ * Thrown when an argument is invalid.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class InvalidOptionsException extends InvalidArgumentException
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

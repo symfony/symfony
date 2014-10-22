@@ -44,13 +44,13 @@ namespace Symfony\Component\Security\Acl\Permission;
  */
 class MaskBuilder
 {
-    const MASK_VIEW = 1;          // 1 << 0
-    const MASK_CREATE = 2;          // 1 << 1
-    const MASK_EDIT = 4;          // 1 << 2
-    const MASK_DELETE = 8;          // 1 << 3
-    const MASK_UNDELETE = 16;         // 1 << 4
-    const MASK_OPERATOR = 32;         // 1 << 5
-    const MASK_MASTER = 64;         // 1 << 6
+    const MASK_VIEW = 1;           // 1 << 0
+    const MASK_CREATE = 2;         // 1 << 1
+    const MASK_EDIT = 4;           // 1 << 2
+    const MASK_DELETE = 8;         // 1 << 3
+    const MASK_UNDELETE = 16;      // 1 << 4
+    const MASK_OPERATOR = 32;      // 1 << 5
+    const MASK_MASTER = 64;        // 1 << 6
     const MASK_OWNER = 128;        // 1 << 7
     const MASK_IDDQD = 1073741823; // 1 << 0 | 1 << 1 | ... | 1 << 30
 

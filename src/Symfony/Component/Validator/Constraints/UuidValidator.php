@@ -32,7 +32,7 @@ class UuidValidator extends ConstraintValidator
     // Roughly speaking:
     // x = any hexadecimal character
     // M = any allowed version {1..5}
-    // N = any allowed variant {9, 9, a, b}
+    // N = any allowed variant {8, 9, a, b}
 
     const STRICT_LENGTH = 36;
     const STRICT_FIRST_HYPHEN_POSITION = 8;

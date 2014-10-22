@@ -39,7 +39,7 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->listener = $this->getMockForAbstractClass('Symfony\Component\HttpKernel\EventListener\TestSessionListener');
-        $this->session  = $this->getSession();
+        $this->session = $this->getSession();
     }
 
     public function testShouldSaveMasterRequestSession()

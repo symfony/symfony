@@ -52,7 +52,7 @@ abstract class AbstractDoctrineExtension extends Extension
             foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
                 if (!isset($objectManager['mappings'][$bundle])) {
                     $objectManager['mappings'][$bundle] = array(
-                        'mapping'   => true,
+                        'mapping' => true,
                         'is_bundle' => true,
                     );
                 }
@@ -65,8 +65,8 @@ abstract class AbstractDoctrineExtension extends Extension
             }
 
             $mappingConfig = array_replace(array(
-                'dir'    => false,
-                'type'   => false,
+                'dir' => false,
+                'type' => false,
                 'prefix' => false,
             ), (array) $mappingConfig);
 
@@ -382,9 +382,9 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!isset($cacheDriver['namespace'])) {
             // generate a unique namespace for the given application
-            $env        = $container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment');
-            $hash       = hash('sha256', $env);
-            $namespace  = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.$hash;
+            $env = $container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment');
+            $hash = hash('sha256', $env);
+            $namespace = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.$hash;
 
             $cacheDriver['namespace'] = $namespace;
         }
@@ -413,7 +413,7 @@ abstract class AbstractDoctrineExtension extends Extension
                     }
                 }
                 $managerConfigs[$autoMappedManager]['mappings'][$bundle] = array(
-                    'mapping'   => true,
+                    'mapping' => true,
                     'is_bundle' => true,
                 );
             }

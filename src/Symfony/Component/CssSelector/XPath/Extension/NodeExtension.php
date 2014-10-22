@@ -25,8 +25,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class NodeExtension extends AbstractExtension
 {
-    const ELEMENT_NAME_IN_LOWER_CASE    = 1;
-    const ATTRIBUTE_NAME_IN_LOWER_CASE  = 2;
+    const ELEMENT_NAME_IN_LOWER_CASE = 1;
+    const ATTRIBUTE_NAME_IN_LOWER_CASE = 2;
     const ATTRIBUTE_VALUE_IN_LOWER_CASE = 4;
 
     /**
@@ -79,15 +79,15 @@ class NodeExtension extends AbstractExtension
     public function getNodeTranslators()
     {
         return array(
-            'Selector'         => array($this, 'translateSelector'),
+            'Selector' => array($this, 'translateSelector'),
             'CombinedSelector' => array($this, 'translateCombinedSelector'),
-            'Negation'         => array($this, 'translateNegation'),
-            'Function'         => array($this, 'translateFunction'),
-            'Pseudo'           => array($this, 'translatePseudo'),
-            'Attribute'        => array($this, 'translateAttribute'),
-            'Class'            => array($this, 'translateClass'),
-            'Hash'             => array($this, 'translateHash'),
-            'Element'          => array($this, 'translateElement'),
+            'Negation' => array($this, 'translateNegation'),
+            'Function' => array($this, 'translateFunction'),
+            'Pseudo' => array($this, 'translatePseudo'),
+            'Attribute' => array($this, 'translateAttribute'),
+            'Class' => array($this, 'translateClass'),
+            'Hash' => array($this, 'translateHash'),
+            'Element' => array($this, 'translateElement'),
         );
     }
 

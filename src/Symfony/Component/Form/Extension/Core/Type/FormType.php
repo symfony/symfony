@@ -85,20 +85,20 @@ class FormType extends BaseType
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only'  => $readOnly,
-            'errors'     => $form->getErrors(),
-            'valid'      => $form->isSubmitted() ? $form->isValid() : true,
-            'value'      => $form->getViewData(),
-            'data'       => $form->getNormData(),
-            'required'   => $form->isRequired(),
+            'read_only' => $readOnly,
+            'errors' => $form->getErrors(),
+            'valid' => $form->isSubmitted() ? $form->isValid() : true,
+            'value' => $form->getViewData(),
+            'data' => $form->getNormData(),
+            'required' => $form->isRequired(),
             'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
-            'pattern'    => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
-            'size'       => null,
+            'pattern' => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
+            'size' => null,
             'label_attr' => $options['label_attr'],
-            'compound'   => $form->getConfig()->getCompound(),
-            'method'     => $form->getConfig()->getMethod(),
-            'action'     => $form->getConfig()->getAction(),
-            'submitted'  => $form->isSubmitted(),
+            'compound' => $form->getConfig()->getCompound(),
+            'method' => $form->getConfig()->getMethod(),
+            'action' => $form->getConfig()->getAction(),
+            'submitted' => $form->isSubmitted(),
         ));
     }
 
@@ -186,26 +186,26 @@ class FormType extends BaseType
         };
 
         $resolver->setDefaults(array(
-            'data_class'            => $dataClass,
-            'empty_data'            => $emptyData,
-            'trim'                  => true,
-            'required'              => true,
-            'read_only'             => false,
-            'max_length'            => null,
-            'pattern'               => null,
-            'property_path'         => null,
-            'mapped'                => true,
-            'by_reference'          => true,
-            'error_bubbling'        => $errorBubbling,
-            'label_attr'            => array(),
-            'virtual'               => null,
-            'inherit_data'          => $inheritData,
-            'compound'              => true,
-            'method'                => 'POST',
+            'data_class' => $dataClass,
+            'empty_data' => $emptyData,
+            'trim' => true,
+            'required' => true,
+            'read_only' => false,
+            'max_length' => null,
+            'pattern' => null,
+            'property_path' => null,
+            'mapped' => true,
+            'by_reference' => true,
+            'error_bubbling' => $errorBubbling,
+            'label_attr' => array(),
+            'virtual' => null,
+            'inherit_data' => $inheritData,
+            'compound' => true,
+            'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
-            'action'                => '',
-            'attr'                  => $defaultAttr,
+            'action' => '',
+            'attr' => $defaultAttr,
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 

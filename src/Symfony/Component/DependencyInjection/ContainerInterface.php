@@ -26,10 +26,10 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 interface ContainerInterface
 {
     const EXCEPTION_ON_INVALID_REFERENCE = 1;
-    const NULL_ON_INVALID_REFERENCE      = 2;
-    const IGNORE_ON_INVALID_REFERENCE    = 3;
-    const SCOPE_CONTAINER                = 'container';
-    const SCOPE_PROTOTYPE                = 'prototype';
+    const NULL_ON_INVALID_REFERENCE = 2;
+    const IGNORE_ON_INVALID_REFERENCE = 3;
+    const SCOPE_CONTAINER = 'container';
+    const SCOPE_PROTOTYPE = 'prototype';
 
     /**
      * Sets a service.

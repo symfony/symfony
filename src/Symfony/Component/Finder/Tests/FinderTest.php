@@ -614,7 +614,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testAdaptersChaining()
     {
-        $iterator  = new \ArrayIterator(array());
+        $iterator = new \ArrayIterator(array());
         $filenames = $this->toAbsolute(array('foo', 'foo/bar.tmp', 'test.php', 'test.py', 'toto'));
         foreach ($filenames as $file) {
             $iterator->append(new \Symfony\Component\Finder\SplFileInfo($file, null, null));

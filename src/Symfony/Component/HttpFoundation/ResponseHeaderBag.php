@@ -20,11 +20,11 @@ namespace Symfony\Component\HttpFoundation;
  */
 class ResponseHeaderBag extends HeaderBag
 {
-    const COOKIES_FLAT           = 'flat';
-    const COOKIES_ARRAY          = 'array';
+    const COOKIES_FLAT = 'flat';
+    const COOKIES_ARRAY = 'array';
 
     const DISPOSITION_ATTACHMENT = 'attachment';
-    const DISPOSITION_INLINE     = 'inline';
+    const DISPOSITION_INLINE = 'inline';
 
     /**
      * @var array
@@ -34,12 +34,12 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * @var array
      */
-    protected $cookies              = array();
+    protected $cookies = array();
 
     /**
      * @var array
      */
-    protected $headerNames          = array();
+    protected $headerNames = array();
 
     /**
      * Constructor.

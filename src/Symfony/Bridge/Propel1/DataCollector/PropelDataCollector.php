@@ -55,8 +55,8 @@ class PropelDataCollector extends DataCollector
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         $this->data = array(
-            'queries'       => $this->buildQueries(),
-            'querycount'    => $this->countQueries(),
+            'queries' => $this->buildQueries(),
+            'querycount' => $this->countQueries(),
         );
     }
 
@@ -118,16 +118,16 @@ class PropelDataCollector extends DataCollector
         $innerGlue = $this->propelConfiguration->getParameter('debugpdo.logging.innerglue', ': ');
 
         foreach ($this->logger->getQueries() as $q) {
-            $parts     = explode($outerGlue, $q, 4);
+            $parts = explode($outerGlue, $q, 4);
 
-            $times     = explode($innerGlue, $parts[0]);
-            $con       = explode($innerGlue, $parts[2]);
-            $memories  = explode($innerGlue, $parts[1]);
+            $times = explode($innerGlue, $parts[0]);
+            $con = explode($innerGlue, $parts[2]);
+            $memories = explode($innerGlue, $parts[1]);
 
-            $sql       = trim($parts[3]);
-            $con       = trim($con[1]);
-            $time      = trim($times[1]);
-            $memory    = trim($memories[1]);
+            $sql = trim($parts[3]);
+            $con = trim($con[1]);
+            $time = trim($times[1]);
+            $memory = trim($memories[1]);
 
             $queries[] = array('connection' => $con, 'sql' => $sql, 'time' => $time, 'memory' => $memory);
         }

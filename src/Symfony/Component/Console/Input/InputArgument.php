@@ -49,8 +49,8 @@ class InputArgument
             throw new \InvalidArgumentException(sprintf('Argument mode "%s" is not valid.', $mode));
         }
 
-        $this->name        = $name;
-        $this->mode        = $mode;
+        $this->name = $name;
+        $this->mode = $mode;
         $this->description = $description;
 
         $this->setDefault($default);

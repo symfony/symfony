@@ -35,8 +35,8 @@ class GraphvizDumper extends Dumper
     private $edges;
     private $options = array(
             'graph' => array('ratio' => 'compress'),
-            'node'  => array('fontsize' => 11, 'fontname' => 'Arial', 'shape' => 'record'),
-            'edge'  => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => 0.5),
+            'node' => array('fontsize' => 11, 'fontname' => 'Arial', 'shape' => 'record'),
+            'edge' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => 'grey', 'arrowhead' => 'open', 'arrowsize' => 0.5),
             'node.instance' => array('fillcolor' => '#9999ff', 'style' => 'filled'),
             'node.definition' => array('fillcolor' => '#eeeeee'),
             'node.missing' => array('fillcolor' => '#ff9999', 'style' => 'filled'),

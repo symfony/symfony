@@ -64,9 +64,9 @@ class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 
         $projectUrlGenerator = new \ProjectUrlGenerator(new RequestContext('/app.php'));
 
-        $absoluteUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), true);
+        $absoluteUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), true);
         $absoluteUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), true);
-        $relativeUrlWithParameter    = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), false);
+        $relativeUrlWithParameter = $projectUrlGenerator->generate('Test', array('foo' => 'bar'), false);
         $relativeUrlWithoutParameter = $projectUrlGenerator->generate('Test2', array(), false);
 
         $this->assertEquals($absoluteUrlWithParameter, 'http://localhost/app.php/testing/bar');

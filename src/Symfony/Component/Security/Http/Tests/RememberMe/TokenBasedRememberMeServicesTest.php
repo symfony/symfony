@@ -220,7 +220,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $service->loginSuccess($request, $response, $token);
 
         $cookies = $response->headers->getCookies(ResponseHeaderBag::COOKIES_ARRAY);
-        $cookie  = $cookies['myfoodomain.foo']['/foo/path']['foo'];
+        $cookie = $cookies['myfoodomain.foo']['/foo/path']['foo'];
         $this->assertFalse($cookie->isCleared());
         $this->assertTrue($cookie->isSecure());
         $this->assertTrue($cookie->isHttpOnly());

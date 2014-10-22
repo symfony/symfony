@@ -57,8 +57,8 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function __construct(TemplateNameParserInterface $parser, LoaderInterface $loader, array $helpers = array())
     {
-        $this->parser  = $parser;
-        $this->loader  = $loader;
+        $this->parser = $parser;
+        $this->loader = $loader;
 
         $this->addHelpers($helpers);
 

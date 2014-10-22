@@ -100,14 +100,14 @@ class AnnotationClassLoaderTest extends AbstractAnnotationLoaderTest
     public function testLoad($className, $routeDatas = array(), $methodArgs = array())
     {
         $routeDatas = array_replace(array(
-            'name'         => 'route',
-            'path'         => '/',
+            'name' => 'route',
+            'path' => '/',
             'requirements' => array(),
-            'options'      => array(),
-            'defaults'     => array(),
-            'schemes'      => array(),
-            'methods'      => array(),
-            'condition'    => null,
+            'options' => array(),
+            'defaults' => array(),
+            'schemes' => array(),
+            'methods' => array(),
+            'condition' => null,
         ), $routeDatas);
 
         $this->reader

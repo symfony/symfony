@@ -156,9 +156,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     {
         $variations = array(
             'services' => array('show_private' => true),
-            'public'   => array('show_private' => false),
-            'tag1'     => array('show_private' => true, 'tag' => 'tag1'),
-            'tags'     => array('group_by' => 'tags', 'show_private' => true),
+            'public' => array('show_private' => false),
+            'tag1' => array('show_private' => true, 'tag' => 'tag1'),
+            'tags' => array('group_by' => 'tags', 'show_private' => true),
         );
 
         $data = array();
@@ -175,8 +175,8 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function getEventDispatcherDescriptionTestData(array $objects)
     {
         $variations = array(
-            'events'    => array(),
-            'event1'    => array('event' => 'event1'),
+            'events' => array(),
+            'event1' => array('event' => 'event1'),
         );
 
         $data = array();

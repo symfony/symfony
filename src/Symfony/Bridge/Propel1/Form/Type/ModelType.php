@@ -85,17 +85,17 @@ class ModelType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'template'          => 'choice',
-            'multiple'          => false,
-            'expanded'          => false,
-            'class'             => null,
-            'property'          => null,
-            'query'             => null,
-            'choices'           => null,
-            'choice_list'       => $choiceList,
-            'group_by'          => null,
-            'by_reference'      => false,
-            'index_property'    => null,
+            'template' => 'choice',
+            'multiple' => false,
+            'expanded' => false,
+            'class' => null,
+            'property' => null,
+            'query' => null,
+            'choices' => null,
+            'choice_list' => $choiceList,
+            'group_by' => null,
+            'by_reference' => false,
+            'index_property' => null,
         ));
     }
 

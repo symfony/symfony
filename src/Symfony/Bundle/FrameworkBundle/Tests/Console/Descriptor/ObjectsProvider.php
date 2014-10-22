@@ -60,9 +60,9 @@ class ObjectsProvider
         return array(
             'parameters_1' => new ParameterBag(array(
                 'integer' => 12,
-                'string'  => 'Hello world!',
+                'string' => 'Hello world!',
                 'boolean' => true,
-                'array'   => array(12, 'Hello world!', true),
+                'array' => array(12, 'Hello world!', true),
             )),
         );
     }

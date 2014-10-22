@@ -75,9 +75,9 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
         $options = array_merge(array(
             'username_parameter' => '_username',
             'password_parameter' => '_password',
-            'csrf_parameter'     => '_csrf_token',
-            'intention'          => 'authenticate',
-            'post_only'          => true,
+            'csrf_parameter' => '_csrf_token',
+            'intention' => 'authenticate',
+            'post_only' => true,
         ), $options);
         parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, $options, $logger, $dispatcher);
     }

@@ -37,10 +37,10 @@ class NumberType extends AbstractType
     {
         $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
-            'precision'     => null,
-            'grouping'      => false,
+            'precision' => null,
+            'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
-            'compound'      => false,
+            'compound' => false,
         ));
 
         $resolver->setAllowedValues(array(

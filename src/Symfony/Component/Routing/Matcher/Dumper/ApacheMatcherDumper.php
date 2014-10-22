@@ -43,7 +43,7 @@ class ApacheMatcherDumper extends MatcherDumper
     {
         $options = array_merge(array(
             'script_name' => 'app.php',
-            'base_uri'    => '',
+            'base_uri' => '',
         ), $options);
 
         $options['script_name'] = self::escape($options['script_name'], ' ', '\\');
@@ -141,10 +141,10 @@ class ApacheMatcherDumper extends MatcherDumper
         }
         foreach ($this->normalizeValues($route->getDefaults()) as $key => $value) {
             $variables[] = 'E=_ROUTING_default_'.$key.':'.strtr($value, array(
-                ':'  => '\\:',
-                '='  => '\\=',
+                ':' => '\\:',
+                '=' => '\\=',
                 '\\' => '\\\\',
-                ' '  => '\\ ',
+                ' ' => '\\ ',
             ));
         }
         $variables = implode(',', $variables);

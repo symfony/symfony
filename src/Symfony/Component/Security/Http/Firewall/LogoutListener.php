@@ -60,8 +60,8 @@ class LogoutListener implements ListenerInterface
         $this->httpUtils = $httpUtils;
         $this->options = array_merge(array(
             'csrf_parameter' => '_csrf_token',
-            'intention'      => 'logout',
-            'logout_path'    => '/logout',
+            'intention' => 'logout',
+            'logout_path' => '/logout',
         ), $options);
         $this->successHandler = $successHandler;
         $this->csrfTokenManager = $csrfTokenManager;

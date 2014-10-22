@@ -26,9 +26,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInterface
 {
-    const NONE         = 'none';
-    const MIGRATE      = 'migrate';
-    const INVALIDATE   = 'invalidate';
+    const NONE = 'none';
+    const MIGRATE = 'migrate';
+    const INVALIDATE = 'invalidate';
 
     private $strategy;
 

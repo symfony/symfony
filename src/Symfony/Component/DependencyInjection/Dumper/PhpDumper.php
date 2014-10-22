@@ -106,7 +106,7 @@ class PhpDumper extends Dumper
     public function dump(array $options = array())
     {
         $options = array_merge(array(
-            'class'      => 'ProjectServiceContainer',
+            'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
             'namespace' => '',
         ), $options);
@@ -347,9 +347,9 @@ class PhpDumper extends Dumper
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
-        $simple           = $this->isSimpleInstance($id, $definition);
+        $simple = $this->isSimpleInstance($id, $definition);
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
-        $instantiation    = '';
+        $instantiation = '';
 
         if (!$isProxyCandidate && ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
             $instantiation = "\$this->services['$id'] = ".($simple ? '' : '$instance');
@@ -578,17 +578,17 @@ EOF;
         }
 
         if ($definition->isLazy()) {
-            $lazyInitialization    = '$lazyLoad = true';
+            $lazyInitialization = '$lazyLoad = true';
             $lazyInitializationDoc = "\n     * @param bool    \$lazyLoad whether to try lazy-loading the service with a proxy\n     *";
         } else {
-            $lazyInitialization    = '';
+            $lazyInitialization = '';
             $lazyInitializationDoc = '';
         }
 
         // with proxies, for 5.3.3 compatibility, the getter must be public to be accessible to the initializer
         $isProxyCandidate = $this->getProxyDumper()->isProxyCandidate($definition);
-        $visibility       = $isProxyCandidate ? 'public' : 'protected';
-        $code             = <<<EOF
+        $visibility = $isProxyCandidate ? 'public' : 'protected';
+        $code = <<<EOF
 
     /**
      * Gets the '$id' service.$doc

@@ -31,7 +31,7 @@ class LoginController extends ContainerAware
         return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:login.html.twig', array(
             // last username entered by the user
             'last_username' => $request->getSession()->get(SecurityContext::LAST_USERNAME),
-            'error'         => $error,
+            'error' => $error,
         ));
     }
 

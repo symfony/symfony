@@ -26,9 +26,9 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getContainer('container1');
         $this->assertEquals(array(
-            'ROLE_ADMIN'       => array('ROLE_USER'),
+            'ROLE_ADMIN' => array('ROLE_USER'),
             'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE'      => array('ROLE_USER', 'ROLE_ADMIN'),
+            'ROLE_REMOTE' => array('ROLE_USER', 'ROLE_ADMIN'),
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 

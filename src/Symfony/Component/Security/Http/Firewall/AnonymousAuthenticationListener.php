@@ -33,10 +33,10 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null, AuthenticationManagerInterface $authenticationManager = null)
     {
-        $this->context               = $context;
-        $this->key                   = $key;
+        $this->context = $context;
+        $this->key = $key;
         $this->authenticationManager = $authenticationManager;
-        $this->logger                = $logger;
+        $this->logger = $logger;
     }
 
     /**

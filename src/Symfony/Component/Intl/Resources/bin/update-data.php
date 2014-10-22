@@ -268,8 +268,7 @@ $generator->generateData($config);
 echo "Resource bundle compilation complete.\n";
 
 $svnInfo = <<<SVN_INFO
-SVN information
-===============
+SVN information ===============
 
 URL: {$svn->getUrl()}
 Revision: {$svn->getLastCommit()->getRevision()}

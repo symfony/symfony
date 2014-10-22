@@ -74,8 +74,8 @@ class RouterController
 
         return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
             'request' => $request,
-            'router'  => $profile->getCollector('router'),
-            'traces'  => $matcher->getTraces($request->getPathInfo()),
+            'router' => $profile->getCollector('router'),
+            'traces' => $matcher->getTraces($request->getPathInfo()),
         )), 200, array('Content-Type' => 'text/html'));
     }
 }

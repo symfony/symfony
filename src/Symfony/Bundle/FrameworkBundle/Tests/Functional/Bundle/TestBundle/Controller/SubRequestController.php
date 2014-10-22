@@ -27,7 +27,7 @@ class SubRequestController extends ContainerAware
 
         // simulates a failure during the rendering of a fragment...
         // should render fr/json
-        $content  = $handler->render($errorUrl, 'inline', array('alt' => $altUrl));
+        $content = $handler->render($errorUrl, 'inline', array('alt' => $altUrl));
 
         // ...to check that the FragmentListener still references the right Request
         // when rendering another fragment after the error occurred

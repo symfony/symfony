@@ -47,11 +47,11 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * @var array
      */
-    protected $normalizers       = array();
+    protected $normalizers = array();
     /**
      * @var array
      */
-    protected $normalizerCache   = array();
+    protected $normalizerCache = array();
     /**
      * @var array
      */

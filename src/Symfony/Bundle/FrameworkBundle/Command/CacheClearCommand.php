@@ -55,8 +55,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $oldCacheDir  = $realCacheDir.'_old';
-        $filesystem   = $this->getContainer()->get('filesystem');
+        $oldCacheDir = $realCacheDir.'_old';
+        $filesystem = $this->getContainer()->get('filesystem');
 
         if (!is_writable($realCacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
@@ -147,7 +147,7 @@ EOF
         }
 
         // fix references to cached files with the real cache directory name
-        $search  = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
+        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
         $replace = str_replace('\\', '/', $realCacheDir);
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
             $content = str_replace($search, $replace, file_get_contents($file));
@@ -155,7 +155,7 @@ EOF
         }
 
         // fix references to kernel/container related classes
-        $search  = $tempKernel->getName().ucfirst($tempKernel->getEnvironment());
+        $search = $tempKernel->getName().ucfirst($tempKernel->getEnvironment());
         $replace = $realKernel->getName().ucfirst($realKernel->getEnvironment());
         foreach (Finder::create()->files()->name($search.'*')->in($warmupDir) as $file) {
             $content = str_replace($search, $replace, file_get_contents($file));

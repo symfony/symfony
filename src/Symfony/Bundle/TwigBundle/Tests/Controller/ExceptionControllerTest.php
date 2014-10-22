@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
@@ -42,27 +43,22 @@ class ExceptionControllerTest extends TestCase
         $controller->showAction($request, $flatten);
     }
 
-    public function testErrorPagesInDebugMode()
+    public function testShowActionCanBeForcedToShowErrorPage()
     {
         $twig = new \Twig_Environment(
             new \Twig_Loader_Array(array(
-                'TwigBundle:Exception:error404.html.twig' => '
-                    {%- if exception is defined and status_text is defined and status_code is defined -%}
-                        OK
-                    {%- else -%}
-                        "exception" variable is missing
-                    {%- endif -%}
-                ',
+                'TwigBundle:Exception:error404.html.twig' => 'ok',
             ))
         );
 
         $request = Request::create('whatever');
+        $exception = FlattenException::create(new \Exception(), 404);
+        $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 
-        $controller = new ExceptionController($twig, /* "debug" set to --> */ true);
-        $response = $controller->testErrorPageAction($request, 404);
+        $response = $controller->showAction($request, $exception, null, /* "showException" per-request set to --> */ false);
 
         $this->assertEquals(200, $response->getStatusCode()); // successful request
-        $this->assertEquals('OK', $response->getContent());  // content of the error404.html template
+        $this->assertEquals('ok', $response->getContent());  // content of the error404.html template
     }
 
     public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
@@ -75,9 +71,10 @@ class ExceptionControllerTest extends TestCase
 
         $request = Request::create('whatever');
         $request->setRequestFormat('txt');
-
+        $exception = FlattenException::create(new \Exception());
         $controller = new ExceptionController($twig, false);
-        $response = $controller->testErrorPageAction($request, 42);
+
+        $response = $controller->showAction($request, $exception);
 
         $this->assertEquals('html', $request->getRequestFormat());
     }

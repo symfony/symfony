@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-10-23T10:15:24Z
+
+It would also be good to detect the Memcached version in the test and skip them when we cannot mock the class, to avoid false failures for people testing locally
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-23T18:46:53Z
+
+That's indeed a good idea. I added it.

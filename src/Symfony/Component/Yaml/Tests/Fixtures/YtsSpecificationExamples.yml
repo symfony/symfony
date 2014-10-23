@@ -1684,7 +1684,8 @@ yaml: |
    # NOTE: the following node should NOT be serialized this way.
    encoded node :
     !special '!' : '!type'
-    !special|canonical '&' : 12 = : value
+    !special|canonical '&' : 12
+    = : value
    # The proper way to serialize the above node is as follows:
    node : !!type &12 value
 ruby: |

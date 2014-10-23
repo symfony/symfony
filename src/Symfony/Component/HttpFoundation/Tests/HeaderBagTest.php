@@ -191,7 +191,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIterator()
     {
-        $headers   = array('foo' => 'bar', 'hello' => 'world', 'third' => 'charm');
+        $headers = array('foo' => 'bar', 'hello' => 'world', 'third' => 'charm');
         $headerBag = new HeaderBag($headers);
 
         $i = 0;
@@ -208,7 +208,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testCount()
     {
-        $headers   = array('foo' => 'bar', 'HELLO' => 'WORLD');
+        $headers = array('foo' => 'bar', 'HELLO' => 'WORLD');
         $headerBag = new HeaderBag($headers);
 
         $this->assertEquals(count($headers), count($headerBag));

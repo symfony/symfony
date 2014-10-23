@@ -23,13 +23,13 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
-    const ROUND_FLOOR    = \NumberFormatter::ROUND_FLOOR;
-    const ROUND_DOWN     = \NumberFormatter::ROUND_DOWN;
+    const ROUND_FLOOR = \NumberFormatter::ROUND_FLOOR;
+    const ROUND_DOWN = \NumberFormatter::ROUND_DOWN;
     const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
     const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
-    const ROUND_HALFUP   = \NumberFormatter::ROUND_HALFUP;
-    const ROUND_UP       = \NumberFormatter::ROUND_UP;
-    const ROUND_CEILING  = \NumberFormatter::ROUND_CEILING;
+    const ROUND_HALFUP = \NumberFormatter::ROUND_HALFUP;
+    const ROUND_UP = \NumberFormatter::ROUND_UP;
+    const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
 
     protected $precision;
 

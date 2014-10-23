@@ -298,7 +298,7 @@ EOF;
                 $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
-            } elseif ('string'  === $item[0]) {
+            } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';

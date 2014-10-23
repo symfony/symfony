@@ -77,11 +77,11 @@ class IntlDateFormatter
      * @var array
      */
     private $defaultDateFormats = array(
-        self::NONE      => '',
-        self::FULL      => 'EEEE, LLLL d, y',
-        self::LONG      => 'LLLL d, y',
-        self::MEDIUM    => 'LLL d, y',
-        self::SHORT     => 'M/d/yy',
+        self::NONE => '',
+        self::FULL => 'EEEE, LLLL d, y',
+        self::LONG => 'LLLL d, y',
+        self::MEDIUM => 'LLL d, y',
+        self::SHORT => 'M/d/yy',
     );
 
     /**
@@ -90,10 +90,10 @@ class IntlDateFormatter
      * @var array
      */
     private $defaultTimeFormats = array(
-        self::FULL   => 'h:mm:ss a zzzz',
-        self::LONG   => 'h:mm:ss a z',
+        self::FULL => 'h:mm:ss a zzzz',
+        self::LONG => 'h:mm:ss a z',
         self::MEDIUM => 'h:mm:ss a',
-        self::SHORT  => 'h:mm a',
+        self::SHORT => 'h:mm a',
     );
 
     /**

@@ -30,7 +30,7 @@ class TimeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $parts  = array('hour');
+        $parts = array('hour');
         $format = 'H';
 
         if ($options['with_seconds'] && !$options['with_minutes']) {
@@ -133,7 +133,7 @@ class TimeType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, array(
-            'widget'       => $options['widget'],
+            'widget' => $options['widget'],
             'with_minutes' => $options['with_minutes'],
             'with_seconds' => $options['with_seconds'],
         ));
@@ -182,26 +182,26 @@ class TimeType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'hours'          => range(0, 23),
-            'minutes'        => range(0, 59),
-            'seconds'        => range(0, 59),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'with_minutes'   => true,
-            'with_seconds'   => false,
+            'hours' => range(0, 23),
+            'minutes' => range(0, 59),
+            'seconds' => range(0, 59),
+            'widget' => 'choice',
+            'input' => 'datetime',
+            'with_minutes' => true,
+            'with_seconds' => false,
             'model_timezone' => null,
-            'view_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'view_timezone' => null,
+            'empty_value' => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
+            'by_reference' => false,
             'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class' => null,
+            'compound' => $compound,
         ));
 
         $resolver->setNormalizers(array(
@@ -223,7 +223,7 @@ class TimeType extends AbstractType
         ));
 
         $resolver->setAllowedTypes(array(
-            'hours'   => 'array',
+            'hours' => 'array',
             'minutes' => 'array',
             'seconds' => 'array',
         ));

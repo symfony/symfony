@@ -49,7 +49,7 @@ class Translator extends BaseTranslator
 
         $this->options = array(
             'cache_dir' => null,
-            'debug'     => false,
+            'debug' => false,
         );
 
         // check option names

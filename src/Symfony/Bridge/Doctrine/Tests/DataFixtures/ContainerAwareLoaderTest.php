@@ -30,8 +30,8 @@ class ContainerAwareLoaderTest extends \PHPUnit_Framework_TestCase
     public function testShouldSetContainerOnContainerAwareFixture()
     {
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $loader    = new ContainerAwareLoader($container);
-        $fixture   = new ContainerAwareFixture();
+        $loader = new ContainerAwareLoader($container);
+        $fixture = new ContainerAwareFixture();
 
         $loader->addFixture($fixture);
 

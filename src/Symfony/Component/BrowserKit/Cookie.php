@@ -62,17 +62,17 @@ class Cookie
     public function __construct($name, $value, $expires = null, $path = null, $domain = '', $secure = false, $httponly = true, $encodedValue = false)
     {
         if ($encodedValue) {
-            $this->value    = urldecode($value);
+            $this->value = urldecode($value);
             $this->rawValue = $value;
         } else {
-            $this->value    = $value;
+            $this->value = $value;
             $this->rawValue = urlencode($value);
         }
-        $this->name     = $name;
-        $this->expires  = null === $expires ? null : (int) $expires;
-        $this->path     = empty($path) ? '/' : $path;
-        $this->domain   = $domain;
-        $this->secure   = (bool) $secure;
+        $this->name = $name;
+        $this->expires = null === $expires ? null : (int) $expires;
+        $this->path = empty($path) ? '/' : $path;
+        $this->domain = $domain;
+        $this->secure = (bool) $secure;
         $this->httponly = (bool) $httponly;
     }
 
@@ -141,12 +141,12 @@ class Cookie
         list($name, $value) = explode('=', array_shift($parts), 2);
 
         $values = array(
-            'name'     => trim($name),
-            'value'    => trim($value),
-            'expires'  => null,
-            'path'     => '/',
-            'domain'   => '',
-            'secure'   => false,
+            'name' => trim($name),
+            'value' => trim($value),
+            'expires' => null,
+            'path' => '/',
+            'domain' => '',
+            'secure' => false,
             'httponly' => false,
             'passedRawValue' => true,
         );

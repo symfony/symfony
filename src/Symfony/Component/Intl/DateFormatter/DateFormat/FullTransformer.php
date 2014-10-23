@@ -290,15 +290,15 @@ class FullTransformer
     {
         $options = $this->getDefaultValueForOptions($options);
 
-        $year         = $options['year'];
-        $month        = $options['month'];
-        $day          = $options['day'];
-        $hour         = $options['hour'];
+        $year = $options['year'];
+        $month = $options['month'];
+        $day = $options['day'];
+        $hour = $options['hour'];
         $hourInstance = $options['hourInstance'];
-        $minute       = $options['minute'];
-        $second       = $options['second'];
-        $marker       = $options['marker'];
-        $timezone     = $options['timezone'];
+        $minute = $options['minute'];
+        $second = $options['second'];
+        $marker = $options['marker'];
+        $timezone = $options['timezone'];
 
         // If month is false, return immediately (intl behavior)
         if (false === $month) {
@@ -341,15 +341,15 @@ class FullTransformer
     private function getDefaultValueForOptions(array $options)
     {
         return array(
-            'year'         => isset($options['year']) ? $options['year'] : 1970,
-            'month'        => isset($options['month']) ? $options['month'] : 1,
-            'day'          => isset($options['day']) ? $options['day'] : 1,
-            'hour'         => isset($options['hour']) ? $options['hour'] : 0,
+            'year' => isset($options['year']) ? $options['year'] : 1970,
+            'month' => isset($options['month']) ? $options['month'] : 1,
+            'day' => isset($options['day']) ? $options['day'] : 1,
+            'hour' => isset($options['hour']) ? $options['hour'] : 0,
             'hourInstance' => isset($options['hourInstance']) ? $options['hourInstance'] : null,
-            'minute'       => isset($options['minute']) ? $options['minute'] : 0,
-            'second'       => isset($options['second']) ? $options['second'] : 0,
-            'marker'       => isset($options['marker']) ? $options['marker'] : null,
-            'timezone'     => isset($options['timezone']) ? $options['timezone'] : null,
+            'minute' => isset($options['minute']) ? $options['minute'] : 0,
+            'second' => isset($options['second']) ? $options['second'] : 0,
+            'marker' => isset($options['marker']) ? $options['marker'] : null,
+            'timezone' => isset($options['timezone']) ? $options['timezone'] : null,
         );
     }
 }

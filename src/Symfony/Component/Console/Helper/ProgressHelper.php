@@ -21,20 +21,20 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProgressHelper extends Helper
 {
-    const FORMAT_QUIET         = ' %percent%%';
-    const FORMAT_NORMAL        = ' %current%/%max% [%bar%] %percent%%';
-    const FORMAT_VERBOSE       = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
-    const FORMAT_QUIET_NOMAX   = ' %current%';
-    const FORMAT_NORMAL_NOMAX  = ' %current% [%bar%]';
+    const FORMAT_QUIET = ' %percent%%';
+    const FORMAT_NORMAL = ' %current%/%max% [%bar%] %percent%%';
+    const FORMAT_VERBOSE = ' %current%/%max% [%bar%] %percent%% Elapsed: %elapsed%';
+    const FORMAT_QUIET_NOMAX = ' %current%';
+    const FORMAT_NORMAL_NOMAX = ' %current% [%bar%]';
     const FORMAT_VERBOSE_NOMAX = ' %current% [%bar%] Elapsed: %elapsed%';
 
     // options
-    private $barWidth     = 28;
-    private $barChar      = '=';
+    private $barWidth = 28;
+    private $barChar = '=';
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format       = null;
-    private $redrawFreq   = 1;
+    private $format = null;
+    private $redrawFreq = 1;
 
     private $lastMessagesLength;
     private $barCharOriginal;
@@ -92,7 +92,7 @@ class ProgressHelper extends Helper
      */
     private $widths = array(
         'current' => 4,
-        'max'     => 4,
+        'max' => 4,
         'percent' => 3,
         'elapsed' => 6,
     );
@@ -183,9 +183,9 @@ class ProgressHelper extends Helper
     public function start(OutputInterface $output, $max = null)
     {
         $this->startTime = time();
-        $this->current   = 0;
-        $this->max       = (int) $max;
-        $this->output    = $output;
+        $this->current = 0;
+        $this->max = (int) $max;
+        $this->output = $output;
         $this->lastMessagesLength = 0;
         $this->barCharOriginal = '';
 
@@ -332,11 +332,11 @@ class ProgressHelper extends Helper
         }
 
         if ($this->max > 0) {
-            $this->widths['max']     = $this->strlen($this->max);
+            $this->widths['max'] = $this->strlen($this->max);
             $this->widths['current'] = $this->widths['max'];
         } else {
             $this->barCharOriginal = $this->barChar;
-            $this->barChar         = $this->emptyBarChar;
+            $this->barChar = $this->emptyBarChar;
         }
     }
 
@@ -349,7 +349,7 @@ class ProgressHelper extends Helper
      */
     private function generate($finish = false)
     {
-        $vars    = array();
+        $vars = array();
         $percent = 0;
         if ($this->max > 0) {
             $percent = (float) $this->current / $this->max;

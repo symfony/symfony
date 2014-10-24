@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-10-24T13:23:35Z
+
+IMO, this makes sense. Switching to a different user should indeed be done before validating the access with the current user.
+
+@aitboudad can you fix the tests ? The fact that the order of listeners is not the same anymore is making them fail
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-10-24T13:36:23Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-24T15:40:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-24T16:10:10Z
+
+:+1:

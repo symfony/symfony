@@ -55,7 +55,12 @@ class CollectionType extends AbstractType
         ));
 
         if ($form->getConfig()->hasAttribute('prototype')) {
-            $view->vars['prototype'] = $form->getConfig()->getAttribute('prototype')->createView($view);
+            $view->vars['prototype'] = $form
+                ->getConfig()
+                ->getAttribute('prototype')
+                ->setData($options['prototype_data'])
+                ->createView($view)
+            ;
         }
     }
 
@@ -84,6 +89,7 @@ class CollectionType extends AbstractType
             'allow_add' => false,
             'allow_delete' => false,
             'prototype' => true,
+            'prototype_data' => null,
             'prototype_name' => '__name__',
             'type' => 'text',
             'options' => array(),

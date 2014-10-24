@@ -274,4 +274,16 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
+
+    public function testPrototypeData()
+    {
+        $form = $this->factory->create('collection', array(), array(
+            'type'           => 'text',
+            'allow_add'      => true,
+            'prototype'      => true,
+            'prototype_data' => 'foo',
+        ));
+
+        $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
+    }
 }

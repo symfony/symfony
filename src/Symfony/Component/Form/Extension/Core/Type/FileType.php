@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FileType extends AbstractType
@@ -49,11 +50,16 @@ class FileType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $translationCount = function (Options $options) {
+            return $options['multiple'] ? 2 : 1;
+        };
+
         $resolver->setDefaults(array(
             'compound' => false,
             'data_class' => 'Symfony\Component\HttpFoundation\File\File',
             'empty_data' => null,
             'multiple' => false,
+            'translation_count' => $translationCount,
         ));
     }
 

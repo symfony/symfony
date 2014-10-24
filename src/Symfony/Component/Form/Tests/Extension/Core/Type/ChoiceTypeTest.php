@@ -1294,4 +1294,26 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // Trigger data initialization
         $form->getViewData();
     }
+
+    public function testtranslationCountSingle()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple'  => false,
+            'choices'   => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals(1, $view->vars['translation_count']);
+    }
+
+    public function testtranslationCountMultiple()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple'  => true,
+            'choices'   => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals(2, $view->vars['translation_count']);
+    }
 }

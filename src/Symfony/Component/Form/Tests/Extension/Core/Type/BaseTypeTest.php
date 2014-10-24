@@ -115,6 +115,24 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals('messages', $view['child']->vars['translation_domain']);
     }
 
+    public function testDefaulttranslationCount()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals(1, $view['child']->vars['translation_count']);
+    }
+
+    public function testPasstranslationCount()
+    {
+        $form = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label', 'translation_count' => 5));
+        $view = $form->createView();
+
+        $this->assertSame(5, $view->vars['translation_count']);
+    }
+
     public function testPassLabelToView()
     {
         $form = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'));

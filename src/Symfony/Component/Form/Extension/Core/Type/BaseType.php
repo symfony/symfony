@@ -98,6 +98,7 @@ abstract class BaseType extends AbstractType
             'block_prefixes'      => $blockPrefixes,
             'unique_block_prefix' => $uniqueBlockPrefix,
             'translation_domain'  => $translationDomain,
+            'translation_count'   => $options['translation_count'],
             // Using the block name here speeds up performance in collection
             // forms, where each entry has the same full block name.
             // Including the type is important too, because if rows of a
@@ -120,6 +121,7 @@ abstract class BaseType extends AbstractType
             'label_format'       => null,
             'attr'               => array(),
             'translation_domain' => null,
+            'translation_count'  => 1,
             'auto_initialize'    => true,
         ));
 

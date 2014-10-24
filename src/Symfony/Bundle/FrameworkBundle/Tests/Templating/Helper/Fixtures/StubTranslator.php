@@ -22,7 +22,7 @@ class StubTranslator implements TranslatorInterface
 
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return '[trans]'.$id.'[/trans]';
+        return '[trans count='.$number.']'.$id.'[/trans]';
     }
 
     public function setLocale($locale)

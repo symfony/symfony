@@ -105,7 +105,7 @@ class DateType extends AbstractType
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
+                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day'), $options['pad']
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -222,6 +222,7 @@ class DateType extends AbstractType
             // this option.
             'data_class'     => null,
             'compound'       => $compound,
+            'pad'            => false,
         ));
 
         $resolver->setNormalizers(array(

@@ -155,6 +155,29 @@ class DateTypeTest extends TypeTestCase
         $this->assertDateTimeEquals($dateTime, $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
+    
+    public function testSubmitFromTextWithPad()
+    {
+        $form = $this->factory->create('date', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'text',
+            'pad'    => true,
+        ));
+
+        $text = array(
+            'day' => '02',
+            'month' => '06',
+            'year' => '2010',
+        );
+
+        $form->submit($text);
+
+        $dateTime = new \DateTime('2010-06-02 UTC');
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals($text, $form->getViewData());
+    }
 
     public function testSubmitFromChoice()
     {

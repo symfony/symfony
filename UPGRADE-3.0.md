@@ -980,6 +980,7 @@ UPGRADE FROM 2.x to 3.0
 
    ```php
    Yaml::parse(file_get_contents($fileName));
+   ```
 
 ### Process
 

@@ -619,7 +619,7 @@ class SecurityExtension extends Extension
             ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
             ->setPublic(false)
             ->addArgument($expression)
-            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request'))->getNodes()))
+            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
         ;
 
         return $this->expressions[$id] = new Reference($id);

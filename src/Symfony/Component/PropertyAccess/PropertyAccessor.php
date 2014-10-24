@@ -326,18 +326,18 @@ class PropertyAccessor implements PropertyAccessorInterface
             throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
         }
 
-        $camelProp = $this->camelize($property);
+        $camelized = $this->camelize($property);
         $reflClass = new \ReflectionClass($object);
-        $getter = 'get'.$camelProp;
-        $getter2 = lcfirst($camelProp);
-        $isser = 'is'.$camelProp;
-        $hasser = 'has'.$camelProp;
+        $getter = 'get'.$camelized;
+        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
+        $isser = 'is'.$camelized;
+        $hasser = 'has'.$camelized;
         $classHasProperty = $reflClass->hasProperty($property);
 
         if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             $result[self::VALUE] = $object->$getter();
-        } elseif ($this->isMethodAccessible($reflClass, $getter2, 0)) {
-            $result[self::VALUE] = $object->$getter2();
+        } elseif ($this->isMethodAccessible($reflClass, $getsetter, 0)) {
+            $result[self::VALUE] = $object->$getsetter();
         } elseif ($reflClass->hasMethod($isser) && $reflClass->getMethod($isser)->isPublic()) {
             $result[self::VALUE] = $object->$isser();
         } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
@@ -359,7 +359,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             // we call the getter and hope the __call do the job
             $result[self::VALUE] = $object->$getter();
         } else {
-            $methods = array($getter, $getter2, $isser, $hasser, '__get');
+            $methods = array($getter, $getsetter, $isser, $hasser, '__get');
             if ($this->magicCall) {
                 $methods[] = '__call';
             }
@@ -416,8 +416,8 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $reflClass = new \ReflectionClass($object);
-        $plural = $this->camelize($property);
-        $singulars = (array) StringUtil::singularify($plural);
+        $camelized = $this->camelize($property);
+        $singulars = (array) StringUtil::singularify($camelized);
 
         if (is_array($value) || $value instanceof \Traversable) {
             $methods = $this->findAdderAndRemover($reflClass, $singulars);
@@ -430,14 +430,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
-        $setter = 'set'.$this->camelize($property);
-        $setter2 = lcfirst($plural);
+        $setter = 'set'.$camelized;
+        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
         $classHasProperty = $reflClass->hasProperty($property);
 
         if ($this->isMethodAccessible($reflClass, $setter, 1)) {
             $object->$setter($value);
-        } elseif ($this->isMethodAccessible($reflClass, $setter2, 1)) {
-            $object->$setter2($value);
+        } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
+            $object->$getsetter($value);
         } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
             $object->$property = $value;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
@@ -461,7 +461,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     return '"add'.$singular.'()"/"remove'.$singular.'()", ';
                 }, $singulars)),
                 $setter,
-                $setter2,
+                $getsetter,
                 $reflClass->name
             ));
         }
@@ -529,12 +529,13 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $reflClass = new \ReflectionClass($object);
 
-        $setter = 'set'.$this->camelize($property);
-        $setter2 = lcfirst($this->camelize($property));
+        $camelized = $this->camelize($property);
+        $setter = 'set'.$camelized;
+        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
         $classHasProperty = $reflClass->hasProperty($property);
 
         if ($this->isMethodAccessible($reflClass, $setter, 1)
-            || $this->isMethodAccessible($reflClass, $setter2, 1)
+            || $this->isMethodAccessible($reflClass, $getsetter, 1)
             || $this->isMethodAccessible($reflClass, '__set', 2)
             || ($classHasProperty && $reflClass->getProperty($property)->isPublic())
             || (!$classHasProperty && property_exists($object, $property))
@@ -542,11 +543,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             return true;
         }
 
-        $plural = $this->camelize($property);
+        $singulars = (array) StringUtil::singularify($camelized);
 
         // Any of the two methods is required, but not yet known
-        $singulars = (array) StringUtil::singularify($plural);
-
         if (null !== $this->findAdderAndRemover($reflClass, $singulars)) {
             return true;
         }
@@ -563,7 +562,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function camelize($string)
     {
-        return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) { return ('.' === $match[1] ? '_' : '').strtoupper($match[2]); }, $string);
+        return strtr(ucwords(strtr($string, array('_' => ' '))), array(' ' => ''));
     }
 
     /**

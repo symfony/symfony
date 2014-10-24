@@ -340,6 +340,36 @@ class DateTypeTest extends TypeTestCase
         ));
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfYearsIsInvalid()
+    {
+        $this->factory->create('date', null, array(
+            'years' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfMonthsIsInvalid()
+    {
+        $this->factory->create('date', null, array(
+            'months' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfDaysIsInvalid()
+    {
+        $this->factory->create('date', null, array(
+            'days' => 'bad value',
+        ));
+    }
+
     public function testSetDataWithDifferentTimezones()
     {
         $form = $this->factory->create('date', null, array(

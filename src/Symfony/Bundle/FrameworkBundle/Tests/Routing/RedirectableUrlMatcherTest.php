@@ -29,7 +29,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
                 'path'        => '/foo/',
                 'permanent'   => true,
-                'scheme'      => null,
+                'scheme'      => 'http',
                 'httpPort'    => $context->getHttpPort(),
                 'httpsPort'   => $context->getHttpsPort(),
                 '_route'      => null,

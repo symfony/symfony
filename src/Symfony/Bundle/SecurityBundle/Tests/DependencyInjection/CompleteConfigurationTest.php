@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
-
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
@@ -82,8 +81,8 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.basic.secure',
                 'security.authentication.listener.digest.secure',
                 'security.authentication.listener.anonymous.secure',
-                'security.access_listener',
                 'security.authentication.switchuser_listener.secure',
+                'security.access_listener',
             ),
         ), $listeners);
     }

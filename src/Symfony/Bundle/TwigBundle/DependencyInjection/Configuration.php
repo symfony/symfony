@@ -54,7 +54,7 @@ class Configuration implements ConfigurationInterface
                     return count($v['form']['resources']) > 0;
                 })
                 ->then(function ($v) {
-                    $v['form_themes'] = array_unique(array_merge($v['form']['resources'], $v['form_themes']));
+                    $v['form_themes'] = array_values(array_unique(array_merge($v['form']['resources'], $v['form_themes'])));
 
                     return $v;
                 })

@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * ExceptionController.
@@ -51,7 +52,7 @@ class ExceptionController
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
-            $this->findTemplate($request, $request->getRequestFormat(), $code, $this->debug),
+            (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $this->debug),
             array(
                 'status_code'    => $code,
                 'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
@@ -84,7 +85,7 @@ class ExceptionController
      * @param int     $code       An HTTP response status code
      * @param bool    $debug
      *
-     * @return TemplateReference
+     * @return TemplateReferenceInterface
      */
     protected function findTemplate(Request $request, $format, $code, $debug)
     {
@@ -110,7 +111,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return new TemplateReference('TwigBundle', 'Exception', $name, 'html', 'twig');
+        return new TemplateReference('TwigBundle', 'Exception', $debug ? 'exception_full' : $name, 'html', 'twig');
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0

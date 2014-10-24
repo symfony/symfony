@@ -97,6 +97,7 @@ EOF
         }
 
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
+        $output->writeln('Quit the server with CONTROL-C.');
 
         $builder = $this->createPhpProcessBuilder($input, $output, $env);
         $builder->setWorkingDirectory($documentRoot);

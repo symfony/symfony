@@ -47,18 +47,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
      */
     public function exists($name)
     {
-        if (parent::exists((string) $name)) {
-            return true;
-        }
-
-        // same logic as findTemplate below for the fallback
-        try {
-            $this->cache[(string) $name] = $this->locator->locate($this->parser->parse($name));
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        return true;
+        return parent::exists((string) $name);
     }
 
     /**
@@ -92,11 +81,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
             // for BC
             try {
                 $template = $this->parser->parse($template);
-                try {
-                    $file = $this->locator->locate($template);
-                } catch (\InvalidArgumentException $e) {
-                    $previous = $e;
-                }
+                $file = $this->locator->locate($template);
             } catch (\Exception $e) {
                 $previous = $e;
             }

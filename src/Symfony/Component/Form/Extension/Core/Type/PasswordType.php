@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PasswordType extends AbstractType
@@ -23,7 +24,7 @@ class PasswordType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['always_empty'] || !$form->isSubmitted()) {
+        if ($options['reset_on_submit'] || !$form->isSubmitted()) {
             $view->vars['value'] = '';
         }
     }
@@ -33,9 +34,21 @@ class PasswordType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        // BC with old "always_empty" option
+        $resetOnSubmit = function (Options $options) {
+            if (null !== $options['always_empty']) {
+                // Uncomment this as soon as the deprecation note should be shown
+                // trigger_error('The form option "always_empty" is deprecated since version 2.3 and will be removed in 3.0. Use "reset_on_submit" instead.', E_USER_DEPRECATED);
+                return $options['always_empty'];
+            }
+
+            return true;
+        };
+
         $resolver->setDefaults(array(
-            'always_empty' => true,
-            'trim'         => false,
+            'reset_on_submit' => $resetOnSubmit,
+            'always_empty'    => null,
+            'trim'            => false,
         ));
     }
 

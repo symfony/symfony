@@ -40,6 +40,15 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('pAs5w0rd', $view->vars['value']);
     }
 
+    public function testNotEmptyIfSubmittedAndNotResetOnSubmit()
+    {
+        $form = $this->factory->create('password', null, array('reset_on_submit' => false));
+        $form->submit('pAs5w0rd');
+        $view = $form->createView();
+
+        $this->assertSame('pAs5w0rd', $view->vars['value']);
+    }
+
     public function testNotTrimmed()
     {
         $form = $this->factory->create('password', null);

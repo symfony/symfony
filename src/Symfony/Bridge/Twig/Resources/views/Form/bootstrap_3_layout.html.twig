@@ -147,8 +147,8 @@
 {%- endblock form_label %}
 
 {% block choice_label %}
-    {# remove the checkbox-inline, it's only use full for embed labels #}
-    {% set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'checkbox-inline': ''})|trim}) %}
+    {# remove the checkbox-inline and radio-inline class, it's only useful for embed labels #}
+    {% set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) %}
     {{- block('form_label') -}}
 {% endblock %}
 

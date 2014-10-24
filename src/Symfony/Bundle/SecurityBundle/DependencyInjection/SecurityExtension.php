@@ -338,13 +338,13 @@ class SecurityExtension extends Extension
 
         $listeners = array_merge($listeners, $authListeners);
 
-        // Access listener
-        $listeners[] = new Reference('security.access_listener');
-
         // Switch user listener
         if (isset($firewall['switch_user'])) {
             $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
+
+        // Access listener
+        $listeners[] = new Reference('security.access_listener');
 
         // Determine default entry point
         if (isset($firewall['entry_point'])) {

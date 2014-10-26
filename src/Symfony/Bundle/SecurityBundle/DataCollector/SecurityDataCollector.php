@@ -37,27 +37,27 @@ class SecurityDataCollector extends DataCollector
     {
         if (null === $this->context) {
             $this->data = array(
-                'enabled'       => false,
+                'enabled' => false,
                 'authenticated' => false,
-                'token_class'   => null,
-                'user'          => '',
-                'roles'         => array(),
+                'token_class' => null,
+                'user' => '',
+                'roles' => array(),
             );
         } elseif (null === $token = $this->context->getToken()) {
             $this->data = array(
-                'enabled'       => true,
+                'enabled' => true,
                 'authenticated' => false,
-                'token_class'   => null,
-                'user'          => '',
-                'roles'         => array(),
+                'token_class' => null,
+                'user' => '',
+                'roles' => array(),
             );
         } else {
             $this->data = array(
-                'enabled'       => true,
+                'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
-                'token_class'   => get_class($token),
-                'user'          => $token->getUsername(),
-                'roles'         => array_map(function ($role) { return $role->getRole();}, $token->getRoles()),
+                'token_class' => get_class($token),
+                'user' => $token->getUsername(),
+                'roles' => array_map(function ($role) { return $role->getRole();}, $token->getRoles()),
             );
         }
     }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
-
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
@@ -26,9 +25,9 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $container = $this->getContainer('container1');
         $this->assertEquals(array(
-            'ROLE_ADMIN'       => array('ROLE_USER'),
+            'ROLE_ADMIN' => array('ROLE_USER'),
             'ROLE_SUPER_ADMIN' => array('ROLE_USER', 'ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'),
-            'ROLE_REMOTE'      => array('ROLE_USER', 'ROLE_ADMIN'),
+            'ROLE_REMOTE' => array('ROLE_USER', 'ROLE_ADMIN'),
         ), $container->getParameter('security.role_hierarchy.roles'));
     }
 
@@ -84,8 +83,8 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.digest.secure',
                 'security.authentication.listener.rememberme.secure',
                 'security.authentication.listener.anonymous.secure',
-                'security.access_listener',
                 'security.authentication.switchuser_listener.secure',
+                'security.access_listener',
             ),
             array(
                 'security.channel_listener',

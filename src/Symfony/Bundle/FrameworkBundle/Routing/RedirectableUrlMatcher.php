@@ -31,12 +31,12 @@ class RedirectableUrlMatcher extends BaseMatcher
     {
         return array(
             '_controller' => 'Symfony\\Bundle\\FrameworkBundle\\Controller\\RedirectController::urlRedirectAction',
-            'path'        => $path,
-            'permanent'   => true,
-            'scheme'      => $scheme,
-            'httpPort'    => $this->context->getHttpPort(),
-            'httpsPort'   => $this->context->getHttpsPort(),
-            '_route'      => $route,
+            'path' => $path,
+            'permanent' => true,
+            'scheme' => $scheme,
+            'httpPort' => $this->context->getHttpPort(),
+            'httpsPort' => $this->context->getHttpsPort(),
+            '_route' => $route,
         );
     }
 }

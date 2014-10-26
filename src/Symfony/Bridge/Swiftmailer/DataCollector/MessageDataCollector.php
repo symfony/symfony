@@ -53,10 +53,10 @@ class MessageDataCollector extends DataCollector
         // only collect when Swiftmailer has already been initialized
         if (class_exists('Swift_Mailer', false)) {
             $logger = $this->container->get('swiftmailer.plugin.messagelogger');
-            $this->data['messages']     = $logger->getMessages();
+            $this->data['messages'] = $logger->getMessages();
             $this->data['messageCount'] = $logger->countMessages();
         } else {
-            $this->data['messages']     = array();
+            $this->data['messages'] = array();
             $this->data['messageCount'] = 0;
         }
 

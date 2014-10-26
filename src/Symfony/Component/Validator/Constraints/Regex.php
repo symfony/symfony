@@ -84,9 +84,9 @@ class Regex extends Constraint
 
         if (preg_match('/^(.)(\^?)(.*?)(\$?)\1$/', $this->pattern, $matches)) {
             $delimiter = $matches[1];
-            $start     = empty($matches[2]) ? '.*' : '';
-            $pattern   = $matches[3];
-            $end       = empty($matches[4]) ? '.*' : '';
+            $start = empty($matches[2]) ? '.*' : '';
+            $pattern = $matches[3];
+            $end = empty($matches[4]) ? '.*' : '';
 
             // Unescape the delimiter in pattern
             $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);

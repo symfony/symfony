@@ -65,10 +65,10 @@ class ExceptionController
         return new Response($this->twig->render(
             $template,
             array(
-                'status_code'    => $code,
-                'status_text'    => Response::$statusTexts[$code],
-                'exception'      => $exception,
-                'logger'         => null,
+                'status_code' => $code,
+                'status_text' => Response::$statusTexts[$code],
+                'exception' => $exception,
+                'logger' => null,
                 'currentContent' => '',
             )
         ), 200, array('Content-Type' => 'text/html'));

@@ -20,7 +20,7 @@ namespace Symfony\Component\Console\Input;
  */
 class InputOption
 {
-    const VALUE_NONE     = 1;
+    const VALUE_NONE = 1;
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
     const VALUE_IS_ARRAY = 8;
@@ -77,9 +77,9 @@ class InputOption
             throw new \InvalidArgumentException(sprintf('Option mode "%s" is not valid.', $mode));
         }
 
-        $this->name        = $name;
-        $this->shortcut    = $shortcut;
-        $this->mode        = $mode;
+        $this->name = $name;
+        $this->shortcut = $shortcut;
+        $this->mode = $mode;
         $this->description = $description;
 
         if ($this->isArray() && !$this->acceptValue()) {

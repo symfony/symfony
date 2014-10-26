@@ -400,8 +400,8 @@ abstract class AbstractTableLayoutTest extends AbstractLayoutTest
     public function testRepeatedWithCustomOptions()
     {
         $form = $this->factory->createNamed('name', 'repeated', 'foobar', array(
-            'type'           => 'password',
-            'first_options'  => array('label' => 'Test', 'required' => false),
+            'type' => 'password',
+            'first_options' => array('label' => 'Test', 'required' => false),
             'second_options' => array('label' => 'Test2'),
         ));
 

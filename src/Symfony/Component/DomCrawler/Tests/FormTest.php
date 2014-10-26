@@ -792,8 +792,8 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $registry->set('foo[bar][baz]', 'fbb');
 
         $registry->set('foo', array(
-            2     => 2,
-            3     => 3,
+            2 => 2,
+            3 => 3,
             'bar' => array(
                 'baz' => 'fbb',
              ),

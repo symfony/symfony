@@ -87,9 +87,9 @@ EOF
             }
             $this->convertController($route);
             $helper->describe($output, $route, array(
-                'format'   => $input->getOption('format'),
+                'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
-                'name'     => $name,
+                'name' => $name,
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
@@ -99,8 +99,8 @@ EOF
             }
 
             $helper->describe($output, $routes, array(
-                'format'           => $input->getOption('format'),
-                'raw_text'         => $input->getOption('raw'),
+                'format' => $input->getOption('format'),
+                'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
             ));
         }

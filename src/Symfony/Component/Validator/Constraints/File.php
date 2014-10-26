@@ -49,14 +49,14 @@ class File extends Constraint
     public $mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
     public $disallowEmptyMessage = 'An empty file is not allowed.';
 
-    public $uploadIniSizeErrorMessage   = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
-    public $uploadFormSizeErrorMessage  = 'The file is too large.';
-    public $uploadPartialErrorMessage   = 'The file was only partially uploaded.';
-    public $uploadNoFileErrorMessage    = 'No file was uploaded.';
-    public $uploadNoTmpDirErrorMessage  = 'No temporary folder was configured in php.ini.';
+    public $uploadIniSizeErrorMessage = 'The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.';
+    public $uploadFormSizeErrorMessage = 'The file is too large.';
+    public $uploadPartialErrorMessage = 'The file was only partially uploaded.';
+    public $uploadNoFileErrorMessage = 'No file was uploaded.';
+    public $uploadNoTmpDirErrorMessage = 'No temporary folder was configured in php.ini.';
     public $uploadCantWriteErrorMessage = 'Cannot write temporary file to disk.';
     public $uploadExtensionErrorMessage = 'A PHP extension caused the upload to fail.';
-    public $uploadErrorMessage          = 'The file could not be uploaded.';
+    public $uploadErrorMessage = 'The file could not be uploaded.';
 
     public function __construct($options = null)
     {

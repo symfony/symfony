@@ -27,12 +27,12 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
-                'path'        => '/foo/',
-                'permanent'   => true,
-                'scheme'      => null,
-                'httpPort'    => $context->getHttpPort(),
-                'httpsPort'   => $context->getHttpsPort(),
-                '_route'      => null,
+                'path' => '/foo/',
+                'permanent' => true,
+                'scheme' => null,
+                'httpPort' => $context->getHttpPort(),
+                'httpsPort' => $context->getHttpsPort(),
+                '_route' => null,
             ),
             $matcher->match('/foo')
         );
@@ -47,12 +47,12 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
-                'path'        => '/foo',
-                'permanent'   => true,
-                'scheme'      => 'https',
-                'httpPort'    => $context->getHttpPort(),
-                'httpsPort'   => $context->getHttpsPort(),
-                '_route'      => 'foo',
+                'path' => '/foo',
+                'permanent' => true,
+                'scheme' => 'https',
+                'httpPort' => $context->getHttpPort(),
+                'httpsPort' => $context->getHttpsPort(),
+                '_route' => 'foo',
             ),
             $matcher->match('/foo')
         );

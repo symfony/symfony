@@ -30,7 +30,7 @@ class IniFileLoaderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->container = new ContainerBuilder();
-        $this->loader    = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
+        $this->loader = new IniFileLoader($this->container, new FileLocator(self::$fixturesPath.'/ini'));
     }
 
     /**

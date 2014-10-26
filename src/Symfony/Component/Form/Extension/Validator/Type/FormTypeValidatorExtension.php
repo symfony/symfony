@@ -68,17 +68,17 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
         };
 
         $resolver->setDefaults(array(
-            'error_mapping'              => array(),
-            'constraints'                => array(),
-            'cascade_validation'         => false,
-            'invalid_message'            => 'This value is not valid.',
+            'error_mapping' => array(),
+            'constraints' => array(),
+            'cascade_validation' => false,
+            'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => array(),
-            'allow_extra_fields'         => false,
-            'extra_fields_message'       => 'This form should not contain extra fields.',
+            'allow_extra_fields' => false,
+            'extra_fields_message' => 'This form should not contain extra fields.',
         ));
 
         $resolver->setNormalizers(array(
-            'constraints'       => $constraintsNormalizer,
+            'constraints' => $constraintsNormalizer,
         ));
     }
 

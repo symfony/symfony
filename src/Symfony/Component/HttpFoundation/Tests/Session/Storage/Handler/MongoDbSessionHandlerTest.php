@@ -37,7 +37,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->options = array(
-            'id_field'   => '_id',
+            'id_field' => '_id',
             'data_field' => 'data',
             'time_field' => 'time',
             'database' => 'sf2-test',

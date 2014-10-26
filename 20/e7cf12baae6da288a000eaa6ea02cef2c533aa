@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-23T06:38:08Z
+
+No need to create a PR for 2.5. We first need to merge this one in 2.3, then 2.5. At this point, you will be able to create a PR for 2.5 for additional changes. Thanks.
+
+---------------------------------------------------------------------------
+
+by disquedur at 2014-10-23T08:59:31Z
+
+I checked all files manualy and i think it's good now. Tests are passing on my debian but dunno why they are not passing on Travis.

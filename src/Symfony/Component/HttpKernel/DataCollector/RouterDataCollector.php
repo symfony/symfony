@@ -31,8 +31,8 @@ class RouterDataCollector extends DataCollector
 
         $this->data = array(
             'redirect' => false,
-            'url'      => null,
-            'route'    => null,
+            'url' => null,
+            'route' => null,
         );
     }
 

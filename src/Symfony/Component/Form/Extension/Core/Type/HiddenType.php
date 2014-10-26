@@ -23,10 +23,10 @@ class HiddenType extends AbstractType
     {
         $resolver->setDefaults(array(
             // hidden fields cannot have a required attribute
-            'required'       => false,
+            'required' => false,
             // Pass errors to the parent
             'error_bubbling' => true,
-            'compound'       => false,
+            'compound' => false,
         ));
     }
 

@@ -38,8 +38,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 {
     protected $encoder;
     protected $decoder;
-    protected $normalizers       = array();
-    protected $normalizerCache   = array();
+    protected $normalizers = array();
+    protected $normalizerCache = array();
     protected $denormalizerCache = array();
 
     public function __construct(array $normalizers = array(), array $encoders = array())

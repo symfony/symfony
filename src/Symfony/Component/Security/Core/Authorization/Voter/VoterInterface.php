@@ -22,7 +22,7 @@ interface VoterInterface
 {
     const ACCESS_GRANTED = 1;
     const ACCESS_ABSTAIN = 0;
-    const ACCESS_DENIED  = -1;
+    const ACCESS_DENIED = -1;
 
     /**
      * Checks if the voter supports the given attribute.

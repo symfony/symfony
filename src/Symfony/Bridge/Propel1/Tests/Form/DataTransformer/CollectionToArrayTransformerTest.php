@@ -87,10 +87,10 @@ class CollectionToArrayTransformerTest extends Propel1TestCase
 
     public function testReverseTransformWithData()
     {
-        $inputData  = array('foo', 'bar');
+        $inputData = array('foo', 'bar');
 
-        $result     = $this->transformer->reverseTransform($inputData);
-        $data       = $result->getData();
+        $result = $this->transformer->reverseTransform($inputData);
+        $data = $result->getData();
 
         $this->assertInstanceOf('\PropelObjectCollection', $result);
 

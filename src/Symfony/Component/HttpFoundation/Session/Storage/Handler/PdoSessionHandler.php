@@ -75,7 +75,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
         }
         $this->pdo = $pdo;
         $dbOptions = array_merge(array(
-            'db_id_col'   => 'sess_id',
+            'db_id_col' => 'sess_id',
             'db_data_col' => 'sess_data',
             'db_time_col' => 'sess_time',
         ), $dbOptions);

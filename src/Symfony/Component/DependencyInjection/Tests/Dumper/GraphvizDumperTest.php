@@ -41,8 +41,8 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new GraphvizDumper($container);
         $this->assertEquals($dumper->dump(array(
             'graph' => array('ratio' => 'normal'),
-            'node'  => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
-            'edge'  => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
+            'node' => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
+            'edge' => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
             'node.instance' => array('fillcolor' => 'green', 'style' => 'empty'),
             'node.definition' => array('fillcolor' => 'grey'),
             'node.missing' => array('fillcolor' => 'red', 'style' => 'empty'),

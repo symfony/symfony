@@ -463,9 +463,9 @@ yaml: |
      0.278 Batting Average
 php: |
   array(
-    'name'           => 'Mark McGwire',
+    'name' => 'Mark McGwire',
     'accomplishment' => "Mark set a major league home run record in 1998.\n",
-    'stats'          => "65 Home Runs\n0.278 Batting Average\n"
+    'stats' => "65 Home Runs\n0.278 Batting Average\n"
   )
 ---
 test: Quoted scalars

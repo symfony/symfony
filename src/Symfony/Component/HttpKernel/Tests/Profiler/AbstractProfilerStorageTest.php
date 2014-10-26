@@ -43,7 +43,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         // Load them from storage
         $parentProfile = $this->getStorage()->read('token_parent');
-        $childProfile  = $this->getStorage()->read('token_child');
+        $childProfile = $this->getStorage()->read('token_child');
 
         // Check child has link to parent
         $this->assertNotNull($childProfile->getParent());

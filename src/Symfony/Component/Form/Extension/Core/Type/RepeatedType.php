@@ -24,7 +24,7 @@ class RepeatedType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Overwrite required option for child fields
-        $options['first_options']['required']  = $options['required'];
+        $options['first_options']['required'] = $options['required'];
         $options['second_options']['required'] = $options['required'];
 
         if (!isset($options['options']['error_bubbling'])) {
@@ -47,18 +47,18 @@ class RepeatedType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'type'           => 'text',
-            'options'        => array(),
-            'first_options'  => array(),
+            'type' => 'text',
+            'options' => array(),
+            'first_options' => array(),
             'second_options' => array(),
-            'first_name'     => 'first',
-            'second_name'    => 'second',
+            'first_name' => 'first',
+            'second_name' => 'second',
             'error_bubbling' => false,
         ));
 
         $resolver->setAllowedTypes(array(
-            'options'        => 'array',
-            'first_options'  => 'array',
+            'options' => 'array',
+            'first_options' => 'array',
             'second_options' => 'array',
         ));
     }

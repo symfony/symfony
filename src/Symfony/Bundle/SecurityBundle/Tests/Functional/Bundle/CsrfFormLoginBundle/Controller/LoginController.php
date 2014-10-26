@@ -22,7 +22,7 @@ class LoginController extends ContainerAware
         $form = $this->container->get('form.factory')->create('user_login');
 
         return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:login.html.twig', array(
-            'form'  => $form->createView(),
+            'form' => $form->createView(),
         ));
     }
 

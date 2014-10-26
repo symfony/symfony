@@ -143,8 +143,8 @@ class SecurityExtension extends Extension
             ->getDefinition('security.acl.dbal.schema_listener')
             ->addTag('doctrine.event_listener', array(
                 'connection' => $config['connection'],
-                'event'      => 'postGenerateSchema',
-                'lazy'       => true,
+                'event' => 'postGenerateSchema',
+                'lazy' => true,
             ))
         ;
 
@@ -297,8 +297,8 @@ class SecurityExtension extends Extension
             $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
             $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
-                'intention'      => $firewall['logout']['csrf_token_id'],
-                'logout_path'    => $firewall['logout']['path'],
+                'intention' => $firewall['logout']['csrf_token_id'],
+                'logout_path' => $firewall['logout']['path'],
             ));
             $listeners[] = new Reference($listenerId);
 
@@ -354,13 +354,13 @@ class SecurityExtension extends Extension
 
         $listeners = array_merge($listeners, $authListeners);
 
-        // Access listener
-        $listeners[] = new Reference('security.access_listener');
-
         // Switch user listener
         if (isset($firewall['switch_user'])) {
             $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
+
+        // Access listener
+        $listeners[] = new Reference('security.access_listener');
 
         // Determine default entry point
         if (isset($firewall['entry_point'])) {
@@ -468,7 +468,7 @@ class SecurityExtension extends Extension
         // pbkdf2 encoder
         if ('pbkdf2' === $config['algorithm']) {
             return array(
-                'class'     => new Parameter('security.encoder.pbkdf2.class'),
+                'class' => new Parameter('security.encoder.pbkdf2.class'),
                 'arguments' => array(
                     $config['hash_algorithm'],
                     $config['encode_as_base64'],
@@ -481,14 +481,14 @@ class SecurityExtension extends Extension
         // bcrypt encoder
         if ('bcrypt' === $config['algorithm']) {
             return array(
-                'class'     => new Parameter('security.encoder.bcrypt.class'),
+                'class' => new Parameter('security.encoder.bcrypt.class'),
                 'arguments' => array($config['cost']),
             );
         }
 
         // message digest encoder
         return array(
-            'class'     => new Parameter('security.encoder.digest.class'),
+            'class' => new Parameter('security.encoder.digest.class'),
             'arguments' => array(
                 $config['algorithm'],
                 $config['encode_as_base64'],

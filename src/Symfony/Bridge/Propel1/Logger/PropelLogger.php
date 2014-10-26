@@ -50,7 +50,7 @@ class PropelLogger implements \BasicLogger
      */
     public function __construct(LoggerInterface $logger = null, Stopwatch $stopwatch = null)
     {
-        $this->logger    = $logger;
+        $this->logger = $logger;
         $this->stopwatch = $stopwatch;
     }
 

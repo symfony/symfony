@@ -28,9 +28,9 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  */
 class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 {
-    const REQUIREMENT_MATCH     = 0;
-    const REQUIREMENT_MISMATCH  = 1;
-    const ROUTE_MATCH           = 2;
+    const REQUIREMENT_MATCH = 0;
+    const REQUIREMENT_MISMATCH = 1;
+    const ROUTE_MATCH = 2;
 
     /**
      * @var RequestContext

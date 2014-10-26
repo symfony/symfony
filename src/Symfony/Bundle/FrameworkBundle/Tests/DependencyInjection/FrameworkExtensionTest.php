@@ -490,12 +490,12 @@ abstract class FrameworkExtensionTest extends TestCase
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
-            'kernel.bundles'     => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
-            'kernel.cache_dir'   => __DIR__,
-            'kernel.debug'       => false,
+            'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.cache_dir' => __DIR__,
+            'kernel.debug' => false,
             'kernel.environment' => 'test',
-            'kernel.name'        => 'kernel',
-            'kernel.root_dir'    => __DIR__,
+            'kernel.name' => 'kernel',
+            'kernel.root_dir' => __DIR__,
         ), $data)));
     }
 

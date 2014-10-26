@@ -723,9 +723,9 @@ class Application
                 $trace = $e->getTrace();
                 array_unshift($trace, array(
                     'function' => '',
-                    'file'     => $e->getFile() != null ? $e->getFile() : 'n/a',
-                    'line'     => $e->getLine() != null ? $e->getLine() : 'n/a',
-                    'args'     => array(),
+                    'file' => $e->getFile() != null ? $e->getFile() : 'n/a',
+                    'line' => $e->getLine() != null ? $e->getLine() : 'n/a',
+                    'args' => array(),
                 ));
 
                 for ($i = 0, $count = count($trace); $i < $count; $i++) {

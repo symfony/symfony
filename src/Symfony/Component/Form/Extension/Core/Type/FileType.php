@@ -29,7 +29,7 @@ class FileType extends AbstractType
         }
 
         $view->vars = array_replace($view->vars, array(
-            'type'  => 'file',
+            'type' => 'file',
             'value' => '',
         ));
     }

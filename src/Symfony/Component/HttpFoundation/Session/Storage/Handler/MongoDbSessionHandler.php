@@ -62,7 +62,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
         $this->mongo = $mongo;
 
         $this->options = array_merge(array(
-            'id_field'   => '_id',
+            'id_field' => '_id',
             'data_field' => 'data',
             'time_field' => 'time',
         ), $options);

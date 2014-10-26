@@ -52,7 +52,7 @@ abstract class AbstractDoctrineExtension extends Extension
             foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
                 if (!isset($objectManager['mappings'][$bundle])) {
                     $objectManager['mappings'][$bundle] = array(
-                        'mapping'   => true,
+                        'mapping' => true,
                         'is_bundle' => true,
                     );
                 }
@@ -65,8 +65,8 @@ abstract class AbstractDoctrineExtension extends Extension
             }
 
             $mappingConfig = array_replace(array(
-                'dir'    => false,
-                'type'   => false,
+                'dir' => false,
+                'type' => false,
                 'prefix' => false,
             ), (array) $mappingConfig);
 

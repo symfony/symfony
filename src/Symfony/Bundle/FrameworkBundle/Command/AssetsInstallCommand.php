@@ -87,7 +87,7 @@ EOT
 
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $targetDir  = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+                $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
 
                 $output->writeln(sprintf('Installing assets for <comment>%s</comment> into <comment>%s</comment>', $bundle->getNamespace(), $targetDir));
 

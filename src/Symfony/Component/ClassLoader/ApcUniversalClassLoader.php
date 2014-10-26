@@ -37,8 +37,8 @@ namespace Symfony\Component\ClassLoader;
  *     // register classes with namespaces
  *     $loader->registerNamespaces(array(
  *         'Symfony\Component' => __DIR__.'/component',
- *         'Symfony'           => __DIR__.'/framework',
- *         'Sensio'            => array(__DIR__.'/src', __DIR__.'/vendor'),
+ *         'Symfony' => __DIR__.'/framework',
+ *         'Sensio' => array(__DIR__.'/src', __DIR__.'/vendor'),
  *     ));
  *
  *     // register a library using the PEAR naming convention

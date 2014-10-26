@@ -68,7 +68,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $dbalLogger->startQuery('SQL', array(
-            'utf8'    => 'foo',
+            'utf8' => 'foo',
             'nonutf8' => "\x7F\xFF",
         ));
     }
@@ -97,7 +97,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 
         $dbalLogger->startQuery('SQL', array(
             'short' => $shortString,
-            'long'  => $longString,
+            'long' => $longString,
         ));
     }
 
@@ -135,7 +135,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 
         $dbalLogger->startQuery('SQL', array(
                 'short' => $shortString,
-                'long'  => $longString,
+                'long' => $longString,
             ));
     }
 }

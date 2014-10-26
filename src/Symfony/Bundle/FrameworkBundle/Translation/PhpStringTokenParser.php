@@ -51,13 +51,13 @@ class PhpStringTokenParser
 {
     protected static $replacements = array(
         '\\' => '\\',
-        '$'  =>  '$',
-        'n'  => "\n",
-        'r'  => "\r",
-        't'  => "\t",
-        'f'  => "\f",
-        'v'  => "\v",
-        'e'  => "\x1B",
+        '$' =>  '$',
+        'n' => "\n",
+        'r' => "\r",
+        't' => "\t",
+        'f' => "\f",
+        'v' => "\v",
+        'e' => "\x1B",
     );
 
     /**

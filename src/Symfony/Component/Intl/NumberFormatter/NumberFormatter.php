@@ -41,91 +41,91 @@ use Symfony\Component\Intl\Locale\Locale;
 class NumberFormatter
 {
     /* Format style constants */
-    const PATTERN_DECIMAL   = 0;
-    const DECIMAL           = 1;
-    const CURRENCY          = 2;
-    const PERCENT           = 3;
-    const SCIENTIFIC        = 4;
-    const SPELLOUT          = 5;
-    const ORDINAL           = 6;
-    const DURATION          = 7;
+    const PATTERN_DECIMAL = 0;
+    const DECIMAL = 1;
+    const CURRENCY = 2;
+    const PERCENT = 3;
+    const SCIENTIFIC = 4;
+    const SPELLOUT = 5;
+    const ORDINAL = 6;
+    const DURATION = 7;
     const PATTERN_RULEBASED = 9;
-    const IGNORE            = 0;
-    const DEFAULT_STYLE     = 1;
+    const IGNORE = 0;
+    const DEFAULT_STYLE = 1;
 
     /* Format type constants */
-    const TYPE_DEFAULT  = 0;
-    const TYPE_INT32    = 1;
-    const TYPE_INT64    = 2;
-    const TYPE_DOUBLE   = 3;
+    const TYPE_DEFAULT = 0;
+    const TYPE_INT32 = 1;
+    const TYPE_INT64 = 2;
+    const TYPE_DOUBLE = 3;
     const TYPE_CURRENCY = 4;
 
     /* Numeric attribute constants */
-    const PARSE_INT_ONLY          = 0;
-    const GROUPING_USED           = 1;
-    const DECIMAL_ALWAYS_SHOWN    = 2;
-    const MAX_INTEGER_DIGITS      = 3;
-    const MIN_INTEGER_DIGITS      = 4;
-    const INTEGER_DIGITS          = 5;
-    const MAX_FRACTION_DIGITS     = 6;
-    const MIN_FRACTION_DIGITS     = 7;
-    const FRACTION_DIGITS         = 8;
-    const MULTIPLIER              = 9;
-    const GROUPING_SIZE           = 10;
-    const ROUNDING_MODE           = 11;
-    const ROUNDING_INCREMENT      = 12;
-    const FORMAT_WIDTH            = 13;
-    const PADDING_POSITION        = 14;
+    const PARSE_INT_ONLY = 0;
+    const GROUPING_USED = 1;
+    const DECIMAL_ALWAYS_SHOWN = 2;
+    const MAX_INTEGER_DIGITS = 3;
+    const MIN_INTEGER_DIGITS = 4;
+    const INTEGER_DIGITS = 5;
+    const MAX_FRACTION_DIGITS = 6;
+    const MIN_FRACTION_DIGITS = 7;
+    const FRACTION_DIGITS = 8;
+    const MULTIPLIER = 9;
+    const GROUPING_SIZE = 10;
+    const ROUNDING_MODE = 11;
+    const ROUNDING_INCREMENT = 12;
+    const FORMAT_WIDTH = 13;
+    const PADDING_POSITION = 14;
     const SECONDARY_GROUPING_SIZE = 15;
     const SIGNIFICANT_DIGITS_USED = 16;
-    const MIN_SIGNIFICANT_DIGITS  = 17;
-    const MAX_SIGNIFICANT_DIGITS  = 18;
-    const LENIENT_PARSE           = 19;
+    const MIN_SIGNIFICANT_DIGITS = 17;
+    const MAX_SIGNIFICANT_DIGITS = 18;
+    const LENIENT_PARSE = 19;
 
     /* Text attribute constants */
-    const POSITIVE_PREFIX   = 0;
-    const POSITIVE_SUFFIX   = 1;
-    const NEGATIVE_PREFIX   = 2;
-    const NEGATIVE_SUFFIX   = 3;
+    const POSITIVE_PREFIX = 0;
+    const POSITIVE_SUFFIX = 1;
+    const NEGATIVE_PREFIX = 2;
+    const NEGATIVE_SUFFIX = 3;
     const PADDING_CHARACTER = 4;
-    const CURRENCY_CODE     = 5;
-    const DEFAULT_RULESET   = 6;
-    const PUBLIC_RULESETS   = 7;
+    const CURRENCY_CODE = 5;
+    const DEFAULT_RULESET = 6;
+    const PUBLIC_RULESETS = 7;
 
     /* Format symbol constants */
-    const DECIMAL_SEPARATOR_SYMBOL           = 0;
-    const GROUPING_SEPARATOR_SYMBOL          = 1;
-    const PATTERN_SEPARATOR_SYMBOL           = 2;
-    const PERCENT_SYMBOL                     = 3;
-    const ZERO_DIGIT_SYMBOL                  = 4;
-    const DIGIT_SYMBOL                       = 5;
-    const MINUS_SIGN_SYMBOL                  = 6;
-    const PLUS_SIGN_SYMBOL                   = 7;
-    const CURRENCY_SYMBOL                    = 8;
-    const INTL_CURRENCY_SYMBOL               = 9;
-    const MONETARY_SEPARATOR_SYMBOL          = 10;
-    const EXPONENTIAL_SYMBOL                 = 11;
-    const PERMILL_SYMBOL                     = 12;
-    const PAD_ESCAPE_SYMBOL                  = 13;
-    const INFINITY_SYMBOL                    = 14;
-    const NAN_SYMBOL                         = 15;
-    const SIGNIFICANT_DIGIT_SYMBOL           = 16;
+    const DECIMAL_SEPARATOR_SYMBOL = 0;
+    const GROUPING_SEPARATOR_SYMBOL = 1;
+    const PATTERN_SEPARATOR_SYMBOL = 2;
+    const PERCENT_SYMBOL = 3;
+    const ZERO_DIGIT_SYMBOL = 4;
+    const DIGIT_SYMBOL = 5;
+    const MINUS_SIGN_SYMBOL = 6;
+    const PLUS_SIGN_SYMBOL = 7;
+    const CURRENCY_SYMBOL = 8;
+    const INTL_CURRENCY_SYMBOL = 9;
+    const MONETARY_SEPARATOR_SYMBOL = 10;
+    const EXPONENTIAL_SYMBOL = 11;
+    const PERMILL_SYMBOL = 12;
+    const PAD_ESCAPE_SYMBOL = 13;
+    const INFINITY_SYMBOL = 14;
+    const NAN_SYMBOL = 15;
+    const SIGNIFICANT_DIGIT_SYMBOL = 16;
     const MONETARY_GROUPING_SEPARATOR_SYMBOL = 17;
 
     /* Rounding mode values used by NumberFormatter::setAttribute() with NumberFormatter::ROUNDING_MODE attribute */
-    const ROUND_CEILING  = 0;
-    const ROUND_FLOOR    = 1;
-    const ROUND_DOWN     = 2;
-    const ROUND_UP       = 3;
+    const ROUND_CEILING = 0;
+    const ROUND_FLOOR = 1;
+    const ROUND_DOWN = 2;
+    const ROUND_UP = 3;
     const ROUND_HALFEVEN = 4;
     const ROUND_HALFDOWN = 5;
-    const ROUND_HALFUP   = 6;
+    const ROUND_HALFUP = 6;
 
     /* Pad position values used by NumberFormatter::setAttribute() with NumberFormatter::PADDING_POSITION attribute */
     const PAD_BEFORE_PREFIX = 0;
-    const PAD_AFTER_PREFIX  = 1;
+    const PAD_AFTER_PREFIX = 1;
     const PAD_BEFORE_SUFFIX = 2;
-    const PAD_AFTER_SUFFIX  = 3;
+    const PAD_AFTER_SUFFIX = 3;
 
     /**
      * The error code from the last operation
@@ -153,8 +153,8 @@ class NumberFormatter
      */
     private $attributes = array(
         self::FRACTION_DIGITS => 0,
-        self::GROUPING_USED   => 1,
-        self::ROUNDING_MODE   => self::ROUND_HALFEVEN,
+        self::GROUPING_USED => 1,
+        self::ROUNDING_MODE => self::ROUND_HALFEVEN,
     );
 
     /**
@@ -171,7 +171,7 @@ class NumberFormatter
      */
     private static $supportedStyles = array(
         'CURRENCY' => self::CURRENCY,
-        'DECIMAL'  => self::DECIMAL,
+        'DECIMAL' => self::DECIMAL,
     );
 
     /**
@@ -181,8 +181,8 @@ class NumberFormatter
      */
     private static $supportedAttributes = array(
         'FRACTION_DIGITS' => self::FRACTION_DIGITS,
-        'GROUPING_USED'   => self::GROUPING_USED,
-        'ROUNDING_MODE'   => self::ROUNDING_MODE,
+        'GROUPING_USED' => self::GROUPING_USED,
+        'ROUNDING_MODE' => self::ROUNDING_MODE,
     );
 
     /**
@@ -195,11 +195,11 @@ class NumberFormatter
     private static $roundingModes = array(
         'ROUND_HALFEVEN' => self::ROUND_HALFEVEN,
         'ROUND_HALFDOWN' => self::ROUND_HALFDOWN,
-        'ROUND_HALFUP'   => self::ROUND_HALFUP,
-        'ROUND_CEILING'  => self::ROUND_CEILING,
-        'ROUND_FLOOR'    => self::ROUND_FLOOR,
-        'ROUND_DOWN'     => self::ROUND_DOWN,
-        'ROUND_UP'       => self::ROUND_UP,
+        'ROUND_HALFUP' => self::ROUND_HALFUP,
+        'ROUND_CEILING' => self::ROUND_CEILING,
+        'ROUND_FLOOR' => self::ROUND_FLOOR,
+        'ROUND_DOWN' => self::ROUND_DOWN,
+        'ROUND_UP' => self::ROUND_UP,
     );
 
     /**
@@ -213,7 +213,7 @@ class NumberFormatter
     private static $phpRoundingMap = array(
         self::ROUND_HALFDOWN => \PHP_ROUND_HALF_DOWN,
         self::ROUND_HALFEVEN => \PHP_ROUND_HALF_EVEN,
-        self::ROUND_HALFUP   => \PHP_ROUND_HALF_UP,
+        self::ROUND_HALFUP => \PHP_ROUND_HALF_UP,
     );
 
     /**
@@ -294,7 +294,7 @@ class NumberFormatter
             throw new MethodArgumentNotImplementedException(__METHOD__, 'pattern');
         }
 
-        $this->style  = $style;
+        $this->style = $style;
     }
 
     /**

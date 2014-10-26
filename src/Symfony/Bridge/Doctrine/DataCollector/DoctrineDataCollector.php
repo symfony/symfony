@@ -59,9 +59,9 @@ class DoctrineDataCollector extends DataCollector
         }
 
         $this->data = array(
-            'queries'     => $queries,
+            'queries' => $queries,
             'connections' => $this->connections,
-            'managers'    => $this->managers,
+            'managers' => $this->managers,
         );
     }
 

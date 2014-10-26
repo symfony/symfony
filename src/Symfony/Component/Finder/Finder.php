@@ -37,24 +37,24 @@ class Finder implements \IteratorAggregate, \Countable
     const IGNORE_VCS_FILES = 1;
     const IGNORE_DOT_FILES = 2;
 
-    private $mode        = 0;
-    private $names       = array();
-    private $notNames    = array();
-    private $exclude     = array();
-    private $filters     = array();
-    private $depths      = array();
-    private $sizes       = array();
+    private $mode = 0;
+    private $names = array();
+    private $notNames = array();
+    private $exclude = array();
+    private $filters = array();
+    private $depths = array();
+    private $sizes = array();
     private $followLinks = false;
-    private $sort        = false;
-    private $ignore      = 0;
-    private $dirs        = array();
-    private $dates       = array();
-    private $iterators   = array();
-    private $contains    = array();
+    private $sort = false;
+    private $ignore = 0;
+    private $dirs = array();
+    private $dates = array();
+    private $iterators = array();
+    private $contains = array();
     private $notContains = array();
-    private $adapters    = array();
-    private $paths       = array();
-    private $notPaths    = array();
+    private $adapters = array();
+    private $paths = array();
+    private $notPaths = array();
     private $ignoreUnreadableDirs = false;
 
     private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
@@ -97,7 +97,7 @@ class Finder implements \IteratorAggregate, \Countable
     public function addAdapter(AdapterInterface $adapter, $priority = 0)
     {
         $this->adapters[$adapter->getName()] = array(
-            'adapter'  => $adapter,
+            'adapter' => $adapter,
             'priority' => $priority,
             'selected' => false,
         );

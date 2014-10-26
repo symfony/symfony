@@ -291,7 +291,7 @@ class Configuration implements ConfigurationInterface
         $organizeUrls = function ($urls) {
             $urls += array(
                 'http' => array(),
-                'ssl'  => array(),
+                'ssl' => array(),
             );
 
             foreach ($urls as $i => $url) {

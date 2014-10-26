@@ -114,14 +114,14 @@ class TwigExtensionTest extends TestCase
     public function testGlobalsWithDifferentTypesAndValues()
     {
         $globals = array(
-            'array'   => array(),
-            'false'   => false,
-            'float'   => 2.0,
+            'array' => array(),
+            'false' => false,
+            'float' => 2.0,
             'integer' => 3,
-            'null'    => null,
-            'object'  => new \stdClass(),
-            'string'  => 'foo',
-            'true'    => true,
+            'null' => null,
+            'object' => new \stdClass(),
+            'string' => 'foo',
+            'true' => true,
         );
 
         $container = $this->createContainer();
@@ -183,10 +183,10 @@ class TwigExtensionTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.cache_dir' => __DIR__,
-            'kernel.root_dir'  => __DIR__.'/Fixtures',
-            'kernel.charset'   => 'UTF-8',
-            'kernel.debug'     => false,
-            'kernel.bundles'   => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
+            'kernel.root_dir' => __DIR__.'/Fixtures',
+            'kernel.charset' => 'UTF-8',
+            'kernel.debug' => false,
+            'kernel.bundles' => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
         )));
 
         return $container;

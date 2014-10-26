@@ -133,10 +133,10 @@
         function CanvasManager(requests, maxRequestTime) {
             "use strict";
 
-            var _drawingColors  = {{ colors|json_encode|raw }},
-                _storagePrefix  = 'timeline/',
-                _threshold      = 1,
-                _requests       = requests,
+            var _drawingColors = {{ colors|json_encode|raw }},
+                _storagePrefix = 'timeline/',
+                _threshold = 1,
+                _requests = requests,
                 _maxRequestTime = maxRequestTime;
 
             /**
@@ -183,16 +183,16 @@
                     xc,
                     drawableEvents,
                     mainEvents,
-                    elementId    = 'timeline_' + request.id,
+                    elementId = 'timeline_' + request.id,
                     canvasHeight = 0,
-                    gapPerEvent  = 38,
+                    gapPerEvent = 38,
                     colors = _drawingColors,
-                    space  = 10.5,
-                    ratio  = (width - space * 2) / max,
+                    space = 10.5,
+                    ratio = (width - space * 2) / max,
                     h = space,
                     x = request.left * ratio + space, // position
                     canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
-                    ctx    = canvas.getContext("2d"),
+                    ctx = canvas.getContext("2d"),
                     scaleRatio,
                     devicePixelRatio;
 
@@ -204,10 +204,10 @@
                 canvasHeight += gapPerEvent * drawableEvents.length;
 
                 // For retina displays so text and boxes will be crisp
-                devicePixelRatio  = window.devicePixelRatio          == "undefined" ? 1 : window.devicePixelRatio;
-                scaleRatio        = devicePixelRatio / 1;
+                devicePixelRatio = window.devicePixelRatio == "undefined" ? 1 : window.devicePixelRatio;
+                scaleRatio = devicePixelRatio / 1;
 
-                canvas.width  = width * scaleRatio;
+                canvas.width = width * scaleRatio;
                 canvas.height = canvasHeight * scaleRatio;
 
                 canvas.style.width = width + 'px';
@@ -256,14 +256,14 @@
                     // For each sub event, ...
                     event.periods.forEach(function(period) {
                         // Set the drawing style.
-                        ctx.fillStyle   = colors['default'];
+                        ctx.fillStyle = colors['default'];
                         ctx.strokeStyle = colors['default'];
 
                         if (colors[event.name]) {
-                            ctx.fillStyle   = colors[event.name];
+                            ctx.fillStyle = colors[event.name];
                             ctx.strokeStyle = colors[event.name];
                         } else if (colors[event.category]) {
-                            ctx.fillStyle   = colors[event.category];
+                            ctx.fillStyle = colors[event.category];
                             ctx.strokeStyle = colors[event.category];
                         }
 
@@ -353,7 +353,7 @@
             {
                 "use strict";
 
-                width     = width || getContainerWidth();
+                width = width || getContainerWidth();
                 threshold = threshold || this.getThreshold();
 
                 var self = this;
@@ -425,15 +425,15 @@
         }
 
         // Bind event handlers
-        var elementTimelineControl  = query('#timeline-control'),
+        var elementTimelineControl = query('#timeline-control'),
             elementThresholdControl = query('input[name="threshold"]');
 
-        window.onresize                 = canvasAutoUpdateOnResizeAndSubmit;
+        window.onresize = canvasAutoUpdateOnResizeAndSubmit;
         elementTimelineControl.onsubmit = canvasAutoUpdateOnResizeAndSubmit;
 
-        elementThresholdControl.onclick  = canvasAutoUpdateOnThresholdChange;
+        elementThresholdControl.onclick = canvasAutoUpdateOnThresholdChange;
         elementThresholdControl.onchange = canvasAutoUpdateOnThresholdChange;
-        elementThresholdControl.onkeyup  = canvasAutoUpdateOnThresholdChange;
+        elementThresholdControl.onkeyup = canvasAutoUpdateOnThresholdChange;
 
         window.setTimeout(function() {
             canvasAutoUpdateOnThresholdChange(null);

@@ -87,13 +87,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         register_shutdown_function(array($this->store, 'cleanup'));
 
         $this->options = array_merge(array(
-            'debug'                  => false,
-            'default_ttl'            => 0,
-            'private_headers'        => array('Authorization', 'Cookie'),
-            'allow_reload'           => false,
-            'allow_revalidate'       => false,
+            'debug' => false,
+            'default_ttl' => 0,
+            'private_headers' => array('Authorization', 'Cookie'),
+            'allow_reload' => false,
+            'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
-            'stale_if_error'         => 60,
+            'stale_if_error' => 60,
         ), $options);
     }
 

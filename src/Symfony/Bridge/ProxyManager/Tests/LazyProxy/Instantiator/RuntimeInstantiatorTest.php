@@ -40,9 +40,9 @@ class RuntimeInstantiatorTest extends \PHPUnit_Framework_TestCase
 
     public function testInstantiateProxy()
     {
-        $instance     = new \stdClass();
-        $container    = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $definition   = new Definition('stdClass');
+        $instance = new \stdClass();
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $definition = new Definition('stdClass');
         $instantiator = function () use ($instance) {
             return $instance;
         };

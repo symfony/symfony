@@ -59,7 +59,7 @@ class ImageValidator extends FileValidator
             return;
         }
 
-        $width  = $size[0];
+        $width = $size[0];
         $height = $size[1];
 
         if ($constraint->minWidth) {

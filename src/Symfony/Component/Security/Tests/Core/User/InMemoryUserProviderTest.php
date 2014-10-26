@@ -21,8 +21,8 @@ class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
         $provider = new InMemoryUserProvider(array(
             'fabien' => array(
                 'password' => 'foo',
-                'enabled'  => false,
-                'roles'    => array('ROLE_USER'),
+                'enabled' => false,
+                'roles' => array('ROLE_USER'),
             ),
         ));
 

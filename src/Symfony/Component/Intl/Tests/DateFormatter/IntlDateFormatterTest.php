@@ -41,14 +41,14 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         $formatter = $this->getDefaultDateFormatter();
 
         $localtime = array(
-            'tm_sec'   => 59,
-            'tm_min'   => 3,
-            'tm_hour'  => 15,
-            'tm_mday'  => 15,
-            'tm_mon'   => 3,
-            'tm_year'  => 112,
-            'tm_wday'  => 0,
-            'tm_yday'  => 105,
+            'tm_sec' => 59,
+            'tm_min' => 3,
+            'tm_hour' => 15,
+            'tm_mday' => 15,
+            'tm_mon' => 3,
+            'tm_year' => 112,
+            'tm_wday' => 0,
+            'tm_yday' => 105,
             'tm_isdst' => 0,
         );
 

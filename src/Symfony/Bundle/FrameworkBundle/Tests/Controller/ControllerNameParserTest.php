@@ -23,7 +23,7 @@ class ControllerNameParserTest extends TestCase
     {
         $this->loader = new ClassLoader();
         $this->loader->addPrefixes(array(
-            'TestBundle'      => __DIR__.'/../Fixtures',
+            'TestBundle' => __DIR__.'/../Fixtures',
             'TestApplication' => __DIR__.'/../Fixtures',
         ));
         $this->loader->register();

@@ -96,12 +96,12 @@ class ChoiceType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, array(
-            'multiple'          => $options['multiple'],
-            'expanded'          => $options['expanded'],
+            'multiple' => $options['multiple'],
+            'expanded' => $options['expanded'],
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
-            'choices'           => $options['choice_list']->getRemainingViews(),
-            'separator'         => '-------------------',
-            'empty_value'       => null,
+            'choices' => $options['choice_list']->getRemainingViews(),
+            'separator' => '-------------------',
+            'empty_value' => null,
         ));
 
         // The decision, whether a choice is selected, is potentially done
@@ -208,19 +208,19 @@ class ChoiceType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'multiple'          => false,
-            'expanded'          => false,
-            'choice_list'       => $choiceList,
-            'choices'           => array(),
+            'multiple' => false,
+            'expanded' => false,
+            'choice_list' => $choiceList,
+            'choices' => array(),
             'preferred_choices' => array(),
-            'empty_data'        => $emptyData,
-            'empty_value'       => $emptyValue,
-            'error_bubbling'    => false,
-            'compound'          => $compound,
+            'empty_data' => $emptyData,
+            'empty_value' => $emptyValue,
+            'error_bubbling' => false,
+            'compound' => $compound,
             // The view data is always a string, even if the "data" option
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
-            'data_class'        => null,
+            'data_class' => null,
         ));
 
         $resolver->setNormalizers(array(

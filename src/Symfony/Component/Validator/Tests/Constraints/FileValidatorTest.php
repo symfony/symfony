@@ -156,8 +156,8 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         fclose($this->file);
 
         $constraint = new File(array(
-            'maxSize'           => $limit,
-            'maxSizeMessage'    => 'myMessage',
+            'maxSize' => $limit,
+            'maxSizeMessage' => 'myMessage',
         ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);
@@ -196,8 +196,8 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
         fclose($this->file);
 
         $constraint = new File(array(
-            'maxSize'           => $limit,
-            'maxSizeMessage'    => 'myMessage',
+            'maxSize' => $limit,
+            'maxSizeMessage' => 'myMessage',
         ));
 
         $this->validator->validate($this->getFile($this->path), $constraint);

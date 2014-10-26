@@ -87,9 +87,9 @@ class InputDefinition
      */
     public function setArguments($arguments = array())
     {
-        $this->arguments          = array();
-        $this->requiredCount      = 0;
-        $this->hasOptional        = false;
+        $this->arguments = array();
+        $this->requiredCount = 0;
+        $this->hasOptional = false;
         $this->hasAnArrayArgument = false;
         $this->addArguments($arguments);
     }

@@ -29,7 +29,7 @@ class LocalizedController extends ContainerAware
         return $this->container->get('templating')->renderResponse('FormLoginBundle:Localized:login.html.twig', array(
             // last username entered by the user
             'last_username' => $this->container->get('request')->getSession()->get(SecurityContext::LAST_USERNAME),
-            'error'         => $error,
+            'error' => $error,
         ));
     }
 

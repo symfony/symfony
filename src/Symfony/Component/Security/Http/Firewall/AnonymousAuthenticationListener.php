@@ -31,8 +31,8 @@ class AnonymousAuthenticationListener implements ListenerInterface
     public function __construct(SecurityContextInterface $context, $key, LoggerInterface $logger = null)
     {
         $this->context = $context;
-        $this->key     = $key;
-        $this->logger  = $logger;
+        $this->key = $key;
+        $this->logger = $logger;
     }
 
     /**

@@ -120,7 +120,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testAllowAddButNoPrototype()
     {
         $form = $this->factory->create('collection', null, array(
-            'type'      => 'form',
+            'type' => 'form',
             'allow_add' => true,
             'prototype' => false,
         ));
@@ -132,7 +132,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $form = $this->factory
             ->create('collection', null, array(
-                'type'      => 'file',
+                'type' => 'file',
                 'allow_add' => true,
                 'prototype' => true,
             ))
@@ -144,7 +144,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testGetDataDoesNotContainsPrototypeNameBeforeDataAreSet()
     {
         $form = $this->factory->create('collection', array(), array(
-            'type'      => 'file',
+            'type' => 'file',
             'prototype' => true,
             'allow_add' => true,
         ));
@@ -156,7 +156,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testGetDataDoesNotContainsPrototypeNameAfterDataAreSet()
     {
         $form = $this->factory->create('collection', array(), array(
-            'type'      => 'file',
+            'type' => 'file',
             'allow_add' => true,
             'prototype' => true,
         ));
@@ -169,7 +169,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPrototypeNameOption()
     {
         $form = $this->factory->create('collection', null, array(
-            'type'      => 'form',
+            'type' => 'form',
             'prototype' => true,
             'allow_add' => true,
         ));
@@ -177,9 +177,9 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('__name__', $form->getConfig()->getAttribute('prototype')->getName(), '__name__ is the default');
 
         $form = $this->factory->create('collection', null, array(
-            'type'           => 'form',
-            'prototype'      => true,
-            'allow_add'      => true,
+            'type' => 'form',
+            'prototype' => true,
+            'allow_add' => true,
             'prototype_name' => '__test__',
         ));
 
@@ -189,7 +189,7 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPrototypeDefaultLabel()
     {
         $form = $this->factory->create('collection', array(), array(
-            'type'      => 'file',
+            'type' => 'file',
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',

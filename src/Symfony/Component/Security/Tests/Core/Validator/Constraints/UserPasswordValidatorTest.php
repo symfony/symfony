@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 
 class UserPasswordValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    const PASSWORD_VALID   = true;
+    const PASSWORD_VALID = true;
     const PASSWORD_INVALID = false;
 
     protected $context;

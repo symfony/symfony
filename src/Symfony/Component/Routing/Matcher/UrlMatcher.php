@@ -26,9 +26,9 @@ use Symfony\Component\Routing\Route;
  */
 class UrlMatcher implements UrlMatcherInterface
 {
-    const REQUIREMENT_MATCH     = 0;
-    const REQUIREMENT_MISMATCH  = 1;
-    const ROUTE_MATCH           = 2;
+    const REQUIREMENT_MATCH = 0;
+    const REQUIREMENT_MISMATCH = 1;
+    const ROUTE_MATCH = 2;
 
     /**
      * @var RequestContext

@@ -196,25 +196,25 @@ class DateType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'years'          => range(date('Y') - 5, date('Y') + 5),
-            'months'         => range(1, 12),
-            'days'           => range(1, 31),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'format'         => $format,
+            'years' => range(date('Y') - 5, date('Y') + 5),
+            'months' => range(1, 12),
+            'days' => range(1, 31),
+            'widget' => 'choice',
+            'input' => 'datetime',
+            'format' => $format,
             'model_timezone' => null,
-            'view_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'view_timezone' => null,
+            'empty_value' => $emptyValue,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
+            'by_reference' => false,
             'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class' => null,
+            'compound' => $compound,
         ));
 
         $resolver->setNormalizers(array(
@@ -222,13 +222,13 @@ class DateType extends AbstractType
         ));
 
         $resolver->setAllowedValues(array(
-            'input'     => array(
+            'input' => array(
                 'datetime',
                 'string',
                 'timestamp',
                 'array',
             ),
-            'widget'    => array(
+            'widget' => array(
                 'single_text',
                 'text',
                 'choice',
@@ -237,9 +237,9 @@ class DateType extends AbstractType
 
         $resolver->setAllowedTypes(array(
             'format' => array('int', 'string'),
-            'years'  => 'array',
+            'years' => 'array',
             'months' => 'array',
-            'days'   => 'array',
+            'days' => 'array',
         ));
     }
 

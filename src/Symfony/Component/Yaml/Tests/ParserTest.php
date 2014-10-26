@@ -577,7 +577,7 @@ EOF
     public function testNestedFoldedStringBlockWithComments()
     {
         $this->assertEquals(array(array(
-            'title'   => 'some title',
+            'title' => 'some title',
             'content' => <<<EOT
 # comment 1
 header

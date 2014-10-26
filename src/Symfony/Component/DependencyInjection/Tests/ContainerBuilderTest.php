@@ -572,7 +572,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
 
-        $classesPath       = realpath(__DIR__.'/Fixtures/includes/classes.php');
+        $classesPath = realpath(__DIR__.'/Fixtures/includes/classes.php');
         $matchingResources = array_filter(
             $container->getResources(),
             function (ResourceInterface $resource) use ($classesPath) {
@@ -650,16 +650,16 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrivateServiceUser()
     {
-        $fooDefinition     = new Definition('BarClass');
+        $fooDefinition = new Definition('BarClass');
         $fooUserDefinition = new Definition('BarUserClass', array(new Reference('bar')));
-        $container         = new ContainerBuilder();
+        $container = new ContainerBuilder();
         $container->setResourceTracking(false);
 
         $fooDefinition->setPublic(false);
 
         $container->addDefinitions(array(
-            'bar'       => $fooDefinition,
-            'bar_user'  => $fooUserDefinition,
+            'bar' => $fooDefinition,
+            'bar_user' => $fooUserDefinition,
         ));
 
         $container->compile();

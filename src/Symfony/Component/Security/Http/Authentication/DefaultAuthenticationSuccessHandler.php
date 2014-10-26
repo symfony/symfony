@@ -36,14 +36,14 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      */
     public function __construct(HttpUtils $httpUtils, array $options)
     {
-        $this->httpUtils   = $httpUtils;
+        $this->httpUtils = $httpUtils;
 
         $this->options = array_merge(array(
             'always_use_default_target_path' => false,
-            'default_target_path'            => '/',
-            'login_path'                     => '/login',
-            'target_path_parameter'          => '_target_path',
-            'use_referer'                    => false,
+            'default_target_path' => '/',
+            'login_path' => '/login',
+            'target_path_parameter' => '_target_path',
+            'use_referer' => false,
         ), $options);
     }
 

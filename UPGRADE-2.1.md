@@ -1107,7 +1107,7 @@
 
     ```php
     $view->vars = array_replace($view->vars, array(
-        'help'        => 'A text longer than six characters',
+        'help' => 'A text longer than six characters',
         'error_class' => 'max_length_error',
     ));
     ```

@@ -19,14 +19,14 @@ namespace Symfony\Component\Security\Acl\Permission;
  */
 class BasicPermissionMap implements PermissionMapInterface
 {
-    const PERMISSION_VIEW        = 'VIEW';
-    const PERMISSION_EDIT        = 'EDIT';
-    const PERMISSION_CREATE      = 'CREATE';
-    const PERMISSION_DELETE      = 'DELETE';
-    const PERMISSION_UNDELETE    = 'UNDELETE';
-    const PERMISSION_OPERATOR    = 'OPERATOR';
-    const PERMISSION_MASTER      = 'MASTER';
-    const PERMISSION_OWNER       = 'OWNER';
+    const PERMISSION_VIEW = 'VIEW';
+    const PERMISSION_EDIT = 'EDIT';
+    const PERMISSION_CREATE = 'CREATE';
+    const PERMISSION_DELETE = 'DELETE';
+    const PERMISSION_UNDELETE = 'UNDELETE';
+    const PERMISSION_OPERATOR = 'OPERATOR';
+    const PERMISSION_MASTER = 'MASTER';
+    const PERMISSION_OWNER = 'OWNER';
 
     protected $map;
 

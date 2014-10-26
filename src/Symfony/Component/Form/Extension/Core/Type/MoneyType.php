@@ -52,10 +52,10 @@ class MoneyType extends AbstractType
     {
         $resolver->setDefaults(array(
             'precision' => 2,
-            'grouping'  => false,
-            'divisor'   => 1,
-            'currency'  => 'EUR',
-            'compound'  => false,
+            'grouping' => false,
+            'divisor' => 1,
+            'currency' => 'EUR',
+            'compound' => false,
         ));
     }
 

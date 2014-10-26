@@ -36,7 +36,7 @@ class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
             'index_5' => new Reference('qux'),
             'index_6' => new Reference('bar'),
             'index_7' => array(
-                'use_forward'                    => true,
+                'use_forward' => true,
             ),
         ), $definition->getArguments());
 

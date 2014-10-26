@@ -22,11 +22,11 @@ class Parser
 {
     const FOLDED_SCALAR_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
-    private $offset         = 0;
-    private $lines          = array();
-    private $currentLineNb  = -1;
-    private $currentLine    = '';
-    private $refs           = array();
+    private $offset = 0;
+    private $lines = array();
+    private $currentLineNb = -1;
+    private $currentLine = '';
+    private $refs = array();
 
     /**
      * Constructor

@@ -31,13 +31,13 @@ class AttributeMatchingExtension extends AbstractExtension
     {
         return array(
             'exists' => array($this, 'translateExists'),
-            '='      => array($this, 'translateEquals'),
-            '~='     => array($this, 'translateIncludes'),
-            '|='     => array($this, 'translateDashMatch'),
-            '^='     => array($this, 'translatePrefixMatch'),
-            '$='     => array($this, 'translateSuffixMatch'),
-            '*='     => array($this, 'translateSubstringMatch'),
-            '!='     => array($this, 'translateDifferent'),
+            '=' => array($this, 'translateEquals'),
+            '~=' => array($this, 'translateIncludes'),
+            '|=' => array($this, 'translateDashMatch'),
+            '^=' => array($this, 'translatePrefixMatch'),
+            '$=' => array($this, 'translateSuffixMatch'),
+            '*=' => array($this, 'translateSubstringMatch'),
+            '!=' => array($this, 'translateDifferent'),
         );
     }
 

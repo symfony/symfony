@@ -45,14 +45,14 @@ class HtmlExtension extends AbstractExtension
     public function getPseudoClassTranslators()
     {
         return array(
-            'checked'  => array($this, 'translateChecked'),
-            'link'     => array($this, 'translateLink'),
+            'checked' => array($this, 'translateChecked'),
+            'link' => array($this, 'translateLink'),
             'disabled' => array($this, 'translateDisabled'),
-            'enabled'  => array($this, 'translateEnabled'),
+            'enabled' => array($this, 'translateEnabled'),
             'selected' => array($this, 'translateSelected'),
-            'invalid'  => array($this, 'translateInvalid'),
-            'hover'    => array($this, 'translateHover'),
-            'visited'  => array($this, 'translateVisited'),
+            'invalid' => array($this, 'translateInvalid'),
+            'hover' => array($this, 'translateHover'),
+            'visited' => array($this, 'translateVisited'),
         );
     }
 

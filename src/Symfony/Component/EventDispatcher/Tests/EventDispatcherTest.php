@@ -99,7 +99,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->addListener('post.foo', $listener6, 10);
 
         $expected = array(
-            'pre.foo'  => array($listener3, $listener2, $listener1),
+            'pre.foo' => array($listener3, $listener2, $listener1),
             'post.foo' => array($listener6, $listener5, $listener4),
         );
 

@@ -88,6 +88,14 @@ interface SessionStorageInterface
      * Note regenerate+destroy should not clear the session data in memory
      * only delete the session data from persistent storage.
      *
+     * Care: When regenerating the session ID no locking is involved in PHPs
+     * session design. See https://bugs.php.net/bug.php?id=61470 for a discussion.
+     * So you must make sure the regenerated session is saved BEFORE sending the
+     * headers with the new ID. Symfonys HttpKernel offers a listener for this.
+     * See Symfony\Component\HttpKernel\EventListener\SaveSessionListener.
+     * Otherwise session data could get lost again for concurrent requests with the
+     * new ID. One result could be that you get logged out after just logging in.
+     *
      * @param bool    $destroy  Destroy session when regenerating?
      * @param int     $lifetime Sets the cookie lifetime for the session cookie. A null value
      *                          will leave the system settings unchanged, 0 sets the cookie

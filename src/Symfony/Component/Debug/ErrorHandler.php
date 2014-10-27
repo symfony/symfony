@@ -110,29 +110,42 @@ class ErrorHandler
     /**
      * Registers the error handler.
      *
-     * @param int  $levels Levels to register to for throwing, 0 for none
-     * @param bool $throw  @deprecated argument, same as setting $levels to 0
+     * @param self|null|int $handler The handler to register, or @deprecated (since 2.6, to be removed in 3.0) bit field of thrown levels
+     * @param bool          $replace Whether to replace or not any existing handler
      *
-     * @return ErrorHandler The registered error handler
+     * @return self The registered error handler
      */
-    public static function register($levels = -1, $throw = true)
+    public static function register($handler = null, $replace = true)
     {
         if (null === self::$reservedMemory) {
             self::$reservedMemory = str_repeat('x', 10240);
             register_shutdown_function(__CLASS__.'::handleFatalError');
         }
 
-        $handler = new static();
-        $levels &= $handler->thrownErrors;
-        $prev = set_error_handler(array($handler, 'handleError'), $levels);
-        $prev = is_array($prev) ? $prev[0] : null;
-        if ($prev instanceof self) {
-            restore_error_handler();
-            $handler = $prev;
-        } else {
-            $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
+        $levels = -1;
+
+        if ($handlerIsNew = !$handler instanceof self) {
+            // @deprecated polymorphism, to be removed in 3.0
+            if (null !== $handler) {
+                $levels = $replace ? $handler : 0;
+                $replace = true;
+            }
+            $handler = new static();
         }
-        $handler->throwAt($throw ? $levels : 0, true);
+
+        $prev = set_error_handler(array($handler, 'handleError'), $handler->thrownErrors | $handler->loggedErrors);
+
+        if ($handlerIsNew && is_array($prev) && $prev[0] instanceof self) {
+            $handler = $prev[0];
+            $replace = false;
+        }
+        if ($replace || !$prev) {
+            $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
+        } else {
+            restore_error_handler();
+        }
+
+        $handler->throwAt($levels & $handler->thrownErrors, true);
 
         return $handler;
     }

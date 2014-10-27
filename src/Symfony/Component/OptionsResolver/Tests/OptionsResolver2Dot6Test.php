@@ -33,12 +33,38 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The option "foo" does not exist. Known options are: "a", "z".
      */
     public function testResolveFailsIfNonExistingOption()
     {
-        $resolver = new OptionsResolver();
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setDefault('a', '2');
 
-        $resolver->resolve(array('foo' => 'bar'));
+        $this->resolver->resolve(array('foo' => 'bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Known options are: "a", "z".
+     */
+    public function testResolveFailsIfMultipleNonExistingOptions()
+    {
+        $this->resolver->setDefault('z', '1');
+        $this->resolver->setDefault('a', '2');
+
+        $this->resolver->resolve(array('ping' => 'pong', 'foo' => 'bar', 'baz' => 'bam'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    public function testResolveFailsFromLazyOption()
+    {
+        $this->resolver->setDefault('foo', function (Options $options) {
+            $options->resolve(array());
+        });
+
+        $this->resolver->resolve();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -256,14 +282,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setRequired('foo');
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testResolveSucceedsIfRequiredOptionPassed()
     {
         $this->resolver->setRequired('foo');
 
-        $this->resolver->resolve(array('foo' => 'bar'));
+        $this->assertNotEmpty($this->resolver->resolve(array('foo' => 'bar')));
     }
 
     public function testIsRequired()
@@ -490,6 +516,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string", but is of type "integer".
      */
     public function testResolveFailsIfInvalidType()
     {
@@ -504,11 +531,12 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->setAllowedTypes('foo', 'string');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is expected to be of type "string" or "bool", but is of type "integer".
      */
     public function testResolveFailsIfInvalidTypeMultiple()
     {
@@ -523,7 +551,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', true);
         $this->resolver->setAllowedTypes('foo', array('string', 'bool'));
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
@@ -542,7 +570,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', new \stdClass());
         $this->resolver->setAllowedTypes('foo', '\stdClass');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -587,7 +615,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->addAllowedTypes('foo', 'string');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     /**
@@ -606,7 +634,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('foo', 'bar');
         $this->resolver->addAllowedTypes('foo', array('string', 'bool'));
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testAddAllowedTypesDoesNotOverwrite()
@@ -617,7 +645,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefault('foo', 'bar');
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     public function testAddAllowedTypesDoesNotOverwrite2()
@@ -628,7 +656,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefault('foo', false);
 
-        $this->resolver->resolve();
+        $this->assertNotEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -659,6 +687,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar".
      */
     public function testResolveFailsIfInvalidValue()
     {
@@ -689,11 +718,12 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar", false, null.
      */
     public function testResolveFailsIfInvalidValueMultiple()
     {
         $this->resolver->setDefault('foo', 42);
-        $this->resolver->setAllowedValues('foo', array('bar', 'baz'));
+        $this->resolver->setAllowedValues('foo', array('bar', false, null));
 
         $this->resolver->resolve();
     }
@@ -1078,7 +1108,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
             \PHPUnit_Framework_Assert::fail('Should not be called.');
         });
 
-        $this->resolver->resolve();
+        $this->assertEmpty($this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1208,7 +1238,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     public function testRemoveUnknownOptionIgnored()
     {
-        $this->resolver->remove('foo');
+        $this->assertNotNull($this->resolver->remove('foo'));
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1374,10 +1404,13 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @expectedExceptionMessage The option "undefined" does not exist. Known options are: "foo", "lazy".
      */
     public function testFailIfGetNonExisting()
     {
+        $this->resolver->setDefault('foo', 'bar');
+
         $this->resolver->setDefault('lazy', function (Options $options) {
             $options['undefined'];
         });
@@ -1386,7 +1419,8 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @expectedExceptionMessage The optional option "defined" has no value set. You should make sure it is set with "isset" before reading it.
      */
     public function testFailIfGetDefinedButUnset()
     {
@@ -1427,8 +1461,10 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('lazy1', function () {});
 
         $this->resolver->setDefault('lazy2', function (Options $options) {
-            \PHPUnit_Framework_Assert::assertCount(3, $options);
+            \PHPUnit_Framework_Assert::assertCount(4, $options);
         });
+
+        $this->assertCount(4, $this->resolver->resolve(array('required' => 'value')));
     }
 
     /**

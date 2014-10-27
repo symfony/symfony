@@ -209,14 +209,14 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected function getGlobals(\ReflectionClass $class)
     {
         $globals = array(
-            'path'         => '',
+            'path' => '',
             'requirements' => array(),
-            'options'      => array(),
-            'defaults'     => array(),
-            'schemes'      => array(),
-            'methods'      => array(),
-            'host'         => '',
-            'condition'    => '',
+            'options' => array(),
+            'defaults' => array(),
+            'schemes' => array(),
+            'methods' => array(),
+            'host' => '',
+            'condition' => '',
         );
 
         if ($annot = $this->reader->getClassAnnotation($class, $this->routeAnnotationClass)) {

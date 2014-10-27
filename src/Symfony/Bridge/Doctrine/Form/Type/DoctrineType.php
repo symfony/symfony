@@ -180,7 +180,7 @@ abstract class DoctrineType extends AbstractType
         ));
 
         $resolver->setAllowedTypes(array(
-            'em'     => array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'),
+            'em' => array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'),
             'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
         ));
     }

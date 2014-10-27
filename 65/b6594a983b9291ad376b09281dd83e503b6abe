@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dawehner at 2014-10-14T06:34:52Z
+
+You are absolute right, let's imit it to the two special cases described in the RFC
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-14T16:15:31Z
+
+@Tobion Is it good now?
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-10-26T20:31:05Z
+
+Okay, let's just do the "/" for now.

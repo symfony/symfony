@@ -48,6 +48,10 @@
             <argument type="service" id="service_container" />
         </service>
 
+        <service id="session.save_listener" class="Symfony\Component\HttpKernel\EventListener\SaveSessionListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <!-- for BC -->
         <service id="session.storage.filesystem" alias="session.storage.mock_file" />
     </services>

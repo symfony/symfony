@@ -38,4 +38,20 @@ class DebugExtension extends Extension
             ->addMethodCall('setMaxItems',  array($config['max_items']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/debug';
+    }
 }

@@ -27,7 +27,7 @@ class Translator extends BaseTranslator
 
     protected $options = array(
         'cache_dir' => null,
-        'debug'     => false,
+        'debug' => false,
     );
 
     /**

@@ -35,9 +35,9 @@ class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandle
     protected $logger;
     protected $options;
     protected $defaultOptions = array(
-        'failure_path'           => null,
-        'failure_forward'        => false,
-        'login_path'             => '/login',
+        'failure_path' => null,
+        'failure_forward' => false,
+        'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
     );
 

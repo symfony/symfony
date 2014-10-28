@@ -382,9 +382,9 @@ abstract class AbstractDoctrineExtension extends Extension
 
         if (!isset($cacheDriver['namespace'])) {
             // generate a unique namespace for the given application
-            $env        = $container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment');
-            $hash       = hash('sha256', $env);
-            $namespace  = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.$hash;
+            $env = $container->getParameter('kernel.root_dir').$container->getParameter('kernel.environment');
+            $hash = hash('sha256', $env);
+            $namespace = 'sf2'.$this->getMappingResourceExtension().'_'.$objectManagerName.'_'.$hash;
 
             $cacheDriver['namespace'] = $namespace;
         }
@@ -413,7 +413,7 @@ abstract class AbstractDoctrineExtension extends Extension
                     }
                 }
                 $managerConfigs[$autoMappedManager]['mappings'][$bundle] = array(
-                    'mapping'   => true,
+                    'mapping' => true,
                     'is_bundle' => true,
                 );
             }

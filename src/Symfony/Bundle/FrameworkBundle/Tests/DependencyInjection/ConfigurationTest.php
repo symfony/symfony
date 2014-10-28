@@ -123,15 +123,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'translator' => array(
                 'enabled' => false,
                 'fallback' => 'en',
-                'logging'  => true,
+                'logging' => true,
             ),
             'validation' => array(
                 'enabled' => false,
                 'enable_annotations' => false,
-                'static_method'      => array('loadValidatorMetadata'),
+                'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
-                'strict_email'       => false,
-                'api'                => version_compare(PHP_VERSION, '5.3.9', '<') ? '2.4' : '2.5-bc',
+                'strict_email' => false,
+                'api' => version_compare(PHP_VERSION, '5.3.9', '<') ? '2.4' : '2.5-bc',
             ),
             'annotations' => array(
                 'cache' => 'file',

@@ -28,17 +28,17 @@ class CliDumper extends AbstractDumper
     protected $maxStringWidth = 0;
     protected $styles = array(
         // See http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-        'num'       => '1;38;5;33',
-        'const'     => '1;38;5;33',
-        'str'       => '1;38;5;37',
-        'cchr'      => '7',
-        'note'      => '38;5;178',
-        'ref'       => '38;5;240',
-        'solo-ref'  => '38;5;240',
-        'public'    => '38;5;28',
+        'num' => '1;38;5;33',
+        'const' => '1;38;5;33',
+        'str' => '1;38;5;37',
+        'cchr' => '7',
+        'note' => '38;5;178',
+        'ref' => '38;5;240',
+        'solo-ref' => '38;5;240',
+        'public' => '38;5;28',
         'protected' => '38;5;166',
-        'private'   => '38;5;160',
-        'meta'      => '38;5;27',
+        'private' => '38;5;160',
+        'meta' => '38;5;27',
     );
 
     protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';

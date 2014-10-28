@@ -54,17 +54,17 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFixManagersAutoMappingsWithTwoAutomappings()
     {
         $emConfigs = array(
-            'em1'=> array(
-                'auto_mapping' => true
+            'em1' => array(
+                'auto_mapping' => true,
             ),
-            'em2'=> array(
-                'auto_mapping' => true
+            'em2' => array(
+                'auto_mapping' => true,
             ),
         );
 
         $bundles = array(
-            'FristBundle'=> 'My\FristBundle',
-            'SecondBundle'=> 'My\SecondBundle',
+            'FristBundle' => 'My\FristBundle',
+            'SecondBundle' => 'My\SecondBundle',
         );
 
         $reflection = new \ReflectionClass(get_class($this->extension));
@@ -79,34 +79,34 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 array( // no auto mapping on em1
-                    'auto_mapping' => false
+                    'auto_mapping' => false,
                 ),
                 array( // no auto mapping on em2
-                    'auto_mapping' => false
+                    'auto_mapping' => false,
                 ),
                 array(),
-                array()
+                array(),
             ),
             array(
                 array( // no auto mapping on em1
-                    'auto_mapping' => false
+                    'auto_mapping' => false,
                 ),
                 array( // auto mapping enabled on em2
-                    'auto_mapping' => true
+                    'auto_mapping' => true,
                 ),
                 array(),
                 array(
                     'mappings' => array(
                         'FristBundle' => array(
                             'mapping' => true,
-                            'is_bundle' => true
+                            'is_bundle' => true,
                         ),
                         'SecondBundle' => array(
                             'mapping' => true,
-                            'is_bundle' => true
-                        )
-                    )
-                )
+                            'is_bundle' => true,
+                        ),
+                    ),
+                ),
             ),
             array(
                 array( // no auto mapping on em1, but it defines SecondBundle as own
@@ -114,30 +114,30 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
                     'mappings' => array(
                         'SecondBundle' => array(
                             'mapping' => true,
-                            'is_bundle' => true
-                        )
-                    )
+                            'is_bundle' => true,
+                        ),
+                    ),
                 ),
                 array( // auto mapping enabled on em2
-                    'auto_mapping' => true
+                    'auto_mapping' => true,
                 ),
                 array(
                     'mappings' => array(
                         'SecondBundle' => array(
                             'mapping' => true,
-                            'is_bundle' => true
-                        )
-                    )
+                            'is_bundle' => true,
+                        ),
+                    ),
                 ),
                 array(
                     'mappings' => array(
                         'FristBundle' => array(
                             'mapping' => true,
-                            'is_bundle' => true
-                        )
-                    )
-                )
-            )
+                            'is_bundle' => true,
+                        ),
+                    ),
+                ),
+            ),
         );
     }
 
@@ -147,13 +147,13 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFixManagersAutoMappings(array $originalEm1, array $originalEm2, array $expectedEm1, array $expectedEm2)
     {
         $emConfigs = array(
-            'em1'=> $originalEm1,
-            'em2'=> $originalEm2,
+            'em1' => $originalEm1,
+            'em2' => $originalEm2,
         );
 
         $bundles = array(
-            'FristBundle'=> 'My\FristBundle',
-            'SecondBundle'=> 'My\SecondBundle',
+            'FristBundle' => 'My\FristBundle',
+            'SecondBundle' => 'My\SecondBundle',
         );
 
         $reflection = new \ReflectionClass(get_class($this->extension));
@@ -163,10 +163,10 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
         $this->assertEquals($newEmConfigs["em1"], array_merge(array(
-            'auto_mapping' => false
+            'auto_mapping' => false,
         ), $expectedEm1));
         $this->assertEquals($newEmConfigs["em2"], array_merge(array(
-            'auto_mapping' => false
+            'auto_mapping' => false,
         ), $expectedEm2));
     }
 
@@ -192,10 +192,10 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadBasicCacheDriver($class, array $config, array $expectedCalls = array())
     {
-        $container      = $this->createContainer();
-        $cacheName      = 'metadata_cache';
-        $objectManager  = array(
-            'name'                  => 'default',
+        $container = $this->createContainer();
+        $cacheName = 'metadata_cache';
+        $objectManager = array(
+            'name' => 'default',
             'metadata_cache_driver' => $config,
         );
 
@@ -203,10 +203,10 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('doctrine.orm.default_metadata_cache'));
 
-        $definition      = $container->getDefinition('doctrine.orm.default_metadata_cache');
-        $defCalls        = $definition->getMethodCalls();
+        $definition = $container->getDefinition('doctrine.orm.default_metadata_cache');
+        $defCalls = $definition->getMethodCalls();
         $expectedCalls[] = 'setNamespace';
-        $actualCalls     = array_map(function ($call) {
+        $actualCalls = array_map(function ($call) {
             return $call[0];
         }, $defCalls);
 
@@ -220,14 +220,14 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testServiceCacheDriver()
     {
-        $cacheName      = 'metadata_cache';
-        $container      = $this->createContainer();
-        $definition     = new Definition('%doctrine.orm.cache.apc.class%');
-        $objectManager  = array(
-            'name'                  => 'default',
+        $cacheName = 'metadata_cache';
+        $container = $this->createContainer();
+        $definition = new Definition('%doctrine.orm.cache.apc.class%');
+        $objectManager = array(
+            'name' => 'default',
             'metadata_cache_driver' => array(
                 'type' => 'service',
-                'id'   => 'service_driver',
+                'id' => 'service_driver',
             ),
         );
 
@@ -244,10 +244,10 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnrecognizedCacheDriverException()
     {
-        $cacheName      = 'metadata_cache';
-        $container      = $this->createContainer();
-        $objectManager  = array(
-            'name'                  => 'default',
+        $cacheName = 'metadata_cache';
+        $container = $this->createContainer();
+        $objectManager = array(
+            'name' => 'default',
             'metadata_cache_driver' => array(
                 'type' => 'unrecognized_type',
             ),
@@ -273,12 +273,12 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
-            'kernel.bundles'     => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
-            'kernel.cache_dir'   => __DIR__,
-            'kernel.debug'       => false,
+            'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
+            'kernel.cache_dir' => __DIR__,
+            'kernel.debug' => false,
             'kernel.environment' => 'test',
-            'kernel.name'        => 'kernel',
-            'kernel.root_dir'    => __DIR__,
+            'kernel.name' => 'kernel',
+            'kernel.root_dir' => __DIR__,
         ), $data)));
     }
 }

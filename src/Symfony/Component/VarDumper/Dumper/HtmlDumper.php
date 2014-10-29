@@ -31,19 +31,19 @@ class HtmlDumper extends CliDumper
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
     protected $styles = array(
-        'num'       => 'font-weight:bold;color:#0087FF',
-        'const'     => 'font-weight:bold;color:#0087FF',
-        'str'       => 'font-weight:bold;color:#00D7FF',
+        'num'       => 'font-weight:bold;color:#1299DA',
+        'const'     => 'font-weight:bold',
+        'str'       => 'font-weight:bold;color:#56DB3A',
         'cchr'      => 'font-style: italic',
-        'note'      => 'color:#D7AF00',
-        'ref'       => 'color:#585858',
-        'solo-ref'  => 'color:#585858',
-        'public'    => 'color:#008700',
-        'protected' => 'color:#D75F00',
-        'private'   => 'color:#D70000',
-        'meta'      => 'color:#005FFF',
-        'key'       => 'color:#005FFF',
-        'index'     => 'color:#005FFF',
+        'note'      => 'color:#1299DA',
+        'ref'       => 'color:#A0A0A0',
+        'solo-ref'  => 'color:#A0A0A0',
+        'public'    => 'color:#FFF',
+        'protected' => 'color:#FFF',
+        'private'   => 'color:#FFF',
+        'meta'      => 'color:#1299DA',
+        'key'       => 'color:#56DB3A',
+        'index'     => 'color:#1299DA',
     );
 
     /**
@@ -152,7 +152,7 @@ return function (root) {
     });
     a('mouseover', function (a) {
         if (a = idRx.exec(a.className)) {
-            refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: yellow; border-radius: 2px}';
+            refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: #B729D9; color: #FFF !important; border-radius: 2px}';
         }
     });
     a('click', function (a, e) {
@@ -247,13 +247,12 @@ return function (root) {
 <style>
 pre.sf-dump {
     display: block;
-    background-color: #300a24;
+    background-color: #18171B;
     white-space: pre;
     line-height: 1.2em;
-    color: #eee8d5;
-    font: 12px monospace, sans-serif;
+    color: #FF8400;
+    font: 12px Menlo, Monaco, Consolas, monospace;
     padding: 5px;
-    border-radius: 5px;
 }
 pre.sf-dump span {
     display: inline;

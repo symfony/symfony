@@ -39,7 +39,7 @@ class PhpProcess extends Process
      *
      * @api
      */
-    public function __construct($script, $cwd = null, array $env = array(), $timeout = 60, array $options = array())
+    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = array())
     {
         parent::__construct(null, $cwd, $env, $script, $timeout, $options);
 

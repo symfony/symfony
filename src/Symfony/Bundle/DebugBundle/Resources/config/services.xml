@@ -30,6 +30,10 @@
             <argument>null</argument><!-- debug.dump_destination -->
             <argument>%kernel.charset%</argument>
         </service>
+
+        <service id="exception_flattener" class="Symfony\Component\Debug\ExceptionFlattener">
+            <argument type="collection" />
+        </service>
     </services>
 
 </container>

@@ -32,6 +32,7 @@
 
         <service id="data_collector.exception" class="%data_collector.exception.class%" public="false">
             <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="255" />
+            <argument type="service" id="exception_flattener" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.events" class="%data_collector.events.class%" public="false">

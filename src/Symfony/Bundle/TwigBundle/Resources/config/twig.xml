@@ -154,6 +154,7 @@
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="exception_flattener" on-invalid="null" />
         </service>
 
         <service id="twig.controller.exception" class="%twig.controller.exception.class%">

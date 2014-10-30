@@ -36,7 +36,7 @@ class ExceptionHandler
     private $caughtLength;
     private $fileLinkFormat;
 
-    public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
+    public function __construct($debug = true, $charset = null, $fileLinkFormat = null, ExceptionFlattener $flattener = null)
     {
         if (false !== strpos($charset, '%')) {
             // Swap $charset and $fileLinkFormat for BC reasons
@@ -47,6 +47,7 @@ class ExceptionHandler
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->flattener = $flattener;
     }
 
     /**
@@ -183,7 +184,7 @@ class ExceptionHandler
     public function sendPhpResponse($exception)
     {
         if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
+            $exception = null !== $this->flattener ? $this->flattener->flatten($exception) : FlattenException::create($exception);
         }
 
         if (!headers_sent()) {
@@ -211,7 +212,7 @@ class ExceptionHandler
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
+            $exception = null !== $this->flattener ? $this->flattener->flatten($exception) : FlattenException::create($exception);
         }
 
         return Response::create($this->getHtml($exception), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);
@@ -227,7 +228,7 @@ class ExceptionHandler
     public function getHtml($exception)
     {
         if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::create($exception);
+            $exception = null !== $this->flattener ? $this->flattener->flatten($exception) : FlattenException::create($exception);
         }
 
         return $this->decorate($this->getContent($exception), $this->getStylesheet($exception));

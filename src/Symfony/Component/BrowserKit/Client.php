@@ -362,7 +362,7 @@ abstract class Client
                      'TEMP' => sys_get_temp_dir());
         $env = array_replace($_ENV, $_SERVER, $env);
         $process = new PhpProcess($this->getScript($request), null, $env);
-	$process->run();
+        $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
             throw new \RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s', $process->getOutput(), $process->getErrorOutput()));

@@ -59,8 +59,8 @@ class DescriptorHelper extends Helper
     public function describe(OutputInterface $output, $object, array $options = array())
     {
         $options = array_merge(array(
-            'raw_text'  => false,
-            'format'    => 'txt',
+            'raw_text' => false,
+            'format' => 'txt',
         ), $options);
 
         if (!isset($this->descriptors[$options['format']])) {

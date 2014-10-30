@@ -17,6 +17,7 @@ use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExceptionListenerPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\AddHighlighterPass;
 
 /**
  * Bundle.
@@ -33,5 +34,6 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new TwigLoaderPass());
         $container->addCompilerPass(new ExceptionListenerPass());
+        $container->addCompilerPass(new AddHighlighterPass());
     }
 }

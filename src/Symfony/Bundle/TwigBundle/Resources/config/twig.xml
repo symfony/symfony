@@ -79,6 +79,7 @@
             <argument>%templating.helper.code.file_link_format%</argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
+            <argument type="collection" />
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
@@ -138,6 +139,14 @@
         <service id="twig.exception_flattener" class="Symfony\Bridge\Twig\Debug\TwigFlattener" public="false">
             <tag name="exception.flattener" />
             <argument type="service" id="twig.loader" />
+        </service>
+
+        <service id="twig.php_highlighter" class="Symfony\Bridge\Twig\Debug\PHPHighlighter" public="false">
+            <tag name="code_highlighter" />
+        </service>
+
+        <service id="twig.twig_highlighter" class="Symfony\Bridge\Twig\Debug\TwigHighlighter" public="false">
+            <tag name="code_highlighter" />
         </service>
     </services>
 </container>

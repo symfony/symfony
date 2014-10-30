@@ -31,9 +31,10 @@
 }
 .sf-reset .trace {
     border: 1px solid #D3D3D3;
-    padding: 10px;
+    padding: 0;
     overflow: auto;
     margin: 10px 0 20px;
+    background-color: #F5F5F5;
 }
 .sf-reset .block-exception {
     border-radius: 16px;
@@ -122,4 +123,62 @@
     color: #fff;
     margin-right: 2px;
     font-size: 11px;
+}
+.sf-reset .trace ol {
+    padding: 0;
+}
+.sf-reset .trace li {
+    margin: 0;
+    padding: 3px 0;
+    margin-left: 8ex;
+    list-style-position: outside;
+    background: #18171B;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+.sf-reset .trace li.selected {
+    background-color: #373831;
+}
+.sf-reset .trace li code {
+    color: #ccc;
+    font-size: 1em;
+    padding: 0;
+    margin: 0 1ex;
+    white-space: pre-wrap;
+    word-spacing: normal;
+    word-break: normal;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+}
+.sf-reset .code .comment {
+    color: #B729D9;
+    font-style: italic;
+}
+.sf-reset .code .operator {
+    color: #E67700;
+}
+.sf-reset .code .tag {
+    color: #A0A0A0;
+}
+.sf-reset .code .string {
+    color: #56DB3A;
+}
+.sf-reset .code .variable {
+    color: #FFFFFF;
+}
+.sf-reset .code .keyword {
+    color: #FF8400;
+}
+.sf-reset .code .name {
+    color: #FFFFFF;
+}
+.sf-reset .code .number {
+    color: #1299da
 }

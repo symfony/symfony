@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+* added ExceptionProcessor with method which flattens exceptions
+
 2.6.0
 -----
 

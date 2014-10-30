@@ -18,6 +18,10 @@
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />
+
+        <service id="exception_processor" class="Symfony\Component\Debug\ExceptionProcessor">
+            <argument type="collection" />
+        </service>
     </services>
 
 </container>

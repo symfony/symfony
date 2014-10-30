@@ -31,18 +31,14 @@ class FileLocator implements FileLocatorInterface
     }
 
     /**
-     * Returns a full path for a given file name.
-     *
-     * @param mixed   $name        The file name to locate
-     * @param string  $currentPath The current path
-     * @param bool    $first       Whether to return the first occurrence or an array of filenames
-     *
-     * @return string|array The full path to the file|An array of file paths
-     *
-     * @throws \InvalidArgumentException When file is not found
+     * {@inheritdoc}
      */
     public function locate($name, $currentPath = null, $first = true)
     {
+        if ('' == $name) {
+            throw new \InvalidArgumentException('An empty file name is not valid to be located.');
+        }
+
         if ($this->isAbsolutePath($name)) {
             if (!file_exists($name)) {
                 throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $name));
@@ -84,10 +80,10 @@ class FileLocator implements FileLocatorInterface
      */
     private function isAbsolutePath($file)
     {
-        if ($file[0] == '/' || $file[0] == '\\'
+        if ($file[0] === '/' || $file[0] === '\\'
             || (strlen($file) > 3 && ctype_alpha($file[0])
-                && $file[1] == ':'
-                && ($file[2] == '\\' || $file[2] == '/')
+                && $file[1] === ':'
+                && ($file[2] === '\\' || $file[2] === '/')
             )
             || null !== parse_url($file, PHP_URL_SCHEME)
         ) {

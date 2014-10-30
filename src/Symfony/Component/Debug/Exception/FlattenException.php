@@ -210,6 +210,11 @@ class FlattenException
         }
     }
 
+    public function setRawTrace($trace)
+    {
+        $this->trace = $trace;
+    }
+
     private function flattenArgs($args, $level = 0)
     {
         $result = array();

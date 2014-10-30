@@ -17,7 +17,7 @@
     <a id="traces-link-{{ position }}"></a>
     <ol class="traces list-exception" id="traces-{{ position }}" style="display: {{ 0 == count ? 'block' : 'none' }}">
         {% for i, trace in exception.trace %}
-            <li>
+            <li class="{{ cycle(['odd', 'even'], i) }}">
                 {% include 'TwigBundle:Exception:trace.html.twig' with { 'prefix': position, 'i': i, 'trace': trace } only %}
             </li>
         {% endfor %}

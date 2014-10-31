@@ -87,7 +87,7 @@ class ProfilerListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $onlyException = true;
-        $listener      = new ProfilerListener($profiler, null, $onlyException);
+        $listener = new ProfilerListener($profiler, null, $onlyException);
 
         // master request
         $listener->onKernelRequest(new GetResponseEvent($kernel, $masterRequest, Kernel::MASTER_REQUEST));

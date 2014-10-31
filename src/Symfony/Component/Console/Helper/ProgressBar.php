@@ -23,12 +23,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProgressBar
 {
     // options
-    private $barWidth     = 28;
-    private $barChar      = '=';
+    private $barWidth = 28;
+    private $barChar = '=';
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format       = null;
-    private $redrawFreq   = 1;
+    private $format = null;
+    private $redrawFreq = 1;
 
     /**
      * @var OutputInterface
@@ -543,17 +543,17 @@ class ProgressBar
     private static function initFormats()
     {
         return array(
-            'normal'             => ' %current%/%max% [%bar%] %percent:3s%%',
-            'normal_nomax'       => ' %current% [%bar%]',
+            'normal' => ' %current%/%max% [%bar%] %percent:3s%%',
+            'normal_nomax' => ' %current% [%bar%]',
 
-            'verbose'            => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
-            'verbose_nomax'      => ' %current% [%bar%] %elapsed:6s%',
+            'verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
+            'verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
 
-            'very_verbose'       => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
+            'very_verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
             'very_verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
 
-            'debug'              => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
-            'debug_nomax'        => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
+            'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
+            'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
     }
 }

@@ -26,7 +26,7 @@ class Translator extends BaseTranslator
     protected $container;
     protected $options = array(
         'cache_dir' => null,
-        'debug'     => false,
+        'debug' => false,
     );
     protected $loaderIds;
 

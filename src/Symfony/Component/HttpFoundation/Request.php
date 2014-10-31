@@ -723,7 +723,7 @@ class Request
      */
     public function get($key, $default = null, $deep = false)
     {
-        $result = $this->query($key, $this, $deep);
+        $result = $this->query->get($key, $this, $deep);
         if ($result === $this) {
             $result = $this->attributes->get($key, $this, $deep);
         }

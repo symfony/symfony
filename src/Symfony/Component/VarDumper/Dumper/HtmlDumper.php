@@ -42,6 +42,8 @@ class HtmlDumper extends CliDumper
         'protected' => 'color:#D75F00',
         'private'   => 'color:#D70000',
         'meta'      => 'color:#005FFF',
+        'key'       => 'color:#005FFF',
+        'index'     => 'color:#005FFF',
     );
 
     /**
@@ -337,8 +339,8 @@ EOHTML;
 
         if ('const' === $style && array_key_exists('value', $attr)) {
             $style .= sprintf(' title="%s"', htmlspecialchars(json_encode($attr['value']), ENT_QUOTES, 'UTF-8'));
-        } elseif ('public' === $style && !empty($attr['dynamic'])) {
-            $style .= ' title="Runtime added dynamic property"';
+        } elseif ('public' === $style) {
+            $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {
             $style .= sprintf(' title="%s%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style) {
@@ -347,8 +349,10 @@ EOHTML;
             } elseif (':' === $v[0]) {
                 return sprintf('<abbr title="`%s` resource" class=sf-dump-%s>%s</abbr>', substr($v, 1), $style, $v);
             }
+        } elseif ('protected' === $style) {
+            $style .= ' title="Protected property"';
         } elseif ('private' === $style) {
-            $style .= sprintf(' title="%s::%s"', $attr['class'], $v);
+            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', $attr['class']);
         }
 
         return "<span class=sf-dump-$style>$v</span>";

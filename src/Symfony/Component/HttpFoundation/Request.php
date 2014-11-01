@@ -507,7 +507,7 @@ class Request
      * Overrides the PHP global variables according to this request instance.
      *
      * It overrides $_GET, $_POST, $_REQUEST, $_SERVER, $_COOKIE.
-     * $_FILES is never override, see rfc1867
+     * $_FILES is never overridden, see rfc1867
      *
      * @api
      */
@@ -1623,7 +1623,7 @@ class Request
     /**
      * Returns true if the request is a XMLHttpRequest.
      *
-     * It works if your JavaScript library set an X-Requested-With HTTP header.
+     * It works if your JavaScript library sets an X-Requested-With HTTP header.
      * It is known to work with common JavaScript frameworks:
      * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *

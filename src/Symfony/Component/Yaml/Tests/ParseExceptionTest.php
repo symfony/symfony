@@ -27,4 +27,16 @@ class ParseExceptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($message, $exception->getMessage());
     }
+
+    public function testGetMessageWithUnicodeInFilename()
+    {
+        $exception = new ParseException('Error message', 42, 'foo: bar', 'äöü.yml');
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            $message = 'Error message in "äöü.yml" at line 42 (near "foo: bar")';
+        } else {
+            $message = 'Error message in "\u00e4\u00f6\u00fc.yml" at line 42 (near "foo: bar")';
+        }
+
+        $this->assertEquals($message, $exception->getMessage());
+    }
 }

@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by Nek- at 2014-10-07T19:46:33Z
+
+:-1: because you broke the BC by removing the exception.
+
+IMO The sense of the exception is another topic.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-07T20:15:08Z
+
+What is another topic? How else do you propose to fix the issue?
+
+---------------------------------------------------------------------------
+
+by Nek- at 2014-10-08T08:50:33Z
+
+Simply by adding `case 'OPTIONS':` and everything should be ok, isn't it ?
+
+I mean this exception can be use by some people consciently in order to report specific errors from their API if the http method is not supported. Adding OPTIONS method looks like a little BCB... Removing the exception is a big one.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-08T08:53:29Z
+
+What do you mean?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-08T16:31:12Z
+
+@Tobion I think his point is that we now treat every other HTTP method but GET like POST. Precisely, we are talking about POST, PUT, OPTIONS, HEAD, DELETE, TRACE and CONNECT (and PATCH) here.
+
+From [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html):
+
+> The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response.
+> GET and HEAD methods SHOULD NOT have the significance of taking an action other than retrieval. These methods ought to be considered "safe".
+
+This implies to me that HEAD requests should never have a body (hence, should be handled like GET).
+
+> the methods OPTIONS and TRACE SHOULD NOT have side effects, and so are inherently idempotent.
+
+> If the OPTIONS request includes an entity-body (as indicated by the presence of Content-Length or Transfer-Encoding), then the media type MUST be indicated by a Content-Type field. Although this specification does not define any use for such a body, future extensions to HTTP might use the OPTIONS body to make more detailed queries on the server. A server that does not support such an extension MAY discard the request body.
+
+Handling OPTIONS requests in forms may make sense, since bodies are theoretically permitted, though not encouraged. Users are responsible for making the OPTIONS request idempotent and free of side-effects.
+
+I don't see any reason for handling TRACE or CONNECT. Do you?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-08T16:31:50Z
+
+Btw your PR now behaves the same as the request handler implementations. Both should probably be fixed.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-08T17:23:10Z
+
+@webmozart I also think trace and connect should be ignored. So should I call `$event->setData(null);` for them? So the request is replaced with empty data?
+
+For the request handlers, should trace and connect also not submit the form? https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/HttpFoundation/HttpFoundationRequestHandler.php#L114
+But this would only happen if the users configured the form to handle these http methods anyway. So they probably also expect it to be handled. But since "A TRACE request MUST NOT include an entity." it would also need to fetch the data from the query string.
+
+@Nek- thinking that the exception is expected by users is unrealistic. It would mean every form handling must be enclosed in try..catch which is nowhere documented. If "unknown" http method are expected to issue an error, then it should be a real error on the form and not an exception. The exception is exactly what we want to  get rid of.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-08T18:35:41Z
+
+@webmozart Ok I think I've found the best solution. For request methods that must not have a request body we fetch data from the query string. Otherwise we look for data in the request body.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-09T13:35:31Z
+
+Looks good.
+
+@fabpot What do you think about this?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-02T00:52:44Z
+
+@fabpot ping
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-02T01:01:53Z
+
+Looks good to me.

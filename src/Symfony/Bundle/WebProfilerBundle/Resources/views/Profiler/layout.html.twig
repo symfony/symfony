@@ -17,9 +17,9 @@
                             <strong>Profile for:</strong>
                             {{ profile.method|upper }}
                             {% if profile.method|upper in ['GET', 'HEAD'] %}
-                                <a href="{{ profile.url }}">{{ profile.url }}</a>
+                                <a href="{{ profile.url }}" id="resume-url">{{ profile.url }}</a>
                             {% else %}
-                                {{ profile.url }}
+                                <span id="resume-url">{{ profile.url }}</span>
                             {% endif %}
                             <span class="date">
                                 <em>by {{ profile.ip }}</em> at <em>{{ profile.time|date('r') }}</em>

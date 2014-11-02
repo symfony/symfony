@@ -51,11 +51,11 @@ class ExceptionControllerTest extends TestCase
             ))
         );
 
-        $request = Request::create('whatever');
+        $request = Request::create('whatever', 'GET', array('showException' => false));
         $exception = FlattenException::create(new \Exception(), 404);
         $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 
-        $response = $controller->showAction($request, $exception, null, /* "showException" per-request set to --> */ false);
+        $response = $controller->showAction($request, $exception, null);
 
         $this->assertEquals(200, $response->getStatusCode()); // successful request
         $this->assertEquals('ok', $response->getContent());  // content of the error404.html template

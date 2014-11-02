@@ -47,7 +47,7 @@ class FrameworkBundle extends Bundle
 {
     public function boot()
     {
-        ErrorHandler::register($this->container->getParameter('debug.error_handler.throw_at'));
+        ErrorHandler::register(null, false)->throwAt($this->container->getParameter('debug.error_handler.throw_at'), true);
 
         if ($trustedProxies = $this->container->getParameter('kernel.trusted_proxies')) {
             Request::setTrustedProxies($trustedProxies);

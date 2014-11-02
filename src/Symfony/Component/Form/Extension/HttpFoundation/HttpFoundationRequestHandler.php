@@ -55,7 +55,9 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        if ('GET' === $method) {
+        // For request methods that must not have a request body we fetch data
+        // from the query string. Otherwise we look for data in the request body.
+        if ('GET' === $method || 'HEAD' === $method || 'TRACE' === $method) {
             if ('' === $name) {
                 $data = $request->query->all();
             } else {

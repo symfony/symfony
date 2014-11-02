@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\HttpFoundation\EventListener;
 
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -49,12 +48,19 @@ class BindRequestListener implements EventSubscriberInterface
         $name = $form->getConfig()->getName();
         $default = $form->getConfig()->getCompound() ? array() : null;
 
-        // Store the bound data in case of a post request
+        // For request methods that must not have a request body we fetch data
+        // from the query string. Otherwise we look for data in the request body.
         switch ($request->getMethod()) {
-            case 'POST':
-            case 'PUT':
-            case 'DELETE':
-            case 'PATCH':
+            case 'GET':
+            case 'HEAD':
+            case 'TRACE':
+                $data = '' === $name
+                    ? $request->query->all()
+                    : $request->query->get($name, $default);
+
+                break;
+
+            default:
                 if ('' === $name) {
                     // Form bound without name
                     $params = $request->request->all();
@@ -71,19 +77,6 @@ class BindRequestListener implements EventSubscriberInterface
                 }
 
                 break;
-
-            case 'GET':
-                $data = '' === $name
-                    ? $request->query->all()
-                    : $request->query->get($name, $default);
-
-                break;
-
-            default:
-                throw new LogicException(sprintf(
-                    'The request method "%s" is not supported',
-                    $request->getMethod()
-                ));
         }
 
         $event->setData($data);

@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Cloner\DumperInterface;
  */
 abstract class AbstractDumper implements DataDumperInterface, DumperInterface
 {
-    public static $defaultOutputStream = 'php://output';
+    public static $defaultOutput = 'php://output';
 
     protected $line = '';
     protected $lineDumper;
@@ -30,37 +30,39 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     protected $indentPad = '  ';
 
     /**
-     * @param callable|resource|string|null $outputStream A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutputStream.
+     * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput.
      */
-    public function __construct($outputStream = null)
+    public function __construct($output = null)
     {
         $this->decimalPoint = (string) 0.5;
         $this->decimalPoint = $this->decimalPoint[1];
-        if (is_callable($outputStream)) {
-            $this->setLineDumper($outputStream);
-        } else {
-            if (null === $outputStream) {
-                $outputStream =& static::$defaultOutputStream;
-            }
-            if (is_string($outputStream)) {
-                $outputStream = fopen($outputStream, 'wb');
-            }
-            $this->outputStream = $outputStream;
-            $this->setLineDumper(array($this, 'echoLine'));
+        $this->setOutput($output ?: static::$defaultOutput);
+        if (!$output && is_string(static::$defaultOutput)) {
+            static::$defaultOutput = $this->outputStream;
         }
     }
 
     /**
-     * Sets a line dumper callback.
+     * Sets the output destination of the dumps.
      *
-     * @param callable $callback A callback responsible for writing the dump, one line at a time.
+     * @param callable|resource|string $output A line dumper callable, an opened stream or an output path.
      *
-     * @return callable|null The previous line dumper.
+     * @return callable|resource|string The previous output destination.
      */
-    public function setLineDumper($callback)
+    public function setOutput($output)
     {
-        $prev = $this->lineDumper;
-        $this->lineDumper = $callback;
+        $prev = null !== $this->outputStream ? $this->outputStream : $this->lineDumper;
+
+        if (is_callable($output)) {
+            $this->outputStream = null;
+            $this->lineDumper = $output;
+        } else {
+            if (is_string($output)) {
+                $output = fopen($output, 'wb');
+            }
+            $this->outputStream = $output;
+            $this->lineDumper = array($this, 'echoLine');
+        }
 
         return $prev;
     }
@@ -83,14 +85,14 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps a Data object.
      *
-     * @param Data          $data       A Data object.
-     * @param callable|null $lineDumper A callback for writing dump's lines.
+     * @param Data                          $data   A Data object.
+     * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path.
      */
-    public function dump(Data $data, $lineDumper = null)
+    public function dump(Data $data, $output = null)
     {
         $exception = null;
-        if ($lineDumper) {
-            $prevLineDumper = $this->setLineDumper($lineDumper);
+        if ($output) {
+            $prevOutput = $this->setOutput($output);
         }
         try {
             $data->dump($this);
@@ -98,8 +100,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         } catch (\Exception $exception) {
             // Re-thrown below
         }
-        if ($lineDumper) {
-            $this->setLineDumper($prevLineDumper);
+        if ($output) {
+            $this->setOutput($prevOutput);
         }
         if (null !== $exception) {
             throw $exception;

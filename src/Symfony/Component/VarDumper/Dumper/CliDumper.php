@@ -22,7 +22,7 @@ use Symfony\Component\VarDumper\Cloner\Cursor;
 class CliDumper extends AbstractDumper
 {
     public static $defaultColors;
-    public static $defaultOutputStream = 'php://stdout';
+    public static $defaultOutput = 'php://stdout';
 
     protected $colors;
     protected $maxStringWidth = 0;
@@ -335,7 +335,7 @@ class CliDumper extends AbstractDumper
      */
     protected function supportsColors()
     {
-        if ($this->outputStream !== static::$defaultOutputStream) {
+        if ($this->outputStream !== static::$defaultOutput) {
             return @(is_resource($this->outputStream) && function_exists('posix_isatty') && posix_isatty($this->outputStream));
         }
         if (null !== static::$defaultColors) {

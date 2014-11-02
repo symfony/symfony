@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class HtmlDumper extends CliDumper
 {
-    public static $defaultOutputStream = 'php://output';
+    public static $defaultOutput = 'php://output';
 
     protected $dumpHeader;
     protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
@@ -47,11 +47,11 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function setLineDumper($callback)
+    public function setOutput($output)
     {
         $this->headerIsDumped = false;
 
-        return parent::setLineDumper($callback);
+        return parent::setOutput($output);
     }
 
     /**
@@ -88,10 +88,10 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $lineDumper = null)
+    public function dump(Data $data, $output = null)
     {
         $this->dumpId = 'sf-dump-'.mt_rand();
-        parent::dump($data, $lineDumper);
+        parent::dump($data, $output);
     }
 
     /**

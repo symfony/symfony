@@ -1,0 +1,199 @@
+---------------------------------------------------------------------------
+
+by acrobat at 2014-10-29T15:20:56Z
+
+:+1: coloring looks better now!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-10-29T15:39:05Z
+
+@WouterJ thanks for working on this. Your proposal has more contrast than the original, which is good, but I think it could be improved.
+
+I think that the information hierarchy of this content in descending order of importance is:
+
+  * The values of the properties or array elements (this includes strings, numbers and special keys such as null, true, false)
+  * The keys of these values (these are the array associative keys or the object properties names)
+  * Everything else (including the type of each data `Db`, `:stream`, `array:5`, etc.)
+
+If we agree on this importance hierarchy, this would be my proposal for the colors:
+
+  * All strings could use the green color (`#56DB3A`), no matter if they are values or keys.
+  * Numeric values could use cyan (`5CE7FF`) and other special values (null, true, false) could go on orange (`#FF8400`).
+  * Keys (property names) could go on the dimmed yellow (`DCBD23`) used in the original proposal and also used in the Symfony console commands.
+  * Everything else (third level of importance) could use a blue color (`#1299DA`) or dimmed gray (`#CCC`) to be legible but not to bother much to the user.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-10-29T15:53:33Z
+
+Thanks @javiereguiluz !
+
+> * All strings could use the green color (#56DB3A), no matter if they are values or keys.
+
+This is currently already the case. Please note that all keys (except from properties) are in the "meta" style group. We can't style strings as keys different than numbers as keys.
+
+> * Numeric values could use cyan (5CE7FF) and other special values (null, true, false) could go on orange (#FF8400).
+
+That's already the case.
+
+> * Keys (property names) could go on the dimmed yellow (DCBD23) used in the original proposal and also used in the Symfony console commands.
+
+Hmm, not sure about this one. Why should we style properties different than keys?
+
+I don't think the dimmed yellow fits good with the other colors in the scheme. If we decide to style them differently, we should look for another yellow.
+
+---
+
+All in all, your proposal would look like (I'm sure you tested it yourself, this is just for others):
+![sf-dump-proposal-javier](https://cloud.githubusercontent.com/assets/749025/4828936/a763d966-5f83-11e4-8004-bab9cf5458b1.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-10-29T15:59:13Z
+
+@WouterJ thanks for testing this proposal. I'm afraid that it's not working because of the limitations of the underlying HTML code.
+
+Right now we display two shades of green, one for strings and other for keys. The other problem is that some keys are displayed in yellow and others in green. The proposal was to use the same color for all the keys, to give consistency to this.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-10-29T16:02:51Z
+
+> Right now we display two shades of green, one for strings and other for keys
+
+This is the same shade, but one is bold (strings) and the other isn't (keys). I didn't change that, since it makes sense to me, the value are more important than the keys.
+
+> The other problem is that some keys are displayed in yellow and others in green. The proposal was to use the same color for all the keys, to give consistency to this.
+
+The yellow "keys" are actually properties. I worry I understood your proposal wrong, as you requested for this?
+In my first proposal, the keys were all using the same color, afaics.
+
+---------------------------------------------------------------------------
+
+by flip111 at 2014-10-29T16:02:53Z
+
+I'm against two shades of the same color (blue and green in the screenshot) when the items which are colored are not related. What i think of related is for example: protected property / private property. Not scalar number and Object
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-29T18:07:18Z
+
+Thanks for trying. Here are my though/comments:
+- I've been quite surprised by the prefix for pub/prot/priv properties. Is that the current convention? Do you think it's better than a color scheme?
+- technically, these prefixes should go in the CliDumper, so that console apps benefit from them,
+- for array keys, numeric vs string has no technical meaning: in PHP, the key `0` is strictly the same as `"0"`. Thus the single style (meta) they currently have. We could change that, but that'll be kind of lying for me (suggesting a difference in nature when there is not, technically)
+- I do thing that a different color for array keys vs obj props is needed: there is a significant semantic difference between them
+- once colors are "definitive", they should also be applied on the CliDumper
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-10-29T18:29:10Z
+
+Thanks for your comments, @nicolas-grekas !
+
+> * I've been quite surprised by the prefix for pub/prot/priv properties. Is that the current convention? Do you think it's better than a color scheme?
+
+That's a convention for years in the UML Class Diagrams. I do believe it has more meaning than colors and to make sure it is clear, I've also added titles indicating the visibility.
+
+> * technically, these prefixes should go in the CliDumper, so that console apps benefit from them,
+
+Good one! Will do once we agree :)
+
+> * for array keys, numeric vs string has no technical meaning: in PHP, the key 0 is strictly the same as "0". Thus the single style (meta) they currently have. We could change that, but that'll be kind of lying for me (suggesting a difference in nature when there is not, technically)
+
+Agreed. I would like to see a difference between array keys and meta data keys (like the stream) though.
+
+> * I do thing that a different color for array keys vs obj props is needed: there is a significant semantic difference between them
+
+Ok, I'll mock something up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-29T19:33:01Z
+
+Here is the patch for having a different style for array keys and meta datas on resources/objects:
+```diff
+diff --git a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
+index a48d88b..034182d 100644
+--- a/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
++++ b/src/Symfony/Component/VarDumper/Dumper/CliDumper.php
+@@ -39,6 +39,7 @@ class CliDumper extends AbstractDumper
+         'protected' => '38;5;166',
+         'private'   => '38;5;160',
+         'meta'      => '38;5;27',
++        'key'       => '38;5;27',
+     );
+
+     protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';
+@@ -263,9 +264,9 @@ class CliDumper extends AbstractDumper
+                 case Cursor::HASH_INDEXED:
+                 case Cursor::HASH_ASSOC:
+                     if (is_int($key)) {
+-                        $this->line .= $this->style('meta', $key).' => ';
++                        $this->line .= $this->style('key', $key).' => ';
+                     } else {
+-                        $this->line .= $bin.'"'.$this->style('meta', $key).'" => ';
++                        $this->line .= $bin.'"'.$this->style('key', $key).'" => ';
+                     }
+                     break;
+
+diff --git a/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php b/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
+index ec99007..1613d40 100644
+--- a/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
++++ b/src/Symfony/Component/VarDumper/Dumper/HtmlDumper.php
+@@ -42,6 +42,7 @@ class HtmlDumper extends CliDumper
+         'protected' => 'color:#D75F00',
+         'private'   => 'color:#D70000',
+         'meta'      => 'color:#005FFF',
++        'key'       => 'color:#005FFF',
+     );
+
+     /**
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-31T17:51:38Z
+
+@WouterJ are you working on this, do you want help? Do you want me to try?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-31T19:34:57Z
+
+@WouterJ I invite you to `reset --hard` to my branch at https://github.com/nicolas-grekas/symfony/tree/issue_12348
+I inserted a commit before yours with the UML prefix in the CliDumper, two new styles for keys of index/associative arrays and updated tests.
+You should now only have to update the colors on the HtmlDumper first, then CliDumper once colors are chosen.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-31T19:38:55Z
+
+Oh, and I remove my "need" for having a different color for keys and properties: the UML prefix and the key/val separator (`=>` for keys vs `:` for properties) may be enough.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-01T10:32:07Z
+
+Here is my try (code is at https://github.com/nicolas-grekas/symfony/tree/issue_12348 )
+Dumps are on dark bg, code for generating it on white bg:
+
+![capture du 2014-11-01 11 29 23](https://cloud.githubusercontent.com/assets/243674/4871394/516e0bcc-61b2-11e4-9aae-474f1b1bd108.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-01T11:53:16Z
+
+Sorry, @nicolas-grekas , I was very busy with the Cmf project the last days.
+
+Looking at your code-dump, all looks fine except the blue color for the indices. I would like to have that different, since the blue color in keys is already used for numbers and meta information. I've now updated the meta information to the color used for comments on symfony.com:
+
+![sf-dump-proposal-nicolas](https://cloud.githubusercontent.com/assets/749025/4871543/9a148a62-61bd-11e4-8ae6-837855777c82.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-01T14:08:34Z
+
+Great, thank you, :+1: from me.
+Can you please squash your last commit?

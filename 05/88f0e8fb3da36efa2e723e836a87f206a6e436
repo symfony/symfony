@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-27T19:38:23Z
+
+So, I found a BC way to fix the issue and enhance the `ErrorHandler::register` function.
+Tests missing, but review could already happen on the submitted patch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-28T10:25:10Z
+
+This is ready for review/merge.
+The new signature of the `ErrorHandler::register()` method allows injecting the handler to register,
+and enabling/disabling the replacement of any previous error handler.
+This is used by the FrameworkBundle: no error handler is registered if one is already in place (fixes #12327).
+The previous interface (levels to register/throw) is still available (BC) by using polymorphism.
+Thus, calling `ErrorHandler::register($levels)` is deprecated in favour of `ErrorHandler::register()->throwAt($levels, true)`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-30T13:43:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-30T13:47:54Z
+
+@nicolas-grekas Your header says "no" deprecations which seems not true.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-30T14:08:45Z
+
+And said "yes" to BC break, which is also not true. Swap done thanks for noticing.

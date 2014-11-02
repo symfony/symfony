@@ -97,7 +97,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
                 array('foo' => 'bar'),
                 array(),
                 "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-note>array:1</span> [<samp>\n"
-                ."  \"<span class=sf-dump-meta>foo</span>\" => \"<span class=sf-dump-str title=\"3 characters\">bar</span>\"\n"
+                ."  \"<span class=sf-dump-key>foo</span>\" => \"<span class=sf-dump-str title=\"3 characters\">bar</span>\"\n"
                 ."</samp>]\n"
                 ."</pre><script>Sfdump(\"sf-dump\")</script>\n",
             ),

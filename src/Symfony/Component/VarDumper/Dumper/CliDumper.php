@@ -39,6 +39,8 @@ class CliDumper extends AbstractDumper
         'protected' => '38;5;166',
         'private'   => '38;5;160',
         'meta'      => '38;5;27',
+        'key'       => '38;5;27',
+        'index'     => '38;5;27',
     );
 
     protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';
@@ -258,14 +260,16 @@ class CliDumper extends AbstractDumper
         if (null !== $key = $cursor->hashKey) {
             $attr = array('binary' => $cursor->hashKeyIsBinary);
             $bin = $cursor->hashKeyIsBinary ? 'b' : '';
+            $style = 'key';
             switch ($cursor->hashType) {
                 default:
                 case Cursor::HASH_INDEXED:
+                    $style = 'index';
                 case Cursor::HASH_ASSOC:
                     if (is_int($key)) {
-                        $this->line .= $this->style('meta', $key).' => ';
+                        $this->line .= $this->style($style, $key).' => ';
                     } else {
-                        $this->line .= $bin.'"'.$this->style('meta', $key).'" => ';
+                        $this->line .= $bin.'"'.$this->style($style, $key).'" => ';
                     }
                     break;
 
@@ -274,28 +278,33 @@ class CliDumper extends AbstractDumper
                     // No break;
                 case Cursor::HASH_OBJECT:
                     if (!isset($key[0]) || "\0" !== $key[0]) {
-                        $this->line .= $bin.$this->style('public', $key).': ';
+                        $this->line .= '+'.$bin.$this->style('public', $key).': ';
                     } elseif (0 < strpos($key, "\0", 1)) {
                         $key = explode("\0", substr($key, 1), 2);
 
                         switch ($key[0]) {
                             case '+': // User inserted keys
                                 $attr['dynamic'] = true;
-                                $this->line .= $bin.'"'.$this->style('public', $key[1], $attr).'": ';
+                                $this->line .= '+'.$bin.'"'.$this->style('public', $key[1], $attr).'": ';
                                 break 2;
-
-                            case '~': $style = 'meta';      break;
-                            case '*': $style = 'protected'; break;
+                            case '~':
+                                $style = 'meta';
+                                break;
+                            case '*':
+                                $style = 'protected';
+                                $bin = '#'.$bin;
+                                break;
                             default:
                                 $attr['class'] = $key[0];
                                 $style = 'private';
+                                $bin = '-'.$bin;
                                 break;
                         }
 
                         $this->line .= $bin.$this->style($style, $key[1], $attr).': ';
                     } else {
                         // This case should not happen
-                        $this->line .= $bin.'"'.$this->style('private', $key, array('class' => '')).'": ';
+                        $this->line .= '-'.$bin.'"'.$this->style('private', $key, array('class' => '')).'": ';
                     }
                     break;
             }

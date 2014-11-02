@@ -52,19 +52,19 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringMatchesFormat(
             <<<EOTXT
 <foo></foo><bar><span class=sf-dump-note>array:25</span> [<samp>
-  "<span class=sf-dump-meta>number</span>" => <span class=sf-dump-num>1</span>
-  <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-meta>const</span>" => <span class=sf-dump-num>1.1</span>
-  <span class=sf-dump-meta>1</span> => <span class=sf-dump-const>true</span>
-  <span class=sf-dump-meta>2</span> => <span class=sf-dump-const>false</span>
-  <span class=sf-dump-meta>3</span> => <span class=sf-dump-num>NAN</span>
-  <span class=sf-dump-meta>4</span> => <span class=sf-dump-num>INF</span>
-  <span class=sf-dump-meta>5</span> => <span class=sf-dump-num>-INF</span>
-  <span class=sf-dump-meta>6</span> => <span class=sf-dump-num>{$intMax}</span>
-  "<span class=sf-dump-meta>str</span>" => "<span class=sf-dump-str title="4 characters">d&#233;j&#224;</span>"
-  <span class=sf-dump-meta>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;<span class=sf-dump-cchr title=\\x00>@</span></span>"
-  "<span class=sf-dump-meta>[]</span>" => []
-  "<span class=sf-dump-meta>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-solo-ref>@{$res1}</a><samp>
+  "<span class=sf-dump-key>number</span>" => <span class=sf-dump-num>1</span>
+  <span class=sf-dump-key>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
+  "<span class=sf-dump-key>const</span>" => <span class=sf-dump-num>1.1</span>
+  <span class=sf-dump-key>1</span> => <span class=sf-dump-const>true</span>
+  <span class=sf-dump-key>2</span> => <span class=sf-dump-const>false</span>
+  <span class=sf-dump-key>3</span> => <span class=sf-dump-num>NAN</span>
+  <span class=sf-dump-key>4</span> => <span class=sf-dump-num>INF</span>
+  <span class=sf-dump-key>5</span> => <span class=sf-dump-num>-INF</span>
+  <span class=sf-dump-key>6</span> => <span class=sf-dump-num>{$intMax}</span>
+  "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="4 characters">d&#233;j&#224;</span>"
+  <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;<span class=sf-dump-cchr title=\\x00>@</span></span>"
+  "<span class=sf-dump-key>[]</span>" => []
+  "<span class=sf-dump-key>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-solo-ref>@{$res1}</a><samp>
     <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
     <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str title="5 characters">STDIO</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
@@ -75,12 +75,12 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
     <span class=sf-dump-meta>eof</span>: <span class=sf-dump-const>false</span>
     <span class=sf-dump-meta>options</span>: []
   </samp>}
-  <span class=sf-dump-meta>8</span> => <abbr title="`Unknown` resource" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-solo-ref>@{$res2}</a>}
-  "<span class=sf-dump-meta>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
-    <span class=sf-dump-public>foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
-    "<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
+  <span class=sf-dump-key>8</span> => <abbr title="`Unknown` resource" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-solo-ref>@{$res2}</a>}
+  "<span class=sf-dump-key>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
+    +<span class=sf-dump-public title="Public property">foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
+    +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
-  "<span class=sf-dump-meta>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-solo-ref>#%d</a><samp>
+  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-solo-ref>#%d</a><samp>
     <span class=sf-dump-meta>reflection</span>: """
       <span class=sf-dump-str title="%d characters">Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
       <span class=sf-dump-str title="%d characters">  @@ {$var['file']} {$var['line']} - {$var['line']}</span>
@@ -92,19 +92,19 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
       <span class=sf-dump-str title="%d characters">}</span>
       """
   </samp>}
-  "<span class=sf-dump-meta>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
-  "<span class=sf-dump-meta>nobj</span>" => <span class=sf-dump-note>array:1</span> [<samp>
-    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
+  "<span class=sf-dump-key>line</span>" => <span class=sf-dump-num>{$var['line']}</span>
+  "<span class=sf-dump-key>nobj</span>" => <span class=sf-dump-note>array:1</span> [<samp>
+    <span class=sf-dump-index>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   </samp>]
-  "<span class=sf-dump-meta>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp id={$dumpId}-ref04>
-    <span class=sf-dump-meta>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a>]
+  "<span class=sf-dump-key>recurs</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<samp id={$dumpId}-ref04>
+    <span class=sf-dump-index>0</span> => <a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a> <span class=sf-dump-note>array:1</span> [<a class=sf-dump-ref href=#{$dumpId}-ref04 title="2 occurrences">&amp;4</a>]
   </samp>]
-  <span class=sf-dump-meta>9</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
-  "<span class=sf-dump-meta>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
-  "<span class=sf-dump-meta>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
-  "<span class=sf-dump-meta>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
-  "<span class=sf-dump-meta>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
-  b"<span class=sf-dump-meta>bin-key-&#233;</span>" => ""
+  <span class=sf-dump-key>9</span> => <a class=sf-dump-ref href=#{$dumpId}-ref01 title="2 occurrences">&amp;1</a> <span class=sf-dump-const>null</span>
+  "<span class=sf-dump-key>sobj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a>}
+  "<span class=sf-dump-key>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
+  "<span class=sf-dump-key>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
+  "<span class=sf-dump-key>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
+  b"<span class=sf-dump-key>bin-key-&#233;</span>" => ""
 </samp>]
 </bar>
 

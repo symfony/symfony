@@ -72,8 +72,8 @@ array:25 [
   }
   8 => :Unknown {@{$res2}}
   "obj" => Symfony\Component\VarDumper\Tests\Fixture\DumbFoo {#%d
-    foo: "foo"
-    "bar": "bar"
+    +foo: "foo"
+    +"bar": "bar"
   }
   "closure" => Closure {#%d
     reflection: """

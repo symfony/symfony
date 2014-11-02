@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-28T15:51:13Z
+
+@Tobion So, I think you need to also submit a PR for 2.5.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-28T16:00:15Z
+
+instead of doing it on master kernel.response with a low priority, which can still break for people streaming responses for instance, I think it would be better to do it on kernel.terminate with a high priority (the goal being to save the session before doing the heavy termination logic)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-28T16:03:52Z
+
+@stof that's useless. Again the point, as documented, is to save the session before it is send(). Terminate would be too late.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-28T16:15:55Z
+
+@Tobion the issue is that this will also save before the processing of streamed responses. The right time to save is actually when finishing the send() call (but before the termination logic), not before the send() call
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-28T18:05:33Z
+
+@stof what exactly is the problem with streamed responses?
+And it must be done BEFORE fast_cgi_finish_request which is inside the send() call. Not after finishing it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-28T18:10:05Z
+
+@fabpot After this is merged into 2.3 and 2.4, I can make a PR on 2.4 to change the listener to listen on `finish_request` instead. But actually it's optional and not required.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-10-28T18:13:27Z
+
+Don't you fear getting bug reports from users changing session state after the event?
+Is there a way to trigger some warning/exception when the session is modified but already closed?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-28T18:15:31Z
+
+This might actually solve some issues I have with a database session storage and a Captcha throwing 404s because it has no code in the session (yet).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-28T18:21:11Z
+
+@nicolas-grekas no because symfony session starts on demand. So writing to the session after it closed, still works as expected.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-29T13:48:37Z
+
+@stof streamed responses are sent via https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/EventListener/StreamedResponseListener.php aren't they? And we want the session to be saved before the headers are sent. So the SaveSessionListener should have a higher priority that the StreamedResponseListener.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-30T13:43:19Z
+
+:+1:

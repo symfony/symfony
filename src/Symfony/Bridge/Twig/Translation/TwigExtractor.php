@@ -61,7 +61,8 @@ class TwigExtractor implements ExtractorInterface
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
             } catch (\Twig_Error $e) {
-                $e->setTemplateFile($file->getPathname());
+                $e->setTemplateFile($file->getRelativePathname());
+
                 throw $e;
             }
         }

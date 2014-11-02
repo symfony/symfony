@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-07T19:31:44Z
+
+Not sure about this one. The goal of the profiler is to actually show the information about a given URL, so hidden it looks weird to me. Also, long URLs are not the norm, but rather the exception.
+
+---------------------------------------------------------------------------
+
+by adrianolek at 2014-10-07T19:46:15Z
+
+How about just removing the fixed height of the #resume bar, and displaying it like:
+![2014-10-07_21-42-22](https://cloud.githubusercontent.com/assets/886304/4549042/281a5ea8-4e5a-11e4-9b92-96486b7f1c60.png)
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-10-07T19:48:53Z
+
+:+1: for removing the fixed height :sparkles:
+
+---------------------------------------------------------------------------
+
+by adrianolek at 2014-10-07T21:52:36Z
+
+Removed the fixed height. So it is displayed like on the last picture. Short urls look like usual.

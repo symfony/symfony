@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-16T13:13:12Z
+
+Btw the method `getHtmlPattern()` belongs absolutely not into `Regex`, but we can't change this now without breaking BC.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-20T10:46:34Z
+
+ping @symfony/deciders

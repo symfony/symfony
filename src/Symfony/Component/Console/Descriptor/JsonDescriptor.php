@@ -97,11 +97,11 @@ class JsonDescriptor extends Descriptor
     private function getInputArgumentData(InputArgument $argument)
     {
         return array(
-            'name'        => $argument->getName(),
+            'name' => $argument->getName(),
             'is_required' => $argument->isRequired(),
-            'is_array'    => $argument->isArray(),
+            'is_array' => $argument->isArray(),
             'description' => $argument->getDescription(),
-            'default'     => $argument->getDefault(),
+            'default' => $argument->getDefault(),
         );
     }
 
@@ -113,13 +113,13 @@ class JsonDescriptor extends Descriptor
     private function getInputOptionData(InputOption $option)
     {
         return array(
-            'name'              => '--'.$option->getName(),
-            'shortcut'          => $option->getShortcut() ? '-'.implode('|-', explode('|', $option->getShortcut())) : '',
-            'accept_value'      => $option->acceptValue(),
+            'name' => '--'.$option->getName(),
+            'shortcut' => $option->getShortcut() ? '-'.implode('|-', explode('|', $option->getShortcut())) : '',
+            'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
-            'is_multiple'       => $option->isArray(),
-            'description'       => $option->getDescription(),
-            'default'           => $option->getDefault(),
+            'is_multiple' => $option->isArray(),
+            'description' => $option->getDescription(),
+            'default' => $option->getDefault(),
         );
     }
 
@@ -154,12 +154,12 @@ class JsonDescriptor extends Descriptor
         $command->mergeApplicationDefinition(false);
 
         return array(
-            'name'        => $command->getName(),
-            'usage'       => $command->getSynopsis(),
+            'name' => $command->getName(),
+            'usage' => $command->getSynopsis(),
             'description' => $command->getDescription(),
-            'help'        => $command->getProcessedHelp(),
-            'aliases'     => $command->getAliases(),
-            'definition'  => $this->getInputDefinitionData($command->getNativeDefinition()),
+            'help' => $command->getProcessedHelp(),
+            'aliases' => $command->getAliases(),
+            'definition' => $this->getInputDefinitionData($command->getNativeDefinition()),
         );
     }
 }

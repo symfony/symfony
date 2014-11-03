@@ -225,9 +225,9 @@ class NumberFormatter
      */
     private static $customRoundingList = array(
         self::ROUND_CEILING => true,
-        self::ROUND_FLOOR   => true,
-        self::ROUND_DOWN    => true,
-        self::ROUND_UP      => true,
+        self::ROUND_FLOOR => true,
+        self::ROUND_DOWN => true,
+        self::ROUND_UP => true,
     );
 
     /**

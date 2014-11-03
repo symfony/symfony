@@ -22,11 +22,11 @@ class Token
     public $type;
     public $cursor;
 
-    const EOF_TYPE         = 'end of expression';
-    const NAME_TYPE        = 'name';
-    const NUMBER_TYPE      = 'number';
-    const STRING_TYPE      = 'string';
-    const OPERATOR_TYPE    = 'operator';
+    const EOF_TYPE = 'end of expression';
+    const NAME_TYPE = 'name';
+    const NUMBER_TYPE = 'number';
+    const STRING_TYPE = 'string';
+    const OPERATOR_TYPE = 'operator';
     const PUNCTUATION_TYPE = 'punctuation';
 
     /**

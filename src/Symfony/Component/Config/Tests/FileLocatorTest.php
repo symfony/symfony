@@ -87,6 +87,7 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The file "foobar.xml" does not exist
      */
     public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
     {
@@ -103,5 +104,16 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
         $loader = new FileLocator(array(__DIR__.'/Fixtures'));
 
         $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage An empty file name is not valid to be located.
+     */
+    public function testLocateEmpty()
+    {
+        $loader = new FileLocator(array(__DIR__.'/Fixtures'));
+
+        $loader->locate(null, __DIR__);
     }
 }

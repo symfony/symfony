@@ -64,9 +64,9 @@ class PhpEngineTest extends TestCase
     protected function getContainer()
     {
         $container = new Container();
-        $session   = new Session(new MockArraySessionStorage());
-        $request   = new Request();
-        $stack     = new RequestStack();
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $stack = new RequestStack();
         $stack->push($request);
 
         $request->setSession($session);

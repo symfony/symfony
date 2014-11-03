@@ -229,6 +229,11 @@ class Parser
                     }
                 }
             } else {
+                // multiple documents are not supported
+                if ('---' === $this->currentLine) {
+                    throw new ParseException('Multiple documents are not supported.');
+                }
+
                 // 1-liner optionally followed by newline
                 $lineCount = count($this->lines);
                 if (1 === $lineCount || (2 === $lineCount && empty($this->lines[1]))) {

@@ -283,7 +283,7 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
         $constraints = new Collection(array(
             'shelves' => new All(array('constraints' => array(
                 new Collection(array(
-                    'name'  => new ConstraintA(),
+                    'name' => new ConstraintA(),
                     'books' => new All(array('constraints' => array(
                         new ConstraintA(),
                     ))),

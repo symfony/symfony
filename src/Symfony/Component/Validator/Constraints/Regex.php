@@ -45,7 +45,14 @@ class Regex extends Constraint
     }
 
     /**
-     * Returns htmlPattern if exists or pattern is convertible.
+     * Converts the htmlPattern to a suitable format for HTML5 pattern.
+     * Example: /^[a-z]+$/ would be converted to [a-z]+
+     * However, if options are specified, it cannot be converted
+     *
+     * Pattern is also ignored if match=false since the pattern should
+     * then be reversed before application.
+     *
+     * @link http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
      *
      * @return string|null
      */
@@ -58,40 +65,34 @@ class Regex extends Constraint
                 : $this->htmlPattern;
         }
 
-        return $this->getNonDelimitedPattern();
-    }
-
-    /**
-     * Converts the htmlPattern to a suitable format for HTML5 pattern.
-     * Example: /^[a-z]+$/ would be converted to [a-z]+
-     * However, if options are specified, it cannot be converted
-     *
-     * Pattern is also ignored if match=false since the pattern should
-     * then be reversed before application.
-     *
-     * @todo reverse pattern in case match=false as per issue #5307
-     *
-     * @link http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
-     *
-     * @return string|null
-     */
-    private function getNonDelimitedPattern()
-    {
-        // If match = false, pattern should not be added to HTML5 validation
-        if (!$this->match) {
+        // Quit if delimiters not at very beginning/end (e.g. when options are passed)
+        if ($this->pattern[0] !== $this->pattern[strlen($this->pattern) - 1]) {
             return;
         }
 
-        if (preg_match('/^(.)(\^?)(.*?)(\$?)\1$/', $this->pattern, $matches)) {
-            $delimiter = $matches[1];
-            $start = empty($matches[2]) ? '.*' : '';
-            $pattern = $matches[3];
-            $end = empty($matches[4]) ? '.*' : '';
+        $delimiter = $this->pattern[0];
 
-            // Unescape the delimiter in pattern
-            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
+        // Unescape the delimiter
+        $pattern = str_replace('\\'.$delimiter, $delimiter, substr($this->pattern, 1, -1));
 
-            return $start.$pattern.$end;
+        // If the pattern is inverted, we can simply wrap it in
+        // ((?!pattern).)*
+        if (!$this->match) {
+            return '((?!'.$pattern.').)*';
         }
+
+        // If the pattern contains an or statement, wrap the pattern in
+        // .*(pattern).* and quit. Otherwise we'd need to parse the pattern
+        if (false !== strpos($pattern, '|')) {
+            return '.*('.$pattern.').*';
+        }
+
+        // Trim leading ^, otherwise prepend .*
+        $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
+
+        // Trim trailing $, otherwise append .*
+        $pattern = '$' === $pattern[strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
+
+        return $pattern;
     }
 }

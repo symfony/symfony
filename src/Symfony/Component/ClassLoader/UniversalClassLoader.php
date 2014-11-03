@@ -74,7 +74,7 @@ class UniversalClassLoader
      */
     public function useIncludePath($useIncludePath)
     {
-        $this->useIncludePath = $useIncludePath;
+        $this->useIncludePath = (bool) $useIncludePath;
     }
 
     /**

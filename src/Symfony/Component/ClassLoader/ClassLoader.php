@@ -107,7 +107,7 @@ class ClassLoader
      */
     public function setUseIncludePath($useIncludePath)
     {
-        $this->useIncludePath = $useIncludePath;
+        $this->useIncludePath = (bool) $useIncludePath;
     }
 
     /**

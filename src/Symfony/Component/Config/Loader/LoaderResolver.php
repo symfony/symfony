@@ -39,12 +39,7 @@ class LoaderResolver implements LoaderResolverInterface
     }
 
     /**
-     * Returns a loader able to load the resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return LoaderInterface|false A LoaderInterface instance
+     * {@inheritdoc}
      */
     public function resolve($resource, $type = null)
     {

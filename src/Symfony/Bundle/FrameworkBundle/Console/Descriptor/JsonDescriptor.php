@@ -185,15 +185,15 @@ class JsonDescriptor extends Descriptor
         unset($requirements['_scheme'], $requirements['_method']);
 
         return array(
-            'path'         => $route->getPath(),
-            'host'         => '' !== $route->getHost() ? $route->getHost() : 'ANY',
-            'scheme'       => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
-            'method'       => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
-            'class'        => get_class($route),
-            'defaults'     => $route->getDefaults(),
+            'path' => $route->getPath(),
+            'host' => '' !== $route->getHost() ? $route->getHost() : 'ANY',
+            'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
+            'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
+            'class' => get_class($route),
+            'defaults' => $route->getDefaults(),
             'requirements' => $requirements ?: 'NO CUSTOM',
-            'options'      => $route->getOptions(),
-            'pathRegex'    => $route->compile()->getRegex(),
+            'options' => $route->getOptions(),
+            'pathRegex' => $route->compile()->getRegex(),
         );
     }
 
@@ -206,11 +206,11 @@ class JsonDescriptor extends Descriptor
     private function getContainerDefinitionData(Definition $definition, $omitTags = false)
     {
         $data = array(
-            'class'     => (string) $definition->getClass(),
-            'scope'     => $definition->getScope(),
-            'public'    => $definition->isPublic(),
+            'class' => (string) $definition->getClass(),
+            'scope' => $definition->getScope(),
+            'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
-            'file'      => $definition->getFile(),
+            'file' => $definition->getFile(),
         );
 
         if (!$omitTags) {
@@ -236,7 +236,7 @@ class JsonDescriptor extends Descriptor
     {
         return array(
             'service' => (string) $alias,
-            'public'  => $alias->isPublic(),
+            'public' => $alias->isPublic(),
         );
     }
 

@@ -74,8 +74,8 @@ EOF
 
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->getApplication(), array(
-            'format'    => $input->getOption('format'),
-            'raw_text'  => $input->getOption('raw'),
+            'format' => $input->getOption('format'),
+            'raw_text' => $input->getOption('raw'),
             'namespace' => $input->getArgument('namespace'),
         ));
     }

@@ -114,6 +114,10 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->processArguments($argument->getArguments());
                 $this->processArguments($argument->getMethodCalls());
                 $this->processArguments($argument->getProperties());
+
+                if ($argument->getFactoryService()) {
+                    $this->processArguments(array(new Reference($argument->getFactoryService())));
+                }
             }
         }
     }

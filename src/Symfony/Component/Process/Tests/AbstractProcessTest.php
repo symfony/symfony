@@ -80,7 +80,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         }
         $duration = microtime(true) - $start;
 
-        $this->assertLessThan(1.8, $duration);
+        $this->assertLessThan(4, $duration);
     }
 
     public function testAllOutputIsActuallyReadOnTermination()

@@ -17,18 +17,25 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class TimeTypeTest extends TypeTestCase
 {
+    private $defaultTimezone;
+
     protected function setUp()
     {
         IntlTestHelper::requireIntl($this);
 
         parent::setUp();
+
+        $this->defaultTimezone = date_default_timezone_get();
+    }
+
+    protected function tearDown()
+    {
+        date_default_timezone_set($this->defaultTimezone);
     }
 
     public function testSubmitDateTime()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'datetime',
         ));
 
@@ -48,8 +55,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitString()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'string',
         ));
 
@@ -67,8 +72,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitTimestamp()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'timestamp',
         ));
 
@@ -88,8 +91,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitArray()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'array',
         ));
 
@@ -107,8 +108,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitDatetimeSingleText()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'widget' => 'single_text',
         ));
@@ -122,8 +121,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitDatetimeSingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -138,8 +135,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitArraySingleText()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'array',
             'widget' => 'single_text',
         ));
@@ -158,8 +153,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitArraySingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'array',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -178,8 +171,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitArraySingleTextWithSeconds()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'array',
             'widget' => 'single_text',
             'with_seconds' => true,
@@ -200,8 +191,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitStringSingleText()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'string',
             'widget' => 'single_text',
         ));
@@ -215,8 +204,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSubmitStringSingleTextWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'string',
             'widget' => 'single_text',
             'with_minutes' => false,
@@ -231,8 +218,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSetDataWithoutMinutes()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'with_minutes' => false,
         ));
@@ -245,8 +230,6 @@ class TimeTypeTest extends TypeTestCase
     public function testSetDataWithSeconds()
     {
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
             'input' => 'datetime',
             'with_seconds' => true,
         ));
@@ -256,53 +239,23 @@ class TimeTypeTest extends TypeTestCase
         $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $form->getViewData());
     }
 
-    public function testSetDataDifferentTimezones()
+    public function testSetDataWithTimezoneDateTime()
     {
+        date_default_timezone_set('Asia/Hong_Kong');
+
         $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Asia/Hong_Kong',
-            'input' => 'string',
-            'with_seconds' => true,
-        ));
-
-        $dateTime = new \DateTime('2013-01-01 12:04:05');
-        $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
-
-        $form->setData($dateTime->format('H:i:s'));
-
-        $outputTime = clone $dateTime;
-        $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
-
-        $displayedData = array(
-            'hour' => (int) $outputTime->format('H'),
-            'minute' => (int) $outputTime->format('i'),
-            'second' => (int) $outputTime->format('s'),
-        );
-
-        $this->assertEquals($displayedData, $form->getViewData());
-    }
-
-    public function testSetDataDifferentTimezonesDateTime()
-    {
-        $form = $this->factory->create('time', null, array(
-            'model_timezone' => 'America/New_York',
-            'view_timezone' => 'Asia/Hong_Kong',
             'input' => 'datetime',
             'with_seconds' => true,
         ));
 
-        $dateTime = new \DateTime('12:04:05');
-        $dateTime->setTimezone(new \DateTimeZone('America/New_York'));
+        $dateTime = new \DateTime('12:04:05', new \DateTimeZone('America/New_York'));
 
         $form->setData($dateTime);
 
-        $outputTime = clone $dateTime;
-        $outputTime->setTimezone(new \DateTimeZone('Asia/Hong_Kong'));
-
         $displayedData = array(
-            'hour' => (int) $outputTime->format('H'),
-            'minute' => (int) $outputTime->format('i'),
-            'second' => (int) $outputTime->format('s'),
+            'hour' => 12,
+            'minute' => 4,
+            'second' => 5,
         );
 
         $this->assertDateTimeEquals($dateTime, $form->getData());

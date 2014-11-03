@@ -17,8 +17,8 @@ class FileTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param mixed $maxSize
-     * @param int   bytes
-     * @param bool  $bytes
+     * @param int   $bytes
+     * @param bool  $binaryFormat
      * @dataProvider provideValidSizes
      */
     public function testMaxSize($maxSize, $bytes, $binaryFormat)
@@ -31,13 +31,12 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $maxSize
-     * @param int   $bytes
      * @dataProvider provideInValidSizes
-     * @expectedException Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testInvalideMaxSize($maxSize)
+    public function testInvalidMaxSize($maxSize)
     {
-        $file = new File(array('maxSize' => $maxSize));
+        new File(array('maxSize' => $maxSize));
     }
 
     /**

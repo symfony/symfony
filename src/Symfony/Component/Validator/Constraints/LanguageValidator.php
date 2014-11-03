@@ -50,10 +50,12 @@ class LanguageValidator extends ConstraintValidator
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
                     ->addViolation();
             }
         }

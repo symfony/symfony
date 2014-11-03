@@ -73,22 +73,19 @@ class FormType extends BaseType
 
         $name = $form->getName();
 
-        $readOnly = isset($view->vars['attr']['readonly']) && false !== $view->vars['attr']['readonly'];
-
         if ($view->parent) {
             if ('' === $name) {
                 throw new LogicException('Form node with empty name can be used only as root form node.');
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly && (isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly'])) {
-                $view->vars['attr']['readonly'] = 'readonly';
-                $readOnly = true;
+            if (!$view->vars['attr']['readonly'] && (isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly'])) {
+                $view->vars['attr']['readonly'] = true;
             }
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only'  => $readOnly,
+            'read_only'  => $view->vars['attr']['readonly'],
             'errors'     => $form->getErrors(),
             'valid'      => $form->isSubmitted() ? $form->isValid() : true,
             'value'      => $form->getViewData(),

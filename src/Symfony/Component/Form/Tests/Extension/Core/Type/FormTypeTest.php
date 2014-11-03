@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -102,22 +101,22 @@ class FormTypeTest extends BaseTypeTest
 
     public function testNonReadOnlyFormWithReadOnlyParentIsReadOnly()
     {
-        $view = $this->factory->createNamedBuilder('parent', 'form', null, array('attr' => array('readonly' => 'readonly')))
+        $view = $this->factory->createNamedBuilder('parent', 'form', null, array('attr' => array('readonly' => true)))
             ->add('child', 'form')
             ->getForm()
             ->createView();
 
-        $this->assertSame('readonly', $view['child']->vars['attr']['readonly']);
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
     }
 
     public function testReadOnlyFormWithNonReadOnlyParentIsReadOnly()
     {
         $view = $this->factory->createNamedBuilder('parent', 'form')
-            ->add('child', 'form', array('attr' => array('readonly' => 'readonly')))
+            ->add('child', 'form', array('attr' => array('readonly' => true)))
             ->getForm()
             ->createView();
 
-        $this->assertSame('readonly', $view['child']->vars['attr']['readonly']);
+        $this->assertTrue($view['child']->vars['attr']['readonly']);
     }
 
     public function testNonReadOnlyFormWithNonReadOnlyParentIsNotReadOnly()

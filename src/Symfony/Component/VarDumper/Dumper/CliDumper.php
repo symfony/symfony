@@ -28,22 +28,45 @@ class CliDumper extends AbstractDumper
     protected $maxStringWidth = 0;
     protected $styles = array(
         // See http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-        'num'       => '1;38;5;33',
-        'const'     => '1;38;5;33',
-        'str'       => '1;38;5;37',
+        'default'   => '38;5;208',
+        'num'       => '1;38;5;38',
+        'const'     => '1;38;5;208',
+        'str'       => '1;38;5;113',
         'cchr'      => '7',
-        'note'      => '38;5;178',
-        'ref'       => '38;5;240',
-        'solo-ref'  => '38;5;240',
-        'public'    => '38;5;28',
-        'protected' => '38;5;166',
-        'private'   => '38;5;160',
-        'meta'      => '38;5;27',
-        'key'       => '38;5;27',
-        'index'     => '38;5;27',
+        'note'      => '38;5;38',
+        'ref'       => '38;5;247',
+        'public'    => '',
+        'protected' => '',
+        'private'   => '',
+        'meta'      => '38;5;170',
+        'key'       => '38;5;113',
+        'index'     => '38;5;38',
     );
 
     protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($output = null)
+    {
+        parent::__construct($output);
+
+        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== @getenv('ANSICON')) {
+            // Use only the base 16 xterm colors when using ANSICON
+            $this->setStyles(array(
+                'default' => '31',
+                'num'     => '1;34',
+                'const'   => '1;31',
+                'str'     => '1;32',
+                'note'    => '34',
+                'ref'     => '1;30',
+                'meta'    => '35',
+                'key'     => '32',
+                'index'   => '34',
+            ));
+        }
+    }
 
     /**
      * Enables/disables colored output.
@@ -70,7 +93,7 @@ class CliDumper extends AbstractDumper
     /**
      * Configures styles.
      *
-     * @param array $styles A map of style namaes to style definitions.
+     * @param array $styles A map of style names to style definitions.
      */
     public function setStyles(array $styles)
     {
@@ -205,10 +228,8 @@ class CliDumper extends AbstractDumper
             $prefix = $class ? $this->style('note', 'array:'.$class).' [' : '[';
         }
 
-        if ($cursor->softRefCount) {
+        if ($cursor->softRefCount || 0 < $cursor->softRefHandle) {
             $prefix .= $this->style('ref', (Cursor::HASH_RESOURCE === $type ? '@' : '#').(0 < $cursor->softRefHandle ? $cursor->softRefHandle : $cursor->softRefTo), array('count' => $cursor->softRefCount));
-        } elseif (0 < $cursor->softRefHandle) {
-            $prefix .= $this->style('solo-ref', (Cursor::HASH_RESOURCE === $type ? '@' : '#').$cursor->softRefHandle);
         } elseif ($cursor->hardRefTo && !$cursor->refIndex && $class) {
             $prefix .= $this->style('ref', '&'.$cursor->hardRefTo, array('count' => $cursor->hardRefCount));
         }
@@ -310,7 +331,7 @@ class CliDumper extends AbstractDumper
             }
 
             if ($cursor->hardRefTo) {
-                $this->line .= ($cursor->hardRefCount ? $this->style('ref', '&'.$cursor->hardRefTo, array('count' => $cursor->hardRefCount)) : $this->style('solo-ref', '&')).' ';
+                $this->line .= $this->style('ref', '&'.$cursor->hardRefTo, array('count' => $cursor->hardRefCount)).' ';
             }
         }
     }
@@ -327,7 +348,7 @@ class CliDumper extends AbstractDumper
     protected function style($style, $value, $attr = array())
     {
         if (null === $this->colors) {
-            $this->colors = $this->supportsColors($this->outputStream);
+            $this->colors = $this->supportsColors();
         }
 
         $style = $this->styles[$style];
@@ -336,7 +357,7 @@ class CliDumper extends AbstractDumper
             return sprintf($cchr, "\x7F" === $r[0] ? '?' : chr(64 + ord($r[0])));
         }, $value);
 
-        return $this->colors ? sprintf("\033[%sm%s\033[m", $style, $value) : $value;
+        return $this->colors ? sprintf("\033[%sm%s\033[m\033[%sm", $style, $value, $this->styles['default']) : $value;
     }
 
     /**
@@ -384,5 +405,16 @@ class CliDumper extends AbstractDumper
         }
 
         return static::$defaultColors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function dumpLine($depth)
+    {
+        if ($this->colors) {
+            $this->line = sprintf("\033[%sm%s\033[m", $this->styles['default'], $this->line);
+        }
+        parent::dumpLine($depth);
     }
 }

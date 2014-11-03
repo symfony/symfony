@@ -31,13 +31,13 @@ class HtmlDumper extends CliDumper
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
     protected $styles = array(
-        'num'       => 'font-weight:bold;color:#1299DA',
+        'default'   => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace',
+        'num'       => 'font-weight:bold; color:#1299DA',
         'const'     => 'font-weight:bold',
-        'str'       => 'font-weight:bold;color:#56DB3A',
-        'cchr'      => 'font-style: italic',
+        'str'       => 'font-weight:bold; color:#56DB3A',
+        'cchr'      => 'font-style:italic',
         'note'      => 'color:#1299DA',
         'ref'       => 'color:#A0A0A0',
-        'solo-ref'  => 'color:#A0A0A0',
         'public'    => 'color:#FFFFFF',
         'protected' => 'color:#FFFFFF',
         'private'   => 'color:#FFFFFF',
@@ -213,8 +213,8 @@ return function (root) {
             if ('sf-dump' != elt.parentNode.className) {
                 toggle(a);
             }
-        } else if ("sf-dump-ref" == elt.className) {
-            a = elt.getAttribute('href').substr(1);
+        } else if ("sf-dump-ref" == elt.className && (a = elt.getAttribute('href'))) {
+            a = a.substr(1);
             elt.className += ' '+a;
 
             if (/[\[{]$/.test(elt.previousSibling.nodeValue)) {
@@ -247,11 +247,7 @@ return function (root) {
 <style>
 pre.sf-dump {
     display: block;
-    background-color: #18171B;
     white-space: pre;
-    line-height: 1.2em;
-    color: #FF8400;
-    font: 12px Menlo, Monaco, Consolas, monospace;
     padding: 5px;
 }
 pre.sf-dump span {
@@ -266,7 +262,6 @@ pre.sf-dump abbr {
     cursor: help;
 }
 pre.sf-dump a {
-    color: #eee8d5;
     text-decoration: none;
     cursor: pointer;
     border: 0;
@@ -275,7 +270,7 @@ pre.sf-dump a {
 EOHTML;
 
         foreach ($this->styles as $class => $style) {
-            $line .= "pre.sf-dump .sf-dump-$class {{$style}}";
+            $line .= 'pre.sf-dump'.('default' !== $class ? ' .sf-dump-'.$class : '').'{'.$style.'}';
         }
 
         return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
@@ -327,10 +322,10 @@ EOHTML;
             return sprintf('<span class=sf-dump-cchr title=\\x%02X>%s</span>', ord($r[0]), "\x7F" === $r[0] ? '?' : chr(64 + ord($r[0])));
         }, $v);
 
-        if ('solo-ref' === $style) {
-            return sprintf('<a class=sf-dump-solo-ref>%s</a>', $v);
-        }
         if ('ref' === $style) {
+            if (empty($attr['count'])) {
+                return sprintf('<a class=sf-dump-ref>%s</a>', $v);
+            }
             $r = ('#' !== $v[0] ? 1 - ('@' !== $v[0]) : 2).substr($value, 1);
 
             return sprintf('<a class=sf-dump-ref href=#%s-ref%s title="%d occurrences">%s</a>', $this->dumpId, $r, 1 + $attr['count'], $v);
@@ -400,8 +395,8 @@ EOHTML;
         );
 
         if (-1 === $depth) {
-            parent::dumpLine(0);
+            AbstractDumper::dumpLine(0);
         }
-        parent::dumpLine($depth);
+        AbstractDumper::dumpLine($depth);
     }
 }

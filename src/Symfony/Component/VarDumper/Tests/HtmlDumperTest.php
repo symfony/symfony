@@ -64,7 +64,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="4 characters">d&#233;j&#224;</span>"
   <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;<span class=sf-dump-cchr title=\\x00>@</span></span>"
   "<span class=sf-dump-key>[]</span>" => []
-  "<span class=sf-dump-key>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-solo-ref>@{$res1}</a><samp>
+  "<span class=sf-dump-key>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-ref>@{$res1}</a><samp>
     <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
     <span class=sf-dump-meta>stream_type</span>: "<span class=sf-dump-str title="5 characters">STDIO</span>"
     <span class=sf-dump-meta>mode</span>: "<span class=sf-dump-str>r</span>"
@@ -75,12 +75,12 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
     <span class=sf-dump-meta>eof</span>: <span class=sf-dump-const>false</span>
     <span class=sf-dump-meta>options</span>: []
   </samp>}
-  <span class=sf-dump-key>8</span> => <abbr title="`Unknown` resource" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-solo-ref>@{$res2}</a>}
+  <span class=sf-dump-key>8</span> => <abbr title="`Unknown` resource" class=sf-dump-note>:Unknown</abbr> {<a class=sf-dump-ref>@{$res2}</a>}
   "<span class=sf-dump-key>obj</span>" => <abbr title="Symfony\Component\VarDumper\Tests\Fixture\DumbFoo" class=sf-dump-note>DumbFoo</abbr> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="2 occurrences">#%d</a><samp id={$dumpId}-ref2%d>
     +<span class=sf-dump-public title="Public property">foo</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
-  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-solo-ref>#%d</a><samp>
+  "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-ref>#%d</a><samp>
     <span class=sf-dump-meta>reflection</span>: """
       <span class=sf-dump-str title="%d characters">Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
       <span class=sf-dump-str title="%d characters">  @@ {$var['file']} {$var['line']} - {$var['line']}</span>

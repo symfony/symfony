@@ -514,6 +514,7 @@ class SecurityExtension extends Extension
     {
         $name = $this->getUserProviderId(strtolower($name));
 
+        // Doctrine Entity and In-memory DAO provider are managed by factories
         foreach ($this->userProviderFactories as $factory) {
             $key = str_replace('-', '_', $factory->getKey());
 
@@ -532,43 +533,15 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        if (isset($provider['chain'])) {
-            $providers = array();
-            foreach ($provider['chain']['providers'] as $providerName) {
-                $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
-            }
-
-            $container
-                ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-                ->addArgument($providers)
-            ;
-
-            return $name;
+        $providers = array();
+        foreach ($provider['chain']['providers'] as $providerName) {
+            $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
         }
 
-        // Doctrine Entity DAO provider
-        if (isset($provider['entity'])) {
-            $container
-                ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
-                ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
-
-            return $name;
-        }
-
-        // In-memory DAO provider
-        $definition = $container->setDefinition($name, new DefinitionDecorator('security.user.provider.in_memory'));
-        foreach ($provider['users'] as $username => $user) {
-            $userId = $name.'_'.$username;
-
-            $container
-                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
-            ;
-
-            $definition->addMethodCall('createUser', array(new Reference($userId)));
-        }
+        $container
+            ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
+            ->addArgument($providers)
+        ;
 
         return $name;
     }

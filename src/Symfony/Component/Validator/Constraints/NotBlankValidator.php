@@ -36,10 +36,12 @@ class NotBlankValidator extends ConstraintValidator
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(NotBlank::IS_BLANK_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(NotBlank::IS_BLANK_ERROR)
                     ->addViolation();
             }
         }

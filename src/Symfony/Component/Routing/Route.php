@@ -130,13 +130,11 @@ class Route implements \Serializable
         $this->options = $data['options'];
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
-<<<<<<< HEAD
         $this->condition = $data['condition'];
-=======
+
         if (isset($data['compiled'])) {
             $this->compiled = $data['compiled'];
         }
->>>>>>> 2.3
     }
 
     /**

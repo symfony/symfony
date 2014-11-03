@@ -77,6 +77,43 @@ Validator
    ```
    value == null or (YOUR_EXPRESSION)
    ```
+   
+ * The basic comparison constraints were deprecated and will be removed in
+   Symfony 3.0:
+   
+   * `AbstractComparison` and `AbstractComparisonValidator`
+   * `Blank` and `BlankValidator`
+   * `EqualTo` and `EqualToValidator`
+   * `False` and `FalseValidator`
+   * `GreaterThan` and `GreaterThanValidator`
+   * `GreaterThanOrEqual` and `GreaterThanOrEqualValidator`
+   * `IdenticalTo` and `IdenticalToValidator`
+   * `LessThan` and `LessThanValidator`
+   * `LessThanOrEqual` and `LessThanOrEqualValidator`
+   * `NotEqualTo` and `NotEqualToValidator`
+   * `NotIdenticalTo` and `NotIdenticalToValidator`
+   * `Null` and `NullValidator`
+   * `True` and `TrueValidator`
+   
+   You should use the `Expression` constraint instead.
+   
+   Before:
+   
+   ```php
+   /**
+    * @GreaterThan(0, message="Please enter a positive number.")
+    */
+   private $age;
+   ```
+   
+   After:
+   
+   ```php
+   /**
+    * @Expression("value > 0", message="Please enter a positive number.")
+    */
+   private $age;
+   ```
 
 Security
 --------

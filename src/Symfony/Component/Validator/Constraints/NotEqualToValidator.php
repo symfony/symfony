@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator\Constraints;
  * Validates values are all unequal (!=).
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 class NotEqualToValidator extends AbstractComparisonValidator
 {

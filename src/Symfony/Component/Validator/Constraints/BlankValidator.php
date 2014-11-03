@@ -19,6 +19,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 class BlankValidator extends ConstraintValidator
 {

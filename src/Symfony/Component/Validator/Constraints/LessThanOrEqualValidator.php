@@ -15,6 +15,9 @@ namespace Symfony\Component\Validator\Constraints;
  * Validates values are less than or equal to the previous (<=).
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 class LessThanOrEqualValidator extends AbstractComparisonValidator
 {

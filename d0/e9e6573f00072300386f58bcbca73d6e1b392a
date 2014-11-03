@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-03T10:01:17Z
+
+This is a term screenshot:
+![capture du 2014-11-03 10 56 18](https://cloud.githubusercontent.com/assets/243674/4880780/4eb8e46c-6340-11e4-82c8-439a5319e093.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-03T10:26:48Z
+
+I'm -1 on using custom colors, at least for windows PCs. The dump looks like this in my windows CMD with ansicon:
+![sf-dump-cli](https://cloud.githubusercontent.com/assets/749025/4881074/e98d6334-6343-11e4-9db4-d1a98d54bb3e.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-03T11:11:15Z
+
+The console output is already styled, this PR only updates the colors to the new scheme.
+Can you please open an issue? We should be able to fix that in the beta phase.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-03T11:30:37Z
+
+See https://github.com/symfony/symfony/issues/12391
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-03T13:15:36Z
+
+@WouterJ can you please test this PR again? I just added a 16 colors only palette.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-03T13:28:35Z
+
+![sf-dump-cli-new](https://cloud.githubusercontent.com/assets/749025/4882975/44768e2e-635d-11e4-8b89-4a14b5fb020d.png)
+
+Looks better :) (just have to update my colors to have more contrast)

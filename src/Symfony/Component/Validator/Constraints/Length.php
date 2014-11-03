@@ -24,8 +24,8 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Length extends Constraint
 {
-    const TOO_SHORT_ERROR = 1;
-    const TOO_LONG_ERROR = 2;
+    const TOO_SHORT_ERROR = '9ff3fdc4-b214-49db-8718-39c315e33d45';
+    const TOO_LONG_ERROR = 'd94b19cc-114f-4f44-9cc4-4138e80a87b9';
 
     protected static $errorNames = array(
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',

@@ -48,6 +48,7 @@ class LanguageValidator extends ConstraintValidator
         if (!isset($languages[$value])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
                 ->addViolation();
         }
     }

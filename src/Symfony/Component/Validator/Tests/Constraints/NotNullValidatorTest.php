@@ -55,6 +55,8 @@ class NotNullValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate(null, $constraint);
 
-        $this->buildViolation('myMessage')->assertRaised();
+        $this->buildViolation('myMessage')
+            ->setCode(NotNull::NULL_ERROR)
+            ->assertRaised();
     }
 }

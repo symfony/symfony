@@ -87,6 +87,7 @@ class ExpressionValidator extends ConstraintValidator
         if (!$this->getExpressionLanguage()->evaluate($constraint->expression, $variables)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Expression::EXPRESSION_FAILED_ERROR)
                 ->addViolation();
         }
     }

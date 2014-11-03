@@ -48,6 +48,7 @@ class LocaleValidator extends ConstraintValidator
         if (!isset($locales[$value])) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
                 ->addViolation();
         }
     }

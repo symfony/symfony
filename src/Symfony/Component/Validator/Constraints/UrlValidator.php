@@ -61,6 +61,7 @@ class UrlValidator extends ConstraintValidator
         if (!preg_match($pattern, $value)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Url::INVALID_URL_ERROR)
                 ->addViolation();
         }
     }

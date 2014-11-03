@@ -42,3 +42,5 @@ CHANGELOG
    RuntimeException
  * [BC BREAK] normalizers are not executed anymore for unset options
  * normalizers are executed after validating the options now
+ * [BC BREAK] an UndefinedOptionsException is now thrown instead of an
+   InvalidOptionsException when non-existing options are passed

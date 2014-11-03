@@ -309,3 +309,43 @@ OptionsResolver
    $options = $resolver->resolve($options);
    ```
    
+ * When undefined options are passed, `resolve()` now throws an
+   `UndefinedOptionsException` instead of an `InvalidOptionsException`.
+   `InvalidOptionsException` is only thrown when option values fail their
+   validation constraints.
+   
+   Before:
+   
+   ```php
+   $resolver->setDefaults(array(
+       'transport' => 'smtp',
+       'port' => 25,
+   ));
+   $resolver->setAllowedTypes(array(
+       'port' => 'integer',
+   ));
+   
+   // throws InvalidOptionsException
+   $resolver->resolve(array('foo' => 'bar'));
+   
+   // throws InvalidOptionsException
+   $resolver->resolve(array('port' => '25'));
+   ```
+   
+   After:
+   
+   ```php
+   $resolver->setDefaults(array(
+       'transport' => 'smtp',
+       'port' => 25,
+   ));
+   $resolver->setAllowedTypes(array(
+       'port' => 'integer',
+   ));
+   
+   // throws UndefinedOptionsException
+   $resolver->resolve(array('foo' => 'bar'));
+   
+   // throws InvalidOptionsException
+   $resolver->resolve(array('port' => '25'));
+   ```

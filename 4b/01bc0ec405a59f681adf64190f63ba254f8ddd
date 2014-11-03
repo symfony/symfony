@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-03T09:10:36Z
+
+Is this BC break allowed by the BC promise? I don't think exceptions are included, I would propose to do that now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-11-03T09:11:41Z
+
+@WouterJ Exceptions are not included at the moment. Could you open a new issue where we can discuss this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-03T14:21:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-03T14:37:37Z
+
+:+1:

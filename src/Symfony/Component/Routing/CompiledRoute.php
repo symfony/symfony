@@ -16,7 +16,7 @@ namespace Symfony\Component\Routing;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CompiledRoute
+class CompiledRoute implements \Serializable
 {
     private $variables;
     private $tokens;
@@ -49,6 +49,39 @@ class CompiledRoute
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            'vars' => $this->variables,
+            'path_prefix' => $this->staticPrefix,
+            'path_regex' => $this->regex,
+            'path_tokens' => $this->tokens,
+            'path_vars' => $this->pathVariables,
+            'host_regex' => $this->hostRegex,
+            'host_tokens' => $this->hostTokens,
+            'host_vars' => $this->hostVariables,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $this->variables = $data['vars'];
+        $this->staticPrefix = $data['path_prefix'];
+        $this->regex = $data['path_regex'];
+        $this->tokens = $data['path_tokens'];
+        $this->pathVariables = $data['path_vars'];
+        $this->hostRegex = $data['host_regex'];
+        $this->hostTokens = $data['host_tokens'];
+        $this->hostVariables = $data['host_vars'];
     }
 
     /**

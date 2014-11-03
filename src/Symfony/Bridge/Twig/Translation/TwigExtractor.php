@@ -58,7 +58,13 @@ class TwigExtractor implements ExtractorInterface
         $finder = new Finder();
         $files = $finder->files()->name('*.twig')->sortByName()->in($directory);
         foreach ($files as $file) {
-            $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
+            try {
+                $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
+            } catch (\Twig_Error $e) {
+                $e->setTemplateFile($file->getRelativePathname());
+
+                throw $e;
+            }
         }
     }
 

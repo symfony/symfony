@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-03T14:30:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-03T15:37:14Z
+
+Are you sure that this change is necessary (the code has been the same since its initial commit, hasn't it?)? The tests that I see are failing, do fail because of the missing Finder component (see #12398 for a fix).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-03T15:41:32Z
+
+Sure: see https://travis-ci.org/symfony/symfony/builds/39832453
+If the line is old, then the test must be new (and right).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-03T15:55:22Z
+
+Oh, yes you're right. The test was introduced in #12329 in the 2.3 branch.

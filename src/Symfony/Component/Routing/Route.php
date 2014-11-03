@@ -64,7 +64,7 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $condition;
+    private $condition = '';
 
     /**
      * Constructor.
@@ -84,7 +84,7 @@ class Route implements \Serializable
      *
      * @api
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = null)
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
     {
         $this->setPath($path);
         $this->setDefaults($defaults);

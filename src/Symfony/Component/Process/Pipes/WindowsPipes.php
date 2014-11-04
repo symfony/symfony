@@ -60,7 +60,7 @@ class WindowsPipes extends AbstractPipes
         }
 
         if (is_resource($input)) {
-            $this->input   = $input;
+            $this->input = $input;
         } else {
             $this->inputBuffer = $input;
         }

@@ -162,21 +162,21 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $handler->setDefaultLogger($logger, array(E_USER_NOTICE => LogLevel::CRITICAL));
 
             $loggers = array(
-                E_DEPRECATED        => array(null, LogLevel::INFO),
-                E_USER_DEPRECATED   => array(null, LogLevel::INFO),
-                E_NOTICE            => array($logger, LogLevel::NOTICE),
-                E_USER_NOTICE       => array($logger, LogLevel::CRITICAL),
-                E_STRICT            => array(null, LogLevel::NOTICE),
-                E_WARNING           => array(null, LogLevel::WARNING),
-                E_USER_WARNING      => array(null, LogLevel::WARNING),
-                E_COMPILE_WARNING   => array(null, LogLevel::WARNING),
-                E_CORE_WARNING      => array(null, LogLevel::WARNING),
-                E_USER_ERROR        => array(null, LogLevel::ERROR),
+                E_DEPRECATED => array(null, LogLevel::INFO),
+                E_USER_DEPRECATED => array(null, LogLevel::INFO),
+                E_NOTICE => array($logger, LogLevel::NOTICE),
+                E_USER_NOTICE => array($logger, LogLevel::CRITICAL),
+                E_STRICT => array(null, LogLevel::NOTICE),
+                E_WARNING => array(null, LogLevel::WARNING),
+                E_USER_WARNING => array(null, LogLevel::WARNING),
+                E_COMPILE_WARNING => array(null, LogLevel::WARNING),
+                E_CORE_WARNING => array(null, LogLevel::WARNING),
+                E_USER_ERROR => array(null, LogLevel::ERROR),
                 E_RECOVERABLE_ERROR => array(null, LogLevel::ERROR),
-                E_COMPILE_ERROR     => array(null, LogLevel::EMERGENCY),
-                E_PARSE             => array(null, LogLevel::EMERGENCY),
-                E_ERROR             => array(null, LogLevel::EMERGENCY),
-                E_CORE_ERROR        => array(null, LogLevel::EMERGENCY),
+                E_COMPILE_ERROR => array(null, LogLevel::EMERGENCY),
+                E_PARSE => array(null, LogLevel::EMERGENCY),
+                E_ERROR => array(null, LogLevel::EMERGENCY),
+                E_CORE_ERROR => array(null, LogLevel::EMERGENCY),
             );
             $this->assertSame($loggers, $handler->setLoggers(array()));
 

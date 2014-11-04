@@ -28,19 +28,19 @@ class CliDumper extends AbstractDumper
     protected $maxStringWidth = 0;
     protected $styles = array(
         // See http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-        'default'   => '38;5;208',
-        'num'       => '1;38;5;38',
-        'const'     => '1;38;5;208',
-        'str'       => '1;38;5;113',
-        'cchr'      => '7',
-        'note'      => '38;5;38',
-        'ref'       => '38;5;247',
-        'public'    => '',
+        'default' => '38;5;208',
+        'num' => '1;38;5;38',
+        'const' => '1;38;5;208',
+        'str' => '1;38;5;113',
+        'cchr' => '7',
+        'note' => '38;5;38',
+        'ref' => '38;5;247',
+        'public' => '',
         'protected' => '',
-        'private'   => '',
-        'meta'      => '38;5;170',
-        'key'       => '38;5;113',
-        'index'     => '38;5;38',
+        'private' => '',
+        'meta' => '38;5;170',
+        'key' => '38;5;113',
+        'index' => '38;5;38',
     );
 
     protected static $controlCharsRx = '/[\x00-\x1F\x7F]/';
@@ -56,14 +56,14 @@ class CliDumper extends AbstractDumper
             // Use only the base 16 xterm colors when using ANSICON
             $this->setStyles(array(
                 'default' => '31',
-                'num'     => '1;34',
-                'const'   => '1;31',
-                'str'     => '1;32',
-                'note'    => '34',
-                'ref'     => '1;30',
-                'meta'    => '35',
-                'key'     => '32',
-                'index'   => '34',
+                'num' => '1;34',
+                'const' => '1;31',
+                'str' => '1;32',
+                'note' => '34',
+                'ref' => '1;30',
+                'meta' => '35',
+                'key' => '32',
+                'index' => '34',
             ));
         }
     }

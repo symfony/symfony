@@ -62,7 +62,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   <span class=sf-dump-key>5</span> => <span class=sf-dump-num>-INF</span>
   <span class=sf-dump-key>6</span> => <span class=sf-dump-num>{$intMax}</span>
   "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="4 characters">d&#233;j&#224;</span>"
-  <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;<span class=sf-dump-cchr title=\\x00>@</span></span>"
+  <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;<span class=sf-dump-cchr title=\\x00>&#9216;</span></span>"
   "<span class=sf-dump-key>[]</span>" => []
   "<span class=sf-dump-key>res</span>" => <abbr title="`stream` resource" class=sf-dump-note>:stream</abbr> {<a class=sf-dump-ref>@{$res1}</a><samp>
     <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"

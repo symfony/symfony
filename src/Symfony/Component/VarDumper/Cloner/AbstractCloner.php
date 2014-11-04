@@ -84,7 +84,6 @@ abstract class AbstractCloner implements ClonerInterface
     protected $maxString = -1;
 
     private $casters = array();
-    private $data = array(array(null));
     private $prevErrorHandler;
     private $classInfo = array();
 

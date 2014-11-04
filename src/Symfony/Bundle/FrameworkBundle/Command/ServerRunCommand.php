@@ -97,7 +97,7 @@ EOF
         }
 
         $address = parse_url($input->getArgument('address'));
-        if(!isset($address["port"])){
+        if (!isset($address["port"])) {
             throw new \RuntimeException(sprintf('No valid port number on address "%s"', $input->getArgument('address')));
         }
 

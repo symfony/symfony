@@ -279,6 +279,17 @@ class Request
      */
     public static function createFromGlobals()
     {
+        // With the php's bug #66606, the php's built-in web server
+        // stores the Content-Type and Content-Length header values in
+        // HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH fields.
+        if (array_key_exists('HTTP_CONTENT_LENGTH', $_SERVER)) {
+            $_SERVER['CONTENT_LENGTH'] = $_SERVER['HTTP_CONTENT_LENGTH'];
+        }
+
+        if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)) {
+            $_SERVER['CONTENT_TYPE'] = $_SERVER['HTTP_CONTENT_TYPE'];
+        }
+
         $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')

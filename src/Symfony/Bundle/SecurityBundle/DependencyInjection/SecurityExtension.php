@@ -333,8 +333,11 @@ class SecurityExtension extends Extension
             ;
         }
 
+        // Determine default entry point
+        $defaultEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
+
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $defaultEntryPoint);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -345,11 +348,6 @@ class SecurityExtension extends Extension
 
         // Access listener
         $listeners[] = new Reference('security.access_listener');
-
-        // Determine default entry point
-        if (isset($firewall['entry_point'])) {
-            $defaultEntryPoint = $firewall['entry_point'];
-        }
 
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $defaultEntryPoint));
@@ -370,11 +368,10 @@ class SecurityExtension extends Extension
         return $this->contextListeners[$contextKey] = $listenerId;
     }
 
-    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider)
+    private function createAuthenticationListeners($container, $id, $firewall, &$authenticationProviders, $defaultProvider, $defaultEntryPoint)
     {
         $listeners = array();
         $hasListeners = false;
-        $defaultEntryPoint = null;
 
         foreach ($this->listenerPositions as $position) {
             foreach ($this->factories[$position] as $factory) {

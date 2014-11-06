@@ -50,4 +50,14 @@ class CountryTypeTest extends TestCase
             }
         }
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidChoices()
+    {
+        $this->factory->create('country', null, array(
+            'choices' => 'bad value',
+        ));
+    }
 }

@@ -45,4 +45,14 @@ class LanguageTypeTest extends TestCase
 
         $this->assertNotContains(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices, '', false, false);
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidChoices()
+    {
+        $this->factory->create('language', null, array(
+            'choices' => 'bad value',
+        ));
+    }
 }

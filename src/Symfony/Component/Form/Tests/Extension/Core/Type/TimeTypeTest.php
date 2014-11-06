@@ -731,4 +731,14 @@ class TimeTypeTest extends TestCase
             'seconds' => 'bad value',
         ));
     }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testThrowExceptionIfEmptyValueIsInvalid()
+    {
+        $this->factory->create('time', null, array(
+            'empty_value' => array(),
+        ));
+    }
 }

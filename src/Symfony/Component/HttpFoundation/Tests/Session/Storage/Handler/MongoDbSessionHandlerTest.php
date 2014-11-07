@@ -103,7 +103,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testWriteWhenUsingExpiresField()
     {
         $this->options = array(
-            'id_field'   => '_id',
+            'id_field' => '_id',
             'data_field' => 'data',
             'time_field' => 'time',
             'database' => 'sf2-test',
@@ -202,7 +202,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testGcWhenUsingExpiresField()
     {
         $this->options = array(
-            'id_field'   => '_id',
+            'id_field' => '_id',
             'data_field' => 'data',
             'time_field' => 'time',
             'database' => 'sf2-test',

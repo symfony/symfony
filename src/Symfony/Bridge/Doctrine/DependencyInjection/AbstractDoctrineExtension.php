@@ -413,7 +413,7 @@ abstract class AbstractDoctrineExtension extends Extension
                     }
                 }
                 $managerConfigs[$autoMappedManager]['mappings'][$bundle] = array(
-                    'mapping'   => true,
+                    'mapping' => true,
                     'is_bundle' => true,
                 );
             }

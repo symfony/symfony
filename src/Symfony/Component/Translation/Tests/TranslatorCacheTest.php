@@ -153,8 +153,8 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('load')
             ->will($this->returnValue($this->getCatalogue('en', array(
-                'foo'    => 'foo (EN)',
-                'bar'    => 'bar (EN)',
+                'foo' => 'foo (EN)',
+                'bar' => 'bar (EN)',
                 'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
             ))))
         ;

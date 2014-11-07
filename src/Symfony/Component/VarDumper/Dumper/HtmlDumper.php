@@ -31,19 +31,19 @@ class HtmlDumper extends CliDumper
     protected $headerIsDumped = false;
     protected $lastDepth = -1;
     protected $styles = array(
-        'default'   => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace',
-        'num'       => 'font-weight:bold; color:#1299DA',
-        'const'     => 'font-weight:bold',
-        'str'       => 'font-weight:bold; color:#56DB3A',
-        'cchr'      => 'font-style:italic',
-        'note'      => 'color:#1299DA',
-        'ref'       => 'color:#A0A0A0',
-        'public'    => 'color:#FFFFFF',
+        'default' => 'background-color:#18171B; color:#FF8400; line-height:1.2em; font:12px Menlo, Monaco, Consolas, monospace',
+        'num' => 'font-weight:bold; color:#1299DA',
+        'const' => 'font-weight:bold',
+        'str' => 'font-weight:bold; color:#56DB3A',
+        'cchr' => 'font-style:italic',
+        'note' => 'color:#1299DA',
+        'ref' => 'color:#A0A0A0',
+        'public' => 'color:#FFFFFF',
         'protected' => 'color:#FFFFFF',
-        'private'   => 'color:#FFFFFF',
-        'meta'      => 'color:#B729D9',
-        'key'       => 'color:#56DB3A',
-        'index'     => 'color:#1299DA',
+        'private' => 'color:#FFFFFF',
+        'meta' => 'color:#B729D9',
+        'key' => 'color:#56DB3A',
+        'index' => 'color:#1299DA',
     );
 
     /**

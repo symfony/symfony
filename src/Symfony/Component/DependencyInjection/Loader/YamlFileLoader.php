@@ -82,6 +82,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
+     * 
      * @throws InvalidArgumentException when "imports" is not an array of arrays
      */
     private function parseImports($content, $file)
@@ -109,6 +110,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param array  $content
      * @param string $file
+     * 
      * @throws InvalidArgumentException when "services" is not an array
      */
     private function parseDefinitions($content, $file)

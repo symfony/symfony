@@ -44,13 +44,15 @@ class ProjectPermissionsCommand extends AbstractConfigCommand
             throw new LogicException('Windows is NOT supported.');
         }
         $container = $this->getContainer();
-        $cacheDir = realpath($container->getParameter('kernel.cache_dir').'/..');
+        $cacheDirParam = $container->getParameter('kernel.cache_dir');
+        $cacheDir = realpath($cacheDirParam.'/..');
         if ($cacheDir === false) {
-            throw new LogicException(sprintf('Oops! Invalid kernel.cache_dir parameter (%s).', $container->getParameter('kernel.cache_dir')));
+            throw new LogicException(sprintf('Oops! Invalid kernel.cache_dir parameter (%s).', $cacheDirParam));
         }
-        $logsDir = realpath($container->getParameter('kernel.logs_dir'));
+        $logsDirParam = $container->getParameter('kernel.logs_dir');
+        $logsDir = realpath($logsDirParam);
         if ($logsDir === false) {
-            throw new LogicException(sprintf('Oops! Invalid kernel.logs_dir parameter (%s).', $container->getParameter('kernel.logs_dir')));
+            throw new LogicException(sprintf('Oops! Invalid kernel.logs_dir parameter (%s).', $logsDirParam));
         }
         $process = new Process("sudo rm -rf $cacheDir/*");
         $process->mustRun();

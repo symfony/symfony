@@ -175,8 +175,8 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function getEventDispatcherDescriptionTestData(array $objects)
     {
         $variations = array(
-            'events'    => array(),
-            'event1'    => array('event' => 'event1'),
+            'events' => array(),
+            'event1' => array('event' => 'event1'),
         );
 
         $data = array();

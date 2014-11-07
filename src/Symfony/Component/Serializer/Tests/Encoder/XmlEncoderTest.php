@@ -446,11 +446,11 @@ XML;
     protected function getNamespacedArray()
     {
         return array(
-            '@xmlns'       => 'http://www.w3.org/2005/Atom',
-            '@xmlns:app'   => 'http://www.w3.org/2007/app',
+            '@xmlns' => 'http://www.w3.org/2005/Atom',
+            '@xmlns:app' => 'http://www.w3.org/2007/app',
             '@xmlns:media' => 'http://search.yahoo.com/mrss/',
-            '@xmlns:gd'    => 'http://schemas.google.com/g/2005',
-            '@xmlns:yt'    => 'http://gdata.youtube.com/schemas/2007',
+            '@xmlns:gd' => 'http://schemas.google.com/g/2005',
+            '@xmlns:yt' => 'http://gdata.youtube.com/schemas/2007',
             'qux' => "1",
             'app:foo' => "foo",
             'yt:bar' => array("a", "b"),
@@ -469,7 +469,7 @@ XML;
                 'Barry' => array(
                     '@size' => 'large',
                     'FooBar' => array(
-                        'Baz'    => 'Ed',
+                        'Baz' => 'Ed',
                         '@gd:id' => 1,
                     ),
                 ),

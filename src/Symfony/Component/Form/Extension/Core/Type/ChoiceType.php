@@ -239,7 +239,7 @@ class ChoiceType extends AbstractType
         ));
 
         $resolver->setAllowedTypes(array(
-            'choices' => array('null', 'array'),
+            'choices' => array('null', 'array', 'Traversable'),
             'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
             'preferred_choices' => 'array',
         ));

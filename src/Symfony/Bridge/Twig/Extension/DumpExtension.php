@@ -29,6 +29,11 @@ class DumpExtension extends \Twig_Extension
 
     public function getFunctions()
     {
+        if (!$this->cloner) {
+            // don't override the dump() function if it can't produce output due to missing components
+            return array();
+        }
+
         return array(
             new \Twig_SimpleFunction('dump', array($this, 'dump'), array('is_safe' => array('html'), 'needs_context' => true, 'needs_environment' => true)),
         );

@@ -487,7 +487,6 @@ class ErrorHandler
     public static function handleFatalError(array $error = null)
     {
         self::$reservedMemory = '';
-        gc_collect_cycles();
         $handler = set_error_handler('var_dump', 0);
         $handler = is_array($handler) ? $handler[0] : null;
         restore_error_handler();

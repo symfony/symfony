@@ -35,7 +35,7 @@ class HtmlDumper extends CliDumper
         'num' => 'font-weight:bold; color:#1299DA',
         'const' => 'font-weight:bold',
         'str' => 'font-weight:bold; color:#56DB3A',
-        'cchr' => 'font-style:italic',
+        'cchr' => 'color:#FF8400',
         'note' => 'color:#1299DA',
         'ref' => 'color:#A0A0A0',
         'public' => 'color:#FFFFFF',
@@ -319,7 +319,8 @@ EOHTML;
 
         $v = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         $v = preg_replace_callback(self::$controlCharsRx, function ($r) {
-            return sprintf('<span class=sf-dump-cchr title=\\x%02X>%s</span>', ord($r[0]), "\x7F" === $r[0] ? '?' : chr(64 + ord($r[0])));
+            // Use Unicode Control Pictures - see http://www.unicode.org/charts/PDF/U2400.pdf
+            return sprintf('<span class=sf-dump-cchr title=\\x%02X>&#%d;</span>', ord($r[0]), "\x7F" !== $r[0] ? 0x2400 + ord($r[0]) : 0x2421);
         }, $v);
 
         if ('ref' === $style) {

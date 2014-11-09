@@ -331,7 +331,7 @@ class CliDumper extends AbstractDumper
             }
 
             if ($cursor->hardRefTo) {
-                $this->line .= $this->style('ref', '&'.$cursor->hardRefTo, array('count' => $cursor->hardRefCount)).' ';
+                $this->line .= $this->style('ref', '&'.($cursor->hardRefCount ? $cursor->hardRefTo : ''), array('count' => $cursor->hardRefCount)).' ';
             }
         }
     }

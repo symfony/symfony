@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class DumpExtension extends \Twig_Extension
+class DumpExtension extends \Twig_Extension_Debug
 {
     public function __construct(ClonerInterface $cloner = null)
     {
@@ -30,8 +30,8 @@ class DumpExtension extends \Twig_Extension
     public function getFunctions()
     {
         if (!$this->cloner) {
-            // don't override the dump() function if it can't produce output due to missing components
-            return array();
+            // use native dump function, as the DebugBundle is not registered
+            return parent::getFunctions();
         }
 
         return array(

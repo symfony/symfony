@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-04T15:38:29Z
+
+I added a not directly related commit to this:
+I propose loading the `dump()` function declaration as soon as the `VarDumper` class is loaded.
+Since this class is used by `DebugBundle::boot()`, this has the effect of autoloading the function when the bundle is loaded.
+This ease the upgrade path for existing projects since they are not required anymore to inline the definition somewhere (in app/autoload.php in next sf-std edition).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-04T15:42:29Z
+
+The effect of this change (see symfony/symfony-standard#732 also) is that if an application has a call to `dump()` somewhere, a Fatal Error will be triggered when the DebugBundle is not enabled.
+This is a wanted side-effect (prevents data leak).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-04T17:32:47Z
+
+:+1:

@@ -51,9 +51,11 @@ class HtmlDumper extends CliDumper
      */
     public function setOutput($output)
     {
-        $this->headerIsDumped = false;
+        if ($output !== $prev = parent::setOutput($output)) {
+            $this->headerIsDumped = false;
+        }
 
-        return parent::setOutput($output);
+        return $prev;
     }
 
     /**

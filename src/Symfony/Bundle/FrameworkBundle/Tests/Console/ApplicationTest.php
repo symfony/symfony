@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BundleImplementsRegisterCommands;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -57,6 +58,15 @@ class ApplicationTest extends TestCase
 
         // as the container might have change between two runs, setContainer must called again
         $tester->run(array('command' => 'foo'));
+    }
+
+    public function testBundleImplementingBundleInterfaceAndRegisterCommandInterfaceShouldRegisterCommands()
+    {
+        $this->setExpectedException('\LogicException', 'You must override the execute() method in the concrete command class.');
+        $kernel = $this->getKernel(array(new BundleImplementsRegisterCommands()));
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(array('my-custom-command')), new NullOutput());
     }
 
     private function getKernel(array $bundles)

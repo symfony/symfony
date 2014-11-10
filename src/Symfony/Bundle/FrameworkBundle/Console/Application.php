@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\Bundle\CommandRegisterInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -101,7 +102,7 @@ class Application extends BaseApplication
         $container = $this->kernel->getContainer();
 
         foreach ($this->kernel->getBundles() as $bundle) {
-            if ($bundle instanceof Bundle) {
+            if ($bundle instanceof CommandRegisterInterface) {
                 $bundle->registerCommands($this);
             }
         }

@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @api
  */
-abstract class Bundle extends ContainerAware implements BundleInterface
+abstract class Bundle extends ContainerAware implements BundleInterface, CommandRegisterInterface
 {
     protected $name;
     protected $extension;

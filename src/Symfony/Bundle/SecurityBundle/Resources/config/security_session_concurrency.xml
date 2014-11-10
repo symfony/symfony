@@ -27,7 +27,7 @@
             <argument type="collection" /> <!-- delegate Strategies -->
         </service>
 
-        <service id="security.authentication.session_registry" class="%security.authentication.session_registry.class%" public="false">
+        <service id="security.authentication.session_registry" class="%security.authentication.session_registry.class%" public="true">
             <argument type="service" id="security.authentication.session_registry_storage" />
             <argument>%security.authentication.session_information.class%</argument>
         </service>

@@ -153,7 +153,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'class' => $r->getName(),
                     'method' => null,
                     'file' => $r->getFileName(),
-                    'line' => $r->getStartLine()
+                    'line' => $r->getStartLine(),
                 );
             } else {
                 $this->data['controller'] = (string) $controller ?: 'n/a';

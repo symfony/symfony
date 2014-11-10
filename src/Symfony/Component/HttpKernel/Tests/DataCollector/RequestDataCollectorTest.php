@@ -142,8 +142,8 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'method' => null,
                     'file' => __FILE__,
                     'line' => $r3->getStartLine(),
-                )
-            )
+                ),
+            ),
         );
 
         $c = new RequestDataCollector();

@@ -301,7 +301,7 @@ class MainConfiguration implements ConfigurationInterface
             ->arrayNode('session_concurrency')
                 ->canBeUnset()
                 ->children()
-                    ->scalarNode('max_sessions')->defaultNull()->end()
+                    ->integerNode('max_sessions')->defaultValue(0)->min(0)->end()
                     ->booleanNode('error_if_maximum_exceeded')->defaultTrue()->end()
                     ->scalarNode('expiration_url')->defaultValue('/')->end()
                 ->end()

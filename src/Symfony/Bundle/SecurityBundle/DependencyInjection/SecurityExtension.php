@@ -719,7 +719,7 @@ class SecurityExtension extends Extension
     {
         $sessionStrategyId = 'security.authentication.session_strategy.'.$id;
 
-        if (isset($config['max_sessions'])) {
+        if (isset($config['max_sessions']) && $config['max_sessions'] > 0) {
             $concurrentSessionControlStrategyId = 'security.authentication.session_strategy.concurrent_control.'.$id;
             $container->setDefinition(
                 $concurrentSessionControlStrategyId,

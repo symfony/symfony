@@ -23,7 +23,7 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
     public function __construct(Connection $connection, $table)
     {
         $this->connection = $connection;
-        $this->table      = $table;
+        $this->table = $table;
     }
 
     /**
@@ -85,14 +85,14 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
             $this->connection->executeQuery(
                 $mergeSql,
                 array(
-                    'session_id'   => $sessionInformation->getSessionId(),
-                    'username'     => $sessionInformation->getUsername(),
+                    'session_id' => $sessionInformation->getSessionId(),
+                    'username' => $sessionInformation->getUsername(),
                     'last_request' => $sessionInformation->getLastRequest(),
-                    'expired'      => $sessionInformation->getExpired(),
+                    'expired' => $sessionInformation->getExpired(),
                 ),
                 array(
                     'last_request' => 'datetime',
-                    'expired'      => 'datetime',
+                    'expired' => 'datetime',
                 )
             );
 
@@ -118,14 +118,14 @@ class SessionRegistryStorage implements SessionRegistryStorageInterface
                 $this->connection->insert(
                     $this->table,
                     array(
-                        'session_id'   => $sessionInformation->getSessionId(),
-                        'username'     => $sessionInformation->getUsername(),
+                        'session_id' => $sessionInformation->getSessionId(),
+                        'username' => $sessionInformation->getUsername(),
                         'last_request' => $sessionInformation->getLastRequest(),
-                        'expired'      => $sessionInformation->getExpired(),
+                        'expired' => $sessionInformation->getExpired(),
                     ),
                     array(
                         'last_request' => 'datetime',
-                        'expired'      => 'datetime',
+                        'expired' => 'datetime',
                     )
                 );
             } catch (DBALException $e) {

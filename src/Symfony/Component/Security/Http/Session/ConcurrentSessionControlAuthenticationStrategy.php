@@ -47,9 +47,9 @@ class ConcurrentSessionControlAuthenticationStrategy implements SessionAuthentic
     {
         $username = $token->getUsername();
 
-        $sessions       = $this->registry->getAllSessions($username);
-        $sessionCount   = count($sessions);
-        $maxSessions    = $this->getMaximumSessionsForThisUser($username);
+        $sessions = $this->registry->getAllSessions($username);
+        $sessionCount = count($sessions);
+        $maxSessions = $this->getMaximumSessionsForThisUser($username);
 
         if ($sessionCount < $maxSessions) {
             return;

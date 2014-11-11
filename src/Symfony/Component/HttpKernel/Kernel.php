@@ -178,10 +178,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (false === $this->booted) {
-            $this->boot();
-        }
-
+        $this->boot();
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
 

@@ -52,17 +52,17 @@ class WriteCheckSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function gc($maxLifetime)
+    public function gc($maxlifetime)
     {
-        return $this->wrappedSessionHandler->gc($maxLifetime);
+        return $this->wrappedSessionHandler->gc($maxlifetime);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function open($savePath, $sessionId)
+    public function open($savePath, $sessionName)
     {
-        return $this->wrappedSessionHandler->open($savePath, $sessionId);
+        return $this->wrappedSessionHandler->open($savePath, $sessionName);
     }
 
     /**
@@ -80,12 +80,12 @@ class WriteCheckSessionHandler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function write($sessionId, $sessionData)
+    public function write($sessionId, $data)
     {
-        if (isset($this->readSessions[$sessionId]) && $sessionData === $this->readSessions[$sessionId]) {
+        if (isset($this->readSessions[$sessionId]) && $data === $this->readSessions[$sessionId]) {
             return true;
         }
 
-        return $this->wrappedSessionHandler->write($sessionId, $sessionData);
+        return $this->wrappedSessionHandler->write($sessionId, $data);
     }
 }

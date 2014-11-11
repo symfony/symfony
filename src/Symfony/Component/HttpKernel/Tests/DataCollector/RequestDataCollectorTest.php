@@ -59,6 +59,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         // make sure we always match the line number
         $r1 = new \ReflectionMethod($this, 'testControllerInspection');
         $r2 = new \ReflectionMethod($this, 'staticControllerMethod');
+        $r3 = new \ReflectionClass($this);
         // test name, callable, expected
         $controllerTests = array(
             array(
@@ -132,6 +133,17 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                     'line' => 'n/a',
                 ),
             ),
+
+            array(
+                'Invokable controller',
+                $this,
+                array(
+                    'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
+                    'method' => null,
+                    'file' => __FILE__,
+                    'line' => $r3->getStartLine(),
+                ),
+            ),
         );
 
         $c = new RequestDataCollector();
@@ -199,6 +211,11 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
      * Magic method to allow non existing methods to be called and delegated.
      */
     public static function __callStatic($method, $args)
+    {
+        throw new \LogicException('Unexpected method call');
+    }
+
+    public function __invoke()
     {
         throw new \LogicException('Unexpected method call');
     }

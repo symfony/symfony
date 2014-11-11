@@ -10,6 +10,7 @@
         <parameter key="security.authentication.session_strategy.composite.class">Symfony\Component\Security\Http\Session\CompositeSessionAuthenticationStrategy</parameter>
         <parameter key="security.authentication.session_registry.class">Symfony\Component\Security\Http\Session\SessionRegistry</parameter>
         <parameter key="security.authentication.session_information.class">Symfony\Component\Security\Http\Session\SessionInformation</parameter>
+        <parameter key="security.logout.handler.session_registry.class">Symfony\Component\Security\Http\Logout\SessionRegistryLogoutHandler</parameter>
     </parameters>
 
     <services>
@@ -31,5 +32,10 @@
             <argument type="service" id="security.authentication.session_registry_storage" />
             <argument>%security.authentication.session_information.class%</argument>
         </service>
+
+        <service id="security.logout.handler.session_registry" class="%security.logout.handler.session_registry.class%" public="false">
+            <argument type="service" id="security.authentication.session_registry" />
+        </service>
+
     </services>
 </container>

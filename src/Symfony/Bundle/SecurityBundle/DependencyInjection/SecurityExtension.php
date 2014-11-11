@@ -786,6 +786,11 @@ class SecurityExtension extends Extension
     {
         $listener = $container->findDefinition($listenerId);
 
+        // add session registry logout handler
+        if (isset($config['session_concurrency'])) {
+            $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session_registry')));
+        }
+
         // add session logout handler
         if (true === $config['logout']['invalidate_session'] && false === $config['stateless']) {
             $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));

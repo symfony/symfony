@@ -148,7 +148,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'line' => $r->getStartLine(),
                 );
             } elseif (is_object($controller)) {
-                $r = new \ReflectionClass(get_class($controller));
+                $r = new \ReflectionClass($controller);
                 $this->data['controller'] = array(
                     'class' => $r->getName(),
                     'method' => null,

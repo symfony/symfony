@@ -125,7 +125,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             }
         }
 
-        return $classes;
+        return array_unique($classes);
     }
 
     /**

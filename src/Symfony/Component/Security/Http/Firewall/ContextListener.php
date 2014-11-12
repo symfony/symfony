@@ -167,11 +167,17 @@ class ContextListener implements ListenerInterface
                 // let's try the next user provider
             } catch (UsernameNotFoundException $notFound) {
                 if (null !== $this->logger) {
-                    $this->logger->warning(sprintf('Username "%s" could not be found.', $notFound->getUsername()));
+                    $this->logger->warning(sprintf('Username "%s" could not be found from "%s" provider.', $notFound->getUsername(), get_class($provider)));
                 }
-
-                return;
+                // let's try the next user provider
             }
+        }
+
+        // if a UsernameNotFoundException has been thrown, there are providers 
+        // associated with the token, but none able to refresh it
+        if (isset($notFound)) {
+
+            return;
         }
 
         throw new \RuntimeException(sprintf('There is no user provider for user "%s".', get_class($user)));

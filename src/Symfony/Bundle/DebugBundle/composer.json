@@ -31,9 +31,8 @@
         "symfony/dependency-injection": "For using as a service from the container"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\DebugBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\DebugBundle\\": "" }
     },
-    "target-dir": "Symfony/Bundle/DebugBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

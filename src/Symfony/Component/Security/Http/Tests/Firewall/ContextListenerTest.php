@@ -21,7 +21,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\Security\Tests\Fixtures\Core\SimpleSecurityContext;
 
 class ContextListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -218,6 +220,54 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new ContextListener($context, array(), 'key123');
         $listener->handle($event);
+    }
+
+    public function testCanRefreshUserWithIdenticalProviders()
+    {
+        $providers = array(
+            $provider1 = new InMemoryUserProvider(array(
+                'foo' => array(),
+            )),
+            $provider2 = new InMemoryUserProvider(array(
+                'bar' => array(),
+            )),
+        );
+
+        $session = new Session(new MockArraySessionStorage());
+
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->any())->method('hasPreviousSession')->will($this->returnValue(true));
+        $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
+
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
+
+        $context = new SimpleSecurityContext();
+
+        /**
+         * We are trying to refresh the "foo" user
+         */
+        $user = new UsernamePasswordToken($provider1->loadUserByUsername('foo'), '123456', 'memory');
+        $session->set('_security_'. $key = 'key123', serialize($user));
+
+        $listener = new ContextListener($context, $providers, $key);
+        $listener->handle($event);
+
+        $this->assertNotNull($context->getToken());
+
+        /**
+         * We are trying to refresh the "bar" user
+         */
+        $user = new UsernamePasswordToken($provider2->loadUserByUsername('bar'), '123456', 'memory');
+        $session->set('_security_'. $key = 'key123', serialize($user));
+
+        $listener = new ContextListener($context, $providers, $key);
+        $listener->handle($event);
+
+        $this->assertNotNull($context->getToken());
     }
 
     protected function runSessionOnKernelResponse($newToken, $original = null)

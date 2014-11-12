@@ -357,9 +357,9 @@ The component and the bundle are new to Symfony 2.6. We encourage you
 to enable the bundle in your `app/AppKernel.php` for the *dev* or *test*
 environments. Just add this line before loading the `WebProfilerBundle`:
 
-   ```php
-   $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
-   ```
+```php
+$bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
+```
 
 Then enjoy dumping variables by calling `dump($var)` anywhere in your PHP
 and `{% dump var %}` or `{{ dump(var) }}` in Twig. Dumps are displayed

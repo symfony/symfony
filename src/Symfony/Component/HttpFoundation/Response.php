@@ -304,6 +304,8 @@ class Response
                 }
             }
         }
+        
+        $this->headers = $headers;
 
         // Fix protocol
         if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {

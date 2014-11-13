@@ -85,7 +85,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function isDecorated()
     {
-        return isset($this->decorator);
+        return null !== $this->decorator;
     }
 
     /**

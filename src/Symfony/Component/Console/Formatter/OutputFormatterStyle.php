@@ -22,15 +22,15 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
     private static $availableForegroundColors = array(
         'black', 'red', 'green', 'yellow',
-        'blue', 'magenta', 'cyan', 'white'
+        'blue', 'magenta', 'cyan', 'white',
     );
     private static $availableBackgroundColors = array(
         'black', 'red', 'green', 'yellow',
-        'blue', 'magenta', 'cyan', 'white'
+        'blue', 'magenta', 'cyan', 'white',
     );
     private static $availableOptions = array(
         'bold', 'underscore', 'blink',  'reverse',
-        'conceal'
+        'conceal',
     );
 
     private $foreground;
@@ -84,6 +84,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     {
         if (null === $color) {
             $this->foreground = null;
+
             return;
         }
 
@@ -123,6 +124,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     {
         if (null === $color) {
             $this->background = null;
+
             return;
         }
 
@@ -216,15 +218,15 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
         $definition = array();
 
         if (isset($this->foreground)) {
-            $definition[] = 'fg=' . $this->foreground;
+            $definition[] = 'fg='.$this->foreground;
         }
 
         if (isset($this->background)) {
-            $definition[] = 'bg=' . $this->background;
+            $definition[] = 'bg='.$this->background;
         }
 
         if (count($this->options)) {
-            $definition[] = 'options=' . implode(',', $this->options);
+            $definition[] = 'options='.implode(';', $this->options);
         }
 
         return implode(';', $definition);

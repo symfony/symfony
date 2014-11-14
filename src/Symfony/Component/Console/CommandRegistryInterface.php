@@ -9,16 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Bundle;
-
-use Symfony\Component\Console\Application;
+namespace Symfony\Component\Console;
 
 /**
- * Class CommandRegisterInterface
+ * Class CommandRegistryInterface
  *
  * @author  Yannick Voyer (http://github.com/yvoyer)
  */
-interface CommandRegisterInterface
+interface CommandRegistryInterface
 {
     /**
      * Registers custom Commands.

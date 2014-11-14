@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Bundle;
 
+use Symfony\Component\Console\CommandRegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Container;
@@ -26,7 +27,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @api
  */
-abstract class Bundle extends ContainerAware implements BundleInterface, CommandRegisterInterface
+abstract class Bundle extends ContainerAware implements BundleInterface, CommandRegistryInterface
 {
     protected $name;
     protected $extension;

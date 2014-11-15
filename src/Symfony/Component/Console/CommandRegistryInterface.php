@@ -14,7 +14,7 @@ namespace Symfony\Component\Console;
 /**
  * Class CommandRegistryInterface
  *
- * @author  Yannick Voyer (http://github.com/yvoyer)
+ * @author  Yannick Voyer <yan.voyer@gmail.com>
  */
 interface CommandRegistryInterface
 {
@@ -25,4 +25,3 @@ interface CommandRegistryInterface
      */
     public function registerCommands(Application $application);
 }
- 

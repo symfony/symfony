@@ -17,9 +17,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 /**
  * Class CommandRegistryBundle
  *
- * @author  Yannick Voyer (http://github.com/yvoyer)
+ * @author  Yannick Voyer <yan.voyer@gmail.com>
  */
 interface CommandRegistryBundle extends BundleInterface, CommandRegistryInterface
 {
 }
- 

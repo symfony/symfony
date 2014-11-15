@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -70,6 +71,11 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (defined('HHVM_VERSION')) {
+            $output->writeln('<error>This command is not supported on HHVM.</error>');
+
+            return 1;
+        }
         if (!extension_loaded('pcntl')) {
             $output->writeln('<error>This command needs the pcntl extension to run.</error>');
             $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');
@@ -105,13 +111,10 @@ EOF
             return 1;
         }
 
-        $process = $this->createServerProcess(
-            $address,
-            $input->getOption('docroot'),
-            $input->getOption('router'),
-            $env,
-            null
-        );
+        if (null === $process = $this->createServerProcess($output, $address, $input->getOption('docroot'), $input->getOption('router'), $env, null)) {
+            return 1;
+        }
+
         $process->disableOutput();
         $process->start();
         $lockFile = $this->getLockFile($address);
@@ -137,23 +140,32 @@ EOF
     /**
      * Creates a process to start PHP's built-in web server.
      *
-     * @param string $address      IP address and port to listen to
-     * @param string $documentRoot The application's document root
-     * @param string $router       The router filename
-     * @param string $env          The application environment
-     * @param int    $timeout      Process timeout
+     * @param OutputInterface $output       A OutputInterface instance
+     * @param string          $address      IP address and port to listen to
+     * @param string          $documentRoot The application's document root
+     * @param string          $router       The router filename
+     * @param string          $env          The application environment
+     * @param int             $timeout      Process timeout
      *
      * @return Process The process
      */
-    private function createServerProcess($address, $documentRoot, $router, $env, $timeout = null)
+    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router, $env, $timeout = null)
     {
         $router = $router ?: $this
             ->getContainer()
             ->get('kernel')
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
+
+        $finder = new PhpExecutableFinder();
+        if (false === $binary = $finder->find()) {
+            $output->writeln('<error>Unable to find PHP binary to start server</error>');
+
+            return;
+        }
+
         $script = implode(' ', array_map(array('Symfony\Component\Process\ProcessUtils', 'escapeArgument'), array(
-            PHP_BINARY,
+            $binary,
             '-S',
             $address,
             $router,

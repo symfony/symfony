@@ -222,7 +222,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    public function testCanRefreshUserWithIdenticalProviders()
+    public function testCanRefreshUserWithIdenticalSupportedProviders()
     {
         $providers = array(
             $provider1 = new InMemoryUserProvider(array(
@@ -251,7 +251,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
          * We are trying to refresh the "foo" user
          */
         $user = new UsernamePasswordToken($provider1->loadUserByUsername('foo'), '123456', 'memory');
-        $session->set('_security_'. $key = 'key123', serialize($user));
+        $session->set('_security_' . $key = 'key123', serialize($user));
 
         $listener = new ContextListener($context, $providers, $key);
         $listener->handle($event);
@@ -262,7 +262,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
          * We are trying to refresh the "bar" user
          */
         $user = new UsernamePasswordToken($provider2->loadUserByUsername('bar'), '123456', 'memory');
-        $session->set('_security_'. $key = 'key123', serialize($user));
+        $session->set('_security_' . $key = 'key123', serialize($user));
 
         $listener = new ContextListener($context, $providers, $key);
         $listener->handle($event);

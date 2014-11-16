@@ -57,8 +57,8 @@ class DateType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                $options['model_timezone'],
-                $options['view_timezone'],
+                'UTC',
+                'UTC',
                 $dateFormat,
                 $timeFormat,
                 $calendar,
@@ -105,7 +105,7 @@ class DateType extends AbstractType
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
+                    'UTC', 'UTC', array('year', 'month', 'day')
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -113,15 +113,15 @@ class DateType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
+                new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
+                new DateTimeToTimestampTransformer('UTC', 'UTC')
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], array('year', 'month', 'day'))
+                new DateTimeToArrayTransformer('UTC', 'UTC', array('year', 'month', 'day'))
             ));
         }
     }

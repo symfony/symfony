@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-11T10:45:30Z
+
+Please also rename `$sessionData` to `$data` and `$maxLifetime` to `$maxlifetime` to be consistent with the other handlers.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-11T10:46:09Z
+
+For merges: Should go into 2.5

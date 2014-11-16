@@ -96,6 +96,11 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
+        $address = parse_url($input->getArgument('address'));
+        if (!isset($address["port"])) {
+            throw new \RuntimeException(sprintf('No valid port number on address "%s"', $input->getArgument('address')));
+        }
+
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
         $output->writeln('Quit the server with CONTROL-C.');
 

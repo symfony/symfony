@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-23T17:07:55Z
+
+I'm not really a fan of useless annotations. What about just creating a command that parses all classes that have the "Events" suffix? This would also make it easier to parse 3rd party packages and list optional events if they follow the same system.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-23T17:34:00Z
+
+@iltar the idea here is to give a hint to phpdoc generators.
+
+And a command parsing classes ending with Events would have to parse all files in the project to find them, which would be quite inefficient.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-23T19:14:05Z
+
+@stof Having 3rd party bundles adapt to this standard will probably even take longer, where as it might be a lot more common for people to name their their classes `*Events`. I know I have done that and I think doctrine has this as well. Making 3rd party bundles adapt to a documentation/annotation standard is a lot harder and more work than scanning for an already existing pattern.
+
+Annotations also have the side effect of being used by parsers and IDEs. With a common name like Category, who knows what breaks. Who knows what custom Annotation readers will break on this? Side effects will most likely be limited, but in my opinion, a (slow but cachable) file scanner should be a better solution and show more possible events.
+
+I think the goal of this is to not only document Symfony events, because they are already documented, but also to gather all events and mark which are being listened to. On systems that have access to "find", this can even be an extremely fast one liner in bash.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-10-23T21:31:02Z
+
+@iltar
+I think having 3rd party bundles adapting to that standard is kind of a weak point, given that there is currently not a really standard anyway.
+
+The one big reason why having some annotation (you could also say that its just a ordinary phpdoc) is that doc tools out there already understand this. Parsing by classname in each file is way more specific compared to every common features, for example listing documentation by group.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-09T20:50:53Z
+
+Can someone explain me what bits here are wrong? There is a contribution header up there, changing documentation should also not let travis fail completly! Any idea?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-11-09T20:59:29Z
+
+@dawehner fabpot is only run when a new commit is pushed. It doesn't detect message changes in the PR description. I assume you didn't have the table when creating this PR?
+Also, travis is not failing because of this.
+Besides that,
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-09T21:04:21Z
+
+Okay ... rebased so updated.
+
+@WouterJ Did you maybe forgot to write down your full sentence.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-10T08:13:57Z
+
+@dawehner the thing is, I really don't see why you would want to list all events known from only symfony. They are already documented on the website.. What I _do_find interesting, is being able to list _all_ events available from _all_ my vendors.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-10T09:32:43Z
+
+@iltar
+Indeed this is the point, thank you. With that standard Drupal can also use the standard and mark
+the events, same as other bundles out there. Its an opt IN thing
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-10T09:34:59Z
+
+@dawehner That's why I think an `@category` won't work. It's a convention symfony might follow, but it takes a long time for everyone to adapt to this, if they even bother.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-10T14:52:34Z
+
+Looks like something that does not hurt us, so I'm :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-12T20:59:08Z
+
+`@category` has a very specific use for phpdocs, so I'm wondering if it would be better to choose something else. What do you think @mvriel?
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-12T21:02:37Z
+
+I would love to be able to use @group but I haven't found any information about that specific tag on phpdoc. Drupal uses it pretty mmuch everywhere already
+
+---------------------------------------------------------------------------
+
+by mvriel at 2014-11-13T06:26:16Z
+
+@fabpot I also think another tag name might be more well suited. With @category people are able to mention a top level grouping above @package.
+
+Even though it is under discussion for PSR-5, this tag name might still cause some confusion for people who have used docblocks for a long time
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-13T06:28:58Z
+
+So, what about a `@event` tag instead? Like Doctrine has an `@annotation` one.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-14T08:24:55Z
+
+I would be totally fine with that as well
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-16T09:02:55Z
+
+@dawehner Can you make the change? I think we need to use `@Event` to be consistent with the Doctrine `@Annotation`.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-16T11:02:20Z
+
+Sure, just was slacking around

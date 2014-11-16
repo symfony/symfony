@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-11-15T18:59:33Z
+
+I'm currently checking what's happening on HHVM (I'm total noob on this platform)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-11-15T19:32:52Z
+
+HHVM does not support such option (`-S`), so I made the command failing in this case

@@ -84,15 +84,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
-
-        $this->init();
-    }
-
-    /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
-     */
-    public function init()
-    {
     }
 
     public function __clone()

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by StephaneSeng at 2014-11-15T18:56:24Z
+
+Below is the failed test output.
+There might have been a network error during the test execution.
+
+```
+Running src/Symfony/Component/Filesystem tests
+Loading composer repositories with package information
+Installing dependencies (including require-dev)
+Nothing to install or update
+Generating autoload files
+PHPUnit 4.3.4 by Sebastian Bergmann.
+Configuration read from /home/travis/build/symfony/symfony/src/Symfony/Component/Filesystem/phpunit.xml.dist
+............E.................................................... 65 / 97 ( 67%)
+................................
+Time: 540 ms, Memory: 6.00Mb
+There was 1 error:
+1) Symfony\Component\Filesystem\Tests\FilesystemTest::testCopyForOriginUrlsAndExistingLocalFileDefaultsToNotCopy
+Symfony\Component\Filesystem\Exception\IOException: Failed to copy "http://symfony.com/images/common/logo/logo_symfony_header.png" to "/tmp/141606272844/copy_target_file" because source file could not be opened for reading.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Filesystem/Filesystem.php:55
+/home/travis/build/symfony/symfony/src/Symfony/Component/Filesystem/Tests/FilesystemTest.php:179
+
+FAILURES!
+Tests: 97, Assertions: 151, Errors: 1.
+```

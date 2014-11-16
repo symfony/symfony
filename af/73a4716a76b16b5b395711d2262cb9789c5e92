@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-16T15:19:27Z
+
+If changed it should be done in the branch where `isMasterRequest` has been introduced.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-16T15:21:34Z
+
+Also this is not a bug fix.

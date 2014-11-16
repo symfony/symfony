@@ -391,6 +391,10 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
+        if ($this->exists($originDir)) {
+            $this->mkdir($targetDir);
+        }
+
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 

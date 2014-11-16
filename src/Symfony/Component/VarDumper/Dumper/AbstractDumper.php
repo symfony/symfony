@@ -115,7 +115,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function dumpLine($depth)
     {
-        call_user_func($this->lineDumper, $this->line, $depth);
+        call_user_func($this->lineDumper, $this->line, $depth, $this->indentPad);
         $this->line = '';
     }
 
@@ -125,10 +125,10 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      * @param string $line  The line to write.
      * @param int    $depth The recursive depth in the dumped structure.
      */
-    protected function echoLine($line, $depth)
+    protected function echoLine($line, $depth, $indentPad)
     {
         if (-1 !== $depth) {
-            fwrite($this->outputStream, str_repeat($this->indentPad, $depth).$line."\n");
+            fwrite($this->outputStream, str_repeat($indentPad, $depth).$line."\n");
         }
     }
 }

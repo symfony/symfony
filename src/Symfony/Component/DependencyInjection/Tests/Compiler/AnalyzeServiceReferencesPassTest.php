@@ -79,6 +79,28 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ref, $refs[0]->getValue());
     }
 
+    public function testProcessDetectsReferencesFromInlinedFactoryDefinitions()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a')
+        ;
+
+        $factory = new Definition();
+        $factory->setFactoryService('a');
+
+        $container
+            ->register('b')
+            ->addArgument($factory)
+        ;
+
+        $graph = $this->process($container);
+
+        $this->assertTrue($graph->hasNode('a'));
+        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
+    }
+
     public function testProcessDoesNotSaveDuplicateReferences()
     {
         $container = new ContainerBuilder();

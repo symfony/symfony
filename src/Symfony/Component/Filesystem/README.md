@@ -18,6 +18,8 @@ $filesystem->touch($files, $time = null, $atime = null);
 
 $filesystem->remove($files);
 
+$filesystem->exists($files);
+
 $filesystem->chmod($files, $mode, $umask = 0000, $recursive = false);
 
 $filesystem->chown($files, $user, $recursive = false);

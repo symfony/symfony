@@ -29,6 +29,8 @@ final class KernelEvents
      * receives a Symfony\Component\HttpKernel\Event\GetResponseEvent
      * instance.
      *
+     * @Event
+     *
      * @var string
      *
      * @api
@@ -42,6 +44,8 @@ final class KernelEvents
      * to modify the thrown exception. The event listener method receives
      * a Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent
      * instance.
+     *
+     * @Event
      *
      * @var string
      *
@@ -58,6 +62,8 @@ final class KernelEvents
      * Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent
      * instance.
      *
+     * @Event
+     *
      * @var string
      *
      * @api
@@ -71,6 +77,8 @@ final class KernelEvents
      * This event allows you to change the controller that will handle the
      * request. The event listener method receives a
      * Symfony\Component\HttpKernel\Event\FilterControllerEvent instance.
+     *
+     * @Event
      *
      * @var string
      *
@@ -86,6 +94,8 @@ final class KernelEvents
      * replied. The event listener method receives a
      * Symfony\Component\HttpKernel\Event\FilterResponseEvent instance.
      *
+     * @Event
+     *
      * @var string
      *
      * @api
@@ -99,6 +109,8 @@ final class KernelEvents
      * The event listener method receives a
      * Symfony\Component\HttpKernel\Event\PostResponseEvent instance.
      *
+     * @Event
+     *
      * @var string
      */
     const TERMINATE = 'kernel.terminate';
@@ -108,6 +120,8 @@ final class KernelEvents
      *
      * This event allows you to reset the global and environmental state of
      * the application, when it was changed during the request.
+     *
+     * @Event
      *
      * @var string
      */

@@ -162,7 +162,7 @@
 
 {% block password_widget -%}
     {% set type = type|default('password') %}
-    {{ block('form_widget_simple') }}
+    {{- block('form_widget_simple') -}}
 {%- endblock password_widget %}
 
 {% block hidden_widget -%}

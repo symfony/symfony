@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-01T14:22:29Z
+
+Would it make sense to make similar changes elsewhere in the code where we also override PHP constants? At least where speed is not critical.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-01T15:37:13Z
+
+Which parts do you have in mind?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-02T01:12:44Z
+
+I think almost all of them:
+
+src/Symfony/Bridge/Twig/Extension/CodeExtension.php
+src/Symfony/Bundle/FrameworkBundle/Templating/Helper/CodeHelper.php
+src/Symfony/Component/ClassLoader/ClassMapGenerator.php
+src/Symfony/Component/Console/Input/InputDefinition.php
+src/Symfony/Component/Debug/ExceptionHandler.php
+src/Symfony/Component/HttpKernel/Fragment/HIncludeFragmentRenderer.php
+src/Symfony/Component/Intl/Resources/bin/common.php
+src/Symfony/Component/Process/Tests/PipeStdinInStdoutStdErrStreamSelect.php
+src/Symfony/Component/Templating/PhpEngine.php
+src/Symfony/Component/Yaml/Exception/ParseException.php
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-16T13:32:56Z
+
+I updated removed other redefinitions of internal PHP constants. However, `src/Symfony/Component/Intl/Resources/bin/common.php` and `src/Symfony/Component/Process/Tests/PipeStdinInStdoutStdErrStreamSelect.php` define some constants, but those are not related to the PHP core itself. So I didn't modify them.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-16T17:53:18Z
+
+:+1: (after the escape() method is optimized)

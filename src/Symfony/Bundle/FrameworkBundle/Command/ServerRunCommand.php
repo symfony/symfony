@@ -29,7 +29,7 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (version_compare(phpversion(), '5.4.0', '<')) {
+        if (PHP_VERSION_ID < 50400) {
             return false;
         }
 

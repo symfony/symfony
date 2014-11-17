@@ -30,7 +30,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsExposedWhenNotProtected($config)
     {
-        if (strpos(PHP_OS, "WIN") === 0 && version_compare(phpversion(), "5.3.9", "<")) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && PHP_VERSION_ID < 50309) {
             $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
         }
 
@@ -46,7 +46,7 @@ class SecurityRoutingIntegrationTest extends WebTestCase
      */
     public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights($config)
     {
-        if (strpos(PHP_OS, "WIN") === 0 && version_compare(phpversion(), "5.3.9", "<")) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && PHP_VERSION_ID < 50309) {
             $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 fixed in http://svn.php.net/viewvc?view=revision&revision=318366');
         }
 

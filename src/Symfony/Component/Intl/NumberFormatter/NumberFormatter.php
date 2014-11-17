@@ -816,10 +816,7 @@ class NumberFormatter
             // The negative PHP_INT_MAX was being converted to float
             if (
                 $value == self::$int32Range['negative'] &&
-                (
-                    (version_compare(PHP_VERSION, '5.4.0', '<') && version_compare(PHP_VERSION, '5.3.14', '>=')) ||
-                    version_compare(PHP_VERSION, '5.4.4', '>=')
-                )
+                ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404)
             ) {
                 return (int) $value;
             }
@@ -832,10 +829,7 @@ class NumberFormatter
             // A 32 bit integer was being generated instead of a 64 bit integer
             if (
                   ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) &&
-                  (
-                      (version_compare(PHP_VERSION, '5.3.14', '<')) ||
-                      (version_compare(PHP_VERSION, '5.4.0', '>=') && version_compare(PHP_VERSION, '5.4.4', '<'))
-                  )
+                  (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404))
             ) {
                 $value = (-2147483648 - ($value % -2147483648)) * ($value / abs($value));
             }

@@ -66,7 +66,7 @@ class BCryptPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     private function skipIfPhpVersionIsNotSupported()
     {
-        if (version_compare(phpversion(), '5.3.7', '<')) {
+        if (PHP_VERSION_ID < 50307) {
             $this->markTestSkipped('Requires PHP >= 5.3.7');
         }
     }

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\ClassLoader;
 
-if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+if (PHP_VERSION_ID >= 50400) {
     define('SYMFONY_TRAIT', T_TRAIT);
 } else {
     define('SYMFONY_TRAIT', 0);

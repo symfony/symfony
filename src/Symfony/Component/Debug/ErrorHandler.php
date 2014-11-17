@@ -101,7 +101,7 @@ class ErrorHandler
 
         if ($level & (E_USER_DEPRECATED | E_DEPRECATED)) {
             if (isset(self::$loggers['deprecation'])) {
-                if (version_compare(PHP_VERSION, '5.4', '<')) {
+                if (PHP_VERSION_ID < 50400) {
                     $stack = array_map(
                         function ($row) {
                             unset($row['args']);

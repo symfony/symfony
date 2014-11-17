@@ -324,7 +324,7 @@ class Response
             while (($level = ob_get_level()) > 0 && $level !== $previous) {
                 $previous = $level;
                 if ($obStatus[$level - 1]) {
-                    if (version_compare(PHP_VERSION, '5.4', '>=')) {
+                    if (PHP_VERSION_ID >= 50400) {
                         if (isset($obStatus[$level - 1]['flags']) && ($obStatus[$level - 1]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)) {
                             ob_end_flush();
                         }

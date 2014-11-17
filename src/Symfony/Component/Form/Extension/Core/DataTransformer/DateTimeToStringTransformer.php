@@ -69,7 +69,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         // The pipe in the parser pattern only works as of PHP 5.3.7
         // See http://bugs.php.net/54316
         $this->parseUsingPipe = null === $parseUsingPipe
-            ? version_compare(phpversion(), '5.3.7', '>=')
+            ? PHP_VERSION_ID >= 50307
             : $parseUsingPipe;
 
         // See http://php.net/manual/en/datetime.createfromformat.php

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-08T09:56:27Z
+
+I'm not sure Propel follows semver good enough for this in version `1.*`...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-09T07:42:17Z
+
+Considering that Propel 1.6 is still the latest version and that there has been no recent activity on Propel, I don't see the need for the change. Let the Propel guys decide when see fit.
+
+---------------------------------------------------------------------------
+
+by hason at 2014-11-09T10:21:26Z
+
+@fabpot The latest version is 1.7.1.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-09T11:03:23Z
+
+Maybe @marcj knows more about the versions and can take a look at this (if it's really an issue).
+
+---------------------------------------------------------------------------
+
+by marcj at 2014-11-09T14:42:58Z
+
+Propel follows semver.
+
+---------------------------------------------------------------------------
+
+by hason at 2014-11-10T08:21:54Z
+
+I used the same version constraint as in https://github.com/propelorm/PropelBundle/blob/1.4/composer.json#L13
+
+---------------------------------------------------------------------------
+
+by hason at 2014-11-17T19:46:43Z
+
+@fabpot ping
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-17T20:29:05Z
+
+going to merge it in 2.3.

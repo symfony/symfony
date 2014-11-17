@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-17T14:36:43Z
+
+I modified the changes from #12372 as [suggested by @stof](https://github.com/symfony/symfony/pull/12372/files#r20435800).
+
+However, there are much more calls to `version_compare()`. I think it does make sense to update them as well. What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-17T14:48:54Z
+
+@xabbuh Looks like a good idea to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-17T15:03:35Z
+
+Indeed, it is a good idea to change this everywhere
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-17T15:55:18Z
+
+It's updated now. I hope I didn't mess anything up.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-17T15:57:24Z
+
+I was not sure how to replace something like this:
+
+```php
+version_compare(PHP_VERSION, '5.5.0-dev', '>=')
+```
+
+Is `PHP_VERSION_ID >= 50500` sufficient?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-17T16:03:23Z
+
+@xabbuh yes. Unreleased versions on 5.5.0 were already using the 50500 id (this id constant does not take pre-release versions into account)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-17T16:28:20Z
+
+Should be good now.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-17T16:35:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-11-17T16:36:10Z
+
+:+1: thanks @xabbuh

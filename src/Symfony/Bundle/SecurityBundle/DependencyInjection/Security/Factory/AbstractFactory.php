@@ -59,8 +59,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         if ($this->isRememberMeAware($config)) {
             $container
                 ->getDefinition($listenerId)
-                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId))
-            ;
+                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId));
         }
 
         // create entry point if applicable (optional)
@@ -77,8 +76,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
             ->scalarNode('provider')->end()
             ->booleanNode('remember_me')->defaultTrue()->end()
             ->scalarNode('success_handler')->end()
-            ->scalarNode('failure_handler')->end()
-        ;
+            ->scalarNode('failure_handler')->end();
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
             if (is_bool($default)) {
@@ -157,6 +155,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
+
+        //Check for custom session authentication strategy
+        $sessionAuthenticationStrategyId = 'security.authentication.session_strategy.'.$id;
+        if ($container->hasDefinition($sessionAuthenticationStrategyId) || $container->hasAlias($sessionAuthenticationStrategyId)) {
+            $listener->replaceArgument(2, new Reference($sessionAuthenticationStrategyId));
+        }
+
         $listener->replaceArgument(4, $id);
         $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(6, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));

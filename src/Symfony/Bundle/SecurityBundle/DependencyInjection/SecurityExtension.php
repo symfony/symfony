@@ -71,6 +71,10 @@ class SecurityExtension extends Extension
             $container->removeDefinition('security.access.expression_voter');
         }
 
+        if (isset($config['session_registry'])) {
+            $this->sessionRegistryLoad($config['session_registry'], $container, $loader);
+        }
+
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
@@ -79,8 +83,7 @@ class SecurityExtension extends Extension
             ->getDefinition('security.access.decision_manager')
             ->addArgument($config['access_decision_manager']['strategy'])
             ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
-            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
-        ;
+            ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied']);
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);
 
@@ -147,8 +150,7 @@ class SecurityExtension extends Extension
                 'connection' => $config['connection'],
                 'event' => 'postGenerateSchema',
                 'lazy' => true,
-            ))
-        ;
+            ));
 
         $container->getDefinition('security.acl.cache.doctrine')->addArgument($config['cache']['prefix']);
 
@@ -157,6 +159,30 @@ class SecurityExtension extends Extension
         $container->setParameter('security.acl.dbal.oid_table_name', $config['tables']['object_identity']);
         $container->setParameter('security.acl.dbal.oid_ancestors_table_name', $config['tables']['object_identity_ancestors']);
         $container->setParameter('security.acl.dbal.sid_table_name', $config['tables']['security_identity']);
+    }
+
+    private function sessionRegistryLoad($config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_session_concurrency.xml');
+
+        if (isset($config['session_registry_storage'])) {
+            $container->setAlias('security.authentication.session_registry_storage', $config['session_registry_storage']);
+
+            return;
+        }
+
+        $this->configureDbalSessionRegistryStorage($config, $container, $loader);
+    }
+
+    private function configureDbalSessionRegistryStorage($config, ContainerBuilder $container, $loader)
+    {
+        $loader->load('security_session_registry_dbal.xml');
+
+        if (isset($config['connection'])) {
+            $container->setAlias('security.session_registry.dbal.connection', sprintf('doctrine.dbal.%s_connection', $config['connection']));
+        }
+
+        $container->setParameter('security.session_registry.dbal.session_information_table_name', $config['table']);
     }
 
     /**
@@ -236,8 +262,7 @@ class SecurityExtension extends Extension
             $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
             $context
                 ->replaceArgument(0, $listeners)
-                ->replaceArgument(1, $exceptionListener)
-            ;
+                ->replaceArgument(1, $exceptionListener);
             $map[$contextId] = $matcher;
         }
         $mapDef->replaceArgument(1, $map);
@@ -248,8 +273,7 @@ class SecurityExtension extends Extension
         }, array_values(array_unique($authenticationProviders)));
         $container
             ->getDefinition('security.authentication.manager')
-            ->replaceArgument(0, $authenticationProviders)
-        ;
+            ->replaceArgument(0, $authenticationProviders);
     }
 
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds)
@@ -304,14 +328,7 @@ class SecurityExtension extends Extension
             ));
             $listeners[] = new Reference($listenerId);
 
-            // add logout success handler
-            if (isset($firewall['logout']['success_handler'])) {
-                $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
-            } else {
-                $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
-                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
-                $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
-            }
+            $logoutSuccessHandlerId = $this->createLogoutSuccessHandler($container, $id, $firewall['logout']);
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
 
             // add CSRF provider
@@ -319,24 +336,7 @@ class SecurityExtension extends Extension
                 $listener->addArgument(new Reference($firewall['logout']['csrf_token_generator']));
             }
 
-            // add session logout handler
-            if (true === $firewall['logout']['invalidate_session'] && false === $firewall['stateless']) {
-                $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
-            }
-
-            // add cookie logout handler
-            if (count($firewall['logout']['delete_cookies']) > 0) {
-                $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
-                $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
-                $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
-
-                $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
-            }
-
-            // add custom handlers
-            foreach ($firewall['logout']['handlers'] as $handlerId) {
-                $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
-            }
+            $this->addLogoutHandlers($container, $listenerId, $id, $firewall);
 
             // register with LogoutUrlHelper
             $container
@@ -347,8 +347,7 @@ class SecurityExtension extends Extension
                     $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
                     isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
-                ))
-            ;
+                ));
         }
 
         // Authentication listeners
@@ -363,6 +362,11 @@ class SecurityExtension extends Extension
 
         // Access listener
         $listeners[] = new Reference('security.access_listener');
+
+        // Expired session listener
+        if (isset($firewall['session_concurrency'])) {
+            $listeners[] = new Reference($this->createExpiredSessionListener($container, $id, $firewall));
+        }
 
         // Determine default entry point
         if (isset($firewall['entry_point'])) {
@@ -394,6 +398,10 @@ class SecurityExtension extends Extension
         $hasListeners = false;
         $defaultEntryPoint = null;
 
+        if (isset($firewall['session_concurrency'])) {
+            $this->createConcurrentSessionAuthenticationStrategy($container, $id, $firewall['session_concurrency']);
+        }
+
         foreach ($this->listenerPositions as $position) {
             foreach ($this->factories[$position] as $factory) {
                 $key = str_replace('-', '_', $factory->getKey());
@@ -415,16 +423,14 @@ class SecurityExtension extends Extension
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
                 ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
-                ->replaceArgument(1, $firewall['anonymous']['key'])
-            ;
+                ->replaceArgument(1, $firewall['anonymous']['key']);
 
             $listeners[] = new Reference($listenerId);
 
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
                 ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
-                ->replaceArgument(0, $firewall['anonymous']['key'])
-            ;
+                ->replaceArgument(0, $firewall['anonymous']['key']);
 
             $authenticationProviders[] = $providerId;
             $hasListeners = true;
@@ -446,8 +452,7 @@ class SecurityExtension extends Extension
 
         $container
             ->getDefinition('security.encoder_factory.generic')
-            ->setArguments(array($encoderMap))
-        ;
+            ->setArguments(array($encoderMap));
     }
 
     private function createEncoder($config, ContainerBuilder $container)
@@ -542,8 +547,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-                ->addArgument($providers)
-            ;
+                ->addArgument($providers);
 
             return $name;
         }
@@ -553,8 +557,7 @@ class SecurityExtension extends Extension
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
                 ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
+                ->addArgument($provider['entity']['property']);
 
             return $name;
         }
@@ -566,8 +569,7 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
-            ;
+                ->setArguments(array($username, (string) $user['password'], $user['roles']));
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
         }
@@ -627,6 +629,22 @@ class SecurityExtension extends Extension
         return $this->expressions[$id] = new Reference($id);
     }
 
+    private function createExpiredSessionListener($container, $id, $config)
+    {
+        $expiredSessionListenerId = 'security.authentication.expiredsession_listener.'.$id;
+        $listener = $container->setDefinition($expiredSessionListenerId, new DefinitionDecorator('security.authentication.expiredsession_listener'));
+
+        $listener->replaceArgument(3, $config['session_concurrency']['expiration_url']);
+
+        if (isset($config['logout'])) {
+            $logoutSuccessHandlerId = $this->createLogoutSuccessHandler($container, $id, $config);
+            $listener->replaceArgument(4, new Reference($logoutSuccessHandlerId));
+            $this->addLogoutHandlers($container, $expiredSessionListenerId, $id, $config);
+        }
+
+        return $expiredSessionListenerId;
+    }
+
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
     {
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
@@ -649,8 +667,7 @@ class SecurityExtension extends Extension
         $container
             ->register($id, '%security.matcher.class%')
             ->setPublic(false)
-            ->setArguments($arguments)
-        ;
+            ->setArguments($arguments);
 
         return $this->requestMatchers[$id] = new Reference($id);
     }
@@ -696,5 +713,101 @@ class SecurityExtension extends Extension
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function createConcurrentSessionAuthenticationStrategy($container, $id, $config)
+    {
+        $sessionStrategyId = 'security.authentication.session_strategy.'.$id;
+
+        if (isset($config['max_sessions']) && $config['max_sessions'] > 0) {
+            $concurrentSessionControlStrategyId = 'security.authentication.session_strategy.concurrent_control.'.$id;
+            $container->setDefinition(
+                $concurrentSessionControlStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.concurrent_control'
+                )
+            )->replaceArgument(1, $config['max_sessions'])
+            ->replaceArgument(2, $config['error_if_maximum_exceeded']);
+
+            $fixationSessionStrategyId = 'security.authentication.session_strategy.fixation.'.$id;
+            $container->setAlias(
+                $fixationSessionStrategyId,
+                'security.authentication.session_strategy'
+            );
+
+            $registerSessionStrategyId = 'security.authentication.session_strategy.register.'.$id;
+            $container->setDefinition(
+                $registerSessionStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.register'
+                )
+            );
+
+            $container->setDefinition(
+                $sessionStrategyId,
+                new DefinitionDecorator(
+                    'security.authentication.session_strategy.composite'
+                )
+            )->replaceArgument(
+                0,
+                array(
+                    new Reference($concurrentSessionControlStrategyId),
+                    new Reference($fixationSessionStrategyId),
+                    new Reference($registerSessionStrategyId),
+                )
+            );
+        } else {
+            $container->setAlias(
+                $sessionStrategyId,
+                'security.authentication.session_strategy'
+            );
+        }
+
+        return $sessionStrategyId;
+    }
+
+    private function createLogoutSuccessHandler($container, $id, $config)
+    {
+        // add logout success handler
+        if (isset($config['success_handler'])) {
+            $logoutSuccessHandlerId = $config['success_handler'];
+        } else {
+            $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
+            if (!$container->hasDefinition($logoutSuccessHandlerId)) {
+                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
+                $logoutSuccessHandler->replaceArgument(1, $config['target']);
+            }
+        }
+
+        return $logoutSuccessHandlerId;
+    }
+
+    private function addLogoutHandlers($container, $listenerId, $id, $config)
+    {
+        $listener = $container->findDefinition($listenerId);
+
+        // add session registry logout handler
+        if (isset($config['session_concurrency'])) {
+            $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session_registry')));
+        }
+
+        // add session logout handler
+        if (true === $config['logout']['invalidate_session'] && false === $config['stateless']) {
+            $listener->addMethodCall('addHandler', array(new Reference('security.logout.handler.session')));
+        }
+
+        // add cookie logout handler
+        if (count($config['logout']['delete_cookies']) > 0) {
+            $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
+            $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
+            $cookieHandler->addArgument($config['logout']['delete_cookies']);
+
+            $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
+        }
+
+        // add custom handlers
+        foreach ($config['logout']['handlers'] as $handlerId) {
+            $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
+        }
     }
 }

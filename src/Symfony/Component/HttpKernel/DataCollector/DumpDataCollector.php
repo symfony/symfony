@@ -155,7 +155,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1)
     {
-        $data = fopen('php://memory' 'r+b');
+        $data = fopen('php://memory', 'r+b');
 
         if ('html' === $format) {
             $dumper = new HtmlDumper($data);

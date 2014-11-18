@@ -7,6 +7,7 @@ CHANGELOG
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
  * added "label_format" option with possible placeholders "%name%" and "%id%"
+ * [BC BREAK] drop support for model_timezone and view_timezone options in TimeType, DateType and BirthdayType
 
 2.5.0
 ------

@@ -5,6 +5,11 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="var_dumper.cloner" />
+        </service>
+
         <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />

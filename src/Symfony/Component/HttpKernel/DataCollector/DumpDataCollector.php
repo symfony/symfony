@@ -155,24 +155,21 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function getDumps($format, $maxDepthLimit = -1, $maxItemsPerDepth = -1)
     {
+        $data = fopen('php://memory', 'r+b');
+
         if ('html' === $format) {
-            $dumper = new HtmlDumper();
+            $dumper = new HtmlDumper($data);
         } else {
             throw new \InvalidArgumentException(sprintf('Invalid dump format: %s', $format));
         }
         $dumps = array();
 
         foreach ($this->data as $dump) {
-            $data = '';
-            $dumper->dump(
-                $dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth),
-                function ($line, $depth) use (&$data) {
-                    if (-1 !== $depth) {
-                        $data .= str_repeat('  ', $depth).$line."\n";
-                    }
-                }
-            );
-            $dump['data'] = $data;
+            $dumper->dump($dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth));
+            rewind($data);
+            $dump['data'] = stream_get_contents($data);
+            ftruncate($data, 0);
+            rewind($data);
             $dumps[] = $dump;
         }
 

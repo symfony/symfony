@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-10T21:14:34Z
+
+Will this even work as expected when you have two extensions providing the same Twig function?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-11T10:48:07Z
+
+Yes, it's expected, and provides compat with <2.6 apps: the last registered function will override the previous one. DebugBundle is always registered after the twig one, so the upgrade path is easy: enable the bundle and get the new dump
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-11T10:53:33Z
+
+Then it should be documented in the DebugBundle that it must be registered after the TwigBundle for people who enable it manually.

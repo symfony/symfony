@@ -1144,4 +1144,3 @@ Symfony2 is the result of the work of many people who made the code better
  - Erik Saunier (snickers)
  - Matej Žilák (teo_sk)
  - Vladislav Vlastovskiy (vlastv)
- - Farhad Safarov (seferov)

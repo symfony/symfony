@@ -107,16 +107,16 @@ class Parser
                         $parser->refs = & $this->refs;
 
                         $block = $values['value'];
+                        $blockIsLiteral = isset($matches['value']) && preg_match('/^'.self::FOLDED_SCALAR_PATTERN.'$/', $matches['value']);
                         if ($this->isNextLineIndented()) {
-                            $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + 2);
+                            $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + 2, false, $blockIsLiteral);
                         }
-
                         $data[] = $parser->parse($block, $exceptionOnInvalidType, $objectSupport, $objectForMap);
                     } else {
                         $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
                     }
                 }
-            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'],' #') || in_array($values['key'][0], array('"', "'")))) {
+            } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))) {
                 if ($context && 'sequence' == $context) {
                     throw new ParseException('You cannot define a mapping item when in a sequence');
                 }
@@ -324,12 +324,13 @@ class Parser
      *
      * @param int  $indentation The indent level at which the block is to be read, or null for default
      * @param bool $inSequence  True if the enclosing data structure is a sequence
+     * @param bool $isLiteral True if the enclosing data is a string literal
      *
      * @return string A YAML string
      *
      * @throws ParseException When indentation problem are detected
      */
-    private function getNextEmbedBlock($indentation = null, $inSequence = false)
+    private function getNextEmbedBlock($indentation = null, $inSequence = false, $isLiteral = false)
     {
         $oldLineIndentation = $this->getCurrentLineIndentation();
 
@@ -363,7 +364,7 @@ class Parser
 
         // Comments must not be removed inside a string block (ie. after a line ending with "|")
         $removeCommentsPattern = '~'.self::FOLDED_SCALAR_PATTERN.'$~';
-        $removeComments = !preg_match($removeCommentsPattern, $this->currentLine);
+        $removeComments = !$isLiteral && !preg_match($removeCommentsPattern, $this->currentLine);
 
         while ($this->moveToNextLine()) {
             $indent = $this->getCurrentLineIndentation();

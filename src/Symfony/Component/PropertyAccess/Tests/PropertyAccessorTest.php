@@ -67,6 +67,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
+    public function testGetValueWhenArrayValueIsNull()
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertNull($this->propertyAccessor->getValue(array('index' => array('nullable' => null)), '[index][nullable]'));
+    }
+
     /**
      * @dataProvider getPathsWithMissingProperty
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException

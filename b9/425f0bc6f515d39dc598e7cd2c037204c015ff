@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-17T14:11:54Z
+
+If the explantions are expanded, it does probably make sense to also link to the [Form events section in the documentation](http://symfony.com/doc/current/cookbook/form/dynamic_form_modification.html).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-19T06:34:23Z
+
+@xabbuh IIRC, we don't have that many references to the docs from the Symfony code. That might be a good idea to add some, but what about creating a specific task/effort for that?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-19T07:43:43Z
+
+I think that would be a great idea @fabpot! It would really make it easier to search for specific use-cases if the comments point you to the right place in the documentation. It also means that code isn't documented twice and thus less effort to keep it up to date.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-19T07:55:23Z
+
+@fabpot That makes sense. I created #12512 for this where we can collect ideas for which parts could be enriched with external links.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-19T08:31:02Z
+
+Thanks @xabbuh. Merging this one now.

@@ -95,14 +95,13 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-        $errorHandler = null;
-        $errorHandler = set_error_handler(function () use (&$errorHandler) {
+        $errorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) use (&$errorHandler) {
             if (JSON_ERROR_NONE !== json_last_error()) {
                 return;
             }
 
             if ($errorHandler) {
-                call_user_func_array($errorHandler, func_get_args());
+                $errorHandler($type, $msg, $file, $line, $context);
             }
         });
 

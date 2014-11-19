@@ -55,7 +55,7 @@ class CallbackValidator extends ConstraintValidator
                     throw new ConstraintDefinitionException(sprintf('"%s::%s" targeted by Callback constraint is not a valid callable', $method[0], $method[1]));
                 }
 
-                call_user_func($method, $object, $this->context);
+                $method($object, $this->context);
 
                 continue;
             }

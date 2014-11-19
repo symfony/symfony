@@ -92,11 +92,11 @@ class StreamedResponse extends Response
 
         $this->streamed = true;
 
-        if (null === $this->callback) {
+        if (null === $callback = $this->callback) {
             throw new \LogicException('The Response callback must not be null.');
         }
 
-        call_user_func($this->callback);
+        $callback();
     }
 
     /**

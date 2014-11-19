@@ -467,7 +467,7 @@ class DialogHelper extends InputAwareHelper
             }
 
             try {
-                return call_user_func($validator, $interviewer());
+                return $validator($interviewer());
             } catch (\Exception $error) {
             }
         }

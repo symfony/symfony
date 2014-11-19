@@ -225,8 +225,10 @@ class ExprBuilder
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {
-                $expressions[$k] = function ($v) use ($expr) {
-                    return call_user_func($expr->ifPart, $v) ? call_user_func($expr->thenPart, $v) : $v;
+                $ifPart = $expr->ifPart;
+                $thenPart = $expr->thenPart;
+                $expressions[$k] = function ($v) use ($ifPart, $thenPart) {
+                    return $ifPart($v) ? $thenPart($v) : $v;
                 };
             }
         }

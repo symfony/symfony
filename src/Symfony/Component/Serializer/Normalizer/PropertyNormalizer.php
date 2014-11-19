@@ -97,7 +97,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
             $attributeValue = $property->getValue($object);
 
             if (array_key_exists($property->name, $this->callbacks)) {
-                $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
+                $attributeValue = $this->callbacks[$property->name]($attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
                 $attributeValue = $this->serializer->normalize($attributeValue, $format);

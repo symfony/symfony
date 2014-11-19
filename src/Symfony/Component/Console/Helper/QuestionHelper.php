@@ -353,13 +353,14 @@ class QuestionHelper extends Helper
     {
         $error = null;
         $attempts = $question->getMaxAttempts();
+        $validator = $question->getValidator();
         while (null === $attempts || $attempts--) {
             if (null !== $error) {
                 $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
             }
 
             try {
-                return call_user_func($question->getValidator(), $interviewer());
+                return $validator($interviewer());
             } catch (\Exception $error) {
             }
         }

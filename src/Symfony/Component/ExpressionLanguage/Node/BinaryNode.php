@@ -88,10 +88,10 @@ class BinaryNode extends Node
             $right = $this->nodes['right']->evaluate($functions, $values);
 
             if ('not in' == $operator) {
-                return !call_user_func('in_array', $left, $right);
+                return !in_array($left, $right);
             }
 
-            return call_user_func(self::$functions[$operator], $left, $right);
+            return self::$functions[$operator]($left, $right);
         }
 
         switch ($operator) {

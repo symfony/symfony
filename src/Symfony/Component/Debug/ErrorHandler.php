@@ -466,11 +466,11 @@ class ErrorHandler
                 }
             }
         }
-        if (empty($this->exceptionHandler)) {
+        if (!$exceptionHandler = $this->exceptionHandler) {
             throw $exception; // Give back $exception to the native handler
         }
         try {
-            call_user_func($this->exceptionHandler, $exception);
+            $exceptionHandler($exception);
         } catch (\Exception $handlerException) {
             $this->exceptionHandler = null;
             $this->handleException($handlerException);

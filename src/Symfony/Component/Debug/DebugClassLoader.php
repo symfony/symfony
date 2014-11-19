@@ -150,12 +150,13 @@ class DebugClassLoader
         ErrorHandler::stackErrors();
 
         try {
+            $classLoader = $this->classLoader;
             if ($this->isFinder) {
-                if ($file = $this->classLoader[0]->findFile($class)) {
+                if ($file = $classLoader[0]->findFile($class)) {
                     require $file;
                 }
             } else {
-                call_user_func($this->classLoader, $class);
+                $classLoader($class);
                 $file = false;
             }
         } catch (\Exception $e) {

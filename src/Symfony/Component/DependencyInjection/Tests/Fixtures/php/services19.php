@@ -42,7 +42,9 @@ class ProjectServiceContainer extends Container
      */
     protected function getServiceFromAnonymousFactoryService()
     {
-        return $this->services['service_from_anonymous_factory'] = call_user_func(array(new \Bar\FooClass(), 'getInstance'));
+        $foo = new \Bar\FooClass();
+
+        return $this->services['service_from_anonymous_factory'] = $foo->getInstance();
     }
 
     /**

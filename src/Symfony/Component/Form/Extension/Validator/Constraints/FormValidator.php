@@ -198,7 +198,7 @@ class FormValidator extends ConstraintValidator
     private static function resolveValidationGroups($groups, FormInterface $form)
     {
         if (!is_string($groups) && is_callable($groups)) {
-            $groups = call_user_func($groups, $form);
+            $groups = $groups($form);
         }
 
         return (array) $groups;

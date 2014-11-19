@@ -211,9 +211,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getFoo_BazService()
     {
-        $this->services['foo.baz'] = $instance = call_user_func(array($this->getParameter('baz_class'), 'getInstance'));
+        $baz = array($this->getParameter('baz_class'), 'getInstance');
+        $this->services['foo.baz'] = $instance = $baz();
 
-        call_user_func(array($this->getParameter('baz_class'), 'configureStatic1'), $instance);
+        $baz[1] = 'configureStatic1';
+        $baz($instance);
 
         return $instance;
     }

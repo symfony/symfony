@@ -505,11 +505,11 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         foreach ($itemToRemove as $item) {
-            call_user_func(array($object, $removeMethod), $item);
+            $object->{$removeMethod}($item);
         }
 
         foreach ($itemsToAdd as $item) {
-            call_user_func(array($object, $addMethod), $item);
+            $object->{$addMethod}($item);
         }
     }
 

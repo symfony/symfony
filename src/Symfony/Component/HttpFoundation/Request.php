@@ -1874,8 +1874,8 @@ class Request
 
     private static function createRequestFromFactory(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
-        if (self::$requestFactory) {
-            $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
+        if ($requestFactory = self::$requestFactory) {
+            $request = $requestFactory($query, $request, $attributes, $cookies, $files, $server, $content);
 
             if (!$request instanceof Request) {
                 throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');

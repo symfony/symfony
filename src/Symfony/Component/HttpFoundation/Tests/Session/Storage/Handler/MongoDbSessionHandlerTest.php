@@ -73,6 +73,42 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->storage->close(), 'The "close" method should always return true');
     }
 
+    public function testRead()
+    {
+        $collection = $this->createMongoCollectionMock();
+
+        $this->mongo->expects($this->once())
+            ->method('selectCollection')
+            ->with($this->options['database'], $this->options['collection'])
+            ->will($this->returnValue($collection));
+
+        $that = $this;
+
+        // defining the timeout before the actual method call
+        // allows to test for "greater than" values in the $criteria
+        $testTimeout = time() - (int) ini_get('session.gc_maxlifetime');
+
+        $collection->expects($this->once())
+            ->method('findOne')
+            ->will($this->returnCallback(function ($criteria) use ($that, $testTimeout) {
+                $that->assertArrayHasKey($that->options['id_field'], $criteria);
+                $that->assertEquals($criteria[$that->options['id_field']], 'foo');
+
+                $that->assertArrayHasKey($that->options['time_field'], $criteria);
+                $that->assertArrayHasKey('$gt', $criteria[$that->options['time_field']]);
+                $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$gt']);
+                $that->assertGreaterThanOrEqual($criteria[$that->options['time_field']]['$gt']->sec, $testTimeout);
+
+                return array(
+                    $that->options['id_field'] => 'foo',
+                    $that->options['data_field'] => new \MongoBinData('bar', \MongoBinData::BYTE_ARRAY),
+                    $that->options['id_field'] => new \MongoDate(),
+                );
+            }));
+
+        $this->assertEquals('bar', $this->storage->read('foo'));
+    }
+
     public function testWrite()
     {
         $collection = $this->createMongoCollectionMock();

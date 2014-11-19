@@ -140,8 +140,11 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
+        $timeoutThreshold = new \MongoDate(time() - (int) ini_get('session.gc_maxlifetime'));
+
         $dbData = $this->getCollection()->findOne(array(
-            $this->options['id_field'] => $sessionId,
+            $this->options['id_field']   => $sessionId,
+            $this->options['time_field'] => array('$gt' => $timeoutThreshold),
         ));
 
         return null === $dbData ? '' : $dbData[$this->options['data_field']]->bin;

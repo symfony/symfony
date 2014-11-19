@@ -31,6 +31,7 @@
         "symfony/security": "~2.4",
         "symfony/stopwatch": "~2.2",
         "symfony/console": "~2.2",
+        "symfony/debug": "~2.6",
         "symfony/var-dumper": "~2.6",
         "symfony/expression-language": "~2.4"
     },
@@ -44,6 +45,7 @@
         "symfony/yaml": "For using the YamlExtension",
         "symfony/security": "For using the SecurityExtension",
         "symfony/stopwatch": "For using the StopwatchExtension",
+        "symfony/debug": "For using the TwigFlattener",
         "symfony/var-dumper": "For using the DumpExtension",
         "symfony/expression-language": "For using the ExpressionExtension"
     },

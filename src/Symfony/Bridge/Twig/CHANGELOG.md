@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added TwigFlattener which adds twig files into the FlattenException
+ * added PHP and Twig syntax highlighters
+
 2.5.0
 -----
 

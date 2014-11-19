@@ -79,6 +79,7 @@
             <argument>%templating.helper.code.file_link_format%</argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
+            <argument type="collection" />
         </service>
 
         <service id="twig.extension.routing" class="%twig.extension.routing.class%" public="false">
@@ -127,11 +128,25 @@
             <tag name="monolog.logger" channel="request" />
             <argument>%twig.exception_listener.controller%</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="exception_processor" on-invalid="ignore" />
         </service>
 
         <service id="twig.controller.exception" class="%twig.controller.exception.class%">
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
+        </service>
+
+        <service id="twig.exception_flattener" class="Symfony\Bridge\Twig\Debug\TwigFlattener" public="false">
+            <tag name="exception.flattener" />
+            <argument type="service" id="twig.loader" />
+        </service>
+
+        <service id="twig.php_highlighter" class="Symfony\Bridge\Twig\Debug\PHPHighlighter" public="false">
+            <tag name="code_highlighter" />
+        </service>
+
+        <service id="twig.twig_highlighter" class="Symfony\Bridge\Twig\Debug\TwigHighlighter" public="false">
+            <tag name="code_highlighter" />
         </service>
     </services>
 </container>

@@ -11,6 +11,9 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Bridge\Twig\Debug\Highlighter;
+use Symfony\Bridge\Twig\Debug\PHPHighlighter;
+
 if (!defined('ENT_SUBSTITUTE')) {
     define('ENT_SUBSTITUTE', 8);
 }
@@ -25,6 +28,7 @@ class CodeExtension extends \Twig_Extension
     private $fileLinkFormat;
     private $rootDir;
     private $charset;
+    private $highlighters = array();
 
     /**
      * Constructor.
@@ -32,12 +36,17 @@ class CodeExtension extends \Twig_Extension
      * @param string $fileLinkFormat The format for links to source files
      * @param string $rootDir        The project root directory
      * @param string $charset        The charset
+     * @param array  $highlighters   The syntax highlighters
      */
-    public function __construct($fileLinkFormat, $rootDir, $charset)
+    public function __construct($fileLinkFormat, $rootDir, $charset, $highlighters = array())
     {
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('\\', '/', dirname($rootDir)).'/';
         $this->charset = $charset;
+
+        foreach ($highlighters as $highlighter) {
+            $this->addHighlighter($highlighter);
+        }
     }
 
     /**
@@ -136,21 +145,22 @@ class CodeExtension extends \Twig_Extension
      */
     public function fileExcerpt($file, $line)
     {
-        if (is_readable($file)) {
-            // highlight_file could throw warnings
-            // see https://bugs.php.net/bug.php?id=25725
-            $code = @highlight_file($file, true);
-            // remove main code/span tags
-            $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            $content = preg_split('#<br />#', $code);
-
-            $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
-            }
-
-            return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
+        if (!is_readable($file)) {
+            return;
         }
+
+        foreach ($this->highlighters as $highlighter) {
+            if ($highlighter->supports($file)) {
+                break;
+            }
+            unset($highlighter);
+        }
+
+        if (!isset($highlighter)) {
+            $highlighter = new PHPHighlighter();
+        }
+
+        return $highlighter->highlight(file_get_contents($file), $line, 3);
     }
 
     /**
@@ -208,6 +218,16 @@ class CodeExtension extends \Twig_Extension
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
             return 'in '.$that->formatFile($match[2], $match[3]);
         }, $text);
+    }
+
+    /**
+     * Adds a syntax highlighter
+     *
+     * @param Highlighter $highlighter A syntax highlighter
+     */
+    public function addHighlighter(Highlighter $highlighter)
+    {
+        $this->highlighters[] = $highlighter;
     }
 
     public function getName()

@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\ExceptionProcessor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -30,11 +31,13 @@ class ExceptionListener implements EventSubscriberInterface
 {
     protected $controller;
     protected $logger;
+    protected $processor;
 
-    public function __construct($controller, LoggerInterface $logger = null)
+    public function __construct($controller, LoggerInterface $logger = null, ExceptionProcessor $processor = null)
     {
         $this->controller = $controller;
         $this->logger = $logger;
+        $this->processor = $processor;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -110,9 +113,17 @@ class ExceptionListener implements EventSubscriberInterface
      */
     protected function duplicateRequest(\Exception $exception, Request $request)
     {
+        if (null === $this->processor) {
+            $flattenException = FlattenException::create($exception);
+        } else {
+            $flattenException = $this->processor->flatten($exception, array(
+                'class' => 'Symfony\Component\HttpKernel\Exception\FlattenException'
+            ));
+        }
+
         $attributes = array(
             '_controller' => $this->controller,
-            'exception' => FlattenException::create($exception),
+            'exception' => $flattenException,
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
             // keep for BC -- as $format can be an argument of the controller callable
             // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php

@@ -107,9 +107,12 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('http://xn--e1afmkfd.xn--80akhbyknj4f.xn--e1afmkfd/'),
             array('http://xn--espaa-rta.xn--ca-ol-fsay5a/'),
             array('http://xn--d1abbgf6aiiy.xn--p1ai/'),
-            array('http://☎.com/'),
             array('http://username:password@symfony.com'),
             array('http://user-name@symfony.com'),
+            array('http://symfony.com?'),
+            array('http://symfony.com#'),
+            array('http://:password@symfony.com'),
+            array('http://goog_le.com'),
         );
     }
 
@@ -136,21 +139,18 @@ class UrlValidatorTest extends AbstractConstraintValidatorTest
             array('://google.com'),
             array('http ://google.com'),
             array('http:/google.com'),
-            array('http://goog_le.com'),
             array('http://google.com::aa'),
             array('http://google.com:aa'),
-            array('http://symfony.com?'),
-            array('http://symfony.com#'),
             array('ftp://google.fr'),
             array('faked://google.fr'),
             array('http://127.0.0.1:aa/'),
             array('ftp://[::1]/'),
             array('http://[::1'),
             array('http://hello.☎/'),
-            array('http://:password@symfony.com'),
             array('http://:password@@symfony.com'),
             array('http://username:passwordsymfony.com'),
             array('http://usern@me:password@symfony.com'),
+            array('http://☎.com/'), # Phone is not allowed in RFC5892 (2460..26CD  ; DISALLOWED  # CIRCLED DIGIT ONE..DISABLED CAR)
         );
     }
 

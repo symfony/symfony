@@ -37,7 +37,7 @@ use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
  *   </dd>
  * </dl>
  */
-class DrupalEventDispatcher implements EventDispatcherInterface
+class CompiledEventDispatcher implements EventDispatcherInterface
 {
     /**
      * The service container.

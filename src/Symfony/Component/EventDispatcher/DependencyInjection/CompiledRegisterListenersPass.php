@@ -15,9 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Compiler pass to register tagged services for an event dispatcher.
+ * Compiler pass to register tagged services for a compiled event dispatcher.
  */
-class DrupalRegisterListenersPass implements CompilerPassInterface
+class CompiledRegisterListenersPass implements CompilerPassInterface
 {
     /**
      * @var string

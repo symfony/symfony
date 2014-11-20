@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by znerol at 2014-10-04T14:14:47Z
+
+Using `git diff -b master:src/Symfony/Component/EventDispatcher/Tests/EventDispatcherTest.php src/Symfony/Component/EventDispatcher/Tests/AbstractEventDispatcherTest.php` to generate a cross-branch diff: https://gist.github.com/znerol/c2f044f3f15f1f7e3f1d
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-10-05T20:16:20Z
+
+What's the use-case where you want to do this?
+
+---------------------------------------------------------------------------
+
+by znerol at 2014-10-06T07:24:55Z
+
+This would help projects supplying their own implementations of the `EventDispatcher` to maintain compatibility.

@@ -47,7 +47,7 @@ class SaveSessionListener implements EventSubscriberInterface
 {
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 

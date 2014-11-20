@@ -200,7 +200,7 @@ class IntlDateFormatter
     {
         // intl allows timestamps to be passed as arrays - we don't
         if (is_array($timestamp)) {
-            $message = version_compare(PHP_VERSION, '5.3.4', '>=') ?
+            $message = PHP_VERSION_ID >= 50304 ?
                 'Only integer Unix timestamps and DateTime objects are supported' :
                 'Only integer Unix timestamps are supported';
 
@@ -209,11 +209,11 @@ class IntlDateFormatter
 
         // behave like the intl extension
         $argumentError = null;
-        if (version_compare(PHP_VERSION, '5.3.4', '<') && !is_int($timestamp)) {
+        if (PHP_VERSION_ID < 50304 && !is_int($timestamp)) {
             $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
-        } elseif (version_compare(PHP_VERSION, '5.3.4', '>=') && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
+        } elseif (PHP_VERSION_ID >= 50304 && !is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
-            if (version_compare(PHP_VERSION, '5.5.0-dev', '>=') && !is_int($timestamp)) {
+            if (PHP_VERSION_ID >= 50500 && !is_int($timestamp)) {
                 $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
             }
         }
@@ -227,7 +227,7 @@ class IntlDateFormatter
         }
 
         // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if (version_compare(PHP_VERSION, '5.3.4', '>=') && $timestamp instanceof \DateTime) {
+        if (PHP_VERSION_ID >= 50304 && $timestamp instanceof \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 
@@ -376,7 +376,7 @@ class IntlDateFormatter
         }
 
         // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
-        if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
+        if (PHP_VERSION_ID >= 50500) {
             return date_default_timezone_get();
         }
     }
@@ -541,7 +541,7 @@ class IntlDateFormatter
     {
         if (null === $timeZoneId) {
             // In PHP 5.5 if $timeZoneId is null it fallbacks to `date_default_timezone_get()` method
-            if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
+            if (PHP_VERSION_ID >= 50500) {
                 $timeZoneId = date_default_timezone_get();
             } else {
                 // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will

@@ -44,7 +44,7 @@ class ServerRunCommand extends ContainerAwareCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', 'localhost:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
@@ -82,6 +82,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $documentRoot = $input->getOption('docroot');
+
+        if (null === $documentRoot) {
+            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+        }
 
         if (!is_dir($documentRoot)) {
             $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));

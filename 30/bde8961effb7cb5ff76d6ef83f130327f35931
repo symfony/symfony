@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-20T09:44:39Z
+
+This change makes it easy to start the built-in web server even when the user is not the in project directory. However, this may affect people how changed the kernel's root directory, but who kept `web/` being the document root.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-11-20T09:49:11Z
+
+Thank you @xabbuh! It worked like a charm for me.
+
+Regarding the potential issue that you mentioned, in my opinion is not that important because people changing the kernel's root directory are advanced enough to:
+
+  * Not use the built-in web server
+  * Know what to do if this error happens
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-20T11:46:25Z
+
+:+1:

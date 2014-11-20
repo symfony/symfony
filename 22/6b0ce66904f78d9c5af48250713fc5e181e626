@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by rjkip at 2014-10-28T12:14:56Z
+
+@fabpot Can you look into this? Is there no dedicated merger/decider for Security?
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2014-11-03T06:59:07Z
+
+@schmittjoh, @fabpot Any chance either of you could tell us what to do to get this handled or (preferably :wink: )merged in? Or is our expectation of the `entry_point` behaviour wrong?
+This is slowly becoming a major blocker for us...
+
+Thanks in advance!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-11-04T00:28:42Z
+
+This looks like a valid fix. Without it, a custom entry point will indeed never be injected into the security listener.
+
+However, it would be good to include tests for this. It's probably the best to add some functional tests (see [Tests/Functaional in the SecurityBundle](https://github.com/symfony/symfony/tree/master/src/Symfony/Bundle/SecurityBundle/Tests/Functional)).
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2014-11-04T10:45:52Z
+
+Cheers, we'll look into adding the tests.
+
+---------------------------------------------------------------------------
+
+by rjkip at 2014-11-05T13:44:02Z
+
+@jakzal As promised, I added a functional test. The test fails as expected at eeaf21b.
+
+---------------------------------------------------------------------------
+
+by rjkip at 2014-11-06T13:30:55Z
+
+@jakzal Failing test is unrelated. Can this be merged?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-11-06T15:53:34Z
+
+@rjkip I'll review this weekend.
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2014-11-11T09:05:25Z
+
+@jakzal Did you manage to take a look at this? Thanks in advance!
+
+---------------------------------------------------------------------------
+
+by DRvanR at 2014-11-18T10:33:44Z
+
+@stof, @webmozart, @Tobion, @romainneutron, @nicolas-grekas, @fabpot As far as I can see in http://symfony.com/doc/current/contributing/code/core_team.html#active-core-members there is no "merger" assigned for the SecurityBundle, any chance either of you can take a peek at this?
+
+Edit: spelling

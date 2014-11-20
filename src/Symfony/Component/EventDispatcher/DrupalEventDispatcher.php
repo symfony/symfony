@@ -37,9 +37,8 @@ use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
  *   </dd>
  * </dl>
  */
-class ContainerAwareEventDispatcher implements EventDispatcherInterface
+class DrupalEventDispatcher implements EventDispatcherInterface
 {
-
     /**
      * The service container.
      *
@@ -94,7 +93,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($event_name, Event $event = NULL)
+    public function dispatch($event_name, Event $event = null)
     {
         if ($event === NULL) {
             $event = new Event();
@@ -131,7 +130,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners($event_name = NULL)
+    public function getListeners($event_name = null)
     {
         $result = array();
 
@@ -143,8 +142,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
                     $result[$event_name] = $listeners;
                 }
             }
-        }
-        elseif (isset($this->listeners[$event_name])) {
+        } elseif (isset($this->listeners[$event_name])) {
             // Sort listeners if necessary.
             if (isset($this->unsorted[$event_name])) {
                 krsort($this->listeners[$event_name]);
@@ -169,7 +167,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function hasListeners($event_name = NULL)
+    public function hasListeners($event_name = null)
     {
         return (bool) count($this->getListeners($event_name));
     }
@@ -180,7 +178,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
     public function addListener($event_name, $listener, $priority = 0)
     {
         $this->listeners[$event_name][$priority][] = array('callable' => $listener);
-        $this->unsorted[$event_name] = TRUE;
+        $this->unsorted[$event_name] = true;
     }
 
     /**
@@ -216,11 +214,9 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
         foreach ($subscriber->getSubscribedEvents() as $event_name => $params) {
             if (is_string($params)) {
                 $this->addListener($event_name, array($subscriber, $params));
-            }
-            elseif (is_string($params[0])) {
+            } elseif (is_string($params[0])) {
                 $this->addListener($event_name, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
-            }
-            else {
+            } else {
                 foreach ($params as $listener) {
                     $this->addListener($event_name, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);
                 }
@@ -238,8 +234,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface
                 foreach ($params as $listener) {
                     $this->removeListener($event_name, array($subscriber, $listener[0]));
                 }
-            }
-            else {
+            } else {
                 $this->removeListener($event_name, array($subscriber, is_string($params) ? $params : $params[0]));
             }
         }

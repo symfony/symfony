@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Drupal\Core\DependencyInjection\Compiler;
+namespace Symfony\Component\EventDispatcher\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -82,12 +82,10 @@ class DrupalRegisterListenersPass implements CompilerPassInterface
                 if (is_string($params)) {
                     $priority = 0;
                     $event_subscriber_info[$event_name][$priority][] = array('service' => array($id, $params));
-                }
-                elseif (is_string($params[0])) {
+                } elseif (is_string($params[0])) {
                     $priority = isset($params[1]) ? $params[1] : 0;
                     $event_subscriber_info[$event_name][$priority][] = array('service' => array($id, $params[0]));
-                }
-                else {
+                } else {
                     foreach ($params as $listener) {
                         $priority = isset($listener[1]) ? $listener[1] : 0;
                         $event_subscriber_info[$event_name][$priority][] = array('service' => array($id, $listener[0]));

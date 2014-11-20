@@ -43,7 +43,7 @@ final class SecureRandom implements SecureRandomInterface
         $this->logger = $logger;
 
         // determine whether to use OpenSSL
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && version_compare(PHP_VERSION, '5.3.4', '<')) {
+        if (defined('PHP_WINDOWS_VERSION_BUILD') && PHP_VERSION_ID < 50304) {
             $this->useOpenSsl = false;
         } elseif (!function_exists('openssl_random_pseudo_bytes')) {
             if (null !== $this->logger) {

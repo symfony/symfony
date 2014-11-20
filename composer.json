@@ -70,7 +70,7 @@
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",
         "monolog/monolog": "~1.3",
-        "propel/propel1": "1.6.*",
+        "propel/propel1": "~1.6",
         "ircmaxell/password-compat": "1.0.*",
         "ocramius/proxy-manager": ">=0.3.1,<0.6-dev",
         "egulias/email-validator": "~1.2"

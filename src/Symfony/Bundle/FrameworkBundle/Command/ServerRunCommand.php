@@ -30,7 +30,7 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (version_compare(phpversion(), '5.4.0', '<') || defined('HHVM_VERSION')) {
+        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -45,7 +45,7 @@ class ServerRunCommand extends ContainerAwareCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
@@ -90,6 +90,10 @@ EOF
         }
 
         $documentRoot = $input->getOption('docroot');
+
+        if (null === $documentRoot) {
+            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+        }
 
         if (!is_dir($documentRoot)) {
             $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));

@@ -205,7 +205,7 @@ class TextDescriptor extends Descriptor
      */
     private function formatDefaultValue($default)
     {
-        if (version_compare(PHP_VERSION, '5.4', '<')) {
+        if (PHP_VERSION_ID < 50400) {
             return str_replace('\/', '/', json_encode($default));
         }
 

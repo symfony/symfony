@@ -126,7 +126,7 @@ class ErrorHandler
                 if (self::$stackedErrorLevels) {
                     self::$stackedErrors[] = func_get_args();
                 } else {
-                    if (version_compare(PHP_VERSION, '5.4', '<')) {
+                    if (PHP_VERSION_ID < 50400) {
                         $stack = array_map(
                             function ($row) {
                                 unset($row['args']);

@@ -72,7 +72,7 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
+        if (PHP_VERSION_ID >= 50400) {
             return $this->active = \PHP_SESSION_ACTIVE === session_status();
         }
 
@@ -93,7 +93,7 @@ abstract class AbstractProxy
      */
     public function setActive($flag)
     {
-        if (version_compare(phpversion(), '5.4.0', '>=')) {
+        if (PHP_VERSION_ID >= 50400) {
             throw new \LogicException('This method is disabled in PHP 5.4.0+');
         }
 

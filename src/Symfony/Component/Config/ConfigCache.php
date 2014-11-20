@@ -90,7 +90,7 @@ class ConfigCache
      * @param string              $content  The content to write in the cache
      * @param ResourceInterface[] $metadata An array of ResourceInterface instances
      *
-     * @throws \RuntimeException When cache file can't be wrote
+     * @throws \RuntimeException When cache file can't be written
      */
     public function write($content, array $metadata = null)
     {

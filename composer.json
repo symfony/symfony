@@ -73,7 +73,7 @@
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
-        "propel/propel1": "1.6.*",
+        "propel/propel1": "~1.6",
         "ircmaxell/password-compat": "1.0.*",
         "ocramius/proxy-manager": ">=0.3.1,<0.6-dev",
         "egulias/email-validator": "~1.2"

@@ -16,9 +16,8 @@
             <argument type="service" id="debug.stopwatch" />
         </service>
 
-        <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
+        <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="var_dumper.cloner" on-invalid="null" />
         </service>
     </services>
 </container>

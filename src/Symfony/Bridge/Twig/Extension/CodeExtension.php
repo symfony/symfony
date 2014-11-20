@@ -11,10 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
@@ -178,7 +174,13 @@ class CodeExtension extends \Twig_Extension
         $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);
+            if (PHP_VERSION_ID >= 50400) {
+                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            } else {
+                $flags = ENT_QUOTES;
+            }
+
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
         }
 
         return $text;

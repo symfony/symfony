@@ -28,7 +28,7 @@ class NativeSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         // note for PHPUnit optimisers - the use of assertTrue/False
         // here is deliberate since the tests do not require the classes to exist - drak
-        if (version_compare(phpversion(), '5.4.0', '<')) {
+        if (PHP_VERSION_ID < 50400) {
             $this->assertFalse($handler instanceof \SessionHandler);
             $this->assertTrue($handler instanceof NativeSessionHandler);
         } else {

@@ -14,7 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\CompiledRegisterListenersPass;
 
-class CompiledCompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
+class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testPassAddsConstructorArgument() {
         $container = new ContainerBuilder();
@@ -32,7 +32,7 @@ class CompiledCompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestC
         $container = new ContainerBuilder();
         $definition = $container->register('event_dispatcher', 'stdClass');
 
-        $container->register('test_subscriber', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService')
+        $container->register('test_subscriber', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\CompiledSubscriberService')
             ->addTag('kernel.event_subscriber');
 
         $container->register('test_listener', 'stdObject')
@@ -138,7 +138,7 @@ class CompiledCompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestC
     }
 }
 
-class SubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
+class CompiledSubscriberService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {

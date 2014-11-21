@@ -115,7 +115,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
                         $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
                     }
 
-                    $definition['callable']($event, $eventName, $this);
+                    call_user_func($definition['callable'], $event, $eventName, $this);
                     if ($event->isPropagationStopped()) {
                         return $event;
                     }

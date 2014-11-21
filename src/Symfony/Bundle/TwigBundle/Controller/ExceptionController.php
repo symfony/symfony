@@ -58,7 +58,7 @@ class ExceptionController
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
-        $showException = $request->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
+        $showException = $request->attributes->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
 
         $code = $exception->getStatusCode();
 

@@ -1289,7 +1289,7 @@ class Process
             }
 
             if (null !== $callback) {
-                call_user_func($callback, $type, $data);
+                $callback($type, $data);
             }
         };
 
@@ -1369,6 +1369,7 @@ class Process
     private function readPipes($blocking, $close)
     {
         $result = $this->processPipes->readAndWrite($blocking, $close);
+        $callback = $this->callback;
 
         foreach ($result as $type => $data) {
             if (3 == $type) {

@@ -257,7 +257,7 @@ abstract class AbstractCloner implements ClonerInterface
     private function callCaster($callback, $obj, $a, $stub, $isNested)
     {
         try {
-            $cast = call_user_func($callback, $obj, $a, $stub, $isNested);
+            $cast = $callback($obj, $a, $stub, $isNested);
 
             if (is_array($cast)) {
                 $a = $cast;
@@ -281,8 +281,8 @@ abstract class AbstractCloner implements ClonerInterface
             throw new \ErrorException($msg, 0, $type, $file, $line);
         }
 
-        if ($this->prevErrorHandler) {
-            return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+        if ($eh = $this->prevErrorHandler) {
+            return $eh($type, $msg, $file, $line, $context);
         }
 
         return false;

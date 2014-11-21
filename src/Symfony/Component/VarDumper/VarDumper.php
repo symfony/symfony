@@ -27,15 +27,15 @@ class VarDumper
 
     public static function dump($var)
     {
-        if (null === self::$handler) {
+        if (null === $h = self::$handler) {
             $cloner = new VarCloner();
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
-            self::$handler = function ($var) use ($cloner, $dumper) {
+            $h = self::$handler = function ($var) use ($cloner, $dumper) {
                 $dumper->dump($cloner->cloneVar($var));
             };
         }
 
-        return call_user_func(self::$handler, $var);
+        return $h($var);
     }
 
     public static function setHandler($callable)

@@ -104,7 +104,7 @@ class ExceptionHandler
      */
     public function handle(\Exception $exception)
     {
-        if (null === $this->handler || $exception instanceof OutOfMemoryException) {
+        if ($exception instanceof OutOfMemoryException || null === $handler = $this->handler) {
             $this->failSafeHandle($exception);
 
             return;
@@ -125,7 +125,7 @@ class ExceptionHandler
         $this->caughtBuffer = null;
 
         try {
-            call_user_func($this->handler, $exception);
+            $handler($exception);
             $this->caughtLength = $caughtLength;
         } catch (\Exception $e) {
             if (!$caughtLength) {

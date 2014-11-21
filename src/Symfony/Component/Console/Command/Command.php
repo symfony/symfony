@@ -246,8 +246,8 @@ class Command
 
         $input->validate();
 
-        if ($this->code) {
-            $statusCode = call_user_func($this->code, $input, $output);
+        if ($code = $this->code) {
+            $statusCode = $code($input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
         }

@@ -138,8 +138,8 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
             if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
                 unset($context['circular_reference_limit'][$objectHash]);
 
-                if ($this->circularReferenceHandler) {
-                    return call_user_func($this->circularReferenceHandler, $object);
+                if ($circularReferenceHandler = $this->circularReferenceHandler) {
+                    return $circularReferenceHandler($object);
                 }
 
                 throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
@@ -164,7 +164,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
                 $attributeValue = $method->invoke($object);
                 if (array_key_exists($attributeName, $this->callbacks)) {
-                    $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
+                    $attributeValue = $this->callbacks[$attributeName]($attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     if (!$this->serializer instanceof NormalizerInterface) {

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by phramz at 2014-10-20T20:00:10Z
+
+won't a `&nbsp;` do it as well?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-10-20T21:00:03Z
+
+It sure could, but personally I think that it would be less understandable. This fix improves usability a bit, too, IMO.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-10-20T21:20:07Z
+
+@kix thanks for this PR! I personally love this kind of small fixes that improve the overall quality of the framework. This will lead to less confusion for developers and that's very important.
+
+I also agree that showing some explicit message, such as `no name`, it's better than displaying a white space.
+
+---------------------------------------------------------------------------
+
+by kix at 2014-10-27T10:17:56Z
+
+@webmozart Done. Is it better now?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-11-03T11:00:20Z
+
+Yes! :) Could you add the same fix to the details view on the right?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-11-04T12:16:16Z
+
+Got it. Right-side detail view is updated in the same manner, too.

@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-20T21:15:43Z
+
+Why `<abbr>`? According to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr it should me used for abbreviations and this is not the case here? `<div>` or `<span>` instead?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-20T21:27:44Z
+
+#12267 seems to be a better fix in my opinion.
+
+---------------------------------------------------------------------------
+
+by kix at 2014-10-20T21:40:33Z
+
+@xabbuh, you've mixed my today's pull requests. #12267 fixes a problem giving a better solution (well, at least IMHO), while this PR adds some verbosity to the component.
+@dunglas, I'm using the same pattern as used in the Events profiler tab: listener class names are wrapped with `<abbr/>`'s there, too.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-21T10:28:20Z
+
+@kix but in the events panel, this can be considered as an abbreviation, as the display text is the short class name, and the title is the FQCN. Here, you are mixing the name of the field and the class name of the form type being used, which are 2 different things
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-21T10:28:54Z
+
+and giving the name of the form type would be better than its class name IMO anyway
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-22T16:36:23Z
+
+I'm not sure this is needed. Hovering for 1-2 seconds is much slower than clicking the entry and checking the type on the right, no?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-10-23T05:15:38Z
+
+Well, technically, it's not clicking, it's the same `<abbr/>` there, as of Symfony 2.5.5:
+![screenshot 2014-10-23 11 13 54](https://cloud.githubusercontent.com/assets/345754/4748564/9388f652-5a73-11e4-85fc-e474884ceff4.png)
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-10-23T08:12:55Z
+
+@kix But you can see from your screenshot that the behavior is inconsistent now. Once you hover over the *type name*, and then over the *form name*. Why (from a usability perspective) should hovering over these two different things show the same tooltip?
+
+---------------------------------------------------------------------------
+
+by kix at 2014-10-27T10:41:05Z
+
+A bit more consistent now:
+![screenshot 2014-10-27 15 39 24](https://cloud.githubusercontent.com/assets/345754/4789478/93f6397e-5dc5-11e4-99d2-ccf338b63ab8.png)
+When `data.type` is empty, the tip and the type name are not displayed.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2014-11-03T10:55:46Z
+
+Better! What does the rest of you think? @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-03T14:24:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-03T14:25:44Z
+
+:+1:

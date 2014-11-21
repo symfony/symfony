@@ -112,6 +112,9 @@ EOF
         $tempKernel = $this->getTempKernel($realKernel, $namespace, $realKernelClass, $warmupDir);
         $tempKernel->boot();
 
+        $tempKernelReflection = new \ReflectionObject($tempKernel);
+        $tempKernelFile = $tempKernelReflection->getFileName();
+
         // warmup temporary dir
         $warmer = $tempKernel->getContainer()->get('cache_warmer');
         if ($enableOptionalWarmers) {
@@ -147,6 +150,9 @@ EOF
             file_put_contents(str_replace($search, $replace, $file), $content);
             unlink($file);
         }
+
+        // remove temp kernel file after cache warmed up
+        @unlink($tempKernelFile);
     }
 
     /**
@@ -186,13 +192,30 @@ namespace $namespace
         {
             return '$rootDir';
         }
+
+        protected function buildContainer()
+        {
+            \$container = parent::buildContainer();
+
+            // filter container's resources, removing reference to temp kernel file
+            \$resources = \$container->getResources();
+            \$filteredResources = array();
+            foreach (\$resources as \$resource) {
+                if ((string) \$resource !== __FILE__) {
+                    \$filteredResources[] = \$resource;
+                }
+            }
+
+            \$container->setResources(\$filteredResources);
+
+            return \$container;
+        }
     }
 }
 EOF;
         $this->getContainer()->get('filesystem')->mkdir($warmupDir);
         file_put_contents($file = $warmupDir.'/kernel.tmp', $code);
         require_once $file;
-        @unlink($file);
         $class = "$namespace\\$class";
 
         return new $class($parent->getEnvironment(), $parent->isDebug());

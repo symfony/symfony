@@ -59,13 +59,41 @@ class CompiledRegisterListenersPass implements CompilerPassInterface
 
         $definition = $container->findDefinition($this->dispatcherService);
 
-        // TODO: Also collect services tagged as listeners.
-
         $event_subscriber_info = array();
-        foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
+
+        foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             $def = $container->getDefinition($id);
             if (!$def->isPublic()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
+            }
+
+            if ($def->isAbstract()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
+            }
+
+            foreach ($events as $event) {
+                $priority = isset($event['priority']) ? $event['priority'] : 0;
+
+                if (!isset($event['event'])) {
+                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "%s" tags.', $id, $this->listenerTag));
+                }
+
+                if (!isset($event['method'])) {
+                    $event['method'] = 'on'.preg_replace_callback(array(
+                        '/(?<=\b)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
+                    $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
+                }
+
+                $event_subscriber_info[$event['event']][$priority][] = array('service' => array($id, $event['method']));
+            }
+        }
+
+        foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
+            $def = $container->getDefinition($id);
+            if (!$def->isPublic()) {
+                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event subscribers are lazy-loaded.', $id));
             }
 
             // We must assume that the class value has been correctly filled, even if the service is created by a factory

@@ -65,9 +65,9 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     /**
      * Whether listeners need to be sorted prior to dispatch, keyed by event name.
      *
-     * @var TRUE[]
+     * @var array
      */
-    private $unsorted;
+    private $unsorted = array();
 
     /**
      * Constructs a container aware event dispatcher.
@@ -87,36 +87,35 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     {
         $this->container = $container;
         $this->listeners = $listeners;
-        $this->unsorted = array();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function dispatch($event_name, Event $event = null)
+    public function dispatch($eventName, Event $event = null)
     {
         if ($event === NULL) {
             $event = new Event();
         }
 
         $event->setDispatcher($this);
-        $event->setName($event_name);
+        $event->setName($eventName);
 
-        if (isset($this->listeners[$event_name])) {
+        if (isset($this->listeners[$eventName])) {
             // Sort listeners if necessary.
-            if (isset($this->unsorted[$event_name])) {
-                krsort($this->listeners[$event_name]);
-                unset($this->unsorted[$event_name]);
+            if (isset($this->unsorted[$eventName])) {
+                krsort($this->listeners[$eventName]);
+                unset($this->unsorted[$eventName]);
             }
 
             // Invoke listeners and resolve callables if necessary.
-            foreach ($this->listeners[$event_name] as $priority => &$definitions) {
+            foreach ($this->listeners[$eventName] as &$definitions) {
                 foreach ($definitions as $key => &$definition) {
                     if (!isset($definition['callable'])) {
                         $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
                     }
 
-                    $definition['callable']($event, $event_name, $this);
+                    $definition['callable']($event, $eventName, $this);
                     if ($event->isPropagationStopped()) {
                         return $event;
                     }
@@ -130,27 +129,27 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function getListeners($event_name = null)
+    public function getListeners($eventName = null)
     {
         $result = array();
 
-        if ($event_name === NULL) {
+        if ($eventName === NULL) {
             // If event name was omitted, collect all listeners of all events.
-            foreach (array_keys($this->listeners) as $event_name) {
-                $listeners = $this->getListeners($event_name);
+            foreach (array_keys($this->listeners) as $eventName) {
+                $listeners = $this->getListeners($eventName);
                 if (!empty($listeners)) {
-                    $result[$event_name] = $listeners;
+                    $result[$eventName] = $listeners;
                 }
             }
-        } elseif (isset($this->listeners[$event_name])) {
+        } elseif (isset($this->listeners[$eventName])) {
             // Sort listeners if necessary.
-            if (isset($this->unsorted[$event_name])) {
-                krsort($this->listeners[$event_name]);
-                unset($this->unsorted[$event_name]);
+            if (isset($this->unsorted[$eventName])) {
+                krsort($this->listeners[$eventName]);
+                unset($this->unsorted[$eventName]);
             }
 
             // Collect listeners and resolve callables if necessary.
-            foreach ($this->listeners[$event_name] as $priority => &$definitions) {
+            foreach ($this->listeners[$eventName] as &$definitions) {
                 foreach ($definitions as $key => &$definition) {
                     if (!isset($definition['callable'])) {
                         $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
@@ -167,30 +166,30 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function hasListeners($event_name = null)
+    public function hasListeners($eventName = null)
     {
-        return (bool) count($this->getListeners($event_name));
+        return (bool) count($this->getListeners($eventName));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addListener($event_name, $listener, $priority = 0)
+    public function addListener($eventName, $listener, $priority = 0)
     {
-        $this->listeners[$event_name][$priority][] = array('callable' => $listener);
-        $this->unsorted[$event_name] = true;
+        $this->listeners[$eventName][$priority][] = array('callable' => $listener);
+        $this->unsorted[$eventName] = true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeListener($event_name, $listener)
+    public function removeListener($eventName, $listener)
     {
-        if (!isset($this->listeners[$event_name])) {
+        if (!isset($this->listeners[$eventName])) {
             return;
         }
 
-        foreach ($this->listeners[$event_name] as $priority => $definitions) {
+        foreach ($this->listeners[$eventName] as $priority => $definitions) {
             foreach ($definitions as $key => $definition) {
                 if (!isset($definition['callable'])) {
                     if (!$this->container->initialized($definition['service'][0])) {
@@ -200,7 +199,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
                 }
 
                 if ($definition['callable'] === $listener) {
-                    unset($this->listeners[$event_name][$priority][$key]);
+                    unset($this->listeners[$eventName][$priority][$key]);
                 }
             }
         }
@@ -211,14 +210,14 @@ class CompiledEventDispatcher implements EventDispatcherInterface
      */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
-        foreach ($subscriber->getSubscribedEvents() as $event_name => $params) {
+        foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_string($params)) {
-                $this->addListener($event_name, array($subscriber, $params));
+                $this->addListener($eventName, array($subscriber, $params));
             } elseif (is_string($params[0])) {
-                $this->addListener($event_name, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
+                $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);
             } else {
                 foreach ($params as $listener) {
-                    $this->addListener($event_name, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);
+                    $this->addListener($eventName, array($subscriber, $listener[0]), isset($listener[1]) ? $listener[1] : 0);
                 }
             }
         }
@@ -229,13 +228,13 @@ class CompiledEventDispatcher implements EventDispatcherInterface
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {
-        foreach ($subscriber->getSubscribedEvents() as $event_name => $params) {
+        foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
             if (is_array($params) && is_array($params[0])) {
                 foreach ($params as $listener) {
-                    $this->removeListener($event_name, array($subscriber, $listener[0]));
+                    $this->removeListener($eventName, array($subscriber, $listener[0]));
                 }
             } else {
-                $this->removeListener($event_name, array($subscriber, is_string($params) ? $params : $params[0]));
+                $this->removeListener($eventName, array($subscriber, is_string($params) ? $params : $params[0]));
             }
         }
     }

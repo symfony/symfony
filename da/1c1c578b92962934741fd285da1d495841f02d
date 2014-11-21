@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-11-21T14:37:33Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T14:52:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T14:54:30Z
+
+@nicolas-grekas there is some tests broken on PHP 5.3 in the Debug component. Could you look at them ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-21T16:00:58Z
+
+What about merging this in 2.3?
+
+---------------------------------------------------------------------------
+
+by KorvinSzanto at 2014-11-21T16:03:40Z
+
+Thanks Christian!
+
+On Fri, Nov 21, 2014, 8:01 AM Fabien Potencier <notifications@github.com>
+wrote:
+
+> What about merging this in 2.3?
+>
+> —
+> Reply to this email directly or view it on GitHub
+> <https://github.com/symfony/symfony/pull/12537#issuecomment-63991024>.
+>
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T16:04:41Z
+
+@fabpot :+1: for 2.3

@@ -692,17 +692,19 @@ class Request
      */
     public function get($key, $default = null, $deep = false)
     {
-        $result = $this->query->get($key, $this, $deep);
-        if ($result === $this) {
-            $result = $this->attributes->get($key, $this, $deep);
+        if ($this !== $result = $this->query->get($key, $this, $deep)) {
+            return $result;
         }
-        if ($result === $this) {
-            $result = $this->request->get($key, $this, $deep);
+
+        if ($this !== $result = $this->attributes->get($key, $this, $deep)) {
+            return $result;
         }
-        if ($result === $this) {
-            return $default;
+
+        if ($this !== $result = $this->request->get($key, $this, $deep)) {
+            return $result;
         }
-        return $result;
+
+        return $default;
     }
 
     /**

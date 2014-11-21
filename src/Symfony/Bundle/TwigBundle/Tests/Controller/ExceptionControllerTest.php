@@ -51,7 +51,8 @@ class ExceptionControllerTest extends TestCase
             ))
         );
 
-        $request = Request::create('whatever', 'GET', array('showException' => false));
+        $request = Request::create('whatever', 'GET');
+        $request->attributes->set('showException', false);
         $exception = FlattenException::create(new \Exception(), 404);
         $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 

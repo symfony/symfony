@@ -122,7 +122,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return new TemplateReference('TwigBundle', 'Exception', $this->debug ? 'exception_full' : $name, 'html', 'twig');
+        return new TemplateReference('TwigBundle', 'Exception', $showException ? 'exception_full' : $name, 'html', 'twig');
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0

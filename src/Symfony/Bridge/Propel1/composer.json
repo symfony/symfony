@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-foundation": "~2.0",
-        "symfony/http-kernel": "~2.0",
-        "symfony/form": "~2.2",
+        "symfony/http-foundation": "~2.0|~3.0",
+        "symfony/http-kernel": "~2.0|~3.0",
+        "symfony/form": "~2.2|~3.0",
         "propel/propel1": "~1.6"
     },
     "require-dev": {

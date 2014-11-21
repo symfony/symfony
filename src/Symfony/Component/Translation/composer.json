@@ -19,9 +19,9 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/config": "~2.0",
-        "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.2"
+        "symfony/config": "~2.0|~3.0",
+        "symfony/intl": "~2.3|~3.0",
+        "symfony/yaml": "~2.2|~3.0"
     },
     "suggest": {
         "symfony/config": "",

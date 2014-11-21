@@ -51,9 +51,10 @@ class ExceptionControllerTest extends TestCase
             ))
         );
 
-        $request = Request::create('whatever', 'GET', array('showException' => false));
+        $controller = new ExceptionController($twig, /* debug mode --> */ true);
         $exception = FlattenException::create(new \Exception(), 404);
-        $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
+        $request = Request::create('/');
+        $request->attributes->set('showException', false);
 
         $response = $controller->showAction($request, $exception, null);
 
@@ -69,7 +70,7 @@ class ExceptionControllerTest extends TestCase
             ))
         );
 
-        $request = Request::create('whatever');
+        $request = Request::create('/');
         $request->setRequestFormat('txt');
         $exception = FlattenException::create(new \Exception());
         $controller = new ExceptionController($twig, false);

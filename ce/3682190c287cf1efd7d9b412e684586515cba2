@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-07T10:34:36Z
+
+I don't know ahy tests are failed. Fail does not related to this PR.
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-09T14:04:08Z
+
+Could someone review?
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-11T08:40:54Z
+
+@xabbuh fixes, except wrapping assertion. I like wrapped :)
+@stof I wrote test for your note.
+
+---------------------------------------------------------------------------
+
+by Strate at 2014-10-20T17:20:23Z
+
+Test failures does not related to code. Could someone merge/reject this?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T00:47:41Z
+
+:+1:

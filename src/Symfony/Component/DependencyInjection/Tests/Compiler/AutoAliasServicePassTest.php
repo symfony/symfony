@@ -7,19 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
-     */
-    public function testProcessWithMissingParameterName()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('example')
-            ->addTag('auto_alias');
-
-        $pass = new AutoAliasServicePass();
-        $pass->process($container);
-    }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
@@ -29,7 +16,7 @@ class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('example')
-          ->addTag('auto_alias', array('parameter_name' => 'non_existing'));
+          ->addTag('auto_alias', array('format' => '%non_existing%.example'));
 
         $pass = new AutoAliasServicePass();
         $pass->process($container);
@@ -43,7 +30,7 @@ class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('example')
-          ->addTag('auto_alias', array('parameter_name' => 'existing'));
+          ->addTag('auto_alias', array());
         $container->setParameter('existing', 'mysql');
 
         $pass = new AutoAliasServicePass();
@@ -55,7 +42,7 @@ class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
-          ->addTag('auto_alias', array('parameter_name' => 'existing', 'format' => '%s.example'));
+          ->addTag('auto_alias', array('format' => '%existing%.example'));
         $container->setParameter('existing', 'mysql');
 
         $pass = new AutoAliasServicePass();
@@ -70,7 +57,7 @@ class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
-          ->addTag('auto_alias', array('parameter_name' => 'existing', 'format' => '%s.example'));
+          ->addTag('auto_alias', array('format' => '%existing%.example'));
 
         $container->register('mysql.example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql');
         $container->setParameter('existing', 'mysql');
@@ -88,7 +75,7 @@ class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassDefault')
-          ->addTag('auto_alias', array('parameter_name' => 'existing', 'format' => '%s.example'));
+          ->addTag('auto_alias', array('format' => '%existing%.example'));
 
         $container->register('mysql.example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMysql');
         $container->register('mariadb.example', 'Symfony\Component\DependencyInjection\Tests\Compiler\ServiceClassMariadb');

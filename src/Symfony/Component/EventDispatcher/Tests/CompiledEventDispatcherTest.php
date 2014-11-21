@@ -20,10 +20,12 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
     protected function createEventDispatcher()
     {
         $container = new Container();
+
         return new CompiledEventDispatcher($container);
     }
 
-    public function testGetListenersWithCallables() {
+    public function testGetListenersWithCallables()
+    {
         // When passing in callables exclusively as listeners into the event
         // dispatcher constructor, the event dispatcher must not attempt to
         // resolve any services.
@@ -57,7 +59,8 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $this->assertSame($expectedListeners, $actualListeners);
     }
 
-    public function testDispatchWithCallables() {
+    public function testDispatchWithCallables()
+    {
         // When passing in callables exclusively as listeners into the event
         // dispatcher constructor, the event dispatcher must not attempt to
         // resolve any services.
@@ -83,7 +86,8 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $this->assertTrue($thirdListener[0]->preFooInvoked);
     }
 
-    public function testGetListenersWithServices() {
+    public function testGetListenersWithServices()
+    {
         $container = new ContainerBuilder();
         $container->register('listener_service', 'Symfony\Component\EventDispatcher\Tests\TestEventListener');
 
@@ -108,7 +112,8 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $this->assertSame($expectedListeners, $actualListeners);
     }
 
-    public function testDispatchWithServices() {
+    public function testDispatchWithServices()
+    {
         $container = new ContainerBuilder();
         $container->register('listener_service', 'Symfony\Component\EventDispatcher\Tests\TestEventListener');
 
@@ -128,7 +133,8 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $this->assertTrue($listenerService->preFooInvoked);
     }
 
-    public function testRemoveService() {
+    public function testRemoveService()
+    {
         $container = new ContainerBuilder();
         $container->register('listener_service', 'Symfony\Component\EventDispatcher\Tests\TestEventListener');
         $container->register('other_listener_service', 'Symfony\Component\EventDispatcher\Tests\TestEventListener');

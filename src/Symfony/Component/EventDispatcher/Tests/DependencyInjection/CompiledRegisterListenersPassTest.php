@@ -16,7 +16,8 @@ use Symfony\Component\EventDispatcher\DependencyInjection\CompiledRegisterListen
 
 class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 {
-    public function testPassAddsConstructorArgument() {
+    public function testPassAddsConstructorArgument()
+    {
         $container = new ContainerBuilder();
         $definition = $container->register('event_dispatcher', 'stdClass')
             ->setArguments(array('foo', 'bar'));
@@ -28,7 +29,8 @@ class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected_arguments, $definition->getArguments());
     }
 
-    public function testPassAddsTaggedListenersAndSubscribers() {
+    public function testPassAddsTaggedListenersAndSubscribers()
+    {
         $container = new ContainerBuilder();
         $definition = $container->register('event_dispatcher', 'stdClass');
 
@@ -67,7 +69,7 @@ class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
                 64 => array(
                     array(
                         'service' => array('test_subscriber', 'methodWithHighPriority'),
-                    )
+                    ),
                 ),
             ),
             'test_event.single_listener_without_priority' => array(

@@ -102,7 +102,7 @@ class CompiledRegisterListenersPass implements CompilerPassInterface
             $refClass = new \ReflectionClass($class);
             $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
             if (!$refClass->implementsInterface($interface)) {
-                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+                throw new \InvalidArgumentException(sprintf('The service "%s" must implement interface "%s".', $id, $interface));
             }
 
             // Get all subscribed events.

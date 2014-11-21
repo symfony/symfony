@@ -420,7 +420,7 @@
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}
-            {{ name }}
+            {{ name|default('(no name)') }}
             {% if data.errors is defined and data.errors|length > 0 %}
             <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
@@ -437,9 +437,9 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data, forms_by_hash) %}
-    <div class="tree-details" id="{{ data.id }}-details">
+    <div class="tree-details" {% if data.id is defined %} id="{{ data.id }}-details"{% endif %}>
         <h2>
-            {{ name }}
+            {{ name|default('(no name)') }}
             {% if data.type_class is defined %}
             <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
             {% endif %}

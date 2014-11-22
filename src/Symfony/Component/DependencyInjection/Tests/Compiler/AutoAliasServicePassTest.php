@@ -7,7 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AutoAliasServicePassTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      */

@@ -403,7 +403,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s".',
+                'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -467,7 +467,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s".',
+                'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -521,7 +521,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s".',
+                'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -573,7 +573,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s".',
+                'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -621,7 +621,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         if (!isset($this->defined[$option])) {
             throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Known options are: "%s".',
+                'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
                 implode('", "', array_keys($this->defined))
             ));
@@ -736,7 +736,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ksort($diff);
 
             throw new UndefinedOptionsException(sprintf(
-                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Known options are: "%s".',
+                (count($diff) > 1 ? 'The options "%s" do not exist.' : 'The option "%s" does not exist.').' Defined options are: "%s".',
                 implode('", "', array_keys($diff)),
                 implode('", "', array_keys($clone->defined))
             ));
@@ -802,7 +802,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
         if (!array_key_exists($option, $this->defaults)) {
             if (!isset($this->defined[$option])) {
                 throw new NoSuchOptionException(sprintf(
-                    'The option "%s" does not exist. Known options are: "%s".',
+                    'The option "%s" does not exist. Defined options are: "%s".',
                     $option,
                     implode('", "', array_keys($this->defined))
                 ));

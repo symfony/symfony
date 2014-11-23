@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
@@ -29,7 +30,7 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (PHP_VERSION_ID < 50400) {
+        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -99,24 +100,13 @@ EOF
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $router = $input->getOption('router') ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
-        ;
-
-        if (!file_exists($router)) {
-            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
-
+        if (null === $builder = $this->createPhpProcessBuilder($input, $output, $env)) {
             return 1;
         }
-
-        $router = realpath($router);
 
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
         $output->writeln('Quit the server with CONTROL-C.');
 
-        $builder = new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
         $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
         $process = $builder->getProcess();
@@ -135,5 +125,31 @@ EOF
         }
 
         return $process->getExitCode();
+    }
+
+    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)
+    {
+        $router = $input->getOption('router') ?: $this
+            ->getContainer()
+            ->get('kernel')
+            ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+        ;
+
+        if (!file_exists($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+
+            return;
+        }
+
+        $router = realpath($router);
+        $finder = new PhpExecutableFinder();
+
+        if (false === $binary = $finder->find()) {
+            $output->writeln('<error>Unable to find PHP binary to run server</error>');
+
+            return;
+        }
+
+        return new ProcessBuilder(array($binary, '-S', $input->getArgument('address'), $router));
     }
 }

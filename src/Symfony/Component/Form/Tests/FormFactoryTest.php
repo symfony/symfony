@@ -97,7 +97,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', null, $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', $options));
     }
 
     public function testCreateNamedBuilderWithTypeInstance()
@@ -125,7 +125,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, $options));
     }
 
     public function testCreateNamedBuilderWithTypeInstanceWithParentType()
@@ -159,7 +159,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, $options));
     }
 
     public function testCreateNamedBuilderWithTypeInstanceWithParentTypeInstance()
@@ -193,7 +193,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, null, $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $type, $options));
     }
 
     public function testCreateNamedBuilderWithResolvedTypeInstance()
@@ -215,7 +215,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $resolvedType, null, $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', $resolvedType, $options));
     }
 
     public function testCreateNamedBuilderFillsDataOption()
@@ -243,7 +243,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $givenOptions));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', array_merge(array('data' => 'DATA'), $givenOptions)));
     }
 
     public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
@@ -270,7 +270,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('buildForm')
             ->with($this->builder, $resolvedOptions);
 
-        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', 'DATA', $options));
+        $this->assertSame($this->builder, $this->factory->createNamedBuilder('name', 'type', array_merge(array('data' => 'DATA'), $options)));
     }
 
     /**
@@ -310,7 +310,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getForm')
             ->will($this->returnValue('FORM'));
 
-        $this->assertSame('FORM', $this->factory->create('TYPE', null, $options));
+        $this->assertSame('FORM', $this->factory->create('TYPE', $options));
     }
 
     public function testCreateUsesTypeNameIfTypeGivenAsObject()
@@ -340,7 +340,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getForm')
             ->will($this->returnValue('FORM'));
 
-        $this->assertSame('FORM', $this->factory->create($resolvedType, null, $options));
+        $this->assertSame('FORM', $this->factory->create($resolvedType, $options));
     }
 
     public function testCreateNamed()
@@ -371,7 +371,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getForm')
             ->will($this->returnValue('FORM'));
 
-        $this->assertSame('FORM', $this->factory->createNamed('name', 'type', null, $options));
+        $this->assertSame('FORM', $this->factory->createNamed('name', 'type', $options));
     }
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
@@ -384,7 +384,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array())
+            ->with('firstName', 'text', array())
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -416,7 +416,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'password', null, array('attr' => array('maxlength' => 7)))
+            ->with('firstName', 'password', array('attr' => array('maxlength' => 7)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty('Application\Author', 'firstName');
@@ -458,13 +458,12 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 11)))
+            ->with('firstName', 'text', array('attr' => array('maxlength' => 11)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName',
-            null,
             array('attr' => array('maxlength' => 11))
         );
 
@@ -493,7 +492,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20)))
+            ->with('firstName', 'text', array('attr' => array('maxlength' => 20)))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -526,7 +525,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('required' => false))
+            ->with('firstName', 'text', array('required' => false))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(
@@ -559,7 +558,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('firstName', 'text', null, array('attr' => array('pattern' => '[a-zA-Z]')))
+            ->with('firstName', 'text', array('attr' => array('pattern' => '[a-zA-Z]')))
             ->will($this->returnValue('builderInstance'));
 
         $this->builder = $factory->createBuilderForProperty(

@@ -26,7 +26,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassValueToView()
     {
-        $form = $this->factory->create('checkbox', null, array('value' => 'foobar'));
+        $form = $this->factory->create('checkbox', array('value' => 'foobar'));
         $view = $form->createView();
 
         $this->assertEquals('foobar', $view->vars['value']);
@@ -43,7 +43,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testCheckedIfDataTrueWithEmptyValue()
     {
-        $form = $this->factory->create('checkbox', null, array('value' => ''));
+        $form = $this->factory->create('checkbox', array('value' => ''));
         $form->setData(true);
         $view = $form->createView();
 
@@ -61,7 +61,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithValueChecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => 'foobar',
         ));
         $form->submit('foobar');
@@ -72,7 +72,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithRandomValueChecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => 'foobar',
         ));
         $form->submit('krixikraxi');
@@ -83,7 +83,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithValueUnchecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => 'foobar',
         ));
         $form->submit(null);
@@ -94,7 +94,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithEmptyValueChecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => '',
         ));
         $form->submit('');
@@ -105,7 +105,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithEmptyValueUnchecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => '',
         ));
         $form->submit(null);
@@ -116,7 +116,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithEmptyValueAndFalseUnchecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => '',
         ));
         $form->submit(false);
@@ -127,7 +127,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitWithEmptyValueAndTrueChecked()
     {
-        $form = $this->factory->create('checkbox', null, array(
+        $form = $this->factory->create('checkbox', array(
             'value' => '',
         ));
         $form->submit(true);

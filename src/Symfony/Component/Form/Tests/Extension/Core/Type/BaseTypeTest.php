@@ -18,7 +18,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testPassDisabledAsOption()
     {
-        $form = $this->factory->create($this->getTestedType(), null, array('disabled' => true));
+        $form = $this->factory->create($this->getTestedType(), array('disabled' => true));
 
         $this->assertTrue($form->isDisabled());
     }
@@ -69,7 +69,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassTranslationDomainToView()
     {
-        $form = $this->factory->create($this->getTestedType(), null, array(
+        $form = $this->factory->create($this->getTestedType(), array(
             'translation_domain' => 'domain',
         ));
         $view = $form->createView();
@@ -80,7 +80,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testInheritTranslationDomainFromParent()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', 'form', array(
                 'translation_domain' => 'domain',
             ))
             ->add('child', $this->getTestedType())
@@ -93,7 +93,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPreferOwnTranslationDomain()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', 'form', array(
                 'translation_domain' => 'parent_domain',
             ))
             ->add('child', $this->getTestedType(), array(
@@ -117,7 +117,7 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassLabelToView()
     {
-        $form = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'));
+        $form = $this->factory->createNamed('__test___field', $this->getTestedType(), array('label' => 'My label'));
         $view = $form->createView();
 
         $this->assertSame('My label', $view->vars['label']);

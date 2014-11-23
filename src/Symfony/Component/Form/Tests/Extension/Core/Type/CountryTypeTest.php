@@ -39,7 +39,7 @@ class CountryTypeTest extends TypeTestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $form = $this->factory->create('country', 'country');
+        $form = $this->factory->create('country', array('data' => 'country'));
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

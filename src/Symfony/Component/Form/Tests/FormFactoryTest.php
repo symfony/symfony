@@ -504,6 +504,40 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
+    public function testCreateBuilderUsesMaxLengthAndPattern()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessMaxLength')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new ValueGuess(
+                20,
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser2->expects($this->once())
+            ->method('guessPattern')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new ValueGuess(
+                '.{5,}',
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20, 'pattern' => '.{5,}')))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())

@@ -112,7 +112,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultApiVersion()
     {
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             // Old implementation on PHP < 5.3.9
             $this->assertInstanceOf('Symfony\Component\Validator\Validator', $this->builder->getValidator());
         } else {
@@ -135,7 +135,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetApiVersion24And25()
     {
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             $this->markTestSkipped('Not supported prior to PHP 5.3.9');
         }
 

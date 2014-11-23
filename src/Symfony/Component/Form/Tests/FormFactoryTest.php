@@ -539,7 +539,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('builderInstance', $this->builder);
     }
 
-
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
     {
         $this->guesser1->expects($this->once())

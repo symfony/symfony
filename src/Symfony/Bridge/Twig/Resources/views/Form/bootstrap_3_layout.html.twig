@@ -14,11 +14,6 @@
     {{- parent() -}}
 {%- endblock textarea_widget %}
 
-{% block submit_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn')|trim}) %}
-    {{- parent() -}}
-{%- endblock %}
-
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn')|trim}) %}
     {{- parent() -}}

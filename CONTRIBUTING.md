@@ -1,7 +1,7 @@
 Contributing
 ------------
 
-Symfony2 is an open source, community-driven project. If you'd like to contribute,
+Symfony is an open source, community-driven project. If you'd like to contribute,
 please read the [Contributing Code][1] part of the documentation. If you're submitting
 a pull request, please follow the guidelines in the [Submitting a Patch][2] section
 and use the [Pull Request Template][3].

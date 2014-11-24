@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 
 /**
- * Extension supporting the Symfony2 Validator component in forms.
+ * Extension supporting the Symfony Validator component in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

@@ -383,13 +383,13 @@ class Application
      */
     public function add(Command $command)
     {
-        $command->setApplication($this);
-
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
             return;
         }
+
+        $command->setApplication($this);
 
         if (null === $command->getDefinition()) {
             throw new \LogicException(sprintf('Command class "%s" is not correctly initialized. You probably forgot to call the parent constructor.', get_class($command)));

@@ -24,8 +24,8 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->string = new StringUtils(new SecureRandom);
-        $this->utils = new StringUtils(new SecureRandom);
+        $this->string = new StringUtils(new SecureRandom());
+        $this->utils = new StringUtils(new SecureRandom());
     }
 
     public function dataProviderTrue()
@@ -96,7 +96,7 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
         return array(
             array(-1),
             array(0),
-            array(new \stdClass),
+            array(new \stdClass()),
             array(-150),
             array(''),
             array('-42'),
@@ -170,6 +170,4 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
     {
         $this->utils->setKeySize($size);
     }
-
-
 }

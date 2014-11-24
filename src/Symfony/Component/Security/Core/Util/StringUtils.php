@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
  */
 class StringUtils
 {
-
     /**
      * A class to provide random data for hmac keys.
      *
@@ -133,8 +132,9 @@ class StringUtils
      */
     public function setKeySize($keySize)
     {
-        if ( ! is_numeric($keySize) or ((int) $keySize <= 0))
+        if (! is_numeric($keySize) or ((int) $keySize <= 0)) {
             throw new InvalidArgumentException("Key size should be an integer > 0");
+        }
 
         // We want to avoid casting to int in the event that $keySize
         // is an object or a resource-like handle as it will return
@@ -161,8 +161,9 @@ class StringUtils
     {
         $algo = (string) $algo;
 
-        if ( ! in_array($algo, hash_algos()))
+        if (! in_array($algo, hash_algos())) {
             throw new InvalidArgumentException("$algo is not a supported algorithm");
+        }
 
         $this->algo = $algo;
     }

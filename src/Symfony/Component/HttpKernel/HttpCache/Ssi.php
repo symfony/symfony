@@ -69,7 +69,7 @@ class Ssi implements SurrogateInterface
     public function addSurrogateCapability(Request $request)
     {
         $current = $request->headers->get('Surrogate-Capability');
-        $new = 'symfony2="SSI/1.0"';
+        $new = 'symfony="SSI/1.0"';
 
         $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
     }

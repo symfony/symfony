@@ -1,7 +1,7 @@
 Monolog Bridge
 ==============
 
-Provides integration for Monolog with various Symfony2 components.
+Provides integration for Monolog with various Symfony components.
 
 Resources
 ---------

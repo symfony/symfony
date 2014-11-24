@@ -19,7 +19,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * Runs Symfony2 application using PHP built-in web server.
+ * Runs Symfony application using PHP built-in web server.
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */

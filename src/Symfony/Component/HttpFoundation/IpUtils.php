@@ -39,7 +39,7 @@ class IpUtils
             $ips = array($ips);
         }
 
-        $method = false !== strpos($requestIp, ':') ? 'checkIp6' : 'checkIp4';
+        $method = substr_count($ip, ':') > 1 ? 'checkIp6' : 'checkIp4';
 
         foreach ($ips as $ip) {
             if (self::$method($requestIp, $ip)) {

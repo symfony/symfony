@@ -65,7 +65,7 @@ class UriSigner
             $params = array();
         }
 
-        if (!isset($params['_hash']) || !$params['_hash']) {
+        if (empty($params['_hash'])) {
             return false;
         }
 

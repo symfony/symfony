@@ -59,21 +59,21 @@ class UriSigner
     public function check($uri)
     {
         $url = parse_url($uri);
-		if (isset($url['query'])) {
-			parse_str($url['query'], $params);
-		} else {
-			$params = array();
-		}
-        
+        if (isset($url['query'])) {
+            parse_str($url['query'], $params);
+        } else {
+            $params = array();
+        }
+
         if (!isset($params['_hash']) || !$params['_hash']) {
             return false;
         }
-        
+
         $hash = urlencode($params['_hash']);
         unset($params['_hash']);
-        
+
         $url['query'] = http_build_query($params);
-        
+
         $scheme   = isset($url['scheme']) ? $url['scheme'] . '://' : ''; 
         $host     = isset($url['host']) ? $url['host'] : ''; 
         $port     = isset($url['port']) ? ':' . $url['port'] : ''; 
@@ -84,7 +84,7 @@ class UriSigner
         $query    = isset($url['query']) && $url['query'] ? '?' . $url['query'] : ''; 
         $fragment = isset($url['fragment']) ? '#' . $url['fragment'] : ''; 
         $testUrl  = $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
-		
+
         return $this->computeHash($testUrl) === $hash;
     }
 

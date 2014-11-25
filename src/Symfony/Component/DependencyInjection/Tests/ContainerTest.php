@@ -305,6 +305,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->initialized('foo'), '->initialized() returns true if service is loaded');
         $this->assertFalse($sc->initialized('foo1'), '->initialized() returns false if service is not loaded');
         $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
+        $this->assertFalse($sc->initialized('alias'), '->initialized() returns false if an aliased service is not initialized');
+
+        $sc->set('bar', new \stdClass());
+        $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
     public function testEnterLeaveCurrentScope()

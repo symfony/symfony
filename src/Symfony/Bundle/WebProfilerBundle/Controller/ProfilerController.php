@@ -249,6 +249,7 @@ class ProfilerController
             'start' => $start,
             'end' => $end,
             'limit' => $limit,
+            'request' => $request,
         )), 200, array('Content-Type' => 'text/html'));
     }
 

@@ -360,6 +360,10 @@ class Container implements IntrospectableContainerInterface
             return true;
         }
 
+        if (isset($this->aliases[$id])) {
+            $id = $this->aliases[$id];
+        }
+
         return isset($this->services[$id]) || array_key_exists($id, $this->services);
     }
 

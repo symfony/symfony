@@ -74,8 +74,8 @@ class UriSigner
 
         $url['query'] = http_build_query($params);
 
-        $scheme   = isset($url['scheme']) ? $url['scheme'].'://' : ''; 
-        $host     = isset($url['host']) ? $url['host'] : ''; 
+        $scheme   = isset($url['scheme']) ? $url['scheme'].'://' : '';
+        $host     = isset($url['host']) ? $url['host'] : '';
         $port     = isset($url['port']) ? ':'.$url['port'] : '';
         $user     = isset($url['user']) ? $url['user'] : '';
         $pass     = isset($url['pass']) ? ':'.$url['pass']  : '';

@@ -384,7 +384,6 @@ class Application
     public function add(Command $command)
     {
         if (!$command->isEnabled()) {
-            $command->setApplication(null);
 
             return;
         }

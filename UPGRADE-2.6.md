@@ -364,3 +364,43 @@ $bundles[] = new Symfony\Bundle\DebugBundle\DebugBundle();
 Then enjoy dumping variables by calling `dump($var)` anywhere in your PHP
 and `{% dump var %}` or `{{ dump(var) }}` in Twig. Dumps are displayed
 **in the web debug toolbar**.
+
+Translation
+-----------
+
+With `LoggingTranslator`, a new translator class is introduced with Symfony
+2.6. By default, the `@translator` service is referring to this class in the
+debug environment.
+
+If you have own services that depend on the `@translator` service and expect
+this service to be an instance of either
+`Symfony\Component\Translation\Translator` or
+`Symfony\Bundle\FrameworkBundle\Translation\Translator`, e.g. by type-hinting
+for either of these classes, you will need to change that type hint. You can
+use the `TranslatorInterface` to be on the safe side for future changes.
+
+Before:
+
+```php
+use Symfony\Component\Translation\Translator;
+
+class MyService {
+    public function __construct(Translator $translator)
+    {
+        ...
+    }
+}
+```
+
+After:
+
+```php
+use Symfony\Component\Translation\TranslatorInterface;
+
+class MyService {
+    public function __construct(TranslatorInterface $translator)
+    {
+        ...
+    }
+}
+```

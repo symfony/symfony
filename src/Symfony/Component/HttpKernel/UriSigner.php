@@ -88,7 +88,7 @@ class UriSigner
     {
         return urlencode(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)));
     }
-    
+
     private function buildUrl(array $url, array $params = array())
     {
         ksort($params);
@@ -106,5 +106,4 @@ class UriSigner
 
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
     }
-
 }

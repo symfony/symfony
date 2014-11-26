@@ -48,9 +48,9 @@ class UriSigner
         } else {
             $params = array();
         }
-        
+
         $uri = $this->buildUrl($url, $params);
-        
+
         return $uri.(false === (strpos($uri, '?')) ? '?' : '&').'_hash='.$this->computeHash($uri);
     }
 
@@ -103,7 +103,7 @@ class UriSigner
         $path     = isset($url['path']) ? $url['path'] : '';
         $query    = isset($url['query']) && $url['query'] ? '?'.$url['query'] : '';
         $fragment = isset($url['fragment']) ? '#'.$url['fragment'] : '';
-        
+
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;
     }
 

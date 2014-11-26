@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
@@ -36,13 +37,12 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
     {
         $prevDumper = $this->getDumpHandler();
 
-        $container = new ContainerBuilder();
-        $container->setDefinition('var_dumper.cloner', new Definition('Symfony\Component\HttpKernel\Tests\EventListener\MockCloner'));
-        $container->setDefinition('mock_dumper', new Definition('Symfony\Component\HttpKernel\Tests\EventListener\MockDumper'));
+        $cloner = new MockCloner();
+        $dumper = new MockDumper();
 
         ob_start();
         $exception = null;
-        $listener = new DumpListener($container, 'mock_dumper');
+        $listener = new DumpListener($cloner, $dumper);
 
         try {
             $listener->configure();
@@ -75,24 +75,26 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
     private function getDumpHandler()
     {
         $prevDumper = VarDumper::setHandler('var_dump');
-        VarDumper::setHandler($prevDumper );
+        VarDumper::setHandler($prevDumper);
 
         return $prevDumper;
     }
 }
 
-class MockCloner
+class MockCloner implements ClonerInterface
 {
     public function cloneVar($var)
     {
-        return $var.'-';
+        return new Data(array($var.'-'));
     }
 }
 
-class MockDumper
+class MockDumper implements DataDumperInterface
 {
-    public function dump($var)
+    public function dump(Data $data)
     {
-        echo '+'.$var;
+        $rawData = $data->getRawData();
+
+        echo '+'.$rawData[0];
     }
 }

@@ -533,17 +533,20 @@ class SecurityExtension extends Extension
         }
 
         // Chain provider
-        $providers = array();
-        foreach ($provider['chain']['providers'] as $providerName) {
-            $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
+        if (isset($provider['chain'])) {
+            $providers = array();
+            foreach ($provider['chain']['providers'] as $providerName) {
+                $providers[] = new Reference($this->getUserProviderId(strtolower($providerName)));
+            }
+
+            $container
+                ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
+                ->addArgument($providers);
+
+            return $name;
         }
 
-        $container
-            ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-            ->addArgument($providers)
-        ;
-
-        return $name;
+        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider', $name));
     }
 
     private function getUserProviderId($name)

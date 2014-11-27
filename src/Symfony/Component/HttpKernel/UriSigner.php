@@ -91,7 +91,7 @@ class UriSigner
 
     private function buildUrl(array $url, array $params = array())
     {
-        ksort($params, SORT_NATURAL);
+        ksort($params);
         $url['query'] = http_build_query($params);
 
         $scheme   = isset($url['scheme']) ? $url['scheme'].'://' : '';

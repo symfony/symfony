@@ -35,7 +35,8 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigure()
     {
-        $prevDumper = $this->getDumpHandler();
+        $prevDumper = VarDumper::setHandler('var_dump');
+        VarDumper::setHandler($prevDumper);
 
         $cloner = new MockCloner();
         $dumper = new MockDumper();
@@ -47,21 +48,10 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
         try {
             $listener->configure();
 
-            $lazyDumper = $this->getDumpHandler();
             VarDumper::dump('foo');
-
-            $loadedDumper = $this->getDumpHandler();
             VarDumper::dump('bar');
 
             $this->assertSame('+foo-+bar-', ob_get_clean());
-
-            $listenerReflector = new \ReflectionClass($listener);
-            $lazyReflector = new \ReflectionFunction($lazyDumper);
-            $loadedReflector = new \ReflectionFunction($loadedDumper);
-
-            $this->assertSame($listenerReflector->getFilename(), $lazyReflector->getFilename());
-            $this->assertSame($listenerReflector->getFilename(), $loadedReflector->getFilename());
-            $this->assertGreaterThan($lazyReflector->getStartLine(), $loadedReflector->getStartLine());
         } catch (\Exception $exception) {
         }
 
@@ -70,14 +60,6 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
         if (null !== $exception) {
             throw $exception;
         }
-    }
-
-    private function getDumpHandler()
-    {
-        $prevDumper = VarDumper::setHandler('var_dump');
-        VarDumper::setHandler($prevDumper);
-
-        return $prevDumper;
     }
 }
 

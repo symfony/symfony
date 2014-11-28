@@ -67,6 +67,12 @@ class LockHandler
             return true;
         }
 
+        // the lock might have been acquired before by a different PHP process
+        // (e.g. a web server process vs. a command-line process)
+        if (file_exists($this->file) && !is_readable($this->file)) {
+            return false;
+        }
+
         // Set an error handler to not trigger the registered error handler if
         // the file can not be opened.
         set_error_handler('var_dump', 0);
@@ -98,6 +104,11 @@ class LockHandler
             flock($this->handle, LOCK_UN | LOCK_NB);
             fclose($this->handle);
             $this->handle = null;
+
+            // remove the lock file so that PHP processes executed by another
+            // user (e.g. a web server process vs. a command-line process) are
+            // able to create it again
+            unlink($this->file);
         }
     }
 }

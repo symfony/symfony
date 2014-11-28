@@ -38,7 +38,7 @@ if ($argc > 3 || 2 === $argc && '-h' === $argv[1]) {
     bailout(<<<MESSAGE
 Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 
-Updates the ICU data for Symfony2 to the latest version of ICU.
+Updates the ICU data for Symfony to the latest version of ICU.
 
 If you downloaded the SVN repository before, you can pass the path to the
 repository source in the first optional argument.

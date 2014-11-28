@@ -249,7 +249,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }
@@ -384,11 +384,6 @@ EOF;
      */
     private function formatArgs(array $args)
     {
-        if (PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
@@ -429,7 +424,7 @@ EOF;
             $str = iconv($charset, 'UTF-8', $str);
         }
 
-        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
     }
 
     /**

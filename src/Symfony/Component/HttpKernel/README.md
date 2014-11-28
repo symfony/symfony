@@ -4,7 +4,7 @@ HttpKernel Component
 HttpKernel provides the building blocks to create flexible and fast HTTP-based
 frameworks.
 
-``HttpKernelInterface`` is the core interface of the Symfony2 full-stack
+``HttpKernelInterface`` is the core interface of the Symfony full-stack
 framework:
 
 ```php
@@ -23,11 +23,11 @@ interface HttpKernelInterface
 
 It takes a ``Request`` as an input and should return a ``Response`` as an
 output. Using this interface makes your code compatible with all frameworks
-using the Symfony2 components. And this will give you many cool features for
+using the Symfony components. And this will give you many cool features for
 free.
 
-Creating a framework based on the Symfony2 components is really easy. Here is
-a very simple, but fully-featured framework based on the Symfony2 components:
+Creating a framework based on the Symfony components is really easy. Here is
+a very simple, but fully-featured framework based on the Symfony components:
 
 ```php
 $routes = new RouteCollection();
@@ -54,7 +54,7 @@ $kernel = new HttpKernel($dispatcher, $resolver);
 $kernel->handle($request)->send();
 ```
 
-This is all you need to create a flexible framework with the Symfony2
+This is all you need to create a flexible framework with the Symfony
 components.
 
 Want to add an HTTP reverse proxy and benefit from HTTP caching and Edge Side

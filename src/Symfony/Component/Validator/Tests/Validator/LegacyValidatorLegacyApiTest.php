@@ -21,7 +21,7 @@ class LegacyValidatorLegacyApiTest extends AbstractLegacyApiTest
 {
     protected function setUp()
     {
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             $this->markTestSkipped('Not supported prior to PHP 5.3.9');
         }
 

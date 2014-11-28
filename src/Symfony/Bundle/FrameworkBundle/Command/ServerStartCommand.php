@@ -33,7 +33,7 @@ class ServerStartCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:start')
@@ -83,6 +83,18 @@ EOF
             return 1;
         }
 
+        $documentRoot = $input->getOption('docroot');
+
+        if (null === $documentRoot) {
+            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+        }
+
+        if (!is_dir($documentRoot)) {
+            $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
+
+            return 1;
+        }
+
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         if ('prod' === $env) {
@@ -111,7 +123,7 @@ EOF
             return 1;
         }
 
-        if (null === $process = $this->createServerProcess($output, $address, $input->getOption('docroot'), $input->getOption('router'), $env, null)) {
+        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $input->getOption('router'), $env, null)) {
             return 1;
         }
 

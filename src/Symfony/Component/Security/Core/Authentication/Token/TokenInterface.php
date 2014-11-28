@@ -47,8 +47,8 @@ interface TokenInterface extends \Serializable
     /**
      * Returns a user representation.
      *
-     * @return mixed either returns an object which implements __toString(), or
-     *                  a primitive string is returned.
+     * @return mixed either returns an object which implements Symfony\Component\Security\Core\User\UserInterface,
+     *                  or a primitive string is returned.
      */
     public function getUser();
 

@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-11-08T22:54:28Z
+
+@webmozart can you please review this PR?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-11-12T00:07:31Z
+
+Shall this PR be submitted against 2.6 branch as `master` has been officially made for the upcoming `3.0`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-12T08:03:10Z
+
+No, I will do the switch when merging.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-11-17T14:47:25Z
+
+@webmozart any thoughts please? This bug fix must be merged before 2.6.0.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T04:51:35Z
+
+I think it is OK to use formatValue here rather than creating another one
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-11-23T11:10:48Z
+
+@Stof done ;)
+@webmozart  can you review it please?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-28T08:06:31Z
+
+:+1:

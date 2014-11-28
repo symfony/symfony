@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-23T19:03:10Z
+
+This backports the improved error message from #12489 if the built-in web server binary could not be found.

@@ -1,0 +1,33 @@
+{
+    "name": "symfony/superclosure-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony SuperClosure Bridge",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/dependency-injection": "~2.6",
+        "jeremeamia/superclosure": "~1.0"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Bridge\\SuperClosure\\": "" }
+    },
+    "target-dir": "Symfony/Bridge/SuperClosure",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.6-dev"
+        }
+    }
+}

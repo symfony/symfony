@@ -26,7 +26,8 @@
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
-        "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
+        "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
+        "symfony/superclosure-bridge": "Allow to dump closure factories"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection\\": "" }

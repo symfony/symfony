@@ -948,6 +948,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $callable = $definition->getFactory();
             } elseif (is_array($factory)) {
                 $callable = array($this->resolveServices($factory[0]), $factory[1]);
+            } elseif ($factory instanceof \Closure) {
+                $callable = $factory;
             } else {
                 throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
             }

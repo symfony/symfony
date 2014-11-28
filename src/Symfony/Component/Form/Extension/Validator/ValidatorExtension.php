@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
- * Extension supporting the Symfony2 Validator component in forms.
+ * Extension supporting the Symfony Validator component in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

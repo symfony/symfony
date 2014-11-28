@@ -295,7 +295,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
         $this->assertSame('setApiVersion', $calls[6][0]);
 
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             $this->assertEquals(array(Validation::API_VERSION_2_4), $calls[6][1]);
         } else {
             $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
@@ -448,7 +448,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setApiVersion', $calls[5][0]);
         // no cache, no annotations
 
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
         } else {
             $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
@@ -472,7 +472,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setApiVersion', $calls[5][0]);
         // no cache, no annotations
 
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
+        if (PHP_VERSION_ID < 50309) {
             $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
         } else {
             $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);

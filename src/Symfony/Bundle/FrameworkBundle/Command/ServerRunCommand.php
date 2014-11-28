@@ -19,7 +19,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * Runs Symfony2 application using PHP built-in web server.
+ * Runs Symfony application using PHP built-in web server.
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
@@ -83,12 +83,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (defined('HHVM_VERSION')) {
-            $output->writeln('<error>This command is not supported on HHVM.</error>');
-
-            return 1;
-        }
-
         $documentRoot = $input->getOption('docroot');
 
         if (null === $documentRoot) {

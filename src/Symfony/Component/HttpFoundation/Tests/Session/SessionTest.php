@@ -136,7 +136,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         return array(
             array('foo', 'bar', array('foo' => 'bar')),
             array('foo.bar', 'too much beer', array('foo.bar' => 'too much beer')),
-            array('great', 'symfony2 is great', array('great' => 'symfony2 is great')),
+            array('great', 'symfony is great', array('great' => 'symfony is great')),
         );
     }
 
@@ -195,7 +195,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetIterator()
     {
-        $attributes = array('hello' => 'world', 'symfony2' => 'rocks');
+        $attributes = array('hello' => 'world', 'symfony' => 'rocks');
         foreach ($attributes as $key => $val) {
             $this->session->set($key, $val);
         }
@@ -215,7 +215,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testGetCount()
     {
         $this->session->set('hello', 'world');
-        $this->session->set('symfony2', 'rocks');
+        $this->session->set('symfony', 'rocks');
 
         $this->assertCount(2, $this->session);
     }

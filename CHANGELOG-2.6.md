@@ -7,6 +7,14 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.0 (2014-11-28)
+
+ * bug #12553 [Debug] fix error message on double exception (nicolas-grekas)
+ * bug #12550 [FrameworkBundle] backport #12489 (xabbuh)
+ * bug #12437  [Validator] make DateTime objects represented as strings in the violation message (hhamon)
+ * bug #12575 [WebProfilerBundle] Remove usage of app.request in search bar template (jeromemacias)
+ * bug #12570 Fix initialized() with aliased services (Daniel Wehner)
+
 * 2.6.0-BETA2 (2014-11-23)
 
  * bug #12555 [Debug] fix ENT_SUBSTITUTE usage (nicolas-grekas)

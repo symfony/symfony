@@ -58,6 +58,8 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
             }
         }
 
+        $collection = $this->loader->addPriorityRoutes($collection);
+
         return $collection;
     }
 

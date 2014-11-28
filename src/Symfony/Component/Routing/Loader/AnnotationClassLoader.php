@@ -73,6 +73,11 @@ abstract class AnnotationClassLoader implements LoaderInterface
     protected $defaultRouteIndex = 0;
 
     /**
+     * @var array
+     */
+    protected $routesWithPriority = array();
+
+    /**
      * Constructor.
      *
      * @param Reader $reader
@@ -122,8 +127,30 @@ abstract class AnnotationClassLoader implements LoaderInterface
             $this->defaultRouteIndex = 0;
             foreach ($this->reader->getMethodAnnotations($method) as $annot) {
                 if ($annot instanceof $this->routeAnnotationClass) {
-                    $this->addRoute($collection, $annot, $globals, $class, $method);
+                    $priority = (int) $annot->getOption('priority');
+                    $this->routesWithPriority[$priority][] = array($annot, $globals, $class, $method);
                 }
+            }
+        }
+
+        $collection = $this->addPriorityRoutes($collection);
+
+        return $collection;
+    }
+
+    /**
+     * Add the prioritised routes to the collection
+     *
+     * @param $collection
+     * @return RouteCollection
+     */
+    public function addPriorityRoutes($collection)
+    {
+        krsort($this->routesWithPriority);
+
+        foreach ($this->routesWithPriority as $priorityGroup) {
+            foreach ($priorityGroup as $route) {
+                $this->addRoute($collection, $route[0], $route[1], $route[2], $route[3]);
             }
         }
 

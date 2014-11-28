@@ -11,13 +11,16 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class LocalizedController extends ContainerAware
+class LocalizedController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function loginAction(Request $request)
     {
         // get the login error if there is one

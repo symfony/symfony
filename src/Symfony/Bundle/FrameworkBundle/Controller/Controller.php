@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -33,8 +34,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Controller extends ContainerAware
+class Controller implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * Generates a URL from the given parameters.
      *

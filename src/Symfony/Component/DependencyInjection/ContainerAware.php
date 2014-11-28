@@ -18,7 +18,7 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @api
  * 
- * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use the trait ContainerAwareTrait instead.
+ * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use ContainerAwareTrait with ContainerAwareInterface instead.
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {

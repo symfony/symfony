@@ -160,6 +160,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function setFallbackLocale($locales)
     {
+        trigger_error('The setFallbackLocale method was removed in 3.0. You should use the new method setFallbackLocales.', E_USER_DEPRECATED);
         $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
     }
 

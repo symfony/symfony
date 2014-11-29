@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by davidfuhr at 2014-11-29T12:13:08Z
+
+Pre-requisite for #12623
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2014-11-29T12:25:15Z
+
+This should also be in each component's phpunit.xml.dist, I should think it would be best to keep them all in this one PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-29T12:25:41Z
+
+@magnusnordlander right
+
+---------------------------------------------------------------------------
+
+by davidfuhr at 2014-11-29T12:27:31Z
+
+@magnusnordlander @fabpot So one pull request including all phpunit.xml files for all components?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-29T12:33:25Z
+
+@davidfuhr yes

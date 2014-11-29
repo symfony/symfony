@@ -123,12 +123,9 @@ class ExceptionListener implements EventSubscriberInterface
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');
 
-        $deprecationMessage = 'The format attribute for exception listener has'
-            . ' been deprecated. You should use _format.';
-
         $request->attributes = new DeprecationParameterBag(
             $request->attributes,
-            array('format' => $deprecationMessage)
+            array('format' => 'The format attribute for exception listener has been deprecated. You should use _format.')
         );
 
         return $request;

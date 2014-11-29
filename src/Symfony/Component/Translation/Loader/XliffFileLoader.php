@@ -129,22 +129,10 @@ class XliffFileLoader implements LoaderInterface
 
         $internalErrors = libxml_use_internal_errors(true);
 
-        $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
-        $parts = explode('/', $location);
-        if (0 === stripos($location, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
-            if ($tmpfile) {
-                copy($location, $tmpfile);
-                $parts = explode('/', str_replace('\\', '/', $tmpfile));
-            }
-        }
-        $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-        $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+        $version = $this->getVersion($dom);
+        $schemaSource = $this->getSchemaSourceFromVersion($version);
 
-        $source = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-1.2-strict.xsd');
-        $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
-
-        if (!@$dom->schemaValidateSource($source)) {
+        if (!@$dom->schemaValidateSource($schemaSource)) {
             throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
 
@@ -181,5 +169,53 @@ class XliffFileLoader implements LoaderInterface
         libxml_use_internal_errors($internalErrors);
 
         return $errors;
+    }
+
+    /**
+     * @param \DOMDocument $dom
+     */
+    private function getVersion(\DOMDocument $dom)
+    {
+        /** @var \DOMNode $xliff */
+        foreach ($dom->getElementsByTagName('xliff') as $xliff) {
+            $version = $xliff->attributes->getNamedItem('version');
+            if ($version) {
+                return $version->nodeValue;
+            }
+        }
+
+        // Falls back to v1.2
+        return '1.2';
+    }
+
+    /**
+     * @param $version
+     */
+    private function getSchemaSourceFromVersion($version)
+    {
+        $newPath = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
+        $parts = explode('/', $newPath);
+        if (0 === stripos($newPath, 'phar://')) {
+            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
+            if ($tmpfile) {
+                copy($newPath, $tmpfile);
+                $parts = explode('/', str_replace('\\', '/', $tmpfile));
+            }
+        }
+        $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+        $newPath = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+
+        if ($version === '1.2') {
+            $schema = 'xliff-core-1.2-strict.xsd';
+            $oldPath = 'http://www.w3.org/2001/xml.xsd';
+
+        } else if ($version === '2.0') {
+            $schema = 'xliff-core-2.0.xsd';
+            $oldPath = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
+        }
+
+        $source = file_get_contents(__DIR__.'/schema/dic/xliff-core/'.$schema);
+
+        return str_replace($oldPath, $newPath, $source);
     }
 }

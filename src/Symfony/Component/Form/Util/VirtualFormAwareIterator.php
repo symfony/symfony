@@ -25,7 +25,6 @@ namespace Symfony\Component\Form\Util;
  */
 class VirtualFormAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {
-
     public function __construct(\Traversable $iterator)
     {
         parent::__construct($iterator);

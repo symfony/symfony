@@ -133,6 +133,8 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
+        trigger_error('The "accept" method of the "MetadataInterface" class has been deprecated since Symfony 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
                 && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
             if ($this->hasGroupSequence()) {

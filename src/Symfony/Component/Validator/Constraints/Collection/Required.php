@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints\Collection;
 
+trigger_error('Symfony\Component\Validator\Constraints\Collection\Required was deprecated in version 2.3 and will be removed in 3.0. You should use Symfony\Component\Validator\Constraints\Required instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraints\Required as BaseRequired;
 
 /**

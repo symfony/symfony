@@ -35,6 +35,8 @@ class TableHelper extends Helper
 
     public function __construct()
     {
+        trigger_error('The TableHelper class was deprecated in version 2.5 and will be removed in 3.0. Use Symfony\Component\Console\Helper\Table instead.', E_USER_DEPRECATED);
+
         $this->table = new Table(new NullOutput());
     }
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\OptionsResolver;
 
+trigger_error('The "Symfony\Component\OptionsResolver\OptionsResolverInterface" interface was deprecated in version 2.6 and will be removed in 3.0. Use "Symfony\Component\OptionsResolver\OptionsResolver" instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;

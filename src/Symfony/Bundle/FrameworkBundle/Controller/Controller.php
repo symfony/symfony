@@ -272,6 +272,8 @@ class Controller extends ContainerAware
      */
     public function getRequest()
     {
+        trigger_error('The "getRequest" method of the base "Controller" class has been deprecated since Symfony 2.4 and will be removed in 3.0. The only reliable way to get the "Request" object is to inject it in the action method.', E_USER_DEPRECATED);
+
         return $this->container->get('request_stack')->getCurrentRequest();
     }
 

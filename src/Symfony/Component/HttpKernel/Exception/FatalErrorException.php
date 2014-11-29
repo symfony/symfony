@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
+trigger_error('Symfony\Component\HttpKernel\Exception\FatalErrorException is deprecated since version 2.3 and will be removed in 3.0. Use the same class from the Debug component instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Debug\Exception\FatalErrorException as DebugFatalErrorException;
 
 /**

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+trigger_error('The Symfony\Component\Routing\Matcher\Dumper\ApacheUrlMatcher is deprecated since it\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 
 /**

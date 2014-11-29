@@ -234,4 +234,12 @@ class StopwatchEvent
 
         return round($time, 1);
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s: %.2F MiB - %d ms', $this->getCategory(), $this->getMemory() / 1024 / 1024, $this->getDuration());
+    }
 }

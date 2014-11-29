@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
  * Definition represents a service definition.
@@ -47,7 +48,7 @@ class Definition
      * Constructor.
      *
      * @param string|null $class     The service class
-     * @param array       $arguments An array of arguments to pass to the service constructor
+     * @param array $arguments An array of arguments to pass to the service constructor
      *
      * @api
      */
@@ -98,6 +99,10 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
+        trigger_error(
+            'setFactoryClass() is deprecated since version 2.6 and will be removed in 3.0. Use setFactory() instead.',
+            E_USER_DEPRECATED);
+
         $this->factoryClass = $factoryClass;
 
         return $this;
@@ -128,6 +133,10 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
+        trigger_error(
+            'setFactoryMethod() is deprecated since version 2.6 and will be removed in 3.0. Use setFactory() instead.',
+            E_USER_DEPRECATED);
+
         $this->factoryMethod = $factoryMethod;
 
         return $this;
@@ -193,6 +202,10 @@ class Definition
      */
     public function setFactoryService($factoryService)
     {
+        trigger_error(
+            'setFactoryService() is deprecated since version 2.6 and will be removed in 3.0. Use setFactory() instead.',
+            E_USER_DEPRECATED);
+
         $this->factoryService = $factoryService;
 
         return $this;
@@ -302,8 +315,8 @@ class Definition
     /**
      * Sets a specific argument
      *
-     * @param int     $index
-     * @param mixed   $argument
+     * @param int $index
+     * @param mixed $argument
      *
      * @return Definition The current instance
      *
@@ -337,7 +350,7 @@ class Definition
     /**
      * Gets an argument to pass to the service constructor/factory method.
      *
-     * @param int     $index
+     * @param int $index
      *
      * @return mixed The argument value
      *
@@ -377,7 +390,7 @@ class Definition
      * Adds a method to call after service initialization.
      *
      * @param string $method    The method name to call
-     * @param array  $arguments An array of arguments to pass to the method call
+     * @param array $arguments An array of arguments to pass to the method call
      *
      * @return Definition The current instance
      *
@@ -494,7 +507,7 @@ class Definition
      * Adds a tag for this definition.
      *
      * @param string $name       The tag name
-     * @param array  $attributes An array of attributes
+     * @param array $attributes An array of attributes
      *
      * @return Definition The current instance
      *
@@ -610,7 +623,7 @@ class Definition
     /**
      * Sets the visibility of this service.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition The current instance
      *
@@ -618,7 +631,7 @@ class Definition
      */
     public function setPublic($boolean)
     {
-        $this->public = (bool) $boolean;
+        $this->public = (bool)$boolean;
 
         return $this;
     }
@@ -638,7 +651,7 @@ class Definition
     /**
      * Sets the synchronized flag of this service.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition The current instance
      *
@@ -646,7 +659,7 @@ class Definition
      */
     public function setSynchronized($boolean)
     {
-        $this->synchronized = (bool) $boolean;
+        $this->synchronized = (bool)$boolean;
 
         return $this;
     }
@@ -666,13 +679,13 @@ class Definition
     /**
      * Sets the lazy flag of this service.
      *
-     * @param bool    $lazy
+     * @param bool $lazy
      *
      * @return Definition The current instance
      */
     public function setLazy($lazy)
     {
-        $this->lazy = (bool) $lazy;
+        $this->lazy = (bool)$lazy;
 
         return $this;
     }
@@ -691,7 +704,7 @@ class Definition
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition the current instance
      *
@@ -699,7 +712,7 @@ class Definition
      */
     public function setSynthetic($boolean)
     {
-        $this->synthetic = (bool) $boolean;
+        $this->synthetic = (bool)$boolean;
 
         return $this;
     }
@@ -721,7 +734,7 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition the current instance
      *
@@ -729,7 +742,7 @@ class Definition
      */
     public function setAbstract($boolean)
     {
-        $this->abstract = (bool) $boolean;
+        $this->abstract = (bool)$boolean;
 
         return $this;
     }

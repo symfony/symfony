@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+trigger_error('Symfony\Component\HttpKernel\Debug\ExceptionHandler is deprecated since version 2.3 and will be removed in 3.0. Use the same class from the Debug component instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Debug\ExceptionHandler as DebugExceptionHandler;
 
 /**

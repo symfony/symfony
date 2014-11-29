@@ -163,7 +163,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
             ->children()
             ->variableNode('key')
             ->validate()
-       ;
+        ;
     }
 
     /**

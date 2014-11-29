@@ -111,7 +111,7 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cmd, $helperset->getCommand(), '->getCommand() retrieves stored command');
     }
 
-   /**
+    /**
      * Create a generic mock for the helper interface. Optionally check for a call to setHelperSet with a specific
      * helperset instance.
      *

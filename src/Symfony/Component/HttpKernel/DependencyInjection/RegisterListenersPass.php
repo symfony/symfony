@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+trigger_error('Class "Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass" is deprecated since 2.5 and will be removed in 3.0. Use "Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass" instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass as BaseRegisterListenersPass;
 
 /**
@@ -20,8 +22,4 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass 
  */
 class RegisterListenersPass extends BaseRegisterListenersPass
 {
-    public function __construct()
-    {
-        trigger_error('Class "Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass" is deprecated since 2.5 and will be removed in 3.0. Use "Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass" instead.', E_USER_DEPRECATED);
-    }
 }

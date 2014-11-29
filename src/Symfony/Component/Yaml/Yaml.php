@@ -30,7 +30,7 @@ class Yaml
      *
      *  Usage:
      *  <code>
-     *   $array = Yaml::parse('config.yml');
+     *   $array = Yaml::parse(file_get_contents('config.yml'));
      *   print_r($array);
      *  </code>
      *
@@ -46,6 +46,8 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
+     * @deprecated The ability to pass file names to Yaml::parse() was deprecated in 2.7 and will be removed in 3.0. Please, pass the contents of the file instead.
+     *
      * @api
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false)
@@ -53,6 +55,8 @@ class Yaml
         // if input is a file, process it
         $file = '';
         if (strpos($input, "\n") === false && is_file($input)) {
+            trigger_error('The ability to pass file names to Yaml::parse() was deprecated in 2.7 and will be removed in 3.0. Please, pass the contents of the file instead.', E_USER_DEPRECATED);
+
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
             }

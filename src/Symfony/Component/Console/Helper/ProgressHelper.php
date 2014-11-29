@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-trigger_error('The ProgressHelper class is deprecated since version 2.5 and will be removed in 3.0. Use the ProgressBar class instead.', E_USER_DEPRECATED);
+trigger_error('The "ProgressHelper" class is deprecated since version 2.5 and will be removed in 3.0. Use "ProgressBar" class instead.', E_USER_DEPRECATED);
 
 /**
  * The Progress class provides helpers to display progress output.

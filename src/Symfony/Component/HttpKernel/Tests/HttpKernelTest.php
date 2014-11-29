@@ -84,7 +84,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             $event->setResponse(new Response('foo', $event->getException()->getStatusCode()));
         });
 
-        $kernel = new HttpKernel($dispatcher, $this->getResolver(function() { return new Response(); }));
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return new Response(); }));
         $response = $kernel->handle(new Request());
 
         $this->assertEquals('foo', $response->getContent());

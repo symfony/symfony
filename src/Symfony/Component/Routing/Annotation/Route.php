@@ -59,6 +59,8 @@ class Route
      */
     public function setPattern($pattern)
     {
+        trigger_error('The pattern option in routing has been removed. You should use path instead.', E_USER_DEPRECATED);
+
         $this->path = $pattern;
     }
 
@@ -67,6 +69,8 @@ class Route
      */
     public function getPattern()
     {
+        trigger_error('The pattern option in routing has been removed. You should use path instead.', E_USER_DEPRECATED);
+
         return $this->path;
     }
 

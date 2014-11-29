@@ -18,11 +18,11 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseFormIntegrationTe
  */
 abstract class FormIntegrationTestCase extends BaseFormIntegrationTestCase
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	protected function setUp() {
-		trigger_error('This class is deprecated. Use Symfony\Component\Form\Test\FormIntegrationTestCase instead.', E_USER_DEPRECATED);
-		parent::setUp();
-	}
+    /**
+    * {@inheritdoc}
+    */
+    protected function setUp() {
+        trigger_error('This class is deprecated. Use Symfony\Component\Form\Test\FormIntegrationTestCase instead.', E_USER_DEPRECATED);
+        parent::setUp();
+    }
 }

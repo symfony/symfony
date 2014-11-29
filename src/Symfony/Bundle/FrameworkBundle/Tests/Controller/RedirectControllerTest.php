@@ -46,12 +46,17 @@ class RedirectControllerTest extends TestCase
     /**
      * @dataProvider provider
      */
-    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $ignoreAttributes, $expectedCode, $expectedAttributes, $queryParams)
     {
-        $request = new Request();
+        $request = new Request($queryParams);
 
+        $url   = '/redirect-url';
         $route = 'new-route';
-        $url = '/redirect-url';
+
+        if($queryParams) {
+            $url .= '?' . http_build_query($queryParams);
+        }
+
         $attributes = array(
             'route' => $route,
             'permanent' => $permanent,
@@ -70,7 +75,7 @@ class RedirectControllerTest extends TestCase
         $router
             ->expects($this->once())
             ->method('generate')
-            ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
+            ->with($this->equalTo($route), $this->equalTo(array_merge($expectedAttributes, $queryParams)))
             ->will($this->returnValue($url));
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
@@ -93,10 +98,10 @@ class RedirectControllerTest extends TestCase
     public function provider()
     {
         return array(
-            array(true, false, 301, array('additional-parameter' => 'value')),
-            array(false, false, 302, array('additional-parameter' => 'value')),
-            array(false, true, 302, array()),
-            array(false, array('additional-parameter'), 302, array()),
+            array(true, false, 301, array('additional-parameter' => 'value'), array('parameter' => 'first')),
+            array(false, false, 302, array('additional-parameter' => 'value'), array()),
+            array(false, true, 302, array(), array()),
+            array(false, array('additional-parameter'), 302, array(), array('parameter' => 'first', 'flag')),
         );
     }
 

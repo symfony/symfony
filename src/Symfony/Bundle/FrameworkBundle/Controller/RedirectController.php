@@ -51,14 +51,21 @@ class RedirectController extends ContainerAware
 
         $attributes = array();
         if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
-            $attributes = $request->attributes->get('_route_params');
+            $attributes = array_merge($request->attributes->get('_route_params'), $request->query->all());
             unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
             if ($ignoreAttributes) {
                 $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
             }
         }
 
-        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
+        return new RedirectResponse(
+            $this->container->get('router')->generate(
+                $route,
+                $attributes,
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+            $permanent ? 301 : 302
+        );
     }
 
     /**

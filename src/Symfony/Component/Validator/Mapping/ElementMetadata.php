@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+trigger_error('Deprecated class, use GenericMetada instead', E_USER_DEPRECATED);
+
 /**
  * Contains the metadata of a structural element.
  *
@@ -21,8 +23,4 @@ namespace Symfony\Component\Validator\Mapping;
  */
 abstract class ElementMetadata extends GenericMetadata
 {
-    public function __construct()
-    {
-        trigger_error('Deprecated class, use GenericMetada instead', E_USER_DEPRECATED);
-    }
 }

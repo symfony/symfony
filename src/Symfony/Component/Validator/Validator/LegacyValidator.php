@@ -52,6 +52,8 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
             return parent::validate($value, $constraints, $groups);
         }
 
+        trigger_error('ValidatorInterface::validate() was deprecated in version 2.5 and will be removed in version 3.0. Please use Validator\\ValidatorInterface::validate() instead.', E_USER_DEPRECATED);
+
         $constraint = new Valid(array('traverse' => $traverse, 'deep' => $deep));
 
         return parent::validate($value, $constraint, $groups);
@@ -59,6 +61,8 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
 
     public function validateValue($value, $constraints, $groups = null)
     {
+        trigger_error('ValidatorInterface::validateValue() was deprecated in version 2.5 and will be removed in version 3.0. Please use Validator\\ValidatorInterface::validate() instead.', E_USER_DEPRECATED);
+
         return parent::validate($value, $constraints, $groups);
     }
 

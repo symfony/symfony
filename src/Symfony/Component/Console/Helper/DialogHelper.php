@@ -28,9 +28,9 @@ class DialogHelper extends InputAwareHelper
     private static $shell;
     private static $stty;
 
-    function __construct()
+    public function __construct()
     {
-        trigger_error( 'DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED );
+        trigger_error('DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED);
 
         parent::__construct();
     }

@@ -905,6 +905,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * [HttpFoundation] Request::getContent() behavior for null value #9942
+     *
+     * @see https://github.com/symfony/symfony/issues/9942
+     */
+    public function testEmptyStringContentReturns()
+    {
+        $req = Request::create('test');
+
+        $this->assertEquals("", $req->getContent());
+    }
+
+    /**
      * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider
      */

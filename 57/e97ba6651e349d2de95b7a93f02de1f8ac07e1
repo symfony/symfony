@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by h4cc at 2014-11-29T13:23:05Z
+
+Changed Message; Removed Newline and wrong PHPUnit Doc.
+
+---------------------------------------------------------------------------
+
+by h4cc at 2014-11-29T13:42:50Z
+
+Removed backslash before Constant.

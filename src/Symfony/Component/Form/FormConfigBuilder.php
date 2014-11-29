@@ -225,11 +225,11 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     private function checkIfEventNameIsDeprecated($eventName)
     {
-        if ($eventName === FormEvents::PRE_BIND) {
+        if (FormEvents::PRE_BIND === $eventName ) {
             trigger_error('Event PRE_BIND is deprecated since Symfony 2.3. Use PRE_SUBMIT instead', E_USER_DEPRECATED);
-        } elseif ($eventName === FormEvents::BIND) {
+        } elseif (FormEvents::BIND === $eventName) {
             trigger_error('Event BIND is deprecated since Symfony 2.3. Use SUBMIT instead', E_USER_DEPRECATED);
-        } elseif ($eventName === FormEvents::POST_BIND) {
+        } elseif (FormEvents::POST_BIND === $eventName) {
             trigger_error('Event POST_BIND is deprecated since Symfony 2.3. Use POST_SUBMIT instead', E_USER_DEPRECATED);
         }
     }

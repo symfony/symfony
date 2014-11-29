@@ -24,6 +24,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutput = 'php://output';
 
     protected $dumpHeader;
+    protected $toggle = '<button data-toggle="collapse" data-toggle-state="closed">+</button>';
     protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
     protected $dumpSuffix = '</pre><script>Sfdump("%s")</script>';
     protected $dumpId = 'sf-dump';
@@ -137,6 +138,37 @@ function toggle(a) {
 
 return function (root) {
     root = doc.getElementById(root);
+
+    var toggler = root.querySelectorAll('button[data-toggle]');
+    for (var i = toggler.length - 1; i >= 0; --i) {
+        toggler[i].addEventListener("click", function(e) {
+            var elem  = e.target;
+            var state = elem.getAttribute('data-toggle-state');
+            root      = elem.parentNode;
+
+            var toggles     = [];
+            var stateToggle = '';
+            var stateIcon   = '+/-';
+
+            if ('closed' === state) {
+                toggles     = root.getElementsByClassName('sf-dump-compact');
+                stateToggle = 'opened';
+                stateIcon   = '-';
+            }
+            else if ('opened' === state) {
+                toggles     = root.getElementsByClassName('sf-dump-expanded');
+                stateToggle = 'closed';
+                stateIcon   = '+';
+            }
+
+            for (var i = toggles.length - 1; i >= 0; --i) {
+                toggle(toggles[i].previousSibling || {});
+            }
+
+            elem.setAttribute('data-toggle-state', stateToggle);
+            elem.innerText = stateIcon;
+        });
+    }
 
     function a(e, f) {
         root.addEventListener(e, function (e) {
@@ -361,7 +393,7 @@ EOHTML;
     protected function dumpLine($depth)
     {
         if (-1 === $this->lastDepth) {
-            $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
+            $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->toggle.$this->line;
         }
         if (!$this->headerIsDumped) {
             $this->line = $this->getDumpHeader().$this->line;

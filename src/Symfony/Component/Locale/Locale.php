@@ -19,8 +19,8 @@ use Symfony\Component\Intl\Intl;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Locale} and {@link \Symfony\Component\Intl\Intl} instead.
+ * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Locale} and {@link \Symfony\Component\Intl\Intl} instead.
  */
 class Locale extends \Locale
 {
@@ -50,9 +50,14 @@ class Locale extends \Locale
      * @return array              The country names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {@link \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames()} instead.
      */
     public static function getDisplayCountries($locale)
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames() instead.', E_USER_DEPRECATED);
+
         if (!isset(self::$countries[$locale])) {
             self::$countries[$locale] = Intl::getRegionBundle()->getCountryNames($locale);
         }
@@ -66,9 +71,14 @@ class Locale extends \Locale
      * @return array              The country codes
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {array_keys(@link \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames())} instead.
      */
     public static function getCountries()
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames()) instead.', E_USER_DEPRECATED);
+
         return array_keys(self::getDisplayCountries(self::getDefault()));
     }
 
@@ -80,9 +90,14 @@ class Locale extends \Locale
      * @return array              The language names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {@link \Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames()} instead.
      */
     public static function getDisplayLanguages($locale)
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames() instead.', E_USER_DEPRECATED);
+
         if (!isset(self::$languages[$locale])) {
             self::$languages[$locale] = Intl::getLanguageBundle()->getLanguageNames($locale);
         }
@@ -96,9 +111,14 @@ class Locale extends \Locale
      * @return array              The language codes
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {array_keys(@link \Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames())} instead.
      */
     public static function getLanguages()
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames()) instead.', E_USER_DEPRECATED);
+
         return array_keys(self::getDisplayLanguages(self::getDefault()));
     }
 
@@ -110,9 +130,14 @@ class Locale extends \Locale
      * @return array              The locale names with their codes as keys
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {@link \Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames()} instead.
      */
     public static function getDisplayLocales($locale)
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames() instead.', E_USER_DEPRECATED);
+
         if (!isset(self::$locales[$locale])) {
             self::$locales[$locale] = Intl::getLocaleBundle()->getLocaleNames($locale);
         }
@@ -126,9 +151,14 @@ class Locale extends \Locale
      * @return array              The locale codes
      *
      * @throws \RuntimeException  When the resource bundles cannot be loaded
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in Symfony 3.0.
+     *             Use {array_keys(@link \Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames())} instead.
      */
     public static function getLocales()
     {
+	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames()) instead.', E_USER_DEPRECATED);
+
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }
 

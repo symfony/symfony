@@ -25,15 +25,21 @@ namespace Symfony\Component\Form\Util;
  */
 class VirtualFormAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {
+
+    public function __construct(\Traversable $iterator)
+    {
+        parent::__construct($iterator);
+
+        if ('Symfony\Component\Form\Util\VirtualFormAwareIterator' === get_class()) {
+            trigger_error('class VirtualFormAwareIterator is deprecated since version 2.7 and will be removed in 3.0. Use InheritDataAwareIterator instead.', E_USER_DEPRECATED);
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getChildren()
     {
-        if ('Symfony\Component\Form\Util\VirtualFormAwareIterator' === get_class()) {
-            trigger_error('class VirtualFormAwareIterator is deprecated since version 2.7 and will be removed in 3.0. Use InheritDataAwareIterator instead.', E_USER_DEPRECATED);
-        }
-
         return new static($this->current());
     }
 
@@ -42,10 +48,6 @@ class VirtualFormAwareIterator extends \IteratorIterator implements \RecursiveIt
      */
     public function hasChildren()
     {
-        if ('Symfony\Component\Form\Util\VirtualFormAwareIterator' === get_class()) {
-            trigger_error('class VirtualFormAwareIterator is deprecated since version 2.7 and will be removed in 3.0. Use InheritDataAwareIterator instead.', E_USER_DEPRECATED);
-        }
-
         return (bool) $this->current()->getConfig()->getInheritData();
     }
 }

@@ -823,6 +823,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorsAsString($level = 0)
     {
+        trigger_error('Form::getErrorsAsString() is deprecated since 2.5 and will be removed in 3.0. Please use Form::getErrors(true, false) instead and cast the result to a string.', E_USER_DEPRECATED);
+
         return self::indent((string) $this->getErrors(true, false), $level);
     }
 

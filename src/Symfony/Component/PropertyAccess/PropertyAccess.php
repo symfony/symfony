@@ -48,7 +48,7 @@ final class PropertyAccess
      */
     public static function getPropertyAccessor()
     {
-        trigger_error('getPropertyAccessor() is deprecated since version 2.3 and will be removed in 3.0. Use createPropertyAccessor() instead.', E_USER_DEPRECATED);
+        trigger_error('PropertyAccess::getPropertyAccessor() is deprecated since version 2.3 and will be removed in 3.0. Use PropertyAccess::createPropertyAccessor() instead.', E_USER_DEPRECATED);
 
         return self::createPropertyAccessor();
     }

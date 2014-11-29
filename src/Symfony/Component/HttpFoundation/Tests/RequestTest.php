@@ -904,16 +904,11 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(feof($retval));
     }
 
-    /**
-     * [HttpFoundation] Request::getContent() behavior for null value #9942
-     *
-     * @see https://github.com/symfony/symfony/issues/9942
-     */
     public function testEmptyStringContentReturns()
     {
         $req = Request::create('test');
 
-        $this->assertEquals("", $req->getContent());
+        $this->assertEquals('', $req->getContent());
     }
 
     /**

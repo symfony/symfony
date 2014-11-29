@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+trigger_error('\Symfony\Component\Console\Helper\DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -20,7 +22,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @deprecated Deprecated since version 2.5, to be removed in 3.0.
- *             Use the question helper instead.
+ *             Use {@link \Symfony\Component\Console\Helper\QuestionHelper} instead.
  */
 class DialogHelper extends InputAwareHelper
 {

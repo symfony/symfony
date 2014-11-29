@@ -103,4 +103,13 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
         }
     }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Deprecated
+     */
+    public function testLoadThrowsExceptionWithDeprecatedRequirements()
+    {
+        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('nonvalidrouterequirements.yml');
+    }
 }

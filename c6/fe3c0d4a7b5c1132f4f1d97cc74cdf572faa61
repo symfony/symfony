@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-28T09:35:57Z
+
+Closing as this is the same as #12551
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-28T17:38:59Z
+
+@fabpot #12551 was for the `server:run` command. This pull request updates `server:start`. I had to create separate pull requests as `server:run` is only available as of Symfony 2.6.

@@ -141,9 +141,14 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in 3.0.
+     *             Use getParameters() instead
      */
     public function getMessageParameters()
     {
+        trigger_error('ConstraintViolation::getMessageParameters() was deprecated since version 2.7, to be removed in 3.0. Use ConstraintViolation::getParameters() instead.', E_USER_DEPRECATED);
+
         return $this->parameters;
     }
 
@@ -157,9 +162,14 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.7, to be removed in 3.0.
+     *             Use getPlural() instead
      */
     public function getMessagePluralization()
     {
+        trigger_error('ConstraintViolation::getMessagePluralization() was deprecated since version 2.7, to be removed in 3.0. Use ConstraintViolation::getPlural() instead.', E_USER_DEPRECATED);
+
         return $this->plural;
     }
 

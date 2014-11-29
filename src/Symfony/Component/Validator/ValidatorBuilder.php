@@ -300,12 +300,13 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.7 and will be removed in 3.0. The validator will function without a property accessor in future.
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor in future.
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
-        trigger_error('ValidatorBuilder::setPropertyAccessor() is deprecated since version 2.7 and will be removed in 3.0. The validator will function without a property accessor in future.', E_USER_DEPRECATED);
+        trigger_error('ValidatorBuilder::setPropertyAccessor() is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
 
         if (null !== $this->validatorFactory) {
             throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');

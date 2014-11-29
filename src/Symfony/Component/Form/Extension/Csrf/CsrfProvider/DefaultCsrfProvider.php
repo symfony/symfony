@@ -42,6 +42,7 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     public function __construct($secret)
     {
+        trigger_error('The options "csrf_provider" and "intention" were deprecated since version 2.4 and will be removed in 3.0. Please use "csrf_token_generator" and "csrf_token_id".', E_USER_DEPRECATED);
         $this->secret = $secret;
     }
 

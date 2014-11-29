@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-29T12:40:25Z
+
+I actually wasn't able to reproduce the issue reported by @arnaugm and @desarrolla2 in #12372. Nonetheless, to me it seems to be a good idea to define a constant only if it has not been defined before.

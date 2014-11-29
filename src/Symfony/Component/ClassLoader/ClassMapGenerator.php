@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\ClassLoader;
 
-if (PHP_VERSION_ID >= 50400) {
-    define('SYMFONY_TRAIT', T_TRAIT);
-} else {
-    define('SYMFONY_TRAIT', 0);
+if (!defined('SYMFONY_TRAIT')) {
+    if (PHP_VERSION_ID >= 50400) {
+        define('SYMFONY_TRAIT', T_TRAIT);
+    } else {
+        define('SYMFONY_TRAIT', 0);
+    }
 }
 
 /**
@@ -32,8 +34,8 @@ class ClassMapGenerator
      */
     public static function dump($dirs, $file)
     {
-        $dirs = (array) $dirs;
-        $maps = array();
+        $dirs = (array)$dirs;
+        $maps = [];
 
         foreach ($dirs as $dir) {
             $maps = array_merge($maps, static::createMap($dir));
@@ -55,7 +57,7 @@ class ClassMapGenerator
             $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         }
 
-        $map = array();
+        $map = [];
 
         foreach ($dir as $file) {
             if (!$file->isFile()) {
@@ -90,7 +92,7 @@ class ClassMapGenerator
         $contents = file_get_contents($path);
         $tokens = token_get_all($contents);
 
-        $classes = array();
+        $classes = [];
 
         $namespace = '';
         for ($i = 0, $max = count($tokens); $i < $max; $i++) {
@@ -107,7 +109,7 @@ class ClassMapGenerator
                     $namespace = '';
                     // If there is a namespace, extract it
                     while (($t = $tokens[++$i]) && is_array($t)) {
-                        if (in_array($t[0], array(T_STRING, T_NS_SEPARATOR))) {
+                        if (in_array($t[0], [T_STRING, T_NS_SEPARATOR])) {
                             $namespace .= $t[1];
                         }
                     }

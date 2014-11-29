@@ -18,4 +18,11 @@ use Symfony\Component\Form\Test\FormPerformanceTestCase as BaseFormPerformanceTe
  */
 abstract class FormPerformanceTestCase extends BaseFormPerformanceTestCase
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	protected function setUp() {
+		trigger_error('This class is deprecated. Use Symfony\Component\Form\Test\FormPerformanceTestCase instead.', E_USER_DEPRECATED);
+		parent::setUp();
+	}
 }

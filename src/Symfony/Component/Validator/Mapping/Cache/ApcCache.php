@@ -23,6 +23,8 @@ class ApcCache implements CacheInterface
 
     public function __construct($prefix)
     {
+        trigger_error('The Symfony\Component\Validator\Mapping\Cache\ApcCache class is deprecated since version 2.5 and will be removed in 3.0. Use DoctrineCache with Doctrine\Common\Cache\ApcCache instead.', E_USER_DEPRECATED);
+
         if (!extension_loaded('apc')) {
             throw new \RuntimeException('Unable to use ApcCache to cache validator mappings as APC is not enabled.');
         }

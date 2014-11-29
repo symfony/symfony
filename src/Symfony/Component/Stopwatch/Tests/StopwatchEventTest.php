@@ -156,4 +156,16 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     {
         new StopwatchEvent("abc");
     }
+
+    public function testHumanRepresentation()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $this->assertEquals('default: 0.00 MiB - 0 ms', (string) $event);
+        $event->start();
+        $event->stop();
+        $this->assertEquals(1, preg_match('/default: [0-9\.]+ MiB - [0-9]+ ms/', (string) $event));
+
+        $event = new StopwatchEvent(microtime(true) * 1000, 'foo');
+        $this->assertEquals('foo: 0.00 MiB - 0 ms', (string) $event);
+    }
 }

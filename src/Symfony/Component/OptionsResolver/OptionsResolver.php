@@ -843,7 +843,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
         if (isset($this->allowedTypes[$option])) {
             $valid = false;
 
+            $typeAliases = array(
+                'boolean' => 'bool',
+                'integer' => 'int',
+                'double' => 'float',
+            );
+
             foreach ($this->allowedTypes[$option] as $type) {
+                $type = isset($typeAliases[$type]) ? $typeAliases[$type] : $type;
+
                 if (function_exists($isFunction = 'is_'.$type)) {
                     if ($isFunction($value)) {
                         $valid = true;

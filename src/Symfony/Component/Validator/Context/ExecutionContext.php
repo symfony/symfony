@@ -321,7 +321,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        trigger_error('validate() is deprecated since version 2.5 and will be removed in 3.0. Use  use getValidator() together with inContext() instead.', E_USER_DEPRECATED);
+        trigger_error('ExecutionContext::validate() is deprecated since version 2.5 and will be removed in 3.0. Use ExecutionContext::getValidator() together with inContext() instead.', E_USER_DEPRECATED);
 
         throw new BadMethodCallException(
             'validate() is not supported anymore as of Symfony 2.5. '.
@@ -334,7 +334,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        trigger_error('validateValue() is deprecated since version 2.5 and will be removed in 3.0. Use  use getValidator() together with inContext() instead.', E_USER_DEPRECATED);
+        trigger_error('ExecutionContext::validateValue() is deprecated since version 2.5 and will be removed in 3.0. Use ExecutionContext::getValidator() together with inContext() instead.', E_USER_DEPRECATED);
 
         throw new BadMethodCallException(
             'validateValue() is not supported anymore as of Symfony 2.5. '.

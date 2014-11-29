@@ -20,11 +20,11 @@
         "doctrine/common": "~2.2"
     },
     "require-dev": {
-        "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0",
-        "symfony/form": "~2.2",
-        "symfony/http-kernel": "~2.2",
-        "symfony/security": "~2.2",
+        "symfony/stopwatch": "~2.2|~3.0",
+        "symfony/dependency-injection": "~2.0|~3.0",
+        "symfony/form": "~2.2|~3.0",
+        "symfony/http-kernel": "~2.2|~3.0",
+        "symfony/security": "~2.2|~3.0",
         "symfony/validator": "~2.3.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",

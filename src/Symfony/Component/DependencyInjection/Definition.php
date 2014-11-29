@@ -98,6 +98,8 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
+        trigger_error('Definition::setFactoryClass() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryClass = $factoryClass;
 
         return $this;
@@ -128,6 +130,8 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
+        trigger_error('Definition::setFactoryMethod() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryMethod = $factoryMethod;
 
         return $this;
@@ -193,6 +197,8 @@ class Definition
      */
     public function setFactoryService($factoryService)
     {
+        trigger_error('Definition::setFactoryService() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryService = $factoryService;
 
         return $this;

@@ -33,6 +33,8 @@ class CsrfProviderAdapter implements CsrfTokenManagerInterface
 
     public function __construct(CsrfProviderInterface $csrfProvider)
     {
+        trigger_error('\Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter was deprecated in version 2.4 and will be removed in version 3.0. Please use \Symfony\Component\Security\Csrf\CsrfTokenManager instead.', E_USER_DEPRECATED);
+
         $this->csrfProvider = $csrfProvider;
     }
 

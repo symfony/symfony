@@ -42,6 +42,8 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     public function __construct($secret)
     {
+        trigger_error('\Symfony\Component\Security\Csrf\CsrfTokenManager was deprecated in version 2.4 and will be removed in version 3.0. Please use \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage instead.', E_USER_DEPRECATED);
+
         $this->secret = $secret;
     }
 

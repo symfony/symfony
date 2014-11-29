@@ -45,6 +45,8 @@ class SessionCsrfProvider extends DefaultCsrfProvider
      */
     public function __construct(Session $session, $secret)
     {
+        trigger_error('\Symfony\Component\Security\Csrf\CsrfTokenManager was deprecated in version 2.4 and will be removed in version 3.0. Please use \Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage instead.', E_USER_DEPRECATED);
+
         parent::__construct($secret);
 
         $this->session = $session;

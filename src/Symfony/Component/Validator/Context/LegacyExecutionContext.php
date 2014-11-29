@@ -49,7 +49,7 @@ class LegacyExecutionContext extends ExecutionContext
             $translationDomain
         );
 
-        trigger_error('The LegacyExecutionContext and will be removed. You should use the new ExecutionContext, which now handles the functionallity of this class.', E_USER_DEPRECATED);
+        trigger_error('The LegacyExecutionContext has been deprecated and will be removed. You should use the new ExecutionContext, which now handles the functionality of this class.', E_USER_DEPRECATED);
 
         $this->metadataFactory = $metadataFactory;
     }
@@ -153,7 +153,7 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function getMetadataFactory()
     {
-        trigger_error('The method getMetadataFactory has been deprecated. You have to use getValidator() to access the metadata, which can be accessed with the same method than with the MetadataFactory.', E_USER_DEPRECATED);
+        trigger_error('The method getMetadataFactory has been deprecated and will be removed. You have to use getValidator() to access the metadata, which can be accessed with the same method than with the MetadataFactory.', E_USER_DEPRECATED);
 
         return $this->metadataFactory;
     }

@@ -24,4 +24,13 @@ use Symfony\Component\Validator\Constraints\Optional as BaseOptional;
  */
 class Optional extends BaseOptional
 {
+    public function __construct($options = null)
+    {
+        trigger_error(
+            'The Symfony\Component\Validator\Constraints\Collection\Optional is deprecated. '.
+            'You should use Symfony\Component\Validator\Constraints\Optional.',
+            E_USER_DEPRECATED
+        );
+        parent::__construct($options);
+    }
 }

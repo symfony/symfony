@@ -33,6 +33,10 @@ class CsrfProviderAdapter implements CsrfTokenManagerInterface
 
     public function __construct(CsrfProviderInterface $csrfProvider)
     {
+        trigger_error(
+            'The options "csrf_provider" and "intention" were renamed to "csrf_token_generator" and "csrf_token_id".',
+            E_USER_DEPRECATED
+        );
         $this->csrfProvider = $csrfProvider;
     }
 

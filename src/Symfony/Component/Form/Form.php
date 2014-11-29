@@ -20,6 +20,7 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
@@ -493,6 +494,10 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function submit($submittedData, $clearMissing = true)
     {
+        if ($submittedData instanceof Request) {
+            trigger_error('Passing a Symfony\Component\HttpFoundation\Request object to '.__CLASS__.'::bind() and '.__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0, please use '.__CLASS__.'::handleRequest(). If you want to test whether the form was submitted separately, you can use the method '.__CLASS__.'::isSubmitted()', E_USER_DEPRECATED);
+        }
+
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
         }
@@ -664,6 +669,12 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function bind($submittedData)
     {
+        // This method is deprecated for Request too, but the error is
+        // triggered in Form::submit() method.
+        if (!$submittedData instanceof Request) {
+            trigger_error(__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0. Please use '.__CLASS__.'::submit() instead.', E_USER_DEPRECATED);
+        }
+
         return $this->submit($submittedData);
     }
 
@@ -701,6 +712,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isBound()
     {
+        trigger_error(__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0. Please use '.__CLASS__.'::isSubmitted() instead.', E_USER_DEPRECATED);
+
         return $this->submitted;
     }
 

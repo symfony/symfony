@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-29T13:27:59Z
+
+Looks like there was a problem when you rebased your code as it contains some commits from other developers.
+
+---------------------------------------------------------------------------
+
+by ioannah at 2014-11-29T13:32:07Z
+
+fixed rebase
+
+---------------------------------------------------------------------------
+
+by ioannah at 2014-11-29T15:25:00Z
+
+@nicolas-grekas , is there anything else I have to do?

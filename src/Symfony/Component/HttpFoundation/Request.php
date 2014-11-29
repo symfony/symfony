@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @deprecated The request service was removed. You must inject the request_stack service instead.
  */
 class Request
 {
@@ -229,6 +231,8 @@ class Request
      */
     public function __construct(array $query = array(), array $request = array(), array $attributes = array(), array $cookies = array(), array $files = array(), array $server = array(), $content = null)
     {
+        trigger_error('The request service was removed. You must inject the request_stack service instead.', E_USER_DEPRECATED);
+
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 

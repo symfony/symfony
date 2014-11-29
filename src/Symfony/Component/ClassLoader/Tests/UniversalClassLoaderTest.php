@@ -15,6 +15,11 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+            $this->markTestSkipped('Deprecated class to test.');
+    }
+
     /**
      * @dataProvider getLoadClassTests
      */

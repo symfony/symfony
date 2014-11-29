@@ -193,7 +193,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         self::validateName($name);
 
         if (null !== $dataClass && !class_exists($dataClass)) {
-            throw new InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
+            throw new InvalidArgumentException(sprintf('Error while building form configuration. The data class "%s" was not found, are you sure it exists?', $dataClass));
         }
 
         $this->name = (string) $name;

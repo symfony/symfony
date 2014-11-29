@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by davidfuhr at 2014-11-29T14:30:11Z
+
+The tests fail for because of the deprecation message: https://travis-ci.org/Flagbit/symfony/builds/42471888
+
+Should the changes to phpunit.xml.dist also be applied to the Bridges and Bundles? Because #12705 only did this for the Components. @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T14:34:39Z
+
+Right, we should also patch bundles and bridges.
+For this PR, can you please move the notices below the namespace declaration (see https://github.com/symfony/symfony/pull/12739/files)
+
+---------------------------------------------------------------------------
+
+by davidfuhr at 2014-11-29T15:34:11Z
+
+Moved trigger_error() statements below the namespace declaration.

@@ -26,10 +26,7 @@ class Required extends BaseRequired
 {
     public function __construct($options = null)
     {
-        trigger_error(
-            'The Symfony\Component\Validator\Constraints\Collection\Required is deprecated. You should use Symfony\Component\Validator\Constraints\Required.',
-            E_USER_DEPRECATED
-        );
+        trigger_error('The Symfony\Component\Validator\Constraints\Collection\Required is deprecated. You should use Symfony\Component\Validator\Constraints\Required.', E_USER_DEPRECATED);
         parent::__construct($options);
     }
 }

@@ -53,8 +53,8 @@ class RedirectControllerTest extends TestCase
         $url   = '/redirect-url';
         $route = 'new-route';
 
-        if($queryParams) {
-            $url .= '?' . http_build_query($queryParams);
+        if ($queryParams) {
+            $url .= '?'.http_build_query($queryParams);
         }
 
         $attributes = array(

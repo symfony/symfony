@@ -92,6 +92,12 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The parameters $invalidValue, $pluralization and $code are not supported anymore '.
+            'as of Symfony 2.5 and will be removed in Symfony 3.0. Please use buildViolation() instead.',
+            E_USER_DEPRECATED
+        );
+
         if (null === $plural) {
             $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
         } else {
@@ -120,6 +126,12 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The parameters $invalidValue, $pluralization and $code are not supported anymore '.
+            'as of Symfony 2.5 and will be removed in Symfony 3.0. Please use buildViolation() instead.',
+            E_USER_DEPRECATED
+        );
+
         $this->globalContext->getViolations()->add(new ConstraintViolation(
             null === $plural
                 ? $this->translator->trans($message, $parameters, $this->translationDomain)

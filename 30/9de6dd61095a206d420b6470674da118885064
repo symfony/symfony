@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-29T11:57:00Z
+
+This should probably be done in 2.3. Also, can you check that this is the only that needs to be "fixed"?
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2014-11-29T12:02:54Z
+
+This was introduced in 2.6. I noticed while diffing 2.5 against 2.6.

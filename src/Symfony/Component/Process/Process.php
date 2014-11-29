@@ -1048,19 +1048,6 @@ class Process
     }
 
     /**
-     * Gets the contents of STDIN.
-     *
-     * @return string|null The current contents
-     *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
-     *             This method is deprecated in favor of getInput.
-     */
-    public function getStdin()
-    {
-        return $this->getInput();
-    }
-
-    /**
      * Gets the Process input.
      *
      * @return null|string The Process input
@@ -1068,24 +1055,6 @@ class Process
     public function getInput()
     {
         return $this->input;
-    }
-
-    /**
-     * Sets the contents of STDIN.
-     *
-     * @param string|null $stdin The new contents
-     *
-     * @return self The current Process instance
-     *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
-     *             This method is deprecated in favor of setInput.
-     *
-     * @throws LogicException           In case the process is running
-     * @throws InvalidArgumentException In case the argument is invalid
-     */
-    public function setStdin($stdin)
-    {
-        return $this->setInput($stdin);
     }
 
     /**

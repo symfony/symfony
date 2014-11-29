@@ -55,7 +55,7 @@ class EntityUserProvider implements UserProviderInterface
             $user = $this->repository->findOneBy(array($this->property => $username));
         } else {
             if (!$this->repository instanceof BaseUserProviderInterface) {
-                throw new \InvalidArgumentException(sprintf('The Doctrine repository "%s" must implement UserProviderInterface.', get_class($this->repository)));
+                throw new \InvalidArgumentException(sprintf('The Doctrine repository "%s" must implement BaseUserProviderInterface.', get_class($this->repository)));
             }
 
             $user = $this->repository->loadUserByUsername($username);
@@ -77,7 +77,7 @@ class EntityUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        if ($this->repository instanceof UserProviderInterface) {
+        if ($this->repository instanceof BaseUserProviderInterface) {
             $refreshedUser = $this->repository->refreshUser($user);
         } else {
             // The user must be reloaded via the primary key as all other data

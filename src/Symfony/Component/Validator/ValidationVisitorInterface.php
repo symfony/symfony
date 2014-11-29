@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+trigger_error('Symfony\Component\Validator\ValidationVisitorInterface was deprecated in version 2.5 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
 /**
  * Validates values against constraints defined in {@link MetadataInterface}
  * instances.

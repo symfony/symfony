@@ -79,6 +79,8 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
      */
     public function __construct($root, MetadataFactoryInterface $metadataFactory, ConstraintValidatorFactoryInterface $validatorFactory, TranslatorInterface $translator, $translationDomain = null, array $objectInitializers = array())
     {
+        trigger_error('Symfony\Component\Validator\ValidationVisitor was deprecated in version 2.5 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
         foreach ($objectInitializers as $initializer) {
             if (!$initializer instanceof ObjectInitializerInterface) {
                 throw new UnexpectedTypeException($initializer, 'Symfony\Component\Validator\ObjectInitializerInterface');

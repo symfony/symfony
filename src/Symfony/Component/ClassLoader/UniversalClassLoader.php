@@ -69,6 +69,14 @@ class UniversalClassLoader
     private $useIncludePath = false;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        trigger_error('The UniversalClassLoader is deprecated since version 2.7 and will be removed in 3.0. Use ClassLoader instead.', E_USER_DEPRECATED);
+    }
+
+    /**
      * Turns on searching the include for class files. Allows easy loading
      * of installed PEAR packages
      *

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * UniversalClassLoader class has been deprecated, use ClassLoader class instead
+
 2.4.0
 -----
 

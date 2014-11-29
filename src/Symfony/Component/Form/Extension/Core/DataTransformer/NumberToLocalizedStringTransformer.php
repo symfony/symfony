@@ -101,6 +101,14 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
     public function __construct($precision = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
+        if (
+            self::ROUND_HALFEVEN === $roundingMode
+            || self::ROUND_HALFUP === $roundingMode
+            || self::ROUND_HALFDOWN === $roundingMode
+        ) {
+            trigger_error('The constants ROUND_HALFEVEN, ROUND_HALFUP and ROUND_HALFDOWN are deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_EVEN, ROUND_HALF_UP and ROUND_HALF_DOWN instead.', E_USER_DEPRECATED);
+        }
+
         if (null === $grouping) {
             $grouping = false;
         }

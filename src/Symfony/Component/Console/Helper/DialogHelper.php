@@ -20,7 +20,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @deprecated Deprecated since version 2.5, to be removed in 3.0.
- *             Use the question helper instead.
+ *             Use {@link \Symfony\Component\Console\Helper\QuestionHelper} instead.
  */
 class DialogHelper extends InputAwareHelper
 {
@@ -28,6 +28,12 @@ class DialogHelper extends InputAwareHelper
     private static $shell;
     private static $stty;
 
+    public function __construct()
+    {
+        trigger_error('DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED);
+
+        parent::__construct();
+    }
     /**
      * Asks the user to select a value.
      *

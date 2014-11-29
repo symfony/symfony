@@ -42,6 +42,10 @@ class DefaultCsrfProvider implements CsrfProviderInterface
      */
     public function __construct($secret)
     {
+        trigger_error(
+            'The options "csrf_provider" and "intention" were renamed to "csrf_token_generator" and "csrf_token_id".',
+            E_USER_DEPRECATED
+        );
         $this->secret = $secret;
     }
 

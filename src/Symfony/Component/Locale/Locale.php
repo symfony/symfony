@@ -56,7 +56,7 @@ class Locale extends \Locale
      */
     public static function getDisplayCountries($locale)
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames() instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames() instead.', E_USER_DEPRECATED);
 
         if (!isset(self::$countries[$locale])) {
             self::$countries[$locale] = Intl::getRegionBundle()->getCountryNames($locale);
@@ -77,7 +77,7 @@ class Locale extends \Locale
      */
     public static function getCountries()
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames()) instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getRegionBundle()->getCountryNames()) instead.', E_USER_DEPRECATED);
 
         return array_keys(self::getDisplayCountries(self::getDefault()));
     }
@@ -96,7 +96,7 @@ class Locale extends \Locale
      */
     public static function getDisplayLanguages($locale)
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames() instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames() instead.', E_USER_DEPRECATED);
 
         if (!isset(self::$languages[$locale])) {
             self::$languages[$locale] = Intl::getLanguageBundle()->getLanguageNames($locale);
@@ -117,7 +117,7 @@ class Locale extends \Locale
      */
     public static function getLanguages()
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames()) instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLanguageBundle()->getLanguageNames()) instead.', E_USER_DEPRECATED);
 
         return array_keys(self::getDisplayLanguages(self::getDefault()));
     }
@@ -136,7 +136,7 @@ class Locale extends \Locale
      */
     public static function getDisplayLocales($locale)
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames() instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use \Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames() instead.', E_USER_DEPRECATED);
 
         if (!isset(self::$locales[$locale])) {
             self::$locales[$locale] = Intl::getLocaleBundle()->getLocaleNames($locale);
@@ -157,7 +157,7 @@ class Locale extends \Locale
      */
     public static function getLocales()
     {
-	    trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames()) instead.', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.7, to be removed in Symfony 3.0. Use array_keys(\Symfony\Component\Intl\Intl::getLocaleBundle()->getLocaleNames()) instead.', E_USER_DEPRECATED);
 
         return array_keys(self::getDisplayLocales(self::getDefault()));
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints\Collection;
 
+trigger_error('The Symfony\Component\Validator\Constraints\Collection\Optional is deprecated. You should use Symfony\Component\Validator\Constraints\Optional.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraints\Optional as BaseOptional;
 
 /**

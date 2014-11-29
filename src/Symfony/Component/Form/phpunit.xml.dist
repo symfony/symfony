@@ -6,6 +6,12 @@
          colors="true"
          bootstrap="vendor/autoload.php"
 >
+
+    <php>
+        <!-- Disable E_USER_DEPRECATED until 3.0 -->
+        <ini name="error_reporting" value="-16385"/>
+    </php>
+
     <testsuites>
         <testsuite name="Symfony Form Component Test Suite">
             <directory>./Tests/</directory>

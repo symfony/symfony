@@ -74,7 +74,7 @@ CHANGELOG
  * added `Util\PropertyPath`
  * made the PropertyAccess component an optional dependency
  * deprecated `ValidatorBuilder::setPropertyAccessor()`
-
+ * deprecated `validate` and `validateValue` on `Validator\Context\ExecutionContext` use `getValidator()` together with `inContext()` instead
 
 2.4.0
 -----

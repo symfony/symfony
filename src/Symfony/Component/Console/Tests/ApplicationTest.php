@@ -959,6 +959,25 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
+
+    public function testCanCheckIfTerminalIsInteractive()
+    {
+        if (!function_exists('posix_isatty')) {
+            $this->markTestSkipped('posix_isatty function is required');
+        }
+
+        $application = new CustomDefaultCommandApplication();
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'help'));
+
+        $this->assertTrue($tester->getInput()->isInteractive());
+        $this->assertFalse($tester->getInput()->hasParameterOption(array('--no-interaction', '-n')));
+
+        $inputStream = $application->getHelperSet()->get('question')->getInputStream();
+        $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
+    }
 }
 
 class CustomApplication extends Application

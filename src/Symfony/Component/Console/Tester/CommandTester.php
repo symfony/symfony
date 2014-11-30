@@ -50,7 +50,7 @@ class CommandTester
      * @param array $input   An array of arguments and options
      * @param array $options An array of options
      *
-     * @return int     The command exit code
+     * @return int The command exit code
      */
     public function execute(array $input, array $options = array())
     {
@@ -73,7 +73,7 @@ class CommandTester
     /**
      * Gets the display returned by the last execution of the command.
      *
-     * @param bool    $normalize Whether to normalize end of lines to \n or not
+     * @param bool $normalize Whether to normalize end of lines to \n or not
      *
      * @return string The display
      */

@@ -105,7 +105,7 @@ class TimeDataCollector extends DataCollector
     /**
      * Gets the request time.
      *
-     * @return int     The time
+     * @return int The time
      */
     public function getStartTime()
     {

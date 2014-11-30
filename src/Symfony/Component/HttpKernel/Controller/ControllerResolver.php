@@ -47,8 +47,8 @@ class ControllerResolver implements ControllerResolverInterface
      *
      * @param Request $request A Request instance
      *
-     * @return mixed|bool    A PHP callable representing the Controller,
-     *                       or false if this resolver is not able to determine the controller
+     * @return mixed|bool A PHP callable representing the Controller,
+     *                    or false if this resolver is not able to determine the controller
      *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      *

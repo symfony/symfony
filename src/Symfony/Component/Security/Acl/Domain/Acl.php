@@ -397,8 +397,9 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes an ACE
      *
-     * @param string  $property
-     * @param int     $index
+     * @param string $property
+     * @param int    $index
+     *
      * @throws \OutOfBoundsException
      */
     private function deleteAce($property, $index)
@@ -421,9 +422,10 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Deletes a field-based ACE
      *
-     * @param string  $property
-     * @param int     $index
-     * @param string  $field
+     * @param string $property
+     * @param int    $index
+     * @param string $field
+     *
      * @throws \OutOfBoundsException
      */
     private function deleteFieldAce($property, $index, $field)
@@ -452,6 +454,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param SecurityIdentityInterface $sid
      * @param bool                      $granting
      * @param string                    $strategy
+     *
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
@@ -501,6 +504,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
      * @param SecurityIdentityInterface $sid
      * @param bool                      $granting
      * @param string                    $strategy
+     *
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
@@ -551,10 +555,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates an ACE
      *
-     * @param string  $property
-     * @param int     $index
-     * @param int     $mask
-     * @param string  $strategy
+     * @param string $property
+     * @param int    $index
+     * @param int    $mask
+     * @param string $strategy
+     *
      * @throws \OutOfBoundsException
      */
     private function updateAce($property, $index, $mask, $strategy = null)
@@ -578,10 +583,11 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates auditing for an ACE
      *
-     * @param array   &$aces
-     * @param int     $index
-     * @param bool    $auditSuccess
-     * @param bool    $auditFailure
+     * @param array &$aces
+     * @param int   $index
+     * @param bool  $auditSuccess
+     * @param bool  $auditFailure
+     *
      * @throws \OutOfBoundsException
      */
     private function updateAuditing(array &$aces, $index, $auditSuccess, $auditFailure)
@@ -604,11 +610,12 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     /**
      * Updates a field-based ACE
      *
-     * @param string  $property
-     * @param int     $index
-     * @param string  $field
-     * @param int     $mask
-     * @param string  $strategy
+     * @param string $property
+     * @param int    $index
+     * @param string $field
+     * @param int    $mask
+     * @param string $strategy
+     *
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */

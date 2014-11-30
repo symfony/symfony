@@ -60,8 +60,8 @@ class WebProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int     $level
-     * @param string  $message
+     * @param int    $level
+     * @param string $message
      *
      * @return array Record
      */

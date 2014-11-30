@@ -138,7 +138,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Returns the fully qualified name of the class
      *
-     * @return string  The fully qualified class name
+     * @return string The fully qualified class name
      */
     public function getClassName()
     {
@@ -158,7 +158,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
      * will validate the group sequence. The constraints assigned to "Default"
      * can still be validated by validating the class in "<ClassName>".
      *
-     * @return string  The name of the default group
+     * @return string The name of the default group
      */
     public function getDefaultGroup()
     {
@@ -400,7 +400,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @param bool    $active
+     * @param bool $active
      *
      * @throws GroupDefinitionException
      */

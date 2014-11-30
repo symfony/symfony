@@ -31,7 +31,7 @@ class Parser
     /**
      * Constructor
      *
-     * @param int     $offset The offset of YAML document (used for line numbers in error messages)
+     * @param int $offset The offset of YAML document (used for line numbers in error messages)
      */
     public function __construct($offset = 0)
     {
@@ -41,11 +41,11 @@ class Parser
     /**
      * Parses a YAML string to a PHP value.
      *
-     * @param string  $value                  A YAML string
-     * @param bool    $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
-     * @param bool    $objectSupport          true if object support is enabled, false otherwise
+     * @param string $value                  A YAML string
+     * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
+     * @param bool   $objectSupport          true if object support is enabled, false otherwise
      *
-     * @return mixed  A PHP value
+     * @return mixed A PHP value
      *
      * @throws ParseException If the YAML is not valid
      */
@@ -266,7 +266,7 @@ class Parser
     /**
      * Returns the current line number (takes the offset into account).
      *
-     * @return int     The current line number
+     * @return int The current line number
      */
     private function getRealCurrentLineNb()
     {
@@ -276,7 +276,7 @@ class Parser
     /**
      * Returns the current line indentation.
      *
-     * @return int     The current line indentation
+     * @return int The current line indentation
      */
     private function getCurrentLineIndentation()
     {
@@ -391,11 +391,11 @@ class Parser
     /**
      * Parses a YAML value.
      *
-     * @param string  $value                  A YAML value
-     * @param bool    $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param bool    $objectSupport          True if object support is enabled, false otherwise
+     * @param string $value                  A YAML value
+     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
+     * @param bool   $objectSupport          True if object support is enabled, false otherwise
      *
-     * @return mixed  A PHP value
+     * @return mixed A PHP value
      *
      * @throws ParseException When reference does not exist
      */
@@ -434,11 +434,11 @@ class Parser
     /**
      * Parses a folded scalar.
      *
-     * @param string  $separator   The separator that was used to begin this folded scalar (| or >)
-     * @param string  $indicator   The indicator that was used to begin this folded scalar (+ or -)
-     * @param int     $indentation The indentation that was used to begin this folded scalar
+     * @param string $separator   The separator that was used to begin this folded scalar (| or >)
+     * @param string $indicator   The indicator that was used to begin this folded scalar (+ or -)
+     * @param int    $indentation The indentation that was used to begin this folded scalar
      *
-     * @return string  The text value
+     * @return string The text value
      */
     private function parseFoldedScalar($separator, $indicator = '', $indentation = 0)
     {
@@ -515,7 +515,7 @@ class Parser
     /**
      * Returns true if the next line is indented.
      *
-     * @return bool    Returns true if the next line is indented, false otherwise
+     * @return bool Returns true if the next line is indented, false otherwise
      */
     private function isNextLineIndented()
     {
@@ -543,7 +543,7 @@ class Parser
     /**
      * Returns true if the current line is blank or if it is a comment line.
      *
-     * @return bool    Returns true if the current line is empty or if it is a comment line, false otherwise
+     * @return bool Returns true if the current line is empty or if it is a comment line, false otherwise
      */
     private function isCurrentLineEmpty()
     {
@@ -553,7 +553,7 @@ class Parser
     /**
      * Returns true if the current line is blank.
      *
-     * @return bool    Returns true if the current line is blank, false otherwise
+     * @return bool Returns true if the current line is blank, false otherwise
      */
     private function isCurrentLineBlank()
     {
@@ -563,7 +563,7 @@ class Parser
     /**
      * Returns true if the current line is a comment line.
      *
-     * @return bool    Returns true if the current line is a comment line, false otherwise
+     * @return bool Returns true if the current line is a comment line, false otherwise
      */
     private function isCurrentLineComment()
     {
@@ -614,7 +614,7 @@ class Parser
     /**
      * Returns true if the next line starts unindented collection
      *
-     * @return bool    Returns true if the next line starts unindented collection, false otherwise
+     * @return bool Returns true if the next line starts unindented collection, false otherwise
      */
     private function isNextLineUnIndentedCollection()
     {
@@ -646,7 +646,7 @@ class Parser
     /**
      * Returns true if the string is un-indented collection item
      *
-     * @return bool    Returns true if the string is un-indented collection item, false otherwise
+     * @return bool Returns true if the string is un-indented collection item, false otherwise
      */
     private function isStringUnIndentedCollectionItem()
     {

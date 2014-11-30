@@ -76,7 +76,7 @@ class LogoutListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
-     * @throws LogoutException if the CSRF token is invalid
+     * @throws LogoutException   if the CSRF token is invalid
      * @throws \RuntimeException if the LogoutSuccessHandlerInterface instance does not return a response
      */
     public function handle(GetResponseEvent $event)

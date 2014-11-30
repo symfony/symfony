@@ -223,6 +223,7 @@ class AclProvider implements AclProviderInterface
      * ACEs, and security identities.
      *
      * @param array $ancestorIds
+     *
      * @return string
      */
     protected function getLookupSql(array $ancestorIds)
@@ -328,6 +329,7 @@ SELECTCLAUSE;
      *
      * @param ObjectIdentityInterface $oid
      * @param bool                    $directChildrenOnly
+     *
      * @return string
      */
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
@@ -359,6 +361,7 @@ FINDCHILDREN;
      * identity.
      *
      * @param ObjectIdentityInterface $oid
+     *
      * @return string
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
@@ -383,6 +386,7 @@ QUERY;
      * Returns the primary key of the passed object identity.
      *
      * @param ObjectIdentityInterface $oid
+     *
      * @return int
      */
     final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
@@ -491,8 +495,10 @@ QUERY;
      * @param Statement $stmt
      * @param array     $oidLookup
      * @param array     $sids
-     * @throws \RuntimeException
+     *
      * @return \SplObjectStorage
+     *
+     * @throws \RuntimeException
      */
     private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
     {

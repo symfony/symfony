@@ -240,7 +240,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      *
-     * @throws RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
     private function addServiceInlinedDefinitions($id, $definition)
@@ -958,9 +958,9 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param array   $parameters
-     * @param string  $path
-     * @param int     $indent
+     * @param array  $parameters
+     * @param string $path
+     * @param int    $indent
      *
      * @return string
      *
@@ -1029,9 +1029,9 @@ EOF;
     /**
      * Builds service calls from arguments.
      *
-     * @param array  $arguments
-     * @param array  &$calls    By reference
-     * @param array  &$behavior By reference
+     * @param array $arguments
+     * @param array &$calls    By reference
+     * @param array &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1107,10 +1107,10 @@ EOF;
     /**
      * Checks if a service id has a reference.
      *
-     * @param string  $id
-     * @param array   $arguments
-     * @param bool    $deep
-     * @param array   $visited
+     * @param string $id
+     * @param array  $arguments
+     * @param bool   $deep
+     * @param array  $visited
      *
      * @return bool
      */
@@ -1145,8 +1145,8 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param array   $value
-     * @param bool    $interpolate
+     * @param array $value
+     * @param bool  $interpolate
      *
      * @return string
      *

@@ -257,9 +257,9 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
-     * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
-     * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When the $style is not supported
+     * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
     public function __construct($locale = 'en', $style = null, $pattern = null)
     {
@@ -296,9 +296,9 @@ class NumberFormatter
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
      * @see http://www.icu-project.org/apiref/icu4c/classRuleBasedNumberFormat.html#_details
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
-     * @throws MethodArgumentValueNotImplementedException  When the $style is not supported
-     * @throws MethodArgumentNotImplementedException       When the pattern value is different than null
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When the $style is not supported
+     * @throws MethodArgumentNotImplementedException      When the pattern value is different than null
      */
     public static function create($locale = 'en', $style = null, $pattern = null)
     {
@@ -347,7 +347,7 @@ class NumberFormatter
      * @param int    $type  Type of the formatting, one of the format type constants.
      *                      Only type NumberFormatter::TYPE_DEFAULT is currently supported.
      *
-     * @return bool|string    The formatted value or false on error
+     * @return bool|string The formatted value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.format.php
      *
@@ -391,7 +391,7 @@ class NumberFormatter
      *
      * @param int $attr An attribute specifier, one of the numeric attribute constants
      *
-     * @return bool|int    The attribute value on success or false on error
+     * @return bool|int The attribute value on success or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.getattribute.php
      */
@@ -444,7 +444,7 @@ class NumberFormatter
     /**
      * Not supported. Returns the formatter's pattern
      *
-     * @return bool|string        The pattern string used by the formatter or false on error
+     * @return bool|string The pattern string used by the formatter or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.getpattern.php
      *
@@ -460,7 +460,7 @@ class NumberFormatter
      *
      * @param int $attr A symbol specifier, one of the format symbol constants
      *
-     * @return bool|string           The symbol value or false on error
+     * @return bool|string The symbol value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.getsymbol.php
      */
@@ -474,7 +474,7 @@ class NumberFormatter
      *
      * @param int $attr An attribute specifier, one of the text attribute constants
      *
-     * @return bool|string           The attribute value or false on error
+     * @return bool|string The attribute value or false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.gettextattribute.php
      */
@@ -490,7 +490,7 @@ class NumberFormatter
      * @param string $currency Parameter to receive the currency name (reference)
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return bool|string              The parsed numeric value of false on error
+     * @return bool|string The parsed numeric value of false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parsecurrency.php
      *
@@ -508,7 +508,7 @@ class NumberFormatter
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return bool|string                                  The parsed value of false on error
+     * @return bool|string The parsed value of false on error
      *
      * @see    http://www.php.net/manual/en/numberformatter.parse.php
      */
@@ -553,12 +553,12 @@ class NumberFormatter
      *                   NumberFormatter::ROUND_HALFEVEN, NumberFormatter::ROUND_HALFDOWN and
      *                   NumberFormatter::ROUND_HALFUP.
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/numberformatter.setattribute.php
      *
-     * @throws MethodArgumentValueNotImplementedException  When the $attr is not supported
-     * @throws MethodArgumentValueNotImplementedException  When the $value is not supported
+     * @throws MethodArgumentValueNotImplementedException When the $attr is not supported
+     * @throws MethodArgumentValueNotImplementedException When the $value is not supported
      */
     public function setAttribute($attr, $value)
     {
@@ -599,7 +599,7 @@ class NumberFormatter
      *
      * @param string $pattern A pattern string in conformance with the ICU DecimalFormat documentation
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/numberformatter.setpattern.php
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details
@@ -617,7 +617,7 @@ class NumberFormatter
      * @param int    $attr  A symbol specifier, one of the format symbol constants
      * @param string $value The value for the symbol
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/numberformatter.setsymbol.php
      *
@@ -634,7 +634,7 @@ class NumberFormatter
      * @param int $attr  An attribute specifier, one of the text attribute constants
      * @param int $value The attribute value
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/numberformatter.settextattribute.php
      *
@@ -693,10 +693,10 @@ class NumberFormatter
     /**
      * Rounds a value.
      *
-     * @param int|float     $value     The value to round
-     * @param int           $precision The number of decimal digits to round to
+     * @param int|float $value     The value to round
+     * @param int       $precision The number of decimal digits to round to
      *
-     * @return int|float     The rounded value
+     * @return int|float The rounded value
      */
     private function round($value, $precision)
     {
@@ -711,8 +711,8 @@ class NumberFormatter
     /**
      * Formats a number.
      *
-     * @param int|float     $value     The numeric value to format
-     * @param int           $precision The number of decimal digits to use
+     * @param int|float $value     The numeric value to format
+     * @param int       $precision The number of decimal digits to use
      *
      * @return string The formatted number
      */
@@ -726,8 +726,8 @@ class NumberFormatter
     /**
      * Returns the precision value if the DECIMAL style is being used and the FRACTION_DIGITS attribute is unitialized.
      *
-     * @param int|float     $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
-     * @param int           $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
+     * @param int|float $value     The value to get the precision from if the FRACTION_DIGITS attribute is unitialized
+     * @param int       $precision The precision value to returns if the FRACTION_DIGITS attribute is initialized
      *
      * @return int The precision value
      */
@@ -752,7 +752,7 @@ class NumberFormatter
      *
      * @param string $attr The attribute name
      *
-     * @return bool    true if the value was set by client, false otherwise
+     * @return bool true if the value was set by client, false otherwise
      */
     private function isInitializedAttribute($attr)
     {
@@ -765,7 +765,7 @@ class NumberFormatter
      * @param mixed $value The value to be converted
      * @param int   $type  The type to convert. Can be TYPE_DOUBLE (float) or TYPE_INT32 (int)
      *
-     * @return int|float     The converted value
+     * @return int|float The converted value
      */
     private function convertValueDataType($value, $type)
     {
@@ -801,7 +801,7 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
-     * @return int|float       The converted value
+     * @return int|float The converted value
      *
      * @see https://bugs.php.net/bug.php?id=59597 Bug #59597
      */
@@ -843,7 +843,7 @@ class NumberFormatter
      *
      * @param int $value The rounding mode value to check
      *
-     * @return bool    true if the rounding mode is invalid, false otherwise
+     * @return bool true if the rounding mode is invalid, false otherwise
      */
     private function isInvalidRoundingMode($value)
     {

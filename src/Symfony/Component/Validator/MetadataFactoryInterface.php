@@ -34,7 +34,7 @@ interface MetadataFactoryInterface
      *
      * @param mixed $value Some value.
      *
-     * @return bool    Whether metadata exists for the value.
+     * @return bool Whether metadata exists for the value.
      */
     public function hasMetadataFor($value);
 }

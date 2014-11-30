@@ -244,7 +244,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      */
     public function has($option)
     {
@@ -324,7 +324,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
      *
      * @param string $option The option name.
      *
-     * @return bool    Whether the option exists.
+     * @return bool Whether the option exists.
      *
      * @see \ArrayAccess::offsetExists()
      */

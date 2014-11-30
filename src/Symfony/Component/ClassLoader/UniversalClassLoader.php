@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ClassLoader;
 
+trigger_error('The "Symfony\Component\ClassLoader\UniversalClassLoader" class was deprecated in version 2.7 and will be removed in 3.0. Use "Symfony\Component\ClassLoader\ClassLoader" instead.', E_USER_DEPRECATED);
+
 /**
  * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
@@ -57,6 +59,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use the ClassLoader class instead.
  */
 class UniversalClassLoader
 {

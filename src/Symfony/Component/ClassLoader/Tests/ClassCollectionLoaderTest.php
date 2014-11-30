@@ -22,12 +22,6 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testTraitDependencies()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Requires PHP > 5.4');
-
-            return;
-        }
-
         require_once __DIR__.'/Fixtures/deps/traits.php';
 
         $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
@@ -100,12 +94,6 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassWithTraitsReordering(array $classes)
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Requires PHP > 5.4');
-
-            return;
-        }
-
         require_once __DIR__.'/Fixtures/ClassesWithParents/ATrait.php';
         require_once __DIR__.'/Fixtures/ClassesWithParents/BTrait.php';
         require_once __DIR__.'/Fixtures/ClassesWithParents/CTrait.php';
@@ -148,12 +136,6 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testFixClassWithTraitsOrdering()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Requires PHP > 5.4');
-
-            return;
-        }
-
         require_once __DIR__.'/Fixtures/ClassesWithParents/CTrait.php';
         require_once __DIR__.'/Fixtures/ClassesWithParents/F.php';
         require_once __DIR__.'/Fixtures/ClassesWithParents/G.php';

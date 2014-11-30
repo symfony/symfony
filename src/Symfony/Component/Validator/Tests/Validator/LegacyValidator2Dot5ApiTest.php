@@ -19,15 +19,6 @@ use Symfony\Component\Validator\Validator\LegacyValidator;
 
 class LegacyValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
 {
-    protected function setUp()
-    {
-        if (PHP_VERSION_ID < 50309) {
-            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
-        }
-
-        parent::setUp();
-    }
-
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {
         $contextFactory = new LegacyExecutionContextFactory($metadataFactory, new DefaultTranslator());

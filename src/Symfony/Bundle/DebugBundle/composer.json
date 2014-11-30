@@ -17,13 +17,13 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-kernel": "~2.6",
-        "symfony/twig-bridge": "~2.6",
-        "symfony/var-dumper": "~2.6"
+        "symfony/http-kernel": "~3.0",
+        "symfony/twig-bridge": "~3.0",
+        "symfony/var-dumper": "~3.0"
     },
     "require-dev": {
-        "symfony/config": "~2.3",
-        "symfony/dependency-injection": "~2.3"
+        "symfony/config": "~3.0",
+        "symfony/dependency-injection": "~3.0"
     },
     "suggest": {
         "symfony/config": "For service container configuration",

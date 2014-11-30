@@ -19,10 +19,10 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "~2.6",
-        "symfony/expression-language": "~2.6",
-        "symfony/config": "~2.0",
-        "symfony/stopwatch": "~2.2",
+        "symfony/dependency-injection": "~3.0",
+        "symfony/expression-language": "~3.0",
+        "symfony/config": "~3.0",
+        "symfony/stopwatch": "~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {

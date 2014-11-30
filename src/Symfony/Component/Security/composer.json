@@ -17,9 +17,9 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": "~2.1",
-        "symfony/http-kernel": "~2.4"
+        "symfony/event-dispatcher": "~3.0",
+        "symfony/http-foundation": "~3.0",
+        "symfony/http-kernel": "~3.0"
     },
     "replace": {
         "symfony/security-acl": "self.version",
@@ -28,13 +28,13 @@
         "symfony/security-http": "self.version"
     },
     "require-dev": {
-        "symfony/routing": "~2.2",
-        "symfony/validator": "~2.5",
+        "symfony/routing": "~3.0",
+        "symfony/validator": "~3.0",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",
         "ircmaxell/password-compat": "1.0.*",
-        "symfony/expression-language": "~2.4"
+        "symfony/expression-language": "~3.0"
     },
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",

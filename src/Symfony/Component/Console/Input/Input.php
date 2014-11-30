@@ -201,6 +201,18 @@ abstract class Input implements InputInterface
     }
 
     /**
+     * Returns true if an InputOption object exists by name in the command line arguments.
+     *
+     * @param string $name The InputOption name
+     *
+     * @return bool    true if the InputOption object exists, false otherwise
+     */
+    public function hasParsedOption($name)
+    {
+        return array_key_exists($name, $this->options);
+    }
+
+    /**
      * Returns true if an InputOption object exists by name.
      *
      * @param string $name The InputOption name

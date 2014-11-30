@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T13:20:10Z
+
+looks like you messed up with rebase, you're asking to merge 3.0 into 2.7 :)
+if you want help, please come and ask
+
+---------------------------------------------------------------------------
+
+by arnaugm at 2014-11-30T02:25:53Z
+
+Ups it's true, now it should be ok.

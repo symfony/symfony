@@ -93,7 +93,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function init()
     {
-        trigger_error('This method is going to be removed in 3.0', E_USER_DEPRECATED);
+        trigger_error('Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.', E_USER_DEPRECATED);
     }
 
     public function __clone()

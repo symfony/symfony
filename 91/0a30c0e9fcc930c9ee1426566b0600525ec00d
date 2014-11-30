@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T14:26:32Z
+
+There is no need to put the notice in every method: just one is needed below the namespace declaration (see https://github.com/symfony/symfony/pull/12739/files)
+
+Also, please tell "what" is deprecated in the message
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T14:38:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by rodrigobb at 2014-11-29T14:39:11Z
+
+Ok, that's what I thought when took this issue but I was unsure.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-29T20:42:51Z
+
+@rodrigobb can you sqash the commits to one?

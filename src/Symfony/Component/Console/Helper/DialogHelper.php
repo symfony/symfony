@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+trigger_error('\Symfony\Component\Console\Helper\DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 

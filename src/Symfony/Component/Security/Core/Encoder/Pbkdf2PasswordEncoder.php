@@ -36,10 +36,10 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     /**
      * Constructor.
      *
-     * @param string  $algorithm          The digest algorithm to use
-     * @param bool    $encodeHashAsBase64 Whether to base64 encode the password hash
-     * @param int     $iterations         The number of iterations to use to stretch the password hash
-     * @param int     $length             Length of derived key to create
+     * @param string $algorithm          The digest algorithm to use
+     * @param bool   $encodeHashAsBase64 Whether to base64 encode the password hash
+     * @param int    $iterations         The number of iterations to use to stretch the password hash
+     * @param int    $length             Length of derived key to create
      */
     public function __construct($algorithm = 'sha512', $encodeHashAsBase64 = true, $iterations = 1000, $length = 40)
     {

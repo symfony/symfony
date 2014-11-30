@@ -707,8 +707,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $locale
-     * @param null $style
-     * @param null $pattern
+     * @param null   $style
+     * @param null   $pattern
      *
      * @return \NumberFormatter
      */
@@ -725,7 +725,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     abstract protected function getIntlErrorCode();
 
     /**
-     * @param int     $errorCode
+     * @param int $errorCode
      *
      * @return bool
      */

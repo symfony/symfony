@@ -151,8 +151,8 @@ class TextBundleWriter implements BundleWriterInterface
     /**
      * Writes a "string" node.
      *
-     * @param resource $file         The file handle to write to.
-     * @param string   $value        The value of the node.
+     * @param resource $file          The file handle to write to.
+     * @param string   $value         The value of the node.
      * @param bool     $requireBraces Whether to require braces to be printed
      *                                around the value.
      *

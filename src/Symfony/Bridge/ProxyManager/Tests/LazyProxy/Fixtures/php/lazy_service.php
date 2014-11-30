@@ -39,7 +39,7 @@ class LazyServiceProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @param bool    $lazyLoad whether to try lazy-loading the service with a proxy
+     * @param bool $lazyLoad whether to try lazy-loading the service with a proxy
      *
      * @return stdClass A stdClass instance.
      */
@@ -97,7 +97,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function __set($name, $value)
     {

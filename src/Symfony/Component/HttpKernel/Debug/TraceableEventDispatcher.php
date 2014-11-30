@@ -324,8 +324,8 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     /**
      * Updates the stopwatch data in the profile hierarchy.
      *
-     * @param string  $token          Profile token
-     * @param bool    $updateChildren Whether to update the children altogether
+     * @param string $token          Profile token
+     * @param bool   $updateChildren Whether to update the children altogether
      */
     private function updateProfiles($token, $updateChildren)
     {

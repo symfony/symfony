@@ -151,7 +151,8 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Create a test treebuilder with a variable node, and init the validation
+     * Create a test treebuilder with a variable node, and init the validation.
+     *
      * @return TreeBuilder
      */
     protected function getTestBuilder()
@@ -167,10 +168,12 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Close the validation process and finalize with the given config
+     * Close the validation process and finalize with the given config.
+     *
      * @param TreeBuilder $testBuilder The tree builder to finalize
      * @param array       $config      The config you want to use for the finalization, if nothing provided
-     *                       a simple array('key'=>'value') will be used
+     *                                 a simple array('key'=>'value') will be used
+     *
      * @return array The finalized config values
      */
     protected function finalizeTestBuilder($testBuilder, $config = null)
@@ -185,8 +188,10 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Return a closure that will return the given value
-     * @param $val The value that the closure must return
+     * Return a closure that will return the given value.
+     *
+     * @param mixed $val The value that the closure must return
+     *
      * @return Closure
      */
     protected function returnClosure($val)
@@ -201,7 +206,8 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      *
      * @param mixed       $value       The value to test
      * @param TreeBuilder $treeBuilder The tree builder to finalize
-     * @param mixed       $config      The config values that new to be finalized
+     *
+     * @param mixed $config The config values that new to be finalized
      */
     protected function assertFinalizedValueIs($value, $treeBuilder, $config = null)
     {

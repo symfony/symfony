@@ -48,7 +48,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * @return bool    true if the use of "__call" by the ProperyAccessor is enabled
+     * @return bool true if the use of "__call" by the ProperyAccessor is enabled
      */
     public function isMagicCallEnabled()
     {

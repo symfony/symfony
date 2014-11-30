@@ -127,9 +127,9 @@ class Response
     /**
      * Constructor.
      *
-     * @param string  $content The response content
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param string $content The response content
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      *
@@ -154,9 +154,9 @@ class Response
      *     return Response::create($body, 200)
      *         ->setSharedMaxAge(300);
      *
-     * @param string  $content The response content
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param string $content The response content
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
      *
      * @return Response
      */
@@ -408,8 +408,8 @@ class Response
     /**
      * Sets the response status code.
      *
-     * @param int     $code HTTP status code
-     * @param mixed   $text HTTP status text
+     * @param int   $code HTTP status code
+     * @param mixed $text HTTP status text
      *
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
@@ -447,7 +447,7 @@ class Response
     /**
      * Retrieves the status code for the current web response.
      *
-     * @return int     Status code
+     * @return int Status code
      *
      * @api
      */
@@ -493,7 +493,7 @@ class Response
      * Responses with neither a freshness lifetime (Expires, max-age) nor cache
      * validator (Last-Modified, ETag) are considered uncacheable.
      *
-     * @return bool    true if the response is worth caching, false otherwise
+     * @return bool true if the response is worth caching, false otherwise
      *
      * @api
      */
@@ -517,7 +517,7 @@ class Response
      * origin. A response is considered fresh when it includes a Cache-Control/max-age
      * indicator or Expires header and the calculated age is less than the freshness lifetime.
      *
-     * @return bool    true if the response is fresh, false otherwise
+     * @return bool true if the response is fresh, false otherwise
      *
      * @api
      */
@@ -530,7 +530,7 @@ class Response
      * Returns true if the response includes headers that can be used to validate
      * the response with the origin server using a conditional GET request.
      *
-     * @return bool    true if the response is validateable, false otherwise
+     * @return bool true if the response is validateable, false otherwise
      *
      * @api
      */
@@ -581,7 +581,7 @@ class Response
      * When present, the TTL of the response should not be overridden to be
      * greater than the value provided by the origin.
      *
-     * @return bool    true if the response must be revalidated by a cache, false otherwise
+     * @return bool true if the response must be revalidated by a cache, false otherwise
      *
      * @api
      */
@@ -624,7 +624,7 @@ class Response
     /**
      * Returns the age of the response.
      *
-     * @return int     The age of the response in seconds
+     * @return int The age of the response in seconds
      */
     public function getAge()
     {
@@ -699,7 +699,7 @@ class Response
      * First, it checks for a s-maxage directive, then a max-age directive, and then it falls
      * back on an expires header. It returns null when no maximum age can be established.
      *
-     * @return int|null     Number of seconds
+     * @return int|null Number of seconds
      *
      * @api
      */
@@ -723,7 +723,7 @@ class Response
      *
      * This methods sets the Cache-Control max-age directive.
      *
-     * @param int     $value Number of seconds
+     * @param int $value Number of seconds
      *
      * @return Response
      *
@@ -741,7 +741,7 @@ class Response
      *
      * This methods sets the Cache-Control s-maxage directive.
      *
-     * @param int     $value Number of seconds
+     * @param int $value Number of seconds
      *
      * @return Response
      *
@@ -763,7 +763,7 @@ class Response
      * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
-     * @return int|null     The TTL in seconds
+     * @return int|null The TTL in seconds
      *
      * @api
      */
@@ -779,7 +779,7 @@ class Response
      *
      * This method adjusts the Cache-Control/s-maxage directive.
      *
-     * @param int     $seconds Number of seconds
+     * @param int $seconds Number of seconds
      *
      * @return Response
      *
@@ -797,7 +797,7 @@ class Response
      *
      * This method adjusts the Cache-Control/max-age directive.
      *
-     * @param int     $seconds Number of seconds
+     * @param int $seconds Number of seconds
      *
      * @return Response
      *
@@ -967,7 +967,7 @@ class Response
     /**
      * Returns true if the response includes a Vary header.
      *
-     * @return bool    true if the response includes a Vary header, false otherwise
+     * @return bool true if the response includes a Vary header, false otherwise
      *
      * @api
      */
@@ -1023,7 +1023,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if the Response validators match the Request, false otherwise
+     * @return bool true if the Response validators match the Request, false otherwise
      *
      * @api
      */

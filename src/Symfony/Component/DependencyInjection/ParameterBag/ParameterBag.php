@@ -82,7 +82,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name The parameter name
      *
-     * @return mixed  The parameter value
+     * @return mixed The parameter value
      *
      * @throws ParameterNotFoundException if the parameter is not defined
      *
@@ -129,7 +129,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @param string $name The parameter name
      *
-     * @return bool    true if the parameter name is defined, false otherwise
+     * @return bool true if the parameter name is defined, false otherwise
      *
      * @api
      */
@@ -183,9 +183,9 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return mixed The resolved value
      *
-     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem.
      */
     public function resolveValue($value, array $resolving = array())
     {
@@ -213,9 +213,9 @@ class ParameterBag implements ParameterBagInterface
      *
      * @return string The resolved string
      *
-     * @throws ParameterNotFoundException if a placeholder references a parameter that does not exist
+     * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem.
      */
     public function resolveString($value, array $resolving = array())
     {

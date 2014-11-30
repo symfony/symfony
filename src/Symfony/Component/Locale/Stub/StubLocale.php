@@ -45,7 +45,7 @@ class StubLocale extends Locale
      *
      * @param string $locale
      *
-     * @return array  The currencies data
+     * @return array The currencies data
      */
     public static function getCurrenciesData($locale)
     {
@@ -61,9 +61,9 @@ class StubLocale extends Locale
      *
      * @param string $locale The locale to use for the currencies names
      *
-     * @return array                     The currencies names with their codes as keys
+     * @return array The currencies names with their codes as keys
      *
-     * @throws \InvalidArgumentException  When the locale is different than 'en'
+     * @throws \InvalidArgumentException When the locale is different than 'en'
      */
     public static function getDisplayCurrencies($locale)
     {
@@ -77,7 +77,7 @@ class StubLocale extends Locale
     /**
      * Returns all available currencies codes
      *
-     * @return array  The currencies codes
+     * @return array The currencies codes
      */
     public static function getCurrencies()
     {

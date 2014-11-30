@@ -159,7 +159,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * @param \DOMNode $node
-     * @param string  $val
+     * @param string   $val
      *
      * @return bool
      */
@@ -290,7 +290,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * Parse the data and convert it to DOMElements
      *
      * @param DOMNode      $parentNode
-     * @param array|object $data       data
+     * @param array|object $data            data
      * @param string       $xmlRootNodeName
      *
      * @return bool

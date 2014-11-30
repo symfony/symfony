@@ -40,8 +40,8 @@ class CssSelector
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @param mixed   $cssExpr The CSS expression.
-     * @param string  $prefix  An optional prefix for the XPath expression.
+     * @param mixed  $cssExpr The CSS expression.
+     * @param string $prefix  An optional prefix for the XPath expression.
      *
      * @return string
      *

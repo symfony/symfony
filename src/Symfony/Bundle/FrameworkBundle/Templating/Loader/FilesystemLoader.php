@@ -40,7 +40,7 @@ class FilesystemLoader implements LoaderInterface
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return FileStorage|bool    false if the template cannot be loaded, a Storage instance otherwise
+     * @return FileStorage|bool false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
     {

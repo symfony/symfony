@@ -173,6 +173,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      * returns attribute name in camelcase format
      *
      * @param string $attributeName
+     *
      * @return string
      */
     protected function formatAttribute($attributeName)
@@ -229,7 +230,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
      *
      * @param \ReflectionMethod $method the method to check
      *
-     * @return bool    whether the method is a getter.
+     * @return bool whether the method is a getter.
      */
     private function isGetMethod(\ReflectionMethod $method)
     {

@@ -103,7 +103,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
      *
      * @param string $path The path to the file
      *
-     * @return string         The mime type or NULL, if none could be guessed
+     * @return string The mime type or NULL, if none could be guessed
      *
      * @throws \LogicException
      * @throws FileNotFoundException

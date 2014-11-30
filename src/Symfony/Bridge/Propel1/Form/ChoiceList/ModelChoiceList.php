@@ -70,12 +70,12 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @see \Symfony\Bridge\Propel1\Form\Type\ModelType How to use the preferred choices.
      *
-     * @param string                   $class             The FQCN of the model class to be loaded.
-     * @param string                   $labelPath         A property path pointing to the property used for the choice labels.
-     * @param array                    $choices           An optional array to use, rather than fetching the models.
-     * @param ModelCriteria            $queryObject       The query to use retrieving model data from database.
-     * @param string                   $groupPath         A property path pointing to the property used to group the choices.
-     * @param array|ModelCriteria      $preferred         The preferred items of this choice.
+     * @param string                    $class            The FQCN of the model class to be loaded.
+     * @param string                    $labelPath        A property path pointing to the property used for the choice labels.
+     * @param array                     $choices          An optional array to use, rather than fetching the models.
+     * @param ModelCriteria             $queryObject      The query to use retrieving model data from database.
+     * @param string                    $groupPath        A property path pointing to the property used to group the choices.
+     * @param array|ModelCriteria       $preferred        The preferred items of this choice.
      *                                                    Either an array if $choices is given,
      *                                                    or a ModelCriteria to be merged with the $queryObject.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
@@ -358,8 +358,8 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create an index for
      *
-     * @return int|string     A unique index containing only ASCII letters,
-     *                        digits and underscores.
+     * @return int|string A unique index containing only ASCII letters,
+     *                    digits and underscores.
      */
     protected function createIndex($model)
     {
@@ -379,7 +379,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create a value for
      *
-     * @return int|string     A unique value without character limitations.
+     * @return int|string A unique value without character limitations.
      */
     protected function createValue($model)
     {

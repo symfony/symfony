@@ -48,7 +48,7 @@ interface TokenInterface extends \Serializable
      * Returns a user representation.
      *
      * @return mixed either returns an object which implements __toString(), or
-     *                  a primitive string is returned.
+     *               a primitive string is returned.
      */
     public function getUser();
 
@@ -69,14 +69,14 @@ interface TokenInterface extends \Serializable
     /**
      * Returns whether the user is authenticated or not.
      *
-     * @return bool    true if the token has been authenticated, false otherwise
+     * @return bool true if the token has been authenticated, false otherwise
      */
     public function isAuthenticated();
 
     /**
      * Sets the authenticated flag.
      *
-     * @param bool    $isAuthenticated The authenticated flag
+     * @param bool $isAuthenticated The authenticated flag
      */
     public function setAuthenticated($isAuthenticated);
 
@@ -104,7 +104,7 @@ interface TokenInterface extends \Serializable
      *
      * @param string $name The attribute name
      *
-     * @return bool    true if the attribute exists, false otherwise
+     * @return bool true if the attribute exists, false otherwise
      */
     public function hasAttribute($name);
 

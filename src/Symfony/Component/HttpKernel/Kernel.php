@@ -710,7 +710,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => (string) $cache));
         if (!$this->debug) {
             $content = static::stripComments($content);
         }

@@ -278,6 +278,24 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if the given option with provided value is in the raw input');
     }
 
+    public function testGetParameterOption()
+    {
+        $input = new ArgvInput(array('cli.php', '--foo'));
+        $input->bind(new InputDefinition(array(new InputOption('foo', null, InputOption::VALUE_OPTIONAL, 'foo option', 'value'))));
+        $this->assertEquals('value', $input->getOption('foo'));
+        $this->assertTrue($input->hasParsedOption('foo'));
+
+        $input = new ArgvInput(array('cli.php', '--foo'));
+        $input->bind(new InputDefinition(array(new InputOption('foo', null, InputOption::VALUE_OPTIONAL, 'foo option'))));
+        $this->assertEquals(null, $input->getOption('foo'));
+        $this->assertTrue($input->hasParsedOption('foo'));
+
+        $input = new ArgvInput(array('cli.php'));
+        $input->bind(new InputDefinition(array(new InputOption('foo', null, InputOption::VALUE_OPTIONAL, 'foo option'))));
+        $this->assertEquals(null, $input->getOption('foo'));
+        $this->assertFalse($input->hasParsedOption('foo'));
+    }
+
     public function testToString()
     {
         $input = new ArgvInput(array('cli.php', '-f', 'foo'));

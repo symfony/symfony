@@ -53,6 +53,8 @@ class PhpProcess extends Process
      */
     public function setPhpBinary($php)
     {
+        $php .= ' -d error_reporting='.error_reporting();
+
         $this->setCommandLine($php);
     }
 
@@ -65,7 +67,8 @@ class PhpProcess extends Process
             if (false === $php = $this->executableFinder->find()) {
                 throw new RuntimeException('Unable to find the PHP executable.');
             }
-            $this->setCommandLine($php);
+
+            $this->setPhpBinary($php);
         }
 
         parent::start($callback);

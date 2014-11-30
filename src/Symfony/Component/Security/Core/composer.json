@@ -19,10 +19,10 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/expression-language": "~2.4",
-        "symfony/http-foundation": "~2.4",
-        "symfony/validator": "~2.5",
+        "symfony/event-dispatcher": "~3.0",
+        "symfony/expression-language": "~3.0",
+        "symfony/http-foundation": "~3.0",
+        "symfony/validator": "~3.0",
         "psr/log": "~1.0",
         "ircmaxell/password-compat": "1.0.*"
     },

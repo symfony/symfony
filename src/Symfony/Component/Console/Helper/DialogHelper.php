@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Console\Helper;
 
-trigger_error('\Symfony\Component\Console\Helper\DialogHelper is deprecated since version 2.5 and will be removed in 3.0. Use QuestionHelper instead.', E_USER_DEPRECATED);
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -29,6 +27,13 @@ class DialogHelper extends InputAwareHelper
     private $inputStream;
     private static $shell;
     private static $stty;
+
+    public function __construct($triggerDeprecationError = true)
+    {
+        if ($triggerDeprecationError) {
+            trigger_error('"Symfony\Component\Console\Helper\DialogHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\QuestionHelper" instead.', E_USER_DEPRECATED);
+        }
+    }
 
     /**
      * Asks the user to select a value.

@@ -950,9 +950,9 @@ class Application
     {
         return new HelperSet(array(
             new FormatterHelper(),
-            new DialogHelper(),
-            new ProgressHelper(),
-            new TableHelper(),
+            new DialogHelper(false),
+            new ProgressHelper(false),
+            new TableHelper(false),
             new DebugFormatterHelper(),
             new ProcessHelper(),
             new QuestionHelper(),

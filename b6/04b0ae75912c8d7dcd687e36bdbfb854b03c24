@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-01T08:24:56Z
+
+Tests added, this PR is ready for review/merge
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-01T12:55:39Z
+
+Comments addressed, Windows support should be OK
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-01T17:00:41Z
+
+:+1:
+
+I've just tested on Heroku and indeed, that fixes the problem we have currently. ping @dzuelke
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-01T18:19:31Z
+
+Failing tests do not seem to be related to these changes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-01T18:19:50Z
+
+As I will have to release 2.6.1 soon, I'd really like to include this PR. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-01T18:29:38Z
+
+Does this work properly for people symlinking their cache folder to a different place ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-01T18:39:26Z
+
+It will work properly but without `__DIR__` relative paths, because the search-and-replaced pattern, being realpath'ed, won't match values in strings (that are not realpath'ed)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-01T18:41:58Z
+
+this seems an acceptable option.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-01T18:44:05Z
+
+Your new test does not rely on any path dumped in service arguments (inlined parameter values). Could you add some to avoid regressions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-01T19:46:49Z
+
+Test updated
+
+---------------------------------------------------------------------------
+
+by eddiejaoude at 2014-12-02T05:48:04Z
+
+> I've just tested on Heroku and indeed, that fixes the problem we have currently
+
+Looking forward to this making into to mainline, to fix issues on `Heroku`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-02T09:32:58Z
+
+any other comments before the merge?
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-12-02T10:31:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2014-12-02T10:43:01Z
+
+:+1: I can confirm this fixes the issue. Great job @nicolas-grekas!
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2014-12-02T10:44:36Z
+
+Actually, should the `export()` method be available to other dumpers as well? I remember something about a serializer dumper having the same basic issue?

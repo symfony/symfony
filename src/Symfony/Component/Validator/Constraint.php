@@ -286,7 +286,7 @@ abstract class Constraint
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
      *
-     * @return string|array  One or more constant values
+     * @return string|array One or more constant values
      *
      * @api
      */

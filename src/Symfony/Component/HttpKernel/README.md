@@ -13,7 +13,7 @@ interface HttpKernelInterface
     /**
      * Handles a Request to convert it to a Response.
      *
-     * @param  Request $request A Request instance
+     * @param Request $request A Request instance
      *
      * @return Response A Response instance
      */

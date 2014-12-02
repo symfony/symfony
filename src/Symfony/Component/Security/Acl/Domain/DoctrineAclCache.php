@@ -147,6 +147,7 @@ class DoctrineAclCache implements AclCacheInterface
      * Unserializes the ACL.
      *
      * @param string $serialized
+     *
      * @return AclInterface
      */
     private function unserializeAcl($serialized)
@@ -205,6 +206,7 @@ class DoctrineAclCache implements AclCacheInterface
      * Returns the key for the object identity
      *
      * @param ObjectIdentityInterface $oid
+     *
      * @return string
      */
     private function getDataKeyByIdentity(ObjectIdentityInterface $oid)
@@ -217,6 +219,7 @@ class DoctrineAclCache implements AclCacheInterface
      * Returns the alias key for the object identity key
      *
      * @param string $aclId
+     *
      * @return string
      */
     private function getAliasKeyForIdentity($aclId)

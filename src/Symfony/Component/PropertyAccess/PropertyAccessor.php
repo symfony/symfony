@@ -556,7 +556,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Camelizes a given string.
      *
-     * @param  string $string Some string
+     * @param string $string Some string
      *
      * @return string The camelized version of the string
      */
@@ -593,12 +593,12 @@ class PropertyAccessor implements PropertyAccessorInterface
     /**
      * Returns whether a method is public and has the number of required parameters.
      *
-     * @param  \ReflectionClass $class      The class of the method
-     * @param  string           $methodName The method name
-     * @param  int              $parameters The number of parameters
+     * @param \ReflectionClass $class      The class of the method
+     * @param string           $methodName The method name
+     * @param int              $parameters The number of parameters
      *
-     * @return bool    Whether the method is public and has $parameters
-     *                                      required parameters
+     * @return bool Whether the method is public and has $parameters
+     *              required parameters
      */
     private function isMethodAccessible(\ReflectionClass $class, $methodName, $parameters)
     {

@@ -24,30 +24,30 @@ interface MutableAclInterface extends AclInterface
     /**
      * Deletes a class-based ACE
      *
-     * @param int     $index
+     * @param int $index
      */
     public function deleteClassAce($index);
 
     /**
      * Deletes a class-field-based ACE
      *
-     * @param int     $index
-     * @param string  $field
+     * @param int    $index
+     * @param string $field
      */
     public function deleteClassFieldAce($index, $field);
 
     /**
      * Deletes an object-based ACE
      *
-     * @param int     $index
+     * @param int $index
      */
     public function deleteObjectAce($index);
 
     /**
      * Deletes an object-field-based ACE
      *
-     * @param int     $index
-     * @param string  $field
+     * @param int    $index
+     * @param string $field
      */
     public function deleteObjectFieldAce($index, $field);
 
@@ -107,7 +107,7 @@ interface MutableAclInterface extends AclInterface
     /**
      * Sets whether entries are inherited
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      */
     public function setEntriesInheriting($boolean);
 
@@ -121,38 +121,38 @@ interface MutableAclInterface extends AclInterface
     /**
      * Updates a class-based ACE
      *
-     * @param int     $index
-     * @param int     $mask
-     * @param string  $strategy if null the strategy should not be changed
+     * @param int    $index
+     * @param int    $mask
+     * @param string $strategy if null the strategy should not be changed
      */
     public function updateClassAce($index, $mask, $strategy = null);
 
     /**
      * Updates a class-field-based ACE
      *
-     * @param int     $index
-     * @param string  $field
-     * @param int     $mask
-     * @param string  $strategy if null the strategy should not be changed
+     * @param int    $index
+     * @param string $field
+     * @param int    $mask
+     * @param string $strategy if null the strategy should not be changed
      */
     public function updateClassFieldAce($index, $field, $mask, $strategy = null);
 
     /**
      * Updates an object-based ACE
      *
-     * @param int     $index
-     * @param int     $mask
-     * @param string  $strategy if null the strategy should not be changed
+     * @param int    $index
+     * @param int    $mask
+     * @param string $strategy if null the strategy should not be changed
      */
     public function updateObjectAce($index, $mask, $strategy = null);
 
     /**
      * Updates an object-field-based ACE
      *
-     * @param int     $index
-     * @param string  $field
-     * @param int     $mask
-     * @param string  $strategy if null the strategy should not be changed
+     * @param int    $index
+     * @param string $field
+     * @param int    $mask
+     * @param string $strategy if null the strategy should not be changed
      */
     public function updateObjectFieldAce($index, $field, $mask, $strategy = null);
 }

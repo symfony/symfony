@@ -42,14 +42,14 @@ class RequestContext
     /**
      * Constructor.
      *
-     * @param string  $baseUrl      The base URL
-     * @param string  $method       The HTTP method
-     * @param string  $host         The HTTP host name
-     * @param string  $scheme       The HTTP scheme
-     * @param int     $httpPort     The HTTP port
-     * @param int     $httpsPort    The HTTPS port
-     * @param string  $path         The path
-     * @param string  $queryString  The query string
+     * @param string $baseUrl     The base URL
+     * @param string $method      The HTTP method
+     * @param string $host        The HTTP host name
+     * @param string $scheme      The HTTP scheme
+     * @param int    $httpPort    The HTTP port
+     * @param int    $httpsPort   The HTTPS port
+     * @param string $path        The path
+     * @param string $queryString The query string
      *
      * @api
      */

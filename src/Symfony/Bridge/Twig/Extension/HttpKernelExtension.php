@@ -36,7 +36,7 @@ class HttpKernelExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('render',array($this, 'renderFragment'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('render', array($this, 'renderFragment'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('render_*', array($this, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('controller', array($this, 'controller')),
         );
@@ -45,8 +45,8 @@ class HttpKernelExtension extends \Twig_Extension
     /**
      * Renders a fragment.
      *
-     * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
-     * @param array                      $options  An array of options
+     * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
+     * @param array                      $options An array of options
      *
      * @return string The fragment content
      *

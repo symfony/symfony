@@ -100,9 +100,9 @@ class TemplateManagerTest extends TestCase
             ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
 
         $result = $this->templateManager->getTemplates($profile);
-        $this->assertArrayHasKey('foo',$result);
-        $this->assertArrayNotHasKey('bar',$result);
-        $this->assertArrayNotHasKey('baz',$result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertArrayNotHasKey('bar', $result);
+        $this->assertArrayNotHasKey('baz', $result);
     }
 
     public function profilerHasCallback($panel)

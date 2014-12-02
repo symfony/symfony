@@ -117,7 +117,7 @@ class MarkdownDescriptor extends Descriptor
 
             $blocks[] = implode("\n", array_map(function ($commandName) {
                 return '* '.$commandName;
-            } , $namespace['commands']));
+            }, $namespace['commands']));
         }
 
         foreach ($description->getCommands() as $command) {

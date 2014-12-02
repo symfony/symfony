@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-02T16:39:45Z
+
+Thanks @rjkip for taking care of that regression.
+
+@zacharyzh @dalibor983 @Imunhatep Can you test this patch and confirm that it fixes the problem for you? Thanks.
+
+---------------------------------------------------------------------------
+
+by zacharyzh at 2014-12-02T16:56:49Z
+
+@rjkip @fabpot
+
+I have tested this patch, and my problem has been fixed. Thank you.

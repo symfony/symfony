@@ -413,12 +413,12 @@ UPGRADE FROM 2.x to 3.0
 
    | Old way | New way
    | ------- | ---
-   | `Locale::getDisplayCountries()` | `Intl::getRegionBundle()->getCountryNames()`
-   | `Locale::getCountries()` | `array_keys(Intl::getRegionBundle()->getCountryNames())`
-   | `Locale::getDisplayLanguages()` | `Intl::getLanguageBundle()->getLanguageNames()`
-   | `Locale::getLanguages()` | `array_keys(Intl::getLanguageBundle()->getLanguageNames())`
-   | `Locale::getDisplayLocales()` | `Intl::getLocaleBundle()->getLocaleNames()`
-   | `Locale::getLocales()` | `array_keys(Intl::getLocaleBundle()->getLocaleNames())`
+   | `Locale::getDisplayCountries()` | `Intl::getCountryNames($locale = null)`
+   | `Locale::getCountries()` | `Intl::getCountryCodes()`
+   | `Locale::getDisplayLanguages()` | `Intl::getLanguageNames($locale = null)`
+   | `Locale::getLanguages()` | `Intl::getLanguageCodes()`
+   | `Locale::getDisplayLocales()` | `Intl::getLocaleNames($locale = null)`
+   | `Locale::getLocales()` | `Intl::getLocaleCodes()`
 
 ### PropertyAccess
 

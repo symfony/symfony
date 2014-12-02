@@ -216,7 +216,6 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
         );
 
         $listener->handle($event);
-
     }
 
     private function getHttpUtils()
@@ -225,5 +224,4 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
     }
-
 }

@@ -109,12 +109,12 @@ interface ExecutionContextInterface
      * Adds a violation at the validation graph node with the given property
      * path relative to the current property path.
      *
-     * @param string   $subPath       The relative property path for the violation
-     * @param string   $message       The error message
-     * @param array    $parameters    The parameters substituted in the error message
-     * @param mixed    $invalidValue  The invalid, validated value
-     * @param int|null $plural        The number to use to pluralize of the message
-     * @param int|null $code          The violation code
+     * @param string   $subPath      The relative property path for the violation
+     * @param string   $message      The error message
+     * @param array    $parameters   The parameters substituted in the error message
+     * @param mixed    $invalidValue The invalid, validated value
+     * @param int|null $plural       The number to use to pluralize of the message
+     * @param int|null $code         The violation code
      *
      * @api
      *

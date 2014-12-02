@@ -123,10 +123,10 @@ class GraphvizDumper extends Dumper
     /**
      * Finds all edges belonging to a specific service id.
      *
-     * @param string  $id        The service id used to find edges
-     * @param array   $arguments An array of arguments
-     * @param bool    $required
-     * @param string  $name
+     * @param string $id        The service id used to find edges
+     * @param array  $arguments An array of arguments
+     * @param bool   $required
+     * @param string $name
      *
      * @return array An array of edges
      */

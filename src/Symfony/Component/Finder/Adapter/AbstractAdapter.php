@@ -230,7 +230,7 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @see isSupported
      *
-     * @return bool    Whether the adapter is supported
+     * @return bool Whether the adapter is supported
      */
     abstract protected function canBeUsed();
 }

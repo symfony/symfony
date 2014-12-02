@@ -46,7 +46,7 @@ class CacheLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|bool    false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
     {

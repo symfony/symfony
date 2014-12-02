@@ -28,7 +28,7 @@ interface SessionStorageInterface
      *
      * @throws \RuntimeException If something goes wrong starting the session.
      *
-     * @return bool    True if started.
+     * @return bool True if started.
      *
      * @api
      */
@@ -37,7 +37,7 @@ interface SessionStorageInterface
     /**
      * Checks if the session is started.
      *
-     * @return bool    True if started, false otherwise.
+     * @return bool True if started, false otherwise.
      */
     public function isStarted();
 
@@ -96,13 +96,13 @@ interface SessionStorageInterface
      * Otherwise session data could get lost again for concurrent requests with the
      * new ID. One result could be that you get logged out after just logging in.
      *
-     * @param bool    $destroy  Destroy session when regenerating?
-     * @param int     $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                          will leave the system settings unchanged, 0 sets the cookie
-     *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp.
+     * @param bool $destroy  Destroy session when regenerating?
+     * @param int  $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                       will leave the system settings unchanged, 0 sets the cookie
+     *                       to expire with browser session. Time is in seconds, and is
+     *                       not a Unix timestamp.
      *
-     * @return bool    True if session regenerated, false if error
+     * @return bool True if session regenerated, false if error
      *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      *

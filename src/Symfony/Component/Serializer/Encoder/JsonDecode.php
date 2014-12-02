@@ -41,8 +41,8 @@ class JsonDecode implements DecoderInterface
     /**
      * Constructs a new JsonDecode instance.
      *
-     * @param bool     $associative True to return the result associative array, false for a nested stdClass hierarchy
-     * @param int      $depth       Specifies the recursion depth
+     * @param bool $associative True to return the result associative array, false for a nested stdClass hierarchy
+     * @param int  $depth       Specifies the recursion depth
      */
     public function __construct($associative = false, $depth = 512)
     {

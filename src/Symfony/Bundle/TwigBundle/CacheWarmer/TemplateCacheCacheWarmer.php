@@ -69,7 +69,7 @@ class TemplateCacheCacheWarmer implements CacheWarmerInterface
     /**
      * Checks whether this warmer is optional or not.
      *
-     * @return bool    always true
+     * @return bool always true
      */
     public function isOptional()
     {

@@ -225,8 +225,8 @@ class ProgressHelper extends Helper
     /**
      * Advances the progress output X steps.
      *
-     * @param int     $step   Number of steps to advance
-     * @param bool    $redraw Whether to redraw or not
+     * @param int  $step   Number of steps to advance
+     * @param bool $redraw Whether to redraw or not
      *
      * @throws \LogicException
      */
@@ -238,8 +238,8 @@ class ProgressHelper extends Helper
     /**
      * Sets the current progress.
      *
-     * @param int     $current The current progress
-     * @param bool    $redraw  Whether to redraw or not
+     * @param int  $current The current progress
+     * @param bool $redraw  Whether to redraw or not
      *
      * @throws \LogicException
      */
@@ -272,7 +272,7 @@ class ProgressHelper extends Helper
     /**
      * Outputs the current progress string.
      *
-     * @param bool    $finish Forces the end result
+     * @param bool $finish Forces the end result
      *
      * @throws \LogicException
      */
@@ -345,7 +345,7 @@ class ProgressHelper extends Helper
     /**
      * Generates the array map of format variables to values.
      *
-     * @param bool    $finish Forces the end result
+     * @param bool $finish Forces the end result
      *
      * @return array Array of format vars and values
      */
@@ -403,7 +403,7 @@ class ProgressHelper extends Helper
     /**
      * Converts seconds into human-readable format.
      *
-     * @param int     $secs Number of seconds
+     * @param int $secs Number of seconds
      *
      * @return string Time in readable format
      */
@@ -428,8 +428,8 @@ class ProgressHelper extends Helper
     /**
      * Overwrites a previous message to the output.
      *
-     * @param OutputInterface $output   An Output instance
-     * @param string          $message  The message
+     * @param OutputInterface $output  An Output instance
+     * @param string          $message The message
      */
     private function overwrite(OutputInterface $output, $message)
     {

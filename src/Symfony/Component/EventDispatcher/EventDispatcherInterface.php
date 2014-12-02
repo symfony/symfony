@@ -28,7 +28,7 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
-     * @param Event $event The event to pass to the event handlers/listeners.
+     * @param Event  $event     The event to pass to the event handlers/listeners.
      *                          If not supplied, an empty Event instance is created.
      *
      * @return Event
@@ -90,7 +90,7 @@ interface EventDispatcherInterface
      *
      * @param string $eventName The name of the event
      *
-     * @return bool    true if the specified event has any listeners, false otherwise
+     * @return bool true if the specified event has any listeners, false otherwise
      */
     public function hasListeners($eventName = null);
 }

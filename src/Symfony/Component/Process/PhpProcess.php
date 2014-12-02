@@ -31,11 +31,11 @@ class PhpProcess extends Process
     /**
      * Constructor.
      *
-     * @param string  $script  The PHP script to run (as a string)
-     * @param string  $cwd     The working directory
-     * @param array   $env     The environment variables
-     * @param int     $timeout The timeout in seconds
-     * @param array   $options An array of options for proc_open
+     * @param string $script  The PHP script to run (as a string)
+     * @param string $cwd     The working directory
+     * @param array  $env     The environment variables
+     * @param int    $timeout The timeout in seconds
+     * @param array  $options An array of options for proc_open
      *
      * @api
      */

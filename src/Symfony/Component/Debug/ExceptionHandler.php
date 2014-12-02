@@ -44,7 +44,7 @@ class ExceptionHandler
     /**
      * Registers the exception handler.
      *
-     * @param bool    $debug
+     * @param bool $debug
      *
      * @return ExceptionHandler The registered exception handler
      */

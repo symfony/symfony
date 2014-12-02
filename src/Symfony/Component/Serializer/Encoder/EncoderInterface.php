@@ -23,8 +23,8 @@ interface EncoderInterface
     /**
      * Encodes data into the given format
      *
-     * @param mixed  $data   Data to encode
-     * @param string $format Format name
+     * @param mixed  $data    Data to encode
+     * @param string $format  Format name
      * @param array  $context options that normalizers/encoders have access to.
      *
      * @return scalar

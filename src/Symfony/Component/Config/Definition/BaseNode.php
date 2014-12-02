@@ -133,7 +133,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Set this node as required.
      *
-     * @param bool    $boolean Required node
+     * @param bool $boolean Required node
      */
     public function setRequired($boolean)
     {
@@ -143,7 +143,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * Sets if this node can be overridden.
      *
-     * @param bool    $allow
+     * @param bool $allow
      */
     public function setAllowOverwrite($allow)
     {

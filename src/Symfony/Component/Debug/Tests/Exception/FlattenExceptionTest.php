@@ -126,9 +126,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened->setPrevious($flattened2);
 
-        $this->assertSame($flattened2,$flattened->getPrevious());
+        $this->assertSame($flattened2, $flattened->getPrevious());
 
-        $this->assertSame(array($flattened2),$flattened->getAllPrevious());
+        $this->assertSame(array($flattened2), $flattened->getAllPrevious());
     }
 
     /**
@@ -162,7 +162,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                 'message' => 'test',
                 'class' => 'Exception',
                 'trace' => array(array(
-                    'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php', 'line' => 123,
+                    'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args' => array(),
                 )),
             ),
@@ -214,12 +214,12 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                 'class' => 'Exception',
                 'trace' => array(
                     array(
-                        'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => '',
+                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '',
                         'file' => 'foo.php', 'line' => 123,
                         'args' => array(),
                     ),
                     array(
-                        'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => 'test',
+                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => 'test',
                         'file' => __FILE__, 'line' => 123,
                         'args' => array(
                             array(

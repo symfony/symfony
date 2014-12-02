@@ -34,7 +34,7 @@ class Esi
      * Constructor.
      *
      * @param array $contentTypes An array of content-type that should be parsed for ESI information.
-     *                           (default: text/html, text/xml, application/xhtml+xml, and application/xml)
+     *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
     public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
     {
@@ -56,7 +56,7 @@ class Esi
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if one surrogate has ESI/1.0 capability, false otherwise
+     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      */
     public function hasSurrogateEsiCapability(Request $request)
     {
@@ -99,7 +99,7 @@ class Esi
      *
      * @param Response $response A Response instance
      *
-     * @return bool    true if the Response needs to be parsed, false otherwise
+     * @return bool true if the Response needs to be parsed, false otherwise
      */
     public function needsEsiParsing(Response $response)
     {
@@ -113,10 +113,10 @@ class Esi
     /**
      * Renders an ESI tag.
      *
-     * @param string  $uri          A URI
-     * @param string  $alt          An alternate URI
-     * @param bool    $ignoreErrors Whether to ignore errors or not
-     * @param string  $comment      A comment to add as an esi:include tag
+     * @param string $uri          A URI
+     * @param string $alt          An alternate URI
+     * @param bool   $ignoreErrors Whether to ignore errors or not
+     * @param string $comment      A comment to add as an esi:include tag
      *
      * @return string
      */

@@ -30,14 +30,14 @@ class CompiledRoute implements \Serializable
     /**
      * Constructor.
      *
-     * @param string      $staticPrefix       The static prefix of the compiled route
-     * @param string      $regex              The regular expression to use to match this route
-     * @param array       $tokens             An array of tokens to use to generate URL for this route
-     * @param array       $pathVariables      An array of path variables
-     * @param string|null $hostRegex          Host regex
-     * @param array       $hostTokens         Host tokens
-     * @param array       $hostVariables      An array of host variables
-     * @param array       $variables          An array of variables (variables defined in the path and in the host patterns)
+     * @param string      $staticPrefix  The static prefix of the compiled route
+     * @param string      $regex         The regular expression to use to match this route
+     * @param array       $tokens        An array of tokens to use to generate URL for this route
+     * @param array       $pathVariables An array of path variables
+     * @param string|null $hostRegex     Host regex
+     * @param array       $hostTokens    Host tokens
+     * @param array       $hostVariables An array of host variables
+     * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
      */
     public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
     {

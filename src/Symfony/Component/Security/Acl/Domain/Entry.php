@@ -125,7 +125,7 @@ class Entry implements AuditableEntryInterface
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      */
     public function setAuditFailure($boolean)
     {
@@ -138,7 +138,7 @@ class Entry implements AuditableEntryInterface
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      */
     public function setAuditSuccess($boolean)
     {
@@ -151,7 +151,7 @@ class Entry implements AuditableEntryInterface
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
      *
-     * @param int     $mask
+     * @param int $mask
      */
     public function setMask($mask)
     {

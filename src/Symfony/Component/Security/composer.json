@@ -33,7 +33,7 @@
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",
-        "ircmaxell/password-compat": "1.0.*",
+        "ircmaxell/password-compat": "~1.0",
         "symfony/expression-language": "~2.4"
     },
     "suggest": {

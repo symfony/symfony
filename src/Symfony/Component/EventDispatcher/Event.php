@@ -48,7 +48,7 @@ class Event
      * Returns whether further event listeners should be triggered.
      *
      * @see Event::stopPropagation
-     * @return bool    Whether propagation was already stopped for this event.
+     * @return bool Whether propagation was already stopped for this event.
      *
      * @api
      */

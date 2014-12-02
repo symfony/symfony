@@ -220,7 +220,7 @@ class TableHelper extends Helper
     /**
      * Sets cell padding type.
      *
-     * @param int     $padType STR_PAD_*
+     * @param int $padType STR_PAD_*
      *
      * @return TableHelper
      */

@@ -110,7 +110,7 @@ class Container implements IntrospectableContainerInterface
     /**
      * Returns true if the container parameter bag are frozen.
      *
-     * @return bool    true if the container parameter bag are frozen, false otherwise
+     * @return bool true if the container parameter bag are frozen, false otherwise
      *
      * @api
      */
@@ -136,7 +136,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return mixed  The parameter value
+     * @return mixed The parameter value
      *
      * @throws InvalidArgumentException if the parameter is not defined
      *
@@ -152,7 +152,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $name The parameter name
      *
-     * @return bool    The presence of parameter in container
+     * @return bool The presence of parameter in container
      *
      * @api
      */
@@ -184,7 +184,7 @@ class Container implements IntrospectableContainerInterface
      * @param object $service The service instance
      * @param string $scope   The scope of the service
      *
-     * @throws RuntimeException When trying to set a service in an inactive scope
+     * @throws RuntimeException         When trying to set a service in an inactive scope
      * @throws InvalidArgumentException When trying to set a service in the prototype scope
      *
      * @api
@@ -231,7 +231,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return bool    true if the service is defined, false otherwise
+     * @return bool true if the service is defined, false otherwise
      *
      * @api
      */
@@ -256,8 +256,8 @@ class Container implements IntrospectableContainerInterface
      * If a service is defined both through a set() method and
      * with a get{$id}Service() method, the former has always precedence.
      *
-     * @param string  $id              The service identifier
-     * @param int     $invalidBehavior The behavior when the service does not exist
+     * @param string $id              The service identifier
+     * @param int    $invalidBehavior The behavior when the service does not exist
      *
      * @return object The associated service
      *
@@ -348,7 +348,7 @@ class Container implements IntrospectableContainerInterface
      *
      * @param string $id The service identifier
      *
-     * @return bool    true if service has already been initialized, false otherwise
+     * @return bool true if service has already been initialized, false otherwise
      */
     public function initialized($id)
     {

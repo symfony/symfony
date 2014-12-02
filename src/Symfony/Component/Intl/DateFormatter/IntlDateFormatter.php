@@ -135,13 +135,13 @@ class IntlDateFormatter
      * @param string $timezone Timezone identifier
      * @param int    $calendar Calendar to use for formatting or parsing. The only currently
      *                         supported value is IntlDateFormatter::GREGORIAN.
-     * @param string $pattern Optional pattern to use when formatting
+     * @param string $pattern  Optional pattern to use when formatting
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
-     * @throws MethodArgumentValueNotImplementedException  When $calendar different than GREGORIAN is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed
      */
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
@@ -168,16 +168,16 @@ class IntlDateFormatter
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param string $timezone Timezone identifier
      * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian.
-     *                           One of the calendar constants.
-     * @param string $pattern Optional pattern to use when formatting
+     *                         One of the calendar constants.
+     * @param string $pattern  Optional pattern to use when formatting
      *
      * @return IntlDateFormatter
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
-     * @throws MethodArgumentValueNotImplementedException  When $calendar different than GREGORIAN is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed
      */
     public static function create($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
@@ -187,10 +187,10 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string
      *
-     * @param int|\DateTime     $timestamp The timestamp to format. \DateTime objects
-     *                                     are supported as of PHP 5.3.4.
+     * @param int|\DateTime $timestamp The timestamp to format. \DateTime objects
+     *                                 are supported as of PHP 5.3.4.
      *
-     * @return string|bool    The formatted value or false if formatting failed.
+     * @return string|bool The formatted value or false if formatting failed.
      *
      * @see http://www.php.net/manual/en/intldateformatter.format.php
      *
@@ -398,7 +398,7 @@ class IntlDateFormatter
     /**
      * Returns whether the formatter is lenient
      *
-     * @return bool    Currently always returns false.
+     * @return bool Currently always returns false.
      *
      * @see http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -414,9 +414,9 @@ class IntlDateFormatter
      *
      * @param string $value    String to convert to a time value
      * @param int    $position Position at which to start the parsing in $value (zero-based).
-     *                              If no error occurs before $value is consumed, $parse_pos will
-     *                              contain -1 otherwise it will contain the position at which parsing
-     *                              ended. If $parse_pos > strlen($value), the parse fails immediately.
+     *                         If no error occurs before $value is consumed, $parse_pos will
+     *                         contain -1 otherwise it will contain the position at which parsing
+     *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
      *
      * @return string Localtime compatible array of integers: contains 24 hour clock value in tm_hour field
      *
@@ -468,7 +468,7 @@ class IntlDateFormatter
      *
      * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN.
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setcalendar.php
      *
@@ -487,10 +487,10 @@ class IntlDateFormatter
      * patterns, parsing as much as possible to obtain a value. Extra space, unrecognized tokens, or
      * invalid values ("February 30th") are not accepted.
      *
-     * @param bool    $lenient Sets whether the parser is lenient or not. Currently
-     *                         only false (strict) is supported.
+     * @param bool $lenient Sets whether the parser is lenient or not. Currently
+     *                      only false (strict) is supported.
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setlenient.php
      *
@@ -510,7 +510,7 @@ class IntlDateFormatter
      *
      * @param string $pattern A pattern string in conformance with the ICU IntlDateFormatter documentation
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.setpattern.php
      * @see http://userguide.icu-project.org/formatparse/datetime
@@ -530,10 +530,10 @@ class IntlDateFormatter
      * Set the formatter's timezone identifier
      *
      * @param string $timeZoneId The time zone ID string of the time zone to use.
-     *                               If NULL or the empty string, the default time zone for the
-     *                               runtime is used.
+     *                           If NULL or the empty string, the default time zone for the
+     *                           runtime is used.
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezoneid.php
      */
@@ -580,9 +580,9 @@ class IntlDateFormatter
     /**
      * This method was added in PHP 5.5 as replacement for `setTimeZoneId()`
      *
-     * @param  mixed $timeZone
+     * @param mixed $timeZone
      *
-     * @return bool    true on success or false on failure
+     * @return bool true on success or false on failure
      *
      * @see http://www.php.net/manual/en/intldateformatter.settimezone.php
      */

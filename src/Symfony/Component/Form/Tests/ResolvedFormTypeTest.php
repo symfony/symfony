@@ -349,7 +349,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @param array $options
+     * @param array  $options
      *
      * @return FormBuilder
      */

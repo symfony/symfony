@@ -107,7 +107,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected function generateAclLevel($depth, $parentId, $ancestors)
     {
         $level = count($ancestors);
-        for ($i = 0,$t = rand(1, 10); $i<$t; $i++) {
+        for ($i = 0, $t = rand(1, 10); $i<$t; $i++) {
             $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
 
             if ($level < $depth) {

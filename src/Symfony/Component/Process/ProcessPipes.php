@@ -173,7 +173,7 @@ class ProcessPipes
     /**
      * Reads data in file handles and pipes.
      *
-     * @param bool    $blocking Whether to use blocking calls or not.
+     * @param bool $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -185,7 +185,7 @@ class ProcessPipes
     /**
      * Reads data in file handles and pipes, closes them if EOF is reached.
      *
-     * @param bool    $blocking Whether to use blocking calls or not.
+     * @param bool $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -262,7 +262,7 @@ class ProcessPipes
     /**
      * Reads data in file handles.
      *
-     * @param bool    $close Whether to close file handles or not.
+     * @param bool $close Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -298,8 +298,8 @@ class ProcessPipes
     /**
      * Reads data in file pipes streams.
      *
-     * @param bool    $blocking Whether to use blocking calls or not.
-     * @param bool    $close    Whether to close file handles or not.
+     * @param bool $blocking Whether to use blocking calls or not.
+     * @param bool $close    Whether to close file handles or not.
      *
      * @return array An array of read data indexed by their fd.
      */

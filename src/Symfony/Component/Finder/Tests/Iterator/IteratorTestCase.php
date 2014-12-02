@@ -62,7 +62,7 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Same as IteratorTestCase::assertIterator with foreach usage
      *
-     * @param array $expected
+     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertIteratorInForeach($expected, \Traversable $iterator)
@@ -82,7 +82,7 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Same as IteratorTestCase::assertOrderedIterator with foreach usage
      *
-     * @param array $expected
+     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertOrderedIteratorInForeach($expected, \Traversable $iterator)

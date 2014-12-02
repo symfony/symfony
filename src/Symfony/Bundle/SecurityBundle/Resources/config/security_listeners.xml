@@ -265,6 +265,7 @@
             <argument type="service" id="security.http_utils" />
             <argument /> <!-- Max idle time -->
             <argument /> <!-- Target-URL -->
+            <argument type="service" id="security.session_registry" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
         </service>
 

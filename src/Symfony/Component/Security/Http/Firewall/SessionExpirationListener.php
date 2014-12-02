@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Exception\SessionExpiredException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Session\SessionRegistry;
+use Symfony\Component\Security\Http\Session\SessionInformation;
 
 /**
  * SessionExpirationListener controls idle sessions
@@ -29,21 +31,23 @@ class SessionExpirationListener implements ListenerInterface
     private $httpUtils;
     private $maxIdleTime;
     private $targetUrl;
+    private $sessionRegistry;
     private $logger;
 
-    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, $maxIdleTime, $targetUrl = null, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, $maxIdleTime, $targetUrl = null, SessionRegistry $sessionRegistry = null, LoggerInterface $logger = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
         $this->maxIdleTime = $maxIdleTime;
         $this->targetUrl = $targetUrl;
+        $this->sessionRegistry = $sessionRegistry;
         $this->logger = $logger;
     }
 
     /**
      * Handles expired sessions.
      *
-     * @param  GetResponseEvent  $event A GetResponseEvent instance
+     * @param  GetResponseEvent        $event A GetResponseEvent instance
      * @throws SessionExpiredException If the session has expired
      */
     public function handle(GetResponseEvent $event)
@@ -55,7 +59,9 @@ class SessionExpirationListener implements ListenerInterface
             return;
         }
 
-        if (!$this->hasSessionExpired($session)) {
+        $sessionInformation = null !== $this->sessionRegistry ? $this->sessionRegistry->getSessionInformation($session->getId()) : null;
+
+        if (!$this->hasSessionExpired($session, $sessionInformation)) {
             return;
         }
 
@@ -65,6 +71,10 @@ class SessionExpirationListener implements ListenerInterface
 
         $this->tokenStorage->setToken(null);
         $session->invalidate();
+
+        if (null !== $this->sessionRegistry && null !== $sessionInformation) {
+            $this->sessionRegistry->removeSessionInformation($sessionInformation->getSessionId());
+        }
 
         if (null === $this->targetUrl) {
             throw new SessionExpiredException();
@@ -77,13 +87,18 @@ class SessionExpirationListener implements ListenerInterface
     /**
      * Checks if the given session has expired.
      *
-     * @param SessionInterface $session
+     * @param  SessionInterface   $session
+     * @param  SessionInformation $sessionInformation
      * @return bool
      */
-    private function hasSessionExpired(SessionInterface $session)
+    private function hasSessionExpired(SessionInterface $session, SessionInformation $sessionInformation = null)
     {
         if (time() - $session->getMetadataBag()->getLastUsed() > $this->maxIdleTime) {
             return true;
+        }
+
+        if (null !== $sessionInformation) {
+            return $sessionInformation->isExpired();
         }
 
         return false;

@@ -146,7 +146,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @param array $config
      *
-     * @return bool    Whether a possibly configured RememberMeServices should be set for this listener
+     * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
     protected function isRememberMeAware($config)
     {
@@ -157,6 +157,13 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     {
         $listenerId = $this->getListenerId();
         $listener = new DefinitionDecorator($listenerId);
+
+        //Check for custom session authentication strategy
+        $sessionAuthenticationStrategyId = 'security.authentication.session_strategy.'.$id;
+        if ($container->hasDefinition($sessionAuthenticationStrategyId) || $container->hasAlias($sessionAuthenticationStrategyId)) {
+            $listener->replaceArgument(2, new Reference($sessionAuthenticationStrategyId));
+        }
+
         $listener->replaceArgument(4, $id);
         $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(6, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));

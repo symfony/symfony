@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="security.authentication.session_strategy.concurrent_control.class">Symfony\Component\Security\Http\Session\ConcurrentSessionControlAuthenticationStrategy</parameter>
+        <parameter key="security.authentication.session_strategy.register.class">Symfony\Component\Security\Http\Session\RegisterSessionAuthenticationStrategy</parameter>
+        <parameter key="security.authentication.session_strategy.composite.class">Symfony\Component\Security\Http\Session\CompositeSessionAuthenticationStrategy</parameter>
+        <parameter key="security.session_registry.class">Symfony\Component\Security\Http\Session\SessionRegistry</parameter>
+        <parameter key="security.session_registry.garbage_collector.class">Symfony\Bundle\SecurityBundle\EventListener\SessionRegistryGarbageCollectorListener</parameter>
+        <parameter key="security.session_registry.storage.file.class">Symfony\Component\Security\Http\Session\FileSessionRegistryStorage</parameter>
+    </parameters>
+
+    <services>
+
+        <service id="security.authentication.session_strategy.concurrent_control" class="%security.authentication.session_strategy.concurrent_control.class%" abstract="true" public="false">
+            <argument type="service" id="security.session_registry" />
+            <argument /> <!-- maximum sessions -->
+            <argument /> <!-- error if maximum exceeded -->
+        </service>
+
+        <service id="security.authentication.session_strategy.register" class="%security.authentication.session_strategy.register.class%" abstract="true" public="false">
+            <argument type="service" id="security.session_registry" />
+        </service>
+
+        <service id="security.authentication.session_strategy.composite" class="%security.authentication.session_strategy.composite.class%" abstract="true" public="false">
+            <argument type="collection" /> <!-- delegate Strategies -->
+        </service>
+
+        <service id="security.session_registry" class="%security.session_registry.class%" public="true">
+            <argument type="service" id="security.session_registry.storage" />
+        </service>
+
+        <service id="security.session_registry.storage.file" class="%security.session_registry.storage.file.class%" public="false">
+            <argument>%kernel.cache_dir%/session_registry</argument>
+        </service>
+    </services>
+</container>

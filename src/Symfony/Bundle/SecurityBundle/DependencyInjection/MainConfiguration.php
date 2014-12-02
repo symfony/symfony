@@ -277,6 +277,13 @@ class MainConfiguration implements ConfigurationInterface
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
                 ->end()
             ->end()
+            ->arrayNode('session_expiration')
+                ->canBeUnset()
+                ->children()
+                    ->integerNode('max_idle_time')->defaultValue(ini_get('session.gc_maxlifetime'))->min(1)->end()
+                    ->scalarNode('expiration_url')->defaultNull()->end()
+                ->end()
+            ->end()
         ;
 
         $abstractFactoryKeys = array();

@@ -370,6 +370,11 @@ class SecurityExtension extends Extension
             $listeners[] = new Reference($this->createSwitchUserListener($container, $id, $firewall['switch_user'], $defaultProvider));
         }
 
+        // Session expiration listener
+        if (isset($firewall['session_expiration'])) {
+            $listeners[] = new Reference($this->createSessionExpirationListener($container, $id, $firewall));
+        }
+
         // Access listener
         $listeners[] = new Reference('security.access_listener');
 
@@ -592,6 +597,17 @@ class SecurityExtension extends Extension
         $listener->replaceArgument(7, $config['role']);
 
         return $switchUserListenerId;
+    }
+
+    private function createSessionExpirationListener($container, $id, $config)
+    {
+        $expiredSessionListenerId = 'security.authentication.sessionexpiration_listener.' . $id;
+        $listener = $container->setDefinition($expiredSessionListenerId, new DefinitionDecorator('security.authentication.sessionexpiration_listener'));
+
+        $listener->replaceArgument(2, $config['session_expiration']['max_idle_time']);
+        $listener->replaceArgument(3, $config['session_expiration']['expiration_url']);
+
+        return $expiredSessionListenerId;
     }
 
     private function createExpression($container, $expression)

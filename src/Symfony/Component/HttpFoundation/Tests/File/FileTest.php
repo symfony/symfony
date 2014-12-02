@@ -116,7 +116,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         copy(__DIR__.'/Fixtures/test.gif', $path);
 
         $file = new File($path);
-        $movedFile = $file->move($targetDir,$filename);
+        $movedFile = $file->move($targetDir, $filename);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\File', $movedFile);
 
         $this->assertTrue(file_exists($targetPath));

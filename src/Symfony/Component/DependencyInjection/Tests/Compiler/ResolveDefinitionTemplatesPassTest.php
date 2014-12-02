@@ -147,9 +147,9 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent','stdClass');
+        $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1',new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new DefinitionDecorator('parent'))
             ->setLazy(true)
         ;
 
@@ -162,11 +162,11 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('parent','stdClass')
+        $container->register('parent', 'stdClass')
             ->setLazy(true)
         ;
 
-        $container->setDefinition('child1',new DefinitionDecorator('parent'));
+        $container->setDefinition('child1', new DefinitionDecorator('parent'));
 
         $this->process($container);
 

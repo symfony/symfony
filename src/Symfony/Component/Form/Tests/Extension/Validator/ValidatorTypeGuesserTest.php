@@ -113,7 +113,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     public function maxLengthTypeProvider()
     {
-        return array (
+        return array(
             array('double'),
             array('float'),
             array('numeric'),

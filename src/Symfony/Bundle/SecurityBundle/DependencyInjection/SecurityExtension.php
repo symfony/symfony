@@ -601,7 +601,7 @@ class SecurityExtension extends Extension
 
     private function createSessionExpirationListener($container, $id, $config)
     {
-        $expiredSessionListenerId = 'security.authentication.sessionexpiration_listener.' . $id;
+        $expiredSessionListenerId = 'security.authentication.sessionexpiration_listener.'.$id;
         $listener = $container->setDefinition($expiredSessionListenerId, new DefinitionDecorator('security.authentication.sessionexpiration_listener'));
 
         $listener->replaceArgument(2, $config['session_expiration']['max_idle_time']);

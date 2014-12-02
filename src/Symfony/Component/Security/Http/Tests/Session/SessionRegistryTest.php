@@ -96,6 +96,14 @@ class SessionRegistryTest extends \PHPUnit_Framework_TestCase
         $registry->removeSessionInformation('foobar');
     }
 
+    public function testCollectGarbage()
+    {
+        $storage = $this->getSessionRegistryStorage();
+        $storage->expects($this->once())->method('collectGarbage')->with(ini_get('session.gc_maxlifetime'));
+        $registry = $this->getSessionRegistry($storage);
+        $registry->collectGarbage();
+    }
+
     private function getSessionRegistryStorage()
     {
         return $this->getMock('Symfony\Component\Security\Http\Session\SessionRegistryStorageInterface');

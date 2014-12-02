@@ -52,4 +52,12 @@ interface SessionRegistryStorageInterface
      * @param string $sessionId the session identifier key.
      */
     public function removeSessionInformation($sessionId);
+
+    /**
+     * Removes sessions information which last used timestamp is older
+     * than the given lifetime
+     *
+     * @param int $maxLifetime
+     */
+    public function collectGarbage($maxLifetime);
 }

@@ -36,5 +36,11 @@
         <service id="security.session_registry.storage.file" class="%security.session_registry.storage.file.class%" public="false">
             <argument>%kernel.cache_dir%/session_registry</argument>
         </service>
+
+        <service id="security.session_registry.garbage_collector" class="%security.session_registry.garbage_collector.class%" public="true">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="security.session_registry" />
+        </service>
+
     </services>
 </container>

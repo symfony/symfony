@@ -154,12 +154,14 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
-     * @deprecated since 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
      *
      * @api
      */
     public function setFallbackLocale($locales)
     {
+        trigger_error('The setFallbackLocale() method is deprecated since version 2.3 and will be removed in 3.0. Use setFallbackLocales() instead.', E_USER_DEPRECATED);
+
         $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
     }
 

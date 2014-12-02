@@ -64,23 +64,23 @@ class ObjectChoiceList extends ChoiceList
     /**
      * Creates a new object choice list.
      *
-     * @param array|\Traversable       $choices           The array of choices. Choices may also be given
+     * @param array|\Traversable        $choices          The array of choices. Choices may also be given
      *                                                    as hierarchy of unlimited depth by creating nested
      *                                                    arrays. The title of the sub-hierarchy can be
      *                                                    stored in the array key pointing to the nested
      *                                                    array. The topmost level of the hierarchy may also
      *                                                    be a \Traversable.
-     * @param string                   $labelPath         A property path pointing to the property used
+     * @param string                    $labelPath        A property path pointing to the property used
      *                                                    for the choice labels. The value is obtained
      *                                                    by calling the getter on the object. If the
      *                                                    path is NULL, the object's __toString() method
      *                                                    is used instead.
-     * @param array                    $preferredChoices  A flat array of choices that should be
+     * @param array                     $preferredChoices A flat array of choices that should be
      *                                                    presented to the user with priority.
-     * @param string                   $groupPath         A property path pointing to the property used
+     * @param string                    $groupPath        A property path pointing to the property used
      *                                                    to group the choices. Only allowed if
      *                                                    the choices are given as flat array.
-     * @param string                   $valuePath         A property path pointing to the property used
+     * @param string                    $valuePath        A property path pointing to the property used
      *                                                    for the choice values. If not given, integers
      *                                                    are generated instead.
      * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.

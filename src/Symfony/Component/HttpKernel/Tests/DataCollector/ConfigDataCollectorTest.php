@@ -26,12 +26,12 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 
-        $this->assertSame('test',$c->getEnv());
+        $this->assertSame('test', $c->getEnv());
         $this->assertTrue($c->isDebug());
-        $this->assertSame('config',$c->getName());
-        $this->assertSame('testkernel',$c->getAppName());
-        $this->assertSame(PHP_VERSION,$c->getPhpVersion());
-        $this->assertSame(Kernel::VERSION,$c->getSymfonyVersion());
+        $this->assertSame('config', $c->getName());
+        $this->assertSame('testkernel', $c->getAppName());
+        $this->assertSame(PHP_VERSION, $c->getPhpVersion());
+        $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());
 
         // if else clause because we don't know it

@@ -244,12 +244,12 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // 'w' eagerly matches as much as possible and the other variables match the remaining chars.
         // This also shows that the variables w-z must all exclude the separating char (the dot '.' in this case) by default requirement.
         // Otherwise they would also consume '.xml' and _format would never match as it's an optional variable.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'Y', 'z' => 'Z','_format' => 'xml', '_route' => 'test'), $matcher->match('/wwwwwxYZ.xml'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'Y', 'z' => 'Z', '_format' => 'xml', '_route' => 'test'), $matcher->match('/wwwwwxYZ.xml'));
         // As 'y' has custom requirement and can only be of value 'y|Y', it will leave  'ZZZ' to variable z.
         // So with carefully chosen requirements adjacent variables, can be useful.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'ZZZ','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxyZZZ'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'ZZZ', '_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxyZZZ'));
         // z and _format are optional.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxy'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z', '_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxy'));
 
         $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $matcher->match('/wxy.html');

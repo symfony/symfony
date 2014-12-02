@@ -43,7 +43,7 @@ class FilesystemLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|bool    false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
      */
@@ -95,7 +95,7 @@ class FilesystemLoader extends Loader
      * @param TemplateReferenceInterface $template A template
      * @param int                        $time     The last modification time of the cached template (timestamp)
      *
-     * @return bool    true if the template is still fresh, false otherwise
+     * @return bool true if the template is still fresh, false otherwise
      *
      * @api
      */
@@ -113,7 +113,7 @@ class FilesystemLoader extends Loader
      *
      * @param string $file A path
      *
-     * @return bool    true if the path exists and is absolute, false otherwise
+     * @return bool true if the path exists and is absolute, false otherwise
      */
     protected static function isAbsolutePath($file)
     {

@@ -93,7 +93,7 @@ abstract class NodeDefinition implements NodeParentInterface
      * Sets an attribute on the node.
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return NodeDefinition
      */
@@ -117,7 +117,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Creates the node.
      *
-     * @param bool    $forceRootNode Whether to force this node as the root node
+     * @param bool $forceRootNode Whether to force this node as the root node
      *
      * @return NodeInterface
      */
@@ -279,7 +279,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param bool    $deny Whether the overwriting is forbidden or not
+     * @param bool $deny Whether the overwriting is forbidden or not
      *
      * @return NodeDefinition
      */

@@ -75,7 +75,7 @@ class ExceptionController
     }
 
     /**
-     * @param int     $startObLevel
+     * @param int $startObLevel
      *
      * @return string
      */
@@ -93,7 +93,7 @@ class ExceptionController
     /**
      * @param Request $request
      * @param string  $format
-     * @param int     $code       An HTTP response status code
+     * @param int     $code          An HTTP response status code
      * @param bool    $showException
      *
      * @return TemplateReferenceInterface

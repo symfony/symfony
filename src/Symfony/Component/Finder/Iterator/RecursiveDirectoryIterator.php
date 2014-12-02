@@ -34,9 +34,9 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Constructor.
      *
-     * @param string  $path
-     * @param int     $flags
-     * @param bool    $ignoreUnreadableDirs
+     * @param string $path
+     * @param int    $flags
+     * @param bool   $ignoreUnreadableDirs
      *
      * @throws \RuntimeException
      */
@@ -104,7 +104,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     /**
      * Checks if the stream is rewindable.
      *
-     * @return bool    true when the stream is rewindable, false otherwise
+     * @return bool true when the stream is rewindable, false otherwise
      */
     public function isRewindable()
     {

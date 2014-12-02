@@ -155,8 +155,8 @@ class FormType extends BaseType
         // BC with old "virtual" option
         $inheritData = function (Options $options) {
             if (null !== $options['virtual']) {
-                // Uncomment this as soon as the deprecation note should be shown
-                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+                trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+
                 return $options['virtual'];
             }
 

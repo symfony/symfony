@@ -48,14 +48,14 @@ class Cookie
     /**
      * Sets a cookie.
      *
-     * @param string  $name         The cookie name
-     * @param string  $value        The value of the cookie
-     * @param string  $expires      The time the cookie expires
-     * @param string  $path         The path on the server in which the cookie will be available on
-     * @param string  $domain       The domain that the cookie is available
-     * @param bool    $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
-     * @param bool    $httponly     The cookie httponly flag
-     * @param bool    $encodedValue Whether the value is encoded or not
+     * @param string $name         The cookie name
+     * @param string $value        The value of the cookie
+     * @param string $expires      The time the cookie expires
+     * @param string $path         The path on the server in which the cookie will be available on
+     * @param string $domain       The domain that the cookie is available
+     * @param bool   $secure       Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
+     * @param bool   $httponly     The cookie httponly flag
+     * @param bool   $encodedValue Whether the value is encoded or not
      *
      * @api
      */
@@ -297,7 +297,7 @@ class Cookie
     /**
      * Returns the secure flag of the cookie.
      *
-     * @return bool    The cookie secure flag
+     * @return bool The cookie secure flag
      *
      * @api
      */
@@ -309,7 +309,7 @@ class Cookie
     /**
      * Returns the httponly flag of the cookie.
      *
-     * @return bool    The cookie httponly flag
+     * @return bool The cookie httponly flag
      *
      * @api
      */
@@ -321,7 +321,7 @@ class Cookie
     /**
      * Returns true if the cookie has expired.
      *
-     * @return bool    true if the cookie has expired, false otherwise
+     * @return bool true if the cookie has expired, false otherwise
      *
      * @api
      */

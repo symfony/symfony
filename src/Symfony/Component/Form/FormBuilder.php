@@ -245,7 +245,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Converts an unresolved child into a {@link FormBuilder} instance.
      *
-     * @param  string $name The name of the unresolved child.
+     * @param string $name The name of the unresolved child.
      *
      * @return FormBuilder The created instance.
      */

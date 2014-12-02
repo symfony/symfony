@@ -25,7 +25,7 @@ abstract class Transformer
      * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
      * @param int       $length   The formatted value string length
      *
-     * @return string               The formatted value
+     * @return string The formatted value
      */
     abstract public function format(\DateTime $dateTime, $length);
 
@@ -34,7 +34,7 @@ abstract class Transformer
      *
      * @param int $length The length of the value to be reverse matched
      *
-     * @return string           The reverse matching regular expression
+     * @return string The reverse matching regular expression
      */
     abstract public function getReverseMatchingRegExp($length);
 
@@ -45,7 +45,7 @@ abstract class Transformer
      * @param string $matched The matched value
      * @param int    $length  The length of the Transformer pattern string
      *
-     * @return array             An associative array
+     * @return array An associative array
      */
     abstract public function extractDateOptions($matched, $length);
 
@@ -55,7 +55,7 @@ abstract class Transformer
      * @param string $value  The string to be padded
      * @param int    $length The length to pad
      *
-     * @return string           The padded string
+     * @return string The padded string
      */
     protected function padLeft($value, $length)
     {

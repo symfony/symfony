@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+trigger_error('The "Symfony\Component\Validator\Mapping\ElementMetadata" class was deprecated in version 2.5 and will be removed in 3.0. Use "Symfony\Component\Validator\Mapping\GenericMetadata" instead.', E_USER_DEPRECATED);
+
 /**
  * Contains the metadata of a structural element.
  *

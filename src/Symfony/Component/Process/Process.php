@@ -131,12 +131,12 @@ class Process
     /**
      * Constructor.
      *
-     * @param string             $commandline The command line to run
-     * @param string|null        $cwd         The working directory or null to use the working dir of the current PHP process
-     * @param array|null         $env         The environment variables or null to inherit
-     * @param string|null        $input       The input
-     * @param int|float|null     $timeout     The timeout in seconds or null to disable
-     * @param array              $options     An array of options for proc_open
+     * @param string         $commandline The command line to run
+     * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env         The environment variables or null to inherit
+     * @param string|null    $input       The input
+     * @param int|float|null $timeout     The timeout in seconds or null to disable
+     * @param array          $options     An array of options for proc_open
      *
      * @throws RuntimeException When proc_open is not installed
      *
@@ -195,7 +195,7 @@ class Process
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
      *
-     * @return int     The exit status code
+     * @return int The exit status code
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
@@ -339,7 +339,7 @@ class Process
      *
      * @param callable|null $callback A valid PHP callback
      *
-     * @return int     The exitcode of the process
+     * @return int The exitcode of the process
      *
      * @throws RuntimeException When process timed out
      * @throws RuntimeException When process stopped after receiving signal
@@ -375,7 +375,7 @@ class Process
     /**
      * Returns the Pid (process identifier), if applicable.
      *
-     * @return int|null     The process id if running, null otherwise
+     * @return int|null The process id if running, null otherwise
      *
      * @throws RuntimeException In case --enable-sigchild is activated
      */
@@ -393,7 +393,7 @@ class Process
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param  int     $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param int $signal A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
      *
      * @return Process
      *
@@ -580,7 +580,7 @@ class Process
     /**
      * Returns the exit code returned by the process.
      *
-     * @return null|int     The exit status code, null if the Process is not terminated
+     * @return null|int The exit status code, null if the Process is not terminated
      *
      * @throws RuntimeException In case --enable-sigchild is activated and the sigchild compatibility mode is disabled
      *
@@ -622,7 +622,7 @@ class Process
     /**
      * Checks if the process ended successfully.
      *
-     * @return bool    true if the process ended successfully, false otherwise
+     * @return bool true if the process ended successfully, false otherwise
      *
      * @api
      */
@@ -724,7 +724,7 @@ class Process
     /**
      * Checks if the process is currently running.
      *
-     * @return bool    true if the process is currently running, false otherwise
+     * @return bool true if the process is currently running, false otherwise
      */
     public function isRunning()
     {
@@ -740,7 +740,7 @@ class Process
     /**
      * Checks if the process has been started with no regard to the current state.
      *
-     * @return bool    true if status is ready, false otherwise
+     * @return bool true if status is ready, false otherwise
      */
     public function isStarted()
     {
@@ -750,7 +750,7 @@ class Process
     /**
      * Checks if the process is terminated.
      *
-     * @return bool    true if process is terminated, false otherwise
+     * @return bool true if process is terminated, false otherwise
      */
     public function isTerminated()
     {
@@ -776,10 +776,10 @@ class Process
     /**
      * Stops the process.
      *
-     * @param int|float     $timeout The timeout in seconds
-     * @param int           $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
+     * @param int|float $timeout The timeout in seconds
+     * @param int       $signal  A POSIX signal to send in case the process has not stop at timeout, default is SIGKILL
      *
-     * @return int     The exit-code of the process
+     * @return int The exit-code of the process
      *
      * @throws RuntimeException if the process got signaled
      */
@@ -889,7 +889,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param int|float|null     $timeout The timeout in seconds
+     * @param int|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance
      *
@@ -928,7 +928,7 @@ class Process
     /**
      * Enables or disables the TTY mode.
      *
-     * @param bool    $tty True to enabled and false to disable
+     * @param bool $tty True to enabled and false to disable
      *
      * @return self The current Process instance
      *
@@ -948,7 +948,7 @@ class Process
     /**
      * Checks if the TTY mode is enabled.
      *
-     * @return bool    true if the TTY mode is enabled, false otherwise
+     * @return bool true if the TTY mode is enabled, false otherwise
      */
     public function isTty()
     {
@@ -1057,6 +1057,8 @@ class Process
      */
     public function getStdin()
     {
+        trigger_error('getStdin() is deprecated since version 2.5 and will be removed in 3.0, use getInput() instead.', E_USER_DEPRECATED);
+
         return $this->getInput();
     }
 
@@ -1085,6 +1087,8 @@ class Process
      */
     public function setStdin($stdin)
     {
+        trigger_error('setStdin() is deprecated since version 2.5 and will be removed in 3.0, use setInput() instead.', E_USER_DEPRECATED);
+
         return $this->setInput($stdin);
     }
 
@@ -1149,7 +1153,7 @@ class Process
     /**
      * Sets whether or not Windows compatibility is enabled.
      *
-     * @param bool    $enhance
+     * @param bool $enhance
      *
      * @return self The current Process instance
      */
@@ -1177,7 +1181,7 @@ class Process
      * determine the success of a process when PHP has been compiled with
      * the --enable-sigchild option
      *
-     * @param bool    $enhance
+     * @param bool $enhance
      *
      * @return self The current Process instance
      */
@@ -1299,7 +1303,7 @@ class Process
     /**
      * Updates the status of the process, reads pipes.
      *
-     * @param bool    $blocking Whether to use a blocking read call.
+     * @param bool $blocking Whether to use a blocking read call.
      */
     protected function updateStatus($blocking)
     {
@@ -1363,8 +1367,8 @@ class Process
     /**
      * Reads pipes, executes callback.
      *
-     * @param bool    $blocking Whether to use blocking calls or not.
-     * @param bool    $close    Whether to close file handles or not.
+     * @param bool $blocking Whether to use blocking calls or not.
+     * @param bool $close    Whether to close file handles or not.
      */
     private function readPipes($blocking, $close)
     {
@@ -1392,7 +1396,7 @@ class Process
     /**
      * Closes process resource, closes file handles, sets the exitcode.
      *
-     * @return int     The exitcode
+     * @return int The exitcode
      */
     private function close()
     {
@@ -1438,10 +1442,10 @@ class Process
     /**
      * Sends a POSIX signal to the process.
      *
-     * @param  int     $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
-     * @param  bool    $throwException Whether to throw exception in case signal failed
+     * @param int  $signal         A valid POSIX signal (see http://www.php.net/manual/en/pcntl.constants.php)
+     * @param bool $throwException Whether to throw exception in case signal failed
      *
-     * @return bool    True if the signal was sent successfully, false otherwise
+     * @return bool True if the signal was sent successfully, false otherwise
      *
      * @throws LogicException   In case the process is not running
      * @throws RuntimeException In case --enable-sigchild is activated

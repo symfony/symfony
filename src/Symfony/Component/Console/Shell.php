@@ -163,7 +163,7 @@ EOF;
      *
      * @param string $text The last segment of the entered text
      *
-     * @return bool|array    A list of guessed strings or true
+     * @return bool|array A list of guessed strings or true
      */
     private function autocompleter($text)
     {

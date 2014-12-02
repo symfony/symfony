@@ -105,7 +105,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
               ->method('read')
               ->will($this->returnValue($metadata));
 
-        $this->assertEquals($metadata,$factory->getMetadataFor(self::PARENTCLASS));
+        $this->assertEquals($metadata, $factory->getMetadataFor(self::PARENTCLASS));
     }
 }
 

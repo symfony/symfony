@@ -47,7 +47,7 @@ class GetResponseForExceptionEvent extends GetResponseEvent
     /**
      * Returns the thrown exception
      *
-     * @return \Exception  The thrown exception
+     * @return \Exception The thrown exception
      *
      * @api
      */

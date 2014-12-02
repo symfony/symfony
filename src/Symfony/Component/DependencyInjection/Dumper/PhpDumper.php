@@ -105,6 +105,7 @@ class PhpDumper extends Dumper
      */
     public function dump(array $options = array())
     {
+        $this->targetDirRegex = null;
         $options = array_merge(array(
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
@@ -126,6 +127,7 @@ class PhpDumper extends Dumper
             $this->endClass().
             $this->addProxyClasses()
         ;
+        $this->targetDirRegex = null;
 
         return $code;
     }
@@ -254,7 +256,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      *
-     * @throws RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
     private function addServiceInlinedDefinitions($id, $definition)
@@ -1020,9 +1022,9 @@ EOF;
     /**
      * Exports parameters.
      *
-     * @param array   $parameters
-     * @param string  $path
-     * @param int     $indent
+     * @param array  $parameters
+     * @param string $path
+     * @param int    $indent
      *
      * @return string
      *
@@ -1043,7 +1045,7 @@ EOF;
             } elseif ($value instanceof Expression) {
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
             } else {
-                $value = var_export($value, true);
+                $value = $this->export($value);
             }
 
             $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);
@@ -1093,9 +1095,9 @@ EOF;
     /**
      * Builds service calls from arguments.
      *
-     * @param array  $arguments
-     * @param array  &$calls    By reference
-     * @param array  &$behavior By reference
+     * @param array $arguments
+     * @param array &$calls    By reference
+     * @param array &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1173,10 +1175,10 @@ EOF;
     /**
      * Checks if a service id has a reference.
      *
-     * @param string  $id
-     * @param array   $arguments
-     * @param bool    $deep
-     * @param array   $visited
+     * @param string $id
+     * @param array  $arguments
+     * @param bool   $deep
+     * @param array  $visited
      *
      * @return bool
      */
@@ -1212,8 +1214,8 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param mixed   $value
-     * @param bool    $interpolate
+     * @param mixed $value
+     * @param bool  $interpolate
      *
      * @return string
      *
@@ -1307,14 +1309,14 @@ EOF;
                     return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 
-                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));
+                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
 
                 return $code;
             }
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         } else {
-            return var_export($value, true);
+            return $this->export($value);
         }
     }
 

@@ -28,7 +28,7 @@ interface LoaderInterface
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|bool    false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
      */

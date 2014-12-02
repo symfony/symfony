@@ -72,7 +72,7 @@ class Collator
      *
      * @param string $locale The locale code. The only currently supported locale is "en".
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
      */
     public function __construct($locale)
     {
@@ -88,7 +88,7 @@ class Collator
      *
      * @return Collator
      *
-     * @throws MethodArgumentValueNotImplementedException  When $locale different than "en" is passed
+     * @throws MethodArgumentValueNotImplementedException When $locale different than "en" is passed
      */
     public static function create($locale)
     {
@@ -98,13 +98,13 @@ class Collator
     /**
      * Sort array maintaining index association
      *
-     * @param array   &$array    Input array
-     * @param int     $sortFlag  Flags for sorting, can be one of the following:
-     *                           Collator::SORT_REGULAR - compare items normally (don't change types)
-     *                           Collator::SORT_NUMERIC - compare items numerically
-     *                           Collator::SORT_STRING - compare items as strings
+     * @param array &$array   Input array
+     * @param int   $sortFlag Flags for sorting, can be one of the following:
+     *                        Collator::SORT_REGULAR - compare items normally (don't change types)
+     *                        Collator::SORT_NUMERIC - compare items numerically
+     *                        Collator::SORT_STRING - compare items as strings
      *
-     * @return bool    True on success or false on failure
+     * @return bool True on success or false on failure
      */
     public function asort(&$array, $sortFlag = self::SORT_REGULAR)
     {
@@ -125,10 +125,10 @@ class Collator
      * @param string $str1 The first string to compare
      * @param string $str2 The second string to compare
      *
-     * @return bool|int        Return the comparison result or false on failure:
-     *                         1 if $str1 is greater than $str2
-     *                         0 if $str1 is equal than $str2
-     *                         -1 if $str1 is less than $str2
+     * @return bool|int Return the comparison result or false on failure:
+     *                  1 if $str1 is greater than $str2
+     *                  0 if $str1 is equal than $str2
+     *                  -1 if $str1 is less than $str2
      *
      * @see http://www.php.net/manual/en/collator.compare.php
      *
@@ -144,7 +144,7 @@ class Collator
      *
      * @param int $attr An attribute specifier, one of the attribute constants
      *
-     * @return bool|int      The attribute value on success or false on error
+     * @return bool|int The attribute value on success or false on error
      *
      * @see http://www.php.net/manual/en/collator.getattribute.php
      *
@@ -207,7 +207,7 @@ class Collator
     /**
      * Not supported. Get current collator's strength
      *
-     * @return bool|int      The current collator's strength or false on failure
+     * @return bool|int The current collator's strength or false on failure
      *
      * @see http://www.php.net/manual/en/collator.getstrength.php
      *
@@ -224,7 +224,7 @@ class Collator
      * @param int $attr An attribute specifier, one of the attribute constants
      * @param int $val  The attribute value, one of the attribute value constants
      *
-     * @return bool    True on success or false on failure
+     * @return bool True on success or false on failure
      *
      * @see http://www.php.net/manual/en/collator.setattribute.php
      *
@@ -239,14 +239,14 @@ class Collator
      * Not supported. Set the collator's strength
      *
      * @param int $strength Strength to set, possible values:
-     *                           Collator::PRIMARY
-     *                           Collator::SECONDARY
-     *                           Collator::TERTIARY
-     *                           Collator::QUATERNARY
-     *                           Collator::IDENTICAL
-     *                           Collator::DEFAULT
+     *                      Collator::PRIMARY
+     *                      Collator::SECONDARY
+     *                      Collator::TERTIARY
+     *                      Collator::QUATERNARY
+     *                      Collator::IDENTICAL
+     *                      Collator::DEFAULT
      *
-     * @return bool    True on success or false on failure
+     * @return bool True on success or false on failure
      *
      * @see http://www.php.net/manual/en/collator.setstrength.php
      *
@@ -260,9 +260,9 @@ class Collator
     /**
      * Not supported. Sort array using specified collator and sort keys
      *
-     * @param  array   &$arr   Array of strings to sort
+     * @param array &$arr Array of strings to sort
      *
-     * @return bool    True on success or false on failure
+     * @return bool True on success or false on failure
      *
      * @see http://www.php.net/manual/en/collator.sortwithsortkeys.php
      *
@@ -276,13 +276,13 @@ class Collator
     /**
      * Not supported. Sort array using specified collator
      *
-     * @param  array   &$arr       Array of string to sort
-     * @param int $sortFlag Optional sorting type, one of the following:
-     *                             Collator::SORT_REGULAR
-     *                             Collator::SORT_NUMERIC
-     *                             Collator::SORT_STRING
+     * @param array &$arr     Array of string to sort
+     * @param int   $sortFlag Optional sorting type, one of the following:
+     *                        Collator::SORT_REGULAR
+     *                        Collator::SORT_NUMERIC
+     *                        Collator::SORT_STRING
      *
-     * @return bool    True on success or false on failure
+     * @return bool True on success or false on failure
      *
      * @see http://www.php.net/manual/en/collator.sort.php
      *

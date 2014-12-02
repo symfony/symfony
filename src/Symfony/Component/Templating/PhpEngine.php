@@ -197,7 +197,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return bool    true if the helper is defined, false otherwise
+     * @return bool true if the helper is defined, false otherwise
      *
      * @api
      */
@@ -283,7 +283,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $name The helper name
      *
-     * @return bool    true if the helper is defined, false otherwise
+     * @return bool true if the helper is defined, false otherwise
      *
      * @api
      */
@@ -400,7 +400,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @param string $context The context name
      *
-     * @return mixed  $escaper A PHP callable
+     * @return mixed $escaper A PHP callable
      *
      * @throws \InvalidArgumentException
      *

@@ -69,16 +69,16 @@ class ChoiceList implements ChoiceListInterface
     /**
      * Creates a new choice list.
      *
-     * @param array|\Traversable $choices The array of choices. Choices may also be given
-     *                                    as hierarchy of unlimited depth. Hierarchies are
-     *                                    created by creating nested arrays. The title of
-     *                                    the sub-hierarchy can be stored in the array
-     *                                    key pointing to the nested array. The topmost
-     *                                    level of the hierarchy may also be a \Traversable.
-     * @param array $labels               The array of labels. The structure of this array
-     *                                    should match the structure of $choices.
-     * @param array $preferredChoices     A flat array of choices that should be
-     *                                    presented to the user with priority.
+     * @param array|\Traversable $choices          The array of choices. Choices may also be given
+     *                                             as hierarchy of unlimited depth. Hierarchies are
+     *                                             created by creating nested arrays. The title of
+     *                                             the sub-hierarchy can be stored in the array
+     *                                             key pointing to the nested array. The topmost
+     *                                             level of the hierarchy may also be a \Traversable.
+     * @param array              $labels           The array of labels. The structure of this array
+     *                                             should match the structure of $choices.
+     * @param array              $preferredChoices A flat array of choices that should be
+     *                                             presented to the user with priority.
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */

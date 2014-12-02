@@ -227,7 +227,7 @@ class Translator implements TranslatorInterface
     }
 
     /**
-     * @param XPathExpr $xpath
+     * @param XPathExpr    $xpath
      * @param FunctionNode $function
      *
      * @return XPathExpr

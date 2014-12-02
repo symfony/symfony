@@ -352,10 +352,10 @@ class SecurityExtension extends Extension
         }
 
         // Determine default entry point
-        $defaultEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
+        $configuredEntryPoint = isset($firewall['entry_point']) ? $firewall['entry_point'] : null;
 
         // Authentication listeners
-        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $defaultEntryPoint);
+        list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $configuredEntryPoint);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -368,7 +368,7 @@ class SecurityExtension extends Extension
         $listeners[] = new Reference('security.access_listener');
 
         // Exception listener
-        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $defaultEntryPoint));
+        $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint));
 
         return array($matcher, $listeners, $exceptionListener);
     }

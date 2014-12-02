@@ -97,18 +97,18 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
     public function testGet()
     {
         $bag = new HeaderBag(array('foo' => 'bar', 'fuzz' => 'bizz'));
-        $this->assertEquals( 'bar', $bag->get('foo'), '->get return current value');
-        $this->assertEquals( 'bar', $bag->get('FoO'), '->get key in case insensitive');
-        $this->assertEquals( array('bar'), $bag->get('foo', 'nope', false), '->get return the value as array');
+        $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
+        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case insensitive');
+        $this->assertEquals(array('bar'), $bag->get('foo', 'nope', false), '->get return the value as array');
 
         // defaults
         $this->assertNull($bag->get('none'), '->get unknown values returns null');
-        $this->assertEquals( 'default', $bag->get('none', 'default'), '->get unknown values returns default');
-        $this->assertEquals( array('default'), $bag->get('none', 'default', false), '->get unknown values returns default as array');
+        $this->assertEquals('default', $bag->get('none', 'default'), '->get unknown values returns default');
+        $this->assertEquals(array('default'), $bag->get('none', 'default', false), '->get unknown values returns default as array');
 
         $bag->set('foo', 'bor', false);
-        $this->assertEquals( 'bar', $bag->get('foo'), '->get return first value');
-        $this->assertEquals( array('bar', 'bor'), $bag->get('foo', 'nope', false), '->get return all values as array');
+        $this->assertEquals('bar', $bag->get('foo'), '->get return first value');
+        $this->assertEquals(array('bar', 'bor'), $bag->get('foo', 'nope', false), '->get return all values as array');
     }
 
     public function testSetAssociativeArray()
@@ -125,16 +125,16 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
     public function testContains()
     {
         $bag = new HeaderBag(array('foo' => 'bar', 'fuzz' => 'bizz'));
-        $this->assertTrue(  $bag->contains('foo', 'bar'), '->contains first value');
-        $this->assertTrue(  $bag->contains('fuzz', 'bizz'), '->contains second value');
-        $this->assertFalse(  $bag->contains('nope', 'nope'), '->contains unknown value');
-        $this->assertFalse(  $bag->contains('foo', 'nope'), '->contains unknown value');
+        $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
+        $this->assertTrue($bag->contains('fuzz', 'bizz'), '->contains second value');
+        $this->assertFalse($bag->contains('nope', 'nope'), '->contains unknown value');
+        $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
 
         // Multiple values
         $bag->set('foo', 'bor', false);
-        $this->assertTrue(  $bag->contains('foo', 'bar'), '->contains first value');
-        $this->assertTrue(  $bag->contains('foo', 'bor'), '->contains second value');
-        $this->assertFalse(  $bag->contains('foo', 'nope'), '->contains unknown value');
+        $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
+        $this->assertTrue($bag->contains('foo', 'bor'), '->contains second value');
+        $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
     }
 
     public function testCacheControlDirectiveAccessors()

@@ -160,7 +160,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @param        $message
+     * @param mixed  $message
      * @param array  $parameters
      * @param string $propertyPath
      * @param string $invalidValue
@@ -350,7 +350,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
     }
 
     /**
-     * @param        $message
+     * @param mixed  $message
      * @param array  $parameters
      * @param string $propertyPath
      * @param string $invalidValue

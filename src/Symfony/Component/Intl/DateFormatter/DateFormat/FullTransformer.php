@@ -84,7 +84,7 @@ class FullTransformer
      *
      * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
      *
-     * @return string               The formatted value
+     * @return string The formatted value
      */
     public function format(\DateTime $dateTime)
     {
@@ -103,9 +103,9 @@ class FullTransformer
      * @param string    $dateChars The date characters to be replaced with a formatted ICU value
      * @param \DateTime $dateTime  A DateTime object to be used to generate the formatted value
      *
-     * @return string                   The formatted value
+     * @return string The formatted value
      *
-     * @throws NotImplementedException  When it encounters a not implemented date character
+     * @throws NotImplementedException When it encounters a not implemented date character
      */
     public function formatReplace($dateChars, $dateTime)
     {
@@ -131,11 +131,11 @@ class FullTransformer
      * Parse a pattern based string to a timestamp value
      *
      * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
-     * @param string   $value    String to convert to a time value
+     * @param string    $value    String to convert to a time value
      *
-     * @return int                       The corresponding Unix timestamp
+     * @return int The corresponding Unix timestamp
      *
-     * @throws \InvalidArgumentException  When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
     public function parse(\DateTime $dateTime, $value)
     {
@@ -171,8 +171,8 @@ class FullTransformer
      *
      * @param string $pattern The pattern to create the reverse matching regular expression
      *
-     * @return string            The reverse matching regular expression with named captures being formed by the
-     *                           transformer index in the $transformer array
+     * @return string The reverse matching regular expression with named captures being formed by the
+     *                transformer index in the $transformer array
      */
     public function getReverseMatchingRegExp($pattern)
     {
@@ -210,7 +210,7 @@ class FullTransformer
      *
      * @param string $quoteMatch The string to check
      *
-     * @return bool                 true if matches, false otherwise
+     * @return bool true if matches, false otherwise
      */
     public function isQuoteMatch($quoteMatch)
     {
@@ -222,7 +222,7 @@ class FullTransformer
      *
      * @param string $quoteMatch The string to replace the quotes
      *
-     * @return string               A string with the single quotes replaced
+     * @return string A string with the single quotes replaced
      */
     public function replaceQuoteMatch($quoteMatch)
     {
@@ -238,7 +238,7 @@ class FullTransformer
      *
      * @param string $specialChars A string of chars to build the regular expression
      *
-     * @return string                 The chars match regular expression
+     * @return string The chars match regular expression
      */
     protected function buildCharsMatch($specialChars)
     {
@@ -284,7 +284,7 @@ class FullTransformer
      * @param \DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param array     $options  An array with the matched values to be used to calculate the timestamp
      *
-     * @return bool|int           The calculated timestamp or false if matched date is invalid
+     * @return bool|int The calculated timestamp or false if matched date is invalid
      */
     protected function calculateUnixTimestamp(\DateTime $dateTime, array $options)
     {

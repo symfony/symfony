@@ -47,7 +47,7 @@ abstract class Helper implements HelperInterface
      *
      * @param string $string The string to check its length
      *
-     * @return int     The length of the string
+     * @return int The length of the string
      */
     public static function strlen($string)
     {

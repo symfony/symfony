@@ -73,7 +73,7 @@ class BinaryFileResponse extends Response
     /**
      * Sets the file to stream.
      *
-     * @param \SplFileInfo|string $file The file to stream
+     * @param \SplFileInfo|string $file               The file to stream
      * @param string              $contentDisposition
      * @param bool                $autoEtag
      * @param bool                $autoLastModified

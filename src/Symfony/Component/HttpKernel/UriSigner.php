@@ -54,7 +54,7 @@ class UriSigner
      *
      * @param string $uri A signed URI
      *
-     * @return bool    True if the URI is signed correctly, false otherwise
+     * @return bool True if the URI is signed correctly, false otherwise
      */
     public function check($uri)
     {

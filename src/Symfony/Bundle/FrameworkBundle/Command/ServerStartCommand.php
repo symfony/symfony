@@ -71,11 +71,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (defined('HHVM_VERSION')) {
-            $output->writeln('<error>This command is not supported on HHVM.</error>');
-
-            return 1;
-        }
         if (!extension_loaded('pcntl')) {
             $output->writeln('<error>This command needs the pcntl extension to run.</error>');
             $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');

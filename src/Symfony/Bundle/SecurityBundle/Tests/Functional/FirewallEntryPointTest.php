@@ -35,6 +35,20 @@ class FirewallEntryPointTest extends WebTestCase
         );
     }
 
+    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
+    {
+        $client = $this->createClient(array('test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml'));
+        $client->insulate();
+
+        $client->request('GET', '/secure/resource');
+
+        $this->assertEquals(
+            EntryPointStub::RESPONSE_TEXT,
+            $client->getResponse()->getContent(),
+            "Custom entry point wasn't started"
+        );
+    }
+
     protected function setUp()
     {
         parent::setUp();

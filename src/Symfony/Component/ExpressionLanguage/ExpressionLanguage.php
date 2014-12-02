@@ -71,7 +71,7 @@ class ExpressionLanguage
      *
      * @return ParsedExpression A ParsedExpression instance
      */
-    public function parse($expression, $names)
+    public function parse($expression, $names = array())
     {
         if ($expression instanceof ParsedExpression) {
             return $expression;

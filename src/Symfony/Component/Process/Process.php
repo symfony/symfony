@@ -1247,14 +1247,13 @@ class Process
      */
     protected function buildCallback($callback)
     {
-        $that = $this;
         $out = self::OUT;
         $err = self::ERR;
-        $callback = function ($type, $data) use ($that, $callback, $out, $err) {
+        $callback = function ($type, $data) use ($callback, $out, $err) {
             if ($out == $type) {
-                $that->addOutput($data);
+                $this->addOutput($data);
             } else {
-                $that->addErrorOutput($data);
+                $this->addErrorOutput($data);
             }
 
             if (null !== $callback) {

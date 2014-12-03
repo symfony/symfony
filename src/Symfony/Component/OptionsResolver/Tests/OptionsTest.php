@@ -31,9 +31,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetLazyOption()
     {
-        $test = $this;
-
-        $this->options->set('foo', function (Options $options) use ($test) {
+        $this->options->set('foo', function (Options $options) {
            return 'dynamic';
         });
 
@@ -42,15 +40,12 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testOverloadKeepsPreviousValue()
     {
-        $test = $this;
-
         // defined by superclass
         $this->options->set('foo', 'bar');
 
         // defined by subclass
-        $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $previousValue);
+        $this->options->overload('foo', function (Options $options, $previousValue) {
+            $this->assertEquals('bar', $previousValue);
 
             return 'dynamic';
         });
@@ -60,17 +55,14 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testPreviousValueIsEvaluatedIfLazy()
     {
-        $test = $this;
-
         // defined by superclass
         $this->options->set('foo', function (Options $options) {
             return 'bar';
         });
 
         // defined by subclass
-        $this->options->overload('foo', function (Options $options, $previousValue) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $previousValue);
+        $this->options->overload('foo', function (Options $options, $previousValue) {
+            $this->assertEquals('bar', $previousValue);
 
             return 'dynamic';
         });
@@ -80,15 +72,13 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testPreviousValueIsNotEvaluatedIfNoSecondArgument()
     {
-        $test = $this;
-
         // defined by superclass
-        $this->options->set('foo', function (Options $options) use ($test) {
-            $test->fail('Should not be called');
+        $this->options->set('foo', function (Options $options) {
+            $this->fail('Should not be called');
         });
 
         // defined by subclass, no $previousValue argument defined!
-        $this->options->overload('foo', function (Options $options) use ($test) {
+        $this->options->overload('foo', function (Options $options) {
             return 'dynamic';
         });
 
@@ -97,13 +87,10 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testLazyOptionCanAccessOtherOptions()
     {
-        $test = $this;
-
         $this->options->set('foo', 'bar');
 
-        $this->options->set('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $options->get('foo'));
+        $this->options->set('bam', function (Options $options) {
+            $this->assertEquals('bar', $options->get('foo'));
 
             return 'dynamic';
         });
@@ -113,15 +100,12 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testLazyOptionCanAccessOtherLazyOptions()
     {
-        $test = $this;
-
         $this->options->set('foo', function (Options $options) {
             return 'bar';
         });
 
-        $this->options->set('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $options->get('foo'));
+        $this->options->set('bam', function (Options $options) {
+            $this->assertEquals('bar', $options->get('foo'));
 
             return 'dynamic';
         });
@@ -153,14 +137,11 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizerCanAccessOtherOptions()
     {
-        $test = $this;
-
         $this->options->set('foo', 'bar');
         $this->options->set('bam', 'baz');
 
-        $this->options->setNormalizer('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $options->get('foo'));
+        $this->options->setNormalizer('bam', function (Options $options) {
+            $this->assertEquals('bar', $options->get('foo'));
 
             return 'normalized';
         });
@@ -170,16 +151,13 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizerCanAccessOtherLazyOptions()
     {
-        $test = $this;
-
         $this->options->set('foo', function (Options $options) {
             return 'bar';
         });
         $this->options->set('bam', 'baz');
 
-        $this->options->setNormalizer('bam', function (Options $options) use ($test) {
-            /* @var \PHPUnit_Framework_TestCase $test */
-            $test->assertEquals('bar', $options->get('foo'));
+        $this->options->setNormalizer('bam', function (Options $options) {
+            $this->assertEquals('bar', $options->get('foo'));
 
             return 'normalized';
         });

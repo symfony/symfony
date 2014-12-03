@@ -99,16 +99,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnMissingOptionalWithoutDefault()
     {
-        $test = $this;
-
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
-            'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertFalse(isset($options['one']));
+            'two' => function (Options $options) {
+                $this->assertFalse(isset($options['one']));
 
                 return '2';
             },
@@ -123,16 +120,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnOptionalWithoutDefault()
     {
-        $test = $this;
-
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
-            'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertTrue(isset($options['one']));
+            'two' => function (Options $options) {
+                $this->assertTrue(isset($options['one']));
 
                 return $options['one'].'2';
             },
@@ -171,12 +165,9 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyReplaceDefaults()
     {
-        $test = $this;
-
         $this->resolver->setDefaults(array(
-            'one' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->fail('Previous closure should not be executed');
+            'one' => function (Options $options) {
+                $this->fail('Previous closure should not be executed');
             },
         ));
 

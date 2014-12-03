@@ -82,6 +82,6 @@ class SessionExpirationListener implements ListenerInterface
      */
     private function hasSessionExpired(SessionInterface $session)
     {
-        return time() - $session->getMetadataBag()->getLastUsed() > $this->maxIdleTime;
+        return time() - $session->getMetadataBag()->getLastUsed() >= $this->maxIdleTime;
     }
 }

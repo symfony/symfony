@@ -25,7 +25,7 @@ security:
                 default_target_path: /profile
             anonymous: ~
             session_expiration:
-                max_idle_time: 2
+                max_idle_time: 1
                 expiration_url: /expired
 
     access_control:

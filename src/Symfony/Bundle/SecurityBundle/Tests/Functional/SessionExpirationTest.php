@@ -29,7 +29,7 @@ class SessionExpirationTest extends WebTestCase
         $client->request('GET', '/protected_resource');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        sleep(3); //Wait for session to expire
+        sleep(1); //Wait for session to expire
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/expired');
     }

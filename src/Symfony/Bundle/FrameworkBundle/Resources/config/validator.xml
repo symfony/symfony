@@ -9,7 +9,7 @@
     </parameters>
 
     <services>
-        <service id="validator" class="Symfony\Component\Validator\ValidatorInterface" factory-service="validator.builder" factory-method="getValidator" />
+        <service id="validator" class="Symfony\Component\Validator\Validator\ValidatorInterface" factory-service="validator.builder" factory-method="getValidator" />
 
         <service id="validator.builder" class="Symfony\Component\Validator\ValidatorBuilderInterface" factory-class="Symfony\Component\Validator\Validation" factory-method="createValidatorBuilder">
             <call method="setConstraintValidatorFactory">

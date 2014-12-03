@@ -53,7 +53,7 @@ class ArrayNode extends Node
         return $result;
     }
 
-    protected function getKeyValuePairs()
+    public function getKeyValuePairs()
     {
         $pairs = array();
         foreach (array_chunk($this->nodes, 2) as $pair) {

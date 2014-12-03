@@ -23,11 +23,14 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
+        $this->parameters = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
 
         $this->set('service_container', $this);
 
@@ -369,18 +372,5 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
-    }
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
     }
 }

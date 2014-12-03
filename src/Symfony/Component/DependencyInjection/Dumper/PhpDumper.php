@@ -823,6 +823,8 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$parameters;
+
 EOF;
     }
 
@@ -833,7 +835,7 @@ EOF;
      */
     private function addConstructor()
     {
-        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
         $code = <<<EOF
 
@@ -842,7 +844,9 @@ EOF;
      */
     public function __construct()
     {
-        parent::__construct($arguments);
+        \$this->parameters = $parameters;
+
+        parent::__construct(new ParameterBag(\$this->parameters));
 
 EOF;
 
@@ -870,26 +874,19 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $code = <<<EOF
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
 
-    private \$parameters;
+        $code = <<<EOF
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-EOF;
-
-        if ($this->container->getParameterBag()->all()) {
-            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
-        }
-
-        $code .= <<<EOF
-
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
+        \$this->parameters = $parameters;
 
         \$this->set('service_container', \$this);
 
@@ -994,8 +991,6 @@ EOF;
             return '';
         }
 
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
-
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
@@ -1043,22 +1038,9 @@ EOF;
 
         return \$this->parameterBag;
     }
+
 EOF;
         }
-
-        $code .= <<<EOF
-
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return $parameters;
-    }
-
-EOF;
 
         return $code;
     }

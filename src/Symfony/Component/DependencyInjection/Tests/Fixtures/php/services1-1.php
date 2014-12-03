@@ -17,11 +17,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class Container extends AbstractContainer
 {
+    private $parameters;
+
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct();
+        $this->parameters = array(
+
+        );
+
+        parent::__construct(new ParameterBag($this->parameters));
     }
 }

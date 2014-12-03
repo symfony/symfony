@@ -52,7 +52,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getSymbol($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -64,7 +64,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getName($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -76,7 +76,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -88,7 +88,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getFractionDigits($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -100,7 +100,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getRoundingIncrement($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -112,7 +112,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 }

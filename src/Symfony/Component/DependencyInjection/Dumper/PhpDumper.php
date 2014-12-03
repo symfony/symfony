@@ -823,6 +823,8 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$parameters;
+
 EOF;
     }
 
@@ -837,14 +839,14 @@ EOF;
 
         $code = <<<EOF
 
-    private static \$parameters = $parameters;
-
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::\$parameters));
+        \$this->parameters = $parameters;
+
+        parent::__construct(new ParameterBag(\$this->parameters));
 
 EOF;
 
@@ -876,8 +878,6 @@ EOF;
 
         $code = <<<EOF
 
-    private static \$parameters = $parameters;
-
     /**
      * Constructor.
      */
@@ -886,6 +886,7 @@ EOF;
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
+        \$this->parameters = $parameters;
 
         \$this->set('service_container', \$this);
 
@@ -1001,11 +1002,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!(isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters))) {
+        if (!(isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return self::\$parameters[\$name];
+        return \$this->parameters[\$name];
     }
 
     /**
@@ -1015,7 +1016,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        return isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters);
+        return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
     }
 
     /**
@@ -1032,7 +1033,7 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-            \$this->parameterBag = new FrozenParameterBag(self::\$parameters);
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
         }
 
         return \$this->parameterBag;

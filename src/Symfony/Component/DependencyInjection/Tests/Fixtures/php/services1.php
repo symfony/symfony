@@ -16,15 +16,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
-
-        );
+    private $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::$parameters));
+        $this->parameters = array(
+
+        );
+
+        parent::__construct(new ParameterBag($this->parameters));
     }
 }

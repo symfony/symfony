@@ -16,16 +16,21 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
+    private $parameters;
+
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->parameters = $this->getDefaultParameters();
-
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
+        $this->parameters = array(
+            'foo' => ('wiz'.dirname(__DIR__)),
+            'bar' => __DIR__,
+            'baz' => (__DIR__.'/PhpDumperTest.php'),
+        );
 
         $this->set('service_container', $this);
 
@@ -36,6 +41,14 @@ class ProjectServiceContainer extends Container
         );
 
         $this->aliases = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped frozen container.');
     }
 
     /**
@@ -93,18 +106,5 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
-    }
-    /**
-     * Gets the default parameters.
-     *
-     * @return array An array of the default parameters
-     */
-    protected function getDefaultParameters()
-    {
-        return array(
-            'foo' => ('wiz'.dirname(__DIR__)),
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
-        );
     }
 }

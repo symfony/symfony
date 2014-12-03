@@ -16,11 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
+    private $parameters;
 
     /**
      * Constructor.
@@ -30,6 +26,11 @@ class ProjectServiceContainer extends Container
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
+        $this->parameters = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
 
         $this->set('service_container', $this);
 
@@ -336,11 +337,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters))) {
+        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
         }
 
-        return self::$parameters[$name];
+        return $this->parameters[$name];
     }
 
     /**
@@ -350,7 +351,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset(self::$parameters[$name]) || array_key_exists($name, self::$parameters);
+        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
     }
 
     /**
@@ -367,7 +368,7 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag(self::$parameters);
+            $this->parameterBag = new FrozenParameterBag($this->parameters);
         }
 
         return $this->parameterBag;

@@ -89,7 +89,7 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
     {
         $constraint = new Choice(array('callback' => function () {
             return array('foo', 'bar');
-        }, ));
+        }));
 
         $this->validator->validate('bar', $constraint);
 

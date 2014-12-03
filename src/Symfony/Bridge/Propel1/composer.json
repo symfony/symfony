@@ -23,6 +23,8 @@
         "propel/propel1": "~1.6"
     },
     "require-dev": {
+        "symfony/dependency-injection": "2.3.*",
+        "symfony/options-resolver": "2.3.*",
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {

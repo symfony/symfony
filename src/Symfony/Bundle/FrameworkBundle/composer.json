@@ -30,13 +30,16 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.3",
-        "symfony/console": "~2.0",
+        "symfony/console": "2.3.*",
+        "symfony/dependency-injection": "2.3.*",
         "symfony/finder": "~2.0",
         "symfony/security": "~2.3",
-        "symfony/form": "~2.3.0",
+        "symfony/form": "2.3.*",
+        "symfony/http-kernel": "2.3.*",
         "symfony/class-loader": "~2.1",
+        "symfony/options-resolver": "2.3.*",
         "symfony/process": "~2.0",
-        "symfony/validator": "~2.1",
+        "symfony/validator": "2.3.*",
         "symfony/yaml": "~2.0"
     },
     "suggest": {

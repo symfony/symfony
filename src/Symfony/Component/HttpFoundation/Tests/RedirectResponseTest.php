@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use \Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class RedirectResponseTest extends \PHPUnit_Framework_TestCase
 {

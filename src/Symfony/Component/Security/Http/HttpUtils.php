@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;

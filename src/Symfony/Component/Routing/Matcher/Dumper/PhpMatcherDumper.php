@@ -305,8 +305,7 @@ EOF;
             }
             $vars[] = "array('_route' => '$name')";
 
-            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
-                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
+            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n", implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {

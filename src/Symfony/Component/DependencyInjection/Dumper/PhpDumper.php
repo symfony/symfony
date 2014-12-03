@@ -833,18 +833,16 @@ EOF;
      */
     private function addConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
 
         $code = <<<EOF
-
-    private static \$parameters = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::\$parameters));
+        parent::__construct($arguments);
 
 EOF;
 
@@ -872,17 +870,23 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
-
         $code = <<<EOF
 
-    private static \$parameters = $parameters;
+    private \$parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
+EOF;
+
+        if ($this->container->getParameterBag()->all()) {
+            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
+        }
+
+        $code .= <<<EOF
+
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
@@ -990,6 +994,8 @@ EOF;
             return '';
         }
 
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
@@ -1001,11 +1007,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!(isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters))) {
+        if (!(isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return self::\$parameters[\$name];
+        return \$this->parameters[\$name];
     }
 
     /**
@@ -1015,7 +1021,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        return isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters);
+        return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
     }
 
     /**
@@ -1032,14 +1038,27 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-            \$this->parameterBag = new FrozenParameterBag(self::\$parameters);
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
         }
 
         return \$this->parameterBag;
     }
-
 EOF;
         }
+
+        $code .= <<<EOF
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return $parameters;
+    }
+
+EOF;
 
         return $code;
     }

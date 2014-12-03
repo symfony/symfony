@@ -7,7 +7,7 @@
     <services>
         <service id="form.resolved_type_factory" class="Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy">
             <argument type="service">
-                <service class="%form.resolved_type_factory.class%" />
+                <service class="Symfony\Component\Form\ResolvedFormTypeFactory" />
             </argument>
             <argument type="service" id="data_collector.form" />
         </service>

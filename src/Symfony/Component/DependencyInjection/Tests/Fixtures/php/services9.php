@@ -16,18 +16,20 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
+    private $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::$parameters));
+        $this->parameters = array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
+
+        parent::__construct(new ParameterBag($this->parameters));
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',

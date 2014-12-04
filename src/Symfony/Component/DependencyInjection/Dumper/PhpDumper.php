@@ -767,7 +767,7 @@ $bagClass
 class $class extends $baseClass
 {
     private \$parameters;
-    private \$targetDirs;
+    private \$targetDirs = array();
 
 EOF;
     }
@@ -779,8 +779,8 @@ EOF;
      */
     private function addConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
         $targetDirs = $this->exportTargetDirs();
+        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
 
         $code = <<<EOF
 
@@ -789,9 +789,7 @@ EOF;
      */
     public function __construct()
     {{$targetDirs}
-        \$this->parameters = $parameters;
-
-        parent::__construct(new ParameterBag(\$this->parameters));
+        parent::__construct($arguments);
 
 EOF;
 
@@ -819,7 +817,6 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
         $targetDirs = $this->exportTargetDirs();
 
         $code = <<<EOF
@@ -829,10 +826,17 @@ EOF;
      */
     public function __construct()
     {{$targetDirs}
+EOF;
+
+        if ($this->container->getParameterBag()->all()) {
+            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
+        }
+
+        $code .= <<<EOF
+
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
-        \$this->parameters = $parameters;
 
         \$this->set('service_container', \$this);
 
@@ -917,6 +921,8 @@ EOF;
             return '';
         }
 
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
@@ -964,9 +970,22 @@ EOF;
 
         return \$this->parameterBag;
     }
-
 EOF;
         }
+
+        $code .= <<<EOF
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return $parameters;
+    }
+
+EOF;
 
         return $code;
     }
@@ -1357,11 +1376,10 @@ EOF;
             $prefix = $matches[0][1] ? var_export(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = $matches[0][1] + strlen($matches[0][0]);
             $suffix = isset($value[$suffix]) ? '.'.var_export(substr($value, $suffix), true) : '';
+            $dirname = '__DIR__';
 
-            if (0 < $dirname = 1 + $this->targetDirMaxMatches - count($matches)) {
-                $dirname = sprintf('$this->targetDirs[%d]', $dirname);
-            } else {
-                $dirname = '__DIR__';
+            if (0 < $offset = 1 + $this->targetDirMaxMatches - count($matches)) {
+                $dirname = sprintf('$this->targetDirs[%d]', $offset);
             }
 
             if ($prefix || $suffix) {

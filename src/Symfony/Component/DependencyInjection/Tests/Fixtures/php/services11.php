@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * ProjectServiceContainer
@@ -24,31 +24,31 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag($this->getDefaultParameters()));
+        $this->services =
+        $this->scopedServices =
+        $this->scopeStacks = array();
+
+        $this->set('service_container', $this);
+
+        $this->scopes = array();
+        $this->scopeChildren = array();
+        $this->methodMap = array(
+            'foo' => 'getFooService',
+        );
+
+        $this->aliases = array();
     }
 
     /**
-     * Gets the default parameters.
+     * Gets the 'foo' service.
      *
-     * @return array An array of the default parameters
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance.
      */
-    protected function getDefaultParameters()
+    protected function getFooService()
     {
-        return array(
-            'foo' => '%baz%',
-            'baz' => 'bar',
-            'bar' => 'foo is %%foo bar',
-            'escape' => '@escapeme',
-            'values' => array(
-                0 => true,
-                1 => false,
-                2 => NULL,
-                3 => 0,
-                4 => 1000.3,
-                5 => 'true',
-                6 => 'false',
-                7 => 'null',
-            ),
-        );
+        return $this->services['foo'] = new \stdClass();
     }
 }

@@ -37,6 +37,21 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         new PhpDumper($container);
     }
 
+    public function testDumpFrozenContainerWithNoParameter()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+        $container->register('foo', 'stdClass');
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $dumpedString = $dumper->dump();
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services11.php', $dumpedString, '->dump() does not add getDefaultParameters() method call if container have no parameters.');
+        $this->assertNotRegexp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
+    }
+
     public function testDumpOptimizationString()
     {
         $definition = new Definition();

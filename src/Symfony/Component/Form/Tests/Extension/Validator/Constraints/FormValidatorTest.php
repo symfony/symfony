@@ -367,7 +367,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $object = $this->getMock('\stdClass');
         $options = array('validation_groups' => function (FormInterface $form) {
             return array('group1', 'group2');
-        },);
+        });
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();

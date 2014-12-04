@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Intl;
 
 /**
  * Default implementation of {@link LocaleBundleInterface}.
@@ -33,7 +31,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return parent::getLocales();
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -45,7 +43,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return $this->getName($locale, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -57,7 +55,7 @@ class LocaleBundle extends LocaleDataProvider implements LocaleBundleInterface
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 }

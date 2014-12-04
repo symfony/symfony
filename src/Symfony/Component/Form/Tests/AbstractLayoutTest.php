@@ -1784,8 +1784,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertMatchesXpath($this->renderWidget($form->createView()),
             '//input[@type="hidden"][@id="_token"][@name="_token"]
             |
-             //input[@type="text"][@id="child"][@name="child"]'
-        , 2);
+             //input[@type="text"][@id="child"][@name="child"]', 2);
     }
 
     public function testButton()

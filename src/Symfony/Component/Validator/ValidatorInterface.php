@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('ValidatorInterface was deprecated in version 2.5 and will be removed in version 3.0. Please use Validator\\ValidatorInterface instead.', E_USER_DEPRECATED);
-
 /**
  * Validates values and graphs of objects and arrays.
  *

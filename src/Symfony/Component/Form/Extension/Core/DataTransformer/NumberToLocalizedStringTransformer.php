@@ -77,36 +77,57 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFEVEN = self::ROUND_HALF_EVEN;
+    const ROUND_HALFEVEN = 7;
 
     /**
      * Alias for {@link self::ROUND_HALF_UP}.
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFUP = self::ROUND_HALF_UP;
+    const ROUND_HALFUP = 8;
 
     /**
      * Alias for {@link self::ROUND_HALF_DOWN}.
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFDOWN = self::ROUND_HALF_DOWN;
+    const ROUND_HALFDOWN = 9;
 
+    /**
+     * @var int|float
+     */
     protected $precision;
 
+    /**
+     * @var boolean
+     */
     protected $grouping;
 
+    /**
+     * @var integer
+     */
     protected $roundingMode;
 
+    /**
+     * @param int|float $precision
+     * @param boolean   $grouping
+     * @param integer   $roundingMode
+     */
     public function __construct($precision = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
-        if (
-            self::ROUND_HALFEVEN === $roundingMode
-            || self::ROUND_HALFUP === $roundingMode
-            || self::ROUND_HALFDOWN === $roundingMode
-        ) {
-            trigger_error('The constants ROUND_HALFEVEN, ROUND_HALFUP and ROUND_HALFDOWN are deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_EVEN, ROUND_HALF_UP and ROUND_HALF_DOWN instead.', E_USER_DEPRECATED);
+        switch ($roundingMode) {
+            case self::ROUND_HALFEVEN:
+                trigger_error('The constant ROUND_HALFEVEN is deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_EVEN instead.', E_USER_DEPRECATED);
+                $roundingMode = self::ROUND_HALF_EVEN;
+                break;
+            case self::ROUND_HALFDOWN:
+                trigger_error('The constant ROUND_HALFDOWN is deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_DOWN instead.', E_USER_DEPRECATED);
+                $roundingMode = self::ROUND_HALF_DOWN;
+                break;
+            case self::ROUND_HALFUP:
+                trigger_error('The constant ROUND_HALFUP is deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_UP instead.', E_USER_DEPRECATED);
+            case null:
+                $roundingMode = self::ROUND_HALF_UP;
         }
 
         if (null === $grouping) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T13:22:33Z
+
+Please add deprecation notices on 2.7, but do not remove methods on 3.0 because that will cause merge conflicts headaches for merges

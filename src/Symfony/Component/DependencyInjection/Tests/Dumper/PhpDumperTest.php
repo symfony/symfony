@@ -70,13 +70,14 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition();
         $definition->setClass('stdClass');
         $definition->addArgument('%foo%');
-        $definition->addArgument(array('%foo%' => '%foo%'));
+        $definition->addArgument(array('%foo%' => '%buz%/'));
 
         $container = new ContainerBuilder();
         $container->setDefinition('test', $definition);
         $container->setParameter('foo', 'wiz'.dirname(dirname(__FILE__)));
         $container->setParameter('bar', dirname(__FILE__));
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
+        $container->setParameter('buz', dirname(dirname(__DIR__)));
         $container->compile();
 
         $dumper = new PhpDumper($container);

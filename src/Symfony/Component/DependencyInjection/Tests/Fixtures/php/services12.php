@@ -17,19 +17,25 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
+    private $targetDirs;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
+        $dir = __DIR__;
+        for ($i = 1; $i <= 5; ++$i) {
+            $this->targetDirs[$i] = $dir = dirname($dir);
+        }
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
         $this->parameters = array(
-            'foo' => ('wiz'.dirname(__DIR__)),
+            'foo' => ('wiz'.$this->targetDirs[1]),
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'buz' => $this->targetDirs[2],
         );
 
         $this->set('service_container', $this);
@@ -53,7 +59,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.dirname(__DIR__)), array(('wiz'.dirname(__DIR__)) => ('wiz'.dirname(__DIR__))));
+        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
     }
 
     /**

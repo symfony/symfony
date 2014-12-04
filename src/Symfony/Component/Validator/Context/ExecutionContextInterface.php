@@ -139,9 +139,9 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Marks an object as validated in a specific validation group.
      *
-     * @param string $cacheKey The hash of the object
-     * @param string $groupHash  The group's name or hash, if it is group
-     *                           sequence
+     * @param string $cacheKey  The hash of the object
+     * @param string $groupHash The group's name or hash, if it is group
+     *                          sequence
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
@@ -151,12 +151,12 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Returns whether an object was validated in a specific validation group.
      *
-     * @param string $cacheKey The hash of the object
-     * @param string $groupHash  The group's name or hash, if it is group
-     *                           sequence
+     * @param string $cacheKey  The hash of the object
+     * @param string $groupHash The group's name or hash, if it is group
+     *                          sequence
      *
-     * @return bool    Whether the object was already validated for that
-     *                 group
+     * @return bool Whether the object was already validated for that
+     *              group
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.
@@ -166,7 +166,7 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Marks a constraint as validated for an object.
      *
-     * @param string $cacheKey     The hash of the object
+     * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
      * @internal Used by the validator engine. Should not be called by user
@@ -177,10 +177,10 @@ interface ExecutionContextInterface extends LegacyExecutionContextInterface
     /**
      * Returns whether a constraint was validated for an object.
      *
-     * @param string $cacheKey     The hash of the object
+     * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
-     * @return bool    Whether the constraint was already validated
+     * @return bool Whether the constraint was already validated
      *
      * @internal Used by the validator engine. Should not be called by user
      *           code.

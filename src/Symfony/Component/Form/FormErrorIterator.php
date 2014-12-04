@@ -128,7 +128,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current position of the iterator.
      *
-     * @return int     The 0-indexed position.
+     * @return int The 0-indexed position.
      */
     public function key()
     {
@@ -138,7 +138,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether the iterator's position is valid.
      *
-     * @return bool    Whether the iterator is valid.
+     * @return bool Whether the iterator is valid.
      */
     public function valid()
     {
@@ -159,9 +159,9 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns whether a position exists in the iterator.
      *
-     * @param int     $position The position
+     * @param int $position The position
      *
-     * @return bool    Whether that position exists
+     * @return bool Whether that position exists
      */
     public function offsetExists($position)
     {
@@ -171,7 +171,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the element at a position in the iterator.
      *
-     * @param int     $position The position
+     * @param int $position The position
      *
      * @return FormError|FormErrorIterator The element at the given position
      *
@@ -210,7 +210,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      * Returns whether the current element of the iterator can be recursed
      * into.
      *
-     * @return bool    Whether the current element is an instance of this class
+     * @return bool Whether the current element is an instance of this class
      */
     public function hasChildren()
     {
@@ -240,7 +240,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
      *
      *     $count = count($form->getErrors(true, true));
      *
-     * @return int     The number of iterated elements
+     * @return int The number of iterated elements
      */
     public function count()
     {
@@ -250,7 +250,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Sets the position of the iterator.
      *
-     * @param int     $position The new position
+     * @param int $position The new position
      *
      * @throws OutOfBoundsException If the position is invalid
      */

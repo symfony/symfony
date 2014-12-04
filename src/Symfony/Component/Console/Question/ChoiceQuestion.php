@@ -47,7 +47,7 @@ class ChoiceQuestion extends Question
      *
      * When multiselect is set to true, multiple choices can be answered.
      *
-     * @param bool    $multiselect
+     * @param bool $multiselect
      *
      * @return ChoiceQuestion The current instance
      */

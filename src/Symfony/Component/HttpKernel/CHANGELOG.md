@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * Removed `Symfony\Component\HttpKernel\Kernel::init()`
+* Removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
 
 2.6.0
 -----

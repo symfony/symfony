@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
-use Symfony\Component\Translation\Loader\XliffFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -138,5 +138,22 @@ class XliffFileLoaderTest extends \PHPUnit_Framework_TestCase
         // message without target
         $this->assertNull($catalogue->getMetadata('extra', 'domain1'));
         $this->assertEquals(array('notes' => array(array('content' => 'baz'), array('priority' => 2, 'from' => 'bar', 'content' => 'qux'))), $catalogue->getMetadata('key', 'domain1'));
+    }
+
+    public function testLoadVersion2()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../fixtures/resources-2.0.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+        $this->assertSame(array(), libxml_get_errors());
+
+        $domains = $catalogue->all();
+        $this->assertCount(3, $domains['domain1']);
+
+        // Notes aren't assigned to specific segments, but to whole units, so there's no way to do a mapping
+        $this->assertEmpty($catalogue->getMetadata());
     }
 }

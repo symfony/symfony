@@ -41,42 +41,28 @@ class XliffFileLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $dom = $this->parseFile($resource);
-        $version = $this->getVersion($dom);
+        try {
+            $dom = XmlUtils::loadFile($resource);
+            $version = $this->getVersion($dom);
+        } catch (\InvalidArgumentException $e) {
+            $message = sprintf('Unable to load "%s": %s', $resource, $e->getMessage());
+
+            throw new InvalidResourceException($message, $e->getCode(), $e);
+        }
+
         $this->validateSchema($dom, $version->getSchema());
 
         $catalogue = new MessageCatalogue($locale);
         $version->extract($dom, $catalogue, $domain);
+
         $catalogue->addResource(new FileResource($resource));
 
         return $catalogue;
     }
 
     /**
-     * Parses the given file into a DOMDocument.
-     *
-     * @param string $file
-     *
-     * @throws \RuntimeException
-     *
-     * @return \DOMDocument
-     *
-     * @throws InvalidResourceException
-     */
-    private function parseFile($file)
-    {
-        try {
-            $dom = XmlUtils::loadFile($file);
-        } catch (\InvalidArgumentException $e) {
-            throw new InvalidResourceException(sprintf('Unable to load "%s": %s', $file, $e->getMessage()), $e->getCode(), $e);
-        }
-
-        return $dom;
-    }
-
-    /**
      * @param \DOMDocument $dom
-     * @param string $schema source of the schema
+     * @param string       $schema source of the schema
      *
      * @throws InvalidResourceException
      */
@@ -126,7 +112,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param \DOMDocument $dom
      *
-     * @throws InvalidResourceException
+     * @throws \InvalidArgumentException
      *
      * @return XliffVersion\AbstractXliffVersion
      */
@@ -134,11 +120,15 @@ class XliffFileLoader implements LoaderInterface
     {
         $versionNumber = $this->getVersionNumber($dom);
 
-        if ('1.2' === $versionNumber) {
-            return new XliffVersion\XliffVersion12();
+        switch ($versionNumber) {
+            case '1.2':
+                return new XliffVersion\XliffVersion12();
+
+            case '2.0':
+                return new XliffVersion\XliffVersion20();
         }
 
-        throw new InvalidResourceException(sprintf(
+        throw new \InvalidArgumentException(sprintf(
             'No support implemented for loading XLIFF version "%s".',
             $versionNumber
         ));
@@ -150,6 +140,8 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param \DOMDocument $dom
      *
+     * @throws \InvalidArgumentException
+     *
      * @return string
      */
     private function getVersionNumber(\DOMDocument $dom)
@@ -159,6 +151,18 @@ class XliffFileLoader implements LoaderInterface
             $version = $xliff->attributes->getNamedItem('version');
             if ($version) {
                 return $version->nodeValue;
+            }
+
+            $namespace = $xliff->attributes->getNamedItem('xmlns');
+            if ($namespace) {
+                if (substr_compare('urn:oasis:names:tc:xliff:document:', $namespace->nodeValue, 0, 34) !== 0) {
+                    throw new \InvalidArgumentException(sprintf(
+                        'Not a valid XLIFF namespace "%s"',
+                        $namespace
+                    ));
+                }
+
+                return substr($namespace, 34);
             }
         }
 

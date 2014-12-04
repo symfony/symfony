@@ -21,6 +21,7 @@
         "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
+        "symfony/http-kernel": "2.3.*",
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.0",
         "symfony/config": "~2.2",

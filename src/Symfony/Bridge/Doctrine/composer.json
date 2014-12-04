@@ -24,8 +24,9 @@
         "symfony/dependency-injection": "~2.0",
         "symfony/form": "~2.2",
         "symfony/http-kernel": "~2.2",
+        "symfony/options-resolver": "2.3.*",
         "symfony/security": "~2.2",
-        "symfony/validator": "~2.3.0",
+        "symfony/validator": "2.3.*",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3"

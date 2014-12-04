@@ -22,12 +22,15 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.3",
+        "symfony/dependency-injection": "2.3.*",
         "symfony/form": "~2.3",
-        "symfony/framework-bundle": "~2.2,<2.6.0",
+        "symfony/framework-bundle": "2.3.*",
+        "symfony/http-kernel": "2.3.*",
+        "symfony/options-resolver": "2.3.*",
         "symfony/twig-bundle": "~2.2",
         "symfony/form": "~2.1",
         "symfony/process": "~2.0",
-        "symfony/validator": "~2.2",
+        "symfony/validator": "2.3.*",
         "symfony/yaml": "~2.0"
     },
     "autoload": {

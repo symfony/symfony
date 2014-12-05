@@ -554,7 +554,7 @@ class Application
             $commandList = $this->commands;
             $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
                 if ($nameOrAlias === $name) {
-                  return true;
+                    return true;
                 }
 
                 $commandName = $commandList[$nameOrAlias]->getName();

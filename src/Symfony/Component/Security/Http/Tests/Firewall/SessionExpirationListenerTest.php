@@ -218,6 +218,19 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Warning
+     */
+    public function testWarningIsTriggeredIfMaxIdleTimeIsTooHigh()
+    {
+        $gcMaxlifetime = ini_get('session.gc_maxlifetime');
+        new SessionExpirationListener(
+            $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
+            $this->getHttpUtils(),
+            $gcMaxlifetime + 1
+        );
+    }
+
     private function getHttpUtils()
     {
         return $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')

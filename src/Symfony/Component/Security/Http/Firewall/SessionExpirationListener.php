@@ -35,7 +35,7 @@ class SessionExpirationListener implements ListenerInterface
     {
         $this->tokenStorage = $tokenStorage;
         $this->httpUtils = $httpUtils;
-        $this->maxIdleTime = $maxIdleTime;
+        $this->setMaxIdleTime($maxIdleTime);
         $this->targetUrl = $targetUrl;
         $this->logger = $logger;
     }
@@ -72,6 +72,17 @@ class SessionExpirationListener implements ListenerInterface
 
         $response = $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
         $event->setResponse($response);
+    }
+
+    /**
+     * @param int $maxIdleTime
+     */
+    private function setMaxIdleTime($maxIdleTime)
+    {
+        if ($maxIdleTime > ini_get('session.gc_maxlifetime')) {
+            trigger_error("Max idle time should not be greater than 'session.gc_maxlifetime'", \E_USER_WARNING);
+        }
+        $this->maxIdleTime = (int) $maxIdleTime;
     }
 
     /**

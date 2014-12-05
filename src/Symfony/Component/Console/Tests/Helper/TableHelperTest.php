@@ -235,7 +235,7 @@ TABLE
 
     public function testRenderMultiByte()
     {
-        if (!function_exists('mb_strlen')) {
+        if (!function_exists('mb_strwidth')) {
             $this->markTestSkipped('The "mbstring" extension is not available');
         }
 
@@ -254,6 +254,33 @@ TABLE
 +------+
 | 1234 |
 +------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testRenderFullWidthCharacters()
+    {
+        if (!function_exists('mb_strwidth')) {
+            $this->markTestSkipped('The "mbstring" extension is not available');
+        }
+
+        $table = new TableHelper();
+        $table
+            ->setHeaders(array('あいうえお'))
+            ->setRows(array(array(1234567890)))
+            ->setLayout(TableHelper::LAYOUT_DEFAULT)
+        ;
+        $table->render($output = $this->getOutputStream());
+
+        $expected =
+            <<<TABLE
++------------+
+| あいうえお |
++------------+
+| 1234567890 |
++------------+
 
 TABLE;
 

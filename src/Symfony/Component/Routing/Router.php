@@ -251,7 +251,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = $this->getMatcherInstance();
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -342,5 +342,13 @@ class Router implements RouterInterface, RequestMatcherInterface
     protected function getMatcherDumperInstance()
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
+    }
+
+    /**
+     * @return UrlMatcherInterface
+     */
+    protected function getMatcherInstance()
+    {
+        return new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
     }
 }

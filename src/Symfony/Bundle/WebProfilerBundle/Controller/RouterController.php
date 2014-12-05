@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
@@ -30,13 +31,16 @@ class RouterController
     private $twig;
     private $matcher;
     private $routes;
+    private $container;
 
-    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, RouteCollection $routes = null)
+    public function __construct(Profiler $profiler = null, \Twig_Environment $twig, UrlMatcherInterface $matcher = null, ContainerInterface $container,
+                                RouteCollection $routes = null)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->matcher = $matcher;
         $this->routes = $routes;
+        $this->container = $container;
 
         if (null === $this->routes && $this->matcher instanceof RouterInterface) {
             $this->routes = $matcher->getRouteCollection();
@@ -68,7 +72,7 @@ class RouterController
 
         $context = $this->matcher->getContext();
         $context->setMethod($profile->getMethod());
-        $matcher = new TraceableUrlMatcher($this->routes, $context);
+        $matcher = new TraceableUrlMatcher($this->routes, $context, $this->container);
 
         $request = $profile->getCollector('request');
 

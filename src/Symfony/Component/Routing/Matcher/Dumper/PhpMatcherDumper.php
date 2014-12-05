@@ -254,7 +254,7 @@ EOF;
         }
 
         if ($route->getCondition()) {
-            $conditions[] = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
+            $conditions[] = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request', 'container'));
         }
 
         $conditions = implode(' && ', $conditions);

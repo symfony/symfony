@@ -17,12 +17,20 @@ use Symfony\Component\Routing\RequestContext;
 
 class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
+
+    protected $dumbContainer;
+
+    public function setUp()
+    {
+        $this->dumbContainer = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface', array(), '', false);
+    }
+
     public function testRedirectWhenNoSlash()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext(), $this->dumbContainer));
         $matcher->expects($this->once())->method('redirect');
         $matcher->match('/foo');
     }
@@ -37,7 +45,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $context = new RequestContext();
         $context->setMethod('POST');
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, $context));
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, $context, $this->dumbContainer));
         $matcher->match('/foo');
     }
 
@@ -46,7 +54,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
 
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext(), $this->dumbContainer));
         $matcher
             ->expects($this->once())
             ->method('redirect')
@@ -61,7 +69,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('FTP', 'HTTPS')));
 
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext(), $this->dumbContainer));
         $matcher
             ->expects($this->once())
             ->method('redirect')
@@ -76,7 +84,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https', 'http')));
 
-        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext(), $this->dumbContainer));
         $matcher
             ->expects($this->never())
             ->method('redirect')

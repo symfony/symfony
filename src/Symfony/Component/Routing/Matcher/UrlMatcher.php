@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
@@ -57,17 +58,22 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected $expressionLanguageProviders = array();
 
     /**
-     * Constructor.
-     *
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     * @param ContainerInterface $container Service container needed for expressionLanguage
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context, ContainerInterface $container)
     {
         $this->routes = $routes;
         $this->context = $context;
+        $this->container = $container;
     }
 
     /**
@@ -211,7 +217,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), array('context' => $this->context, 'request' => $this->request))) {
+        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(),
+                array('context' => $this->context, 'request' => $this->request, 'container' => $this->container))) {
+
             return array(self::REQUIREMENT_MISMATCH, null);
         }
 

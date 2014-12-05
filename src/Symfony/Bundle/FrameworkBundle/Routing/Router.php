@@ -74,6 +74,14 @@ class Router extends BaseRouter implements WarmableInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getMatcherInstance()
+    {
+        return new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->container);
+    }
+
+    /**
      * Replaces placeholders with service container parameter values in:
      * - the route defaults,
      * - the route requirements,

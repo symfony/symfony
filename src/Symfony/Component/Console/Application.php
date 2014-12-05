@@ -553,6 +553,10 @@ class Application
         if (count($commands) > 1) {
             $commandList = $this->commands;
             $commands = array_filter($commands, function ($nameOrAlias) use ($commandList, $commands) {
+                if ($nameOrAlias === $name) {
+                  return true;
+                }
+
                 $commandName = $commandList[$nameOrAlias]->getName();
 
                 return $commandName === $nameOrAlias || !in_array($commandName, $commands);

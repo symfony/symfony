@@ -151,12 +151,12 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
             array(
                 array(
                     'bar' => function ($bar) {
-                        return null;
+                        return;
                     },
                 ),
                 'baz',
                 array('foo' => '', 'bar' => null),
-                'Null an item'
+                'Null an item',
             ),
             array(
                 array(

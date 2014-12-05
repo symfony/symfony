@@ -382,7 +382,7 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
      * @throws \LogicException
      */

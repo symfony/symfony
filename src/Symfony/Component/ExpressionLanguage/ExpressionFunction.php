@@ -48,18 +48,18 @@ class ExpressionFunction
        $this->evaluator = $evaluator;
    }
 
-   public function getName()
-   {
-       return $this->name;
-   }
+    public function getName()
+    {
+        return $this->name;
+    }
 
-   public function getCompiler()
-   {
-       return $this->compiler;
-   }
+    public function getCompiler()
+    {
+        return $this->compiler;
+    }
 
-   public function getEvaluator()
-   {
-       return $this->evaluator;
-   }
+    public function getEvaluator()
+    {
+        return $this->evaluator;
+    }
 }

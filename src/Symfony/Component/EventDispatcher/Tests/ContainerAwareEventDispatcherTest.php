@@ -22,6 +22,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
     protected function createEventDispatcher()
     {
         $container = new Container();
+
         return new ContainerAwareEventDispatcher($container);
     }
 

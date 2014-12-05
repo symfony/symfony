@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-use \PropelPDO;
+use PropelPDO;
 
 class Item implements \Persistent
 {

@@ -46,7 +46,7 @@ interface ClassMetadataInterface extends MetadataInterface, LegacyPropertyMetada
      *
      * If it is, you can access the group sequence with {@link getGroupSequence()}.
      *
-     * @return bool    Returns true if the "Default" group is overridden
+     * @return bool Returns true if the "Default" group is overridden
      *
      * @see \Symfony\Component\Validator\Constraints\GroupSequence
      */
@@ -71,8 +71,8 @@ interface ClassMetadataInterface extends MetadataInterface, LegacyPropertyMetada
      * This interface will be used to obtain the group sequence when an object
      * of this class is validated.
      *
-     * @return bool    Returns true if the "Default" group is overridden by
-     *                 a dynamic group sequence
+     * @return bool Returns true if the "Default" group is overridden by
+     *              a dynamic group sequence
      *
      * @see \Symfony\Component\Validator\GroupSequenceProviderInterface
      */

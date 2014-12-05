@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Form\DataTransformer;
 
-use \PropelObjectCollection;
+use PropelObjectCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 

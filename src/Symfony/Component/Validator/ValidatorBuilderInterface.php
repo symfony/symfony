@@ -174,7 +174,7 @@ interface ValidatorBuilderInterface
     /**
      * Sets the API version that the returned validator should support.
      *
-     * @param int     $apiVersion The required API version
+     * @param int $apiVersion The required API version
      *
      * @return ValidatorBuilderInterface The builder object
      *

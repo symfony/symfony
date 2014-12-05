@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
-use \ModelCriteria;
-use \BaseObject;
-use \Persistent;
+use ModelCriteria;
+use BaseObject;
+use Persistent;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;

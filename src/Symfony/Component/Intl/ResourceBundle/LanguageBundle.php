@@ -16,7 +16,6 @@ use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Intl;
 
 /**
  * Default implementation of {@link LanguageBundleInterface}.
@@ -69,7 +68,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->getName($language, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -81,7 +80,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -93,7 +92,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->scriptProvider->getName($script, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -105,7 +104,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->scriptProvider->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -117,7 +116,7 @@ class LanguageBundle extends LanguageDataProvider implements LanguageBundleInter
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 }

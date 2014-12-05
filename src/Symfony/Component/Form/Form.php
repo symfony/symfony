@@ -1174,8 +1174,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Utility function for indenting multi-line strings.
      *
-     * @param string  $string The string
-     * @param int     $level  The number of spaces to use for indentation
+     * @param string $string The string
+     * @param int    $level  The number of spaces to use for indentation
      *
      * @return string The indented string
      */

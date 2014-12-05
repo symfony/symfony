@@ -48,10 +48,10 @@ class AssetsExtension extends \Twig_Extension
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
-     * @param string              $path        A public path
-     * @param string              $packageName The name of the asset package to use
-     * @param bool                $absolute    Whether to return an absolute URL or a relative one
-     * @param string|bool|null    $version     A specific version
+     * @param string           $path        A public path
+     * @param string           $packageName The name of the asset package to use
+     * @param bool             $absolute    Whether to return an absolute URL or a relative one
+     * @param string|bool|null $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */
@@ -93,8 +93,9 @@ class AssetsExtension extends \Twig_Extension
      *
      * @param string $url The URL that has to be absolute
      *
-     * @return string The absolute URL
      * @throws \RuntimeException
+     *
+     * @return string The absolute URL
      */
     private function ensureUrlIsAbsolute($url)
     {

@@ -114,6 +114,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * ACL entries have the CASCADE option on their foreign key so they will also get deleted
      *
      * @param SecurityIdentityInterface $sid
+     *
      * @throws \InvalidArgumentException
      */
     public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
@@ -368,7 +369,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      * Updates a user security identity when the user's username changes
      *
      * @param UserSecurityIdentity $usid
-     * @param string $oldUsername
+     * @param string               $oldUsername
      */
     public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
     {
@@ -653,7 +654,9 @@ QUERY;
      * Constructs the SQL to delete a security identity.
      *
      * @param SecurityIdentityInterface $sid
+     *
      * @throws \InvalidArgumentException
+     *
      * @return string
      */
     protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
@@ -692,7 +695,8 @@ QUERY;
      * Constructs the SQL for updating a user security identity.
      *
      * @param UserSecurityIdentity $usid
-     * @param string $oldUsername
+     * @param string               $oldUsername
+     *
      * @return string
      */
     protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)

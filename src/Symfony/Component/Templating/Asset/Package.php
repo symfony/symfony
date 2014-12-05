@@ -56,8 +56,8 @@ class Package implements PackageInterface
     /**
      * Applies version to the supplied path.
      *
-     * @param string              $path    A path
-     * @param string|bool|null    $version A specific version
+     * @param string           $path    A path
+     * @param string|bool|null $version A specific version
      *
      * @return string The versionized path
      */

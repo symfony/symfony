@@ -38,11 +38,11 @@ class SimplePreAuthenticationListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface         $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface   $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                           $providerKey
-     * @param SimplePreAuthenticatorInterface  $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface                  $logger                A LoggerInterface instance
+     * @param SecurityContextInterface        $securityContext       A SecurityContext instance
+     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                          $providerKey
+     * @param SimplePreAuthenticatorInterface $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
+     * @param LoggerInterface                 $logger                A LoggerInterface instance
      */
     public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
     {

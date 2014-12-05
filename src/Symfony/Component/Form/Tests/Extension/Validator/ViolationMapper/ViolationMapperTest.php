@@ -213,7 +213,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
         $child = $this->getForm('address', 'address');
-        $grandChild = $this->getForm('street' , 'street');
+        $grandChild = $this->getForm('street', 'street');
 
         $parent->add($child);
         $child->add($grandChild);

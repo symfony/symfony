@@ -123,7 +123,7 @@ class CommandTester
     /**
      * Gets the status code returned by the last execution of the application.
      *
-     * @return int     The status code
+     * @return int The status code
      */
     public function getStatusCode()
     {

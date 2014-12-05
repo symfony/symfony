@@ -12,7 +12,6 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 
 class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase

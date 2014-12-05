@@ -37,6 +37,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
+    const ROLE_PREVOIUS_ADMIN = 'ROLE_PREVIOUS_ADMIN';
+
     private $tokenStorage;
     private $provider;
     private $userChecker;
@@ -69,25 +71,31 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param GetResponseEvent $event A GetResponseEvent instance
      *
-     * @throws \LogicException if switching to a user failed
+     * @throws \LogicException if switching to a user or exiting fails
      */
     public function handle(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        $usernameParameter = $request->get($this->usernameParameter);
 
-        if (!$request->get($this->usernameParameter)) {
+        // listener stops if _switch_user request parameters is not defined
+        if (!$usernameParameter) {
             return;
         }
 
-        if ('_exit' === $request->get($this->usernameParameter)) {
-            $this->tokenStorage->setToken($this->attemptExitUser($request));
-        } else {
-            try {
-                $this->tokenStorage->setToken($this->attemptSwitchUser($request));
-            } catch (AuthenticationException $e) {
-                throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
+        try {
+
+            if ('_exit' === $usernameParameter) {
+                $token = $this->getTokenOnUserExit($request);
+            } else {
+                $token = $this->getTokenOnUserSwitch($request);
             }
+
+        } catch (AuthenticationException $e) {
+            throw new \LogicException(sprintf('Switch User failed: "%s"', $e->getMessage()));
         }
+
+        $this->tokenStorage->setToken($token);
 
         $request->query->remove($this->usernameParameter);
         $request->server->set('QUERY_STRING', http_build_query($request->query->all()));
@@ -107,37 +115,52 @@ class SwitchUserListener implements ListenerInterface
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request)
+    private function getTokenOnUserSwitch(Request $request)
     {
-        $token = $this->tokenStorage->getToken();
-        $originalToken = $this->getOriginalToken($token);
-
-        if (false !== $originalToken) {
-            if ($token->getUsername() === $request->get($this->usernameParameter)) {
-                return $token;
-            } else {
-                throw new \LogicException(sprintf('You are already switched to "%s" user.', $token->getUsername()));
-            }
-        }
-
-        if (false === $this->accessDecisionManager->decide($token, array($this->role))) {
-            throw new AccessDeniedException();
-        }
-
-        $username = $request->get($this->usernameParameter);
-
         if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', array('username' => $username));
+            $this->logger->info('Attempting to switch to user.', array('username' => $request->get($this->usernameParameter));
         }
 
-        $user = $this->provider->loadUserByUsername($username);
+        // token of the currently authenticated user
+        $sourceToken = $this->tokenStorage->getToken();
+
+        // check if the authenticated user has the a role to switch user
+        if (true !== $this->accessDecisionManager->decide($sourceToken, array($this->role)) && true !== $this->accessDecisionManager->decide($sourceToken, array(self::ROLE_PREVOIUS_ADMIN))) {
+            throw new AccessDeniedException(sprintf("You must have the \"%s\" or the \"%s\" role to be able to switch user.", $this->role, self::ROLE_PREVOIUS_ADMIN));
+        }
+
+        // user is attempting to switch to his own username
+        if ($sourceToken->getUsername() === $request->get($this->usernameParameter)) {
+            return $sourceToken;
+        }
+
+        // authenticate the user with username passed by request
+        $user = $this->provider->loadUserByUsername($request->get($this->usernameParameter));
         $this->userChecker->checkPostAuth($user);
 
-        $roles = $user->getRoles();
-        $roles[] = new SwitchUserRole('ROLE_PREVIOUS_ADMIN', $this->tokenStorage->getToken());
+        /*
+         * if user is attempting to switch from an already switched token,
+         * fetch the original token instead of the currently authenticated user's one
+         */
+        $originalToken = $this->getOriginalToken($sourceToken);
+        if ($originalToken !== null) {
+            $sourceToken = $originalToken;
+        }
 
+        $roles = $user->getRoles();
+
+        /*
+         * add role ROLE_PREVIOUS_ADMIN to switched user lo let him exit switching,
+         * only if he's not the original one
+         */
+        if (!$originalToken || $originalToken->getUsername() !== $request->get($this->usernameParameter)) {
+            $roles[] = new SwitchUserRole(self::ROLE_PREVOIUS_ADMIN, $sourceToken);
+        }
+
+        // create token for switched user
         $token = new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey, $roles);
 
+        // dispatch event on user switching
         if (null !== $this->dispatcher) {
             $switchEvent = new SwitchUserEvent($request, $token->getUser());
             $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
@@ -155,18 +178,27 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException
      */
-    private function attemptExitUser(Request $request)
+    private function getTokenOnUserExit(Request $request)
     {
-        if (false === $original = $this->getOriginalToken($this->tokenStorage->getToken())) {
+        $token = $this->tokenStorage->getToken();
+
+        // check if the authenticated user has the right role to exit switching
+        if (true !== $this->accessDecisionManager->decide($token, array(self::ROLE_PREVOIUS_ADMIN))) {
+            throw new \LogicException(sprintf("You must have the \"%s\" role to exit user switching.", self::ROLE_PREVOIUS_ADMIN));
+        }
+
+        $originalToken = $this->getOriginalToken($token);
+
+        if (null === $originalToken) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
 
         if (null !== $this->dispatcher) {
-            $switchEvent = new SwitchUserEvent($request, $original->getUser());
+            $switchEvent = new SwitchUserEvent($request, $originalToken->getUser());
             $this->dispatcher->dispatch(SecurityEvents::SWITCH_USER, $switchEvent);
         }
 
-        return $original;
+        return $originalToken;
     }
 
     /**
@@ -174,7 +206,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param TokenInterface $token A switched TokenInterface instance
      *
-     * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
+     * @return TokenInterface|null The original TokenInterface instance, false if the current TokenInterface is not switched
      */
     private function getOriginalToken(TokenInterface $token)
     {
@@ -184,6 +216,6 @@ class SwitchUserListener implements ListenerInterface
             }
         }
 
-        return false;
+        return;
     }
 }

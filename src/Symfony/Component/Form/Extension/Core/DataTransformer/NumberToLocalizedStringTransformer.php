@@ -134,10 +134,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $grouping = false;
         }
 
-        if (null === $roundingMode) {
-            $roundingMode = self::ROUND_HALF_UP;
-        }
-
         $this->precision = $precision;
         $this->grouping = $grouping;
         $this->roundingMode = $roundingMode;

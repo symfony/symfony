@@ -104,7 +104,7 @@ class ExceptionListener implements EventSubscriberInterface
      * Clones the request for the exception.
      *
      * @param \Exception $exception The thrown exception.
-     * @param Request $request The original request.
+     * @param Request    $request   The original request.
      *
      * @return Request $request The cloned request.
      */

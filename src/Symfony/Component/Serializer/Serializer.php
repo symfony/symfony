@@ -157,7 +157,7 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching normalizer.
      *
-     * @param object $data The object to get the serializer for
+     * @param object $data   The object to get the serializer for
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return NormalizerInterface|null

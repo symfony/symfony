@@ -146,7 +146,7 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      *
      * @param string|object $value A class name or an object
      *
-     * @return bool    Whether metadata can be returned for that class
+     * @return bool Whether metadata can be returned for that class
      */
     public function hasMetadataFor($value)
     {

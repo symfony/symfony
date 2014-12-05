@@ -94,9 +94,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the errors of this form.
      *
-     * @param bool    $deep    Whether to include errors of child forms as well
-     * @param bool    $flatten Whether to flatten the list of errors in case
-     *                         $deep is set to true
+     * @param bool $deep    Whether to include errors of child forms as well
+     * @param bool $flatten Whether to flatten the list of errors in case
+     *                      $deep is set to true
      *
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to this form

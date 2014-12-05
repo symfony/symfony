@@ -242,9 +242,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Rounds a number according to the configured precision and rounding mode.
      *
-     * @param int|float     $number A number.
+     * @param int|float $number A number.
      *
-     * @return int|float     The rounded number.
+     * @return int|float The rounded number.
      */
     private function round($number)
     {

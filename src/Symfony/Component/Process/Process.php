@@ -906,7 +906,7 @@ class Process
      *
      * To disable the timeout, set this value to null.
      *
-     * @param int|float|null     $timeout The timeout in seconds
+     * @param int|float|null $timeout The timeout in seconds
      *
      * @return self The current Process instance.
      *
@@ -957,7 +957,7 @@ class Process
     /**
      * Sets PTY mode.
      *
-     * @param bool    $bool
+     * @param bool $bool
      *
      * @return self
      */
@@ -1338,7 +1338,7 @@ class Process
     /**
      * Validates and returns the filtered timeout.
      *
-     * @param int|float|null     $timeout
+     * @param int|float|null $timeout
      *
      * @return float|null
      *

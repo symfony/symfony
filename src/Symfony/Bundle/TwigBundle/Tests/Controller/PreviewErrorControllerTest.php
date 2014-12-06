@@ -38,7 +38,8 @@ class PreviewErrorControllerTest extends TestCase
                     $self->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
 
                     $exception = $request->attributes->get('exception');
-                    $self->assertInstanceOf('Symfony\Component\HttpKernel\Exception\FlattenException', $exception);
+
+                    $self->assertInstanceOf('Symfony\Component\Debug\Exception\FlattenException', $exception);
                     $self->assertEquals($code, $exception->getStatusCode());
 
                     $self->assertFalse($request->attributes->get('showException'));

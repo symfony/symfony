@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
  *   <dd>
  *     Instead of calling <code>addSubscriberService</code> once for each
  *     subscriber, a precompiled array of listener definitions is passed
- *     directly to the constructor. This is faster by roughly an order of
- *     magnitude. The listeners are collected and prepared using a compiler
+ *     directly to the constructor. This is faster by an order of magnitude.
+ *     The listeners are collected and prepared using a compiler
  *     pass.
  *   </dd>
  *   <dt>Lazy instantiation of listeners</dt>

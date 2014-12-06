@@ -1072,6 +1072,11 @@ EOF;
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
             } else {
                 $value = $this->export($value);
+
+                // If exported value is `null` then standardize it: `true` and `false` are exported in lower-case, so let do the same with `null`.
+                if ('NULL' === $value) {
+                    $value = 'null';
+                }
             }
 
             $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);

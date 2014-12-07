@@ -114,7 +114,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         return $this->parseXml($xml);
     }
 
-    /**
+     /**
       * Checks whether the serializer can encode to given format
       *
       * @param string $format format name

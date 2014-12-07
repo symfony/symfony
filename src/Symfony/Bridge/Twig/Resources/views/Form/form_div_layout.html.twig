@@ -80,8 +80,8 @@
             </optgroup>
         {%- else -%}
             {%- set choice_label = choice.label -%}
-            {%- if options.choice_label_format is defined and options.choice_label_format is not empty -%}
-                {%- set choice_label = options.choice_label_format|replace({
+            {%- if choice_label_format is defined and choice_label_format is not empty -%}
+                {%- set choice_label = choice_label_format|replace({
                     '%value%': choice.value,
                     '%choice%': choice.label,
                     '%name%': name,

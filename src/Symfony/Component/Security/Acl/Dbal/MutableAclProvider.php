@@ -361,7 +361,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     protected function getDeleteAccessControlEntriesSql($oidPK)
     {
         return sprintf(
-              'DELETE FROM %s WHERE object_identity_id = %d',
+            'DELETE FROM %s WHERE object_identity_id = %d',
             $this->options['entry_table_name'],
             $oidPK
         );

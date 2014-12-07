@@ -183,7 +183,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
     {
-        list($listener, $context, $service, $manager,, $dispatcher) = $this->getListener(true);
+        list($listener, $context, $service, $manager, , $dispatcher) = $this->getListener(true);
 
         $context
             ->expects($this->once())

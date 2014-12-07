@@ -290,6 +290,7 @@ class Filesystem
 
         if ($onWindows && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
+
             return;
         }
 

@@ -196,7 +196,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @return string a service definition name
      *
      * @throws ParameterNotFoundException if none of the managerParameters has a
-     *      non-empty value.
+     *                                    non-empty value.
      */
     private function getConfigurationServiceName(ContainerBuilder $container)
     {

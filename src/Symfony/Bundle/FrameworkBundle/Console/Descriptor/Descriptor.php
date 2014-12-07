@@ -189,16 +189,16 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * name: name of listened event
      *
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param array                     $options
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param array                    $options
      */
     abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array());
 
     /**
      * Describes a callable.
      *
-     * @param callable  $callable
-     * @param array     $options
+     * @param callable $callable
+     * @param array    $options
      */
     abstract protected function describeCallable($callable, array $options = array());
 

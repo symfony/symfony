@@ -141,5 +141,4 @@ EOT
         // We use a custom iterator to ignore VCS files
         $filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
     }
-
 }

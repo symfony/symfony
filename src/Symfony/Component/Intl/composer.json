@@ -35,8 +35,8 @@
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Intl\\": "" },
-        "classmap": [ "Symfony/Component/Intl/Resources/stubs" ],
-        "files": [ "Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "classmap": [ "Resources/stubs" ],
+        "files": [ "Resources/stubs/functions.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

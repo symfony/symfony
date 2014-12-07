@@ -18,6 +18,12 @@ namespace Symfony\Component\Console\Question;
  */
 class ConfirmationQuestion extends Question
 {
+    /**
+     * Constructor.
+     *
+     * @param string $question The question to ask to the user
+     * @param bool   $default  The default answer to return, true or false
+     */
     public function __construct($question, $default = true)
     {
         parent::__construct($question, (bool) $default);
@@ -25,6 +31,11 @@ class ConfirmationQuestion extends Question
         $this->setNormalizer($this->getDefaultNormalizer());
     }
 
+    /**
+     * Returns the default answer normalizer.
+     *
+     * @return callable
+     */
     private function getDefaultNormalizer()
     {
         $default = $this->getDefault();

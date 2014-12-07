@@ -21,15 +21,15 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 class TestDenormalizer implements DenormalizerInterface
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return true;

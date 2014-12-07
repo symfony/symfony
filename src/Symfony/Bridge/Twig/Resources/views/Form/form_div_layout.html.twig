@@ -79,7 +79,16 @@
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
-            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            {%- set choice_label = choice.label -%}
+            {%- if options.choice_label_format is defined and options.choice_label_format is not empty -%}
+                {%- set choice_label = options.choice_label_format|replace({
+                    '%value%': choice.value,
+                    '%choice%': choice.label,
+                    '%name%': name,
+                    '%id%': id,
+                }) -%}
+            {%- endif -%}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_label|trans({}, translation_domain) }}</option>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options %}

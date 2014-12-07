@@ -186,7 +186,7 @@ class StringUtil
                         return $singulars;
                     }
 
-                    return $newBase.($firstUpper ? ucFirst($newSuffix) : $newSuffix);
+                    return $newBase.($firstUpper ? ucfirst($newSuffix) : $newSuffix);
                 }
 
                 // Suffix is longer than word

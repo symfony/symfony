@@ -17,13 +17,13 @@ namespace Symfony\Component\EventDispatcher;
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
- * @author  Fabien Potencier <fabien@symfony.com>
- * @author  Jordi Boggiano <j.boggiano@seld.be>
- * @author  Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  *
  * @api
  */

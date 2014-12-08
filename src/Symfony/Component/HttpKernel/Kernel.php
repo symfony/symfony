@@ -205,6 +205,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function isClassInActiveBundle($class)
     {
+        trigger_error('Symfony\\Component\\HttpKernel\\Kernel::isClassInActiveBundle() is deprecated since version 2.6 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
         foreach ($this->getBundles() as $bundle) {
             if (0 === strpos($class, $bundle->getNamespace())) {
                 return true;

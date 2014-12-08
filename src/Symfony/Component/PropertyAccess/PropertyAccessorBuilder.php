@@ -85,7 +85,7 @@ class PropertyAccessorBuilder
     }
 
     /**
-     * @return bool    true is exceptions in read context for array is enabled
+     * @return bool true is exceptions in read context for array is enabled
      */
     public function isExceptionOnInvalidIndexEnabled()
     {

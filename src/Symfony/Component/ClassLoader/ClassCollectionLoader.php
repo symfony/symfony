@@ -353,14 +353,17 @@ class ClassCollectionLoader
             $unresolved = new \ArrayObject();
         }
         $nodeName = $node->getName();
-        $unresolved[$nodeName] = $node;
-        foreach ($tree[$nodeName] as $dependency) {
-            if (!$resolved->offsetExists($dependency->getName())) {
-                self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+
+        if (isset($tree[$nodeName])) {
+            $unresolved[$nodeName] = $node;
+            foreach ($tree[$nodeName] as $dependency) {
+                if (!$resolved->offsetExists($dependency->getName())) {
+                    self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+                }
             }
+            $resolved[$nodeName] = $node;
+            unset($unresolved[$nodeName]);
         }
-        $resolved[$nodeName] = $node;
-        unset($unresolved[$nodeName]);
 
         return $resolved;
     }

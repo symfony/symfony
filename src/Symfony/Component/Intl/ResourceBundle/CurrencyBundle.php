@@ -15,7 +15,6 @@ use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Provider\CurrencyDataProvider;
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Exception\MissingResourceException;
-use Symfony\Component\Intl\Intl;
 
 /**
  * Default implementation of {@link CurrencyBundleInterface}.
@@ -53,7 +52,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getSymbol($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -65,7 +64,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getName($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -77,7 +76,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -89,7 +88,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getFractionDigits($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -101,7 +100,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getRoundingIncrement($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -113,7 +112,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 }

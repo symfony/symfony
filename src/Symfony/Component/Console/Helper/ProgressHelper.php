@@ -14,8 +14,6 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-trigger_error('The "ProgressHelper" class is deprecated since version 2.5 and will be removed in 3.0. Use "ProgressBar" class instead.', E_USER_DEPRECATED);
-
 /**
  * The Progress class provides helpers to display progress output.
  *
@@ -118,6 +116,13 @@ class ProgressHelper extends Helper
         array(129600, '1 day'),
         array(604800, 'days', 86400),
     );
+
+    public function __construct($triggerDeprecationError = true)
+    {
+        if ($triggerDeprecationError) {
+            trigger_error('"Symfony\Component\Console\Helper\ProgressHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\ProgressBar" instead.', E_USER_DEPRECATED);
+        }
+    }
 
     /**
      * Sets the progress bar width.

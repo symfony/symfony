@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Form\DataTransformer;
 
-use \PropelObjectCollection;
+use PropelObjectCollection;
 use Symfony\Bridge\Propel1\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Propel1\Tests\Propel1TestCase;
 

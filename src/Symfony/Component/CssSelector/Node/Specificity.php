@@ -81,6 +81,7 @@ class Specificity
      * 0 if they are equal, and 1 if the argument is lower
      *
      * @param Specificity $specificity
+     *
      * @return int
      */
     public function compareTo(Specificity $specificity)

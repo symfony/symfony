@@ -53,7 +53,7 @@ interface TokenStorageInterface
      *
      * @param string $tokenId The token ID
      *
-     * @return bool    Whether a token exists with the given ID
+     * @return bool Whether a token exists with the given ID
      */
     public function hasToken($tokenId);
 }

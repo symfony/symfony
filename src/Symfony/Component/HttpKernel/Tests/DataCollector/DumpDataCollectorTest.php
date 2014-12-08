@@ -29,7 +29,8 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('dump', $collector->getName());
 
-        $collector->dump($data); $line = __LINE__;
+        $collector->dump($data);
+        $line = __LINE__;
         $this->assertSame(1, $collector->getDumpsCount());
 
         $dump = $collector->getDumps('html');
@@ -61,7 +62,8 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $data = new Data(array(array(456)));
         $collector = new DumpDataCollector();
-        $collector->dump($data); $line = __LINE__;
+        $collector->dump($data);
+        $line = __LINE__;
 
         ob_start();
         $collector = null;

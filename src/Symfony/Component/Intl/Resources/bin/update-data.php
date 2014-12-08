@@ -76,7 +76,6 @@ foreach ($urls as $urlVersion => $url) {
         ? $urlVersion
         : $maxVersion;
 
-
     echo "  $urlVersion\n";
 }
 

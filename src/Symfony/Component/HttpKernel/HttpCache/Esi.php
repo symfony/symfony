@@ -73,7 +73,7 @@ class Esi implements SurrogateInterface
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if one surrogate has ESI/1.0 capability, false otherwise
+     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      *
      * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
      */
@@ -142,7 +142,7 @@ class Esi implements SurrogateInterface
      *
      * @param Response $response A Response instance
      *
-     * @return bool    true if the Response needs to be parsed, false otherwise
+     * @return bool true if the Response needs to be parsed, false otherwise
      *
      * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
      */

@@ -412,8 +412,8 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param string|null               $event
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param string|null              $event
      *
      * @return \DOMDocument
      */

@@ -139,7 +139,7 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param int     $encodingOptions
+     * @param int $encodingOptions
      *
      * @return JsonResponse
      */

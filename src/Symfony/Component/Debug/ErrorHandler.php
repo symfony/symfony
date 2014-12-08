@@ -338,7 +338,7 @@ class ErrorHandler
     /**
      * Handles errors by filtering then logging them according to the configured bit fields.
      *
-     * @param int    $type One of the E_* constants
+     * @param int    $type    One of the E_* constants
      * @param string $file
      * @param int    $line
      * @param array  $context
@@ -584,7 +584,7 @@ class ErrorHandler
     /**
      * Sets the level at which the conversion to Exception is done.
      *
-     * @param int|null     $level The level (null to use the error_reporting() value and 0 to disable)
+     * @param int|null $level The level (null to use the error_reporting() value and 0 to disable)
      *
      * @deprecated since 2.6, to be removed in 3.0. Use throwAt() instead.
      */
@@ -597,7 +597,7 @@ class ErrorHandler
     /**
      * Sets the display_errors flag value.
      *
-     * @param int     $displayErrors The display_errors flag value
+     * @param int $displayErrors The display_errors flag value
      *
      * @deprecated since 2.6, to be removed in 3.0. Use throwAt() instead.
      */

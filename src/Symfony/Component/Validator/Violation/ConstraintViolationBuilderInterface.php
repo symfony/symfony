@@ -82,7 +82,7 @@ interface ConstraintViolationBuilderInterface
      * Sets the number which determines how the plural form of the violation
      * message is chosen when it is translated.
      *
-     * @param int     $number The number for determining the plural form
+     * @param int $number The number for determining the plural form
      *
      * @return ConstraintViolationBuilderInterface This builder
      *

@@ -30,7 +30,7 @@ class DecoratorServicePass implements CompilerPassInterface
             }
             $definition->setDecoratedService(null);
 
-            list ($inner, $renamedId) = $decorated;
+            list($inner, $renamedId) = $decorated;
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }

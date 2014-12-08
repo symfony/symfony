@@ -1,6 +1,12 @@
 UPGRADE FROM 2.5 to 2.6
 =======================
 
+Known Backwards-Compatability Breaks
+------------------------------------
+
+* If you use the `PdoSessionHandler`, the session table now has a different
+  schema and must be modified. Look below for more details.
+
 Form
 ----
 

@@ -164,7 +164,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     }
 
     /**
-     * @param $rootBundle
+     * @param ArrayAccessibleResourceBundle $rootBundle
      *
      * @return array
      */

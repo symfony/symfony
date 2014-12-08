@@ -146,6 +146,38 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFixClassWithTraitsOrdering()
+    {
+        if (PHP_VERSION_ID < 50400) {
+            $this->markTestSkipped('Requires PHP > 5.4');
+
+            return;
+        }
+
+        require_once __DIR__.'/Fixtures/ClassesWithParents/CTrait.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/F.php';
+        require_once __DIR__.'/Fixtures/ClassesWithParents/G.php';
+
+        $classes = array(
+            'ClassesWithParents\\F',
+            'ClassesWithParents\\G',
+        );
+
+        $expected = array(
+            'ClassesWithParents\\CTrait',
+            'ClassesWithParents\\F',
+            'ClassesWithParents\\G',
+        );
+
+        $r = new \ReflectionClass('Symfony\Component\ClassLoader\ClassCollectionLoader');
+        $m = $r->getMethod('getOrderedClasses');
+        $m->setAccessible(true);
+
+        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
+
+        $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
+    }
+
     /**
      * @dataProvider getFixNamespaceDeclarationsData
      */

@@ -23,6 +23,13 @@ class ChoiceQuestion extends Question
     private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
 
+    /**
+     * Constructor.
+     *
+     * @param string $question The question to ask to the user
+     * @param array  $choices  The list of available choices
+     * @param mixed  $default  The default answer to return
+     */
     public function __construct($question, array $choices, $default = null)
     {
         parent::__construct($question, $default);
@@ -100,6 +107,11 @@ class ChoiceQuestion extends Question
         return $this;
     }
 
+    /**
+     * Returns the default answer validator.
+     *
+     * @return callable
+     */
     private function getDefaultValidator()
     {
         $choices = $this->choices;

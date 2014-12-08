@@ -811,7 +811,17 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $code = <<<EOF
+        $code = '';
+
+        if ($this->container->getParameterBag()->all()) {
+            $code = <<<EOF
+
+    private \$parameters;
+
+EOF;
+        }
+
+        $code .= <<<EOF
 
     /**
      * Constructor.

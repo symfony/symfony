@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,10 +25,12 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class SecurityDataCollector extends DataCollector
 {
     private $context;
+    private $roleHierarchy;
 
-    public function __construct(SecurityContextInterface $context = null)
+    public function __construct(SecurityContextInterface $context = null, RoleHierarchyInterface $roleHierarchy = null)
     {
         $this->context = $context;
+        $this->roleHierarchy = $roleHierarchy;
     }
 
     /**
@@ -42,6 +45,8 @@ class SecurityDataCollector extends DataCollector
                 'token_class' => null,
                 'user' => '',
                 'roles' => array(),
+                'inherited_roles' => array(),
+                'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         } elseif (null === $token = $this->context->getToken()) {
             $this->data = array(
@@ -50,14 +55,28 @@ class SecurityDataCollector extends DataCollector
                 'token_class' => null,
                 'user' => '',
                 'roles' => array(),
+                'inherited_roles' => array(),
+                'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         } else {
+            $inheritedRoles = array();
+            $assignedRoles = $token->getRoles();
+            if (null !== $this->roleHierarchy) {
+                $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
+                foreach ($allRoles as $role) {
+                    if (!in_array($role, $assignedRoles)) {
+                        $inheritedRoles[] = $role;
+                    }
+                }
+            }
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
                 'user' => $token->getUsername(),
-                'roles' => array_map(function ($role) { return $role->getRole();}, $token->getRoles()),
+                'roles' => array_map(function ($role) { return $role->getRole();}, $assignedRoles),
+                'inherited_roles' => array_map(function ($role) { return $role->getRole();}, $inheritedRoles),
+                'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }
     }
@@ -90,6 +109,27 @@ class SecurityDataCollector extends DataCollector
     public function getRoles()
     {
         return $this->data['roles'];
+    }
+
+    /**
+     * Gets the inherited roles of the user.
+     *
+     * @return string The inherited roles
+     */
+    public function getInheritedRoles()
+    {
+        return $this->data['inherited_roles'];
+    }
+
+    /**
+     * Checks if the data contains information about inherited roles. Still the inherited
+     * roles can be an empty array.
+     *
+     * @return bool true if the profile was contains inherited role information.
+     */
+    public function supportsRoleHierarchy()
+    {
+        return $this->data['supports_role_hierarchy'];
     }
 
     /**

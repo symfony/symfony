@@ -17,10 +17,10 @@ namespace Symfony\Component\EventDispatcher;
  * {@link getSubscribedEvents} and registers the subscriber as a listener for all
  * returned events.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */

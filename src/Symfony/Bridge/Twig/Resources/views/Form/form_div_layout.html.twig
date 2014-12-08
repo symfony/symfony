@@ -83,7 +83,7 @@
             {%- if choice_label_format is defined and choice_label_format is not empty -%}
                 {%- set choice_label = choice_label_format|replace({
                     '%value%': choice.value,
-                    '%choice%': choice.label,
+                    '%choice%': choice_label,
                     '%name%': name,
                     '%id%': id,
                 }) -%}

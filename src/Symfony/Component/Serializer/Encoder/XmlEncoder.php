@@ -117,21 +117,21 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         return $data;
     }
 
-     /**
-      * {@inheritdoc}
-      */
-     public function supportsEncoding($format)
-     {
-         return 'xml' === $format;
-     }
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsEncoding($format)
+    {
+        return 'xml' === $format;
+    }
 
-     /**
-      * {@inheritdoc}
-      */
-     public function supportsDecoding($format)
-     {
-         return 'xml' === $format;
-     }
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDecoding($format)
+    {
+        return 'xml' === $format;
+    }
 
     /**
      * Sets the root node name

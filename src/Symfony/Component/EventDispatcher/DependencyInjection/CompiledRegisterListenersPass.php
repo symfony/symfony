@@ -20,25 +20,31 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 class CompiledRegisterListenersPass implements CompilerPassInterface
 {
     /**
+     * Service name of the event dispatcher in processed container.
+     *
      * @var string
      */
-    protected $dispatcherService;
+    private $dispatcherService;
 
     /**
+     * Tag name used for listeners.
+     *
      * @var string
      */
-    protected $listenerTag;
+    private $listenerTag;
 
     /**
+     * Tag name used for subscribers.
+     *
      * @var string
      */
-    protected $subscriberTag;
+    private $subscriberTag;
 
     /**
      * Constructor.
      *
      * @param string $dispatcherService Service name of the event dispatcher in processed container
-     * @param string $listenerTag       Tag name used for listener
+     * @param string $listenerTag       Tag name used for listeners
      * @param string $subscriberTag     Tag name used for subscribers
      */
     public function __construct($dispatcherService = 'event_dispatcher', $listenerTag = 'kernel.event_listener', $subscriberTag = 'kernel.event_subscriber')

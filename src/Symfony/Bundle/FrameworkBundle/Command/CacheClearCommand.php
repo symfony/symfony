@@ -150,10 +150,10 @@ EOF
         }
 
         // fix references to cached files with the real cache directory name
-        $search = array($warmupDir, str_replace('\\', '\\\\', $warmupDir));
-        $replace = str_replace('\\', '/', $realCacheDir);
+        $search = sprintf('/(dirname\(.+?)(%s)/', preg_quote(basename($warmupDir)));
+        $replace = sprintf('$1%s', preg_quote(basename($realCacheDir)));
         foreach (Finder::create()->files()->in($warmupDir) as $file) {
-            $content = str_replace($search, $replace, file_get_contents($file));
+            $content = preg_replace($search, $replace, file_get_contents($file));
             file_put_contents($file, $content);
         }
 

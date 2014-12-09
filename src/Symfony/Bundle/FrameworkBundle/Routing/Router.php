@@ -35,13 +35,16 @@ class Router extends BaseRouter implements WarmableInterface
      * @param mixed              $resource  The main resource to load
      * @param array              $options   An array of options
      * @param RequestContext     $context   The context
+     * @param array              $expressionLanguageCtx Context for expression language component in matcher
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null)
+    public function __construct(ContainerInterface $container, $resource, array $options = array(), RequestContext $context = null,
+                                array $expressionLanguageCtx)
     {
         $this->container = $container;
 
         $this->resource = $resource;
         $this->context = $context ?: new RequestContext();
+        $this->expressionLanguageCtx = $expressionLanguageCtx;
         $this->setOptions($options);
     }
 

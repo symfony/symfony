@@ -72,6 +72,11 @@ class Router implements RouterInterface, RequestMatcherInterface
     protected $logger;
 
     /**
+     * @var array
+     */
+    protected $expressionLanguageCtx;
+
+    /**
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
@@ -85,7 +90,8 @@ class Router implements RouterInterface, RequestMatcherInterface
      * @param RequestContext  $context  The context
      * @param LoggerInterface $logger   A logger instance
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null)
+    public function __construct(LoaderInterface $loader, $resource, array $options = array(), RequestContext $context = null, LoggerInterface $logger = null,
+                                array $expressionLang)
     {
         $this->loader = $loader;
         $this->resource = $resource;

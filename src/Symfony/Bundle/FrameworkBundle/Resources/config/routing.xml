@@ -70,6 +70,9 @@
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
+            <argument type="collection">
+                <argument key="container" type="service" id="service_container" />
+            </argument>
         </service>
 
         <service id="router" alias="router.default" />

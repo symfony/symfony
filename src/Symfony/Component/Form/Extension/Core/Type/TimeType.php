@@ -48,7 +48,7 @@ class TimeType extends AbstractType
         }
 
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer('UTC', 'UTC', $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer(null, null, $format));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,
@@ -109,20 +109,20 @@ class TimeType extends AbstractType
                 $builder->add('second', $options['widget'], $secondOptions);
             }
 
-            $builder->addViewTransformer(new DateTimeToArrayTransformer('UTC', 'UTC', $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeToArrayTransformer(null, null, $parts, 'text' === $options['widget']));
         }
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer('UTC', 'UTC', 'H:i:s')
+                new DateTimeToStringTransformer(null, null, 'H:i:s')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer('UTC', 'UTC')
+                new DateTimeToTimestampTransformer(null, null)
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer('UTC', 'UTC', $parts)
+                new DateTimeToArrayTransformer(null, null, $parts)
             ));
         }
     }

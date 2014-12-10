@@ -1372,6 +1372,8 @@ EOF;
 
     private function export($value)
     {
+        $originalValue = $value;
+        $value = (is_string($value) && (is_dir($value) || is_file($value)) && !in_array($value, array('.', '..'))) ? realpath($value) : $value;
         if (null !== $this->targetDirRegex && is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
             $prefix = $matches[0][1] ? var_export(substr($value, 0, $matches[0][1]), true).'.' : '';
             $suffix = $matches[0][1] + strlen($matches[0][0]);
@@ -1389,6 +1391,6 @@ EOF;
             return $dirname;
         }
 
-        return var_export($value, true);
+        return var_export($originalValue, true);
     }
 }

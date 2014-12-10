@@ -93,10 +93,24 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->setParameter('bar', dirname(__FILE__));
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
         $container->setParameter('buz', dirname(dirname(__DIR__)));
+        $container->setParameter('baz_dir_with_dots', dirname(__FILE__).'/../'.basename(dirname(__FILE__)));
+        $container->setParameter('baz_file_with_dots', dirname(__FILE__).'/../'.basename(dirname(__FILE__)).'/PhpDumperTest.php');
         $container->compile();
 
         $dumper = new PhpDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services12.php', $dumper->dump(array('file' => __FILE__)), '->dump() dumps __DIR__ relative strings');
+    }
+
+    public function testDumpRelativeDirAndKeepValuesWhichNotMatchTargetDirRegex()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('baz_dir_with_dots', dirname(__FILE__).'/../'.basename(dirname(__FILE__)));
+        $container->setParameter('baz_file_with_dots', dirname(__FILE__).'/../'.basename(dirname(__FILE__)).'/PhpDumperTest.php');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumpedString = $dumper->dump(array('file' => '/foo/bar'));
+        $this->assertEquals(str_replace('%path%', dirname(__FILE__), file_get_contents(self::$fixturesPath.'/php/services13.php')), $dumpedString, '->dump() dumps __DIR__ relative strings and keep values which not match target dir regex');
     }
 
     /**

@@ -992,7 +992,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p = $this->getProcess('php -r "usleep(500000);"');
         $p->disableOutput();
         $this->setExpectedException($exception, $exceptionMessage);
-        call_user_func(array($p, $startMethod), function () {});
+        $p->{$startMethod}(function () {});
     }
 
     public function provideStartMethods()
@@ -1013,7 +1013,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->disableOutput();
         $p->start();
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled.');
-        call_user_func(array($p, $fetchMethod));
+        $p->{$fetchMethod}();
     }
 
     public function provideOutputFetchingMethods()

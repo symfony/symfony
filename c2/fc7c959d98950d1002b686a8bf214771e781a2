@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-09T10:00:28Z
+
+@fabpot it would be good to have fabbot setting the ``context`` key when setting its status (and stopping to build a combined status given that Github finally displays the combined status directly).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-09T10:01:43Z
+
+:+1:

@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Un fichier vide n'est pas autorisé.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Le nom de domaine n'a pas pu être résolu.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

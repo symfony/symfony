@@ -109,17 +109,19 @@ class PhpDumper extends Dumper
         ), $options);
 
         if (!empty($options['file']) && is_dir($dir = dirname($options['file']))) {
-            // Build a regexp where the first two root dirs are mandatory,
+            // Build a regexp where the first root dirs are mandatory,
             // but every other sub-dir is optional up to the full path in $dir
+            // Mandate at least 2 root dirs and not more that 5 optional dirs.
 
             $dir = explode(DIRECTORY_SEPARATOR, realpath($dir));
             $i = count($dir);
 
             if (3 <= $i) {
                 $regex = '';
-                $this->targetDirMaxMatches = $i - 3;
+                $lastOptionalDir = $i > 8 ? $i - 5 : 3;
+                $this->targetDirMaxMatches = $i - $lastOptionalDir;
 
-                while (2 < --$i) {
+                while (--$i >= $lastOptionalDir) {
                     $regex = sprintf('(%s%s)?', preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#'), $regex);
                 }
 
@@ -786,6 +788,9 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$parameters;
+    private \$targetDirs = array();
+
 EOF;
     }
 
@@ -796,6 +801,7 @@ EOF;
      */
     private function addConstructor()
     {
+        $targetDirs = $this->exportTargetDirs();
         $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
 
         $code = <<<EOF
@@ -804,7 +810,7 @@ EOF;
      * Constructor.
      */
     public function __construct()
-    {
+    {{$targetDirs}
         parent::__construct($arguments);
 
 EOF;
@@ -833,6 +839,8 @@ EOF;
      */
     private function addFrozenConstructor()
     {
+        $targetDirs = $this->exportTargetDirs();
+
         $code = <<<EOF
 
     private \$parameters;
@@ -841,7 +849,7 @@ EOF;
      * Constructor.
      */
     public function __construct()
-    {
+    {{$targetDirs}
 EOF;
 
         if ($this->container->getParameterBag()->all()) {
@@ -1405,6 +1413,17 @@ EOF;
         return $this->expressionLanguage;
     }
 
+    private function exportTargetDirs()
+    {
+        return null === $this->targetDirRegex ? '' : <<<EOF
+
+        \$dir = __DIR__;
+        for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
+            \$this->targetDirs[\$i] = \$dir = dirname(\$dir);
+        }
+EOF;
+    }
+
     private function export($value)
     {
         if (null !== $this->targetDirRegex && is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
@@ -1413,8 +1432,8 @@ EOF;
             $suffix = isset($value[$suffix]) ? '.'.var_export(substr($value, $suffix), true) : '';
             $dirname = '__DIR__';
 
-            for ($i = $this->targetDirMaxMatches - count($matches); 0 <= $i; --$i) {
-                $dirname = sprintf('dirname(%s)', $dirname);
+            if (0 < $offset = 1 + $this->targetDirMaxMatches - count($matches)) {
+                $dirname = sprintf('$this->targetDirs[%d]', $offset);
             }
 
             if ($prefix || $suffix) {

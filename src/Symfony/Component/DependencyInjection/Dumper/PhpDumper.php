@@ -843,7 +843,6 @@ EOF;
 
         $code = <<<EOF
 
-
     /**
      * Constructor.
      */

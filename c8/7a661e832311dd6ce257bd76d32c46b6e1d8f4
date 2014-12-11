@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T09:14:04Z
+
+You backported too much things
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-21T09:42:13Z
+
+Ok, tests are green, for your two remaining comments @stof, the values are guaranteed to be of type `Closure`
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T09:55:21Z
+
+> Ok, tests are green, for your two remaining comments @stof, the values are guaranteed to be of type Closure
+
+For the Process, I agree, given that the user-provide callback gets wrapped in a closure. But for the error handler, this is not guaranteed AFAICT
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-21T10:08:50Z
+
+It is per https://github.com/nicolas-grekas/symfony/blob/no-call-user-func-23/src/Symfony/Component/Finder/Shell/Command.php#L227 or do I miss something?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T10:11:47Z
+
+ah indeed
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T10:11:54Z
+
+:+1:

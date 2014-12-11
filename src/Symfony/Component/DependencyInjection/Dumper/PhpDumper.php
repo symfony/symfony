@@ -843,8 +843,6 @@ EOF;
 
         $code = <<<EOF
 
-    private \$parameters;
-
     /**
      * Constructor.
      */

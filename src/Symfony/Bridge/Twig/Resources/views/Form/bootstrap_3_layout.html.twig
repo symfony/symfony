@@ -4,7 +4,7 @@
 
 {% block form_widget_simple -%}
     {% if type is not defined or 'file' != type %}
-        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
     {% endif %}
     {{- parent() -}}
 {%- endblock form_widget_simple %}
@@ -168,8 +168,8 @@
             {% set label = name|humanize %}
         {% endif %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                {{ widget|raw }}
-                {{ label is not sameas(false) ? label|trans({}, translation_domain) }}
+            {{- widget|raw -}}
+            {{- label is not sameas(false) ? label|trans({}, translation_domain) -}}
         </label>
     {% endif %}
 {% endblock checkbox_radio_label %}

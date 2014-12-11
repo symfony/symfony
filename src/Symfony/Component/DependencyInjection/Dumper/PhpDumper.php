@@ -788,6 +788,7 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$parameters;
     private \$targetDirs = array();
 
 EOF;
@@ -842,7 +843,6 @@ EOF;
 
         $code = <<<EOF
 
-    private \$parameters;
 
     /**
      * Constructor.

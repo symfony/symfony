@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-04T20:24:19Z
+
+This is ready: I reverted the drop of getDefaultParameters() - there is no gain to expect from here, even in 2.6.
+The 3 steps git history should help merging back into 2.5 then 2.6.
+One file will need an update on 2.6 after the merge:
+```patch
+--- a/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/services19.php
++++ b/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/services19.php
+@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+ class ProjectServiceContainer extends Container
+ {
+     private $parameters;
++    private $targetDirs = array();
+
+     /**
+      * Constructor.
+```

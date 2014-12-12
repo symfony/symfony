@@ -414,13 +414,13 @@
 
 {% macro form_tree_entry(name, data, expanded) %}
     <li>
-        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
+        <div class="tree-inner" data-tab-target-id="{% if data.id is defined %}{{ data.id }}{% endif %}-details">
             {% if data.children is not empty %}
                 <a class="toggle-button" data-toggle-target-id="{{ data.id }}-children" href="#"><span class="toggle-icon"></span></a>
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}
-            {{ name|default('(no name)') }} {% if data.type is not empty %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
             {% if data.errors is defined and data.errors|length > 0 %}
             <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
@@ -437,7 +437,7 @@
 {% endmacro %}
 
 {% macro form_tree_details(name, data, forms_by_hash) %}
-    <div class="tree-details" {% if data.id is defined %} id="{{ data.id }}-details"{% endif %}>
+    <div class="tree-details" id="{% if data.id is defined %}{{ data.id }}{% endif %}-details">
         <h2>
             {{ name|default('(no name)') }}
             {% if data.type_class is defined %}
@@ -542,13 +542,13 @@
 
         {% if data.submitted_data is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
+            <a class="toggle-button" {% if data.id is defined %}data-toggle-target-id="{{ data.id }}-submitted_data"{% endif %} href="#">
                 Submitted Data
                 <span class="toggle-icon"></span>
             </a>
         </h3>
 
-        <div id="{{ data.id }}-submitted_data">
+        <div id="{% if data.id is defined %}{{ data.id }}{% endif %}-submitted_data">
         {% if data.submitted_data.norm is defined %}
             <table>
                 <tr>

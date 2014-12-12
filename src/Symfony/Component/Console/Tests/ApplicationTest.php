@@ -972,7 +972,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'help'));
 
-        $this->assertTrue($tester->getInput()->isInteractive());
         $this->assertFalse($tester->getInput()->hasParameterOption(array('--no-interaction', '-n')));
 
         $inputStream = $application->getHelperSet()->get('question')->getInputStream();

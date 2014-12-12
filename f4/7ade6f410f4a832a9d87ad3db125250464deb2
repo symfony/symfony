@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-23T06:58:30Z
+
+@xabbuh removed class parameter.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-23T17:05:08Z
+
+Avoiding BC is a bad idea. We want to avoid breaking BC, not keeping it.
+
+and making this normalizer run at a high priority is definitely a BC break, as it means it would run before custom normalizers registered the simple way, thus changing the behavior for existing apps
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-23T17:11:07Z
+
+@stof sorry I've misspelled my sentence. I want to keep BC of course :)
+But it seems that the lower is the value of the "priority" tag, the higher is the "real" priority: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/SerializerPass.php#L57
+
+So my current code is OK (or `FrameworkBundle` must be fixed).
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-23T17:35:27Z
+
+@dunglas krsort is meant to sort the high priority first (i.e. sorting in descending order). The effect is to make the high priority win (as the serializer uses the first normalizer supporting the value)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-23T17:46:50Z
+
+@stof Ok I got it. I've missed the `r` in krsort! I'll fix the code.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-23T17:48:42Z
+
+Fixed and squashed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-11-21T10:43:06Z
+
+Changed according to @stof comments.

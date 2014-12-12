@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-12-12T15:00:29Z
+
+@thewilkybarkid thanks for your PR! I love these quick wins!
+
+By the way, your message ends abruptly, so it's been probably cut unintentionally: *"This PR changes it to only include the method section/double dots if the method name is included. This does mean that there is no link included... (so either the )"*
+
+---------------------------------------------------------------------------
+
+by thewilkybarkid at 2014-12-12T15:03:49Z
+
+@javiereguiluz Fixed now. Got to that point, fixed the code, didn't fix the text. :smiley:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-12T15:07:13Z
+
+:+1:

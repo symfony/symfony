@@ -75,7 +75,7 @@
         "monolog/monolog": "~1.11",
         "propel/propel1": "~1.6",
         "ircmaxell/password-compat": "~1.0",
-        "ocramius/proxy-manager": ">=0.3.1,<0.6-dev",
+        "ocramius/proxy-manager": "~0.3.1",
         "egulias/email-validator": "~1.2"
     },
     "autoload": {

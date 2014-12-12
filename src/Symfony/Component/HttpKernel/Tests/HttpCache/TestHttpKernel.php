@@ -72,8 +72,8 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 
         $response = new Response($this->body, $this->status, $this->headers);
 
-        if (null !== $this->customizer) {
-            call_user_func($this->customizer, $request, $response);
+        if (null !== $customizer = $this->customizer) {
+            $customizer($request, $response);
         }
 
         return $response;

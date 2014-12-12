@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-23T13:33:15Z
+
+Thanks for the PR. Looks good. :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-28T09:56:00Z
+
+Isn't it something that needs to be merged in 2.3?
+
+---------------------------------------------------------------------------
+
+by origaminal at 2014-11-28T14:10:01Z
+
+@fabpot No. There are the deprecated `max_length` and `pattern` options used on 2.3 branch.

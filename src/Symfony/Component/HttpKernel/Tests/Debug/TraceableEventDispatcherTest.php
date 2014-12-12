@@ -75,6 +75,24 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request);
     }
 
+    public function testAddListenerNested()
+    {
+        $called1 = false;
+        $called2 = false;
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('my-event', function () use ($dispatcher, &$called1, &$called2) {
+            $called1 = true;
+            $dispatcher->addListener('my-event', function () use (&$called2) {
+                $called2 = true;
+            });
+        });
+        $dispatcher->dispatch('my-event');
+        $this->assertTrue($called1);
+        $this->assertFalse($called2);
+        $dispatcher->dispatch('my-event');
+        $this->assertTrue($called2);
+    }
+
     protected function getHttpKernel($dispatcher, $controller)
     {
         $resolver = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');

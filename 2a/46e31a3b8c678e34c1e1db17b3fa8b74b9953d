@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-11T16:21:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-12T07:58:29Z
+
+`e.g.` means `for example`, so the `for` should be removed. But anyway, the list is exhaustive, so I would just remove it like it was before.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-12T08:57:40Z
+
+The list is exhaustive to the extend that our Levenshtein matching is, which is not true in the general case, thus the `e.g.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-12T09:01:36Z
+
+Ok, forget my comment, Levenshtein is used for methods, not class names currently (but it could some day :) ).

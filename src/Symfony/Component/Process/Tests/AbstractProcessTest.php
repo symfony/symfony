@@ -865,7 +865,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         $process = $this->getProcess('php -m');
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', sprintf('Process must be started before calling %s.', $method));
-        call_user_func(array($process, $method));
+        $process->{$method}();
     }
 
     public function provideMethodsThatNeedARunningProcess()
@@ -887,7 +887,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process = $this->getProcess('php -r "sleep(1);"');
         $process->start();
         try {
-            call_user_func(array($process, $method));
+            $process->{$method}();
             $process->stop(0);
             $this->fail('A LogicException must have been thrown');
         } catch (\Exception $e) {
@@ -1013,7 +1013,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p = $this->getProcess('php -r "usleep(500000);"');
         $p->disableOutput();
         $this->setExpectedException($exception, $exceptionMessage);
-        call_user_func(array($p, $startMethod), function () {});
+        $p->{$startMethod}(function () {});
     }
 
     public function provideStartMethods()
@@ -1034,7 +1034,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->disableOutput();
         $p->start();
         $this->setExpectedException('Symfony\Component\Process\Exception\LogicException', 'Output has been disabled.');
-        call_user_func(array($p, $fetchMethod));
+        $p->{$fetchMethod}();
     }
 
     public function provideOutputFetchingMethods()

@@ -17,19 +17,18 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class ProjectServiceContainer extends Container
 {
     private $parameters;
+    private $targetDirs = array();
 
     /**
      * Constructor.
      */
     public function __construct()
     {
+        $this->parameters = $this->getDefaultParameters();
+
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
-        $this->parameters = array(
-            'empty_value' => '',
-            'some_string' => '-',
-        );
 
         $this->set('service_container', $this);
 
@@ -105,5 +104,18 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->parameterBag;
+    }
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return array(
+            'empty_value' => '',
+            'some_string' => '-',
+        );
     }
 }

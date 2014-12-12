@@ -51,14 +51,25 @@
     cursor: help;
 }
 .sf-toolbarreset span,
-.sf-toolbarreset div {
+.sf-toolbarreset div,
+.sf-toolbarreset td,
+.sf-toolbarreset th {
     font-size: 11px;
 }
 .sf-toolbarreset img {
     width: auto;
     display: inline;
 }
-
+.sf-toolbarreset table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    table-layout: auto;
+}
 .sf-toolbarreset .hide-button {
     display: block;
     position: absolute;
@@ -289,12 +300,11 @@
     overflow-y: auto;
 }
 
-table.sf-toolbar-ajax-requests {
-    border-collapse: collapse;
-}
 .sf-toolbar-ajax-requests th, .sf-toolbar-ajax-requests td {
     border-bottom: 1px solid #ddd;
     padding: 0 4px;
+    color: #2f2f2f;
+    background-color: #fff;
 }
 .sf-toolbar-ajax-requests th {
     background-color: #eee;

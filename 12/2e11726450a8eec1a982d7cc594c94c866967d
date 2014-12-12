@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-30T10:55:22Z
+
+Can you add some unit tests?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-11-30T10:57:10Z
+
+Ok, I'll try ;)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-11-30T16:45:23Z
+
+done
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-12-07T22:50:44Z
+
+@aitboudad Does this fix #12793? That issue is about a minor BC break because when a symlink fails, it now throws an exception. If this fixes that issue, I'm not clear now (but it's likely I'm missing something!)
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-12-08T09:59:02Z
+
+@weaverryan sorry I didn't read the full description for #12793 :p , this PR fix symlink to a relative pathname.

@@ -542,7 +542,7 @@
 
         {% if data.submitted_data is defined %}
         <h3>
-            <a class="toggle-button" data-toggle-target-id="{{ data.id }}-submitted_data" href="#">
+            <a class="toggle-button"{% if data.id is defined %} data-toggle-target-id="{{ data.id }}-submitted_data"{% endif %} href="#">
                 Submitted Data
                 <span class="toggle-icon"></span>
             </a>

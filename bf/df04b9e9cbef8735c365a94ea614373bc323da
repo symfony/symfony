@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-30T15:30:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2014-11-30T20:04:38Z
+
+@fabpot Just rebased this. :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-04T09:49:48Z
+
+Why are we forbidding maintained versions of the ProxyManager ?
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2014-12-04T21:28:29Z
+
+Because they don't work with symfony 2.3. Supporting them would be a bc break, that was only made in later versions, like 2.5 for example.

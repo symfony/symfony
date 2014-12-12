@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-11T15:08:47Z
+
+Apparently, that breaks the tests.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-11T16:48:53Z
+
+@fabpot Yes, I had one local commit missing - now it should be okay.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-11T21:17:45Z
+
+@stof Thanks for the valuable feedback, has been updated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-12T06:28:33Z
+
+@peterrehm Can you also have a look at the tests?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-12T09:26:50Z
+
+@fabpot It looks like they broke due to the switch to array_diff as suggested by @stof.
+I reverted those changes to the userland implementation.
+
+It is all due to the diff with objects
+
+````php
+$role1 = new \Symfony\Component\Security\Core\Role\Role('ROLE_USER');
+
+$assignedRoles = array($role1);
+$allRoles = array($role1);
+
+var_dump(array_diff($assignedRoles, $allRoles));
+````
+
+Fails with the following error:
+
+    PHP Catchable fatal error:  Object of class Symfony\Component\Security\Core\Role\Role could not be converted to string in /www/symfony/play.php on line 10
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-12T16:36:26Z
+
+Now it should be okay. However there are many failing tests due to the depreciation messages.

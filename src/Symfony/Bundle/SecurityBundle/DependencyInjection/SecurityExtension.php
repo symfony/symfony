@@ -495,6 +495,7 @@ class SecurityExtension extends Extension
     {
         $name = $this->getUserProviderId(strtolower($name));
 
+        // Doctrine Entity and In-memory DAO provider are managed by factories
         foreach ($this->userProviderFactories as $factory) {
             $key = str_replace('-', '_', $factory->getKey());
 
@@ -521,37 +522,12 @@ class SecurityExtension extends Extension
 
             $container
                 ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
-                ->addArgument($providers)
-            ;
+                ->addArgument($providers);
 
             return $name;
         }
 
-        // Doctrine Entity DAO provider
-        if (isset($provider['entity'])) {
-            $container
-                ->setDefinition($name, new DefinitionDecorator('security.user.provider.entity'))
-                ->addArgument($provider['entity']['class'])
-                ->addArgument($provider['entity']['property'])
-            ;
-
-            return $name;
-        }
-
-        // In-memory DAO provider
-        $definition = $container->setDefinition($name, new DefinitionDecorator('security.user.provider.in_memory'));
-        foreach ($provider['users'] as $username => $user) {
-            $userId = $name.'_'.$username;
-
-            $container
-                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
-            ;
-
-            $definition->addMethodCall('createUser', array(new Reference($userId)));
-        }
-
-        return $name;
+        throw new InvalidConfigurationException(sprintf('Unable to create definition for "%s" user provider', $name));
     }
 
     private function getUserProviderId($name)

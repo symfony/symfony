@@ -85,7 +85,7 @@ EOF
             $context->setHost($host);
         }
 
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context, $this->getContainer());
 
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 

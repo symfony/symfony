@@ -15,15 +15,22 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $dumbContainer;
+
     public function testRedirectWhenNoSlash()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext(), $this->dumbContainer);
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -43,7 +50,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext(), $this->dumbContainer);
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -63,7 +70,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext(), $this->dumbContainer);
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',

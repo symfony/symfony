@@ -57,17 +57,22 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected $expressionLanguageProviders = array();
 
     /**
-     * Constructor.
-     *
+     * @var array
+     */
+    protected $expressionLanguageCtx;
+
+    /**
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     * @param array $expressionLanguageCtx Context for evaluation of ExpLang expressions
      *
      * @api
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context, array $expressionLanguageCtx)
     {
         $this->routes = $routes;
         $this->context = $context;
+        $this->expressionLanguageCtx = $expressionLanguageCtx;
     }
 
     /**
@@ -211,7 +216,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected function handleRouteRequirements($pathinfo, $name, Route $route)
     {
         // expression condition
-        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(), array('context' => $this->context, 'request' => $this->request))) {
+        if ($route->getCondition() && !$this->getExpressionLanguage()->evaluate($route->getCondition(),
+                array('context' => $this->context, 'request' => $this->request) + $this->expressionLanguageCtx)) {
+
             return array(self::REQUIREMENT_MISMATCH, null);
         }
 

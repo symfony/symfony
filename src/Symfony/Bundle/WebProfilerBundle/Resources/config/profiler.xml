@@ -24,6 +24,7 @@
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">

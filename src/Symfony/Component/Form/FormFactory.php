@@ -113,11 +113,11 @@ class FormFactory implements FormFactoryInterface
         $pattern = $patternGuess ? $patternGuess->getValue() : null;
 
         if (null !== $pattern) {
-            $options = array_merge(array('attr' => array('pattern' => $pattern)), $options);
+            $options = array_replace_recursive(array('attr' => array('pattern' => $pattern)), $options);
         }
 
         if (null !== $maxLength) {
-            $options = array_merge(array('attr' => array('maxlength' => $maxLength)), $options);
+            $options = array_replace_recursive(array('attr' => array('maxlength' => $maxLength)), $options);
         }
 
         if ($requiredGuess) {

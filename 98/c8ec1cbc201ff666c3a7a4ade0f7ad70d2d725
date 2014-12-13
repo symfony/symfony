@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-13T09:07:18Z
+
+@nicolas-grekas This is basically the same as #12963.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-13T09:10:09Z
+
+I just cherry-picked your fix so that the combinaison of both fixes have a chance to make tests green
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-13T09:11:50Z
+
+@nicolas-grekas Thanks, though that was not really necessary since you fixed it in the same way. I closed #12963 in the meantime.
+
+The question remains if we should also allow `~1.0` and `~2.0` for the proxy manager. Both releases don't break tests. What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-13T09:18:06Z
+
+Just added ~1.0 (but not 2.0 since it's a dev branch)

@@ -93,6 +93,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function init()
     {
+        trigger_error('The Kernel::init() method was deprecated in version 2.3 and will be removed in 3.0. Move your logic to the constructor instead.', E_USER_DEPRECATED);
     }
 
     public function __clone()

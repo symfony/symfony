@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -72,6 +72,16 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+     * Returns the output.
+     *
+     * @return OutputInterface The output
+     */
+    protected function getOutput()
+    {
+        return $this->output;
+    }
+
+    /**
      * Writes content to output.
      *
      * @param string $content
@@ -85,17 +95,18 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Writes content to output.
      *
-     * @param TableHelper $table
-     * @param bool        $decorated
+     * @param Table $table
+     * @param bool  $decorated
      */
-    protected function renderTable(TableHelper $table, $decorated = false)
+    protected function renderTable(Table $table, $decorated = false)
     {
         if (!$decorated) {
-            $table->setCellRowFormat('%s');
-            $table->setCellHeaderFormat('%s');
+            $table->getStyle()->setCellRowFormat('%s');
+            $table->getStyle()->setCellRowContentFormat('%s');
+            $table->getStyle()->setCellHeaderFormat('%s');
         }
 
-        $table->render($this->output);
+        $table->render();
     }
 
     /**

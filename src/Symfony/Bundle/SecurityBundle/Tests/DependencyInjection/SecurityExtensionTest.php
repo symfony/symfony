@@ -80,13 +80,13 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container->loadFromExtension('security', array(
             'providers' => array(
-                'my_foo' => array('foo' => []),
+                'my_foo' => array('foo' => array()),
             ),
 
             'firewalls' => array(
                 'some_firewall' => array(
                     'pattern' => '/.*',
-                    'http_basic' => [],
+                    'http_basic' => array(),
                 ),
             ),
         ));

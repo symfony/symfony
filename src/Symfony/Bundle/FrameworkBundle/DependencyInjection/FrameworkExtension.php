@@ -40,7 +40,6 @@ class FrameworkExtension extends Extension
      *
      * @param array            $configs
      * @param ContainerBuilder $container
-     * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -299,7 +298,7 @@ class FrameworkExtension extends Extension
             'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
             'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
         );
-        list($class, ) = explode(':', $config['dsn'], 2);
+        list($class) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
@@ -722,7 +721,9 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
-        list($xmlMappings, $yamlMappings) = $this->getValidatorMappingFiles($container);
+        $xmlMappings = $this->getValidatorXmlMappingFiles($container);
+        $yamlMappings = $this->getValidatorYamlMappingFiles($container);
+
         if (count($xmlMappings) > 0) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
         }
@@ -769,30 +770,66 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.api', $api);
     }
 
-    private function getValidatorMappingFiles(ContainerBuilder $container)
+    private function getValidatorXmlMappingFiles(ContainerBuilder $container)
     {
-        $files = array(array(), array());
+        $files = array();
 
         if (interface_exists('Symfony\Component\Form\FormInterface')) {
             $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
-            $files[0][] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
-            $container->addResource(new FileResource($files[0][0]));
+            $files[] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
+            $container->addResource(new FileResource($files[0]));
         }
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFilename());
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $filesPath = $this->findValidationFiles($bundle, 'xml');
 
-            if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
-                $files[0][] = realpath($file);
+            foreach ($filesPath as $file) {
+                $files[] = $file;
                 $container->addResource(new FileResource($file));
             }
+        }
 
-            if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
-                $files[1][] = realpath($file);
+        return $files;
+    }
+
+    private function getValidatorYamlMappingFiles(ContainerBuilder $container)
+    {
+        $files = array();
+
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $filesPath = $this->findValidationFiles($bundle, 'yml');
+
+            foreach ($filesPath as $file) {
+                $files[] = $file;
                 $container->addResource(new FileResource($file));
             }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Finds files to perform validation in a bundle.
+     *
+     * @param string $bundle    Path to a bundle.
+     * @param string $extension Extention of file(s) wanted to be found
+     *
+     * @return array array of paths to validation files
+     */
+    private function findValidationFiles($bundle, $extension)
+    {
+        $files = array();
+        $reflection = new \ReflectionClass($bundle);
+        $dir = dirname($reflection->getFilename()).'/Resources/config';
+
+        if (!is_dir($dir)) {
+            return $files;
+        }
+
+        $finder = Finder::create()->files()->name('/\W*(v|V)alidation.'.$extension.'$/')->in($dir);
+
+        foreach ($finder as $file) {
+            $files[] = $file->getRealpath();
         }
 
         return $files;

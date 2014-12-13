@@ -67,6 +67,12 @@
                 <th>Roles</th>
                 <td>{{ collector.roles|yaml_encode }}</td>
             </tr>
+            {% if collector.supportsRoleHierarchy %}
+            <tr>
+                <th>Inherited Roles</th>
+                <td>{{ collector.inheritedRoles|yaml_encode }}</td>
+            </tr>
+            {% endif %}
             {% if collector.tokenClass != null %}
             <tr>
                 <th>Token class</th>

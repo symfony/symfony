@@ -111,7 +111,27 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository(get_class($entity));
+        if (null !== $constraint->repository) {
+            /* Retrieve repository from given entity name.
+             * We ensure the retrieved repository can handle the entity
+             * by checking the entity is the same, or subclass of the supported entity.
+             */
+            $repository = $em->getRepository($constraint->repository);
+            $supportedClass = $repository->getClassName();
+
+            $className = $class->getName();
+
+            if (!($supportedClass === $className || is_subclass_of($className, $supportedClass))) {
+                throw new ConstraintDefinitionException(sprintf(
+                    "Unable to use the given '%s' repository for the '%s' entity.",
+                    get_class($repository),
+                    $className
+                ));
+            }
+        } else {
+            $repository = $em->getRepository(get_class($entity));
+        }
+
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         /* If the result is a MongoCursor, it must be advanced to the first

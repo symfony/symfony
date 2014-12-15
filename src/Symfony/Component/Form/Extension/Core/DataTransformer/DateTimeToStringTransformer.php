@@ -66,12 +66,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
         $this->generateFormat = $this->parseFormat = $format;
 
-        // The pipe in the parser pattern only works as of PHP 5.3.7
-        // See http://bugs.php.net/54316
-        $this->parseUsingPipe = null === $parseUsingPipe
-            ? PHP_VERSION_ID >= 50307
-            : $parseUsingPipe;
-
         // See http://php.net/manual/en/datetime.createfromformat.php
         // The character "|" in the format makes sure that the parts of a date
         // that are *not* specified in the format are reset to the corresponding

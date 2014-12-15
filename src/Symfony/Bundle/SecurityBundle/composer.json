@@ -22,13 +22,20 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.3",
+        "symfony/css-selector": "~2.0,>=2.0.5",
+        "symfony/dependency-injection": "~2.3",
+        "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/form": "~2.3",
         "symfony/framework-bundle": "~2.2,<2.6.0",
+        "symfony/http-foundation": "~2.3",
         "symfony/twig-bundle": "~2.2",
-        "symfony/process": "~2.0",
+        "symfony/twig-bridge": "~2.2,>=2.2.6",
+        "symfony/form": "~2.3",
+        "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.2",
-        "symfony/yaml": "~2.0",
-        "symfony/expression-language": "~2.4"
+        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/expression-language": "~2.4",
+        "twig/twig": "~1.12"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

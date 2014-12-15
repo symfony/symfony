@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dependency-injection" : "~2.2",
+        "symfony/dependency-injection" : "~2.3",
         "symfony/config" : "~2.4",
         "symfony/event-dispatcher": "~2.5",
         "symfony/http-foundation": "~2.4",
@@ -28,20 +28,24 @@
         "symfony/security-csrf": "~2.4",
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
-        "symfony/translation": "~2.3",
+        "symfony/translation": "~2.3,>=2.3.19",
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
         "symfony/browser-kit": "~2.3",
-        "symfony/console": "~2.0",
-        "symfony/finder": "~2.0",
+        "symfony/console": "~2.3",
+        "symfony/css-selector": "~2.0,>=2.0.5",
+        "symfony/dom-crawler": "~2.0,>=2.0.5",
+        "symfony/finder": "~2.0,>=2.0.5",
+        "symfony/locale": "~2.0,>=2.0.5",
         "symfony/security": "~2.4",
         "symfony/form": "2.5.*",
         "symfony/class-loader": "~2.1",
         "symfony/expression-language": "~2.4",
-        "symfony/process": "~2.0",
+        "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.5",
-        "symfony/yaml": "~2.0"
+        "symfony/yaml": "~2.0,>=2.0.5"
+        "doctrine/common": "~2.2"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

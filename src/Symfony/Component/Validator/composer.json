@@ -17,19 +17,18 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/translation": "~2.0"
+        "symfony/translation": "~2.0,>=2.0.5"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.0",
+        "symfony/yaml": "~2.0,>=2.0.5",
         "symfony/config": "~2.2",
         "symfony/property-access": "~2.2",
         "symfony/expression-language": "~2.4",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "~1.0",
-        "symfony/expression-language": "~2.4"
+        "egulias/email-validator": "~1.0"
     },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",

@@ -117,6 +117,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $this->data['request_server']['PHP_AUTH_PW'] = '******';
         }
 
+        if (isset($this->data['request_request']['_password'])) {
+            $this->data['request_request']['_password'] = '******';
+        }
+
         if (isset($this->controllers[$request])) {
             $controller = $this->controllers[$request];
             if (is_array($controller)) {

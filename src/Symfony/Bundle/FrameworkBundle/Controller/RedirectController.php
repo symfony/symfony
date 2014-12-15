@@ -58,14 +58,7 @@ class RedirectController extends ContainerAware
             }
         }
 
-        return new RedirectResponse(
-            $this->container->get('router')->generate(
-                $route,
-                $attributes,
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ),
-            $permanent ? 301 : 302
-        );
+        return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
     }
 
     /**

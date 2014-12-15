@@ -14,14 +14,15 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Clear and Warmup the cache.
  *
  * @author Francis Besset <francis.besset@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Gábor Egyed <gabor.egyed@gmail.com>
  */
 class CacheClearCommand extends ContainerAwareCommand
 {
@@ -56,6 +57,7 @@ EOF
         $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
         $oldCacheDir = $realCacheDir.'_old';
         $filesystem = $this->getContainer()->get('filesystem');
+        $ret = 0;
 
         if (!is_writable($realCacheDir)) {
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
@@ -70,6 +72,43 @@ EOF
         $this->getContainer()->get('cache_clearer')->clear($realCacheDir);
 
         $filesystem->rename($realCacheDir, $oldCacheDir);
+
+        if (!$input->getOption('no-warmup')) {
+            $finder = new PhpExecutableFinder();
+            $php = $finder->find();
+
+            $pb = new ProcessBuilder();
+            $pb
+                ->inheritEnvironmentVariables(true)
+                ->add($php)
+                ->add($_SERVER['argv'][0])
+                ->add('cache:warmup')
+            ;
+
+            // pass valid options only
+            $options = array_intersect_key($input->getOptions(), array_merge(
+                $this->getApplication()->getDefinition()->getOptions(),
+                $this->getApplication()->get('cache:warmup')->getDefinition()->getOptions()
+            ));
+
+            foreach ($options as $option => $value) {
+                if (!is_bool($value)) {
+                    $pb->add(sprintf('--%s=%s', $option, $value));
+                } elseif (true === $value) {
+                    $pb->add(sprintf('--%s', $option));
+                }
+            }
+
+            $process = $pb->getProcess();
+            $process->run();
+
+            if (0 !== $ret = $process->getExitCode()) {
+                $output->writeln(sprintf('<error>Cache warmup terminated with an error status (%s)</error>', $ret));
+            }
+        }
+
         $filesystem->remove($oldCacheDir);
+
+        return $ret;
     }
 }

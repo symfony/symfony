@@ -176,6 +176,16 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRouteWithFragmentAsPathParameter()
+    {
+        $route = new Route('/{_fragment}');
+
+        $compiled = $route->compile();
+    }
+
+    /**
      * @dataProvider getNumericVariableNames
      * @expectedException \DomainException
      */

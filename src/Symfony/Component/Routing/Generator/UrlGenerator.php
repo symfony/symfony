@@ -257,12 +257,22 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             $url = $schemeAuthority.$this->context->getBaseUrl().$url;
         }
 
-        // add a query string if needed
+        // extract unused parameters
         $extra = array_diff_key($parameters, $variables, $defaults);
+
+        // extract fragment
+        $fragment = isset($extra['_fragment']) ? $extra['_fragment'] : '';
+        unset($extra['_fragment']);
+
+        // add a query string if needed
         if ($extra && $query = http_build_query($extra, '', '&')) {
             // "/" and "?" can be left decoded for better user experience, see
             // http://tools.ietf.org/html/rfc3986#section-3.4
             $url .= '?'.strtr($query, array('%2F' => '/'));
+        }
+
+        if ('' !== $fragment) {
+            $url .= '#'.strtr(rawurlencode($fragment), array('%2F' => '/', '%3F' => '?'));
         }
 
         return $url;

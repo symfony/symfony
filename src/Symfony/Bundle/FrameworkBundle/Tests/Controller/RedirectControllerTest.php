@@ -100,7 +100,7 @@ class RedirectControllerTest extends TestCase
             array(false, array('additional-parameter'), 302, array()),
         );
     }
-    
+
     public function testRedirectWithQueryParams()
     {
         $host        = 'www.example.com';

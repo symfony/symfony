@@ -59,10 +59,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.7.0-DEV';
-    const VERSION_ID = '20700';
-    const MAJOR_VERSION = '2';
-    const MINOR_VERSION = '7';
+    const VERSION = '3.0.0-DEV';
+    const VERSION_ID = '30000';
+    const MAJOR_VERSION = '3';
+    const MINOR_VERSION = '0';
     const RELEASE_VERSION = '0';
     const EXTRA_VERSION = 'DEV';
 
@@ -84,15 +84,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if ($this->debug) {
             $this->startTime = microtime(true);
         }
-
-        $this->init();
-    }
-
-    /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
-     */
-    public function init()
-    {
     }
 
     public function __clone()

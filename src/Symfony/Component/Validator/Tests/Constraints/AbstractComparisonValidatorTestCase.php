@@ -163,7 +163,8 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
     abstract public function provideInvalidComparisons();
 
     /**
-     * @param  array      $options Options for the constraint
+     * @param array $options Options for the constraint
+     *
      * @return Constraint
      */
     abstract protected function createConstraint(array $options);

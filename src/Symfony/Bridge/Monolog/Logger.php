@@ -27,6 +27,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function emerg($message, array $context = array())
     {
+        trigger_error('The emerg() method of the Monolog Logger was removed. You should use the new method emergency() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
         return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
     }
 
@@ -35,6 +37,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function crit($message, array $context = array())
     {
+        trigger_error('The crit() method of the Monolog Logger was removed. You should use the new method critical() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
         return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
     }
 
@@ -43,6 +47,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function err($message, array $context = array())
     {
+        trigger_error('The err() method of the Monolog Logger was removed. You should use the new method error() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
         return parent::addRecord(BaseLogger::ERROR, $message, $context);
     }
 
@@ -51,6 +57,8 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
      */
     public function warn($message, array $context = array())
     {
+        trigger_error('The warn() method of the Monolog Logger was removed. You should use the new method warning() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
         return parent::addRecord(BaseLogger::WARNING, $message, $context);
     }
 

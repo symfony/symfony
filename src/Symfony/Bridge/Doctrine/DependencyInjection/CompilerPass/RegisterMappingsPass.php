@@ -168,7 +168,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @return string The name of the chain driver service
      *
      * @throws ParameterNotFoundException if non of the managerParameters has a
-     *      non-empty value.
+     *                                    non-empty value.
      */
     protected function getChainDriverServiceName(ContainerBuilder $container)
     {
@@ -179,7 +179,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Create the service definition for the metadata driver.
      *
      * @param ContainerBuilder $container passed on in case an extending class
-     *      needs access to the container.
+     *                                    needs access to the container.
      *
      * @return Definition|Reference the metadata driver to add to all chain drivers
      */
@@ -196,7 +196,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @return string a service definition name
      *
      * @throws ParameterNotFoundException if none of the managerParameters has a
-     *      non-empty value.
+     *                                    non-empty value.
      */
     private function getConfigurationServiceName(ContainerBuilder $container)
     {

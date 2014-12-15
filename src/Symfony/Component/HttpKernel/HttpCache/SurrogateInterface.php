@@ -35,7 +35,7 @@ interface SurrogateInterface
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if one surrogate has Surrogate capability, false otherwise
+     * @return bool true if one surrogate has Surrogate capability, false otherwise
      */
     public function hasSurrogateCapability(Request $request);
 
@@ -60,17 +60,17 @@ interface SurrogateInterface
      *
      * @param Response $response A Response instance
      *
-     * @return bool    true if the Response needs to be parsed, false otherwise
+     * @return bool true if the Response needs to be parsed, false otherwise
      */
     public function needsParsing(Response $response);
 
     /**
      * Renders a Surrogate tag.
      *
-     * @param string  $uri          A URI
-     * @param string  $alt          An alternate URI
-     * @param bool    $ignoreErrors Whether to ignore errors or not
-     * @param string  $comment      A comment to add as an esi:include tag
+     * @param string $uri          A URI
+     * @param string $alt          An alternate URI
+     * @param bool   $ignoreErrors Whether to ignore errors or not
+     * @param string $comment      A comment to add as an esi:include tag
      *
      * @return string
      */

@@ -38,8 +38,8 @@ class SimpleXMLElement extends \SimpleXMLElement
     /**
      * Returns arguments as valid PHP types.
      *
-     * @param string  $name
-     * @param bool    $lowercase
+     * @param string $name
+     * @param bool   $lowercase
      *
      * @return mixed
      */

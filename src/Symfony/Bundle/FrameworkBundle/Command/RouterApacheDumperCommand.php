@@ -56,7 +56,7 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
                 new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
-            ->setDescription('Dumps all routes as Apache rewrite rules')
+            ->setDescription('[DEPRECATED] Dumps all routes as Apache rewrite rules')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> dumps all routes as Apache rewrite rules.
 These can then be used with the ApacheUrlMatcher to use Apache for route
@@ -74,6 +74,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        trigger_error('The router:dump-apache command is deprecated since 2.5 and will be removed in 3.0', E_USER_DEPRECATED);
+
         $router = $this->getContainer()->get('router');
 
         $dumpOptions = array();

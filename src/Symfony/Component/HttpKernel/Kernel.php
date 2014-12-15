@@ -69,8 +69,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Constructor.
      *
-     * @param string  $environment The environment
-     * @param bool    $debug       Whether to enable debugging or not
+     * @param string $environment The environment
+     * @param bool   $debug       Whether to enable debugging or not
      *
      * @api
      */
@@ -214,6 +214,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     public function isClassInActiveBundle($class)
     {
+        trigger_error('Symfony\\Component\\HttpKernel\\Kernel::isClassInActiveBundle() is deprecated since version 2.6 and will be removed in version 3.0.', E_USER_DEPRECATED);
+
         foreach ($this->getBundles() as $bundle) {
             if (0 === strpos($class, $bundle->getNamespace())) {
                 return true;
@@ -260,9 +262,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * before looking in the bundle resource folder.
      *
-     * @param string  $name  A resource name to locate
-     * @param string  $dir   A directory where to look for the resource first
-     * @param bool    $first Whether to return the first path or paths for all matching bundles
+     * @param string $name  A resource name to locate
+     * @param string $dir   A directory where to look for the resource first
+     * @param bool   $first Whether to return the first path or paths for all matching bundles
      *
      * @return string|array The absolute path of the resource or an array if $first is false
      *
@@ -710,7 +712,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => (string) $cache));
         if (!$this->debug) {
             $content = static::stripComments($content);
         }

@@ -180,7 +180,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     /**
      * Format an attribute name, for example to convert a snake_case name to camelCase.
      *
-     * @param  string $attributeName
+     * @param string $attributeName
      *
      * @return string
      */

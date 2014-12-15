@@ -592,9 +592,14 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * Unsupported method.
      *
      * @return bool Always returns false.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *              {@link getInheritData()} instead.
      */
     public function getVirtual()
     {
+        trigger_error('ButtonBuilder::getVirtual() is deprecated since version 2.3 and will be removed in 3.0. Use FormConfigBuilder::getInheritData() instead.', E_USER_DEPRECATED);
+
         return false;
     }
 

@@ -98,6 +98,8 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
+        trigger_error('Definition::setFactoryClass() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryClass = $factoryClass;
 
         return $this;
@@ -128,6 +130,8 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
+        trigger_error('Definition::setFactoryMethod() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryMethod = $factoryMethod;
 
         return $this;
@@ -193,6 +197,8 @@ class Definition
      */
     public function setFactoryService($factoryService)
     {
+        trigger_error('Definition::setFactoryService() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+
         $this->factoryService = $factoryService;
 
         return $this;
@@ -302,8 +308,8 @@ class Definition
     /**
      * Sets a specific argument
      *
-     * @param int     $index
-     * @param mixed   $argument
+     * @param int   $index
+     * @param mixed $argument
      *
      * @return Definition The current instance
      *
@@ -337,7 +343,7 @@ class Definition
     /**
      * Gets an argument to pass to the service constructor/factory method.
      *
-     * @param int     $index
+     * @param int $index
      *
      * @return mixed The argument value
      *
@@ -610,7 +616,7 @@ class Definition
     /**
      * Sets the visibility of this service.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition The current instance
      *
@@ -638,7 +644,7 @@ class Definition
     /**
      * Sets the synchronized flag of this service.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition The current instance
      *
@@ -666,7 +672,7 @@ class Definition
     /**
      * Sets the lazy flag of this service.
      *
-     * @param bool    $lazy
+     * @param bool $lazy
      *
      * @return Definition The current instance
      */
@@ -691,7 +697,7 @@ class Definition
      * Sets whether this definition is synthetic, that is not constructed by the
      * container, but dynamically injected.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition the current instance
      *
@@ -721,7 +727,7 @@ class Definition
      * Whether this definition is abstract, that means it merely serves as a
      * template for other definitions.
      *
-     * @param bool    $boolean
+     * @param bool $boolean
      *
      * @return Definition the current instance
      *

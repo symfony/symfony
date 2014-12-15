@@ -44,6 +44,7 @@ interface TokenProviderInterface
      * @param string    $series
      * @param string    $tokenValue
      * @param \DateTime $lastUsed
+     *
      * @throws TokenNotFoundException if the token is not found
      */
     public function updateToken($series, $tokenValue, \DateTime $lastUsed);

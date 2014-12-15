@@ -814,7 +814,7 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * This method should only be used to help debug a form.
      *
-     * @param int     $level The indentation level (used internally)
+     * @param int $level The indentation level (used internally)
      *
      * @return string A string representation of all errors
      *
@@ -823,6 +823,8 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getErrorsAsString($level = 0)
     {
+        trigger_error('Form::getErrorsAsString() is deprecated since 2.5 and will be removed in 3.0. Please use Form::getErrors(true, false) instead and cast the result to a string.', E_USER_DEPRECATED);
+
         return self::indent((string) $this->getErrors(true, false), $level);
     }
 
@@ -1015,7 +1017,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int     The number of embedded form children
+     * @return int The number of embedded form children
      */
     public function count()
     {
@@ -1174,8 +1176,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Utility function for indenting multi-line strings.
      *
-     * @param string  $string The string
-     * @param int     $level  The number of spaces to use for indentation
+     * @param string $string The string
+     * @param int    $level  The number of spaces to use for indentation
      *
      * @return string The indented string
      */

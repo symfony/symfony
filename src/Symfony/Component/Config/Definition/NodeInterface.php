@@ -38,21 +38,21 @@ interface NodeInterface
     /**
      * Returns true when the node is required.
      *
-     * @return bool    If the node is required
+     * @return bool If the node is required
      */
     public function isRequired();
 
     /**
      * Returns true when the node has a default value.
      *
-     * @return bool    If the node has a default value
+     * @return bool If the node has a default value
      */
     public function hasDefaultValue();
 
     /**
      * Returns the default value of the node.
      *
-     * @return mixed The default value
+     * @return mixed             The default value
      * @throws \RuntimeException if the node has no default value
      */
     public function getDefaultValue();

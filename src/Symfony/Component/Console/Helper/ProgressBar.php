@@ -151,7 +151,7 @@ class ProgressBar
     /**
      * Gets the progress bar start time.
      *
-     * @return int     The progress bar start time
+     * @return int The progress bar start time
      */
     public function getStartTime()
     {
@@ -161,7 +161,7 @@ class ProgressBar
     /**
      * Gets the progress bar maximal steps.
      *
-     * @return int     The progress bar max steps
+     * @return int The progress bar max steps
      */
     public function getMaxSteps()
     {
@@ -173,7 +173,7 @@ class ProgressBar
      *
      * @deprecated since 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
      *
-     * @return int     The progress bar step
+     * @return int The progress bar step
      */
     public function getStep()
     {
@@ -195,7 +195,7 @@ class ProgressBar
      *
      * @internal This method is public for PHP 5.3 compatibility, it should not be used.
      *
-     * @return int     The progress bar step width
+     * @return int The progress bar step width
      */
     public function getStepWidth()
     {
@@ -215,7 +215,7 @@ class ProgressBar
     /**
      * Sets the progress bar width.
      *
-     * @param int     $size The progress bar size
+     * @param int $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -225,7 +225,7 @@ class ProgressBar
     /**
      * Gets the progress bar width.
      *
-     * @return int     The progress bar size
+     * @return int The progress bar size
      */
     public function getBarWidth()
     {
@@ -318,7 +318,7 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param int     $freq The frequency in steps
+     * @param int $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -346,7 +346,7 @@ class ProgressBar
     /**
      * Advances the progress output X steps.
      *
-     * @param int     $step Number of steps to advance
+     * @param int $step Number of steps to advance
      *
      * @throws \LogicException
      */
@@ -360,7 +360,7 @@ class ProgressBar
      *
      * @deprecated since 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
      * @throws \LogicException
      */
@@ -382,7 +382,7 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
      * @throws \LogicException
      */

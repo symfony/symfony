@@ -121,7 +121,7 @@ class UnixPipes extends AbstractPipes
             $r = $this->pipes;
         }
         // discard read on stdin
-        unset ($r[0]);
+        unset($r[0]);
 
         $w = isset($this->pipes[0]) ? array($this->pipes[0]) : null;
         $e = null;

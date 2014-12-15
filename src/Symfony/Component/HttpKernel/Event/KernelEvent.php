@@ -77,8 +77,8 @@ class KernelEvent extends Event
     /**
      * Returns the request type the kernel is currently processing
      *
-     * @return int      One of HttpKernelInterface::MASTER_REQUEST and
-     *                  HttpKernelInterface::SUB_REQUEST
+     * @return int One of HttpKernelInterface::MASTER_REQUEST and
+     *             HttpKernelInterface::SUB_REQUEST
      *
      * @api
      */
@@ -90,7 +90,7 @@ class KernelEvent extends Event
     /**
      * Checks if this is a master request.
      *
-     * @return bool    True if the request is a master request
+     * @return bool True if the request is a master request
      *
      * @api
      */

@@ -37,7 +37,7 @@ interface TemplateReferenceInterface
      *
      * @return TemplateReferenceInterface The TemplateReferenceInterface instance
      *
-     * @throws  \InvalidArgumentException if the parameter name is not supported
+     * @throws \InvalidArgumentException if the parameter name is not supported
      *
      * @api
      */
@@ -50,7 +50,7 @@ interface TemplateReferenceInterface
      *
      * @return string The parameter value
      *
-     * @throws  \InvalidArgumentException if the parameter name is not supported
+     * @throws \InvalidArgumentException if the parameter name is not supported
      *
      * @api
      */

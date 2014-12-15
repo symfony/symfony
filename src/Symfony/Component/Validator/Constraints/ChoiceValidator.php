@@ -49,13 +49,12 @@ class ChoiceValidator extends ConstraintValidator
         }
 
         if ($constraint->callback) {
-            if (is_callable(array($this->context->getClassName(), $constraint->callback))) {
-                $choices = call_user_func(array($this->context->getClassName(), $constraint->callback));
-            } elseif (is_callable($constraint->callback)) {
-                $choices = call_user_func($constraint->callback);
-            } else {
+            if (!is_callable($choices = array($this->context->getClassName(), $constraint->callback))
+                && !is_callable($choices = $constraint->callback)
+            ) {
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
+            $choices = call_user_func($choices);
         } else {
             $choices = $constraint->choices;
         }

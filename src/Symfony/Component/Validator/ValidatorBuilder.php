@@ -301,9 +301,13 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {
+        trigger_error('ValidatorBuilder::setPropertyAccessor() is deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.', E_USER_DEPRECATED);
+
         if (null !== $this->validatorFactory) {
             throw new ValidatorException('You cannot set a property accessor after setting a custom validator factory. Configure your validator factory instead.');
         }

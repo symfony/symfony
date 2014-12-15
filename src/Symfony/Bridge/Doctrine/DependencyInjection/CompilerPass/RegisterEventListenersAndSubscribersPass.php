@@ -35,7 +35,7 @@ class RegisterEventListenersAndSubscribersPass implements CompilerPassInterface
      * @param string $connections     Parameter ID for connections
      * @param string $managerTemplate sprintf() template for generating the event
      *                                manager's service ID for a connection name
-     * @param string $tagPrefix Tag prefix for listeners and subscribers
+     * @param string $tagPrefix       Tag prefix for listeners and subscribers
      */
     public function __construct($connections, $managerTemplate, $tagPrefix)
     {

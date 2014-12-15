@@ -126,7 +126,7 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function start()
     {
-        if ($this->started && !$this->closed) {
+        if ($this->started) {
             return true;
         }
 
@@ -134,7 +134,7 @@ class NativeSessionStorage implements SessionStorageInterface
             throw new \RuntimeException('Failed to start the session: already started by PHP.');
         }
 
-        if (PHP_VERSION_ID < 50400 && isset($_SESSION) && session_id()) {
+        if (PHP_VERSION_ID < 50400 && !$this->closed && isset($_SESSION) && session_id()) {
             // not 100% fool-proof, but is the most reliable way to determine if a session is active in PHP 5.3
             throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set).');
         }
@@ -162,10 +162,6 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function getId()
     {
-        if (!$this->started && !$this->closed) {
-            return ''; // returning empty is consistent with session_id() behaviour
-        }
-
         return $this->saveHandler->getId();
     }
 

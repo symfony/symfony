@@ -55,6 +55,8 @@ class PhpDumper extends Dumper
     private $variableCount;
     private $reservedVariables = array('instance', 'class');
     private $expressionLanguage;
+    private $targetDirRegex;
+    private $targetDirMaxMatches;
 
     /**
      * @var ExpressionFunctionProviderInterface[]
@@ -105,11 +107,37 @@ class PhpDumper extends Dumper
      */
     public function dump(array $options = array())
     {
+        $this->targetDirRegex = null;
         $options = array_merge(array(
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
             'namespace' => '',
         ), $options);
+
+        if (!empty($options['file']) && is_dir($dir = dirname($options['file']))) {
+            // Build a regexp where the first root dirs are mandatory,
+            // but every other sub-dir is optional up to the full path in $dir
+            // Mandate at least 2 root dirs and not more that 5 optional dirs.
+
+            $dir = explode(DIRECTORY_SEPARATOR, realpath($dir));
+            $i = count($dir);
+
+            if (3 <= $i) {
+                $regex = '';
+                $lastOptionalDir = $i > 8 ? $i - 5 : 3;
+                $this->targetDirMaxMatches = $i - $lastOptionalDir;
+
+                while (--$i >= $lastOptionalDir) {
+                    $regex = sprintf('(%s%s)?', preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#'), $regex);
+                }
+
+                do {
+                    $regex = preg_quote(DIRECTORY_SEPARATOR.$dir[$i], '#').$regex;
+                } while (0 < --$i);
+
+                $this->targetDirRegex = '#'.preg_quote($dir[0], '#').$regex.'#';
+            }
+        }
 
         $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
 
@@ -126,6 +154,7 @@ class PhpDumper extends Dumper
             $this->endClass().
             $this->addProxyClasses()
         ;
+        $this->targetDirRegex = null;
 
         return $code;
     }
@@ -254,7 +283,7 @@ class PhpDumper extends Dumper
      *
      * @return string
      *
-     * @throws RuntimeException When the factory definition is incomplete
+     * @throws RuntimeException                  When the factory definition is incomplete
      * @throws ServiceCircularReferenceException When a circular reference is detected
      */
     private function addServiceInlinedDefinitions($id, $definition)
@@ -796,6 +825,9 @@ $bagClass
  */
 class $class extends $baseClass
 {
+    private \$parameters;
+    private \$targetDirs = array();
+
 EOF;
     }
 
@@ -806,18 +838,17 @@ EOF;
      */
     private function addConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+        $targetDirs = $this->exportTargetDirs();
+        $arguments = $this->container->getParameterBag()->all() ? 'new ParameterBag($this->getDefaultParameters())' : null;
 
         $code = <<<EOF
-
-    private static \$parameters = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
-    {
-        parent::__construct(new ParameterBag(self::\$parameters));
+    {{$targetDirs}
+        parent::__construct($arguments);
 
 EOF;
 
@@ -845,17 +876,23 @@ EOF;
      */
     private function addFrozenConstructor()
     {
-        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+        $targetDirs = $this->exportTargetDirs();
 
         $code = <<<EOF
-
-    private static \$parameters = $parameters;
 
     /**
      * Constructor.
      */
     public function __construct()
-    {
+    {{$targetDirs}
+EOF;
+
+        if ($this->container->getParameterBag()->all()) {
+            $code .= "\n        \$this->parameters = \$this->getDefaultParameters();\n";
+        }
+
+        $code .= <<<EOF
+
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
@@ -963,6 +1000,8 @@ EOF;
             return '';
         }
 
+        $parameters = $this->exportParameters($this->container->getParameterBag()->all());
+
         $code = '';
         if ($this->container->isFrozen()) {
             $code .= <<<EOF
@@ -974,11 +1013,11 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        if (!(isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters))) {
+        if (!(isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', \$name));
         }
 
-        return self::\$parameters[\$name];
+        return \$this->parameters[\$name];
     }
 
     /**
@@ -988,7 +1027,7 @@ EOF;
     {
         \$name = strtolower(\$name);
 
-        return isset(self::\$parameters[\$name]) || array_key_exists(\$name, self::\$parameters);
+        return isset(\$this->parameters[\$name]) || array_key_exists(\$name, \$this->parameters);
     }
 
     /**
@@ -1005,7 +1044,7 @@ EOF;
     public function getParameterBag()
     {
         if (null === \$this->parameterBag) {
-            \$this->parameterBag = new FrozenParameterBag(self::\$parameters);
+            \$this->parameterBag = new FrozenParameterBag(\$this->parameters);
         }
 
         return \$this->parameterBag;
@@ -1014,15 +1053,29 @@ EOF;
 EOF;
         }
 
+        $code .= <<<EOF
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return $parameters;
+    }
+
+EOF;
+
         return $code;
     }
 
     /**
      * Exports parameters.
      *
-     * @param array   $parameters
-     * @param string  $path
-     * @param int     $indent
+     * @param array  $parameters
+     * @param string $path
+     * @param int    $indent
      *
      * @return string
      *
@@ -1043,7 +1096,7 @@ EOF;
             } elseif ($value instanceof Expression) {
                 throw new InvalidArgumentException(sprintf('You cannot dump a container with parameters that contain expressions. Expression "%s" found in "%s".', $value, $path.'/'.$key));
             } else {
-                $value = var_export($value, true);
+                $value = $this->export($value);
             }
 
             $php[] = sprintf('%s%s => %s,', str_repeat(' ', $indent), var_export($key, true), $value);
@@ -1093,9 +1146,9 @@ EOF;
     /**
      * Builds service calls from arguments.
      *
-     * @param array  $arguments
-     * @param array  &$calls    By reference
-     * @param array  &$behavior By reference
+     * @param array $arguments
+     * @param array &$calls    By reference
+     * @param array &$behavior By reference
      */
     private function getServiceCallsFromArguments(array $arguments, array &$calls, array &$behavior)
     {
@@ -1173,10 +1226,10 @@ EOF;
     /**
      * Checks if a service id has a reference.
      *
-     * @param string  $id
-     * @param array   $arguments
-     * @param bool    $deep
-     * @param array   $visited
+     * @param string $id
+     * @param array  $arguments
+     * @param bool   $deep
+     * @param array  $visited
      *
      * @return bool
      */
@@ -1212,8 +1265,8 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param mixed   $value
-     * @param bool    $interpolate
+     * @param mixed $value
+     * @param bool  $interpolate
      *
      * @return string
      *
@@ -1307,14 +1360,14 @@ EOF;
                     return "'.".$that->dumpParameter(strtolower($match[2])).".'";
                 };
 
-                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, var_export($value, true)));
+                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
 
                 return $code;
             }
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
         } else {
-            return var_export($value, true);
+            return $this->export($value);
         }
     }
 
@@ -1444,5 +1497,38 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function exportTargetDirs()
+    {
+        return null === $this->targetDirRegex ? '' : <<<EOF
+
+        \$dir = __DIR__;
+        for (\$i = 1; \$i <= {$this->targetDirMaxMatches}; ++\$i) {
+            \$this->targetDirs[\$i] = \$dir = dirname(\$dir);
+        }
+EOF;
+    }
+
+    private function export($value)
+    {
+        if (null !== $this->targetDirRegex && is_string($value) && preg_match($this->targetDirRegex, $value, $matches, PREG_OFFSET_CAPTURE)) {
+            $prefix = $matches[0][1] ? var_export(substr($value, 0, $matches[0][1]), true).'.' : '';
+            $suffix = $matches[0][1] + strlen($matches[0][0]);
+            $suffix = isset($value[$suffix]) ? '.'.var_export(substr($value, $suffix), true) : '';
+            $dirname = '__DIR__';
+
+            if (0 < $offset = 1 + $this->targetDirMaxMatches - count($matches)) {
+                $dirname = sprintf('$this->targetDirs[%d]', $offset);
+            }
+
+            if ($prefix || $suffix) {
+                return sprintf('(%s%s%s)', $prefix, $dirname, $suffix);
+            }
+
+            return $dirname;
+        }
+
+        return var_export($value, true);
     }
 }

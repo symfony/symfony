@@ -72,7 +72,7 @@ class Question
     /**
      * Sets whether the user response must be hidden or not.
      *
-     * @param bool    $hidden
+     * @param bool $hidden
      *
      * @return Question The current instance
      *
@@ -102,7 +102,7 @@ class Question
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
      *
-     * @param bool    $fallback
+     * @param bool $fallback
      *
      * @return Question The current instance
      */
@@ -116,7 +116,7 @@ class Question
     /**
      * Gets values for the autocompleter.
      *
-     * @return null|array|Traversable
+     * @return null|array|\Traversable
      */
     public function getAutocompleterValues()
     {
@@ -126,7 +126,7 @@ class Question
     /**
      * Sets values for the autocompleter.
      *
-     * @param null|array|Traversable $values
+     * @param null|array|\Traversable $values
      *
      * @return Question The current instance
      *
@@ -165,7 +165,7 @@ class Question
     }
 
     /**
-     * Gets the validator for the question
+     * Gets the validator for the question.
      *
      * @return null|callable
      */
@@ -179,7 +179,7 @@ class Question
      *
      * Null means an unlimited number of attempts.
      *
-     * @param null|int     $attempts
+     * @param null|int $attempts
      *
      * @return Question The current instance
      *
@@ -211,9 +211,9 @@ class Question
     /**
      * Sets a normalizer for the response.
      *
-     * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
+     * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
      *
-     * @param string|Closure $normalizer
+     * @param string|\Closure $normalizer
      *
      * @return Question The current instance
      */
@@ -229,7 +229,7 @@ class Question
      *
      * The normalizer can ba a callable (a string), a closure or a class implementing __invoke.
      *
-     * @return string|Closure
+     * @return string|\Closure
      */
     public function getNormalizer()
     {

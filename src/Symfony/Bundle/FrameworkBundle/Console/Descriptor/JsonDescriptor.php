@@ -242,7 +242,7 @@ class JsonDescriptor extends Descriptor
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
-     * @param string|null $event
+     * @param string|null              $event
      *
      * @return array
      */
@@ -270,7 +270,7 @@ class JsonDescriptor extends Descriptor
 
     /**
      * @param callable $callable
-     * @param array $options
+     * @param array    $options
      *
      * @return array
      */

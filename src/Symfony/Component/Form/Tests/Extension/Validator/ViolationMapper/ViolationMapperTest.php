@@ -169,7 +169,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $child = $this->getForm('address', 'address', null, array(), false, false);
         // even though "street" is synchronized, it should not have any errors
         // due to its parent not being synchronized
-        $grandChild = $this->getForm('street' , 'street');
+        $grandChild = $this->getForm('street', 'street');
 
         $parent->add($child);
         $child->add($grandChild);
@@ -213,7 +213,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
         $child = $this->getForm('address', 'address');
-        $grandChild = $this->getForm('street' , 'street');
+        $grandChild = $this->getForm('street', 'street');
 
         $parent->add($child);
         $child->add($grandChild);

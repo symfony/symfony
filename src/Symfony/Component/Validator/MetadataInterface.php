@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+trigger_error('Symfony\Component\Validator\MetadataInterface was deprecated in version 2.5 and will be removed in 3.0. Use Symfony\Component\Validator\Mapping\MetadataInterface instead.', E_USER_DEPRECATED);
+
 /**
  * A container for validation metadata.
  *

@@ -20,10 +20,10 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     /**
      * Constructor.
      *
-     * @param string  $dsn      A data source name
-     * @param string  $username Not used
-     * @param string  $password Not used
-     * @param int     $lifetime The lifetime to use for the purge
+     * @param string $dsn      A data source name
+     * @param string $username Not used
+     * @param string $password Not used
+     * @param int    $lifetime The lifetime to use for the purge
      */
     public function __construct($dsn, $username = '', $password = '', $lifetime = 86400)
     {

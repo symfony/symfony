@@ -7,6 +7,17 @@ in 2.5 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.5.0...v2.5.1
 
+* 2.5.8 (2014-12-03)
+
+ * bug #12811 Configure firewall's kernel exception listener with configured entry point or a default entry point (rjkip)
+ * bug #12784 [DependencyInjection] make paths relative to __DIR__ in the generated container (nicolas-grekas)
+ * bug #12716 [ClassLoader] define constant only if it wasn't defined before (xabbuh)
+ * bug #12553 [Debug] fix error message on double exception (nicolas-grekas)
+ * bug #12550 [FrameworkBundle] backport #12489 (xabbuh)
+ * bug #12570 Fix initialized() with aliased services (Daniel Wehner)
+ * bug #12267 [Form][WebProfiler] Empty form names fix (kix)
+ * bug #12137 [FrameworkBundle] cache:clear command fills *.php.meta files with wrong data (Strate)
+
 * 2.5.7 (2014-11-20)
 
  * bug #12525 [Bundle][FrameworkBundle] be smarter when guessing the document root (xabbuh)

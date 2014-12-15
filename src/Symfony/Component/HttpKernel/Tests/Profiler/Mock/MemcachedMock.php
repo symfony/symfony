@@ -24,8 +24,8 @@ class MemcachedMock
     /**
      * Set a Memcached option
      *
-     * @param int     $option
-     * @param mixed   $value
+     * @param int   $option
+     * @param mixed $value
      *
      * @return bool
      */
@@ -37,9 +37,9 @@ class MemcachedMock
     /**
      * Add a memcached server to connection pool
      *
-     * @param string  $host
-     * @param int     $port
-     * @param int     $weight
+     * @param string $host
+     * @param int    $port
+     * @param int    $weight
      *
      * @return bool
      */
@@ -57,9 +57,9 @@ class MemcachedMock
     /**
      * Add an item to the server only if such key doesn't exist at the server yet.
      *
-     * @param string  $key
-     * @param mixed   $value
-     * @param int     $expiration
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
      *
      * @return bool
      */
@@ -81,9 +81,9 @@ class MemcachedMock
     /**
      * Store data at the server.
      *
-     * @param string  $key
-     * @param mixed   $value
-     * @param int     $expiration
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
      *
      * @return bool
      */
@@ -101,9 +101,9 @@ class MemcachedMock
     /**
      * Replace value of the existing item.
      *
-     * @param string  $key
-     * @param mixed   $value
-     * @param int     $expiration
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $expiration
      *
      * @return bool
      */

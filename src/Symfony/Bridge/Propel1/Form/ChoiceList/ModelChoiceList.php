@@ -11,9 +11,9 @@
 
 namespace Symfony\Bridge\Propel1\Form\ChoiceList;
 
-use \ModelCriteria;
-use \BaseObject;
-use \Persistent;
+use ModelCriteria;
+use BaseObject;
+use Persistent;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -368,8 +368,8 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create an index for
      *
-     * @return int|string     A unique index containing only ASCII letters,
-     *                        digits and underscores.
+     * @return int|string A unique index containing only ASCII letters,
+     *                    digits and underscores.
      */
     protected function createIndex($model)
     {
@@ -389,7 +389,7 @@ class ModelChoiceList extends ObjectChoiceList
      *
      * @param mixed $model The choice to create a value for
      *
-     * @return int|string     A unique value without character limitations.
+     * @return int|string A unique value without character limitations.
      */
     protected function createValue($model)
     {

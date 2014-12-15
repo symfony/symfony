@@ -224,6 +224,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     {
         $skipped = false;
         foreach ($this->dispatcher->getListeners($eventName) as $listener) {
+            if (!$listener instanceof WrappedListener) { // #12845: a new listener was added during dispatch.
+                continue;
+            }
             // Unwrap listener
             $this->dispatcher->removeListener($eventName, $listener);
             $this->dispatcher->addListener($eventName, $listener->getWrappedListener());

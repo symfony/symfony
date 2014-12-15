@@ -800,8 +800,8 @@ class Application
      *
      * Can be useful to force terminal dimensions for functional tests.
      *
-     * @param int     $width  The width
-     * @param int     $height The height
+     * @param int $width  The width
+     * @param int $height The height
      *
      * @return Application The current application
      */
@@ -828,8 +828,8 @@ class Application
 
         if (true === $input->hasParameterOption(array('--no-interaction', '-n'))) {
             $input->setInteractive(false);
-        } elseif (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
-            $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
+        } elseif (function_exists('posix_isatty') && $this->getHelperSet()->has('question')) {
+            $inputStream = $this->getHelperSet()->get('question')->getInputStream();
             if (!@posix_isatty($inputStream)) {
                 $input->setInteractive(false);
             }
@@ -950,9 +950,9 @@ class Application
     {
         return new HelperSet(array(
             new FormatterHelper(),
-            new DialogHelper(),
-            new ProgressHelper(),
-            new TableHelper(),
+            new DialogHelper(false),
+            new ProgressHelper(false),
+            new TableHelper(false),
             new DebugFormatterHelper(),
             new ProcessHelper(),
             new QuestionHelper(),
@@ -1041,8 +1041,8 @@ class Application
      * Finds alternative of $name among $collection,
      * if nothing is found in $collection, try in $abbrevs
      *
-     * @param string               $name       The string
-     * @param array|\Traversable   $collection The collection
+     * @param string             $name       The string
+     * @param array|\Traversable $collection The collection
      *
      * @return array A sorted array of similar string
      */

@@ -22,7 +22,8 @@
         "symfony/event-dispatcher": "~2.1",
         "symfony/expression-language": "~2.4",
         "symfony/http-foundation": "~2.4",
-        "symfony/validator": "~2.5",
+        "symfony/translation": "~2.0,>=2.0.5",
+        "symfony/validator": "~2.5,>=2.5.5",
         "psr/log": "~1.0",
         "ircmaxell/password-compat": "1.0.*"
     },

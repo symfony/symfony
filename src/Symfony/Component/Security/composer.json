@@ -30,7 +30,8 @@
     "require-dev": {
         "symfony/locale": "~2.0,>=2.0.5",
         "symfony/routing": "~2.2",
-        "symfony/validator": "~2.2,<2.5.0",
+        "symfony/translation": "~2.0,>=2.0.5",
+        "symfony/validator": "~2.5,>=2.5.5",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",

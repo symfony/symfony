@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dependency-injection" : "~2.3",
+        "symfony/dependency-injection" : "~2.3,>=2.3.3",
         "symfony/config" : "~2.4",
         "symfony/event-dispatcher": "~2.5",
-        "symfony/http-foundation": "~2.4",
-        "symfony/http-kernel": "~2.5",
+        "symfony/http-foundation": "~2.4,>=2.4.9",
+        "symfony/http-kernel": "~2.5,>=2.5.7",
         "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.2",
         "symfony/security-core": "~2.4",
@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.3",
-        "symfony/console": "~2.3",
+        "symfony/console": "~2.4,>=2.4.8",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/finder": "~2.0,>=2.0.5",
@@ -45,7 +45,6 @@
         "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.5",
         "symfony/yaml": "~2.0,>=2.0.5"
-        "doctrine/common": "~2.2"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

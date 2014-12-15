@@ -125,6 +125,8 @@ HttpFoundation
    There is also an [issue](https://github.com/symfony/symfony/issues/12834)
    that affects Windows servers.
 
+   A legacy class, `LegacyPdoSessionHandler` has been created to ease backwards-compatability issues when upgrading.
+
    The changes to the `PdoSessionHandler` are:
    - By default, it now implements session locking to prevent loss of data by concurrent access to the same session.
      - It does so using a transaction between opening and closing a session. For this reason, it's not

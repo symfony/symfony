@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-13T14:51:56Z
+
+Nice work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-15T10:40:19Z
+
+All `>=2.0.5` constraints are required: that's the first version where auto-loading works with composer

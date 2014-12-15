@@ -39,7 +39,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param OutputFormatterDecoratorInterface|bool $decorated Whether this formatter should actually decorate strings
+     * @param OutputFormatterDecoratorInterface|bool $decorated The output decorator to use or FALSE if the output shall not be decorated
      * @param OutputFormatterStyleInterface[]        $styles    Array of "name => FormatterStyle" instances
      *
      * @api
@@ -63,7 +63,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param OutputFormatterDecoratorInterface|bool $decorated Whether to decorate the messages or not
+     * @param OutputFormatterDecoratorInterface|bool $decorated The output decorator to use, TRUE to use the default decorator or FALSE if the output shall not be decorated
      *
      * @api
      */
@@ -73,6 +73,8 @@ class OutputFormatter implements OutputFormatterInterface
             $this->decorator = $decorated;
         } elseif ($decorated) {
             $this->decorator = new OutputFormatterDecorator();
+        } else {
+            $this->decorator = null;
         }
     }
 

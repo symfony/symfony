@@ -17,16 +17,18 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "doctrine/common": "~2.2"
+        "doctrine/common": "~2.3"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0",
-        "symfony/form": "~2.2",
+        "symfony/dependency-injection": "~2.2",
+        "symfony/form": "~2.3,>=2.3.8",
         "symfony/http-kernel": "~2.2",
+        "symfony/property-access": "~2.3",
         "symfony/security": "~2.2",
         "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.4",
+        "symfony/validator": "~2.5,>=2.5.5",
+        "symfony/translation": "~2.0,>=2.0.5",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3"

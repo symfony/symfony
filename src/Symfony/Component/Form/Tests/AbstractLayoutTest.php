@@ -385,6 +385,94 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testChoiceLabelFormatName()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'choice', array(
+                'choices' => array(
+                    'choice1',
+                    'choice2',
+                )
+            ))
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, array('choicelabel_format' => 'form.%name%.choices.%choice%'));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]form.myfield.choices.choice1[/trans]"]
+'
+        );
+    }
+
+    public function testChoiceLabelFormatId()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'text')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, array(
+            'choice_label_format' => 'myform.%id%.choices.%choice%',
+            'choices' => array(
+                'choice1',
+                'choice2',
+            )
+        ));
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]myform.myform_myfield.choices.choice1[/trans]"]
+'
+        );
+    }
+
+    public function testChoiceLabelFormatAsFormOption()
+    {
+        $options = array('choice_label_format' => 'form.%name%.choices.%choice%');
+
+        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+            ->add('myfield', 'choice', array(
+                'choice1',
+                'choice2',
+            ))
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]form.myfield.choices.choice1[/trans]"]
+'
+        );
+    }
+
+    public function testChoiceLabelFormatOverriddenOption()
+    {
+        $options = array('choice_label_format' => 'otherform.choices.%name%.%choice%');
+
+        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+            ->add('myfield', 'choice', array(
+                'choice_label_format' => 'myform.choices.%name%.%choice%',
+                'choices' => array(
+                    'choice1',
+                    'choice2',
+                ),
+            ))
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+'/label
+    [@for="myform_myfield"]
+    [.="[trans]myform.choices.myfield.choice1[/trans]"]
+'
+        );
+    }
+
     public function testErrors()
     {
         $form = $this->factory->createNamed('name', 'text');

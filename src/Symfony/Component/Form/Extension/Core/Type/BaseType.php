@@ -45,6 +45,7 @@ abstract class BaseType extends AbstractType
         $blockName = $options['block_name'] ?: $form->getName();
         $translationDomain = $options['translation_domain'];
         $labelFormat = $options['label_format'];
+        $choiceLabelFormat = $options['choice_label_format'];
 
         if ($view->parent) {
             if ('' !== ($parentFullName = $view->parent->vars['full_name'])) {
@@ -63,6 +64,10 @@ abstract class BaseType extends AbstractType
 
             if (!$labelFormat) {
                 $labelFormat = $view->parent->vars['label_format'];
+            }
+
+            if (!$choiceLabelFormat) {
+                $choiceLabelFormat = $view->parent->vars['choice_label_format'];
             }
         } else {
             $id = $name;
@@ -93,6 +98,7 @@ abstract class BaseType extends AbstractType
             'disabled' => $form->isDisabled(),
             'label' => $options['label'],
             'label_format' => $labelFormat,
+            'choice_label_format' => $choiceLabelFormat,
             'multipart' => false,
             'attr' => $options['attr'],
             'block_prefixes' => $blockPrefixes,
@@ -118,6 +124,7 @@ abstract class BaseType extends AbstractType
             'disabled' => false,
             'label' => null,
             'label_format' => null,
+            'choice_label_format' => null,
             'attr' => array(),
             'translation_domain' => null,
             'auto_initialize' => true,

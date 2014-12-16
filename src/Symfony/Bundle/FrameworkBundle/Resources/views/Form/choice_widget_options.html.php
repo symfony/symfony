@@ -6,6 +6,12 @@
             <?php echo $formHelper->block($form, 'choice_widget_options', array('choices' => $choice)) ?>
         </optgroup>
     <?php else: ?>
-        <option value="<?php echo $view->escape($choice->value) ?>"<?php if ($is_selected($choice->value, $value)): ?> selected="selected"<?php endif?>><?php echo $view->escape($translatorHelper->trans($choice->label, array(), $translation_domain)) ?></option>
+        <?php
+        $choiceLabel = $choice->label;
+        if (isset($choice_label_format)) {
+            $choiceLabel = strtr($choice_label_format, array('%name%' => $name, '%id%' => $id, '%value%' => $choice->value, '%choice%' => $choice->label));
+        }
+        ?>
+        <option value="<?php echo $view->escape($choice->value) ?>"<?php if ($is_selected($choice->value, $value)): ?> selected="selected"<?php endif?>><?php echo $view->escape($translatorHelper->trans($choiceLabel, array(), $translation_domain)) ?></option>
     <?php endif ?>
 <?php endforeach ?>

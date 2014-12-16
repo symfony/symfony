@@ -129,6 +129,10 @@ EOF
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
+
+        // Create translation dir to prevent exception
+        $this->getContainer()->get('filesystem')->mkdir($translationsPath, 0755);
+
         $loader->loadMessages($translationsPath, $currentCatalogue);
 
         // process catalogues

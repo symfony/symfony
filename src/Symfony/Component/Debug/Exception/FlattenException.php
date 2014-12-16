@@ -214,8 +214,7 @@ class FlattenException
     {
         $result = array();
         foreach ($args as $key => $value) {
-            if (++$count > 1e4)
-            {
+            if (++$count > 1e4) {
                 return array('array', '*SKIPPED over 10000 entries*');
             }
             if (is_object($value)) {

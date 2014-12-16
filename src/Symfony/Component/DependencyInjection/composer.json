@@ -21,7 +21,7 @@
     "require-dev": {
         "symfony/yaml": "~2.1",
         "symfony/config": "~2.2",
-        "symfony/expression-language": "~2.4,>=2.4.10"
+        "symfony/expression-language": "~2.6"
     },
     "suggest": {
         "symfony/yaml": "",

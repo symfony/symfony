@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/event-dispatcher": "2.5.*,>2.5.8|~2.6,>2.6.1",
-        "symfony/http-foundation": "~2.5",
+        "symfony/http-foundation": "~2.5,>=2.5.4",
         "symfony/debug": "~2.6",
         "psr/log": "~1.0"
     },
@@ -26,7 +26,7 @@
         "symfony/browser-kit": "~2.3",
         "symfony/class-loader": "~2.1",
         "symfony/config": "~2.0,>=2.0.5",
-        "symfony/console": "~2.2",
+        "symfony/console": "~2.3",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dependency-injection": "~2.2",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
@@ -36,7 +36,7 @@
         "symfony/routing": "~2.2",
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.2",
-        "symfony/translation": "~2.0",
+        "symfony/translation": "~2.0,>=2.0.5",
         "symfony/var-dumper": "~2.6"
     },
     "suggest": {

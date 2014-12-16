@@ -21,8 +21,8 @@
     "require-dev": {
         "symfony/dependency-injection": "~2.6",
         "symfony/expression-language": "~2.6",
-        "symfony/config": "~2.0",
-        "symfony/stopwatch": "~2.2",
+        "symfony/config": "~2.0,>=2.0.5",
+        "symfony/stopwatch": "~2.3",
         "psr/log": "~1.0"
     },
     "suggest": {

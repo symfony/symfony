@@ -17,10 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-foundation": "~2.0",
-        "symfony/http-kernel": "~2.0",
-        "symfony/form": "~2.2",
-        "propel/propel1": "~1.6"
+        "symfony/http-foundation": "~2.0,>=2.0.5",
+        "symfony/http-kernel": "~2.0,>=2.0.5",
+        "symfony/form": "~2.3,>=2.3.8",
+        "symfony/property-access": "~2.3",
+        "propel/propel1": "~1.6,>=1.6.5"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2"

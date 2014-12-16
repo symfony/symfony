@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/http-kernel": "~2.3",
+        "symfony/http-kernel": "~2.4",
         "symfony/routing": "~2.2",
         "symfony/twig-bridge": "~2.2"
     },
     "require-dev": {
         "symfony/config": "~2.2",
         "symfony/console": "~2.3",
-        "symfony/dependency-injection": "~2.0",
+        "symfony/dependency-injection": "~2.2",
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {

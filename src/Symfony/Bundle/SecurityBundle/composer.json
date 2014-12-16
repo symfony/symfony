@@ -17,18 +17,24 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/security": "~2.4",
+        "symfony/security": "~2.5",
         "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
-        "symfony/browser-kit": "~2.3",
-        "symfony/form": "~2.3",
-        "symfony/framework-bundle": "~2.2,<2.6.0",
+        "symfony/browser-kit": "~2.4",
+        "symfony/css-selector": "~2.0,>=2.0.5",
+        "symfony/dependency-injection": "~2.3",
+        "symfony/dom-crawler": "~2.0,>=2.0.5",
+        "symfony/form": "~2.4",
+        "symfony/framework-bundle": "~2.4,<2.6.0",
+        "symfony/http-foundation": "~2.3",
         "symfony/twig-bundle": "~2.2",
-        "symfony/process": "~2.0",
+        "symfony/twig-bridge": "~2.2,>=2.2.6",
+        "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.2",
-        "symfony/yaml": "~2.0",
-        "symfony/expression-language": "~2.4"
+        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/expression-language": "~2.4",
+        "twig/twig": "~1.12"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

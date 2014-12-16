@@ -18,19 +18,20 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/security-csrf": "~2.4",
-        "twig/twig": "~1.12"
+        "twig/twig": "~1.13,>=1.13.1"
     },
     "require-dev": {
         "symfony/finder": "~2.3",
-        "symfony/form": "~2.5,<2.6.0",
-        "symfony/http-kernel": "~2.2",
+        "symfony/form": "2.5.*,>=2.5.2",
+        "symfony/http-kernel": "~2.3",
+        "symfony/locale": "~2.0,>=2.0.5",
         "symfony/routing": "~2.2",
         "symfony/templating": "~2.1",
         "symfony/translation": "~2.2",
-        "symfony/yaml": "~2.0",
+        "symfony/yaml": "~2.0,>=2.0.5",
         "symfony/security": "~2.4",
         "symfony/stopwatch": "~2.2",
-        "symfony/console": "~2.2",
+        "symfony/console": "~2.4",
         "symfony/expression-language": "~2.4"
     },
     "suggest": {

@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0",
+        "symfony/dependency-injection": "~2.2",
         "symfony/expression-language": "~2.4",
         "symfony/config": "~2.2",
         "symfony/routing": "~2.1",

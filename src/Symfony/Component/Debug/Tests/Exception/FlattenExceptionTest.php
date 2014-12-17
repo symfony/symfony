@@ -186,6 +186,28 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('*DEEP NESTED ARRAY*', serialize($trace));
     }
 
+    public function testTooBigArray()
+    {
+        $a = array();
+        for ($i = 0; $i < 20; $i++) {
+            for ($j = 0; $j < 50; $j++) {
+                for ($k = 0; $k < 10; $k++) {
+                    $a[$i][$j][$k] = 'value';
+                }
+            }
+        }
+        $a[20] = 'value';
+        $a[21] = 'value1';
+        $exception = $this->createException($a);
+
+        $flattened = FlattenException::create($exception);
+        $trace = $flattened->getTrace();
+        $serialize_trace = serialize($trace);
+
+        $this->assertContains('*SKIPPED over 10000 entries*', $serialize_trace);
+        $this->assertNotContains('*value1*', $serialize_trace);
+    }
+
     private function createException($foo)
     {
         return new \Exception();

@@ -809,7 +809,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             }
 
             throw new NoSuchOptionException(sprintf(
-                'The defined option "%s" has no value set. You should make sure it is set with "isset" before reading it.',
+                'The optional option "%s" has no value set. You should make sure it is set with "isset" before reading it.',
                 $option
             ));
         }

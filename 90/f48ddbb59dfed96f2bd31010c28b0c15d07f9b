@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-17T20:17:43Z
+
+I just noticed that #12939 does a subset of these changes. So I decided to cherry pick the commit from that pull request.

@@ -202,10 +202,10 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
-        $serialize_trace = serialize($trace);
+        $serializeTrace = serialize($trace);
 
-        $this->assertContains('*SKIPPED over 10000 entries*', $serialize_trace);
-        $this->assertNotContains('*value1*', $serialize_trace);
+        $this->assertContains('*SKIPPED over 10000 entries*', $serializeTrace);
+        $this->assertNotContains('*value1*', $serializeTrace);
     }
 
     private function createException($foo)

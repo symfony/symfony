@@ -586,12 +586,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         return array_merge(
             array(
-                'kernel.root_dir' => $this->rootDir,
+                'kernel.root_dir' => realpath($this->rootDir) ?: $this->rootDir,
                 'kernel.environment' => $this->environment,
                 'kernel.debug' => $this->debug,
                 'kernel.name' => $this->name,
-                'kernel.cache_dir' => $this->getCacheDir(),
-                'kernel.logs_dir' => $this->getLogDir(),
+                'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
+                'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
                 'kernel.bundles' => $bundles,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),

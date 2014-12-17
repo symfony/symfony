@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by 1ed at 2014-12-16T10:24:52Z
+
+@nicolas-grekas great catch.
+
+It works great, but this way `cache:warmup` and `cache:clear` not produces the same result, but I think it doesn't really matter.
+
+Here are my results:
+```php
+    public function getCacheDir()
+    {
+        return '/tmp/sf/'.$this->getEnvironment();
+    }
+```
+The partial diff of cache:warmup vs cache:clear
+```diff
+             'kernel.root_dir' => '/home/egabor/dev/OSS/symfony-standard/app',
+             'kernel.environment' => 'dev',
+             'kernel.debug' => true,
+-            'kernel.name' => 'app',
++            'kernel.name' => 'ap_',
+             'kernel.cache_dir' => __DIR__,
+             'kernel.logs_dir' => '/home/egabor/dev/OSS/symfony-standard/app/logs',
+             'kernel.bundles' => array(
+```
+
+```php
+    public function getCacheDir()
+    {
+        return __DIR__.'/../../../../../../../tmp/sf/'.$this->getEnvironment();
+    }
+```
+The partial diff of cache:warmup vs cache:clear
+```diff
+             'kernel.root_dir' => '/home/egabor/dev/OSS/symfony-standard/app',
+             'kernel.environment' => 'dev',
+             'kernel.debug' => true,
+-            'kernel.name' => 'app',
+-            'kernel.cache_dir' => ('/home/egabor/dev/OSS/symfony-standard/app/../../../../../../..'.__DIR__),
++            'kernel.name' => 'ap_',
++            'kernel.cache_dir' => __DIR__,
+             'kernel.logs_dir' => '/home/egabor/dev/OSS/symfony-standard/app/logs',
+             'kernel.bundles' => array(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-16T11:33:33Z
+
+I added a `realpath()` in the Kernel that removes the diff for `kernel.cache_dir`.
+The diff for `kernel.name` is not new, and thus not related to the issue we're working on.
+Kernel::getKernelParameters() is always called after the [dirs are created ](https://github.com/nicolas-grekas/symfony/blob/a14153a4fd6d3379d60a85af882dc8aefea08c7d/src/Symfony/Component/HttpKernel/Kernel.php#L633) thus this realpath should never fail

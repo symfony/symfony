@@ -123,7 +123,7 @@ EOF
         $helper->describe($output, $object, $options);
 
         if (!$input->getArgument('name') && $input->isInteractive()) {
-            $output->writeln('To search for a service, re-run this command with a search term. <comment>container:debug log</comment>');
+            $output->writeln('To search for a service, re-run this command with a search term. <comment>debug:container log</comment>');
         }
     }
 

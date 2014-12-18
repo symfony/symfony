@@ -1,7 +1,7 @@
 UPGRADE FROM 2.5 to 2.6
 =======================
 
-Known Backwards-Compatability Breaks
+Known Backwards-Compatibility Breaks
 ------------------------------------
 
 * If you use the `PdoSessionHandler`, the session table now has a different
@@ -112,7 +112,7 @@ HttpFoundation
 --------------
 
  * The `PdoSessionHandler` to store sessions in a database changed significantly.
-   This introduced a **backwards-compatability** break in the schema of the
+   This introduced a **backwards-compatibility** break in the schema of the
    session table. The following changes must be made to your session table:
 
    - Add a new integer column called `sess_lifetime`. Assuming you have the
@@ -125,7 +125,7 @@ HttpFoundation
    There is also an [issue](https://github.com/symfony/symfony/issues/12834)
    that affects Windows servers.
 
-   A legacy class, `LegacyPdoSessionHandler` has been created to ease backwards-compatability issues when upgrading.
+   A legacy class, `LegacyPdoSessionHandler` has been created to ease backwards-compatibility issues when upgrading.
 
    The changes to the `PdoSessionHandler` are:
    - By default, it now implements session locking to prevent loss of data by concurrent access to the same session.

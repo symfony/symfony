@@ -268,6 +268,83 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $this->resolver->resolve($options));
     }
 
+    public function testResolveSucceedsIfOptionValueAllowedRegex()
+    {
+        $this->resolver->setDefaults(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => '4'
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'one'   => '/\d+/',
+                'two'   => '/\w/',
+                'three' => '/t+h+r+e+e/',
+                'four'  => '/((q|c)+(uatr)+(e|o))/'
+            ));
+
+        $options = array(
+            'four'  => 'quatre'
+        );
+
+        $this->assertEquals(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => 'quatre'
+            ), $this->resolver->resolve($options));
+
+        $options = array(
+            'four'  => 'cuatro'
+        );
+
+        $this->assertEquals(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => 'cuatro'
+            ), $this->resolver->resolve($options));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage Accepted values must match the regular expression: "/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/"
+     */
+    public function testResolveFailsIfOptionValueNotAllowedRegex()
+    {
+        $this->resolver->setDefaults(array(
+                'email' => 'default@email.com',
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'email' => '/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/',
+            ));
+
+        $this->resolver->resolve(array(
+                'email' => 'invalid@email',
+            ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage Accepted values must match the regular expression: "/(https?)+(:\/\/symfony.com)(.*)/"
+     */
+    public function testResolveFailsIfOptionValueNotAllowedRegex2()
+    {
+        $this->resolver->setDefaults(array(
+                'symfony-website' => 'http://symfony.com'
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'symfony-website' => '/(https?)+(:\/\/symfony.com)(.*)/',
+            ));
+
+        $this->resolver->resolve(array(
+                'symfony-website' => 'https://twig.com',
+            ));
+    }
+
     public function testResolveSucceedsIfOptionalWithAllowedValuesNotSet()
     {
         $this->resolver->setRequired(array(

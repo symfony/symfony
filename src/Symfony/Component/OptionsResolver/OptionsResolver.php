@@ -873,7 +873,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
         // Validate the value of the resolved option
         if (isset($this->allowedValues[$option])) {
-            $success = false;
+            $success = $isRegex = false;
             $printableAllowedValues = array();
 
             foreach ($this->allowedValues[$option] as $allowedValue) {
@@ -885,9 +885,21 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
                     // Don't include closures in the exception message
                     continue;
-                } elseif ($value === $allowedValue) {
+                }
+
+                if($value === $allowedValue){
                     $success = true;
-                    break;
+
+                    continue;
+                }
+
+                if(preg_match('/^(\/)(.*)(\/)$/', $allowedValue)){
+                    $isRegex = true;
+                    if(preg_match($allowedValue, $value)){
+                        $success = true;
+
+                        continue;
+                    }
                 }
 
                 $printableAllowedValues[] = $allowedValue;
@@ -901,10 +913,19 @@ class OptionsResolver implements Options, OptionsResolverInterface
                 );
 
                 if (count($printableAllowedValues) > 0) {
-                    $message .= sprintf(
-                        ' Accepted values are: %s.',
-                        $this->formatValues($printableAllowedValues)
-                    );
+                    $formatValue = $this->formatValues($printableAllowedValues);
+                    if($isRegex){
+                        $message .= sprintf(
+                            ' Accepted values must match the regular expression: %s.',
+                            $formatValue
+                        );
+                    }else{
+                        $message .= sprintf(
+                            ' Accepted values are: %s.',
+                            $formatValue
+                        );
+                    }
+
                 }
 
                 throw new InvalidOptionsException($message);

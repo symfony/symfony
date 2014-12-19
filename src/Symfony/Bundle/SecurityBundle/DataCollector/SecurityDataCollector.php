@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
  * SecurityDataCollector.
@@ -23,11 +24,16 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class SecurityDataCollector extends DataCollector
 {
-    private $context;
+    private $tokenStorage;
 
-    public function __construct(SecurityContextInterface $context = null)
+    /**
+     * Constructor.
+     *
+     * @param TokenStorageInterface|null $tokenStorage
+     */
+    public function __construct(TokenStorageInterface $tokenStorage = null)
     {
-        $this->context = $context;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -35,7 +41,7 @@ class SecurityDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        if (null === $this->context) {
+        if (null === $this->tokenStorage) {
             $this->data = array(
                 'enabled' => false,
                 'authenticated' => false,
@@ -43,7 +49,7 @@ class SecurityDataCollector extends DataCollector
                 'user' => '',
                 'roles' => array(),
             );
-        } elseif (null === $token = $this->context->getToken()) {
+        } elseif (null === $token = $this->tokenStorage->getToken()) {
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,
@@ -57,7 +63,7 @@ class SecurityDataCollector extends DataCollector
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
                 'user' => $token->getUsername(),
-                'roles' => array_map(function ($role) { return $role->getRole();}, $token->getRoles()),
+                'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $token->getRoles()),
             );
         }
     }

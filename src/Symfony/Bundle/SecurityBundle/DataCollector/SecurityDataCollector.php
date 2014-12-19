@@ -11,8 +11,9 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -24,12 +25,18 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class SecurityDataCollector extends DataCollector
 {
-    private $context;
+    private $tokenStorage;
     private $roleHierarchy;
 
-    public function __construct(SecurityContextInterface $context = null, RoleHierarchyInterface $roleHierarchy = null)
+    /**
+     * Constructor.
+     *
+     * @param TokenStorageInterface|null  $tokenStorage
+     * @param RoleHierarchyInterface|null $roleHierarchy
+     */
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null)
     {
-        $this->context = $context;
+        $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
     }
 
@@ -38,7 +45,7 @@ class SecurityDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        if (null === $this->context) {
+        if (null === $this->tokenStorage) {
             $this->data = array(
                 'enabled' => false,
                 'authenticated' => false,
@@ -48,7 +55,7 @@ class SecurityDataCollector extends DataCollector
                 'inherited_roles' => array(),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
-        } elseif (null === $token = $this->context->getToken()) {
+        } elseif (null === $token = $this->tokenStorage->getToken()) {
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,
@@ -74,8 +81,8 @@ class SecurityDataCollector extends DataCollector
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
                 'user' => $token->getUsername(),
-                'roles' => array_map(function ($role) { return $role->getRole();}, $assignedRoles),
-                'inherited_roles' => array_map(function ($role) { return $role->getRole();}, $inheritedRoles),
+                'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
+                'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }

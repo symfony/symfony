@@ -1500,6 +1500,12 @@ EOF;
             }
             $providers = array_merge($this->container->getExpressionLanguageProviders(), $this->expressionLanguageProviders);
             $this->expressionLanguage = new ExpressionLanguage(null, $providers);
+
+            if ($this->container->isTrackingResources()) {
+                foreach ($providers as $provider) {
+                    $this->container->addObjectResource($provider);
+                }
+            }
         }
 
         return $this->expressionLanguage;

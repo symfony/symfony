@@ -13,13 +13,12 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\LoginManagerBund
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\Security\Core\User\User;
 
 class LoginController extends ContainerAware
 {
     public function loginAction()
     {
-        $user = new User('norzechowicz', 'password123');
+        $user = $this->container->get('security.user.provider.concrete.in_memory')->loadUserByUsername('norzechowicz');
         $this->container->get('security.login_manager')->loginUser('secured_area', $user);
 
         return new Response();

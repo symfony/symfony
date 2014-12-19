@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesResolverInterface;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class LoginManager
 {
@@ -70,8 +71,13 @@ class LoginManager
      */
     public function loginUser($firewallName, UserInterface $user, Response $response = null)
     {
+        $this->userChecker->checkPreAuth($user);
         $this->userChecker->checkPostAuth($user);
         $token = $this->createToken($firewallName, $user);
+
+        if (!$token->isAuthenticated()) {
+            throw new AuthenticationException("Unauthenticated token");
+        }
 
         $request = $this->requestStack->getMasterRequest();
         if (null !== $request) {

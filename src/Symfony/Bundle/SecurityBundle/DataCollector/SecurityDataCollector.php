@@ -114,7 +114,7 @@ class SecurityDataCollector extends DataCollector
     /**
      * Gets the inherited roles of the user.
      *
-     * @return string The inherited roles
+     * @return array The inherited roles
      */
     public function getInheritedRoles()
     {

@@ -227,10 +227,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         ## assume rewrite rule: (.*) --> app/app.php ; app/ is a symlink to a symfony web/ directory
         $request = Request::create('http://test.com/apparthotel-1234', 'GET', array(), array(), array(),
             array(
-                'DOCUMENT_ROOT' =>'/var/www/www.test.com',
+                'DOCUMENT_ROOT' => '/var/www/www.test.com',
                 'SCRIPT_FILENAME' => '/var/www/www.test.com/app/app.php',
                 'SCRIPT_NAME' => '/app/app.php',
-                'PHP_SELF' => '/app/app.php/apparthotel-1234'
+                'PHP_SELF' => '/app/app.php/apparthotel-1234',
             ));
         $this->assertEquals('http://test.com/apparthotel-1234', $request->getUri());
         $this->assertEquals('/apparthotel-1234', $request->getPathInfo());

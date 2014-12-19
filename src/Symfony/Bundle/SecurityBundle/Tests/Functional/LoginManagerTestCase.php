@@ -19,7 +19,14 @@ class LoginManagerTestCase extends WebTestCase
     public function testLoginUserInController()
     {
         $client = $this->createClient(array('test_case' => 'LoginManager'));
-        $client->insulate();
+
+        // Avoid to follow redirects. If we follow this redirect, the user
+        // will be logged in automatically
+        $client->setMaxRedirects(-1);
+        $client->request('GET', '/secured/index');
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        // Access to '/login' route to login the user automatically
         $client->request('GET', '/login');
         $client->request('GET', '/secured/index');
         $this->assertEquals('Secured area', $client->getResponse()->getContent());

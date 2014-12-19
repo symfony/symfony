@@ -63,7 +63,7 @@ class LoginManagerTest extends \PHPUnit_Framework_TestCase
     public function testLoginWithoutRequest()
     {
         $loginManager = $this->createLoginManager();
-        $user = new User('norzechowicz', 'password123');
+        $user = new User('norzechowicz', 'password123', array('ROLE_USER'));
 
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')
@@ -83,7 +83,7 @@ class LoginManagerTest extends \PHPUnit_Framework_TestCase
     public function testLoginWithRequest()
     {
         $loginManager = $this->createLoginManager();
-        $user = new User('norzechowicz', 'password123');
+        $user = new User('norzechowicz', 'password123', array('ROLE_USER'));
 
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')
@@ -110,7 +110,7 @@ class LoginManagerTest extends \PHPUnit_Framework_TestCase
     public function testLoginWithRequestResponseAndRememberMeServices()
     {
         $loginManager = $this->createLoginManager();
-        $user = new User('norzechowicz', 'password123');
+        $user = new User('norzechowicz', 'password123', array('ROLE_USER'));
 
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')
@@ -142,6 +142,17 @@ class LoginManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
 
         $loginManager->loginUser(self::FIREWALL_NAME, $user, Response::create());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
+     */
+    public function testLoginShouldFailWithoutAuthenticatedToken()
+    {
+        $loginManager = $this->createLoginManager();
+        $user = new User('norzechowicz', 'password123');
+
+        $loginManager->loginUser(self::FIREWALL_NAME, $user);
     }
 
     /**

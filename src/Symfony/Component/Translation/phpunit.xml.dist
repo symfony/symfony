@@ -11,7 +11,6 @@
         <!-- php -r 'echo -1 & ~E_USER_DEPRECATED;' -->
         <ini name="error_reporting" value="-16385"/>
     </php>
-
     <testsuites>
         <testsuite name="Symfony Translation Component Test Suite">
             <directory>./Tests/</directory>

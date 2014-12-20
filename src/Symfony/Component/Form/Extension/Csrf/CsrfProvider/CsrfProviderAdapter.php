@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
+trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter was deprecated in version 2.4 and will be removed in version 3.0. Please use Symfony\Component\Security\Csrf\CsrfTokenManager instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\Exception\BadMethodCallException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;

@@ -85,7 +85,13 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $this->startTime = microtime(true);
         }
 
-        $this->init();
+        $defClass = new \ReflectionMethod($this, 'init');
+        $defClass = $defClass->getDeclaringClass()->name;
+
+        if (__CLASS__ !== $defClass) {
+            trigger_error(sprintf('Calling %s::init() was deprecated in Symfony 2.3 and will be removed in 3.0. Move your logic to the constructor instead.', $defClass), E_USER_DEPRECATED);
+            $this->init();
+        }
     }
 
     /**

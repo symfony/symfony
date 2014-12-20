@@ -30,7 +30,7 @@ class LoggingTranslatorPass implements CompilerPassInterface
             return;
         }
 
-        if ($container->getParameter('translator.logging')) {
+        if ($container->hasParameter('translator.logging') && $container->getParameter('translator.logging')) {
             $translatorAlias = $container->getAlias('translator');
             $definition = $container->getDefinition((string) $translatorAlias);
             $class = $container->getParameterBag()->resolveValue($definition->getClass());

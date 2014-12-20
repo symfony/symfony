@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-05T08:26:41Z
+
+I'm not sure but I think this PR is a duplicate.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-12-05T08:29:25Z
+
+@hhamon I checked before I got started but I could have missed it.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-05T09:12:09Z
+
+you should also add the deprecation warning in 2.7 in this method
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-12-05T09:13:28Z
+
+@stof Will create a PR for that on the weekend.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-12-15T18:46:55Z
+
+@hhamon Double-checked and there is no other PR. You might have seen #11869 before but besides that I’m pretty sure there isn’t another PR out there.

@@ -29,7 +29,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     private $memcached;
 
     /**
-     * @var int     Time to live in seconds
+     * @var int Time to live in seconds
      */
     private $ttl;
 

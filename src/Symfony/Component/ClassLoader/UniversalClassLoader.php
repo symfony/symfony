@@ -68,7 +68,7 @@ class UniversalClassLoader
 
     /**
      * Turns on searching the include for class files. Allows easy loading
-     * of installed PEAR packages
+     * of installed PEAR packages.
      *
      * @param bool $useIncludePath
      */
@@ -173,7 +173,7 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers an array of namespaces
+     * Registers an array of namespaces.
      *
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      *

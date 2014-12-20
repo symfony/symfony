@@ -10,7 +10,7 @@ class DummyProvider implements UserProviderFactoryInterface
 {
     public function create(ContainerBuilder $container, $id, $config)
     {
-        
+        //
     }
 
     public function getKey()
@@ -20,6 +20,6 @@ class DummyProvider implements UserProviderFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        
+        //
     }
 }

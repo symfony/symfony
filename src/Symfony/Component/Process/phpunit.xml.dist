@@ -6,6 +6,10 @@
          colors="true"
          bootstrap="vendor/autoload.php"
 >
+    <php>
+        <!-- Silence E_USER_DEPRECATED (-16385 == -1 & ~E_USER_DEPRECATED) -->
+        <ini name="error_reporting" value="-16385"/>
+    </php>
     <testsuites>
         <testsuite name="Symfony Process Component Test Suite">
             <directory>./Tests/</directory>

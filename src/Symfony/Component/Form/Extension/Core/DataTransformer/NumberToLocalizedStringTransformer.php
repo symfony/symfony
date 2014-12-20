@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Deprecated\NumberToLocalizedStringTransformer as Deprecated;
 
 /**
  * Transforms between a number type and a localized number with grouping
@@ -77,21 +78,21 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFEVEN = self::ROUND_HALF_EVEN;
+    const ROUND_HALFEVEN = Deprecated::ROUND_HALFEVEN;
 
     /**
      * Alias for {@link self::ROUND_HALF_UP}.
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFUP = self::ROUND_HALF_UP;
+    const ROUND_HALFUP = Deprecated::ROUND_HALFUP;
 
     /**
      * Alias for {@link self::ROUND_HALF_DOWN}.
      *
      * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
      */
-    const ROUND_HALFDOWN = self::ROUND_HALF_DOWN;
+    const ROUND_HALFDOWN = Deprecated::ROUND_HALFDOWN;
 
     protected $precision;
 

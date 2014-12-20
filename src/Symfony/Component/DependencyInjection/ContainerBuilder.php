@@ -1076,6 +1076,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * @return ExpressionFunctionProviderInterface[]
+     */
+    public function getExpressionLanguageProviders()
+    {
+        return $this->expressionLanguageProviders;
+    }
+
+    /**
      * Returns the Service Conditionals.
      *
      * @param mixed $value An array of conditionals to return.

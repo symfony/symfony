@@ -13,7 +13,7 @@
         <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
-            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">

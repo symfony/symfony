@@ -10,6 +10,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Deprecated\FormEvents as Deprecated;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -77,7 +79,7 @@ final class FormEvents
      *
      * @Event
      */
-    const PRE_BIND = 'form.pre_bind';
+    const PRE_BIND = Deprecated::PRE_BIND;
 
     /**
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
@@ -85,7 +87,7 @@ final class FormEvents
      *
      * @Event
      */
-    const BIND = 'form.bind';
+    const BIND = Deprecated::BIND;
 
     /**
      * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
@@ -93,7 +95,7 @@ final class FormEvents
      *
      * @Event
      */
-    const POST_BIND = 'form.post_bind';
+    const POST_BIND = Deprecated::POST_BIND;
 
     private function __construct()
     {

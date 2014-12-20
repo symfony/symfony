@@ -41,6 +41,15 @@ class MessageDataCollector extends DataCollector
      */
     public function __construct(ContainerInterface $container, $isSpool)
     {
+        trigger_error(
+            'Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector class'
+            .' is deprecated since version 2.4 and will be removed in 3.0. Use the'
+            .' Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector'
+            .' class from SwiftmailerBundle instead. The SwiftmailerBundle package'
+            .' can be downloaded with Composer. See https://packagist.org/packages/symfony/swiftmailer-bundle.',
+            E_USER_DEPRECATED
+        );
+
         $this->container = $container;
         $this->isSpool = $isSpool;
     }

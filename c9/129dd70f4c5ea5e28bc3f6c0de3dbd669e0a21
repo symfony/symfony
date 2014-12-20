@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by mvrhov at 2014-12-09T07:57:36Z
+
+IMO It has been said many times.. Ancient browsers are not supported in dev mode.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-12-09T08:10:49Z
+
+@korotovsky thanks for your pull request and for helping us improve Symfony!
+
+Unfortunately, as pointed by @mvrhov, we usually don't accept this kind of pull request. The reason is that Symfony is a backend technology, so there is no need to test it with a specific browser.
+
+We understand that the end clients sometimes are stuck in a particular browser (e.g. IE8) but developers never are. If you are a Symfony developer, there is no reason to use IE8 to test the dev toolbar. That's why we decided to not dedicate any effort to make the debug toolbar compatible with ancient browsers. I hope you understand this decision!
+
+---------------------------------------------------------------------------
+
+by korotovsky at 2014-12-09T08:12:15Z
+
+@mvrov So... Everything was fine in version <2.6. And in UPGRADE file this deprecation didn't listed.
+
+That's why this is bug, and should be fixed.
+
+---------------------------------------------------------------------------
+
+by korotovsky at 2014-12-09T08:17:34Z
+
+@javiereguiluz That means our frontend developers now unable to test site in IE8 without any additional work from backend. (to disable toolbar in IE8).
+
+Sad.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-09T08:34:29Z
+
+If it worked in Symfony 2.5 and considering the change here, which looks like very simple, I'm :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-09T10:07:13Z
+
+@javiereguiluz our policy was that we don't need to support IE8 in the profiler. But the WDT is displayed in the page itself, and errors in IE8 means it will break the page itself. We already fixed the IE support for it previously (see the changelog for 2.3.5).
+So the fix is needed IMO
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-09T10:08:23Z
+
+hmm, actually, IE8 does not implement ``querySelectorAll`` AFAIK, so the fix itself seems wrong.
+
+---------------------------------------------------------------------------
+
+by korotovsky at 2014-12-09T10:11:48Z
+
+@stof http://caniuse.com/#search=querySelectorAll
+
+> Partial support in IE8 is due to being limited to CSS 2.1 selectors. Additionally, it will have trouble with selectors including unrecognized tags (for example HTML5 ones).
+
+IE8 has partial `querySelectorAll` support, but it enough for display page (main site page, where profiler was loaded) correctly.
+
+---------------------------------------------------------------------------
+
+by raulfraile at 2014-12-10T10:40:42Z
+
+IMHO, the profiler and the toolbar should provide the same support for browsers/versions. They are meant to be used by backend developers, they don't give any value for frontend developers trying to make the website compatible with older browsers. The problem is that they need an **easy way to disable the web toolbar in those cases**.
+
+AFAIK, the recommended way now would be having a different environment that extends from `dev` and changes only the `debug_toolbar` parameter. It's a lot of work and can cause problems for example if bundles are loaded based on the environment name. If that could be defined dynamically in the front controller would be much easier to use:
+
+````
+// app_dev.php
+
+// Now:
+$env = 'dev';
+if (isUnsupportedBrowser()) {
+    $env = 'dev_no_wdt';
+}
+$kernel = new AppKernel($env, true);
+
+// Option:
+$kernel = new AppKernel('dev', true);
+if (isUnsupportedBrowser()) {
+    $kernel->disableWdt();
+}
+```
+
+I think that the important thing here is being able to disable the toolbar easily and look for a good way to do it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-20T15:54:15Z
+
+:+1: ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-20T16:12:02Z
+
+:+1:

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-20T10:23:44Z
+
+What about just adding the second parameter to the method?
+`get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)`
+
+https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L465
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2014-12-20T10:35:23Z
+
+@iltar  But 'translator.logging' here is not a service see [translator.logging](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L641)
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-20T11:27:45Z
+
+@aitboudad Ah my bad, I didn't see it was related to parameters

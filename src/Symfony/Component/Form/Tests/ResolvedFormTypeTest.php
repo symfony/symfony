@@ -15,7 +15,7 @@ use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Form;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -66,7 +66,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $i = 0;
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
-            return function (OptionsResolverInterface $resolver) use (&$i, $test, $index, $option, $default) {
+            return function (OptionsResolver $resolver) use (&$i, $test, $index, $option, $default) {
                 /* @var \PHPUnit_Framework_TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
@@ -111,7 +111,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -143,7 +143,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))

@@ -277,6 +277,28 @@ UPGRADE FROM 2.x to 3.0
    echo $form->getErrors(true, false);
    ```
 
+ * The `OptionsResolverInterface` interface was removed, since
+   `OptionsResolver` instances are not supposed to be shared between classes.
+   You should type hint against `OptionsResolver` instead.
+
+   Before:
+
+   ```php
+   protected function configureOptions(OptionsResolverInterface $resolver)
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   protected function configureOptions(OptionsResolver $resolver)
+   {
+       // ...
+   }
+   ```
+
 ### FrameworkBundle
 
  * The `getRequest` method of the base `Controller` class has been deprecated

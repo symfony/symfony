@@ -30,7 +30,7 @@ namespace Symfony\Component\EventDispatcher;
 class Event
 {
     /**
-     * @var bool    Whether no further event listeners should be triggered
+     * @var bool Whether no further event listeners should be triggered
      */
     private $propagationStopped = false;
 

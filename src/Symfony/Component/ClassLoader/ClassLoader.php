@@ -12,7 +12,7 @@
 namespace Symfony\Component\ClassLoader;
 
 /**
- * ClassLoader implements an PSR-0 class loader
+ * ClassLoader implements an PSR-0 class loader.
  *
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
  *
@@ -76,7 +76,7 @@ class ClassLoader
     }
 
     /**
-     * Registers a set of classes
+     * Registers a set of classes.
      *
      * @param string       $prefix The classes prefix
      * @param array|string $paths  The location(s) of the classes

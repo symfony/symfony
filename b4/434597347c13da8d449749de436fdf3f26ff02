@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-19T11:08:14Z
+
+It would be better to register them as resources only when an expression is used, but I'm not sure whether the PhpDumper can register resources or if it is too late.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-19T11:11:17Z
+
+hmm, actually, the dumper is called before retrieving resources, so it is possible to set the resources there. I will update my code. This way, function providers will be resources only if the container contains at least 1 expression (we cannot register only the providers used by these expressions though, which would be even more fine-grained, but this is not a big issue IMO)

@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2014-10-01T15:55:07Z
+
+:-1:
+
+The serializer Symfony meets the needs, and that's enough (well I think), and for further applications, there JMSSerializer exists, and have an exellent approach to resolve this problematic. I find that having a "simple" serializer (sf) and serializer under "Steroid" (jms) is good. What is the motivation to add this kind of functionality?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-01T16:06:42Z
+
+@ProPheT777 the initial motivation is adding groups support to [HydraBundle](https://github.com/lanthaler/HydraBundle). Of course this can be done directly in that bundle but as the code is generic and will work with any encoder (Hydra or anything else) I've opened this PR here. Note that this does not break BC and that groups support is not enabled by default. Pass no parameter to the normalizer's constructor and the `Serializer` will behave exactly as before.
+
+Other motivations are:
+- have a powerful MIT serializer (JMSSerializer is under Apache license, so we cannot use it in a GPLv2 project - and it's my case)
+- have all tools needed to easily create REST APIs directly in Symfony (and groups support or something similar is a must have)
+
+And btw, the Serializer currently does not meet the need. Circular references are not handled and serializing a typical set of entities can lead to an infinite loop. I'll submit a PR to fix that soon.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-01T16:14:37Z
+
+About the licensing issue see https://github.com/symfony/symfony-standard/pull/535
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-02T13:53:20Z
+
+@stof fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-06T16:19:46Z
+
+This PR is almost done. I've added a YAML and a XML loader.
+Something still bothers me: some code (especially `LoaderChain`) is almost copy/pasted from the `Validation` component. Should it be refactored?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-07T10:02:20Z
+
+@dunglas we have the time to figure a way to handle this, given that it won't be part of 2.6 (we have reach the feature freeze)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-07T17:14:08Z
+
+I've looked more in depth to this piece of code. Only `LoaderChain` is duplicated and it's only 50 lines of very generic code. Other loaders are similar in structure but have different responsibilities (because serializer's metadata have nothing to do with validator's metadata).
+It seems acceptable to me to duplicate this particular (`LoaderChain`) small piece of code.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-10-20T12:13:04Z
+
+btw .. need a rebase now
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-10-20T21:31:34Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-12-11T22:46:30Z
+
+Rebased against master. Any update about the status of this PR now that 2.6 has been released?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-12T06:27:21Z
+
+I agree with @dunglas that getting a better serializer in code in a good idea for reasons he explained above; of course, we need to keep the current philosophy of the component.
+
+Seeing that @dunglas is investing a lot of time in this component with great ideas and PRs, no one is really maintaining this component, I propose to let him move the component forward. What do you think @lsmith77 @Seldaek?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2014-12-12T06:31:20Z
+
++1 .. I have full trust in him
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-12-12T10:55:16Z
+
++1 for me too, run with it and do great things! :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-12-13T09:47:28Z
+
+:smiley_cat:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-12-15T13:20:28Z
+
+@fabpot It's possible to host the new `xsd` on symfony.com to make Travis happy?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T15:10:37Z
+
+@dunglas I think the next step would be to open a PR on the docs as it needs to be documented before merge.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-12-21T21:49:19Z
+
+Submitted a doc: symfony/symfony-docs/pull/4675

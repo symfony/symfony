@@ -62,13 +62,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('This test requires PHPUnit 3.7.');
         }
 
-        $test = $this;
         $i = 0;
 
-        $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
-            return function (OptionsResolverInterface $resolver) use (&$i, $test, $index, $option, $default) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index '.$index);
+        $assertIndexAndAddOption = function ($index, $option, $default) use (&$i) {
+            return function (OptionsResolverInterface $resolver) use (&$i, $index, $option, $default) {
+                $this->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
 
@@ -173,13 +171,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('This test requires PHPUnit 3.7.');
         }
 
-        $test = $this;
         $i = 0;
 
-        $assertIndex = function ($index) use (&$i, $test) {
-            return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index '.$index);
+        $assertIndex = function ($index) use (&$i) {
+            return function () use (&$i, $index) {
+                $this->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
             };
@@ -241,13 +237,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
 
-        $test = $this;
         $i = 0;
 
-        $assertIndex = function ($index) use (&$i, $test) {
-            return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index '.$index);
+        $assertIndex = function ($index) use (&$i) {
+            return function () use (&$i, $index) {
+                $this->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
             };
@@ -285,13 +279,12 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
 
-        $test = $this;
         $i = 0;
 
-        $assertIndex = function ($index) use (&$i, $test) {
-            return function () use (&$i, $test, $index) {
+        $assertIndex = function ($index) use (&$i) {
+            return function () use (&$i, $index) {
                 /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertEquals($index, $i, 'Executed at index '.$index);
+                $this->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
             };

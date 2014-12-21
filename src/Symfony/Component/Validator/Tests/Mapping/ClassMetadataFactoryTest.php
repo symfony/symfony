@@ -63,7 +63,6 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
         $factory = new ClassMetadataFactory(new TestLoader(), $cache);
 
-        $tester = $this;
         $constraints = array(
             new ConstraintA(array('groups' => array('Default', 'EntityParent'))),
         );
@@ -76,8 +75,8 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue(false));
         $cache->expects($this->once())
               ->method('write')
-              ->will($this->returnCallback(function ($metadata) use ($tester, $constraints) {
-                  $tester->assertEquals($constraints, $metadata->getConstraints());
+              ->will($this->returnCallback(function ($metadata) use ($constraints) {
+                  $this->assertEquals($constraints, $metadata->getConstraints());
               }));
 
         $metadata = $factory->getMetadataFor(self::PARENTCLASS);
@@ -92,7 +91,6 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
         $factory = new ClassMetadataFactory($loader, $cache);
 
-        $tester = $this;
         $metadata = new ClassMetadata(self::PARENTCLASS);
         $metadata->addConstraint(new ConstraintA());
 

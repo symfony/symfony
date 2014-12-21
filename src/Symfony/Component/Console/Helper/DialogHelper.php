@@ -346,10 +346,8 @@ class DialogHelper extends InputAwareHelper
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
-        $that = $this;
-
-        $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
-            return $that->ask($output, $question, $default, $autocomplete);
+        $interviewer = function () use ($output, $question, $default, $autocomplete) {
+            return $this->ask($output, $question, $default, $autocomplete);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);
@@ -376,10 +374,8 @@ class DialogHelper extends InputAwareHelper
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
-        $that = $this;
-
-        $interviewer = function () use ($output, $question, $fallback, $that) {
-            return $that->askHiddenResponse($output, $question, $fallback);
+        $interviewer = function () use ($output, $question, $fallback) {
+            return $this->askHiddenResponse($output, $question, $fallback);
         };
 
         return $this->validateAttempts($interviewer, $output, $validator, $attempts);

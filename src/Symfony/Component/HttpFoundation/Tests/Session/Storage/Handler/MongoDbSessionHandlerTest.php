@@ -82,14 +82,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
         $data = array();
 
         $collection->expects($this->once())
             ->method('update')
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
-                $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data) {
+                $this->assertEquals(array($this->options['id_field'] => 'foo'), $criteria);
+                $this->assertEquals(array('upsert' => true, 'multiple' => false), $options);
 
                 $data = $updateData['$set'];
             }));
@@ -97,7 +96,7 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->storage->write('foo', 'bar'));
 
         $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
-        $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+        $this->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
     }
 
     public function testWriteWhenUsingExpiresField()
@@ -120,14 +119,13 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
         $data = array();
 
         $collection->expects($this->once())
             ->method('update')
-            ->will($this->returnCallback(function ($criteria, $updateData, $options) use ($that, &$data) {
-                $that->assertEquals(array($that->options['id_field'] => 'foo'), $criteria);
-                $that->assertEquals(array('upsert' => true, 'multiple' => false), $options);
+            ->will($this->returnCallback(function ($criteria, $updateData, $options) use (&$data) {
+                $this->assertEquals(array($this->options['id_field'] => 'foo'), $criteria);
+                $this->assertEquals(array('upsert' => true, 'multiple' => false), $options);
 
                 $data = $updateData['$set'];
             }));
@@ -135,8 +133,8 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->storage->write('foo', 'bar'));
 
         $this->assertEquals('bar', $data[$this->options['data_field']]->bin);
-        $that->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
-        $that->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
+        $this->assertInstanceOf('MongoDate', $data[$this->options['time_field']]);
+        $this->assertInstanceOf('MongoDate', $data[$this->options['expiry_field']]);
     }
 
     public function testReplaceSessionData()
@@ -187,13 +185,11 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->options['database'], $this->options['collection'])
             ->will($this->returnValue($collection));
 
-        $that = $this;
-
         $collection->expects($this->once())
             ->method('remove')
-            ->will($this->returnCallback(function ($criteria) use ($that) {
-                $that->assertInstanceOf('MongoDate', $criteria[$that->options['time_field']]['$lt']);
-                $that->assertGreaterThanOrEqual(time() - 1, $criteria[$that->options['time_field']]['$lt']->sec);
+            ->will($this->returnCallback(function ($criteria) {
+                $this->assertInstanceOf('MongoDate', $criteria[$this->options['time_field']]['$lt']);
+                $this->assertGreaterThanOrEqual(time() - 1, $criteria[$this->options['time_field']]['$lt']->sec);
             }));
 
         $this->assertTrue($this->storage->gc(1));
@@ -216,8 +212,6 @@ class MongoDbSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->mongo->expects($this->never())
             ->method('selectCollection');
-
-        $that = $this;
 
         $collection->expects($this->never())
             ->method('remove');

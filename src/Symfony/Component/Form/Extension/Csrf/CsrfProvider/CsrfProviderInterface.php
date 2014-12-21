@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
 /**
- * Marks classes able to provide CSRF protection
+ * Marks classes able to provide CSRF protection.
  *
  * You can generate a CSRF token by using the method generateCsrfToken(). To
  * this method you should pass a value that is unique to the page that should

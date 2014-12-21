@@ -58,7 +58,7 @@ EOF
     }
 
     /**
-     * Sets the command
+     * Sets the command.
      *
      * @param Command $command The command to set
      */

@@ -134,7 +134,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Returns a preconfigured \NumberFormatter instance
+     * Returns a preconfigured \NumberFormatter instance.
      *
      * @return \NumberFormatter
      */

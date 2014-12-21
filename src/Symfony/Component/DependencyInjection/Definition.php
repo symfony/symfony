@@ -238,7 +238,7 @@ class Definition
     }
 
     /**
-     * Sets a specific argument
+     * Sets a specific argument.
      *
      * @param int   $index
      * @param mixed $argument
@@ -387,7 +387,7 @@ class Definition
     }
 
     /**
-     * Sets tags for this definition
+     * Sets tags for this definition.
      *
      * @param array $tags
      *
@@ -446,7 +446,7 @@ class Definition
     }
 
     /**
-     * Whether this definition has a tag with the given name
+     * Whether this definition has a tag with the given name.
      *
      * @param string $name
      *
@@ -518,7 +518,7 @@ class Definition
     }
 
     /**
-     * Sets the scope of the service
+     * Sets the scope of the service.
      *
      * @param string $scope Whether the service must be shared or not
      *
@@ -534,7 +534,7 @@ class Definition
     }
 
     /**
-     * Returns the scope of the service
+     * Returns the scope of the service.
      *
      * @return string
      *
@@ -562,7 +562,7 @@ class Definition
     }
 
     /**
-     * Whether this service is public facing
+     * Whether this service is public facing.
      *
      * @return bool
      *

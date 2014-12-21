@@ -124,7 +124,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Build SQL criteria to fetch records by ip and url
+     * Build SQL criteria to fetch records by ip and url.
      *
      * @param string $ip     The IP
      * @param string $url    The URL
@@ -138,7 +138,7 @@ abstract class PdoProfilerStorage implements ProfilerStorageInterface
     abstract protected function buildCriteria($ip, $url, $start, $end, $limit, $method);
 
     /**
-     * Initializes the database
+     * Initializes the database.
      *
      * @throws \RuntimeException When the requested database driver is not installed
      */

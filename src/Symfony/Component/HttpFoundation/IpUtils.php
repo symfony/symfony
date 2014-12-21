@@ -19,14 +19,14 @@ namespace Symfony\Component\HttpFoundation;
 class IpUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
     }
 
     /**
-     * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets
+     * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
      * @param string       $requestIp IP to check
      * @param string|array $ips       List of IPs or subnets (can be a string if only a single one)
@@ -80,6 +80,7 @@ class IpUtils
      * In case a subnet is given, it checks if it contains the request IP.
      *
      * @author David Soria Parra <dsp at php dot net>
+     *
      * @see https://github.com/dsp/v6tools
      *
      * @param string $requestIp IPv6 address to check

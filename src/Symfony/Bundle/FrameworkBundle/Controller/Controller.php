@@ -164,7 +164,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Creates and returns a form builder instance
+     * Creates and returns a form builder instance.
      *
      * @param mixed $data    The initial data for the form
      * @param array $options Options for the form
@@ -203,7 +203,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Get a user from the Security Context
+     * Get a user from the Security Context.
      *
      * @return mixed
      *

@@ -47,7 +47,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     private $listeners;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int                                 $id
      * @param ObjectIdentityInterface             $objectIdentity
@@ -71,7 +71,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Adds a property changed listener
+     * Adds a property changed listener.
      *
      * @param PropertyChangedListener $listener
      */
@@ -256,7 +256,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Implementation for the \Serializable interface
+     * Implementation for the \Serializable interface.
      *
      * @return string
      */
@@ -276,7 +276,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Implementation for the \Serializable interface
+     * Implementation for the \Serializable interface.
      *
      * @param string $serialized
      */
@@ -395,7 +395,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Deletes an ACE
+     * Deletes an ACE.
      *
      * @param string $property
      * @param int    $index
@@ -420,7 +420,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Deletes a field-based ACE
+     * Deletes a field-based ACE.
      *
      * @param string $property
      * @param int    $index
@@ -446,7 +446,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Inserts an ACE
+     * Inserts an ACE.
      *
      * @param string                    $property
      * @param int                       $index
@@ -495,7 +495,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Inserts a field-based ACE
+     * Inserts a field-based ACE.
      *
      * @param string                    $property
      * @param int                       $index
@@ -553,7 +553,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Updates an ACE
+     * Updates an ACE.
      *
      * @param string $property
      * @param int    $index
@@ -581,7 +581,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Updates auditing for an ACE
+     * Updates auditing for an ACE.
      *
      * @param array &$aces
      * @param int   $index
@@ -608,7 +608,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Updates a field-based ACE
+     * Updates a field-based ACE.
      *
      * @param string $property
      * @param int    $index
@@ -642,7 +642,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Called when a property of the ACL changes
+     * Called when a property of the ACL changes.
      *
      * @param string $name
      * @param mixed  $oldValue
@@ -656,7 +656,7 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
     }
 
     /**
-     * Called when a property of an ACE associated with this ACL changes
+     * Called when a property of an ACE associated with this ACL changes.
      *
      * @param EntryInterface $entry
      * @param string         $name

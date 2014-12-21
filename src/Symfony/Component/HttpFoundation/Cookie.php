@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 /**
- * Represents a cookie
+ * Represents a cookie.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
@@ -197,7 +197,7 @@ class Cookie
     }
 
     /**
-     * Whether this cookie is about to be cleared
+     * Whether this cookie is about to be cleared.
      *
      * @return bool
      *

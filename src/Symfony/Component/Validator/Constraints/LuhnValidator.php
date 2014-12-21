@@ -16,12 +16,13 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates a PAN using the LUHN Algorithm
+ * Validates a PAN using the LUHN Algorithm.
  *
  * For a list of example card numbers that are used to test this
  * class, please see the LuhnValidatorTest class.
  *
  * @see    http://en.wikipedia.org/wiki/Luhn_algorithm
+ *
  * @author Tim Nagel <t.nagel@infinite.net.au>
  * @author Greg Knapp http://gregk.me/2011/php-implementation-of-bank-card-luhn-algorithm/
  * @author Bernhard Schussek <bschussek@gmail.com>

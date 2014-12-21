@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\Tests;
 class CompoundFormPerformanceTest extends \Symfony\Component\Form\Tests\FormPerformanceTestCase
 {
     /**
-     * Create a compound form multiple times, as happens in a collection form
+     * Create a compound form multiple times, as happens in a collection form.
      *
      * @group benchmark
      */

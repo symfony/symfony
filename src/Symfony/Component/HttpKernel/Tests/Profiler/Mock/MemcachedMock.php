@@ -28,7 +28,7 @@ class MemcachedMock
     }
 
     /**
-     * Set a Memcached option
+     * Set a Memcached option.
      *
      * @param int   $option
      * @param mixed $value
@@ -41,7 +41,7 @@ class MemcachedMock
     }
 
     /**
-     * Add a memcached server to connection pool
+     * Add a memcached server to connection pool.
      *
      * @param string $host
      * @param int    $port
@@ -147,7 +147,7 @@ class MemcachedMock
     }
 
     /**
-     * Append data to an existing item
+     * Append data to an existing item.
      *
      * @param string $key
      * @param string $value
@@ -170,7 +170,7 @@ class MemcachedMock
     }
 
     /**
-     * Delete item from the server
+     * Delete item from the server.
      *
      * @param string $key
      *
@@ -192,7 +192,7 @@ class MemcachedMock
     }
 
     /**
-     * Flush all existing items at the server
+     * Flush all existing items at the server.
      *
      * @return bool
      */

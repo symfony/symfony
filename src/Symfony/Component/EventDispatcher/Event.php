@@ -48,6 +48,7 @@ class Event
      * Returns whether further event listeners should be triggered.
      *
      * @see Event::stopPropagation
+     *
      * @return bool Whether propagation was already stopped for this event.
      *
      * @api
@@ -72,7 +73,7 @@ class Event
     }
 
     /**
-     * Stores the EventDispatcher that dispatches this Event
+     * Stores the EventDispatcher that dispatches this Event.
      *
      * @param EventDispatcherInterface $dispatcher
      *
@@ -84,7 +85,7 @@ class Event
     }
 
     /**
-     * Returns the EventDispatcher that dispatches this Event
+     * Returns the EventDispatcher that dispatches this Event.
      *
      * @return EventDispatcherInterface
      *

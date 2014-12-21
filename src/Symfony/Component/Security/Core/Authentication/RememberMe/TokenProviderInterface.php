@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 /**
- * Interface for TokenProviders
+ * Interface for TokenProviders.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

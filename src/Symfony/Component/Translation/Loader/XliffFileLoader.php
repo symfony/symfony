@@ -75,7 +75,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Validates and parses the given file into a SimpleXMLElement
+     * Validates and parses the given file into a SimpleXMLElement.
      *
      * @param string $file
      *
@@ -123,7 +123,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Returns the XML errors of the internal XML parser
+     * Returns the XML errors of the internal XML parser.
      *
      * @param bool $internalErrors
      *

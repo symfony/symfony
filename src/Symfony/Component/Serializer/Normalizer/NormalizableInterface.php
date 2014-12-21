@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 /**
- * Defines the most basic interface a class must implement to be normalizable
+ * Defines the most basic interface a class must implement to be normalizable.
  *
  * If a normalizer is registered for the class and it doesn't implement
  * the Normalizable interfaces, the normalizer will be used instead

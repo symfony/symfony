@@ -24,13 +24,15 @@ use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 class ClassMetadataFactory implements MetadataFactoryInterface
 {
     /**
-     * The loader for loading the class metadata
+     * The loader for loading the class metadata.
+     *
      * @var LoaderInterface
      */
     protected $loader;
 
     /**
-     * The cache for caching class metadata
+     * The cache for caching class metadata.
+     *
      * @var CacheInterface
      */
     protected $cache;

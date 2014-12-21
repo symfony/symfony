@@ -17,14 +17,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Allows to execute logic after a response was sent
+ * Allows to execute logic after a response was sent.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 class PostResponseEvent extends Event
 {
     /**
-     * The kernel in which this event was thrown
+     * The kernel in which this event was thrown.
+     *
      * @var HttpKernelInterface
      */
     private $kernel;

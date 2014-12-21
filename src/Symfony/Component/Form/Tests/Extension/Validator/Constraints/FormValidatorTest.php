@@ -552,7 +552,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     /**
      * Access has to be public, as this method is called via callback array
      * in {@link testValidateFormDataCanHandleCallbackValidationGroups()}
-     * and {@link testValidateFormDataUsesInheritedCallbackValidationGroup()}
+     * and {@link testValidateFormDataUsesInheritedCallbackValidationGroup()}.
      */
     public function getValidationGroups(FormInterface $form)
     {

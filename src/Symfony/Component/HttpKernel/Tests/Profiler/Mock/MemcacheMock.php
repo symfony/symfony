@@ -28,7 +28,7 @@ class MemcacheMock
     }
 
     /**
-     * Open memcached server connection
+     * Open memcached server connection.
      *
      * @param string $host
      * @param int    $port
@@ -48,7 +48,7 @@ class MemcacheMock
     }
 
     /**
-     * Open memcached server persistent connection
+     * Open memcached server persistent connection.
      *
      * @param string $host
      * @param int    $port
@@ -68,7 +68,7 @@ class MemcacheMock
     }
 
     /**
-     * Add a memcached server to connection pool
+     * Add a memcached server to connection pool.
      *
      * @param string   $host
      * @param int      $port
@@ -193,7 +193,7 @@ class MemcacheMock
     }
 
     /**
-     * Delete item from the server
+     * Delete item from the server.
      *
      * @param string $key
      *
@@ -215,7 +215,7 @@ class MemcacheMock
     }
 
     /**
-     * Flush all existing items at the server
+     * Flush all existing items at the server.
      *
      * @return bool
      */
@@ -231,7 +231,7 @@ class MemcacheMock
     }
 
     /**
-     * Close memcached server connection
+     * Close memcached server connection.
      *
      * @return bool
      */

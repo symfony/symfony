@@ -18,7 +18,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * A choice list presenting a list of Doctrine entities as choices
+ * A choice list presenting a list of Doctrine entities as choices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -41,7 +41,7 @@ class EntityChoiceList extends ObjectChoiceList
 
     /**
      * Contains the query builder that builds the query for fetching the
-     * entities
+     * entities.
      *
      * This property should only be accessed through queryBuilder.
      *
@@ -50,21 +50,21 @@ class EntityChoiceList extends ObjectChoiceList
     private $entityLoader;
 
     /**
-     * The identifier field, if the identifier is not composite
+     * The identifier field, if the identifier is not composite.
      *
      * @var array
      */
     private $idField = null;
 
     /**
-     * Whether to use the identifier for index generation
+     * Whether to use the identifier for index generation.
      *
      * @var bool
      */
     private $idAsIndex = false;
 
     /**
-     * Whether to use the identifier for value generation
+     * Whether to use the identifier for value generation.
      *
      * @var bool
      */
@@ -128,7 +128,7 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the list of entities
+     * Returns the list of entities.
      *
      * @return array
      *
@@ -144,7 +144,7 @@ class EntityChoiceList extends ObjectChoiceList
     }
 
     /**
-     * Returns the values for the entities
+     * Returns the values for the entities.
      *
      * @return array
      *

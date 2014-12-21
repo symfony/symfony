@@ -53,7 +53,7 @@ class GenericEventTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests Event->getArgs()
+     * Tests Event->getArgs().
      */
     public function testGetArguments()
     {

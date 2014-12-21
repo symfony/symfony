@@ -23,7 +23,7 @@ class StopwatchPeriod
     private $memory;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int $start The relative time of the start of the period
      * @param int $end   The relative time of the end of the period

@@ -353,7 +353,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the first node of the current selection
+     * Returns the first node of the current selection.
      *
      * @return Crawler A Crawler instance with the first selected node
      *
@@ -365,7 +365,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the last node of the current selection
+     * Returns the last node of the current selection.
      *
      * @return Crawler A Crawler instance with the last selected node
      *
@@ -377,7 +377,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the siblings nodes of the current selection
+     * Returns the siblings nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the sibling nodes
      *
@@ -395,7 +395,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the next siblings nodes of the current selection
+     * Returns the next siblings nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the next sibling nodes
      *
@@ -413,7 +413,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the previous sibling nodes of the current selection
+     * Returns the previous sibling nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the previous sibling nodes
      *
@@ -431,7 +431,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the parents nodes of the current selection
+     * Returns the parents nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the parents nodes of the current selection
      *
@@ -458,7 +458,7 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Returns the children nodes of the current selection
+     * Returns the children nodes of the current selection.
      *
      * @return Crawler A Crawler instance with the children nodes
      *

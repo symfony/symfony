@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds tagged translation.formatter services to translation writer
+ * Adds tagged translation.formatter services to translation writer.
  */
 class TranslationDumperPass implements CompilerPassInterface
 {

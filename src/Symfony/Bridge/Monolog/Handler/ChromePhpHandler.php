@@ -34,7 +34,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
     private $response;
 
     /**
-     * Adds the headers to the response once it's created
+     * Adds the headers to the response once it's created.
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -73,7 +73,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
     }
 
     /**
-     * Override default behavior since we check it in onKernelResponse
+     * Override default behavior since we check it in onKernelResponse.
      */
     protected function headersAccepted()
     {

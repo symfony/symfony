@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * A console command for dumping available configuration reference
+ * A console command for dumping available configuration reference.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

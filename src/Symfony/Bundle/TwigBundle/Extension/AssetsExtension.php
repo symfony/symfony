@@ -14,7 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Twig extension for Symfony assets helper
+ * Twig extension for Symfony assets helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

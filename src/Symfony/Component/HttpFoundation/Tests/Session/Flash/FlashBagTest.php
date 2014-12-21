@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
- * FlashBagTest
+ * FlashBagTest.
  *
  * @author Drak <drak@zikula.org>
  */

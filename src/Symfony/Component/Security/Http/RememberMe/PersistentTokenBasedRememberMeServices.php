@@ -52,7 +52,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     }
 
     /**
-     * Sets the token provider
+     * Sets the token provider.
      *
      * @param TokenProviderInterface $tokenProvider
      */

@@ -64,7 +64,7 @@ class Request
     protected static $httpMethodParameterOverride = false;
 
     /**
-     * Custom parameters
+     * Custom parameters.
      *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
@@ -73,7 +73,7 @@ class Request
     public $attributes;
 
     /**
-     * Request body parameters ($_POST)
+     * Request body parameters ($_POST).
      *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
@@ -82,7 +82,7 @@ class Request
     public $request;
 
     /**
-     * Query string parameters ($_GET)
+     * Query string parameters ($_GET).
      *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
@@ -91,7 +91,7 @@ class Request
     public $query;
 
     /**
-     * Server and execution environment parameters ($_SERVER)
+     * Server and execution environment parameters ($_SERVER).
      *
      * @var \Symfony\Component\HttpFoundation\ServerBag
      *
@@ -100,7 +100,7 @@ class Request
     public $server;
 
     /**
-     * Uploaded files ($_FILES)
+     * Uploaded files ($_FILES).
      *
      * @var \Symfony\Component\HttpFoundation\FileBag
      *
@@ -109,7 +109,7 @@ class Request
     public $files;
 
     /**
-     * Cookies ($_COOKIE)
+     * Cookies ($_COOKIE).
      *
      * @var \Symfony\Component\HttpFoundation\ParameterBag
      *
@@ -118,7 +118,7 @@ class Request
     public $cookies;
 
     /**
-     * Headers (taken from the $_SERVER)
+     * Headers (taken from the $_SERVER).
      *
      * @var \Symfony\Component\HttpFoundation\HeaderBag
      *
@@ -1572,7 +1572,7 @@ class Request
     }
 
     /**
-     * Gets a list of content types acceptable by the client browser
+     * Gets a list of content types acceptable by the client browser.
      *
      * @return array List of content types in preferable order
      *
@@ -1592,6 +1592,7 @@ class Request
      *
      * It works if your JavaScript library sets an X-Requested-With HTTP header.
      * It is known to work with common JavaScript frameworks:
+     *
      * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
      * @return bool true if the request is an XMLHttpRequest, false otherwise

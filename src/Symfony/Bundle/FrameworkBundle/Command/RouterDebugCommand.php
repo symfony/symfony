@@ -101,7 +101,7 @@ EOF
 
         $format = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
         $formatHeader = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %s';
-        $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>',  '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
+        $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
 
         foreach ($routes as $name => $route) {
             $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';

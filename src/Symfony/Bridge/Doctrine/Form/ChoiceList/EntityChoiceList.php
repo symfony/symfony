@@ -98,7 +98,7 @@ class EntityChoiceList extends ObjectChoiceList
      *                                                     the choices are given as flat array.
      * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths.
      */
-    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null,  array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->em = $manager;
         $this->entityLoader = $entityLoader;

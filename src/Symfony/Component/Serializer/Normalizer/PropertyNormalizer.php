@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -29,53 +28,10 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * property with the corresponding name exists. If found, the property gets the value.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class PropertyNormalizer extends AbstractNormalizer
 {
-    private $callbacks = array();
-    private $ignoredAttributes = array();
-    private $camelizedAttributes = array();
-
-    /**
-     * Set normalization callbacks
-     *
-     * @param array $callbacks help normalize the result
-     *
-     * @throws InvalidArgumentException if a non-callable callback is set
-     */
-    public function setCallbacks(array $callbacks)
-    {
-        foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The given callback for attribute "%s" is not callable.',
-                    $attribute
-                ));
-            }
-        }
-        $this->callbacks = $callbacks;
-    }
-
-    /**
-     * Set ignored attributes for normalization.
-     *
-     * @param array $ignoredAttributes
-     */
-    public function setIgnoredAttributes(array $ignoredAttributes)
-    {
-        $this->ignoredAttributes = $ignoredAttributes;
-    }
-
-    /**
-     * Set attributes to be camelized on denormalize
-     *
-     * @param array $camelizedAttributes
-     */
-    public function setCamelizedAttributes(array $camelizedAttributes)
-    {
-        $this->camelizedAttributes = $camelizedAttributes;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -83,9 +39,14 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
+        $allowedAttributes = $this->getAllowedAttributes($object, $context);
 
         foreach ($reflectionObject->getProperties() as $property) {
             if (in_array($property->name, $this->ignoredAttributes)) {
+                continue;
+            }
+
+            if (false !== $allowedAttributes && !in_array($property->name, $allowedAttributes)) {
                 continue;
             }
 
@@ -114,6 +75,8 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+
         $reflectionClass = new \ReflectionClass($class);
         $constructor = $reflectionClass->getConstructor();
 
@@ -124,7 +87,9 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
 
-                if (isset($data[$paramName])) {
+                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+                $ignored = in_array($paramName, $this->ignoredAttributes);
+                if ($allowed && !$ignored && isset($data[$paramName])) {
                     $params[] = $data[$paramName];
                     // don't run set for a parameter passed to the constructor
                     unset($data[$paramName]);
@@ -146,7 +111,9 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
         foreach ($data as $propertyName => $value) {
             $propertyName = lcfirst($this->formatAttribute($propertyName));
 
-            if ($reflectionClass->hasProperty($propertyName)) {
+            $allowed = $allowedAttributes === false || in_array($propertyName, $allowedAttributes);
+            $ignored = in_array($propertyName, $this->ignoredAttributes);
+            if ($allowed && !$ignored && $reflectionClass->hasProperty($propertyName)) {
                 $property = $reflectionClass->getProperty($propertyName);
 
                 // Override visibility
@@ -175,24 +142,6 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $this->supports($type);
-    }
-
-    /**
-     * Format an attribute name, for example to convert a snake_case name to camelCase.
-     *
-     * @param string $attributeName
-     *
-     * @return string
-     */
-    protected function formatAttribute($attributeName)
-    {
-        if (in_array($attributeName, $this->camelizedAttributes)) {
-            return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-            }, $attributeName);
-        }
-
-        return $attributeName;
     }
 
     /**

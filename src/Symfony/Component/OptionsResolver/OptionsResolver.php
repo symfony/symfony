@@ -1015,6 +1015,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function set($option, $value)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefaults() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefault($option, $value);
     }
 
@@ -1025,6 +1027,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function replace(array $defaults)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the clear() and setDefaults() methods instead.', E_USER_DEPRECATED);
+
         $this->clear();
 
         return $this->setDefaults($defaults);
@@ -1037,6 +1041,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function overload($option, $value)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefault() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefault($option, $value);
     }
 
@@ -1047,6 +1053,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function get($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the ArrayAccess syntax instead to get an option value.', E_USER_DEPRECATED);
+
         return $this->offsetGet($option);
     }
 
@@ -1057,6 +1065,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function has($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the ArrayAccess syntax instead to get an option value.', E_USER_DEPRECATED);
+
         return $this->offsetExists($option);
     }
 
@@ -1067,6 +1077,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function replaceDefaults(array $defaultValues)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the clear() and setDefaults() methods instead.', E_USER_DEPRECATED);
+
         $this->clear();
 
         return $this->setDefaults($defaultValues);
@@ -1079,6 +1091,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function setOptional(array $optionNames)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefined() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefined($optionNames);
     }
 
@@ -1089,6 +1103,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     public function isKnown($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the isDefined() method instead.', E_USER_DEPRECATED);
+
         return $this->isDefined($option);
     }
 

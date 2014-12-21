@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The "Symfony\Component\Validator\MetadataFactoryInterface" interface is deprecated since version 2.5 and will be removed in Symfony 3.0. You should use the "Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface" interface instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\MetadataFactoryInterface interface is deprecated since version 2.5 and will be removed in Symfony 3.0. Use the Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface interface instead.', E_USER_DEPRECATED);
 
 /**
  * Returns {@link MetadataInterface} instances for values.

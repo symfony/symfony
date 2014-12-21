@@ -14,8 +14,7 @@ namespace Symfony\Bridge\Twig\Node;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             the helper "form_start()" instead.
+ * @deprecated since version 2.3, to be removed in 3.0. Use the helper "form_start()" instead.
  */
 class FormEnctypeNode extends SearchAndRenderBlockNode
 {

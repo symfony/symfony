@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The "Symfony\Component\Validator\ExecutionContextInterface" interface was deprecated in version 2.5 and will be removed in 3.0. Use "Symfony\Component\Validator\Context\ExecutionContextInterface" instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\ExecutionContextInterface interface is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Context\ExecutionContextInterface interface instead.', E_USER_DEPRECATED);
 
 /**
  * Stores the validator's state during validation.

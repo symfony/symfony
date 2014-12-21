@@ -151,6 +151,8 @@ class Route implements \Serializable
      */
     public function getPattern()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the getPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
         return $this->path;
     }
 
@@ -167,6 +169,8 @@ class Route implements \Serializable
      */
     public function setPattern($pattern)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the setPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
         return $this->setPath($pattern);
     }
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
+trigger_error('The '.__NAMESPACE__.'\StubGlobalExecutionContext class is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\GlobalExecutionContextInterface;
 use Symfony\Component\Validator\ValidationVisitorInterface;
@@ -20,14 +22,12 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated
+ * @deprecated since version 2.5, to be removed in 3.0
  */
 class StubGlobalExecutionContext implements GlobalExecutionContextInterface
 {
     private $violations;
-
     private $root;
-
     private $visitor;
 
     public function __construct($root = null, ValidationVisitorInterface $visitor = null)

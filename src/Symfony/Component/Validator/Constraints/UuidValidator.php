@@ -56,17 +56,17 @@ class UuidValidator extends ConstraintValidator
     const LOOSE_FIRST_HYPHEN_POSITION = 4;
 
     /**
-     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0
      */
     const STRICT_PATTERN = '/^[a-f0-9]{8}-[a-f0-9]{4}-[%s][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i';
 
     /**
-     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0
      */
     const LOOSE_PATTERN = '/^[a-f0-9]{4}(?:-?[a-f0-9]{4}){7}$/i';
 
     /**
-     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0
+     * @deprecated Deprecated since version 2.6, to be removed in 3.0
      */
     const STRICT_UUID_LENGTH = self::STRICT_LENGTH;
 

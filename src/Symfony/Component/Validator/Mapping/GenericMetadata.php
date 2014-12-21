@@ -233,11 +233,13 @@ class GenericMetadata implements MetadataInterface
      *
      * @throws BadMethodCallException
      *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+     * @deprecated Implemented for backward compatibility with Symfony < 2.5.
      *             Will be removed in Symfony 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath)
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         throw new BadMethodCallException('Not supported.');
     }
 }

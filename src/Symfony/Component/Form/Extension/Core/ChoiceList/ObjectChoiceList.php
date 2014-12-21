@@ -191,6 +191,8 @@ class ObjectChoiceList extends ChoiceList
      */
     public function getIndicesForChoices(array $choices)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (!$this->valuePath) {
             return parent::getIndicesForChoices($choices);
         }

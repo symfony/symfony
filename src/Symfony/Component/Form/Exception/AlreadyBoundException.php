@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Exception;
 
+trigger_error('The '.__NAMESPACE__.'\AlreadyBoundException class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Exception\AlreadySubmittedException class instead.', E_USER_DEPRECATED);
+
 /**
  * Alias of {@link AlreadySubmittedException}.
  *

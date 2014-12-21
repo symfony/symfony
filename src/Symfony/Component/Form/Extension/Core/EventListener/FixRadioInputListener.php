@@ -68,6 +68,8 @@ class FixRadioInputListener implements EventSubscriberInterface
      */
     public function preBind(FormEvent $event)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the preSubmit() method instead.', E_USER_DEPRECATED);
+
         $this->preSubmit($event);
     }
 

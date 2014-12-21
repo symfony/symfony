@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Validator;
 
+trigger_error('The '.__NAMESPACE__.'\LegacyValidator class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\RecursiveValidator class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -34,7 +36,7 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
  * @see \Symfony\Component\Validator\ValidatorInterface
  * @see \Symfony\Component\Validator\Validator\ValidatorInterface
  *
- * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+ * @deprecated Implemented for backward compatibility with Symfony < 2.5.
  *             To be removed in Symfony 3.0.
  */
 class LegacyValidator extends RecursiveValidator implements LegacyValidatorInterface

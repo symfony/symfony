@@ -77,6 +77,8 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (null === $this->requestStack) {
             $this->requests[] = $event->getRequest();
         }

@@ -65,6 +65,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function buildViolation($message, array $parameters = array())
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($this->context instanceof ExecutionContextInterface2Dot5) {
             return $this->context->buildViolation($message, $parameters);
         }
@@ -86,6 +88,8 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($context instanceof ExecutionContextInterface2Dot5) {
             return $context->buildViolation($message, $parameters);
         }

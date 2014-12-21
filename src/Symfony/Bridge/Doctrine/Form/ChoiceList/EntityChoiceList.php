@@ -300,6 +300,8 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForChoices(array $entities)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         // Performance optimization
         if (empty($entities)) {
             return array();
@@ -342,6 +344,8 @@ class EntityChoiceList extends ObjectChoiceList
      */
     public function getIndicesForValues(array $values)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         // Performance optimization
         if (empty($values)) {
             return array();

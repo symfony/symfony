@@ -21,7 +21,7 @@ class Unescaper
 {
     // Parser and Inline assume UTF-8 encoding, so escaped Unicode characters
     // must be converted to that encoding.
-    // @deprecated since 2.5, to be removed in 3.0
+    // @deprecated since version 2.5, to be removed in 3.0
     const ENCODING = 'UTF-8';
 
     // Regex fragment that matches an escaped character in a double quoted

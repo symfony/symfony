@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The Symfony\Component\Validator\ClassBasedInterface interface was deprecated in version 2.7 and will be removed in 3.0. Use Symfony\Component\Validator\Mapping\ClassMetadataInterface instead', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\ClassBasedInterface interface is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Component\Validator\Mapping\ClassMetadataInterface interface instead', E_USER_DEPRECATED);
 
 /**
  * An object backed by a PHP class.

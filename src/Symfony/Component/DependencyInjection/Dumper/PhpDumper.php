@@ -1402,12 +1402,14 @@ EOF;
     }
 
     /**
-     * @deprecated Deprecated since 2.6.2, to be removed in 3.0. Use Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
+     * @deprecated Deprecated since version 2.6.2, to be removed in 3.0. Use Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
      *
      * @param ExpressionFunctionProviderInterface $provider
      */
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6.2 and will be removed in 3.0. Use the Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider method instead.', E_USER_DEPRECATED);
+
         $this->expressionLanguageProviders[] = $provider;
     }
 

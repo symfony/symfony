@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
+trigger_error('The '.__NAMESPACE__.'\ActionsExtension class is deprecated since version 2.2 and will be removed in Symfony 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;

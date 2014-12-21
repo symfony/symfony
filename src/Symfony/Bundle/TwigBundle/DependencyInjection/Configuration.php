@@ -61,7 +61,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->children()
                 ->arrayNode('form')
-                    ->info('Deprecated since 2.6, to be removed in 3.0. Use twig.form_themes instead')
+                    ->info('Deprecated since version 2.6, to be removed in 3.0. Use twig.form_themes instead')
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()

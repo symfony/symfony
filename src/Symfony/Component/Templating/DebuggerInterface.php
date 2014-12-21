@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating;
 
+trigger_error('The '.__NAMESPACE__.'\DebuggerInterface interface is deprecated since version 2.4 and will be removed in 3.0. Use Psr\Log\LoggerInterface instead.', E_USER_DEPRECATED);
+
 /**
  * DebuggerInterface is the interface you need to implement
  * to debug template loader instances.

@@ -52,6 +52,7 @@ class Callback extends Constraint
                 $options = array('callback' => $options);
             } else {
                 // BC with Symfony < 2.4
+                trigger_error('The "methods" option of the '.__CLASS__.' class is deprecated since version 2.4 and will be removed in 3.0. Use the "callback" option instead.', E_USER_DEPRECATED);
                 $options = array('methods' => $options);
             }
         }

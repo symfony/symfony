@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('Symfony\Component\Validator\PropertyMetadataContainerInterface is deprecated since version 2.5 and will be removed in 3.0. Use Symfony\Component\Validator\Mapping\ClassMetadataInterface instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.' interface is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Mapping\ClassMetadataInterface interface instead.', E_USER_DEPRECATED);
 
 /**
  * A container for {@link PropertyMetadataInterface} instances.

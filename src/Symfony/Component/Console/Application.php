@@ -628,6 +628,8 @@ class Application
      */
     public function asText($namespace = null, $raw = false)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $descriptor = new TextDescriptor();
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, !$raw);
         $descriptor->describe($output, $this, array('namespace' => $namespace, 'raw_output' => true));
@@ -647,6 +649,8 @@ class Application
      */
     public function asXml($namespace = null, $asDom = false)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $descriptor = new XmlDescriptor();
 
         if ($asDom) {

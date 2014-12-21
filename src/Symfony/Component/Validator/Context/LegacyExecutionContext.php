@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Context;
 
+trigger_error('The '.__NAMESPACE__.'\LegacyExecutionContext class is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\MetadataFactoryInterface;
@@ -22,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
+ * @deprecated Implemented for backward compatibility with Symfony < 2.5.
  *             To be removed in Symfony 3.0.
  */
 class LegacyExecutionContext extends ExecutionContext

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+trigger_error('The '.__NAMESPACE__.'\SimpleXMLElement method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\ExpressionLanguage\Expression;
 

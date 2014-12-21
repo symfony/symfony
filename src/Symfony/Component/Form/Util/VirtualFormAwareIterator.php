@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Util;
 
-trigger_error('Symfony\Component\Form\Util\VirtualFormAwareIterator is deprecated since Symfony 2.3 and will be removed in 3.0. Use Symfony\Component\Form\Util\InheritDataAwareIterator instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\VirtualFormAwareIterator class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Util\InheritDataAwareIterator class instead.', E_USER_DEPRECATED);
 
 /**
  * Iterator that traverses an array of forms.

@@ -83,6 +83,8 @@ class Event
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
+
         $this->dispatcher = $dispatcher;
     }
 
@@ -97,6 +99,8 @@ class Event
      */
     public function getDispatcher()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
+
         return $this->dispatcher;
     }
 
@@ -111,6 +115,8 @@ class Event
      */
     public function getName()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
+
         return $this->name;
     }
 
@@ -125,6 +131,8 @@ class Event
      */
     public function setName($name)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
+
         $this->name = $name;
     }
 }

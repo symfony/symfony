@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -10,10 +11,10 @@
 
 namespace Symfony\Component\Form\Deprecated;
 
-trigger_error('Constants PRE_BIND, BIND and POST_BIND on class Symfony\Component\Form\FormEvents were deprecated in Symfony 2.3 and will be removed in 3.0. Use PRE_SUBMIT, SUBMIT and POST_SUBMIT instead.', E_USER_DEPRECATED);
+trigger_error('Constants PRE_BIND, BIND and POST_BIND in class Symfony\Component\Form\FormEvents are deprecated since version 2.3 and will be removed in 3.0. Use PRE_SUBMIT, SUBMIT and POST_SUBMIT instead.', E_USER_DEPRECATED);
 
 /**
- * @deprecated since 2.7, to be removed in 3.0.
+ * @deprecated since version 2.7, to be removed in 3.0.
  * @internal
  */
 final class FormEvents

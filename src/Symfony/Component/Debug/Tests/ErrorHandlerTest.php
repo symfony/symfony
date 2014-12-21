@@ -386,7 +386,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             ;
 
             $handler = ErrorHandler::register(E_NOTICE);
-            $handler->setLogger($logger, 'scream');
+            @$handler->setLogger($logger, 'scream');
             unset($undefVar);
             @$undefVar++;
 

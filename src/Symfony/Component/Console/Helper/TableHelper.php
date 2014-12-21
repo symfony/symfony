@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\NullOutput;
  * @author Саша Стаменковић <umpirsky@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since 2.5, to be removed in 3.0; use Table instead.
+ * @deprecated Deprecated since version 2.5, to be removed in 3.0; use Table instead.
  */
 class TableHelper extends Helper
 {
@@ -36,7 +36,7 @@ class TableHelper extends Helper
     public function __construct($triggerDeprecationError = true)
     {
         if ($triggerDeprecationError) {
-            trigger_error('"Symfony\Component\Console\Helper\TableHelper" is deprecated since version 2.5 and will be removed in 3.0. Use "Symfony\Component\Console\Helper\Table" instead.', E_USER_DEPRECATED);
+            trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Console\Helper\Table class instead.', E_USER_DEPRECATED);
         }
 
         $this->table = new Table(new NullOutput());

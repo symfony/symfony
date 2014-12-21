@@ -304,6 +304,8 @@ class ModelChoiceList extends ObjectChoiceList
      */
     public function getIndicesForChoices(array $models)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (empty($models)) {
             return array();
         }
@@ -350,6 +352,8 @@ class ModelChoiceList extends ObjectChoiceList
      */
     public function getIndicesForValues(array $values)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (empty($values)) {
             return array();
         }

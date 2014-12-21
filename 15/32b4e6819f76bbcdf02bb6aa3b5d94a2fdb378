@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T10:24:57Z
+
+Can you check that this is the only occurrence in the whole project?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-21T10:30:23Z
+
+Let's try!
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-21T10:43:38Z
+
+It seems there is no other occurrences in the whole project. I grepped on all built-in SPL exceptions.

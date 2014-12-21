@@ -21,35 +21,42 @@ class ConfirmationQuestion extends Question
     /**
      * Constructor.
      *
-     * @param string $question The question to ask to the user
-     * @param bool   $default  The default answer to return, true or false
+     * @param string $question     The question to ask to the user
+     * @param bool   $default      The default answer to return, true or false
+     * @param array  $rightAnswers All the answers equivalent to "yes" (only first letter will be taken into account)
      */
-    public function __construct($question, $default = true)
+    public function __construct($question, $default = true, $rightAnswers = ['y'])
     {
         parent::__construct($question, (bool) $default);
 
-        $this->setNormalizer($this->getDefaultNormalizer());
+        $rightAnswers = array_map(function ($value) {
+                return strtolower($value[0]);
+            }, $rightAnswers);
+
+        $this->setNormalizer($this->getDefaultNormalizer($rightAnswers));
     }
 
     /**
      * Returns the default answer normalizer.
      *
+     * @param array $rightAnswers
+     *
      * @return callable
      */
-    private function getDefaultNormalizer()
+    private function getDefaultNormalizer(array $rightAnswers)
     {
         $default = $this->getDefault();
 
-        return function ($answer) use ($default) {
+        return function ($answer) use ($default, $rightAnswers) {
             if (is_bool($answer)) {
                 return $answer;
             }
 
             if (false === $default) {
-                return $answer && 'y' === strtolower($answer[0]);
+                return $answer && in_array(strtolower($answer[0]), $rightAnswers);
             }
 
-            return !$answer || 'y' === strtolower($answer[0]);
+            return !$answer || in_array(strtolower($answer[0]), $rightAnswers);
         };
     }
 }

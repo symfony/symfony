@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
- * ExceptionListenerTest
+ * ExceptionListenerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
  */

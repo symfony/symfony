@@ -41,7 +41,7 @@ interface SessionInterface
     public function getId();
 
     /**
-     * Sets the session ID
+     * Sets the session ID.
      *
      * @param string $id
      *

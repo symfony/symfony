@@ -29,14 +29,14 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 interface ChoiceListInterface
 {
     /**
-     * Returns the list of choices
+     * Returns the list of choices.
      *
      * @return array The choices with their indices as keys
      */
     public function getChoices();
 
     /**
-     * Returns the values for the choices
+     * Returns the values for the choices.
      *
      * @return array The values with the corresponding choice indices as keys
      */

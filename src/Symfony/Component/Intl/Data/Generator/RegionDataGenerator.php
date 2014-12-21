@@ -61,7 +61,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     );
 
     /**
-     * Collects all available language codes
+     * Collects all available language codes.
      *
      * @var string[]
      */

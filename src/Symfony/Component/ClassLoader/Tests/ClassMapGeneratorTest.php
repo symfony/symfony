@@ -16,7 +16,7 @@ use Symfony\Component\ClassLoader\ClassMapGenerator;
 class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string $workspace
+     * @var string|null
      */
     private $workspace = null;
 

@@ -32,7 +32,7 @@ class RuntimeInstantiator implements InstantiatorInterface
     private $factory;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {

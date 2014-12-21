@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Checks your services for circular references
+ * Checks your services for circular references.
  *
  * References from method calls are ignored since we might be able to resolve
  * these references depending on the order in which services are called.

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\DBAL\Schema\SchemaException;
 
 /**
- * Installs the tables required by the ACL system
+ * Installs the tables required by the ACL system.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

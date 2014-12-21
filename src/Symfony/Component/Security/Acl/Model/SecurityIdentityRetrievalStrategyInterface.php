@@ -14,14 +14,14 @@ namespace Symfony\Component\Security\Acl\Model;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Interface for retrieving security identities from tokens
+ * Interface for retrieving security identities from tokens.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface SecurityIdentityRetrievalStrategyInterface
 {
     /**
-     * Retrieves the available security identities for the given token
+     * Retrieves the available security identities for the given token.
      *
      * The order in which the security identities are returned is significant.
      * Typically, security identities should be ordered from most specific to

@@ -224,7 +224,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * https://github.com/symfony/symfony/issues/11604
+     * https://github.com/symfony/symfony/issues/11604.
      */
     public function testGetMemberMetadatasReturnsEmptyArrayWithoutConfiguredMetadata()
     {
@@ -232,7 +232,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * https://github.com/symfony/symfony/issues/11604
+     * https://github.com/symfony/symfony/issues/11604.
      */
     public function testGetPropertyMetadataReturnsEmptyArrayWithoutConfiguredMetadata()
     {

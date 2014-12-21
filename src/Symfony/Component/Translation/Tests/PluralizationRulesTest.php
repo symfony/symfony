@@ -15,7 +15,7 @@ use Symfony\Component\Translation\PluralizationRules;
 
 /**
  * Test should cover all languages mentioned on http://translate.sourceforge.net/wiki/l10n/pluralforms
- * and Plural forms mentioned on http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms
+ * and Plural forms mentioned on http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms.
  *
  * See also https://developer.mozilla.org/en/Localization_and_Plurals which mentions 15 rules having a maximum of 6 forms.
  * The mozilla code is also interesting to check for.

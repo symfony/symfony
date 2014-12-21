@@ -100,7 +100,7 @@ abstract class FormField
     }
 
     /**
-     * Check if the current field is disabled
+     * Check if the current field is disabled.
      *
      * @return bool
      */

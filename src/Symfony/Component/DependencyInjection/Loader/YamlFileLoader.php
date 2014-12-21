@@ -77,7 +77,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses all imports
+     * Parses all imports.
      *
      * @param array  $content
      * @param string $file
@@ -103,7 +103,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses definitions
+     * Parses definitions.
      *
      * @param array  $content
      * @param string $file
@@ -363,7 +363,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Loads from Extensions
+     * Loads from Extensions.
      *
      * @param array $content
      */

@@ -86,7 +86,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a localized number into an integer or float
+     * Transforms a localized number into an integer or float.
      *
      * @param string $value The localized value
      *
@@ -158,7 +158,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Returns a preconfigured \NumberFormatter instance
+     * Returns a preconfigured \NumberFormatter instance.
      *
      * @return \NumberFormatter
      */

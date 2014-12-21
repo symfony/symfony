@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * This is a lazy-loading firewall map implementation
+ * This is a lazy-loading firewall map implementation.
  *
  * Listeners will only be initialized if we really need them.
  *

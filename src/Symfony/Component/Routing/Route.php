@@ -368,7 +368,7 @@ class Route implements \Serializable
     }
 
     /**
-     * Checks if an option has been set
+     * Checks if an option has been set.
      *
      * @param string $name An option name
      *

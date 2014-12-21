@@ -76,7 +76,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the names of the properties that should be serialized
+     * Returns the names of the properties that should be serialized.
      *
      * @return array
      */
@@ -93,7 +93,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the name of the member
+     * Returns the name of the member.
      *
      * @return string
      */
@@ -103,7 +103,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the class this member is defined on
+     * Returns the class this member is defined on.
      *
      * @return string
      */
@@ -113,7 +113,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the name of the property this member belongs to
+     * Returns the name of the property this member belongs to.
      *
      * @return string The property name
      */
@@ -123,7 +123,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns whether this member is public
+     * Returns whether this member is public.
      *
      * @param object|string $objectOrClassName The object or the class name
      *
@@ -135,7 +135,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns whether this member is protected
+     * Returns whether this member is protected.
      *
      * @param object|string $objectOrClassName The object or the class name
      *
@@ -147,7 +147,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns whether this member is private
+     * Returns whether this member is private.
      *
      * @param object|string $objectOrClassName The object or the class name
      *
@@ -159,7 +159,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns whether objects stored in this member should be validated
+     * Returns whether objects stored in this member should be validated.
      *
      * @return bool
      */
@@ -170,7 +170,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
 
     /**
      * Returns whether arrays or traversable objects stored in this member
-     * should be traversed and validated in each entry
+     * should be traversed and validated in each entry.
      *
      * @return bool
      */
@@ -181,7 +181,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
 
     /**
      * Returns whether arrays or traversable objects stored in this member
-     * should be traversed recursively for inner arrays/traversable objects
+     * should be traversed recursively for inner arrays/traversable objects.
      *
      * @return bool
      */
@@ -191,7 +191,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns the Reflection instance of the member
+     * Returns the Reflection instance of the member.
      *
      * @param object|string $objectOrClassName The object or the class name
      *
@@ -208,7 +208,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Creates a new Reflection instance for the member
+     * Creates a new Reflection instance for the member.
      *
      * @param object|string $objectOrClassName The object or the class name
      *

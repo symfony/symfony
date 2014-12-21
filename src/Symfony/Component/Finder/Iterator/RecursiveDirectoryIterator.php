@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Finder\SplFileInfo;
 
 /**
- * Extends the \RecursiveDirectoryIterator to support relative paths
+ * Extends the \RecursiveDirectoryIterator to support relative paths.
  *
  * @author Victor Berchet <victor@suumit.com>
  */
@@ -51,7 +51,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     }
 
     /**
-     * Return an instance of SplFileInfo with support for relative paths
+     * Return an instance of SplFileInfo with support for relative paths.
      *
      * @return SplFileInfo File information
      */
@@ -87,7 +87,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
     }
 
     /**
-     * Do nothing for non rewindable stream
+     * Do nothing for non rewindable stream.
      */
     public function rewind()
     {

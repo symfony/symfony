@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Trims string data
+ * Trims string data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

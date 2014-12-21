@@ -66,7 +66,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses parameters
+     * Parses parameters.
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
@@ -81,7 +81,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses imports
+     * Parses imports.
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
@@ -99,7 +99,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses multiple definitions
+     * Parses multiple definitions.
      *
      * @param SimpleXMLElement $xml
      * @param string           $file
@@ -116,7 +116,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses an individual Definition
+     * Parses an individual Definition.
      *
      * @param string           $id
      * @param SimpleXMLElement $service
@@ -215,7 +215,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Processes anonymous services
+     * Processes anonymous services.
      *
      * @param SimpleXMLElement $xml
      * @param string           $file

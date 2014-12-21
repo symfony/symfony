@@ -15,7 +15,7 @@ use Monolog\Handler\SwiftMailerHandler as BaseSwiftMailerHandler;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 
 /**
- * Extended SwiftMailerHandler that flushes mail queue if necessary
+ * Extended SwiftMailerHandler that flushes mail queue if necessary.
  *
  * @author Philipp Kräutli <pkraeutli@astina.ch>
  */
@@ -34,7 +34,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     }
 
     /**
-     * After the kernel has been terminated we will always flush messages
+     * After the kernel has been terminated we will always flush messages.
      *
      * @param PostResponseEvent $event
      */
@@ -56,7 +56,7 @@ class SwiftMailerHandler extends BaseSwiftMailerHandler
     }
 
     /**
-     * Flushes the mail queue if a memory spool is used
+     * Flushes the mail queue if a memory spool is used.
      */
     private function flushMemorySpool()
     {

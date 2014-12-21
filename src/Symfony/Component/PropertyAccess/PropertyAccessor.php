@@ -251,7 +251,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of the property at the given index in the path
+     * Sets the value of the property at the given index in the path.
      *
      * @param \ArrayAccess|array $array An array or \ArrayAccess object to write to
      * @param string|int         $index The index to write at
@@ -269,7 +269,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of the property at the given index in the path
+     * Sets the value of the property at the given index in the path.
      *
      * @param object|array $object   The object or array to write to
      * @param string       $property The property to write

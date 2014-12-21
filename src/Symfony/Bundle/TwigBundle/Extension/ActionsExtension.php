@@ -15,7 +15,7 @@ use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Twig extension for Symfony actions helper
+ * Twig extension for Symfony actions helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *

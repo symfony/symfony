@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * RememberMeListener implements authentication capabilities via a cookie
+ * RememberMeListener implements authentication capabilities via a cookie.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

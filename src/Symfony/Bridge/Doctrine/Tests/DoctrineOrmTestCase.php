@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 
 /**
- * Class DoctrineOrmTestCase
+ * Class DoctrineOrmTestCase.
  *
  * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
  *             Use {@link DoctrineTestHelper} instead.

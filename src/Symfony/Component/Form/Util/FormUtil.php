@@ -17,7 +17,7 @@ namespace Symfony\Component\Form\Util;
 class FormUtil
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {

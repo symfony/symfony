@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 /**
- * Encodes JSON data
+ * Encodes JSON data.
  *
  * @author Sander Coolen <sander@jibber.nl>
  */
@@ -27,7 +27,7 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * Returns the last encoding error (if any)
+     * Returns the last encoding error (if any).
      *
      * @return int
      *
@@ -39,7 +39,7 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * Encodes PHP data to a JSON string
+     * Encodes PHP data to a JSON string.
      *
      * {@inheritdoc}
      */

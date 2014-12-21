@@ -42,7 +42,7 @@ interface SessionStorageInterface
     public function isStarted();
 
     /**
-     * Returns the session ID
+     * Returns the session ID.
      *
      * @return string The session ID or empty.
      *
@@ -51,7 +51,7 @@ interface SessionStorageInterface
     public function getId();
 
     /**
-     * Sets the session ID
+     * Sets the session ID.
      *
      * @param string $id
      *
@@ -60,7 +60,7 @@ interface SessionStorageInterface
     public function setId($id);
 
     /**
-     * Returns the session name
+     * Returns the session name.
      *
      * @return mixed The session name.
      *
@@ -69,7 +69,7 @@ interface SessionStorageInterface
     public function getName();
 
     /**
-     * Sets the session name
+     * Sets the session name.
      *
      * @param string $name
      *

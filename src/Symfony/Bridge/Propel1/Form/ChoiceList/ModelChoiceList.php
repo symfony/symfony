@@ -29,7 +29,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class ModelChoiceList extends ObjectChoiceList
 {
     /**
-     * The fields of which the identifier of the underlying class consists
+     * The fields of which the identifier of the underlying class consists.
      *
      * This property should only be accessed through identifier.
      *

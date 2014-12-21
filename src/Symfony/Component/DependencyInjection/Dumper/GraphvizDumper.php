@@ -229,7 +229,7 @@ class GraphvizDumper extends Dumper
     }
 
     /**
-     * Adds attributes
+     * Adds attributes.
      *
      * @param array $attributes An array of attributes
      *
@@ -246,7 +246,7 @@ class GraphvizDumper extends Dumper
     }
 
     /**
-     * Adds options
+     * Adds options.
      *
      * @param array $options An array of options
      *

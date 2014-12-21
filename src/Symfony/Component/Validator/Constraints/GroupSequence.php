@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Constraints;
 
 /**
- * Annotation for group sequences
+ * Annotation for group sequences.
  *
  * @Annotation
  * @Target({"CLASS", "ANNOTATION"})
@@ -24,7 +24,8 @@ namespace Symfony\Component\Validator\Constraints;
 class GroupSequence
 {
     /**
-     * The members of the sequence
+     * The members of the sequence.
+     *
      * @var array
      */
     public $groups;

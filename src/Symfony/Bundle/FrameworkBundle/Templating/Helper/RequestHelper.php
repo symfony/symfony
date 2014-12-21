@@ -49,7 +49,7 @@ class RequestHelper extends Helper
     }
 
     /**
-     * Returns the locale
+     * Returns the locale.
      *
      * @return string
      */

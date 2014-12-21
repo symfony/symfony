@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Psr\Log\LoggerInterface;
 
 /**
- * Base class implementing the RememberMeServicesInterface
+ * Base class implementing the RememberMeServicesInterface.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -251,7 +251,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * Decodes the raw cookie value
+     * Decodes the raw cookie value.
      *
      * @param string $rawCookie
      *
@@ -263,7 +263,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * Encodes the cookie parts
+     * Encodes the cookie parts.
      *
      * @param array $cookieParts
      *
@@ -275,7 +275,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * Deletes the remember-me cookie
+     * Deletes the remember-me cookie.
      *
      * @param Request $request
      */
@@ -289,7 +289,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     }
 
     /**
-     * Checks whether remember-me capabilities were requested
+     * Checks whether remember-me capabilities were requested.
      *
      * @param Request $request
      *

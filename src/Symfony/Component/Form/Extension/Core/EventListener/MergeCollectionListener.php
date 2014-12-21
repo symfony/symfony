@@ -22,13 +22,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class MergeCollectionListener implements EventSubscriberInterface
 {
     /**
-     * Whether elements may be added to the collection
+     * Whether elements may be added to the collection.
+     *
      * @var bool
      */
     private $allowAdd;
 
     /**
-     * Whether elements may be removed from the collection
+     * Whether elements may be removed from the collection.
+     *
      * @var bool
      */
     private $allowDelete;

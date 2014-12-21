@@ -28,7 +28,7 @@ class FormValidatorPerformanceTest extends FormPerformanceTestCase
     }
 
     /**
-     * findClickedButton() used to have an exponential number of calls
+     * findClickedButton() used to have an exponential number of calls.
      *
      * @group benchmark
      */

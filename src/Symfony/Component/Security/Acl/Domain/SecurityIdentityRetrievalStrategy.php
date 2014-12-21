@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 /**
- * Strategy for retrieving security identities
+ * Strategy for retrieving security identities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -29,7 +29,7 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
     private $authenticationTrustResolver;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver

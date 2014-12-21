@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Validates whether a value is a valid image file and is valid
- * against minWidth, maxWidth, minHeight and maxHeight constraints
+ * against minWidth, maxWidth, minHeight and maxHeight constraints.
  *
  * @author Benjamin Dulau <benjamin.dulau@gmail.com>
  */

@@ -103,7 +103,7 @@ class PhpExtractor implements ExtractorInterface
 
     /**
      * Extracts the message from the iterator while the tokens
-     * match allowed message tokens
+     * match allowed message tokens.
      */
     private function getMessage(\Iterator $tokenIterator)
     {

@@ -44,7 +44,7 @@ class DumperCollection implements \IteratorAggregate
     }
 
     /**
-     * Adds a route or collection
+     * Adds a route or collection.
      *
      * @param DumperRoute|DumperCollection The route or collection
      */

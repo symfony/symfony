@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * InvalidArgumentException
+ * InvalidArgumentException.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

@@ -22,24 +22,28 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 {
     /**
      * A list of option values.
+     *
      * @var array
      */
     private $options = array();
 
     /**
      * A list of normalizer closures.
+     *
      * @var array
      */
     private $normalizers = array();
 
     /**
      * A list of closures for evaluating lazy options.
+     *
      * @var array
      */
     private $lazy = array();
 
     /**
      * A list containing the currently locked options.
+     *
      * @var array
      */
     private $lock = array();

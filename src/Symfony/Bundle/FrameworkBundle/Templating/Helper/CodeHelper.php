@@ -197,10 +197,8 @@ class CodeHelper extends Helper
 
     public function formatFileFromText($text)
     {
-        $that = $this;
-
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[2], $match[3]);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
+            return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
     }
 

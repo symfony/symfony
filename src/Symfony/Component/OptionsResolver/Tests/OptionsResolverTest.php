@@ -99,16 +99,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnMissingOptionalWithoutDefault()
     {
-        $test = $this;
-
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
-            'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertFalse(isset($options['one']));
+            'two' => function (Options $options) {
+                $this->assertFalse(isset($options['one']));
 
                 return '2';
             },
@@ -123,16 +120,13 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnOptionalWithoutDefault()
     {
-        $test = $this;
-
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
-            'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->assertTrue(isset($options['one']));
+            'two' => function (Options $options) {
+                $this->assertTrue(isset($options['one']));
 
                 return $options['one'].'2';
             },
@@ -171,12 +165,9 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyReplaceDefaults()
     {
-        $test = $this;
-
         $this->resolver->setDefaults(array(
-            'one' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
-                $test->fail('Previous closure should not be executed');
+            'one' => function (Options $options) {
+                $this->fail('Previous closure should not be executed');
             },
         ));
 
@@ -275,6 +266,83 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => '1',
             'two' => 'two',
         ), $this->resolver->resolve($options));
+    }
+
+    public function testResolveSucceedsIfOptionValueAllowedRegex()
+    {
+        $this->resolver->setDefaults(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => '4'
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'one'   => '/\d+/',
+                'two'   => '/\w/',
+                'three' => '/t+h+r+e+e/',
+                'four'  => '/((q|c)+(uatr)+(e|o))/'
+            ));
+
+        $options = array(
+            'four'  => 'quatre'
+        );
+
+        $this->assertEquals(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => 'quatre'
+            ), $this->resolver->resolve($options));
+
+        $options = array(
+            'four'  => 'cuatro'
+        );
+
+        $this->assertEquals(array(
+                'one'   => '1',
+                'two'   => 'two',
+                'three' => 'three',
+                'four'  => 'cuatro'
+            ), $this->resolver->resolve($options));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage Accepted values must match the regular expression: "/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/"
+     */
+    public function testResolveFailsIfOptionValueNotAllowedRegex()
+    {
+        $this->resolver->setDefaults(array(
+                'email' => 'default@email.com',
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'email' => '/[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/',
+            ));
+
+        $this->resolver->resolve(array(
+                'email' => 'invalid@email',
+            ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage Accepted values must match the regular expression: "/(https?)+(:\/\/symfony.com)(.*)/"
+     */
+    public function testResolveFailsIfOptionValueNotAllowedRegex2()
+    {
+        $this->resolver->setDefaults(array(
+                'symfony-website' => 'http://symfony.com'
+            ));
+
+        $this->resolver->setAllowedValues(array(
+                'symfony-website' => '/(https?)+(:\/\/symfony.com)(.*)/',
+            ));
+
+        $this->resolver->resolve(array(
+                'symfony-website' => 'https://twig.com',
+            ));
     }
 
     public function testResolveSucceedsIfOptionalWithAllowedValuesNotSet()

@@ -57,7 +57,6 @@
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
         "symfony/stopwatch": "self.version",
-        "symfony/swiftmailer-bridge": "self.version",
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
@@ -89,7 +88,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -31,7 +31,8 @@ class SecurityDataCollector extends DataCollector
     /**
      * Constructor.
      *
-     * @param TokenStorageInterface|null $tokenStorage
+     * @param TokenStorageInterface|null  $tokenStorage
+     * @param RoleHierarchyInterface|null $roleHierarchy
      */
     public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null)
     {
@@ -81,7 +82,7 @@ class SecurityDataCollector extends DataCollector
                 'token_class' => get_class($token),
                 'user' => $token->getUsername(),
                 'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
-                'inherited_roles' => array_map(function ($role) { return $role->getRole();}, $inheritedRoles),
+                'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }

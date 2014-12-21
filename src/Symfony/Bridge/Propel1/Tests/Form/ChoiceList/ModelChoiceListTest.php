@@ -249,7 +249,7 @@ class ModelChoiceListTest extends Propel1TestCase
      */
     public function testEmptyClass()
     {
-        $choiceList = new ModelChoiceList('');
+        new ModelChoiceList('');
     }
 
     /**
@@ -257,6 +257,6 @@ class ModelChoiceListTest extends Propel1TestCase
      */
     public function testInvalidClass()
     {
-        $choiceList = new ModelChoiceList('Foo\Bar\DoesNotExistClass');
+        new ModelChoiceList('Foo\Bar\DoesNotExistClass');
     }
 }

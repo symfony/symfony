@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Propel1\Form\EventListener\TranslationCollectionFormListener;
 
 /**
- * form type for i18n-columns in propel
+ * Form type for i18n-columns in propel
  *
  * @author Patrick Kaufmann
  */
@@ -40,6 +40,9 @@ class TranslationCollectionType extends AbstractType
         $builder->addEventSubscriber($listener);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'collection';

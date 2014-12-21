@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-20T13:03:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-20T15:39:39Z
+
+Can you also submit a PR for 2.7 to add a deprecation notice when the obsolete class is used?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-20T21:25:51Z
+
+Sure!
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-21T10:01:20Z
+
+The PR with the deprecation notice on 2.7 is here: https://github.com/symfony/symfony/pull/13056

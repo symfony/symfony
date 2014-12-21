@@ -887,15 +887,15 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     continue;
                 }
 
-                if($value === $allowedValue){
+                if ($value === $allowedValue) {
                     $success = true;
 
                     continue;
                 }
 
-                if(preg_match('/^(\/)(.*)(\/)$/', $allowedValue)){
+                if (preg_match('/^(\/)(.*)(\/)$/', $allowedValue)) {
                     $isRegex = true;
-                    if(preg_match($allowedValue, $value)){
+                    if (preg_match($allowedValue, $value)) {
                         $success = true;
 
                         continue;
@@ -914,18 +914,17 @@ class OptionsResolver implements Options, OptionsResolverInterface
 
                 if (count($printableAllowedValues) > 0) {
                     $formatValue = $this->formatValues($printableAllowedValues);
-                    if($isRegex){
+                    if ($isRegex) {
                         $message .= sprintf(
                             ' Accepted values must match the regular expression: %s.',
                             $formatValue
                         );
-                    }else{
+                    } else {
                         $message .= sprintf(
                             ' Accepted values are: %s.',
                             $formatValue
                         );
                     }
-
                 }
 
                 throw new InvalidOptionsException($message);

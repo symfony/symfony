@@ -274,36 +274,36 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
                 'one'   => '1',
                 'two'   => 'two',
                 'three' => 'three',
-                'four'  => '4'
+                'four'  => '4',
             ));
 
         $this->resolver->setAllowedValues(array(
                 'one'   => '/\d+/',
                 'two'   => '/\w/',
                 'three' => '/t+h+r+e+e/',
-                'four'  => '/((q|c)+(uatr)+(e|o))/'
+                'four'  => '/((q|c)+(uatr)+(e|o))/',
             ));
 
         $options = array(
-            'four'  => 'quatre'
+            'four'  => 'quatre',
         );
 
         $this->assertEquals(array(
                 'one'   => '1',
                 'two'   => 'two',
                 'three' => 'three',
-                'four'  => 'quatre'
+                'four'  => 'quatre',
             ), $this->resolver->resolve($options));
 
         $options = array(
-            'four'  => 'cuatro'
+            'four'  => 'cuatro',
         );
 
         $this->assertEquals(array(
                 'one'   => '1',
                 'two'   => 'two',
                 'three' => 'three',
-                'four'  => 'cuatro'
+                'four'  => 'cuatro',
             ), $this->resolver->resolve($options));
     }
 
@@ -333,7 +333,7 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolveFailsIfOptionValueNotAllowedRegex2()
     {
         $this->resolver->setDefaults(array(
-                'symfony-website' => 'http://symfony.com'
+                'symfony-website' => 'http://symfony.com',
             ));
 
         $this->resolver->setAllowedValues(array(

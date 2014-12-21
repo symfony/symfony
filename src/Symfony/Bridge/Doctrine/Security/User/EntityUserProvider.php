@@ -32,6 +32,14 @@ class EntityUserProvider implements UserProviderInterface
     private $property;
     private $metadata;
 
+    /**
+     * Constructor.
+     *
+     * @param ManagerRegistry $registry    The Doctrine entity manager registry
+     * @param string          $class       The entity class name
+     * @param string|null     $property    The entity property name on which to select a unique entity
+     * @param string|null     $managerName The entity manager name, null for default
+     */
     public function __construct(ManagerRegistry $registry, $class, $property = null, $managerName = null)
     {
         $em = $registry->getManager($managerName);

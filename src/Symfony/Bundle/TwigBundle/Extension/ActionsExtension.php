@@ -51,7 +51,7 @@ class ActionsExtension extends \Twig_Extension
     /**
      * Returns the token parser instance to add to the existing list.
      *
-     * @return array An array of Twig_TokenParser instances
+     * @return array An array of \Twig_TokenParser instances
      */
     public function getTokenParsers()
     {

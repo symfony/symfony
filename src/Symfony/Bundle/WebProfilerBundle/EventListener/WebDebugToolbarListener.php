@@ -38,6 +38,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $position;
 
+    /**
+     * Constructor.
+     *
+     * @param \Twig_Environment $twig               The Twig instance
+     * @param bool              $interceptRedirects Whether or not to intercept redirects
+     * @param int               $mode               Whether or not the listener is enabled
+     * @param string            $position           The Web Debug Toolbar display position
+     */
     public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom')
     {
         $this->twig = $twig;

@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-12-03T22:17:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mayeco at 2014-12-03T22:29:01Z
+
+:+1:
+
+Thanks @saro0h
+
+Ref: [2](https://wiki.php.net/rfc/closures/object-extension) [sample](https://eval.in/private/3c0e4292cc5c97)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-04T05:04:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-04T09:54:58Z
+
+We have a few methods which are marked as internal and are public only for such ``$that`` accesses. They should be switched to private
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-05T00:30:41Z
+
+@stof I'm not sure to understand what you mean. Can you give an example so that I'll be able to do it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-05T07:22:11Z
+
+@saro0h For `preg_replace_callback` calls, you need to pass an anonymous function, but sometimes, we use a method call. The method call should obvsiously be private but because of the way PHP works, we made them public with a note saying that it's really private (so, we tagged them with `@internal` -- not sure if it was done everywhere.) Now, we can just mark them private as they should be.
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-12-05T18:17:14Z
+
+`$that` is not the only one variale used to replace $this in closures
+some examples:
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Doctrine/Form/Type/DoctrineType.php#L66
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/ProxyManager/Tests/LazyProxy/Fixtures/php/lazy_service.php#L49
+
+And so many other ($self, $guesser, $test, ...) search the expression `= $this;`
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-09T22:25:27Z
+
+Here you go (that was more work than I expected). Is that ok for you?
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-21T12:11:34Z
+
+Changes have been made

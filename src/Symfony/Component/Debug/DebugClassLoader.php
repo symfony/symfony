@@ -65,11 +65,7 @@ class DebugClassLoader
      */
     public function getClassLoader()
     {
-        if ($this->wasFinder) {
-            return $this->classLoader[0];
-        } else {
-            return $this->classLoader;
-        }
+        return $this->wasFinder ? $this->classLoader[0] : $this->classLoader;
     }
 
     /**

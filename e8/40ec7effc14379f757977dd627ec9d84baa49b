@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by kbond at 2014-12-18T18:12:05Z
+
++1 for this
+
+---------------------------------------------------------------------------
+
+by jeremylivingston at 2014-12-18T22:57:01Z
+
+@stof, I fixed three occurrences of this typo in the upgrade file. Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T15:12:57Z
+
+@jeremylivingston Can you create a PR for 2.7 where this new class is deprecated (and will be removed in 3.0)? Thanks.

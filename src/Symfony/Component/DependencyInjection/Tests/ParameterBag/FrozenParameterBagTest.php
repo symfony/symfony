@@ -57,4 +57,15 @@ class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new FrozenParameterBag(array());
         $bag->add(array());
     }
+
+    public function testResolveEnvironmentMaps()
+    {
+        $bag = new FrozenParameterBag(array('foo' => 'bar', 'environment_map' => array('foo' => 'SYMFONY_TEST')));
+
+        putenv('SYMFONY_TEST=baz');
+        $bag->resolveEnvironmentMap();
+        putenv('SYMFONY_TEST');
+
+        $this->assertEquals($bag->get('foo'), 'baz');
+    }
 }

@@ -540,6 +540,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $this->container = new $class();
         $this->container->set('kernel', $this);
 
+        $this->postProcessContainer($this->container);
+
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
@@ -648,6 +650,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         // ensure these extensions are implicitly loaded
         $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
+    }
+
+    /**
+     * Post processing of the Container after it was loaded from cache.
+     * This always occurs
+     *
+     * @param  ContainerInterface $container
+     */
+    protected function postProcessContainer(ContainerInterface $container)
+    {
+        $container->getParameterBag()->resolveEnvironmentMap();
     }
 
     /**

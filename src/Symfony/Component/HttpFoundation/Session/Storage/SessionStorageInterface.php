@@ -42,6 +42,19 @@ interface SessionStorageInterface
     public function isStarted();
 
     /**
+     * Checks if the session was started in an earlier request.
+     * Will also always return true if the session has already been
+     * started in this request.
+     * When returning false it is taken as a guarantee that if the session
+     * is to be started in this request it will be a fresh and empty session.
+     *
+     * @return boolean True if the session was started earlier
+     *                 (and may contain data),
+     *                 False if the session has not been started earlier.
+     */
+    public function wasStarted();
+
+    /**
      * Returns the session ID
      *
      * @return string The session ID or empty.

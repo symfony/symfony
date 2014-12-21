@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\EmptyStorage;
 
 /**
  * Session.
@@ -55,6 +56,9 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     public function __construct(SessionStorageInterface $storage = null, AttributeBagInterface $attributes = null, FlashBagInterface $flashes = null)
     {
         $this->storage = $storage ?: new NativeSessionStorage();
+        if (!$this->wasStarted()) {
+            $this->storage = new EmptyStorage($this->storage);
+        }
 
         $attributes = $attributes ?: new AttributeBag();
         $this->attributeName = $attributes->getName();
@@ -135,6 +139,14 @@ class Session implements SessionInterface, \IteratorAggregate, \Countable
     public function isStarted()
     {
         return $this->storage->isStarted();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wasStarted()
+    {
+        return $this->storage->wasStarted();
     }
 
     /**

@@ -291,6 +291,18 @@ class NativeSessionStorage implements SessionStorageInterface
     /**
      * {@inheritdoc}
      */
+    public function wasStarted()
+    {
+        if ($this->started) {
+            return true;
+        }
+
+        return array_key_exists($this->getName(), $_COOKIE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isStarted()
     {
         return $this->started;

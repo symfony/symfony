@@ -216,6 +216,16 @@ class MockArraySessionStorage implements SessionStorageInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function wasStarted()
+    {
+        // No need to optimize the use of this storage
+        // so we just always return true
+        return true;
+    }
+
+    /**
      * Sets the MetadataBag.
      *
      * @param MetadataBag $bag

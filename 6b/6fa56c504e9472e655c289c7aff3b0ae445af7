@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-06T02:02:49Z
+
+Keys should win over values, because keys are unique while values are not guaranteed to be unique. Your implementation favors values.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-06T09:40:35Z
+
+I'm throwing an exception telling the user that he/her answer is ambiguous with the value he/she should supply instead. I think it's the right compromise.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-21T13:13:59Z
+
+Changes have been made.

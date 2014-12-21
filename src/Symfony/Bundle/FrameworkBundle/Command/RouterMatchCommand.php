@@ -72,7 +72,7 @@ EOF
         $traces = $matcher->getTraces($input->getArgument('path_info'));
 
         $matches = false;
-        foreach ($traces as $i => $trace) {
+        foreach ($traces as $trace) {
             if (TraceableUrlMatcher::ROUTE_ALMOST_MATCHES == $trace['level']) {
                 $output->writeln(sprintf('<fg=yellow>Route "%s" almost matches but %s</>', $trace['name'], lcfirst($trace['log'])));
             } elseif (TraceableUrlMatcher::ROUTE_MATCHES == $trace['level']) {

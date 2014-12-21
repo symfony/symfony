@@ -15,7 +15,17 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;
 use Symfony\Component\Finder\Adapter\PhpAdapter;
+use Symfony\Component\Finder\Comparator\DateComparator;
+use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Exception\ExceptionInterface;
+use Symfony\Component\Finder\Iterator\CustomFilterIterator;
+use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
+use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
+use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
+use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
+use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
+use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
+use Symfony\Component\Finder\Iterator\SortableIterator;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -202,8 +212,8 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\DepthRangeFilterIterator
-     * @see Symfony\Component\Finder\Comparator\NumberComparator
+     * @see DepthRangeFilterIterator
+     * @see NumberComparator
      *
      * @api
      */
@@ -229,8 +239,8 @@ class Finder implements \IteratorAggregate, \Countable
      * @return Finder The current Finder instance
      *
      * @see strtotime
-     * @see Symfony\Component\Finder\Iterator\DateRangeFilterIterator
-     * @see Symfony\Component\Finder\Comparator\DateComparator
+     * @see DateRangeFilterIterator
+     * @see DateComparator
      *
      * @api
      */
@@ -254,7 +264,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     * @see FilenameFilterIterator
      *
      * @api
      */
@@ -272,7 +282,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     * @see FilenameFilterIterator
      *
      * @api
      */
@@ -295,7 +305,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     * @see FilecontentFilterIterator
      */
     public function contains($pattern)
     {
@@ -316,7 +326,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilecontentFilterIterator
+     * @see FilecontentFilterIterator
      */
     public function notContains($pattern)
     {
@@ -339,7 +349,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     * @see FilenameFilterIterator
      */
     public function path($pattern)
     {
@@ -362,7 +372,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\FilenameFilterIterator
+     * @see FilenameFilterIterator
      */
     public function notPath($pattern)
     {
@@ -382,8 +392,8 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SizeRangeFilterIterator
-     * @see Symfony\Component\Finder\Comparator\NumberComparator
+     * @see SizeRangeFilterIterator
+     * @see NumberComparator
      *
      * @api
      */
@@ -401,7 +411,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
+     * @see ExcludeDirectoryFilterIterator
      *
      * @api
      */
@@ -419,7 +429,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
+     * @see ExcludeDirectoryFilterIterator
      *
      * @api
      */
@@ -441,7 +451,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator
+     * @see ExcludeDirectoryFilterIterator
      *
      * @api
      */
@@ -459,7 +469,7 @@ class Finder implements \IteratorAggregate, \Countable
     /**
      * Adds VCS patterns.
      *
-     * @see ignoreVCS
+     * @see ignoreVCS()
      *
      * @param string|string[] $pattern VCS patterns to ignore
      */
@@ -483,7 +493,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -501,7 +511,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -519,7 +529,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -539,7 +549,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -561,7 +571,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -581,7 +591,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\SortableIterator
+     * @see SortableIterator
      *
      * @api
      */
@@ -602,7 +612,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @return Finder The current Finder instance
      *
-     * @see Symfony\Component\Finder\Iterator\CustomFilterIterator
+     * @see CustomFilterIterator
      *
      * @api
      */

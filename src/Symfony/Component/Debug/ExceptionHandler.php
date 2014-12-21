@@ -61,8 +61,8 @@ class ExceptionHandler
      *
      * @param \Exception $exception An \Exception instance
      *
-     * @see sendPhpResponse
-     * @see createResponse
+     * @see sendPhpResponse()
+     * @see createResponse()
      */
     public function handle(\Exception $exception)
     {

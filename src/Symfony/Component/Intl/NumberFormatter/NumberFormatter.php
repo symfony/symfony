@@ -510,7 +510,7 @@ class NumberFormatter
      *
      * @return bool|string The parsed value of false on error
      *
-     * @see    http://www.php.net/manual/en/numberformatter.parse.php
+     * @see http://www.php.net/manual/en/numberformatter.parse.php
      */
     public function parse($value, $type = self::TYPE_DOUBLE, &$position = 0)
     {

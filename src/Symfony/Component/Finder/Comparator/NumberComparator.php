@@ -30,7 +30,7 @@ namespace Symfony\Component\Finder\Comparator;
  * @copyright 2004-2005 Fabien Potencier <fabien@symfony.com>
  * @copyright 2002 Richard Clamp <richardc@unixbeard.net>
  *
- * @see       http://physics.nist.gov/cuu/Units/binary.html
+ * @see http://physics.nist.gov/cuu/Units/binary.html
  */
 class NumberComparator extends Comparator
 {

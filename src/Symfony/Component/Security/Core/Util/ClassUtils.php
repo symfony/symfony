@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Security\Core\Util;
 
+use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
+
 /**
  * Class related functionality for objects that
  * might or might not be proxy objects at the moment.
  *
- * @see Doctrine\Common\Util\ClassUtils
+ * @see DoctrineClassUtils
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Johannes Schmitt <schmittjoh@gmail.com>

@@ -50,7 +50,7 @@ class HttpKernelExtension extends \Twig_Extension
      *
      * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     * @see FragmentHandler::render()
      */
     public function renderFragment($uri, $options = array())
     {
@@ -69,7 +69,7 @@ class HttpKernelExtension extends \Twig_Extension
      *
      * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     * @see FragmentHandler::render()
      */
     public function renderFragmentStrategy($strategy, $uri, $options = array())
     {

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-20T09:23:01Z
+
+@hhamon The tests would make sense in 2.3 as well.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-20T10:19:02Z
+
+Indeed! I will backport the test on Symfony 2.3 as well.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-20T10:27:08Z
+
+How public is this class? When I made the split, I didn't change any classes using the `SecurityContext` as it would mean the constructor would become BC incompatible. It would mean you'd have to support both the new and old constructor arguments.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-20T10:51:16Z
+
+@iltar Given that `SecurityContextInterface` extends `TokenStorageInterface`, you can still use the class as before, can't you?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-20T11:26:42Z
+
+@xabbuh in theory nothing would break, but for people extending this class, things might change. Hence this should be done carefully depending on whether this is public or not.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-20T11:54:34Z
+
+The constructor is the only method that can be overriden safely. As I didn't change the argument order and considering the `SecurityContext` implements both `TokenStorageInterface` and `AuthorizationCheckerInterface`, you can still inject a `SecurityContext` instance as token storage. I can add a unit test to prove it's still BC. What do you think?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-20T12:11:47Z
+
+Just added an extra unit test to ensure injecting a `SecurityContext` ensures BC.
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-20T13:20:39Z
+
+Looking good to me :+1:

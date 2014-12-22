@@ -893,7 +893,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
                     continue;
                 }
 
-                if (preg_match('/^(\/)(.*)(\/)$/', $allowedValue)) {
+                if (preg_match('/^\/.+\/([imsxeAESUXu])?$/i', $allowedValue)) {
                     $isRegex = true;
                     if (preg_match($allowedValue, $value)) {
                         $success = true;

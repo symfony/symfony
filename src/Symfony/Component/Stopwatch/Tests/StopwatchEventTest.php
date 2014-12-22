@@ -14,7 +14,7 @@ namespace Symfony\Component\Stopwatch\Tests;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
- * StopwatchEventTest
+ * StopwatchEventTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

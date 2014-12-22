@@ -43,10 +43,9 @@ class WinCacheClassLoader
     private $prefix;
 
     /**
-     * The class loader object being decorated.
+     * A class loader object that implements the findFile() method.
      *
-     * @var \Symfony\Component\ClassLoader\ClassLoader
-     *   A class loader object that implements the findFile() method.
+     * @var object
      */
     protected $decorated;
 

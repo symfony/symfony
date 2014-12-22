@@ -108,7 +108,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     }
 
     /**
-     * Sets the RememberMeServices implementation to use
+     * Sets the RememberMeServices implementation to use.
      *
      * @param RememberMeServicesInterface $rememberMeServices
      */

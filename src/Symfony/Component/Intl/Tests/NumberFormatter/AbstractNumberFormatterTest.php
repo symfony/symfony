@@ -233,6 +233,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * The parse() method works differently with integer out of the 32 bit range. format() works fine.
+     *
      * @dataProvider formatTypeInt64Provider
      */
     public function testFormatTypeInt64($formatter, $value, $expected)

@@ -190,7 +190,7 @@ class Filesystem
     }
 
     /**
-     * Change the owner of an array of files or directories
+     * Change the owner of an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
@@ -217,7 +217,7 @@ class Filesystem
     }
 
     /**
-     * Change the group of an array of files or directories
+     * Change the group of an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
@@ -308,7 +308,7 @@ class Filesystem
     }
 
     /**
-     * Given an existing path, convert it to a path relative to a given starting path
+     * Given an existing path, convert it to a path relative to a given starting path.
      *
      * @param string $endPath   Absolute path of target
      * @param string $startPath Absolute path where traversal begins

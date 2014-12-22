@@ -44,7 +44,7 @@ class SessionHelper extends Helper
     }
 
     /**
-     * Returns an attribute
+     * Returns an attribute.
      *
      * @param string $name    The attribute name
      * @param mixed  $default The default value

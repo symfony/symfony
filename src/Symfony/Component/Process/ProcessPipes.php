@@ -368,7 +368,7 @@ class ProcessPipes
     }
 
     /**
-     * Removes temporary files
+     * Removes temporary files.
      */
     private function removeFiles()
     {

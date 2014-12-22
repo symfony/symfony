@@ -10,7 +10,7 @@
  */
 
 /**
- * SessionHandlerInterface for PHP < 5.4
+ * SessionHandlerInterface for PHP < 5.4.
  *
  * Extensive documentation can be found at php.net, see links:
  *

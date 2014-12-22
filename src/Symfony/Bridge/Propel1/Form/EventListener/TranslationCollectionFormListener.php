@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 
 /**
- * listener class for propel1_translatable_collection
+ * listener class for propel1_translatable_collection.
  *
  * @author Patrick Kaufmann
  */

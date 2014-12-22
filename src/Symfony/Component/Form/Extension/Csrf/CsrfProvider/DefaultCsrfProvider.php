@@ -27,13 +27,14 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 class DefaultCsrfProvider implements CsrfProviderInterface
 {
     /**
-     * A secret value used for generating the CSRF token
+     * A secret value used for generating the CSRF token.
+     *
      * @var string
      */
     protected $secret;
 
     /**
-     * Initializes the provider with a secret value
+     * Initializes the provider with a secret value.
      *
      * A recommended value for the secret is a generated value with at least
      * 32 characters and mixed letters, digits and special characters.

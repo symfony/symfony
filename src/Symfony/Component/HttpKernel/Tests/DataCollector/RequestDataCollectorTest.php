@@ -192,7 +192,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Dummy method used as controller callable
+     * Dummy method used as controller callable.
      */
     public static function staticControllerMethod()
     {

@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 
 /**
- * Tests AttributeBag
+ * Tests AttributeBag.
  *
  * @author Drak <drak@zikula.org>
  */

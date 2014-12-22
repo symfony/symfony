@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds tagged translation.extractor services to translation extractor
+ * Adds tagged translation.extractor services to translation extractor.
  */
 class TranslationExtractorPass implements CompilerPassInterface
 {

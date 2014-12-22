@@ -111,7 +111,7 @@ class ApacheMatcherDumper extends MatcherDumper
     }
 
     /**
-     * Dumps a single route
+     * Dumps a single route.
      *
      * @param string $name            Route name
      * @param Route  $route           The route
@@ -190,7 +190,7 @@ class ApacheMatcherDumper extends MatcherDumper
     }
 
     /**
-     * Returns methods allowed for a route
+     * Returns methods allowed for a route.
      *
      * @param Route $route The route
      *
@@ -211,7 +211,7 @@ class ApacheMatcherDumper extends MatcherDumper
     }
 
     /**
-     * Converts a regex to make it suitable for mod_rewrite
+     * Converts a regex to make it suitable for mod_rewrite.
      *
      * @param string $regex The regex
      *

@@ -31,19 +31,22 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 abstract class Constraint
 {
     /**
-     * The name of the group given to all constraints with no explicit group
+     * The name of the group given to all constraints with no explicit group.
+     *
      * @var string
      */
     const DEFAULT_GROUP = 'Default';
 
     /**
-     * Marks a constraint that can be put onto classes
+     * Marks a constraint that can be put onto classes.
+     *
      * @var string
      */
     const CLASS_CONSTRAINT = 'class';
 
     /**
-     * Marks a constraint that can be put onto properties
+     * Marks a constraint that can be put onto properties.
+     *
      * @var string
      */
     const PROPERTY_CONSTRAINT = 'property';
@@ -144,7 +147,7 @@ abstract class Constraint
     }
 
     /**
-     * Adds the given group if this constraint is in the Default group
+     * Adds the given group if this constraint is in the Default group.
      *
      * @param string $group
      *
@@ -158,11 +161,12 @@ abstract class Constraint
     }
 
     /**
-     * Returns the name of the default option
+     * Returns the name of the default option.
      *
      * Override this method to define a default option.
      *
      * @return string
+     *
      * @see __construct()
      *
      * @api
@@ -172,11 +176,12 @@ abstract class Constraint
     }
 
     /**
-     * Returns the name of the required options
+     * Returns the name of the required options.
      *
      * Override this method if you want to define required options.
      *
      * @return array
+     *
      * @see __construct()
      *
      * @api
@@ -187,7 +192,7 @@ abstract class Constraint
     }
 
     /**
-     * Returns the name of the class that validates this constraint
+     * Returns the name of the class that validates this constraint.
      *
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
@@ -204,7 +209,7 @@ abstract class Constraint
 
     /**
      * Returns whether the constraint can be put onto classes, properties or
-     * both
+     * both.
      *
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.

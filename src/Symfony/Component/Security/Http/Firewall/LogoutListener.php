@@ -69,7 +69,7 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
-     * Adds a logout handler
+     * Adds a logout handler.
      *
      * @param LogoutHandlerInterface $handler
      */
@@ -79,7 +79,7 @@ class LogoutListener implements ListenerInterface
     }
 
     /**
-     * Performs the logout if requested
+     * Performs the logout if requested.
      *
      * If a CsrfTokenManagerInterface instance is available, it will be used to
      * validate the request.

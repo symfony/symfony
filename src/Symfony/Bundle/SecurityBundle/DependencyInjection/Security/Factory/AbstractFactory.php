@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * AbstractFactory is the base class for all classes inheriting from
- * AbstractAuthenticationListener
+ * AbstractAuthenticationListener.
  *
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>

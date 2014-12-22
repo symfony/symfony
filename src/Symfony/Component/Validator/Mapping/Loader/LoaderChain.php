@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
- * Calls multiple LoaderInterface instances in a chain
+ * Calls multiple LoaderInterface instances in a chain.
  *
  * This class accepts multiple instances of LoaderInterface to be passed to the
  * constructor. When loadClassMetadata() is called, the same method is called
@@ -29,7 +29,7 @@ class LoaderChain implements LoaderInterface
     protected $loaders;
 
     /**
-     * Accepts a list of LoaderInterface instances
+     * Accepts a list of LoaderInterface instances.
      *
      * @param LoaderInterface[] $loaders An array of LoaderInterface instances
      *

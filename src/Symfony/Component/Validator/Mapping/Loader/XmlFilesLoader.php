@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 /**
- * Loads multiple xml mapping files
+ * Loads multiple xml mapping files.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  *

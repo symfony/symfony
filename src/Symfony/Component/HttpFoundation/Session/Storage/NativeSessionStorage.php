@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 class NativeSessionStorage implements SessionStorageInterface
 {
     /**
-     * Array of SessionBagInterface
+     * Array of SessionBagInterface.
      *
      * @var SessionBagInterface[]
      */
@@ -58,6 +58,7 @@ class NativeSessionStorage implements SessionStorageInterface
      * want to override this constructor entirely.
      *
      * List of options for $options array with their defaults.
+     *
      * @see http://php.net/session.configuration for options
      * but we omit 'session.' from the beginning of the keys for convenience.
      *

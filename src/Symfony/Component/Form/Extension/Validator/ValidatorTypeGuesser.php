@@ -78,7 +78,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * Guesses a field class name for a given constraint
+     * Guesses a field class name for a given constraint.
      *
      * @param Constraint $constraint The constraint to guess for
      *
@@ -162,7 +162,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * Guesses whether a field is required based on the given constraint
+     * Guesses whether a field is required based on the given constraint.
      *
      * @param Constraint $constraint The constraint to guess for
      *
@@ -179,7 +179,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * Guesses a field's maximum length based on the given constraint
+     * Guesses a field's maximum length based on the given constraint.
      *
      * @param Constraint $constraint The constraint to guess for
      *
@@ -209,7 +209,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * Guesses a field's pattern based on the given constraint
+     * Guesses a field's pattern based on the given constraint.
      *
      * @param Constraint $constraint The constraint to guess for
      *
@@ -248,7 +248,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
     /**
      * Iterates over the constraints of a property, executes a constraints on
-     * them and returns the best guess
+     * them and returns the best guess.
      *
      * @param string   $class        The class to read the constraints from
      * @param string   $property     The property for which to find constraints

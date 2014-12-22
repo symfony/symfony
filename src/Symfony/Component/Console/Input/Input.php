@@ -213,7 +213,7 @@ abstract class Input implements InputInterface
     }
 
     /**
-     * Escapes a token through escapeshellarg if it contains unsafe chars
+     * Escapes a token through escapeshellarg if it contains unsafe chars.
      *
      * @param string $token
      *

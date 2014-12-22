@@ -61,7 +61,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds a service
+     * Adds a service.
      *
      * @param string     $id
      * @param Definition $definition
@@ -163,7 +163,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds a service alias
+     * Adds a service alias.
      *
      * @param string $alias
      * @param Alias  $id
@@ -180,7 +180,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds services
+     * Adds services.
      *
      * @return string
      */
@@ -207,7 +207,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Adds parameters
+     * Adds parameters.
      *
      * @return string
      */
@@ -223,7 +223,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Dumps the value to YAML format
+     * Dumps the value to YAML format.
      *
      * @param mixed $value
      *
@@ -312,7 +312,7 @@ class YamlDumper extends Dumper
     }
 
     /**
-     * Escapes arguments
+     * Escapes arguments.
      *
      * @param array $arguments
      *

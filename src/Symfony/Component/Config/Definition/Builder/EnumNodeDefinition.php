@@ -36,7 +36,7 @@ class EnumNodeDefinition extends ScalarNodeDefinition
     }
 
     /**
-     * Instantiate a Node
+     * Instantiate a Node.
      *
      * @return EnumNode The node
      *

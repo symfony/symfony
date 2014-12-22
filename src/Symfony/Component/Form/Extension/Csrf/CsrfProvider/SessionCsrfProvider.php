@@ -29,7 +29,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class SessionCsrfProvider extends DefaultCsrfProvider
 {
     /**
-     * The user session from which the session ID is returned
+     * The user session from which the session ID is returned.
+     *
      * @var Session
      */
     protected $session;

@@ -25,30 +25,35 @@ class OptionsResolver implements OptionsResolverInterface
 {
     /**
      * The default option values.
+     *
      * @var Options
      */
     private $defaultOptions;
 
     /**
      * The options known by the resolver.
+     *
      * @var array
      */
     private $knownOptions = array();
 
     /**
      * The options without defaults that are required to be passed to resolve().
+     *
      * @var array
      */
     private $requiredOptions = array();
 
     /**
      * A list of accepted values for each option.
+     *
      * @var array
      */
     private $allowedValues = array();
 
     /**
      * A list of accepted types for each option.
+     *
      * @var array
      */
     private $allowedTypes = array();

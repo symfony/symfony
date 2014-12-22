@@ -171,6 +171,7 @@ class ExceptionListener
      * @param AuthenticationException $authException
      *
      * @return Response
+     *
      * @throws AuthenticationException
      */
     private function startAuthentication(Request $request, AuthenticationException $authException)

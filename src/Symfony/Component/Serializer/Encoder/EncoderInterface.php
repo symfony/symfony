@@ -14,14 +14,14 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Defines the interface of encoders
+ * Defines the interface of encoders.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
 interface EncoderInterface
 {
     /**
-     * Encodes data into the given format
+     * Encodes data into the given format.
      *
      * @param mixed  $data    Data to encode
      * @param string $format  Format name
@@ -34,7 +34,7 @@ interface EncoderInterface
     public function encode($data, $format, array $context = array());
 
     /**
-     * Checks whether the serializer can encode to given format
+     * Checks whether the serializer can encode to given format.
      *
      * @param string $format format name
      *

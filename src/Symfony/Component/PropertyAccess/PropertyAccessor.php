@@ -400,7 +400,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of a property in the given object
+     * Sets the value of a property in the given object.
      *
      * @param object $object   The object to write to
      * @param string $property The property to write

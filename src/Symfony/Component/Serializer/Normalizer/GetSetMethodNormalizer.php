@@ -62,7 +62,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Set ignored attributes for normalization
+     * Set ignored attributes for normalization.
      *
      * @param array $ignoredAttributes
      *
@@ -76,7 +76,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     }
 
     /**
-     * Set attributes to be camelized on denormalize
+     * Set attributes to be camelized on denormalize.
      *
      * @param array $camelizedAttributes
      *
@@ -185,7 +185,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * Format attribute name to access parameters or methods
      * As option, if attribute name is found on camelizedAttributes array
-     * returns attribute name in camelcase format
+     * returns attribute name in camelcase format.
      *
      * @param string $attributeName
      *

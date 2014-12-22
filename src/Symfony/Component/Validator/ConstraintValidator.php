@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use Symfony\Component\Validator\Violation\LegacyConstraintViolationBuilder;
 
 /**
- * Base class for constraint validators
+ * Base class for constraint validators.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

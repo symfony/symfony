@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Encodes JSON data
+ * Encodes JSON data.
  *
  * @author Sander Coolen <sander@jibber.nl>
  */
@@ -43,7 +43,7 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
-     * Encodes PHP data to a JSON string
+     * Encodes PHP data to a JSON string.
      *
      * {@inheritdoc}
      */

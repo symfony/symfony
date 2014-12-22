@@ -50,7 +50,7 @@ class CardSchemeValidator extends ConstraintValidator
         ),
         /**
          * Discover card numbers begin with 6011, 622126 through 622925, 644 through 649 or 65.
-         * All have 16 digits
+         * All have 16 digits.
          */
         'DISCOVER' => array(
             '/^6011[0-9]{12}$/',
@@ -59,7 +59,7 @@ class CardSchemeValidator extends ConstraintValidator
             '/^622(12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|91[0-9]|92[0-5])[0-9]{10}$/',
         ),
         /**
-         * InstaPayment cards begin with 637 through 639 and have 16 digits
+         * InstaPayment cards begin with 637 through 639 and have 16 digits.
          */
         'INSTAPAYMENT' => array(
             '/^63[7-9][0-9]{13}$/',
@@ -72,14 +72,14 @@ class CardSchemeValidator extends ConstraintValidator
             '/^(?:2131|1800|35[0-9]{3})[0-9]{11}$/',
         ),
         /**
-         * Laser cards begin with either 6304, 6706, 6709 or 6771 and have between 16 and 19 digits
+         * Laser cards begin with either 6304, 6706, 6709 or 6771 and have between 16 and 19 digits.
          */
         'LASER' => array(
             '/^(6304|670[69]|6771)[0-9]{12,15}$/',
         ),
         /**
          * Maestro cards begin with either 5018, 5020, 5038, 5893, 6304, 6759, 6761, 6762, 6763 or 0604
-         * They have between 12 and 19 digits
+         * They have between 12 and 19 digits.
          */
         'MAESTRO' => array(
             '/^(5018|5020|5038|6304|6759|6761|676[23]|0604)[0-9]{8,15}$/',

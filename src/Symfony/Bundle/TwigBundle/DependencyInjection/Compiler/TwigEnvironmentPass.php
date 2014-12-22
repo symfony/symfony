@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds tagged twig.extension services to twig service
+ * Adds tagged twig.extension services to twig service.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -37,13 +37,15 @@ use Symfony\Component\ExpressionLanguage\Expression;
 class PhpDumper extends Dumper
 {
     /**
-     * Characters that might appear in the generated variable name as first character
+     * Characters that might appear in the generated variable name as first character.
+     *
      * @var string
      */
     const FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 
     /**
-     * Characters that might appear in the generated variable name as any but the first character
+     * Characters that might appear in the generated variable name as any but the first character.
+     *
      * @var string
      */
     const NON_FIRST_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789_';
@@ -217,7 +219,7 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Generates code for the proxies to be attached after the container class
+     * Generates code for the proxies to be attached after the container class.
      *
      * @return string
      */
@@ -499,7 +501,7 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Adds configurator definition
+     * Adds configurator definition.
      *
      * @param string     $id
      * @param Definition $definition
@@ -532,7 +534,7 @@ class PhpDumper extends Dumper
     }
 
     /**
-     * Adds a service
+     * Adds a service.
      *
      * @param string     $id
      * @param Definition $definition
@@ -645,7 +647,7 @@ EOF;
     }
 
     /**
-     * Adds multiple services
+     * Adds multiple services.
      *
      * @return string
      */
@@ -885,7 +887,7 @@ EOF;
     }
 
     /**
-     * Adds the methodMap property definition
+     * Adds the methodMap property definition.
      *
      * @return string
      */
@@ -905,7 +907,7 @@ EOF;
     }
 
     /**
-     * Adds the aliases property definition
+     * Adds the aliases property definition.
      *
      * @return string
      */
@@ -1301,7 +1303,7 @@ EOF;
     }
 
     /**
-     * Dumps a parameter
+     * Dumps a parameter.
      *
      * @param string $name
      *
@@ -1317,7 +1319,7 @@ EOF;
     }
 
     /**
-     * Gets a service call
+     * Gets a service call.
      *
      * @param string    $id
      * @param Reference $reference
@@ -1362,7 +1364,7 @@ EOF;
     }
 
     /**
-     * Returns the next name to use
+     * Returns the next name to use.
      *
      * @return string
      */

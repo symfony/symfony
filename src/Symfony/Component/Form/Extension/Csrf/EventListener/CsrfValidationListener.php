@@ -28,19 +28,21 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CsrfValidationListener implements EventSubscriberInterface
 {
     /**
-     * The name of the CSRF field
+     * The name of the CSRF field.
+     *
      * @var string
      */
     private $fieldName;
 
     /**
-     * The generator for CSRF tokens
+     * The generator for CSRF tokens.
+     *
      * @var CsrfTokenManagerInterface
      */
     private $tokenManager;
 
     /**
-     * A text mentioning the tokenId of the CSRF token
+     * A text mentioning the tokenId of the CSRF token.
      *
      * Validation of the token will only succeed if it was generated in the
      * same session and with the same tokenId.
@@ -51,6 +53,7 @@ class CsrfValidationListener implements EventSubscriberInterface
 
     /**
      * The message displayed in case of an error.
+     *
      * @var string
      */
     private $errorMessage;

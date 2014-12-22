@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * SessionTest
+ * SessionTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Robert Schönthal <seroscho@googlemail.com>

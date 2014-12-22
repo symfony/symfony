@@ -327,6 +327,7 @@ class FormTypeTest extends BaseTypeTest
 
     /**
      * @dataProvider provideZeros
+     *
      * @see https://github.com/symfony/symfony/issues/1986
      */
     public function testSetDataThroughParamsWithZero($data, $dataAsString)

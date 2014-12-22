@@ -19,7 +19,7 @@ namespace Symfony\Component\PropertyAccess;
 interface PropertyPathInterface extends \Traversable
 {
     /**
-     * Returns the string representation of the property path
+     * Returns the string representation of the property path.
      *
      * @return string The path as string
      */
@@ -45,14 +45,14 @@ interface PropertyPathInterface extends \Traversable
     public function getParent();
 
     /**
-     * Returns the elements of the property path as array
+     * Returns the elements of the property path as array.
      *
      * @return array An array of property/index names
      */
     public function getElements();
 
     /**
-     * Returns the element at the given index in the property path
+     * Returns the element at the given index in the property path.
      *
      * @param int $index The index key
      *
@@ -63,7 +63,7 @@ interface PropertyPathInterface extends \Traversable
     public function getElement($index);
 
     /**
-     * Returns whether the element at the given index is a property
+     * Returns whether the element at the given index is a property.
      *
      * @param int $index The index in the property path
      *
@@ -74,7 +74,7 @@ interface PropertyPathInterface extends \Traversable
     public function isProperty($index);
 
     /**
-     * Returns whether the element at the given index is an array index
+     * Returns whether the element at the given index is an array index.
      *
      * @param int $index The index in the property path
      *

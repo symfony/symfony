@@ -111,7 +111,7 @@ class ArrayInput extends Input
     }
 
     /**
-     * Returns a stringified representation of the args passed to the command
+     * Returns a stringified representation of the args passed to the command.
      *
      * @return string
      */

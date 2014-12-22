@@ -29,7 +29,7 @@ class Parser
     private $refs = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int $offset The offset of YAML document (used for line numbers in error messages)
      */
@@ -647,7 +647,7 @@ class Parser
     }
 
     /**
-     * Returns true if the next line starts unindented collection
+     * Returns true if the next line starts unindented collection.
      *
      * @return bool Returns true if the next line starts unindented collection, false otherwise
      */
@@ -679,7 +679,7 @@ class Parser
     }
 
     /**
-     * Returns true if the string is un-indented collection item
+     * Returns true if the string is un-indented collection item.
      *
      * @return bool Returns true if the string is un-indented collection item, false otherwise
      */

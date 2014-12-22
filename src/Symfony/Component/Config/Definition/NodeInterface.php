@@ -52,7 +52,8 @@ interface NodeInterface
     /**
      * Returns the default value of the node.
      *
-     * @return mixed             The default value
+     * @return mixed The default value
+     *
      * @throws \RuntimeException if the node has no default value
      */
     public function getDefaultValue();

@@ -60,7 +60,7 @@
     {% if collector.requestquery.all|length %}
         {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestquery } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No GET parameters</em>
         </p>
     {% endif %}
@@ -70,7 +70,7 @@
     {% if collector.requestrequest.all|length %}
         {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestrequest } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No POST parameters</em>
         </p>
     {% endif %}
@@ -80,7 +80,7 @@
     {% if collector.requestattributes.all|length %}
         {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestattributes } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No attributes</em>
         </p>
     {% endif %}
@@ -90,7 +90,7 @@
     {% if collector.requestcookies.all|length %}
         {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestcookies } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No cookies</em>
         </p>
     {% endif %}
@@ -102,11 +102,11 @@
     <h2>Request Content</h2>
 
     {% if collector.content == false %}
-        <p><em>Request content not available (it was retrieved as a resource).</em></p>
+        <p class="sf-no-data"><em>Request content not available (it was retrieved as a resource).</em></p>
     {% elseif collector.content %}
         <pre>{{ collector.content }}</pre>
     {% else %}
-        <p><em>No content</em></p>
+        <p class="sf-no-data"><em>No content</em></p>
     {% endif %}
 
     <h2>Request Server Parameters</h2>
@@ -122,7 +122,7 @@
     {% if collector.sessionmetadata|length %}
     {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.sessionmetadata } only %}
     {% else %}
-    <p>
+    <p class="sf-no-data">
         <em>No session metadata</em>
     </p>
     {% endif %}
@@ -132,7 +132,7 @@
     {% if collector.sessionattributes|length %}
         {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.sessionattributes } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No session attributes</em>
         </p>
     {% endif %}
@@ -142,7 +142,7 @@
     {% if collector.flashes|length %}
         {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': collector.flashes } only %}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No flashes</em>
         </p>
     {% endif %}

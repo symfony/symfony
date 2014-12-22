@@ -19,7 +19,7 @@ namespace Symfony\Component\PropertyAccess;
 interface PropertyAccessorInterface
 {
     /**
-     * Sets the value at the end of the property path of the object
+     * Sets the value at the end of the property path of the object.
      *
      * Example:
      *
@@ -50,7 +50,7 @@ interface PropertyAccessorInterface
     public function setValue(&$objectOrArray, $propertyPath, $value);
 
     /**
-     * Returns the value at the end of the property path of the object
+     * Returns the value at the end of the property path of the object.
      *
      * Example:
      *

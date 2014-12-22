@@ -155,7 +155,7 @@ class ReferenceDumper
     }
 
     /**
-     * Outputs a single config reference line
+     * Outputs a single config reference line.
      *
      * @param string $text
      * @param int    $indent

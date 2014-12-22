@@ -91,7 +91,7 @@ class MongoDbProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Internal convenience method that returns the instance of the MongoDB Collection
+     * Internal convenience method that returns the instance of the MongoDB Collection.
      *
      * @return \MongoCollection
      *

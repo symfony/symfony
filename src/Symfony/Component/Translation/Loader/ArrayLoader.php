@@ -37,7 +37,7 @@ class ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Flattens an nested array of translations
+     * Flattens an nested array of translations.
      *
      * The scheme used is:
      *   'key' => array('key2' => array('key3' => 'value'))

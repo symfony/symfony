@@ -15,7 +15,7 @@ use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\DummyException;
 
 /**
- * ErrorHandlerTest
+ * ErrorHandlerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
  */

@@ -10,7 +10,7 @@
  */
 
 /**
- * Stub implementation for the NumberFormatter class of the intl extension
+ * Stub implementation for the NumberFormatter class of the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

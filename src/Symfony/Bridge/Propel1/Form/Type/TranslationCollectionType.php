@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Propel1\Form\EventListener\TranslationCollectionFormListener;
 
 /**
- * form type for i18n-columns in propel
+ * form type for i18n-columns in propel.
  *
  * @author Patrick Kaufmann
  */

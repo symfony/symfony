@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * Base exception
+ * Base exception.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

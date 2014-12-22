@@ -135,7 +135,7 @@ class ContextListener implements ListenerInterface
     }
 
     /**
-     * Refreshes the user by reloading it from the user provider
+     * Refreshes the user by reloading it from the user provider.
      *
      * @param TokenInterface $token
      *

@@ -25,25 +25,28 @@ use Symfony\Component\Intl\Intl;
 class Locale extends \Locale
 {
     /**
-     * Caches the countries in different locales
+     * Caches the countries in different locales.
+     *
      * @var array
      */
     protected static $countries = array();
 
     /**
-     * Caches the languages in different locales
+     * Caches the languages in different locales.
+     *
      * @var array
      */
     protected static $languages = array();
 
     /**
-     * Caches the different locales
+     * Caches the different locales.
+     *
      * @var array
      */
     protected static $locales = array();
 
     /**
-     * Returns the country names for a locale
+     * Returns the country names for a locale.
      *
      * @param string $locale The locale to use for the country names
      *
@@ -61,7 +64,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns all available country codes
+     * Returns all available country codes.
      *
      * @return array The country codes
      *
@@ -73,7 +76,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the language names for a locale
+     * Returns the language names for a locale.
      *
      * @param string $locale The locale to use for the language names
      *
@@ -91,7 +94,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns all available language codes
+     * Returns all available language codes.
      *
      * @return array The language codes
      *
@@ -103,7 +106,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the locale names for a locale
+     * Returns the locale names for a locale.
      *
      * @param string $locale The locale to use for the locale names
      *
@@ -121,7 +124,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns all available locale codes
+     * Returns all available locale codes.
      *
      * @return array The locale codes
      *
@@ -133,7 +136,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the ICU version as defined by the intl extension
+     * Returns the ICU version as defined by the intl extension.
      *
      * @return string|null The ICU version
      */
@@ -143,7 +146,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the ICU Data version as defined by the intl extension
+     * Returns the ICU Data version as defined by the intl extension.
      *
      * @return string|null The ICU Data version
      */
@@ -164,7 +167,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the directory path of the ICU data that ships with Symfony
+     * Returns the directory path of the ICU data that ships with Symfony.
      *
      * @return string The path to the ICU data directory
      */
@@ -174,7 +177,7 @@ class Locale extends \Locale
     }
 
     /**
-     * Returns the fallback locale for a given locale, if any
+     * Returns the fallback locale for a given locale, if any.
      *
      * @param string $locale The locale to find the fallback for.
      *

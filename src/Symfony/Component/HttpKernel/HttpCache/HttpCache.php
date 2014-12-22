@@ -143,7 +143,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Kernel instance
+     * Gets the Kernel instance.
      *
      * @return HttpKernelInterface An HttpKernelInterface instance
      */
@@ -153,7 +153,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Esi instance
+     * Gets the Esi instance.
      *
      * @return Esi An Esi instance
      */

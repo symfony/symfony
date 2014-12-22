@@ -24,24 +24,28 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 {
     /**
      * Character used for separating between plural and singular of an element.
+     *
      * @var string
      */
     const SINGULAR_SEPARATOR = '|';
 
     /**
-     * The elements of the property path
+     * The elements of the property path.
+     *
      * @var array
      */
     private $elements = array();
 
     /**
      * The singular forms of the elements in the property path.
+     *
      * @var array
      */
     private $singulars = array();
 
     /**
-     * The number of elements in the property path
+     * The number of elements in the property path.
+     *
      * @var int
      */
     private $length;
@@ -49,12 +53,14 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     /**
      * Contains a Boolean for each property in $elements denoting whether this
      * element is an index. It is a property otherwise.
+     *
      * @var array
      */
     private $isIndex = array();
 
     /**
-     * String representation of the path
+     * String representation of the path.
+     *
      * @var string
      */
     private $pathAsString;
@@ -170,7 +176,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
     }
 
     /**
-     * Returns a new iterator for this path
+     * Returns a new iterator for this path.
      *
      * @return PropertyPathIteratorInterface
      */

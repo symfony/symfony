@@ -96,7 +96,7 @@ interface ParameterBagInterface
     public function resolveValue($value);
 
     /**
-     * Escape parameter placeholders %
+     * Escape parameter placeholders %.
      *
      * @param mixed $value
      *
@@ -105,7 +105,7 @@ interface ParameterBagInterface
     public function escapeValue($value);
 
     /**
-     * Unescape parameter placeholders %
+     * Unescape parameter placeholders %.
      *
      * @param mixed $value
      *

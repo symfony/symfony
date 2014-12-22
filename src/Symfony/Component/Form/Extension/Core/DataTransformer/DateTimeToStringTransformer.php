@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between a date string and a DateTime object
+ * Transforms between a date string and a DateTime object.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
@@ -23,13 +23,14 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
     /**
-     * Format used for generating strings
+     * Format used for generating strings.
+     *
      * @var string
      */
     private $generateFormat;
 
     /**
-     * Format used for parsing strings
+     * Format used for parsing strings.
      *
      * Different than the {@link $generateFormat} because formats for parsing
      * support additional characters in PHP that are not supported for
@@ -49,7 +50,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     private $parseUsingPipe;
 
     /**
-     * Transforms a \DateTime instance to a string
+     * Transforms a \DateTime instance to a string.
      *
      * @see \DateTime::format() for supported formats
      *
@@ -87,7 +88,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a DateTime object into a date string with the configured format
-     * and timezone
+     * and timezone.
      *
      * @param \DateTime $value A DateTime object
      *

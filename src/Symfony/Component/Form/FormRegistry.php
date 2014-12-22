@@ -23,7 +23,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 class FormRegistry implements FormRegistryInterface
 {
     /**
-     * Extensions
+     * Extensions.
      *
      * @var FormExtensionInterface[] An array of FormExtensionInterface
      */

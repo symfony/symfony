@@ -73,7 +73,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     );
 
     /**
-     * Collects all available currency codes
+     * Collects all available currency codes.
      *
      * @var string[]
      */

@@ -32,7 +32,7 @@ interface PermissionMapInterface
     public function getMasks($permission, $object);
 
     /**
-     * Whether this map contains the given permission
+     * Whether this map contains the given permission.
      *
      * @param string $permission
      *

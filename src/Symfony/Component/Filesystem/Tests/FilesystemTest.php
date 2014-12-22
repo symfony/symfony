@@ -19,12 +19,12 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesystemTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string $workspace
+     * @var string
      */
     private $workspace = null;
 
     /**
-     * @var \Symfony\Component\Filesystem\Filesystem $filesystem
+     * @var \Symfony\Component\Filesystem\Filesystem
      */
     private $filesystem = null;
 
@@ -992,7 +992,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Returns file permissions as three digits (i.e. 755)
+     * Returns file permissions as three digits (i.e. 755).
      *
      * @param string $filePath
      *

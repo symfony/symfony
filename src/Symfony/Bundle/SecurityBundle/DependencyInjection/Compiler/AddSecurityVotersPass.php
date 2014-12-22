@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds all configured security voters to the access decision manager
+ * Adds all configured security voters to the access decision manager.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

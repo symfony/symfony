@@ -68,7 +68,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     private $reflClass;
 
     /**
-     * Constructs a metadata for the given class
+     * Constructs a metadata for the given class.
      *
      * @param string $class
      */
@@ -118,7 +118,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the properties to be serialized
+     * Returns the properties to be serialized.
      *
      * @return array
      */
@@ -136,7 +136,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the fully qualified name of the class
+     * Returns the fully qualified name of the class.
      *
      * @return string The fully qualified class name
      */
@@ -146,7 +146,7 @@ class ClassMetadata extends ElementMetadata implements MetadataInterface, ClassB
     }
 
     /**
-     * Returns the name of the default group for this class
+     * Returns the name of the default group for this class.
      *
      * For each class, the group "Default" is an alias for the group
      * "<ClassName>", where <ClassName> is the non-namespaced name of the

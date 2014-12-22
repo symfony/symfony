@@ -113,7 +113,7 @@ class ServiceReferenceGraphNode
     }
 
     /**
-     * Returns the value of this Node
+     * Returns the value of this Node.
      *
      * @return mixed The value
      */

@@ -411,6 +411,8 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Imports acls.
+     *
      * Data must have the following format:
      * array(
      *     *name* => array(

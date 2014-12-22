@@ -23,7 +23,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class ProcessUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -75,7 +75,7 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalized a Process input
+     * Validates and normalized a Process input.
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate

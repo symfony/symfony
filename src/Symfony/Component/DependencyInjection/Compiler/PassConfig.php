@@ -14,7 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
- * Compiler Pass Configuration
+ * Compiler Pass Configuration.
  *
  * This class has a default configuration embedded.
  *

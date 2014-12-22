@@ -45,6 +45,7 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
 
     /**
      * Generates a relative path based on the current request path, e.g. "../parent-file".
+     *
      * @see UrlGenerator::getRelativePath()
      */
     const RELATIVE_PATH = 'relative';

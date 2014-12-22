@@ -39,7 +39,7 @@ interface RegistryInterface extends ManagerRegistryInterface
     public function getEntityManager($name = null);
 
     /**
-     * Gets an array of all registered entity managers
+     * Gets an array of all registered entity managers.
      *
      * @return array An array of EntityManager instances
      */

@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates whether a value is a valid language code
+ * Validates whether a value is a valid language code.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

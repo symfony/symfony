@@ -37,7 +37,7 @@ class ProxyDumper implements DumperInterface
     private $classGenerator;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {

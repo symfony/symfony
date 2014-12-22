@@ -138,7 +138,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * Implementation of PropertyChangedListener
+     * Implementation of PropertyChangedListener.
      *
      * This allows us to keep track of which values have been changed, so we don't
      * have to do a full introspection when ->updateAcl() is called.
@@ -674,7 +674,7 @@ QUERY;
     }
 
     /**
-     * Creates the ACL for the passed object identity
+     * Creates the ACL for the passed object identity.
      *
      * @param ObjectIdentityInterface $oid
      */

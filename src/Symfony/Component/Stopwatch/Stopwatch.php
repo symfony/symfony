@@ -90,7 +90,7 @@ class Stopwatch
     }
 
     /**
-     * Checks if the event was started
+     * Checks if the event was started.
      *
      * @param string $name The event name
      *
@@ -247,7 +247,7 @@ class Section
     }
 
     /**
-     * Checks if the event was started
+     * Checks if the event was started.
      *
      * @param string $name The event name
      *

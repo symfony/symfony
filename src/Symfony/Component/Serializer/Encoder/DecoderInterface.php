@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 /**
- * Defines the interface of decoders
+ * Defines the interface of decoders.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

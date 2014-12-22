@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Allows filtering of a controller callable
+ * Allows filtering of a controller callable.
  *
  * You can call getController() to retrieve the current controller. With
  * setController() you can set a new controller that is used in the processing
@@ -30,7 +30,8 @@ use Symfony\Component\HttpFoundation\Request;
 class FilterControllerEvent extends KernelEvent
 {
     /**
-     * The current controller
+     * The current controller.
+     *
      * @var callable
      */
     private $controller;
@@ -43,7 +44,7 @@ class FilterControllerEvent extends KernelEvent
     }
 
     /**
-     * Returns the current controller
+     * Returns the current controller.
      *
      * @return callable
      *
@@ -55,7 +56,7 @@ class FilterControllerEvent extends KernelEvent
     }
 
     /**
-     * Sets a new controller
+     * Sets a new controller.
      *
      * @param callable $controller
      *

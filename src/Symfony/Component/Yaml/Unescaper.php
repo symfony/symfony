@@ -59,7 +59,7 @@ class Unescaper
     }
 
     /**
-     * Unescapes a character that was found in a double-quoted string
+     * Unescapes a character that was found in a double-quoted string.
      *
      * @param string $value An escaped character
      *

@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Tests\Fixtures\StubGlobalExecutionContext;
 
 /**
  * @since  2.5.3
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCase

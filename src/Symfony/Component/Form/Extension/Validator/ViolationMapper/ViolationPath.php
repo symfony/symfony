@@ -222,7 +222,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     }
 
     /**
-     * Returns a new iterator for this path
+     * Returns a new iterator for this path.
      *
      * @return ViolationPathIterator
      */

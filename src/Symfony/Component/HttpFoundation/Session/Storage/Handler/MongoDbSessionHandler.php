@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 /**
- * MongoDB session handler
+ * MongoDB session handler.
  *
  * @author Markus Bachmann <markus.bachmann@bachi.biz>
  */
@@ -148,7 +148,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a "MongoCollection" instance
+     * Return a "MongoCollection" instance.
      *
      * @return \MongoCollection
      */

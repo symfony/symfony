@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * A console command for retrieving information about routes
+ * A console command for retrieving information about routes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
@@ -101,7 +101,7 @@ EOF
 
         $format = '%-'.$maxName.'s %-'.$maxMethod.'s %-'.$maxScheme.'s %-'.$maxHost.'s %s';
         $formatHeader = '%-'.($maxName + 19).'s %-'.($maxMethod + 19).'s %-'.($maxScheme + 19).'s %-'.($maxHost + 19).'s %s';
-        $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>',  '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
+        $output->writeln(sprintf($formatHeader, '<comment>Name</comment>', '<comment>Method</comment>', '<comment>Scheme</comment>', '<comment>Host</comment>', '<comment>Path</comment>'));
 
         foreach ($routes as $name => $route) {
             $method = $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY';

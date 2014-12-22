@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * A console command for retrieving information about services
+ * A console command for retrieving information about services.
  *
  * @author Ryan Weaver <ryan@thatsquality.com>
  */
@@ -269,7 +269,7 @@ EOF
     }
 
     /**
-     * Renders detailed service information about one service
+     * Renders detailed service information about one service.
      */
     protected function outputService(OutputInterface $output, $serviceId)
     {
@@ -409,7 +409,7 @@ EOF
     }
 
     /**
-     * Renders list of tagged services grouped by tag
+     * Renders list of tagged services grouped by tag.
      *
      * @param OutputInterface $output
      * @param bool            $showPrivate

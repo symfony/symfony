@@ -23,7 +23,7 @@ class MergeBuilder
     public $allowOverwrite = true;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param NodeDefinition $node The related node
      */

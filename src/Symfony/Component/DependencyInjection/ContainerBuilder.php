@@ -285,10 +285,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $extension The extension alias or namespace
      * @param array  $values    An array of values that customizes the extension
      *
-     * @return ContainerBuilder       The current instance
-     * @throws BadMethodCallException When this ContainerBuilder is frozen
+     * @return ContainerBuilder The current instance
      *
-     * @throws \LogicException if the container is frozen
+     * @throws BadMethodCallException When this ContainerBuilder is frozen
+     * @throws \LogicException        if the container is frozen
      *
      * @api
      */
@@ -522,7 +522,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * constructor.
      *
      * @param ContainerBuilder $container The ContainerBuilder instance to merge.
-     *
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      *
@@ -1155,7 +1154,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Shares a given service in the container
+     * Shares a given service in the container.
      *
      * @param Definition $definition
      * @param mixed      $service

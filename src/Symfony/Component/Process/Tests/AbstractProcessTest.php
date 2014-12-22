@@ -128,7 +128,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests results from sub processes
+     * tests results from sub processes.
      *
      * @dataProvider responsesCodeProvider
      */
@@ -141,7 +141,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests results from sub processes
+     * tests results from sub processes.
      *
      * @dataProvider pipesCodeProvider
      */
@@ -249,7 +249,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @dataProvider chainedCommandsOutputProvider
      */
     public function testChainedCommandsOutput($expected, $operator, $input)
@@ -1082,7 +1081,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * provides default method names for simple getter/setter
+     * provides default method names for simple getter/setter.
      */
     public function methodProvider()
     {

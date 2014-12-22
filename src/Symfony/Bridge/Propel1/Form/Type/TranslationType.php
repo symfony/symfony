@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Bridge\Propel1\Form\EventListener\TranslationFormListener;
 
 /**
- * Translation type class
+ * Translation type class.
  *
  * @author Patrick Kaufmann
  */

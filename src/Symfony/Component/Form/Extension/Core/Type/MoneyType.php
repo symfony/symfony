@@ -68,7 +68,7 @@ class MoneyType extends AbstractType
     }
 
     /**
-     * Returns the pattern for this locale
+     * Returns the pattern for this locale.
      *
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted

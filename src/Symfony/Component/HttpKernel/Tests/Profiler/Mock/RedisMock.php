@@ -22,7 +22,7 @@ class RedisMock
     private $storage = array();
 
     /**
-     * Add a server to connection pool
+     * Add a server to connection pool.
      *
      * @param string $host
      * @param int    $port
@@ -132,7 +132,7 @@ class RedisMock
     }
 
     /**
-     * Append data to an existing item
+     * Append data to an existing item.
      *
      * @param string $key
      * @param string $value
@@ -205,7 +205,7 @@ class RedisMock
     }
 
     /**
-     * Close Redis server connection
+     * Close Redis server connection.
      *
      * @return bool
      */

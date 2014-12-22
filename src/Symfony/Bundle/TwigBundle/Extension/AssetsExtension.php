@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * Twig extension for Symfony assets helper
+ * Twig extension for Symfony assets helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

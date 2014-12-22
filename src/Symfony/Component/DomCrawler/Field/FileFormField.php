@@ -83,7 +83,7 @@ class FileFormField extends FormField
     }
 
     /**
-     * Sets path to the file as string for simulating HTTP request
+     * Sets path to the file as string for simulating HTTP request.
      *
      * @param string $path The path to the file
      */

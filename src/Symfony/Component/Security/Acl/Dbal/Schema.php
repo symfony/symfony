@@ -24,7 +24,7 @@ final class Schema extends BaseSchema
     protected $options;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param array      $options    the names for tables
      * @param Connection $connection
@@ -61,7 +61,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the class table to the schema
+     * Adds the class table to the schema.
      */
     protected function addClassTable()
     {
@@ -73,7 +73,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the entry table to the schema
+     * Adds the entry table to the schema.
      */
     protected function addEntryTable()
     {
@@ -101,7 +101,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the object identity table to the schema
+     * Adds the object identity table to the schema.
      */
     protected function addObjectIdentitiesTable()
     {
@@ -121,7 +121,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the object identity relation table to the schema
+     * Adds the object identity relation table to the schema.
      */
     protected function addObjectIdentityAncestorsTable()
     {
@@ -138,7 +138,7 @@ final class Schema extends BaseSchema
     }
 
     /**
-     * Adds the security identity table to the schema
+     * Adds the security identity table to the schema.
      */
     protected function addSecurityIdentitiesTable()
     {

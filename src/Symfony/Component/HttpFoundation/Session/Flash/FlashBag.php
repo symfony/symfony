@@ -30,7 +30,7 @@ class FlashBag implements FlashBagInterface, \IteratorAggregate
     private $flashes = array();
 
     /**
-     * The storage key for flashes in the session
+     * The storage key for flashes in the session.
      *
      * @var string
      */

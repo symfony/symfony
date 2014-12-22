@@ -63,7 +63,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
     }
 
     /**
-     * Compares the two given values to find if their relationship is valid
+     * Compares the two given values to find if their relationship is valid.
      *
      * @param mixed $value1 The first value to compare
      * @param mixed $value2 The second value to compare

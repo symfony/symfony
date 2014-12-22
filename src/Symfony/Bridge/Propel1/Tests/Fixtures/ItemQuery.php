@@ -57,7 +57,7 @@ class ItemQuery
     }
 
     /**
-     * Method from the TableMap API
+     * Method from the TableMap API.
      */
     public function hasColumn($column)
     {
@@ -65,7 +65,7 @@ class ItemQuery
     }
 
     /**
-     * Method from the TableMap API
+     * Method from the TableMap API.
      */
     public function getColumn($column)
     {
@@ -75,7 +75,7 @@ class ItemQuery
     }
 
     /**
-     * Method from the TableMap API
+     * Method from the TableMap API.
      */
     public function hasColumnByInsensitiveCase($column)
     {

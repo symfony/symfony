@@ -157,7 +157,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     }
 
     /**
-     * Returns whether this member is protected
+     * Returns whether this member is protected.
      *
      * @param object|string $objectOrClassName The object or the class name
      *

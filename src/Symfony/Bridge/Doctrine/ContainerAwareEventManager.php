@@ -24,6 +24,7 @@ class ContainerAwareEventManager extends EventManager
 {
     /**
      * Map of registered listeners.
+     *
      * <event> => <listeners>
      *
      * @var array

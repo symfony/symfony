@@ -198,6 +198,60 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @dataProvider answerProvider
+     */
+    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = array(
+            'env_1' => 'My environment 1',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    public function testAmbiguousChoiceFromChoicelist()
+    {
+        $possibleChoices = array(
+            'env_1' => 'My environment 1',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("My environment\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+
+        try {
+            $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('The provided answer is ambiguous. Value should be one of env_2 or env_3.', $e->getMessage());
+        }
+    }
+
+    public function answerProvider()
+    {
+        return array(
+            array('env_1', 'env_1'),
+            array('env_2', 'env_2'),
+            array('env_3', 'env_3'),
+            array('My environment 1', 'env_1'),
+        );
+    }
+
     public function testNoInteraction()
     {
         $dialog = new QuestionHelper();

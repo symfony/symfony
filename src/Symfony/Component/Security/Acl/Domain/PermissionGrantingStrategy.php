@@ -32,7 +32,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     private $auditLogger;
 
     /**
-     * Sets the audit logger
+     * Sets the audit logger.
      *
      * @param AuditLoggerInterface $auditLogger
      */

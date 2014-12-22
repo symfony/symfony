@@ -18,8 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplate
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-
-// should probably be moved to the Translation component
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 
 class FormHelperDivLayoutTest extends AbstractDivLayoutTest

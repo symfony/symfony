@@ -110,7 +110,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
     }
 
     /**
-     * Generates a hash for the cookie to ensure it is not being tempered with
+     * Generates a hash for the cookie to ensure it is not being tempered with.
      *
      * @param string $class
      * @param string $username The username

@@ -80,6 +80,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 
     /**
      * @dataProvider provideAllValidComparisons
+     *
      * @param mixed $dirtyValue
      * @param mixed $comparisonValue
      */
@@ -115,6 +116,7 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 
     /**
      * @dataProvider provideAllInvalidComparisons
+     *
      * @param mixed  $dirtyValue
      * @param mixed  $dirtyValueAsString
      * @param mixed  $comparedValue

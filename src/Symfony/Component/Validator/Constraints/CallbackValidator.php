@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validator for Callback constraint
+ * Validator for Callback constraint.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

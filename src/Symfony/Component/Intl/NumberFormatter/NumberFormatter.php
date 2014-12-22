@@ -128,14 +128,14 @@ class NumberFormatter
     const PAD_AFTER_SUFFIX = 3;
 
     /**
-     * The error code from the last operation
+     * The error code from the last operation.
      *
      * @var int
      */
     protected $errorCode = IntlGlobals::U_ZERO_ERROR;
 
     /**
-     * The error message from the last operation
+     * The error message from the last operation.
      *
      * @var string
      */
@@ -147,7 +147,7 @@ class NumberFormatter
     private $style;
 
     /**
-     * Default values for the en locale
+     * Default values for the en locale.
      *
      * @var array
      */
@@ -158,14 +158,14 @@ class NumberFormatter
     );
 
     /**
-     * Holds the initialized attributes code
+     * Holds the initialized attributes code.
      *
      * @var array
      */
     private $initializedAttributes = array();
 
     /**
-     * The supported styles to the constructor $styles argument
+     * The supported styles to the constructor $styles argument.
      *
      * @var array
      */
@@ -175,7 +175,7 @@ class NumberFormatter
     );
 
     /**
-     * Supported attributes to the setAttribute() $attr argument
+     * Supported attributes to the setAttribute() $attr argument.
      *
      * @var array
      */
@@ -188,7 +188,7 @@ class NumberFormatter
     /**
      * The available rounding modes for setAttribute() usage with
      * NumberFormatter::ROUNDING_MODE. NumberFormatter::ROUND_DOWN
-     * and NumberFormatter::ROUND_UP does not have a PHP only equivalent
+     * and NumberFormatter::ROUND_UP does not have a PHP only equivalent.
      *
      * @var array
      */
@@ -324,7 +324,7 @@ class NumberFormatter
     }
 
     /**
-     * Format a currency value
+     * Format a currency value.
      *
      * @param float  $value    The numeric currency value
      * @param string $currency The 3-letter ISO 4217 currency code indicating the currency to use
@@ -359,7 +359,7 @@ class NumberFormatter
     }
 
     /**
-     * Format a number
+     * Format a number.
      *
      * @param number $value The value to format
      * @param int    $type  Type of the formatting, one of the format type constants.
@@ -405,7 +405,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns an attribute value
+     * Returns an attribute value.
      *
      * @param int $attr An attribute specifier, one of the numeric attribute constants
      *
@@ -419,7 +419,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value
+     * Returns formatter's last error code. Always returns the U_ZERO_ERROR class constant value.
      *
      * @return int The error code from last formatter call
      *
@@ -431,7 +431,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns formatter's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value
+     * Returns formatter's last error message. Always returns the U_ZERO_ERROR_MESSAGE class constant value.
      *
      * @return string The error message from last formatter call
      *
@@ -443,7 +443,7 @@ class NumberFormatter
     }
 
     /**
-     * Returns the formatter's locale
+     * Returns the formatter's locale.
      *
      * The parameter $type is currently ignored.
      *
@@ -460,7 +460,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Returns the formatter's pattern
+     * Not supported. Returns the formatter's pattern.
      *
      * @return bool|string The pattern string used by the formatter or false on error
      *
@@ -474,7 +474,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Returns a formatter symbol value
+     * Not supported. Returns a formatter symbol value.
      *
      * @param int $attr A symbol specifier, one of the format symbol constants
      *
@@ -488,7 +488,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Returns a formatter text attribute value
+     * Not supported. Returns a formatter text attribute value.
      *
      * @param int $attr An attribute specifier, one of the text attribute constants
      *
@@ -502,7 +502,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Parse a currency number
+     * Not supported. Parse a currency number.
      *
      * @param string $value    The value to parse
      * @param string $currency Parameter to receive the currency name (reference)
@@ -520,7 +520,7 @@ class NumberFormatter
     }
 
     /**
-     * Parse a number
+     * Parse a number.
      *
      * @param string $value    The value to parse
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
@@ -562,7 +562,7 @@ class NumberFormatter
     }
 
     /**
-     * Set an attribute
+     * Set an attribute.
      *
      * @param int $attr  An attribute specifier, one of the numeric attribute constants.
      *                   The only currently supported attributes are NumberFormatter::FRACTION_DIGITS,
@@ -611,7 +611,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Set the formatter's pattern
+     * Not supported. Set the formatter's pattern.
      *
      * @param string $pattern A pattern string in conformance with the ICU DecimalFormat documentation
      *
@@ -628,7 +628,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Set the formatter's symbol
+     * Not supported. Set the formatter's symbol.
      *
      * @param int    $attr  A symbol specifier, one of the format symbol constants
      * @param string $value The value for the symbol
@@ -645,7 +645,7 @@ class NumberFormatter
     }
 
     /**
-     * Not supported. Set a text attribute
+     * Not supported. Set a text attribute.
      *
      * @param int $attr  An attribute specifier, one of the text attribute constants
      * @param int $value The attribute value
@@ -662,7 +662,7 @@ class NumberFormatter
     }
 
     /**
-     * Set the error to the default U_ZERO_ERROR
+     * Set the error to the default U_ZERO_ERROR.
      */
     protected function resetError()
     {
@@ -672,7 +672,7 @@ class NumberFormatter
     }
 
     /**
-     * Rounds a currency value, applying increment rounding if applicable
+     * Rounds a currency value, applying increment rounding if applicable.
      *
      * When a currency have a rounding increment, an extra round is made after the first one. The rounding factor is
      * determined in the ICU data and is explained as of:

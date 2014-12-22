@@ -155,7 +155,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Retrieves the prototype
+     * Retrieves the prototype.
      *
      * @return PrototypeNodeInterface The prototype
      */

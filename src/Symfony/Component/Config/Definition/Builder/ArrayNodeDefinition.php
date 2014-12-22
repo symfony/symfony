@@ -329,7 +329,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Returns a node builder to be used to add children and prototype
+     * Returns a node builder to be used to add children and prototype.
      *
      * @return NodeBuilder The node builder
      */

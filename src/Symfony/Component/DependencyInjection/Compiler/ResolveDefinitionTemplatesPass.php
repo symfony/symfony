@@ -52,7 +52,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     }
 
     /**
-     * Resolves the definition
+     * Resolves the definition.
      *
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition

@@ -16,7 +16,7 @@ use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**
- * ErrorHandlerTest
+ * ErrorHandlerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
  * @author Nicolas Grekas <p@tchwork.com>

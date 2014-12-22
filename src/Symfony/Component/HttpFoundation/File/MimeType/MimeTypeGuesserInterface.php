@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /**
- * Guesses the mime type of a file
+ * Guesses the mime type of a file.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

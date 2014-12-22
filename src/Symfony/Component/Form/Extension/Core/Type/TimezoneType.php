@@ -17,7 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class TimezoneType extends AbstractType
 {
     /**
-     * Stores the available timezone choices
+     * Stores the available timezone choices.
+     *
      * @var array
      */
     private static $timezones;

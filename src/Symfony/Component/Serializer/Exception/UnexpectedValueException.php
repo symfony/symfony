@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * UnexpectedValueException
+ * UnexpectedValueException.
  *
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */

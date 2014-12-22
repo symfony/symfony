@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 /**
- * Encodes JSON data
+ * Encodes JSON data.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

@@ -257,7 +257,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Asks a question to the user, the response is hidden
+     * Asks a question to the user, the response is hidden.
      *
      * @param OutputInterface $output   An Output instance
      * @param string|array    $question The question
@@ -370,7 +370,6 @@ class DialogHelper extends InputAwareHelper
      *
      * @throws \Exception        When any of the validators return an error
      * @throws \RuntimeException In case the fallback is deactivated and the response can not be hidden
-     *
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
@@ -394,7 +393,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Returns the helper's input stream
+     * Returns the helper's input stream.
      *
      * @return string
      */
@@ -412,7 +411,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Return a valid Unix shell
+     * Return a valid Unix shell.
      *
      * @return string|bool The valid shell name, false in case no valid shell is found
      */
@@ -450,7 +449,7 @@ class DialogHelper extends InputAwareHelper
     }
 
     /**
-     * Validate an attempt
+     * Validate an attempt.
      *
      * @param callable        $interviewer A callable that will ask for a question and return the result
      * @param OutputInterface $output      An Output instance

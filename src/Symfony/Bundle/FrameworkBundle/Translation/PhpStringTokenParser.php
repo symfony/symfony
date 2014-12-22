@@ -77,7 +77,7 @@ class PhpStringTokenParser
         if ('\'' === $str[$bLength]) {
             return str_replace(
                 array('\\\\', '\\\''),
-                array(  '\\',   '\''),
+                array(  '\\', '\''),
                 substr($str, $bLength + 1, -1)
             );
         } else {

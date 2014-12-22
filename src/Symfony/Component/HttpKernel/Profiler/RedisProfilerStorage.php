@@ -233,7 +233,7 @@ class RedisProfilerStorage implements ProfilerStorageInterface
     }
 
     /**
-     * Set instance of the Redis
+     * Set instance of the Redis.
      *
      * @param \Redis $redis
      */

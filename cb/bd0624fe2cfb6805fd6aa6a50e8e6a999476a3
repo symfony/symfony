@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by keradus at 2014-12-21T17:57:09Z
+
+> too many files (452) changed.
+
+:(
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2014-12-21T18:07:30Z
+
+@keradus Yeh, @fabpot indicated that he wanted this all in one pull. Otherwise, I would have split up the short description changes from the rest.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-12-22T08:42:24Z
+
+https://github.com/symfony/symfony/pull/13066.patch :smiling_imp:
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-12-22T11:55:42Z
+
+Seems good to me.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2014-12-22T12:01:28Z
+
+https://github.com/symfony/symfony/pull/13066.diff might be easier to read. :)

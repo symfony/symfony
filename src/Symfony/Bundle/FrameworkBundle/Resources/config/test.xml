@@ -5,26 +5,22 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="test.client.class">Symfony\Bundle\FrameworkBundle\Client</parameter>
         <parameter key="test.client.parameters" type="collection"></parameter>
-        <parameter key="test.client.history.class">Symfony\Component\BrowserKit\History</parameter>
-        <parameter key="test.client.cookiejar.class">Symfony\Component\BrowserKit\CookieJar</parameter>
-        <parameter key="test.session.listener.class">Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener</parameter>
     </parameters>
 
     <services>
-        <service id="test.client" class="%test.client.class%" scope="prototype">
+        <service id="test.client" class="Symfony\Bundle\FrameworkBundle\Client" scope="prototype">
             <argument type="service" id="kernel" />
             <argument>%test.client.parameters%</argument>
             <argument type="service" id="test.client.history" />
             <argument type="service" id="test.client.cookiejar" />
         </service>
 
-        <service id="test.client.history" class="%test.client.history.class%" scope="prototype" />
+        <service id="test.client.history" class="Symfony\Component\BrowserKit\History" scope="prototype" />
 
-        <service id="test.client.cookiejar" class="%test.client.cookiejar.class%" scope="prototype" />
+        <service id="test.client.cookiejar" class="Symfony\Component\BrowserKit\CookieJar" scope="prototype" />
 
-        <service id="test.session.listener" class="%test.session.listener.class%">
+        <service id="test.session.listener" class="Symfony\Bundle\FrameworkBundle\EventListener\TestSessionListener">
             <argument type="service" id="service_container" />
             <tag name="kernel.event_subscriber" />
         </service>

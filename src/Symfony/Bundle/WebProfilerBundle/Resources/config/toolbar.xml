@@ -4,12 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="web_profiler.debug_toolbar.class">Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener</parameter>
-    </parameters>
-
     <services>
-        <service id="web_profiler.debug_toolbar" class="%web_profiler.debug_toolbar.class%">
+        <service id="web_profiler.debug_toolbar" class="Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="twig" />
             <argument>%web_profiler.debug_toolbar.intercept_redirects%</argument>

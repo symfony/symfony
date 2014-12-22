@@ -21,42 +21,42 @@ class ConfirmationQuestion extends Question
     /**
      * Constructor.
      *
-     * @param string $question     The question to ask to the user
-     * @param bool   $default      The default answer to return, true or false
-     * @param array  $rightAnswers All the answers equivalent to "yes" (only first letter will be taken into account)
+     * @param string $question       The question to ask to the user
+     * @param bool   $default        The default answer to return, true or false
+     * @param array  $correctAnswers All the answers equivalent to "yes" (only first letter will be taken into account)
      */
-    public function __construct($question, $default = true, $rightAnswers = ['y'])
+    public function __construct($question, $default = true, array $correctAnswers = array('y'))
     {
         parent::__construct($question, (bool) $default);
 
-        $rightAnswers = array_map(function ($value) {
+        $correctAnswers = array_map(function ($value) {
                 return strtolower($value[0]);
-            }, $rightAnswers);
+            }, $correctAnswers);
 
-        $this->setNormalizer($this->getDefaultNormalizer($rightAnswers));
+        $this->setNormalizer($this->getDefaultNormalizer($correctAnswers));
     }
 
     /**
      * Returns the default answer normalizer.
      *
-     * @param array $rightAnswers
+     * @param array $correctAnswers
      *
      * @return callable
      */
-    private function getDefaultNormalizer(array $rightAnswers)
+    private function getDefaultNormalizer(array $correctAnswers)
     {
         $default = $this->getDefault();
 
-        return function ($answer) use ($default, $rightAnswers) {
+        return function ($answer) use ($default, $correctAnswers) {
             if (is_bool($answer)) {
                 return $answer;
             }
 
             if (false === $default) {
-                return $answer && in_array(strtolower($answer[0]), $rightAnswers);
+                return $answer && in_array(strtolower($answer[0]), $correctAnswers);
             }
 
-            return !$answer || in_array(strtolower($answer[0]), $rightAnswers);
+            return !$answer || in_array(strtolower($answer[0]), $correctAnswers);
         };
     }
 }

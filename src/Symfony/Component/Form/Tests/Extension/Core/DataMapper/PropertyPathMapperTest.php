@@ -41,6 +41,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $path
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getPropertyPath($path)

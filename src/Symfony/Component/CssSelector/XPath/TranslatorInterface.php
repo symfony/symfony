@@ -34,7 +34,7 @@ interface TranslatorInterface
     public function cssToXPath($cssExpr, $prefix = 'descendant-or-self::');
 
     /**
-     * Translates a parsed selector node to an XPath expression
+     * Translates a parsed selector node to an XPath expression.
      *
      * @param SelectorNode $selector
      * @param string       $prefix

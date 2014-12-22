@@ -192,7 +192,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * Gets a HTTP kernel from the container
+     * Gets a HTTP kernel from the container.
      *
      * @return HttpKernel
      */

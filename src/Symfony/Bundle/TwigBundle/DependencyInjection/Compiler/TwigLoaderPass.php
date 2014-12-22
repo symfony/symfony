@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
- * Adds services tagged twig.loader as Twig loaders
+ * Adds services tagged twig.loader as Twig loaders.
  *
  * @author Daniel Leech <daniel@dantleech.com>
  */

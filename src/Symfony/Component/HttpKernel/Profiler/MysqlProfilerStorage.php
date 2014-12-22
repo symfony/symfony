@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Profiler;
 
 /**
- * A ProfilerStorage for Mysql
+ * A ProfilerStorage for Mysql.
  *
  * @author Jan Schumann <js@schumann-it.com>
  */

@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Event Listener class for propel1_translation
+ * Event Listener class for propel1_translation.
  *
  * @author Patrick Kaufmann
  */

@@ -17,7 +17,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 /**
- * ObjectIdentity implementation
+ * ObjectIdentity implementation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -48,7 +48,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     }
 
     /**
-     * Constructs an ObjectIdentity for the given domain object
+     * Constructs an ObjectIdentity for the given domain object.
      *
      * @param object $domainObject
      *
@@ -103,7 +103,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
     }
 
     /**
-     * Returns a textual representation of this object identity
+     * Returns a textual representation of this object identity.
      *
      * @return string
      */

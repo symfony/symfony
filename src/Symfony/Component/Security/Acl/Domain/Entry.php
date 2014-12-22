@@ -16,7 +16,7 @@ use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
- * Auditable ACE implementation
+ * Auditable ACE implementation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -32,7 +32,7 @@ class Entry implements AuditableEntryInterface
     private $granting;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int                       $id
      * @param AclInterface              $acl
@@ -146,7 +146,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * Sets the permission mask
+     * Sets the permission mask.
      *
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
@@ -159,7 +159,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * Sets the mask comparison strategy
+     * Sets the mask comparison strategy.
      *
      * Do never call this method directly. Use the respective methods on the
      * AclInterface instead.
@@ -172,7 +172,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * Implementation of \Serializable
+     * Implementation of \Serializable.
      *
      * @return string
      */
@@ -190,7 +190,7 @@ class Entry implements AuditableEntryInterface
     }
 
     /**
-     * Implementation of \Serializable
+     * Implementation of \Serializable.
      *
      * @param string $serialized
      */

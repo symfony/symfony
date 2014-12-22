@@ -223,7 +223,7 @@ class Application
     }
 
     /**
-     * Set an input definition set to be used with this application
+     * Set an input definition set to be used with this application.
      *
      * @param InputDefinition $definition The input definition
      *
@@ -736,7 +736,7 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal width in which this application runs
+     * Tries to figure out the terminal width in which this application runs.
      *
      * @return int|null
      */
@@ -748,7 +748,7 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal height in which this application runs
+     * Tries to figure out the terminal height in which this application runs.
      *
      * @return int|null
      */
@@ -760,7 +760,7 @@ class Application
     }
 
     /**
-     * Tries to figure out the terminal dimensions based on the current environment
+     * Tries to figure out the terminal dimensions based on the current environment.
      *
      * @return array Array containing width and height
      */
@@ -960,7 +960,7 @@ class Application
     }
 
     /**
-     * Runs and parses stty -a if it's available, suppressing any error output
+     * Runs and parses stty -a if it's available, suppressing any error output.
      *
      * @return string
      */
@@ -983,7 +983,7 @@ class Application
     }
 
     /**
-     * Runs and parses mode CON if it's available, suppressing any error output
+     * Runs and parses mode CON if it's available, suppressing any error output.
      *
      * @return string <width>x<height> or null if it could not be parsed
      */
@@ -1039,7 +1039,7 @@ class Application
 
     /**
      * Finds alternative of $name among $collection,
-     * if nothing is found in $collection, try in $abbrevs
+     * if nothing is found in $collection, try in $abbrevs.
      *
      * @param string             $name       The string
      * @param array|\Traversable $collection The collection

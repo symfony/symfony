@@ -49,7 +49,7 @@ class TableHelper extends Helper
      *
      * @return TableHelper
      *
-     * @throws InvalidArgumentException when the table layout is not known
+     * @throws \InvalidArgumentException when the table layout is not known
      */
     public function setLayout($layout)
     {
@@ -68,7 +68,6 @@ class TableHelper extends Helper
 
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
-                break;
         };
 
         return $this;

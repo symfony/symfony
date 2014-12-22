@@ -17,13 +17,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Getting Entities through the ORM QueryBuilder
+ * Getting Entities through the ORM QueryBuilder.
  */
 class ORMQueryBuilderLoader implements EntityLoaderInterface
 {
     /**
      * Contains the query builder that builds the query for fetching the
-     * entities
+     * entities.
      *
      * This property should only be accessed through queryBuilder.
      *
@@ -32,7 +32,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     private $queryBuilder;
 
     /**
-     * Construct an ORM Query Builder Loader
+     * Construct an ORM Query Builder Loader.
      *
      * @param QueryBuilder|\Closure $queryBuilder
      * @param EntityManager         $manager

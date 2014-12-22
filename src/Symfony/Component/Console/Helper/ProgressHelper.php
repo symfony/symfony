@@ -48,28 +48,28 @@ class ProgressHelper extends Helper
     private $output;
 
     /**
-     * Current step
+     * Current step.
      *
      * @var int
      */
     private $current;
 
     /**
-     * Maximum number of steps
+     * Maximum number of steps.
      *
      * @var int
      */
     private $max;
 
     /**
-     * Start time of the progress bar
+     * Start time of the progress bar.
      *
      * @var int
      */
     private $startTime;
 
     /**
-     * List of formatting variables
+     * List of formatting variables.
      *
      * @var array
      */
@@ -82,14 +82,14 @@ class ProgressHelper extends Helper
     );
 
     /**
-     * Available formatting variables
+     * Available formatting variables.
      *
      * @var array
      */
     private $formatVars;
 
     /**
-     * Stored format part widths (used for padding)
+     * Stored format part widths (used for padding).
      *
      * @var array
      */
@@ -101,7 +101,7 @@ class ProgressHelper extends Helper
     );
 
     /**
-     * Various time formats
+     * Various time formats.
      *
      * @var array
      */

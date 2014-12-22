@@ -45,7 +45,7 @@ class PropelUserProvider implements UserProviderInterface
     protected $property;
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param string      $class    The User model class.
      * @param string|null $property The property to use to retrieve a user.

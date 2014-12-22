@@ -96,7 +96,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     }
 
     /**
-     * Clears a PreAuthenticatedToken for this provider (if present)
+     * Clears a PreAuthenticatedToken for this provider (if present).
      *
      * @param AuthenticationException $exception
      */

@@ -58,7 +58,7 @@ class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
     /**
      * Updates should not change the position of an element, otherwise we could
      * turn foreach loops into endless loops if they change the current
-     * element:
+     * element.
      *
      *     foreach ($map as $index => $value) {
      *         $map[$index] = $value + 1;

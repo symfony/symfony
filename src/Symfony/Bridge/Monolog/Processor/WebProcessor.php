@@ -15,7 +15,7 @@ use Monolog\Processor\WebProcessor as BaseWebProcessor;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
- * WebProcessor override to read from the HttpFoundation's Request
+ * WebProcessor override to read from the HttpFoundation's Request.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

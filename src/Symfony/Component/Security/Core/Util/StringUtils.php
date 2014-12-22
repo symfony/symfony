@@ -19,7 +19,7 @@ namespace Symfony\Component\Security\Core\Util;
 class StringUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {

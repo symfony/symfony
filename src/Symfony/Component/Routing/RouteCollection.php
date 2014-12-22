@@ -106,7 +106,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Removes a route or an array of routes by name from the collection
+     * Removes a route or an array of routes by name from the collection.
      *
      * @param string|array $name The route name or an array of route names
      */

@@ -59,7 +59,7 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
 class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
-     * The groups in the sequence
+     * The groups in the sequence.
      *
      * @var string[]|GroupSequence[]
      */

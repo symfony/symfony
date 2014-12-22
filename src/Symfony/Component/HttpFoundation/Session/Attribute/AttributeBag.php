@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Attribute;
 
 /**
- * This class relates to session attribute storage
+ * This class relates to session attribute storage.
  */
 class AttributeBag implements AttributeBagInterface, \IteratorAggregate, \Countable
 {

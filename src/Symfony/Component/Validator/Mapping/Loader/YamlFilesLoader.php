@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 /**
- * Loads multiple yaml mapping files
+ * Loads multiple yaml mapping files.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  *

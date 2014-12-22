@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface was deprecated in version 2.4 and will be removed in version 3.0. Please use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface instead.', E_USER_DEPRECATED);
 
 /**
- * Marks classes able to provide CSRF protection
+ * Marks classes able to provide CSRF protection.
  *
  * You can generate a CSRF token by using the method generateCsrfToken(). To
  * this method you should pass a value that is unique to the page that should

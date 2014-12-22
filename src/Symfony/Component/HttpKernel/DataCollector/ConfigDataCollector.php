@@ -181,7 +181,7 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Returns true if Zend OPcache is enabled
+     * Returns true if Zend OPcache is enabled.
      *
      * @return bool true if Zend OPcache is enabled, false otherwise
      */

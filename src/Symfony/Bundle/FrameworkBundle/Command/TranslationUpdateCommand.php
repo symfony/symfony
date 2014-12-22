@@ -136,6 +136,13 @@ EOF
             ? new DiffOperation($currentCatalogue, $extractedCatalogue)
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
 
+        // Exit if no messages found.
+        if (!count($operation->getDomains())) {
+            $output->writeln("\n<comment>No translation found.</comment>");
+
+            return;
+        }
+
         // show compiled list of messages
         if ($input->getOption('dump-messages') === true) {
             foreach ($operation->getDomains() as $domain) {

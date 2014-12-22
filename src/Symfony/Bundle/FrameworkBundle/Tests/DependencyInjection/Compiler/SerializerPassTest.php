@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 
 /**
- * Tests for the SerializerPass class
+ * Tests for the SerializerPass class.
  *
  * @author Javier Lopez <f12loalf@gmail.com>
  */

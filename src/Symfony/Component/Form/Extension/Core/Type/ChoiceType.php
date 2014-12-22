@@ -32,6 +32,7 @@ class ChoiceType extends AbstractType
 {
     /**
      * Caches created choice lists.
+     *
      * @var array
      */
     private $choiceListCache = array();

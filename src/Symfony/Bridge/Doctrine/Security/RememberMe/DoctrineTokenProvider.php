@@ -39,14 +39,14 @@ class DoctrineTokenProvider implements TokenProviderInterface
 {
     /**
      * Doctrine DBAL database connection
-     * F.ex. service id: doctrine.dbal.default_connection
+     * F.ex. service id: doctrine.dbal.default_connection.
      *
      * @var \Doctrine\DBAL\Connection
      */
     private $conn;
 
     /**
-     * new DoctrineTokenProvider for the RememberMe authentication service
+     * new DoctrineTokenProvider for the RememberMe authentication service.
      *
      * @param \Doctrine\DBAL\Connection $conn
      */

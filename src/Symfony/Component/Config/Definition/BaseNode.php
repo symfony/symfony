@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
- * The base node class
+ * The base node class.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -182,7 +182,7 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
-     * Returns the name of this node
+     * Returns the name of this node.
      *
      * @return string The Node's name.
      */

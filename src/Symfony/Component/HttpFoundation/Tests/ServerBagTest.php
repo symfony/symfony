@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
- * ServerBagTest
+ * ServerBagTest.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */

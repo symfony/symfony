@@ -19,7 +19,7 @@ namespace Symfony\Component\PropertyAccess;
 class StringUtil
 {
     /**
-     * Map english plural to singular suffixes
+     * Map english plural to singular suffixes.
      *
      * @var array
      *

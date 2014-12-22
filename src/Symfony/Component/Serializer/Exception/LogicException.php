@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * LogicException
+ * LogicException.
  *
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */

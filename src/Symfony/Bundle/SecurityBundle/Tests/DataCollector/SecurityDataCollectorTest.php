@@ -80,6 +80,7 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
     }
+
     private function getResponse()
     {
         return $this

@@ -105,7 +105,7 @@ class StopwatchEvent
     }
 
     /**
-     * Checks if the event was started
+     * Checks if the event was started.
      *
      * @return bool
      */

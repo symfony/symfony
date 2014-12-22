@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\File\MimeType;
 
 /**
- * Guesses the file extension corresponding to a given mime type
+ * Guesses the file extension corresponding to a given mime type.
  */
 interface ExtensionGuesserInterface
 {

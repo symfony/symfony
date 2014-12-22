@@ -208,7 +208,7 @@ class Response
     }
 
     /**
-     * Factory method for chainability
+     * Factory method for chainability.
      *
      * Example:
      *
@@ -1260,7 +1260,7 @@ class Response
     }
 
     /**
-     * Checks if we need to remove Cache-Control for SSL encrypted downloads when using IE < 9
+     * Checks if we need to remove Cache-Control for SSL encrypted downloads when using IE < 9.
      *
      * @link http://support.microsoft.com/kb/323308
      */

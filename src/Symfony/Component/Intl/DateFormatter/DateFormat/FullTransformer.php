@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Intl\Globals\IntlGlobals;
 
 /**
- * Parser and formatter for date formats
+ * Parser and formatter for date formats.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
@@ -35,7 +35,7 @@ class FullTransformer
     private $timezone;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $pattern  The pattern to be used to format and/or parse values
      * @param string $timezone The timezone to perform the date/time calculations
@@ -70,7 +70,7 @@ class FullTransformer
     }
 
     /**
-     * Return the array of Transformer objects
+     * Return the array of Transformer objects.
      *
      * @return Transformer[] Associative array of Transformer objects (format char => Transformer)
      */
@@ -80,7 +80,7 @@ class FullTransformer
     }
 
     /**
-     * Format a DateTime using ICU dateformat pattern
+     * Format a DateTime using ICU dateformat pattern.
      *
      * @param \DateTime $dateTime A DateTime object to be used to generate the formatted value
      *
@@ -98,7 +98,7 @@ class FullTransformer
     }
 
     /**
-     * Return the formatted ICU value for the matched date characters
+     * Return the formatted ICU value for the matched date characters.
      *
      * @param string    $dateChars The date characters to be replaced with a formatted ICU value
      * @param \DateTime $dateTime  A DateTime object to be used to generate the formatted value
@@ -128,7 +128,7 @@ class FullTransformer
     }
 
     /**
-     * Parse a pattern based string to a timestamp value
+     * Parse a pattern based string to a timestamp value.
      *
      * @param \DateTime $dateTime A configured DateTime object to use to perform the date calculation
      * @param string    $value    String to convert to a time value
@@ -206,7 +206,7 @@ class FullTransformer
     }
 
     /**
-     * Check if the first char of a string is a single quote
+     * Check if the first char of a string is a single quote.
      *
      * @param string $quoteMatch The string to check
      *
@@ -218,7 +218,7 @@ class FullTransformer
     }
 
     /**
-     * Replaces single quotes at the start or end of a string with two single quotes
+     * Replaces single quotes at the start or end of a string with two single quotes.
      *
      * @param string $quoteMatch The string to replace the quotes
      *
@@ -234,7 +234,7 @@ class FullTransformer
     }
 
     /**
-     * Builds a chars match regular expression
+     * Builds a chars match regular expression.
      *
      * @param string $specialChars A string of chars to build the regular expression
      *
@@ -253,7 +253,7 @@ class FullTransformer
 
     /**
      * Normalize a preg_replace match array, removing the numeric keys and returning an associative array
-     * with the value and pattern values for the matched Transformer
+     * with the value and pattern values for the matched Transformer.
      *
      * @param array $data
      *
@@ -279,7 +279,7 @@ class FullTransformer
 
     /**
      * Calculates the Unix timestamp based on the matched values by the reverse matching regular
-     * expression of parse()
+     * expression of parse().
      *
      * @param \DateTime $dateTime The DateTime object to be used to calculate the timestamp
      * @param array     $options  An array with the matched values to be used to calculate the timestamp
@@ -332,7 +332,7 @@ class FullTransformer
 
     /**
      * Add sensible default values for missing items in the extracted date/time options array. The values
-     * are base in the beginning of the Unix era
+     * are base in the beginning of the Unix era.
      *
      * @param array $options
      *

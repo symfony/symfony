@@ -77,6 +77,10 @@ class TranslationWriter
         // get the right dumper
         $dumper = $this->dumpers[$format];
 
+        if (isset($options['path']) && !is_dir($options['path'])) {
+            mkdir($options['path'], 0777, true);
+        }
+
         // save
         $dumper->dump($catalogue, $options);
     }

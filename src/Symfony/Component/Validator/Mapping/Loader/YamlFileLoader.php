@@ -19,7 +19,7 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * An array of YAML class descriptions
+     * An array of YAML class descriptions.
      *
      * @var array
      */
@@ -110,7 +110,7 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a collection of YAML nodes
+     * Parses a collection of YAML nodes.
      *
      * @param array $nodes The YAML nodes
      *

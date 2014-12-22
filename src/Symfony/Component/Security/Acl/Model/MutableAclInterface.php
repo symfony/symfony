@@ -22,14 +22,14 @@ namespace Symfony\Component\Security\Acl\Model;
 interface MutableAclInterface extends AclInterface
 {
     /**
-     * Deletes a class-based ACE
+     * Deletes a class-based ACE.
      *
      * @param int $index
      */
     public function deleteClassAce($index);
 
     /**
-     * Deletes a class-field-based ACE
+     * Deletes a class-field-based ACE.
      *
      * @param int    $index
      * @param string $field
@@ -37,14 +37,14 @@ interface MutableAclInterface extends AclInterface
     public function deleteClassFieldAce($index, $field);
 
     /**
-     * Deletes an object-based ACE
+     * Deletes an object-based ACE.
      *
      * @param int $index
      */
     public function deleteObjectAce($index);
 
     /**
-     * Deletes an object-field-based ACE
+     * Deletes an object-field-based ACE.
      *
      * @param int    $index
      * @param string $field
@@ -52,14 +52,14 @@ interface MutableAclInterface extends AclInterface
     public function deleteObjectFieldAce($index, $field);
 
     /**
-     * Returns the primary key of this ACL
+     * Returns the primary key of this ACL.
      *
      * @return int
      */
     public function getId();
 
     /**
-     * Inserts a class-based ACE
+     * Inserts a class-based ACE.
      *
      * @param SecurityIdentityInterface $sid
      * @param int                       $mask
@@ -70,7 +70,7 @@ interface MutableAclInterface extends AclInterface
     public function insertClassAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
     /**
-     * Inserts a class-field-based ACE
+     * Inserts a class-field-based ACE.
      *
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
@@ -82,7 +82,7 @@ interface MutableAclInterface extends AclInterface
     public function insertClassFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
     /**
-     * Inserts an object-based ACE
+     * Inserts an object-based ACE.
      *
      * @param SecurityIdentityInterface $sid
      * @param int                       $mask
@@ -93,7 +93,7 @@ interface MutableAclInterface extends AclInterface
     public function insertObjectAce(SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
     /**
-     * Inserts an object-field-based ACE
+     * Inserts an object-field-based ACE.
      *
      * @param string                    $field
      * @param SecurityIdentityInterface $sid
@@ -105,21 +105,21 @@ interface MutableAclInterface extends AclInterface
     public function insertObjectFieldAce($field, SecurityIdentityInterface $sid, $mask, $index = 0, $granting = true, $strategy = null);
 
     /**
-     * Sets whether entries are inherited
+     * Sets whether entries are inherited.
      *
      * @param bool $boolean
      */
     public function setEntriesInheriting($boolean);
 
     /**
-     * Sets the parent ACL
+     * Sets the parent ACL.
      *
      * @param AclInterface|null $acl
      */
     public function setParentAcl(AclInterface $acl = null);
 
     /**
-     * Updates a class-based ACE
+     * Updates a class-based ACE.
      *
      * @param int    $index
      * @param int    $mask
@@ -128,7 +128,7 @@ interface MutableAclInterface extends AclInterface
     public function updateClassAce($index, $mask, $strategy = null);
 
     /**
-     * Updates a class-field-based ACE
+     * Updates a class-field-based ACE.
      *
      * @param int    $index
      * @param string $field
@@ -138,7 +138,7 @@ interface MutableAclInterface extends AclInterface
     public function updateClassFieldAce($index, $field, $mask, $strategy = null);
 
     /**
-     * Updates an object-based ACE
+     * Updates an object-based ACE.
      *
      * @param int    $index
      * @param int    $mask
@@ -147,7 +147,7 @@ interface MutableAclInterface extends AclInterface
     public function updateObjectAce($index, $mask, $strategy = null);
 
     /**
-     * Updates an object-field-based ACE
+     * Updates an object-field-based ACE.
      *
      * @param int    $index
      * @param string $field

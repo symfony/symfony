@@ -82,7 +82,7 @@ class DebugClassLoader
     }
 
     /**
-     * Finds a file by class name
+     * Finds a file by class name.
      *
      * @param string $class A class name to resolve to file
      *

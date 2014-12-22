@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Manuel Reinhard <manu@sprain.ch>
  * @author Michael Schummel
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
  * @link http://www.michael-schummel.de/2007/10/05/iban-prufung-mit-php/
  */
 class IbanValidator extends ConstraintValidator

@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Decodes JSON data
+ * Decodes JSON data.
  *
  * @author Sander Coolen <sander@jibber.nl>
  */

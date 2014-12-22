@@ -19,7 +19,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests find() with the env var PHP_PATH
+     * tests find() with the env var PHP_PATH.
      */
     public function testFindWithPhpPath()
     {
@@ -43,7 +43,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests find() with the env var PHP_PATH
+     * tests find() with the env var PHP_PATH.
      */
     public function testFindWithHHVM()
     {
@@ -60,7 +60,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests find() with the env var PHP_PATH
+     * tests find() with the env var PHP_PATH.
      */
     public function testFindArguments()
     {
@@ -74,7 +74,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * tests find() with default executable
+     * tests find() with default executable.
      */
     public function testFindWithSuffix()
     {

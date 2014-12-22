@@ -12,7 +12,7 @@
 namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 /**
- * Parser and formatter for month format
+ * Parser and formatter for month format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
@@ -37,25 +37,28 @@ class MonthTransformer extends Transformer
     );
 
     /**
-     * Short months names (first 3 letters)
+     * Short months names (first 3 letters).
+     *
      * @var array
      */
     protected static $shortMonths = array();
 
     /**
-     * Flipped $months array, $name => $index
+     * Flipped $months array, $name => $index.
+     *
      * @var array
      */
     protected static $flippedMonths = array();
 
     /**
-     * Flipped $shortMonths array, $name => $index
+     * Flipped $shortMonths array, $name => $index.
+     *
      * @var array
      */
     protected static $flippedShortMonths = array();
 
     /**
-     * Constructor
+     * Constructor.
      */
     public function __construct()
     {

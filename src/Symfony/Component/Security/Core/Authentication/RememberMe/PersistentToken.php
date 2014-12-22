@@ -25,7 +25,7 @@ final class PersistentToken implements PersistentTokenInterface
     private $lastUsed;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string    $class
      * @param string    $username

@@ -105,7 +105,7 @@ class CompiledRoute implements \Serializable
     }
 
     /**
-     * Returns the host regex
+     * Returns the host regex.
      *
      * @return string|null The host regex or null
      */

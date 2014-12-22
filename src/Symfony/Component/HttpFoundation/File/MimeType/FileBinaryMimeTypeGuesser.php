@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
 /**
- * Guesses the mime type with the binary "file" (only available on *nix)
+ * Guesses the mime type with the binary "file" (only available on *nix).
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -39,7 +39,7 @@ class FileBinaryMimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * Returns whether this guesser is supported on the current OS
+     * Returns whether this guesser is supported on the current OS.
      *
      * @return bool
      */

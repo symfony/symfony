@@ -15,6 +15,7 @@ namespace Symfony\Component\HttpKernel\Exception;
  * PreconditionRequiredHttpException.
  *
  * @author Ben Ramsey <ben@benramsey.com>
+ *
  * @see http://tools.ietf.org/html/rfc6585
  */
 class PreconditionRequiredHttpException extends HttpException

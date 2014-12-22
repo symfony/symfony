@@ -22,7 +22,7 @@ class ValidationBuilder
     public $rules = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param NodeDefinition $node The related node
      */

@@ -61,67 +61,78 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class Form implements \IteratorAggregate, FormInterface
 {
     /**
-     * The form's configuration
+     * The form's configuration.
+     *
      * @var FormConfigInterface
      */
     private $config;
 
     /**
-     * The parent of this form
+     * The parent of this form.
+     *
      * @var FormInterface
      */
     private $parent;
 
     /**
-     * The children of this form
+     * The children of this form.
+     *
      * @var FormInterface[] A map of FormInterface instances
      */
     private $children;
 
     /**
-     * The errors of this form
+     * The errors of this form.
+     *
      * @var FormError[] An array of FormError instances
      */
     private $errors = array();
 
     /**
-     * Whether this form was submitted
+     * Whether this form was submitted.
+     *
      * @var bool
      */
     private $submitted = false;
 
     /**
-     * The button that was used to submit the form
+     * The button that was used to submit the form.
+     *
      * @var Button
      */
     private $clickedButton;
 
     /**
-     * The form data in model format
+     * The form data in model format.
+     *
      * @var mixed
      */
     private $modelData;
 
     /**
-     * The form data in normalized format
+     * The form data in normalized format.
+     *
      * @var mixed
      */
     private $normData;
 
     /**
-     * The form data in view format
+     * The form data in view format.
+     *
      * @var mixed
      */
     private $viewData;
 
     /**
-     * The submitted values that don't belong to any children
+     * The submitted values that don't belong to any children.
+     *
      * @var array
      */
     private $extraData = array();
 
     /**
-     * Returns the transformation failure generated during submission, if any
+     * Returns the transformation failure generated during submission, if any.
+     *
      * @var TransformationFailedException|null
      */
     private $transformationFailure;
@@ -142,6 +153,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether setData() is currently being called.
+     *
      * @var bool
      */
     private $lockSetData = false;

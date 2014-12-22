@@ -344,7 +344,7 @@ class Container implements IntrospectableContainerInterface
     }
 
     /**
-     * Returns true if the given service has actually been initialized
+     * Returns true if the given service has actually been initialized.
      *
      * @param string $id The service identifier
      *
@@ -387,7 +387,7 @@ class Container implements IntrospectableContainerInterface
     }
 
     /**
-     * This is called when you enter a scope
+     * This is called when you enter a scope.
      *
      * @param string $name
      *
@@ -517,7 +517,7 @@ class Container implements IntrospectableContainerInterface
     }
 
     /**
-     * Returns whether this container has a certain scope
+     * Returns whether this container has a certain scope.
      *
      * @param string $name The name of the scope
      *
@@ -531,7 +531,7 @@ class Container implements IntrospectableContainerInterface
     }
 
     /**
-     * Returns whether this scope is currently active
+     * Returns whether this scope is currently active.
      *
      * This does not actually check if the passed scope actually exists.
      *

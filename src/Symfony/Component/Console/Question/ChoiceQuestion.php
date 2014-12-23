@@ -117,8 +117,9 @@ class ChoiceQuestion extends Question
         $choices = $this->choices;
         $errorMessage = $this->errorMessage;
         $multiselect = $this->multiselect;
+        $isAssoc = $this->isAssoc($choices);
 
-        return function ($selected) use ($choices, $errorMessage, $multiselect) {
+        return function ($selected) use ($choices, $errorMessage, $multiselect, $isAssoc) {
             // Collapse all spaces.
             $selectedChoices = str_replace(' ', '', $selected);
 
@@ -134,8 +135,28 @@ class ChoiceQuestion extends Question
 
             $multiselectChoices = array();
             foreach ($selectedChoices as $value) {
-                $this->checkMultipleResults($choices, $value);
-                $result = $this->getResult($choices, $value);
+                $results = array();
+                foreach ($choices as $key => $choice) {
+                    if ($choice === $value) {
+                        $results[] = $key;
+                    }
+                }
+
+                if (count($results) > 1) {
+                    throw new \InvalidArgumentException(sprintf('The provided answer is ambiguous. Value should be one of %s.', implode(' or ', $results)));
+                }
+
+                $result = array_search($value, $choices);
+
+                if (!$isAssoc) {
+                    if (!empty($result)) {
+                        $result = $choices[$result];
+                    } elseif (isset($choices[$value])) {
+                        $result = $choices[$value];
+                    }
+                } elseif (empty($result) && array_key_exists($value, $choices)) {
+                    $result = $value;
+                }
 
                 if (empty($result)) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
@@ -149,54 +170,5 @@ class ChoiceQuestion extends Question
 
             return current($multiselectChoices);
         };
-    }
-
-    /**
-     * Checks if there are multiple keys corresponding to the value supplied
-     * by the user.
-     *
-     * @param array  $possibleChoices Possible value(s) that the user can supply
-     * @param string $value           Value supplied by the user
-     *
-     * @return null
-     */
-    private function checkMultipleResults(array $possibleChoices, $value)
-    {
-        $results = array();
-        foreach ($possibleChoices as $key => $choice) {
-            if ($choice === $value) {
-                $results[] = $key;
-            }
-        }
-
-        if (count($results) > 1) {
-            throw new \InvalidArgumentException(sprintf('The provided answer is ambiguous. Value should be one of %s.', implode(' or ', $results)));
-        }
-    }
-
-    /**
-     * Get the result according to what have been provided by the user and the
-     * possible choices.
-     *
-     * @param array $possibleChoices Possible value(s) that the user can supply
-     * @param string $value          Value supplied by the user
-     *
-     * @retun string
-     */
-    private function getResult(array $possibleChoices, $value)
-    {
-        $result = array_search($value, $possibleChoices);
-
-        if (!$this->isAssoc($possibleChoices)) {
-            if (!empty($result)) {
-                $result = $possibleChoices[$result];
-            } elseif (isset($possibleChoices[$value])) {
-                $result = $possibleChoices[$value];
-            }
-        } elseif (empty($result) && array_key_exists($value, $possibleChoices)) {
-            $result = $value;
-        }
-
-        return $result;
     }
 }

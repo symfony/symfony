@@ -101,7 +101,7 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * The resource name must follow the following pattern:
      *
-     *     @BundleName/path/to/a/file.something
+     *     @<BundleName>/path/to/a/file.something
      *
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.

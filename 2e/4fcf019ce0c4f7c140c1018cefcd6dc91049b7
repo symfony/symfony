@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by kbond at 2014-12-22T14:13:29Z
+
+Hmm, shouldn't this be added to 2.6 as it fixes a BC break?
+
+---------------------------------------------------------------------------
+
+by jeremylivingston at 2014-12-22T14:15:01Z
+
+@kbond yes, I definitely think this should be added to 2.6 too. @fabpot, what do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-22T15:47:29Z
+
+Sure thing; it should be merged into 2.6.
+
+---------------------------------------------------------------------------
+
+by jeremylivingston at 2014-12-23T17:30:43Z
+
+@fabpot, do you need me to do anything else or are you able to merge this PR into 2.6 too?

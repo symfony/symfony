@@ -42,30 +42,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Foo', 'bar'), $def->getFactory(), '->setFactory() converts string static method call to the array');
     }
 
-    public function testSetGetFactoryClass()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryClass());
-        $this->assertSame($def, $def->setFactoryClass('stdClass2'), "->setFactoryClass() implements a fluent interface.");
-        $this->assertEquals('stdClass2', $def->getFactoryClass(), "->getFactoryClass() returns current class to construct this service.");
-    }
-
-    public function testSetGetFactoryMethod()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryMethod());
-        $this->assertSame($def, $def->setFactoryMethod('foo'), '->setFactoryMethod() implements a fluent interface');
-        $this->assertEquals('foo', $def->getFactoryMethod(), '->getFactoryMethod() returns the factory method name');
-    }
-
-    public function testSetGetFactoryService()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryService());
-        $this->assertSame($def, $def->setFactoryService('foo.bar'), "->setFactoryService() implements a fluent interface.");
-        $this->assertEquals('foo.bar', $def->getFactoryService(), "->getFactoryService() returns current service to construct this service.");
-    }
-
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setClass
      * @covers Symfony\Component\DependencyInjection\Definition::getClass

@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * A console command for dumping available configuration reference.
@@ -73,7 +73,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         return $extension;
     }
 
-    public function validateConfiguration(Extension $extension, $configuration)
+    public function validateConfiguration(ExtensionInterface $extension, $configuration)
     {
         if (!$configuration) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have its getConfiguration() method setup', $extension->getAlias()));

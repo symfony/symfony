@@ -91,6 +91,10 @@
 
             {{ dump.data|raw }}
         </li>
+        {% else %}
+            <p>
+                <em>No variables to dump</em>
+            </p>
         {% endfor %}
     </ul>
 {% endblock %}

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by mmoreram at 2014-12-23T12:24:08Z
+
+Completely agree with this change, even it is a BR Break (Well, not at all... where is the PHPDoc @api?)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-23T12:56:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-23T15:41:58Z
+
+Merging it in 2.5 is a BC break, but it will probably not affect anyone...
+
+---------------------------------------------------------------------------
+
+by xphere at 2014-12-23T15:48:49Z
+
+Yes, I think it was not meant to be extended (maybe a `final` is in order?), but I can't make assumptions on what others have done…

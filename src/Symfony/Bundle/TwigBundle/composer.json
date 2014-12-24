@@ -24,7 +24,7 @@
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
         "symfony/config": "~2.2",
-        "symfony/framework-bundle": "~2.1"
+        "symfony/framework-bundle": "~2.1,<2.6.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }

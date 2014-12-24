@@ -1,0 +1,171 @@
+---------------------------------------------------------------------------
+
+by SofHad at 2014-12-23T21:32:26Z
+
+sure enough :)
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2014-12-23T21:41:16Z
+
+Just looking at the template, wouldn't it be better to apply same rule for count as above? And ff some, display the content?
+
+`{% if dumps_count %}`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-24T05:44:22Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-24T07:05:59Z
+
+Can you add a screenshot please?
+
+---------------------------------------------------------------------------
+
+by SofHad at 2014-12-24T11:31:03Z
+
+In order to ensure consistency throughout the WebProfiler it should to use p instead of li because the font-size is not the same. (li => 13px, p => 14px)
+
+[Here is the version with p](https://github.com/SofHad/symfony/blob/dump-replace-li-by-p/src/Symfony/Bundle/DebugBundle/Resources/views/Profiler/dump.html.twig#L72-102)
+
+@nicolas-grekas Here is the screenshot:
+for p
+![screenshot-127 0 0 1 8000 2014-12-24 11-50-01](https://cloud.githubusercontent.com/assets/1835430/5547996/1eee2b86-8b66-11e4-9275-2779eaa8c0f1.png)
+
+for  li
+![screenshot-127 0 0 1 8000 2014-12-24 12-14-13](https://cloud.githubusercontent.com/assets/1835430/5548006/8566db9c-8b66-11e4-9f69-4e85b2884536.png)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-12-24T11:36:13Z
+
+> In order to ensure consistency throughout the WebProfiler it should to use p instead of li because the font-size is not the same. (li => 13px, p => 14px)
+
+Yeah, but that's invalid HTML as you cannot use a p element inside an ul element.
+
+Instead, you should do something like:
+
+````diff
+     <ul class="alt">
++        {% if collection.dumpCount %}
+-        {% for dump in collector.getDumps('html') %}
+-        <li class="sf-dump sf-reset">
+-            in
+-            {% if dump.line %}
+-                {% set link = dump.file|file_link(dump.line) %}
+-                {% if link %}
+-                    <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+-                {% else %}
+-                    <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+-                {% endif %}
+-            {% else %}
+-                {{ dump.name }}
+-            {% endif %}
+-            line {{ dump.line }}:
+-            <a onclick="Sfdump.toggle(this)">▶</a>
+-            <span class="sf-dump-compact">
+-            {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
+-            </span>
+-
+-            {{ dump.data|raw }}
+-        </li>
+-        {% endfor %}
++            {% for dump in collector.getDumps('html') %}
++            <li class="sf-dump sf-reset">
++                in
++                {% if dump.line %}
++                    {% set link = dump.file|file_link(dump.line) %}
++                    {% if link %}
++                        <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
++                    {% else %}
++                        <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
++                    {% endif %}
++                {% else %}
++                    {{ dump.name }}
++                {% endif %}
++                line {{ dump.line }}:
++                <a onclick="Sfdump.toggle(this)">▶</a>
++                <span class="sf-dump-compact">
++                {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
++                </span>
++
++                {{ dump.data|raw }}
++            </li>
++            {% endfor %}
++        {% else %}
++        <p>No dumped variable</p>
++        {% endif %}
+     </ul>
+
+````
+
+---------------------------------------------------------------------------
+
+by SofHad at 2014-12-24T13:49:48Z
+
+@WouterJ
+ Indeed, I've updated [here] (https://github.com/SofHad/symfony/blob/dump-replace-li-by-p/src/Symfony/Bundle/DebugBundle/Resources/views/Profiler/dump.html.twig#L72-102)
+Thank you
+```
+{% if collector.dumpsCount %}
+        <ul class="alt">
+            {% for dump in collector.getDumps('html') %}
+            <li class="sf-dump sf-reset">
+                in
+                {% if dump.line %}
+                    {% set link = dump.file|file_link(dump.line) %}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                    {% else %}
+                        <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                    {% endif %}
+                {% else %}
+                    {{ dump.name }}
+                {% endif %}
+                line {{ dump.line }}:
+                <a onclick="Sfdump.toggle(this)">▶</a>
+                <span class="sf-dump-compact">
+                {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
+                </span>
+
+                {{ dump.data|raw }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            <em>No dumped variable</em>
+        </p>
+    {% endif %}
+
+```
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-12-24T13:53:12Z
+
+@SofHad you should commit directly into this branch, the PR will be updated automatically.
+
+Btw, I think "No dumped data" or "No dumped variables" is better.
+
+---------------------------------------------------------------------------
+
+by SofHad at 2014-12-24T14:42:46Z
+
+Sorry, It is done now  :)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-24T16:10:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-24T16:12:46Z
+
+:+1:

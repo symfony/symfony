@@ -26,6 +26,12 @@ class PropelFactory implements UserProviderFactoryInterface
     private $key;
     private $providerId;
 
+    /**
+     * Constructor.
+     *
+     * @param string $key
+     * @param string $providerId
+     */
     public function __construct($key, $providerId)
     {
         $this->key = $key;
@@ -38,7 +44,7 @@ class PropelFactory implements UserProviderFactoryInterface
             ->setDefinition($id, new DefinitionDecorator($this->providerId))
             ->addArgument($config['class'])
             ->addArgument($config['property'])
-            ;
+        ;
     }
 
     public function getKey()
@@ -50,9 +56,14 @@ class PropelFactory implements UserProviderFactoryInterface
     {
         $node
             ->children()
-            ->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('property')->defaultNull()->end()
+                ->scalarNode('class')
+                    ->isRequired()
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('property')
+                    ->defaultNull()
+                ->end()
             ->end()
-            ;
+        ;
     }
 }

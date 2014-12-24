@@ -40,6 +40,9 @@ class TranslationCollectionType extends AbstractType
         $builder->addEventSubscriber($listener);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'collection';

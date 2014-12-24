@@ -81,9 +81,12 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
-        $def->setFactoryClass($parentDef->getFactoryClass());
-        $def->setFactoryMethod($parentDef->getFactoryMethod());
-        $def->setFactoryService($parentDef->getFactoryService());
+        if (null !== $parentDef->getFactoryMethod()) {
+            $def->setFactoryClass($parentDef->getFactoryClass());
+            $def->setFactoryMethod($parentDef->getFactoryMethod());
+            $def->setFactoryService($parentDef->getFactoryService());
+        }
+        $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());

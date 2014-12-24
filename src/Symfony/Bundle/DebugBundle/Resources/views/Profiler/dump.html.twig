@@ -69,32 +69,34 @@
         }
     </style>
 
-    <ul class="alt">
-        {% for dump in collector.getDumps('html') %}
-        <li class="sf-dump sf-reset">
-            in
-            {% if dump.line %}
-                {% set link = dump.file|file_link(dump.line) %}
-                {% if link %}
-                    <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+    {% if collector.dumpsCount %}
+        <ul class="alt">
+            {% for dump in collector.getDumps('html') %}
+            <li class="sf-dump sf-reset">
+                in
+                {% if dump.line %}
+                    {% set link = dump.file|file_link(dump.line) %}
+                    {% if link %}
+                        <a href="{{ link }}" title="{{ dump.file }}">{{ dump.name }}</a>
+                    {% else %}
+                        <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                    {% endif %}
                 {% else %}
-                    <abbr title="{{ dump.file }}">{{ dump.name }}</abbr>
+                    {{ dump.name }}
                 {% endif %}
-            {% else %}
-                {{ dump.name }}
-            {% endif %}
-            line {{ dump.line }}:
-            <a onclick="Sfdump.toggle(this)">▶</a>
-            <span class="sf-dump-compact">
-            {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
-            </span>
+                line {{ dump.line }}:
+                <a onclick="Sfdump.toggle(this)">▶</a>
+                <span class="sf-dump-compact">
+                {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
+                </span>
 
-            {{ dump.data|raw }}
-        </li>
-        {% else %}
-        <li>
+                {{ dump.data|raw }}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>
             <em>No dumped variable</em>
-        </li>
-        {% endfor %}
-    </ul>
+        </p>
+    {% endif %}
 {% endblock %}

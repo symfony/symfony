@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-18T19:10:17Z
+
+The notices are making the build output too large for Travis, breaking the build again
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-18T19:45:25Z
+
+Funny :) I tried with a custom error handler. If that works, I'll enhance the summary of deprecation notices.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-20T14:35:47Z
+
+On this one, I think the failings tests are for an other PR. But I thought: what about making a new component with this DeprecationErrorHandler and add it as a require-dev dep to all 2.7 components? That would make tests green again for non-Symfony projects that relies on them, but would still report the deprecations as part of the phpunit report.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-20T15:42:24Z
+
+@nicolas-grekas I would rather test this strategy in Symfony before extracting this handler.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-23T06:58:10Z
+
+This PR is ready, failures are not related. Patch #13081 is embedded because it's required to silence deprecations triggered when using the `test.client` the service.

@@ -26,19 +26,20 @@ env:
 before_install:
     - travis_retry sudo apt-get install parallel
     - composer self-update
-    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini; fi;'
-    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
-    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
-    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then pecl install -f memcached-2.1.0; fi;'
-    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;'
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then pecl install -f memcached-2.1.0; fi;
+    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
-#    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;'
+#    - if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;
 
 install:
-    - sh -c 'if [ "$components" = "no" ]; then sh -c "COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install"; fi;'
+    - if [ "$components" = "no" ]; then COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; fi;
 
 script:
-    - sh -c 'if [ "$components" = "no" ]; then sh -c "ls -d src/Symfony/*/* | parallel --gnu --keep-order '\''echo \"Running {} tests\"; phpunit --exclude-group tty,benchmark,intl-data {};'\''"; fi;'
-    - sh -c 'if [ "$components" = "no" ]; then sh -c "echo "\""Running tests requiring tty"\""; phpunit --group tty"; fi;'
-    - sh -c 'if [ "$components" = "high" ]; then sh -c "find src/Symfony -mindepth 3 -type f -name '\''phpunit.xml.dist'\'' | sed '\''s#\(.*\)/.*#\1#'\'' | parallel --gnu --keep-order '\''echo \"Running {} tests\"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; phpunit --exclude-group tty,benchmark,intl-data;'\''"; fi;'
-    - sh -c 'if [ "$components" = "low" ]; then sh -c "find src/Symfony -mindepth 3 -type f -name '\''phpunit.xml.dist'\'' | sed '\''s#\(.*\)/.*#\1#'\'' | parallel --gnu --keep-order '\''echo \"Running {} tests\"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data;'\''"; fi;'
+    - if [ "$components" = "no" ]; then ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo "Running {} tests"; phpunit --exclude-group tty,benchmark,intl-data {};'; fi;
+    - if [ "$components" = "no" ]; then echo "Running tests requiring tty"; phpunit --group tty; fi;
+    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order 'echo "Running {} tests"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; phpunit --exclude-group tty,benchmark,intl-data;'; fi;
+    - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order 'echo "Running {} tests"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data;'; fi;

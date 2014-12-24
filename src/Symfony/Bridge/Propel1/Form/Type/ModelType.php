@@ -55,11 +55,19 @@ class ModelType extends AbstractType
      */
     private $propertyAccessor;
 
+    /**
+     * Constructor.
+     *
+     * @param PropertyAccessorInterface|null $propertyAccessor
+     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['multiple']) {
@@ -67,6 +75,9 @@ class ModelType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $propertyAccessor = $this->propertyAccessor;
@@ -99,11 +110,17 @@ class ModelType extends AbstractType
         ));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'choice';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'model';

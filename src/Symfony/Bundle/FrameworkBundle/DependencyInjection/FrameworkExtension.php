@@ -741,7 +741,7 @@ class FrameworkExtension extends Extension
                 'validator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
 
-            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.'.$config['cache'])));
+            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
 
         switch ($config['api']) {

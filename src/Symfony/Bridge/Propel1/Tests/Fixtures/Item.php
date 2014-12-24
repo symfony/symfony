@@ -11,16 +11,11 @@
 
 namespace Symfony\Bridge\Propel1\Tests\Fixtures;
 
-use PropelPDO;
-
 class Item implements \Persistent
 {
     private $id;
-
     private $value;
-
     private $groupName;
-
     private $price;
 
     private $slug;
@@ -106,11 +101,11 @@ class Item implements \Persistent
     {
     }
 
-    public function delete(PropelPDO $con = null)
+    public function delete(\PropelPDO $con = null)
     {
     }
 
-    public function save(PropelPDO $con = null)
+    public function save(\PropelPDO $con = null)
     {
     }
 }

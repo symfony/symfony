@@ -26,7 +26,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Propel logger.
      *
-     * @var \Symfony\Bridge\Propel1\Logger\PropelLogger
+     * @var PropelLogger
      */
     private $logger;
 
@@ -63,7 +63,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the collector name.
      *
-     * @return string The collector name.
+     * @return string
      */
     public function getName()
     {
@@ -71,9 +71,9 @@ class PropelDataCollector extends DataCollector
     }
 
     /**
-     * Returns queries.
+     * Returns the collected stats for all executed SQL queries.
      *
-     * @return array Queries
+     * @return array
      */
     public function getQueries()
     {
@@ -83,7 +83,7 @@ class PropelDataCollector extends DataCollector
     /**
      * Returns the query count.
      *
-     * @return int The query count
+     * @return int
      */
     public function getQueryCount()
     {
@@ -91,9 +91,9 @@ class PropelDataCollector extends DataCollector
     }
 
     /**
-     * Returns the total time of queries.
+     * Returns the total time spent on running all queries.
      *
-     * @return float The total time of queries
+     * @return float
      */
     public function getTime()
     {
@@ -106,9 +106,9 @@ class PropelDataCollector extends DataCollector
     }
 
     /**
-     * Creates an array of Build objects.
+     * Computes the stats of all executed SQL queries.
      *
-     * @return array An array of Build objects
+     * @return array
      */
     private function buildQueries()
     {
@@ -136,9 +136,9 @@ class PropelDataCollector extends DataCollector
     }
 
     /**
-     * Count queries.
+     * Returns the total count of SQL queries.
      *
-     * @return int The number of queries.
+     * @return int
      */
     private function countQueries()
     {

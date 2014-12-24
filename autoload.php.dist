@@ -6,6 +6,86 @@ if (PHP_VERSION_ID >= 50400 && gc_enabled()) {
     gc_disable();
 }
 
+/**
+ * Catch deprecation notices and print a summary report at the end of the test suite
+ *
+ * @internal
+ */
+class DeprecationErrorHandler
+{
+    private static $isRegistered = false;
+
+    public static function register()
+    {
+        if (self::$isRegistered) {
+            return;
+        }
+        $deprecations = array(0);
+        $oldErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                return PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
+            }
+
+            ++$deprecations[0];
+            $trace = debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false);
+
+            $i = count($trace);
+            while (isset($trace[--$i]['class']) && ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_'))) {
+                // No-op
+            }
+
+            if (isset($trace[$i]['class'])) {
+                if (isset($deprecations[$trace[$i]['class']][$trace[$i]['function']][$msg])) {
+                    ++$deprecations[$trace[$i]['class']][$trace[$i]['function']][$msg];
+                } else {
+                    $deprecations[$trace[$i]['class']][$trace[$i]['function']][$msg] = 1;
+                }
+            }
+        });
+
+        if (null !== $oldErrorHandler) {
+            restore_error_handler();
+            if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler) {
+                restore_error_handler();
+                self::register();
+            }
+        } else {
+            self::$isRegistered = true;
+            register_shutdown_function(function () use (&$deprecations) {
+                if ($deprecations[0]) {
+                    if (function_exists('posix_isatty') && @posix_isatty(STDOUT)) {
+                        echo "\n\x1B[43;30mDeprecation notices ($deprecations[0]):\x1B[0m\n";
+                    } else {
+                        echo "\nDeprecation notices ($deprecations[0]):\n";
+                    }
+
+                    foreach ($deprecations as $class => $notices) {
+                        if (0 !== $class) {
+                            echo "\n{$class}\n";
+                            foreach ($notices as $method => $notices) {
+                                echo "  ->{$method}()\n";
+                                foreach ($notices as $msg => $freq) {
+                                    echo "      {$msg}: $freq\n";
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (function_exists('posix_isatty') && @posix_isatty(STDOUT)) {
+                        echo "\n\x1B[42;30mNo deprecation notice\x1B[0m\n";
+                    } else {
+                        echo "\nNo deprecation notice\n";
+                    }
+                }
+            });
+        }
+    }
+}
+
+if (class_exists('PHPUnit_Util_ErrorHandler')) {
+    DeprecationErrorHandler::register();
+}
+
 $loader = require_once __DIR__.'/vendor/autoload.php';
 
 use Doctrine\Common\Annotations\AnnotationRegistry;

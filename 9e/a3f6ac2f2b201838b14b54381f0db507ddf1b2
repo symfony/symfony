@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T16:35:07Z
+
+Not really related to this PR, but I think that the Propel bridge should be removed from Symfony (3.0 or even 2.7?) and moved to the Propel organization. What do you think?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-21T16:39:02Z
+
+I agree the Propel bridge should be removed from Symfony 3.0 and managed by the Propel organization.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-23T16:01:46Z
+
+@fabpot @hhamon I'd move it in 2.7. We could probably do it in a BC manner, right?

@@ -36,7 +36,7 @@ class PdoCasterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('BOTH', $attr['DEFAULT_FETCH_MODE']->class);
 
         $xCast = array(
-            "\0~\0inTransaction" => false,
+            "\0~\0inTransaction" => $pdo->inTransaction(),
             "\0~\0attributes" => array(
                 'CASE' => $attr['CASE'],
                 'ERRMODE' => $attr['ERRMODE'],

@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "symfony/finder": "~2.3",
-        "symfony/form": "~2.3,>=2.3.5",
+        "symfony/form": "~2.3.5",
         "symfony/http-kernel": "~2.3",
         "symfony/locale": "~2.0,>=2.0.5",
         "symfony/routing": "~2.2",

@@ -59,3 +59,27 @@ Form
             }
         }
    ```
+
+Serializer
+----------
+
+ * The `setCamelizedAttributes()` method of the
+   `Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` classes is marked
+   as deprecated in favor of the new NameConverter system.
+
+   Before:
+
+   ```php
+   $normalizer->setCamelizedAttributes(array('foo_bar', 'bar_foo'));
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+   use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+
+   $nameConverter = new CamelCaseToSnakeCaseNameConverter(array('fooBar', 'barFoo'));
+   $normalizer = new GetSetMethodNormalizer(null, $nameConverter);
+   ```

@@ -14,6 +14,8 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Normalizer implementation.
@@ -25,6 +27,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     protected $circularReferenceLimit = 1;
     protected $circularReferenceHandler;
     protected $classMetadataFactory;
+    protected $nameConverter;
     protected $callbacks = array();
     protected $ignoredAttributes = array();
     protected $camelizedAttributes = array();
@@ -32,11 +35,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Sets the {@link ClassMetadataFactory} to use.
      *
-     * @param ClassMetadataFactory $classMetadataFactory
+     * @param ClassMetadataFactory|null   $classMetadataFactory
+     * @param NameConverterInterface|null $nameConverter
      */
-    public function __construct(ClassMetadataFactory $classMetadataFactory = null)
+    public function __construct(ClassMetadataFactory $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -114,13 +119,28 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set attributes to be camelized on denormalize.
      *
+     * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.
+     *
      * @param array $camelizedAttributes
      *
      * @return self
      */
     public function setCamelizedAttributes(array $camelizedAttributes)
     {
-        $this->camelizedAttributes = $camelizedAttributes;
+        trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
+
+        if ($this->nameConverter && !$this->nameConverter instanceof CamelCaseToSnakeCaseNameConverter) {
+            throw new \LogicException(sprintf('%s cannot be called if a custom Name Converter is defined.', __METHOD__));
+        }
+
+        $attributes = array();
+        foreach ($camelizedAttributes as $camelizedAttribute) {
+            $attributes[] = lcfirst(preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
+                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
+            }, $camelizedAttribute));
+        }
+
+        $this->nameConverter = new CamelCaseToSnakeCaseNameConverter($attributes);
 
         return $this;
     }
@@ -178,18 +198,17 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Format an attribute name, for example to convert a snake_case name to camelCase.
      *
+     * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.
+     *
      * @param string $attributeName
+     *
      * @return string
      */
     protected function formatAttribute($attributeName)
     {
-        if (in_array($attributeName, $this->camelizedAttributes)) {
-            return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-            }, $attributeName);
-        }
+        trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
 
-        return $attributeName;
+        return $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
     }
 
     /**
@@ -272,14 +291,15 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
             $params = array();
             foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
+                $paramName = $constructorParameter->name;
+                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
 
                 $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
                 $ignored = in_array($paramName, $this->ignoredAttributes);
-                if ($allowed && !$ignored && isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
+                if ($allowed && !$ignored && isset($data[$key])) {
+                    $params[] = $data[$key];
                     // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
+                    unset($data[$key]);
                 } elseif ($constructorParameter->isOptional()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {

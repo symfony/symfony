@@ -77,6 +77,10 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                     $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
                 }
 
+                if ($this->nameConverter) {
+                    $attributeName = $this->nameConverter->normalize($attributeName);
+                }
+
                 $attributes[$attributeName] = $attributeValue;
             }
         }
@@ -102,7 +106,11 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
-                $setter = 'set'.$this->formatAttribute($attribute);
+                if ($this->nameConverter) {
+                    $attribute = $this->nameConverter->denormalize($attribute);
+                }
+
+                $setter = 'set'.ucfirst($attribute);
 
                 if (method_exists($object, $setter)) {
                     $object->$setter($value);

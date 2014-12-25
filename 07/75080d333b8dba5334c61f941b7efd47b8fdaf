@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-25T10:09:25Z
+
+@nicolas-grekas Can you add a test so that we avoid any regressions in the future?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-25T10:40:35Z
+
+This is already tested (see the touch of the linked file after the link creation)
+
+---------------------------------------------------------------------------
+
+by 1ed at 2014-12-25T11:01:59Z
+
+I think this breaks the `assets:install` command new fallback mechanism in certain cases discussed in https://github.com/symfony/symfony/issues/11297
+
+I have a pending PR where I put back the check into the command itself https://github.com/symfony/symfony/pull/13057/files#diff-8948f478796eebd6196480b10309a0a9R158, but I don't know if it is acceptable with the other changes I made or not.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-25T11:19:30Z
+
+@1ed patch updated, can you please check if that's ok now?
+
+---------------------------------------------------------------------------
+
+by 1ed at 2014-12-25T12:00:56Z
+
+@nicolas-grekas It looks fine, but I can't test it as I don't have windows.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2014-12-25T18:17:07Z
+
+Looks good, thanks for the patch! :+1:

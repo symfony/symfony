@@ -52,13 +52,19 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    /**
+     * @var bool
+     */
+    private $reindex;
+
+    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false, $reindex = false)
     {
         $this->type = $type;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
         $this->options = $options;
         $this->deleteEmpty = $deleteEmpty;
+        $this->reindex = $reindex;
     }
 
     public static function getSubscribedEvents()
@@ -108,6 +114,37 @@ class ResizeFormListener implements EventSubscriberInterface
 
         if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             $data = array();
+        }
+
+        // Fix array indices
+        if ($this->reindex) {
+            $tempData = array();
+            foreach ($form as $name => $child) {
+                if (isset($data[$name])) {
+                    $tempData[$name] = $data[$name];
+                    unset($data[$name]);
+                } else {
+                    $tempData[$name] = null;
+                }
+            }
+
+            $toDelete = array();
+            foreach ($data as $name => $child) {
+                $tempData[] = $child;
+                $toDelete[] = $name;
+            }
+
+            foreach ($toDelete as $name) {
+                unset($data[$name]);
+            }
+
+            foreach ($tempData as $name => $child) {
+                if (null !== $child) {
+                    $data[$name] = $child;
+                }
+            }
+
+            $event->setData($data);
         }
 
         // Remove all empty rows

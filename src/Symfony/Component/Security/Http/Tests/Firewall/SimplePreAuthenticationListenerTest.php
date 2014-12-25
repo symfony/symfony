@@ -110,10 +110,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->request))
         ;
 
-        $this->logger = $this->getMockBuilder('Symfony\Bridge\Monolog\Logger')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
         $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
             ->disableOriginalConstructor()

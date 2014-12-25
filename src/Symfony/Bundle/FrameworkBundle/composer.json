@@ -41,7 +41,7 @@
         "symfony/security": "~2.6",
         "symfony/form": "~2.6",
         "symfony/class-loader": "~2.1",
-        "symfony/expression-language": "~2.4",
+        "symfony/expression-language": "~2.6",
         "symfony/process": "~2.0,>=2.0.5",
         "symfony/validator": "~2.5",
         "symfony/yaml": "~2.0,>=2.0.5"

@@ -25,7 +25,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serializer.yml');
+        $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
     }
 

@@ -498,6 +498,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('debug.stopwatch'));
     }
 
+    public function testSerializerDisabled()
+    {
+        $container = $this->createContainerFromFile('default_config');
+        $this->assertFalse($container->has('serializer'));
+    }
+
+    public function testSerializerEnabled()
+    {
+        $container = $this->createContainerFromFile('full');
+        $this->assertTrue($container->has('serializer'));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

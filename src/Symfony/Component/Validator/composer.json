@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/translation": "~2.0,>=2.0.5"
+        "symfony/translation": "^2.0.5"
     },
     "require-dev": {
         "symfony/http-foundation": "~2.1",
         "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/yaml": "^2.0.5",
         "symfony/config": "~2.2"
     },
     "suggest": {

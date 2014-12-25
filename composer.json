@@ -63,7 +63,7 @@
     "require-dev": {
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/orm": "^2.2.3",
         "monolog/monolog": "~1.3",
         "propel/propel1": "~1.6",
         "ircmaxell/password-compat": "~1.0",

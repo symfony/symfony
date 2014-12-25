@@ -22,8 +22,8 @@
         "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
-        "symfony/form": "~2.0,>=2.0.5",
-        "symfony/locale": "~2.0,>=2.0.5",
+        "symfony/form": "^2.0.5",
+        "symfony/locale": "^2.0.5",
         "symfony/routing": "~2.2",
         "symfony/validator": "~2.2",
         "doctrine/common": "~2.2",

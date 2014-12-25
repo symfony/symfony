@@ -567,15 +567,15 @@ class SecurityExtension extends Extension
 
     private function createRequestMatcher($container, $path = null, $host = null, $methods = array(), $ip = null, array $attributes = array())
     {
+        if ($methods) {
+            $methods = array_map('strtoupper', (array) $methods);
+        }
+
         $serialized = serialize(array($path, $host, $methods, $ip, $attributes));
         $id = 'security.request_matcher.'.md5($serialized).sha1($serialized);
 
         if (isset($this->requestMatchers[$id])) {
             return $this->requestMatchers[$id];
-        }
-
-        if ($methods) {
-            $methods = array_map('strtoupper', (array) $methods);
         }
 
         // only add arguments that are necessary

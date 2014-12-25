@@ -18,8 +18,21 @@
 
         <!-- Normalizer -->
         <service id="serializer.normalizer.get_set_method" class="Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer" public="false">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+
             <!-- Run after all custom serializers -->
             <tag name="serializer.normalizer" priority="-1000" />
+        </service>
+
+        <!-- Loader -->
+        <service id="serializer.mapping.chain_loader" class="Symfony\Component\Serializer\Mapping\Loader\LoaderChain" public="false">
+            <argument type="collection" />
+        </service>
+
+        <!-- Class Metadata Factory -->
+        <service id="serializer.mapping.class_metadata_factory" class="Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory" public="false">
+            <argument type="service" id="serializer.mapping.chain_loader" />
+            <argument>null</argument>
         </service>
 
         <!-- Encoders -->

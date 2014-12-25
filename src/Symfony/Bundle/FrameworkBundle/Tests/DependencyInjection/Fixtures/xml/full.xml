@@ -37,5 +37,6 @@
         <framework:translator enabled="true" fallback="fr" logging="true" />
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+        <framework:serializer enabled="true" />
     </framework:config>
 </container>

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -29,6 +30,7 @@ use Symfony\Component\Validator\Validation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class FrameworkExtension extends Extension
 {
@@ -121,11 +123,10 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
 
-        if (isset($config['serializer']) && $config['serializer']['enabled']) {
-            $loader->load('serializer.xml');
+        if (isset($config['serializer'])) {
+            $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
         $loader->load('debug_prod.xml');
@@ -864,6 +865,75 @@ class FrameworkExtension extends Extension
 
         // Enable services for CSRF protection (even without forms)
         $loader->load('security_csrf.xml');
+    }
+
+    /**
+     * Loads the serializer configuration.
+     *
+     * @param array            $config A serializer configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader An XmlFileLoader instance
+     */
+    private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $loader->load('serializer.xml');
+        $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
+
+        $serializerLoaders = array();
+        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            $annotationLoader = new Definition(
+                'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
+                 array(new Reference('annotation_reader'))
+            );
+            $annotationLoader->setPublic(false);
+
+            $serializerLoaders[] = $annotationLoader;
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            $dirname = dirname($reflection->getFilename());
+
+            if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_file($file = $dirname.'/Resources/config/serialization.yml')) {
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+        }
+
+        $chainLoader->replaceArgument(0, $serializerLoaders);
+
+        if (isset($config['cache']) && $config['cache'] !== 'none') {
+            $container->setParameter(
+                'serializer.mapping.cache.prefix',
+                'serializer_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+            );
+
+            if ($config['cache'] === 'apc') {
+                $apcCacheDefinition = $container->register('serializer.mapping.cache.apc', 'Doctrine\Common\Cache\ApcCache');
+                $apcCacheDefinition->addMethodCall('setNamespace', array('%serializer.mapping.cache.prefix%'));
+                $apcCacheDefinition->setPublic(false);
+            }
+
+            $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
+                1, new Reference('serializer.mapping.cache.'.$config['cache'])
+            );
+        }
     }
 
     /**

@@ -106,6 +106,9 @@ EOT
 
                     try {
                         $filesystem->symlink($relativeOriginDir, $targetDir);
+                        if (!file_exists($targetDir)) {
+                            throw new IOException('Symbolic link is broken');
+                        }
                         $output->writeln('The assets were installed using symbolic links.');
                     } catch (IOException $e) {
                         if (!$input->getOption('relative')) {
@@ -116,6 +119,9 @@ EOT
                         // try again without the relative option
                         try {
                             $filesystem->symlink($originDir, $targetDir);
+                            if (!file_exists($targetDir)) {
+                                throw new IOException('Symbolic link is broken');
+                            }
                             $output->writeln('It looks like your system doesn\'t support relative symbolic links, so the assets were installed by using absolute symbolic links.');
                         } catch (IOException $e) {
                             $this->hardCopy($originDir, $targetDir);

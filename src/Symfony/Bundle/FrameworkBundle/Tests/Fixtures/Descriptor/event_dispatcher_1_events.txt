@@ -1,16 +1,12 @@
 <info>[event_dispatcher]</info> Registered listeners by event
 
 <info>[Event]</info> event1
-+-------+-------------------+
-| Order | Callable          |
-+-------+-------------------+
-| #1    | global_function() |
-| #2    | \Closure()        |
-+-------+-------------------+
 
 <info>[Event]</info> event2
 +-------+-----------------------------------------------------------------------------------+
-| Order | Callable                                                                          |
+|[32m Order [39m|[32m Callable                                                                          [39m|
 +-------+-----------------------------------------------------------------------------------+
+| #1    | global_function()                                                                 |
+| #2    | \Closure()                                                                        |
 | #1    | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\CallableClass::__invoke() |
 +-------+-----------------------------------------------------------------------------------+

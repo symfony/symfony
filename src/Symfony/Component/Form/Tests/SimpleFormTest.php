@@ -122,19 +122,19 @@ class SimpleFormTest extends AbstractFormTest
     public function testFalseIsConvertedToNull()
     {
         $mock = $this->getMockBuilder('\stdClass')
-            ->setMethods(array('preBind'))
+            ->setMethods(array('preSubmit'))
             ->getMock();
         $mock->expects($this->once())
-            ->method('preBind')
+            ->method('preSubmit')
             ->with($this->callback(function ($event) {
                 return null === $event->getData();
             }));
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
-        $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preBind'));
+        $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preSubmit'));
         $form = new Form($config);
 
-        $form->submit(false);
+        $form->bind(false);
 
         $this->assertTrue($form->isValid());
         $this->assertNull($form->getData());

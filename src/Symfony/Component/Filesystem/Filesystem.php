@@ -286,9 +286,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        $onWindows = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN';
-
-        if ($onWindows && $copyOnWindows) {
+        if (defined('PHP_WINDOWS_VERSION_MAJOR') && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
 
             return;
@@ -314,10 +312,6 @@ class Filesystem
                     }
                 }
                 throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
-            }
-
-            if (!file_exists($targetDir)) {
-                throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $targetDir), 0, null, $targetDir);
             }
         }
     }

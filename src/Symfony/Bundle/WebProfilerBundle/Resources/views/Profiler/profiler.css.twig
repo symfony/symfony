@@ -237,9 +237,25 @@ table th.value {
     background-color: #dfeeb8;
 }
 #content h2 {
-    font-size: 24px;
-    color: #313131;
+    font-size: 13px;
     font-weight: bold;
+    color: #313131;
+    line-height: 18px;
+    padding: 10px 10px 7px 10px;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    text-decoration: none;
+    min-height: 20px;
+    background: #d1d1d1 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA7CAAAAACfn7+eAAAACXZwQWcAAAABAAAAOwDiPIGUAAAAJElEQVQIW2N4y8TA9B+KGZDYEP5/FD4Eo7IgNLJqZDUIMRRTAcmVHUZf/1g/AAAAAElFTkSuQmCC) repeat-x 0 0;
+    border-top-right-radius: 16px;
+    border-collapse: collapse;
+    border: 1px solid #d0dbb3;
+    z-index: 10000;
+}
+
+#content table {
+    margin-top: 0px;
+    border-top: none;
 }
 #content #main {
     padding: 0;
@@ -250,6 +266,15 @@ table th.value {
     color: #313131;
     font-size: 14px;
     padding-bottom: 20px;
+}
+#content #main p.sf-no-data {
+    background-color: #f1f7e2;
+    border: 1px solid #d0dbb3;
+    border-top: 0;
+    margin-bottom: 20px;
+    padding: 5px 10px;
+    color: #848484;
+    font-size: 13px;
 }
 .sf-toolbarreset {
     border-top: 0;
@@ -287,6 +312,10 @@ ul.alt li.scream, ul.alt li.scream strong {
 ul.sf-call-stack li {
     text-size: small;
     padding: 0 0 0 20px;
+}
+ul.sf-list-bordered {
+    border: 1px solid #d0dbb3;
+    padding: 3px;
 }
 td.main, td.menu {
     text-align: left;

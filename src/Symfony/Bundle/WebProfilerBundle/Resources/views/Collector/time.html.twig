@@ -42,7 +42,7 @@
     {% if collector.events|length %}
         {{ block('panelContent') }}
     {% else %}
-        <p>
+        <p class="sf-no-data">
             <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</em>
         </p>
     {% endif %}

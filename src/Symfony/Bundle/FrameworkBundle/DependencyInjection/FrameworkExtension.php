@@ -40,6 +40,7 @@ class FrameworkExtension extends Extension
      *
      * @param array            $configs
      * @param ContainerBuilder $container
+     * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -711,9 +712,7 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('validator.translation_domain', $config['translation_domain']);
 
-        $xmlMappings = $this->getValidatorXmlMappingFiles($container);
-        $yamlMappings = $this->getValidatorYamlMappingFiles($container);
-
+        list($xmlMappings, $yamlMappings) = $this->getValidatorMappingFiles($container);
         if (count($xmlMappings) > 0) {
             $validatorBuilder->addMethodCall('addXmlMappings', array($xmlMappings));
         }
@@ -766,35 +765,28 @@ class FrameworkExtension extends Extension
         $container->setParameter('validator.api', $api);
     }
 
-    private function getValidatorXmlMappingFiles(ContainerBuilder $container)
+    private function getValidatorMappingFiles(ContainerBuilder $container)
     {
-        $files = array();
+        $files = array(array(), array());
 
         if (interface_exists('Symfony\Component\Form\FormInterface')) {
             $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
-            $files[] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
-            $container->addResource(new FileResource($files[0]));
+            $files[0][] = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
+            $container->addResource(new FileResource($files[0][0]));
         }
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.xml')) {
-                $files[] = realpath($file);
+            $dirname = dirname($reflection->getFilename());
+
+            if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
+                $files[0][] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
-        }
 
-        return $files;
-    }
-
-    private function getValidatorYamlMappingFiles(ContainerBuilder $container)
-    {
-        $files = array();
-
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/validation.yml')) {
-                $files[] = realpath($file);
+            if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
+                $files[1][] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
         }

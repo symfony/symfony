@@ -77,7 +77,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->sendContent();
 
         $this->assertEquals(206, $response->getStatusCode());
-        $this->assertEquals('binary', $response->headers->get('Content-Transfer-Encoding'));
         $this->assertEquals($responseRange, $response->headers->get('Content-Range'));
     }
 
@@ -113,7 +112,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->sendContent();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('binary', $response->headers->get('Content-Transfer-Encoding'));
     }
 
     public function provideFullFileRanges()
@@ -144,7 +142,6 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->sendContent();
 
         $this->assertEquals(416, $response->getStatusCode());
-        $this->assertEquals('binary', $response->headers->get('Content-Transfer-Encoding'));
         #$this->assertEquals('', $response->headers->get('Content-Range'));
     }
 

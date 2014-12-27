@@ -17,14 +17,23 @@ use Doctrine\DBAL\Schema\Schema;
  * DBAL Session Storage Schema.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Hugo Hamon <hugohamon@neuf.fr>
  */
 final class DbalSessionHandlerSchema extends Schema
 {
-    public function __construct($tableName = 'sessions')
+    /**
+     * Constructor.
+     *
+     * @param string $tableName  The session table name
+     * @param string $idColumn   The session id table column
+     * @param string $dataColumn The session data table column
+     * @param string $timeColumn The session time table column
+     */
+    public function __construct($tableName = 'sessions', $idColumn = 'sess_id', $dataColumn = 'sess_data', $timeColumn = 'sess_time')
     {
         parent::__construct();
 
-        $this->addSessionTable($tableName);
+        $this->addSessionTable($tableName, $idColumn, $dataColumn, $timeColumn);
     }
 
     public function addToSchema(Schema $schema)
@@ -34,12 +43,12 @@ final class DbalSessionHandlerSchema extends Schema
         }
     }
 
-    private function addSessionTable($tableName)
+    private function addSessionTable($tableName, $idColumn, $dataColumn, $timeColumn)
     {
         $table = $this->createTable($tableName);
-        $table->addColumn('sess_id', 'string');
-        $table->addColumn('sess_data', 'text')->setNotNull(true);
-        $table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);
-        $table->setPrimaryKey(array('sess_id'));
+        $table->addColumn($idColumn, 'string');
+        $table->addColumn($dataColumn, 'text')->setNotNull(true);
+        $table->addColumn($timeColumn, 'integer')->setNotNull(true)->setUnsigned(true);
+        $table->setPrimaryKey(array($idColumn));
     }
 }

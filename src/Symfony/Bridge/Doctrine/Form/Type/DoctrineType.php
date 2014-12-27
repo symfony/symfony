@@ -42,6 +42,12 @@ abstract class DoctrineType extends AbstractType
      */
     private $propertyAccessor;
 
+    /**
+     * Constructor.
+     *
+     * @param ManagerRegistry                $registry
+     * @param PropertyAccessorInterface|null $propertyAccessor
+     */
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->registry = $registry;

@@ -25,7 +25,7 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
  *     <webprofiler:config
  *        toolbar="true"
  *        intercept-redirects="true"
- *    />
+ *     />
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

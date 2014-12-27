@@ -30,6 +30,8 @@ class UniqueEntityValidator extends ConstraintValidator
     private $registry;
 
     /**
+     * Constructor.
+     *
      * @param ManagerRegistry $registry
      */
     public function __construct(ManagerRegistry $registry)

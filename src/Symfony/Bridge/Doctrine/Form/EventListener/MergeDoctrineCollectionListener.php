@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see    Doctrine\Common\Collections\Collection
+ * @see \Doctrine\Common\Collections\Collection
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {

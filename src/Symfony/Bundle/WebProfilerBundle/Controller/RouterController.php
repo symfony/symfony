@@ -38,7 +38,7 @@ class RouterController
         $this->matcher = $matcher;
         $this->routes = $routes;
 
-        if (null === $this->routes && $this->matcher instanceof RouterInterface) {
+        if (null === $this->routes && $matcher instanceof RouterInterface) {
             $this->routes = $matcher->getRouteCollection();
         }
     }

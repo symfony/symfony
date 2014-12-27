@@ -28,6 +28,12 @@ class ExceptionController
     protected $twig;
     protected $debug;
 
+    /**
+     * Constructor.
+     *
+     * @param \Twig_Environment $twig  The Twig instance
+     * @param bool              $debug Whether or not debug mode is enabled
+     */
     public function __construct(\Twig_Environment $twig, $debug)
     {
         $this->twig = $twig;

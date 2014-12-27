@@ -40,28 +40,34 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * @var string Column for session id
      */
-    private $idCol = 'sess_id';
+    private $idCol;
 
     /**
      * @var string Column for session data
      */
-    private $dataCol = 'sess_data';
+    private $dataCol;
 
     /**
      * @var string Column for timestamp
      */
-    private $timeCol = 'sess_time';
+    private $timeCol;
 
     /**
      * Constructor.
      *
-     * @param Connection $con       A connection
-     * @param string     $tableName Table name
+     * @param Connection $con        A database connection handler
+     * @param string     $tableName  The session table name
+     * @param string     $idColumn   The session id table column
+     * @param string     $dataColumn The session data table column
+     * @param string     $timeColumn The session time table column
      */
-    public function __construct(Connection $con, $tableName = 'sessions')
+    public function __construct(Connection $con, $tableName = 'sessions', $idColumn = 'sess_id', $dataColumn = 'sess_data', $timeColumn = 'sess_time')
     {
         $this->con = $con;
         $this->table = $tableName;
+        $this->idCol = $idColumn;
+        $this->dataCol = $dataColumn;
+        $this->timeCol = $timeColumn;
     }
 
     /**

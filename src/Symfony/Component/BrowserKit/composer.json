@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/dom-crawler": "~2.0,>=2.0.5"
+        "symfony/dom-crawler": "~2.0,>=2.0.5|~3.0.0"
     },
     "require-dev": {
-        "symfony/process": "~2.0,>=2.0.5",
-        "symfony/css-selector": "~2.0,>=2.0.5"
+        "symfony/process": "~2.0,>=2.0.5|~3.0.0",
+        "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0"
     },
     "suggest": {
         "symfony/process": ""

@@ -18,6 +18,8 @@ use Symfony\Component\Routing\RequestContext;
  * Twig extension for Symfony assets helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.7, to be removed in 3.0. Use Symfony\Component\Twig\Extension\AssetExtension instead.
  */
 class AssetsExtension extends \Twig_Extension
 {
@@ -57,6 +59,8 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
+        trigger_error('The Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_path() instead.', E_USER_DEPRECATED);
+
         $url = $this->container->get('templating.helper.assets')->getUrl($path, $packageName, $version);
 
         if (!$absolute) {
@@ -75,6 +79,8 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetsVersion($packageName = null)
     {
+        trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
+
         return $this->container->get('templating.helper.assets')->getVersion($packageName);
     }
 

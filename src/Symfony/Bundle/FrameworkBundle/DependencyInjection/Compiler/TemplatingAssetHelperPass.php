@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @deprecated since 2.7, will be removed in 3.0
+ */
 class TemplatingAssetHelperPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

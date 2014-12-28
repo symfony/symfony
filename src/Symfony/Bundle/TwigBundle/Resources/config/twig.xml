@@ -92,6 +92,10 @@
             <argument type="service" id="router.request_context" on-invalid="null" />
         </service>
 
+        <service id="twig.extension.new_assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
+            <argument type="service" id="assets.packages" />
+        </service>
+
         <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
             <argument type="service" id="fragment.handler" />
         </service>

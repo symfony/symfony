@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="assets.packages" class="Symfony\Component\Asset\Packages">
+            <argument /> <!-- default package -->
+            <argument type="collection" /> <!-- named packages -->
+        </service>
+
+        <service id="assets.context" class="Symfony\Component\Asset\Context\RequestStackContext">
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true">
+            <argument /> <!-- base path -->
+            <argument type="service" /> <!-- version strategy -->
+            <call method="setContext">
+                <argument type="service" id="assets.context" />
+            </call>
+        </service>
+
+        <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true">
+            <argument /> <!-- base URLs -->
+            <argument type="service" /> <!-- version strategy -->
+            <call method="setContext">
+                <argument type="service" id="assets.context" />
+            </call>
+        </service>
+
+        <service id="assets.static_version_strategy" class="Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy" abstract="true">
+            <argument /> <!-- version -->
+            <argument /> <!-- format -->
+        </service>
+
+        <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" public="false" />
+
+    </services>
+</container>

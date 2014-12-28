@@ -13,7 +13,7 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
-class AssetsHelperTest extends \PHPUnit_Framework_TestCase
+class LegacyAssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetVersion()
     {

@@ -101,6 +101,10 @@ class FrameworkExtension extends Extension
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
+        if (isset($config['assets'])) {
+            $this->registerAssetsConfiguration($config['assets'], $container, $loader);
+        }
+
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
@@ -630,6 +634,86 @@ class FrameworkExtension extends Extension
         ;
 
         return $package;
+    }
+
+    /**
+     * Loads the assets configuration.
+     *
+     * @param array            $config    A assets configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('assets.xml');
+
+        $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format']);
+
+        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
+        $container->setDefinition('assets._default_package', $defaultPackage);
+
+        $namedPackages = array();
+        foreach ($config['packages'] as $name => $package) {
+            if (null === $package['version']) {
+                $version = $defaultVersion;
+            } else {
+                $format = $package['version_format'] ?: $config['version_format'];
+
+                $version = $this->createVersion($container, $package['version'], $format, $name);
+            }
+
+            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
+            $namedPackages[$name] = new Reference('assets._package_'.$name);
+        }
+
+        $container->getDefinition('assets.packages')
+            ->replaceArgument(0, new Reference('assets._default_package'))
+            ->replaceArgument(1, $namedPackages)
+        ;
+    }
+
+    /**
+     * Returns a definition for an asset package.
+     */
+    private function createPackageDefinition($basePath, array $baseUrls, Reference $version)
+    {
+        if ($basePath && $baseUrls) {
+            throw new \LogicException('An asset package cannot have base URLs and base paths.');
+        }
+
+        if (!$baseUrls) {
+            $package = new DefinitionDecorator('assets.path_package');
+
+            return $package
+                ->setPublic(false)
+                ->replaceArgument(0, $basePath)
+                ->replaceArgument(1, $version)
+            ;
+        }
+
+        $package = new DefinitionDecorator('assets.url_package');
+
+        return $package
+            ->setPublic(false)
+            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(1, $version)
+        ;
+    }
+
+    private function createVersion(ContainerBuilder $container, $version, $format, $name = null)
+    {
+        if (!$version) {
+            return new Reference('assets.empty_version_strategy');
+        }
+
+        $def = new DefinitionDecorator('assets.static_version_strategy');
+        $def
+            ->replaceArgument(0, $version)
+            ->replaceArgument(1, $format)
+        ;
+        $container->setDefinition('assets._version_'.$name, $def);
+
+        return new Reference('assets._version_'.$name);
     }
 
     /**

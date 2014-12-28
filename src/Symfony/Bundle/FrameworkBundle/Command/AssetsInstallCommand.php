@@ -108,28 +108,22 @@ EOT
             $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
             $this->filesystem->remove($targetDir);
 
-            if ($symlink) {
-                try {
-                    $relative = $this->symlink($originDir, $targetDir, $input->getOption('relative'));
-                    $table->addRow(array(
-                        $bundle->getNamespace(),
-                        $targetDir,
-                        sprintf('%s symbolic link', $relative ? 'relative' : 'absolute'),
-                    ));
-
-                    continue;
-                } catch (IOException $e) {
-                    // fall back to hard copy
-                }
-            }
-
             try {
-                $this->hardCopy($originDir, $targetDir);
-                $table->addRow(array($bundle->getNamespace(), $targetDir, 'hard copy'));
+                if ($symlink) {
+                    if ($input->getOption('relative')) {
+                        $methodOrError = $this->relativeSymlinkWithFallback($originDir, $targetDir);
+                    } else {
+                        $methodOrError = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
+                    }
+                } else {
+                    $methodOrError = $this->hardCopy($originDir, $targetDir);
+                }
             } catch (IOException $e) {
-                $table->addRow(array($bundle->getNamespace(), $targetDir, sprintf('<error>%s</error>', $e->getMessage())));
+                $methodOrError = sprintf('<error>%s</error>', $e->getMessage());
                 $failed = 1;
             }
+
+            $table->addRow(array($bundle->getNamespace(), $targetDir, $methodOrError));
         }
 
         $table->render();
@@ -138,51 +132,84 @@ EOT
     }
 
     /**
-     * Creates links with absolute as a fallback.
+     * Try to create relative symlink.
      *
-     * @param string $origin
-     * @param string $target
-     * @param bool $relative
+     * Falling back to absolute symlink and finally hard copy.
      *
-     * @throws IOException If link can not be created.
+     * @param string $originDir
+     * @param string $targetDir
      *
-     * @return bool Created a relative link or not.
+     * @return string
      */
-    private function symlink($origin, $target, $relative = true)
+    private function relativeSymlinkWithFallback($originDir, $targetDir)
     {
         try {
-            $this->filesystem->symlink(
-                $relative ? $this->filesystem->makePathRelative($origin, realpath(dirname($target))) : $origin,
-                $target
-            );
-            if (!file_exists($target)) {
-                throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $target), 0, null, $target);
-            }
+            $this->symlink($originDir, $targetDir, true);
+            $method = 'relative symbolic link';
         } catch (IOException $e) {
-            if ($relative) {
-                // relative link failed, try again with absolute
-                $this->filesystem->symlink($origin, $target);
-                if (!file_exists($target)) {
-                    throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $target), 0, null, $target);
-                }
-
-                return false;
-            }
-
-            throw $e;
+            $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
         }
 
-        return $relative;
+        return $method;
     }
 
     /**
+     * Try to create absolute symlink.
+     *
+     * Falling back to hard copy.
+     *
      * @param string $originDir
      * @param string $targetDir
+     *
+     * @return string
+     */
+    private function absoluteSymlinkWithFallback($originDir, $targetDir)
+    {
+        try {
+            $this->symlink($originDir, $targetDir);
+            $method = 'absolute symbolic link';
+        } catch (IOException $e) {
+            // fall back to copy
+            $method = $this->hardCopy($originDir, $targetDir);
+        }
+
+        return $method;
+    }
+
+    /**
+     * Creates symbolic link.
+     *
+     * @param string $originDir
+     * @param string $targetDir
+     * @param bool $relative
+     *
+     * @throws IOException If link can not be created.
+     */
+    private function symlink($originDir, $targetDir, $relative = false)
+    {
+        if ($relative) {
+            $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
+        }
+        $this->filesystem->symlink($originDir, $targetDir);
+        if (!file_exists($targetDir)) {
+            throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $targetDir), 0, null, $targetDir);
+        }
+    }
+
+    /**
+     * Copies origin to target.
+     *
+     * @param string $originDir
+     * @param string $targetDir
+     *
+     * @return string
      */
     private function hardCopy($originDir, $targetDir)
     {
         $this->filesystem->mkdir($targetDir, 0777);
         // We use a custom iterator to ignore VCS files
         $this->filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+
+        return 'hard copy';
     }
 }

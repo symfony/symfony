@@ -155,14 +155,18 @@ EOT
                 $relative ? $this->filesystem->makePathRelative($origin, realpath(dirname($target))) : $origin,
                 $target
             );
-
             if (!file_exists($target)) {
                 throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $target), 0, null, $target);
             }
         } catch (IOException $e) {
             if ($relative) {
-                // try again with absolute
-                return $this->symlink($origin, $target, false);
+                // relative link failed, try again with absolute
+                $this->filesystem->symlink($origin, $target);
+                if (!file_exists($target)) {
+                    throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $target), 0, null, $target);
+                }
+
+                return false;
             }
 
             throw $e;

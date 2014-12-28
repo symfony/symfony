@@ -99,41 +99,42 @@ EOT
         $table = new Table($output);
         $table->setHeaders(array('Source', 'Target', 'Method / Error'));
 
-        $ret = 0;
+        $failed = 0;
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
-            if (is_dir($originDir = $bundle->getPath().'/Resources/public')) {
-                $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            if (!is_dir($originDir = $bundle->getPath().'/Resources/public')) {
+                continue;
+            }
 
-                $this->filesystem->remove($targetDir);
+            $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
+            $this->filesystem->remove($targetDir);
 
-                if ($symlink) {
-                    try {
-                        $relative = $this->symlink($originDir, $targetDir, $input->getOption('relative'));
-                        $table->addRow(array(
-                            $bundle->getNamespace(),
-                            $targetDir,
-                            sprintf('%s symbolic link', $relative ? 'relative' : 'absolute'),
-                        ));
-
-                        continue;
-                    } catch (IOException $e) {
-                        // fall back to hard copy
-                    }
-                }
-
+            if ($symlink) {
                 try {
-                    $this->hardCopy($originDir, $targetDir);
-                    $table->addRow(array($bundle->getNamespace(), $targetDir, 'hard copy'));
+                    $relative = $this->symlink($originDir, $targetDir, $input->getOption('relative'));
+                    $table->addRow(array(
+                        $bundle->getNamespace(),
+                        $targetDir,
+                        sprintf('%s symbolic link', $relative ? 'relative' : 'absolute'),
+                    ));
+
+                    continue;
                 } catch (IOException $e) {
-                    $table->addRow(array($bundle->getNamespace(), $targetDir, sprintf('<error>%s</error>', $e->getMessage())));
-                    $ret = 1;
+                    // fall back to hard copy
                 }
+            }
+
+            try {
+                $this->hardCopy($originDir, $targetDir);
+                $table->addRow(array($bundle->getNamespace(), $targetDir, 'hard copy'));
+            } catch (IOException $e) {
+                $table->addRow(array($bundle->getNamespace(), $targetDir, sprintf('<error>%s</error>', $e->getMessage())));
+                $failed = 1;
             }
         }
 
         $table->render();
 
-        return $ret;
+        return $failed;
     }
 
     /**

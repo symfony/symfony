@@ -145,7 +145,7 @@ EOT
     {
         try {
             $this->symlink($originDir, $targetDir, true);
-            $method = 'relative symbolic link';
+            $method = 'relative symlink';
         } catch (IOException $e) {
             $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
         }
@@ -167,7 +167,7 @@ EOT
     {
         try {
             $this->symlink($originDir, $targetDir);
-            $method = 'absolute symbolic link';
+            $method = 'absolute symlink';
         } catch (IOException $e) {
             // fall back to copy
             $method = $this->hardCopy($originDir, $targetDir);
@@ -210,6 +210,6 @@ EOT
         // We use a custom iterator to ignore VCS files
         $this->filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
 
-        return 'hard copy';
+        return 'copy';
     }
 }

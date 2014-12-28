@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Exception;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -106,9 +107,10 @@ EOT
             }
 
             $targetDir = $bundlesDir.preg_replace('/bundle$/', '', strtolower($bundle->getName()));
-            $this->filesystem->remove($targetDir);
 
             try {
+                $this->filesystem->remove($targetDir);
+
                 if ($symlink) {
                     if ($input->getOption('relative')) {
                         $methodOrError = $this->relativeSymlinkWithFallback($originDir, $targetDir);
@@ -118,7 +120,7 @@ EOT
                 } else {
                     $methodOrError = $this->hardCopy($originDir, $targetDir);
                 }
-            } catch (IOException $e) {
+            } catch (Exception $e) {
                 $methodOrError = sprintf('<error>%s</error>', $e->getMessage());
                 $failed = 1;
             }

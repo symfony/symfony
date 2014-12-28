@@ -111,12 +111,10 @@ EOT
             try {
                 $this->filesystem->remove($targetDir);
 
-                if ($symlink) {
-                    if ($input->getOption('relative')) {
-                        $methodOrError = $this->relativeSymlinkWithFallback($originDir, $targetDir);
-                    } else {
-                        $methodOrError = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
-                    }
+                if ($input->getOption('relative')) {
+                    $methodOrError = $this->relativeSymlinkWithFallback($originDir, $targetDir);
+                } elseif ($symlink) {
+                    $methodOrError = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
                 } else {
                     $methodOrError = $this->hardCopy($originDir, $targetDir);
                 }

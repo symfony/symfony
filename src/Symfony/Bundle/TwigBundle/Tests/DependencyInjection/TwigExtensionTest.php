@@ -95,7 +95,8 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'customTemplateEscapingGuesser', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'my_project.some_bundle.template_escaping_guesser', 'guess');
+        $options = $container->getParameter('twig.options');
+        $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
     }
 
     /**
@@ -108,7 +109,8 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'empty', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'templating.engine.twig', 'guessDefaultEscapingStrategy');
+        $options = $container->getParameter('twig.options');
+        $this->assertEquals(array('Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy', 'guess'), $options['autoescape']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()
@@ -218,19 +220,5 @@ class TwigExtensionTest extends TestCase
         }
 
         $loader->load($file.'.'.$format);
-    }
-
-    private function assertTemplateEscapingGuesserDefinition(ContainerBuilder $container, $serviceId, $serviceMethod)
-    {
-        $def = $container->getDefinition('templating.engine.twig');
-
-        $this->assertCount(1, $def->getMethodCalls());
-
-        foreach ($def->getMethodCalls() as $call) {
-            if ('setDefaultEscapingStrategy' === $call[0]) {
-                $this->assertSame($serviceId, (string) $call[1][0][0]);
-                $this->assertSame($serviceMethod, $call[1][0][1]);
-            }
-        }
     }
 }

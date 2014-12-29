@@ -25,7 +25,7 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionOnAbstractTaggedSubscriber()
     {
@@ -41,7 +41,7 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionOnAbstractTaggedListener()
     {

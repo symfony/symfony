@@ -25,7 +25,7 @@ interface EncoderInterface
      * @param string $format  Format name
      * @param array  $context options that normalizers/encoders have access to.
      *
-     * @return scalar
+     * @return string|bool|int|float|null
      */
     public function encode($data, $format, array $context = array());
 

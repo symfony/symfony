@@ -18,7 +18,7 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     const TRUE_VALUE = '1';
 
     /**
-     * @var boolToStringTransformer
+     * @var BooleanToStringTransformer
      */
     protected $transformer;
 

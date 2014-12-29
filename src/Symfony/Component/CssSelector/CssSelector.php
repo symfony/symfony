@@ -24,7 +24,7 @@ use Symfony\Component\CssSelector\XPath\Translator;
  *
  * $xpath = CssSelector::toXpath('h1.foo');
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * Copyright (c) 2007-2012 Ian Bicking and contributors. See AUTHORS

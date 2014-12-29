@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 
 /**
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,7 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
     {
         ini_set('session.save_handler', 'files');
         ini_set('session.save_path', sys_get_temp_dir());
+        ini_set('error_reporting', -1 & ~E_USER_DEPRECATED);
     }
 
     protected function setUp()

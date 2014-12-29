@@ -57,8 +57,8 @@ class DateType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                'UTC',
-                'UTC',
+                null,
+                null,
                 $dateFormat,
                 $timeFormat,
                 $calendar,
@@ -73,7 +73,7 @@ class DateType extends AbstractType
                 \Locale::getDefault(),
                 $dateFormat,
                 $timeFormat,
-                'UTC',
+                null,
                 $calendar,
                 $pattern
             );
@@ -105,7 +105,7 @@ class DateType extends AbstractType
                 ->add('month', $options['widget'], $monthOptions)
                 ->add('day', $options['widget'], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    'UTC', 'UTC', array('year', 'month', 'day')
+                    null, null, array('year', 'month', 'day')
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -113,15 +113,15 @@ class DateType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d')
+                new DateTimeToStringTransformer(null, null, 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer('UTC', 'UTC')
+                new DateTimeToTimestampTransformer(null, null)
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer('UTC', 'UTC', array('year', 'month', 'day'))
+                new DateTimeToArrayTransformer(null, null, array('year', 'month', 'day'))
             ));
         }
     }

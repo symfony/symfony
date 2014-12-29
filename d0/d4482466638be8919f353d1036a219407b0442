@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-09T09:41:25Z
+
+@Soullivaneuh You could probably base your fix on the tests from #12843.
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2014-12-09T09:57:21Z
+
+@xabbuh ok I will rebase my commit and run this test when it will be merged.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-12-14T19:26:52Z
+
+The options that were used need to be readded too, as it's now a bc break (throwing an option does not exist exception)
+
+---------------------------------------------------------------------------
+
+by Soullivaneuh at 2014-12-15T08:38:38Z
+
+@WouterJ I understand. I made this PR in priority to fix a critical error for most applications.
+
+Don't know how @fabpot and symfony team want to manage this BC break.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-12-16T09:59:22Z
+
+Using Timezone for time doesn't make sense and leads to problems with DST (which was the original issue). So for that we can use UTC as timezone and `Jan 1st, 1970` as the date (for BC).
+
+The problem with the Date and timezone was that you could get the wrong date (for the same reason).
+https://github.com/symfony/symfony/issues/7187#issuecomment-17473741
+
+Doctrine also warns for storing an timezone specific DateTime in the DB and advises to use UTC as timezone instead.
+
+So for Date(Time) we should be able to use the timezone of the user (view) and convert it to UTC in the model.
+
+Time is simply something we can't fix without a Date, so using UTC for BC seems like the best compromise.
+
+---------------------------------------------------------------------------
+
+by lucagtc at 2014-12-16T11:02:32Z
+
+Why not implement a single option to determine the timezone to use. It can be set default to null or UTC or date_default_timezone_get().
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-12-16T11:10:20Z
+
+If you set the timezone to null it will use the default `date_default_timezone_get()`.
+
+---------------------------------------------------------------------------
+
+by lucagtc at 2014-12-18T18:14:33Z
+
+I sugest this solution (https://github.com/lucagtc/symfony/commit/0b3062f0f10797146359924fd3cb498236ba2c1b).
+Use only model_timezone.
+
+Doctrine (Propel I don't know, but it should be the same) by default create DateTime for date and time field with default timezone, so I'm suggest to leave model_timezone = null.
+
+Luca
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-20T18:36:19Z
+
+ping @webmozart
+
+---------------------------------------------------------------------------
+
+by acasademont at 2014-12-23T10:30:40Z
+
+The problem is that Doctrine creates DateTime objects with the default timezone in the "time" type but the Form Component assumes UTC in the model, so there's a nice break here.
+
+Even I agree that timezones make no sense in time types this is not a subtle change, it should have been done in 3.0 with some coordination with the Doctrine team.
+
++1 for the quick fix!

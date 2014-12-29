@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Tests\Fixtures\StubGlobalExecutionContext;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @since  2.5.3
+ * @since 2.5.3
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -167,13 +167,10 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
      *
      * @return ConstraintViolation
      *
-     * @deprecated To be removed in Symfony 3.0. Use
-     *             {@link buildViolation()} instead.
+     * @deprecated to be removed in Symfony 3.0. Use {@link buildViolation()} instead.
      */
     protected function createViolation($message, array $parameters = array(), $propertyPath = 'property.path', $invalidValue = 'InvalidValue', $plural = null, $code = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the buildViolation() method instead.', E_USER_DEPRECATED);
-
         return new ConstraintViolation(
             null,
             $message,

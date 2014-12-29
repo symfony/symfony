@@ -12,9 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTimeTypeTest extends TypeTestCase
+class DateTimeTypeTest extends TestCase
 {
     protected function setUp()
     {

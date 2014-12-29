@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class SessionHandlerProxyTest extends \PHPUnit_Framework_TestCase
 {

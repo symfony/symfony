@@ -303,7 +303,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.5 and will be removed in 3.0. The validator will function without a property accessor.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             The validator will function without a property accessor.
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
     {

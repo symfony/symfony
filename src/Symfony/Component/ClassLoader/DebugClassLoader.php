@@ -25,7 +25,8 @@ trigger_error('The '.__NAMESPACE__.'\DebugClassLoader class is deprecated since 
  *
  * @api
  *
- * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the DebugClassLoader provided by the Debug component instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Debug\DebugClassLoader} instead.
  */
 class DebugClassLoader
 {

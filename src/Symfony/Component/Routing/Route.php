@@ -147,7 +147,7 @@ class Route implements \Serializable
      *
      * @return string The pattern
      *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
      */
     public function getPattern()
     {
@@ -165,7 +165,7 @@ class Route implements \Serializable
      *
      * @return Route The current Route instance
      *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function setPattern($pattern)
     {

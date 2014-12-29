@@ -21,7 +21,8 @@ use Psr\Log\LoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated in 2.4, to be removed in 3.0. Use Psr\Log\LoggerInterface instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use Psr\Log\LoggerInterface instead.
  */
 class Debugger implements DebuggerInterface
 {

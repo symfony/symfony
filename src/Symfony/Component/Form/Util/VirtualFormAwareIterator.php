@@ -22,8 +22,8 @@ trigger_error('The '.__NAMESPACE__.'\VirtualFormAwareIterator class is deprecate
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link InheritDataAwareIterator} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link InheritDataAwareIterator} instead.
  */
 class VirtualFormAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {

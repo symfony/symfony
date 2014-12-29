@@ -417,7 +417,7 @@ class InputDefinition
      *
      * @return string A string representing the InputDefinition
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
@@ -437,7 +437,7 @@ class InputDefinition
      *
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {

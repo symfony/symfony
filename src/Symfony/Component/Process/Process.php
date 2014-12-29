@@ -1062,7 +1062,8 @@ class Process
      *
      * @return string|null The current contents
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use setInput() instead.
      *             This method is deprecated in favor of getInput.
      */
     public function getStdin()
@@ -1089,8 +1090,8 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
-     *             This method is deprecated in favor of setInput.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use setInput() instead.
      *
      * @throws LogicException           In case the process is running
      * @throws InvalidArgumentException In case the argument is invalid

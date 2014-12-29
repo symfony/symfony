@@ -60,7 +60,8 @@ trigger_error('The '.__NAMESPACE__.'\UniversalClassLoader class is deprecated si
  *
  * @api
  *
- * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the ClassLoader class instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use the {@link ClassLoader} class instead.
  */
 class UniversalClassLoader
 {

@@ -16,8 +16,8 @@ trigger_error('The '.__NAMESPACE__.'\AlreadyBoundException class is deprecated s
 /**
  * Alias of {@link AlreadySubmittedException}.
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link AlreadySubmittedException} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link AlreadySubmittedException} instead.
  */
 class AlreadyBoundException extends LogicException
 {

@@ -20,7 +20,7 @@ use Symfony\Component\Intl\Intl;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+ * @deprecated since version 2.3, to be removed in 3.0.
  *             Use {@link \Locale} and {@link \Symfony\Component\Intl\Intl} instead.
  */
 class Locale extends \Locale

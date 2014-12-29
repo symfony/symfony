@@ -199,7 +199,7 @@ class ChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
@@ -227,7 +227,7 @@ class ChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {

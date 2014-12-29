@@ -46,7 +46,9 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
-     * @deprecated The ability to pass file names to the Yaml::parse() method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
+     * @deprecated since version 2.2, to be removed in 3.0.
+     *             The ability to pass file names to the parse() method is
+     *             deprecated. Pass the YAML contents of the file instead.
      *
      * @api
      */
@@ -55,7 +57,7 @@ class Yaml
         // if input is a file, process it
         $file = '';
         if (strpos($input, "\n") === false && is_file($input)) {
-            trigger_error('The ability to pass file names to the Yaml::parse() method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
+            trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
 
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));

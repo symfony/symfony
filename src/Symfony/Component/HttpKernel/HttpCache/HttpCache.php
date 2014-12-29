@@ -170,7 +170,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Esi An Esi instance
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
      */
     public function getEsi()
     {

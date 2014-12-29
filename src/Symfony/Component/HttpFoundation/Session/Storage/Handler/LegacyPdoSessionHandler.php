@@ -24,7 +24,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  * @author Michael Williams <michael.williams@funsational.com>
  * @author Tobias Schultze <http://tobion.de>
  *
- * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use
+ * @deprecated since version 2.6, to be removed in 3.0. Use
  *             {@link PdoSessionHandler} instead.
  */
 class LegacyPdoSessionHandler implements \SessionHandlerInterface

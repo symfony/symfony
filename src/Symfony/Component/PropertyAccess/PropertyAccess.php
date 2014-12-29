@@ -43,8 +43,8 @@ final class PropertyAccess
      *
      * @return PropertyAccessor The new property accessor
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link createPropertyAccessor()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link createPropertyAccessor()} instead.
      */
     public static function getPropertyAccessor()
     {

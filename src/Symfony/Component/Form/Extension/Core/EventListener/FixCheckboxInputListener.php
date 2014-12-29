@@ -81,8 +81,8 @@ class FixCheckboxInputListener implements EventSubscriberInterface
     /**
      * Alias of {@link preSubmit()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link preSubmit()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link preSubmit()} instead.
      */
     public function preBind(FormEvent $event)
     {

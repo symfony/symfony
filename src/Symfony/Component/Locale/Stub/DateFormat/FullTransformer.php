@@ -20,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer as BaseFullT
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\FullTransformer}
  *             instead.
  */
 class FullTransformer extends BaseFullTransformer

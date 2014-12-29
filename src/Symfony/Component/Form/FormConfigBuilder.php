@@ -351,8 +351,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link getInheritData()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link getInheritData()} instead.
      */
     public function getVirtual()
     {
@@ -717,8 +717,8 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @return FormConfigBuilder The configuration object.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link setInheritData()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link setInheritData()} instead.
      */
     public function setVirtual($inheritData)
     {

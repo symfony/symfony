@@ -122,7 +122,7 @@ class DebugClassLoader
      *
      * @return string|null
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function findFile($class)
     {

@@ -83,7 +83,7 @@ namespace Symfony\Component\Validator;
  *
  * @api
  *
- * @deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface ExecutionContextInterface
@@ -118,7 +118,7 @@ interface ExecutionContextInterface
      *
      * @api
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::buildViolation()}
      *             instead.
      */
@@ -163,7 +163,7 @@ interface ExecutionContextInterface
      * @param bool                 $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead.
      */
@@ -196,7 +196,7 @@ interface ExecutionContextInterface
      *                                             groups here, the current group of the context
      *                                             will be used.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead.
      */
@@ -257,7 +257,7 @@ interface ExecutionContextInterface
      *
      * @return MetadataFactoryInterface The metadata factory.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead and call
      *             {@link Validator\ValidatorInterface::getMetadataFor()} or

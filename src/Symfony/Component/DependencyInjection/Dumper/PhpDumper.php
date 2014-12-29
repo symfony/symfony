@@ -1402,7 +1402,8 @@ EOF;
     }
 
     /**
-     * @deprecated Deprecated since version 2.6.2, to be removed in 3.0. Use Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
+     * @deprecated since version 2.6.2, to be removed in 3.0.
+     *             Use \Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
      *
      * @param ExpressionFunctionProviderInterface $provider
      */

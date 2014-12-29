@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Clément JOBEILI <clement.jobeili@gmail.com>
  *
- * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use
- *             MessageDataCollector of SwiftmailerBundle instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use the MessageDataCollector from SwiftmailerBundle instead.
  */
 class MessageDataCollector extends DataCollector
 {

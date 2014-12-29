@@ -20,6 +20,6 @@ trigger_error('The '.__NAMESPACE__.'\FlattenException class is deprecated since 
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
+ * @deprecated since version 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
  */
 class_exists('Symfony\Component\Debug\Exception\FlattenException');

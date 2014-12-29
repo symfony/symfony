@@ -55,7 +55,7 @@ class Route
     }
 
     /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function setPattern($pattern)
     {
@@ -65,7 +65,7 @@ class Route
     }
 
     /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
      */
     public function getPattern()
     {

@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory as Mapp
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Factory\BlackHoleMetadataFactory} instead.
  */
 class BlackholeMetadataFactory extends MappingBlackHoleMetadataFactory

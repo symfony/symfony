@@ -20,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\Transformer as BaseTransform
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Transformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Transformer}
  *             instead.
  */
 abstract class Transformer extends BaseTransformer

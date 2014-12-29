@@ -142,7 +142,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.7, to be removed in 3.0.
+     * @deprecated since version 2.7, to be removed in 3.0.
      *             Use getParameters() instead
      */
     public function getMessageParameters()
@@ -163,7 +163,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.7, to be removed in 3.0.
+     * @deprecated since version 2.7, to be removed in 3.0.
      *             Use getPlural() instead
      */
     public function getMessagePluralization()

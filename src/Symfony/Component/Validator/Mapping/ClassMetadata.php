@@ -129,7 +129,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
@@ -373,7 +373,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      *
      * @param MemberMetadata $metadata
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be in 3.0.
      */
     protected function addMemberMetadata(MemberMetadata $metadata)
     {
@@ -389,7 +389,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use {@link hasPropertyMetadata} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link hasPropertyMetadata} instead.
      */
     public function hasMemberMetadatas($property)
     {
@@ -405,7 +405,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      *
      * @return MemberMetadata[] An array of MemberMetadata
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use {@link getPropertyMetadata} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link getPropertyMetadata} instead.
      */
     public function getMemberMetadatas($property)
     {

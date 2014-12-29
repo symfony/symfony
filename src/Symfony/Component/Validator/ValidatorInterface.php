@@ -18,7 +18,7 @@ namespace Symfony\Component\Validator;
  *
  * @api
  *
- * @deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Validator\ValidatorInterface} instead.
  */
 interface ValidatorInterface
@@ -105,7 +105,7 @@ interface ValidatorInterface
      *
      * @api
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Validator\ValidatorInterface::getMetadataFor()} or
      *             {@link Validator\ValidatorInterface::hasMetadataFor()}
      *             instead.

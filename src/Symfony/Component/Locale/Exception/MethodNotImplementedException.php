@@ -20,8 +20,8 @@ use Symfony\Component\Intl\Exception\MethodNotImplementedException as BaseMethod
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\Exception\MethodNotImplementedException}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\Exception\MethodNotImplementedException}
  *             instead.
  */
 class MethodNotImplementedException extends BaseMethodNotImplementedException

@@ -46,8 +46,8 @@ class FixUrlProtocolListener implements EventSubscriberInterface
     /**
      * Alias of {@link onSubmit()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link onSubmit()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link onSubmit()} instead.
      */
     public function onBind(FormEvent $event)
     {

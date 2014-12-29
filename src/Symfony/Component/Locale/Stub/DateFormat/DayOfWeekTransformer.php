@@ -20,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\DayOfWeekTransformer as Base
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayOfWeekTransformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\DayOfWeekTransformer}
  *             instead.
  */
 class DayOfWeekTransformer extends BaseDayOfWeekTransformer

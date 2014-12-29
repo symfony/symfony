@@ -33,7 +33,7 @@ class Callback extends Constraint
     /**
      * @var array
      *
-     * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public $methods;
 

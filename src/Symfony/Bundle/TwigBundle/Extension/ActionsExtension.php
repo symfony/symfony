@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated in 2.2, to be removed in 3.0.
+ * @deprecated since version 2.2, to be removed in 3.0.
  */
 class ActionsExtension extends \Twig_Extension
 {

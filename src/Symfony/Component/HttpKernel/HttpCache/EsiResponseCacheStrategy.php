@@ -26,7 +26,7 @@ trigger_error('The '.__NAMESPACE__.'\EsiResponseCacheStrategy class is deprecate
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use ResponseCacheStrategy instead
+ * @deprecated since version 2.6, to be removed in 3.0. Use ResponseCacheStrategy instead
  */
 class EsiResponseCacheStrategy extends ResponseCacheStrategy implements EsiResponseCacheStrategyInterface
 {

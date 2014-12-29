@@ -21,8 +21,8 @@ trigger_error('The '.__NAMESPACE__.'\DefaultCsrfProvider is deprecated since ver
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0. Use
- *             {@link \Symfony\Component\Security\Csrf\CsrfTokenManager} in
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Security\Csrf\CsrfTokenManager} in
  *             combination with {@link \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage}
  *             instead.
  */

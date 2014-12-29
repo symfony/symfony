@@ -78,7 +78,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
@@ -187,7 +187,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getCascadingStrategy()} instead.
      */
     public function isCascaded()
@@ -203,7 +203,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getTraversalStrategy()} instead.
      */
     public function isCollectionCascaded()
@@ -219,7 +219,7 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getTraversalStrategy()} instead.
      */
     public function isCollectionCascadedDeeply()

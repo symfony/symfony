@@ -14,7 +14,8 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\Test\TypeTestCase as BaseTypeTestCase;
 
 /**
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use Symfony\Component\Form\Test\TypeTestCase instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Form\Test\TypeTestCase} instead.
  */
 abstract class TypeTestCase extends BaseTypeTestCase
 {

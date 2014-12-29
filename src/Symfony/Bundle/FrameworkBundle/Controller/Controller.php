@@ -267,8 +267,8 @@ class Controller extends ContainerAware
      *
      * @return Request
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0. Ask
-     *             Symfony to inject the Request object into your controller
+     * @deprecated since version 2.4, to be removed in 3.0.
+     *             Ask Symfony to inject the Request object into your controller
      *             method instead by type hinting it in the method's signature.
      */
     public function getRequest()

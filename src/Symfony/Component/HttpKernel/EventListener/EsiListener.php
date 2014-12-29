@@ -18,7 +18,7 @@ trigger_error('The '.__NAMESPACE__.'\EsiListener class is deprecated since versi
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use SurrogateListener instead
+ * @deprecated since version 2.6, to be removed in 3.0. Use SurrogateListener instead
  */
 class EsiListener extends SurrogateListener
 {

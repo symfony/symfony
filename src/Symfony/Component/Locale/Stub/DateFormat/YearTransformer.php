@@ -20,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer as BaseYearT
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\YearTransformer}
  *             instead.
  */
 class YearTransformer extends BaseYearTransformer

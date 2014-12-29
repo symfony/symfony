@@ -1011,7 +1011,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefault()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function set($option, $value)
     {
@@ -1023,7 +1023,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Shortcut for {@link clear()} and {@link setDefaults()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function replace(array $defaults)
     {
@@ -1037,7 +1037,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefault()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function overload($option, $value)
     {
@@ -1049,7 +1049,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link offsetGet()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function get($option)
     {
@@ -1061,7 +1061,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link offsetExists()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function has($option)
     {
@@ -1073,7 +1073,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Shortcut for {@link clear()} and {@link setDefaults()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function replaceDefaults(array $defaultValues)
     {
@@ -1087,7 +1087,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefined()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setOptional(array $optionNames)
     {
@@ -1099,7 +1099,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link isDefined()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function isKnown($option)
     {

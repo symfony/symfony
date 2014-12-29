@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Route;
 /**
  * Dumps a set of Apache mod_rewrite rules.
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             The performance gains are minimal and it's very hard to replicate
  *             the behavior of PHP implementation.
  *

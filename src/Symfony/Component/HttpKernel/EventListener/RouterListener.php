@@ -82,7 +82,7 @@ class RouterListener implements EventSubscriberInterface
      *
      * @param Request|null $request A Request instance
      *
-     * @deprecated Deprecated since version 2.4, to be moved to a private function in 3.0.
+     * @deprecated since version 2.4, to be moved to a private function in 3.0.
      */
     public function setRequest(Request $request = null)
     {

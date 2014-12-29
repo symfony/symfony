@@ -154,7 +154,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
+     * @deprecated since version 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
      *
      * @api
      */

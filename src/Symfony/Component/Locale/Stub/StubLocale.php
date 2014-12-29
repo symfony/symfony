@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+ * @deprecated since version 2.3, to be removed in 3.0.
  *             Use {@link \Symfony\Component\Intl\Locale\Locale} and
  *             {@link \Symfony\Component\Intl\Intl} instead.
  */

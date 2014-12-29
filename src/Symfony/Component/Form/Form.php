@@ -676,8 +676,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Alias of {@link submit()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link submit()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link submit()} instead.
      */
     public function bind($submittedData)
     {
@@ -719,8 +719,8 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Alias of {@link isSubmitted()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link isSubmitted()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link isSubmitted()} instead.
      */
     public function isBound()
     {
@@ -843,8 +843,8 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string A string representation of all errors
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use
-     *             {@link getErrors()} instead and cast the result to a string.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link getErrors()} instead and cast the result to a string.
      */
     public function getErrorsAsString($level = 0)
     {

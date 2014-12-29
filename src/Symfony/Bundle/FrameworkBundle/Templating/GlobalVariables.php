@@ -37,7 +37,8 @@ class GlobalVariables
     /**
      * Returns the security context service.
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
+     *
      * @return SecurityContext|null The security context
      */
     public function getSecurity()

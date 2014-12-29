@@ -34,7 +34,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
      *
      * @param Profiler|null $profiler A Profiler instance
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function setProfiler(Profiler $profiler = null)
     {

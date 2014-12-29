@@ -20,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\MinuteTransformer as BaseMin
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\MinuteTransformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\MinuteTransformer}
  *             instead.
  */
 class MinuteTransformer extends BaseMinuteTransformer

@@ -95,7 +95,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
+     * @deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
      */
     public function init()
     {
@@ -217,7 +217,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @api
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function isClassInActiveBundle($class)
     {

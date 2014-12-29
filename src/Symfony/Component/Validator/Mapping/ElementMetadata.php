@@ -18,7 +18,7 @@ trigger_error('The '.__NAMESPACE__.'\ElementMetadata class is deprecated since v
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Extend {@link GenericMetadata} instead.
  */
 abstract class ElementMetadata extends GenericMetadata

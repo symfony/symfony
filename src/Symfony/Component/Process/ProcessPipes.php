@@ -115,7 +115,7 @@ class ProcessPipes
     public function getDescriptors()
     {
         if ($this->disableOutput) {
-            $nullstream = fopen(defined('PHP_WINDOWS_VERSION_BUILD') ? 'NUL' : '/dev/null', 'c');
+            $nullstream = fopen('\\' === DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null', 'c');
 
             return array(
                 array('pipe', 'r'),

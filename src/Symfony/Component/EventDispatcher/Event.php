@@ -77,14 +77,12 @@ class Event
      *
      * @param EventDispatcherInterface $dispatcher
      *
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
+     * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      *
      * @api
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
-
         $this->dispatcher = $dispatcher;
     }
 
@@ -93,13 +91,13 @@ class Event
      *
      * @return EventDispatcherInterface
      *
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
+     * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
      *
      * @api
      */
     public function getDispatcher()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' and '.__CLASS__.'::setDispatcher methods are deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
 
         return $this->dispatcher;
     }
@@ -109,13 +107,13 @@ class Event
      *
      * @return string
      *
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event name is passed to the listener call.
+     * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
      *
      * @api
      */
     public function getName()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' and '.__CLASS__.'::setName methods are deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
 
         return $this->name;
     }
@@ -125,14 +123,12 @@ class Event
      *
      * @param string $name The event name.
      *
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. The event name is passed to the listener call.
+     * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
      *
      * @api
      */
     public function setName($name)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
-
         $this->name = $name;
     }
 }

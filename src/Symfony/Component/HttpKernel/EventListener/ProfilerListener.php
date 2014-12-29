@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * ProfilerListener collects data for the current request by listening to the onKernelResponse event.
+ * ProfilerListener collects data for the current request by listening to the kernel events.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -49,6 +49,13 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function __construct(Profiler $profiler, RequestMatcherInterface $matcher = null, $onlyException = false, $onlyMasterRequests = false, RequestStack $requestStack = null)
     {
+        if (null === $requestStack) {
+            // Prevent the deprecation notice to be triggered all the time.
+            // The onKernelRequest() method fires some logic only when the
+            // RequestStack instance is not provided as a dependency.
+            trigger_error('The '.__CLASS__.'::onKernelRequest method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->profiler = $profiler;
         $this->matcher = $matcher;
         $this->onlyException = (bool) $onlyException;
@@ -77,8 +84,6 @@ class ProfilerListener implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
-
         if (null === $this->requestStack) {
             $this->requests[] = $event->getRequest();
         }

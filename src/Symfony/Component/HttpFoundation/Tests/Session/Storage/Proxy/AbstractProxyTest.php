@@ -96,6 +96,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testIsActivePhp54()
     {
@@ -122,6 +123,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @expectedException \LogicException
      */
     public function testSetActivePhp54()
@@ -135,6 +137,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testName()
     {
@@ -159,6 +162,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @expectedException \LogicException
      */
     public function testNameExceptionPhp54()
@@ -173,6 +177,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testId()
     {
@@ -197,6 +202,7 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @expectedException \LogicException
      */
     public function testIdExceptionPhp54()

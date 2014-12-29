@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class NativeSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {

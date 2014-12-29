@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-25T13:37:31Z
+
+I'm not sure if this fix is the right way to deal with your issue. X.X.X.X:X is no valid IP address (neither IPv4 nor IPv6).
+
+---------------------------------------------------------------------------
+
+by Neime at 2014-12-10T16:29:54Z
+
+Yes, i'm ok with you but i think that it's a more effective ipv6 check.
+PS : i can't access the stacktrace anymore, to find the real issue's origin.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-25T19:22:15Z
+
+:+1:  The root cause is fixed in #13114
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-12-28T13:46:27Z
+
+:+1:

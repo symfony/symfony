@@ -94,7 +94,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Requires the PHP_BINARY constant');
         }
 
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
         }
 
@@ -133,7 +133,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
     private function assertSamePath($expected, $tested)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertEquals(strtolower($expected), strtolower($tested));
         } else {
             $this->assertEquals($expected, $tested);
@@ -142,6 +142,6 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
     private function getPhpBinaryName()
     {
-        return basename(PHP_BINARY, defined('PHP_WINDOWS_VERSION_BUILD') ? '.exe' : '');
+        return basename(PHP_BINARY, '\\' === DIRECTORY_SEPARATOR ? '.exe' : '');
     }
 }

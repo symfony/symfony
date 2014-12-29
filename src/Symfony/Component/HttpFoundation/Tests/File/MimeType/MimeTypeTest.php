@@ -74,7 +74,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGuessWithNonReadablePath()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Can not verify chmod operations on Windows');
         }
 

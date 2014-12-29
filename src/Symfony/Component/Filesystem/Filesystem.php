@@ -152,7 +152,7 @@ class Filesystem
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
-                if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
+                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
                     if (true !== @rmdir($file)) {
                         throw new IOException(sprintf('Failed to remove file %s', $file));
                     }
@@ -295,7 +295,7 @@ class Filesystem
             if (true !== @symlink($originDir, $targetDir)) {
                 $report = error_get_last();
                 if (is_array($report)) {
-                    if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
+                    if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
                         throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
@@ -315,7 +315,7 @@ class Filesystem
     public function makePathRelative($endPath, $startPath)
     {
         // Normalize separators on Windows
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $endPath = strtr($endPath, '\\', '/');
             $startPath = strtr($startPath, '\\', '/');
         }

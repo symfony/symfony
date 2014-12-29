@@ -734,7 +734,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 
@@ -773,7 +773,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
      */
     public function testIgnoredAccessDeniedException(Adapter\AdapterInterface $adapter)
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
 

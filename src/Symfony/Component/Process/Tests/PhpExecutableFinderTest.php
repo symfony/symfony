@@ -89,7 +89,7 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
         $current = $f->find();
 
         //TODO maybe php executable is custom or even Windows
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertTrue(is_executable($current));
             $this->assertTrue((bool) preg_match('/'.addSlashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable PHP with suffixes');
         }

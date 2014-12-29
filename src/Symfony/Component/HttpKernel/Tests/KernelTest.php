@@ -341,7 +341,7 @@ EOF;
 
         // Heredocs are preserved, making the output mixing Unix and Windows line
         // endings, switching to "\n" everywhere on Windows to avoid failure.
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $expected = str_replace("\r\n", "\n", $expected);
             $output = str_replace("\r\n", "\n", $output);
         }

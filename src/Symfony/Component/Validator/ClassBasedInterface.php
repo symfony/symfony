@@ -18,7 +18,7 @@ trigger_error('The Symfony\Component\Validator\ClassBasedInterface interface was
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in Symfony 3.0.
  *             Use {@link Mapping\ClassMetadataInterface} instead.
  */
 interface ClassBasedInterface

@@ -85,7 +85,7 @@ trigger_error('The "Symfony\Component\Validator\ExecutionContextInterface" inter
  *
  * @api
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in Symfony 3.0.
  *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface ExecutionContextInterface

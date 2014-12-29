@@ -19,7 +19,7 @@ class SecurityContextInterfaceTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if the BC Layer is working as intended
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function testConstantSync()
     {

@@ -21,7 +21,7 @@ namespace Symfony\Component\HttpKernel\HttpCache;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use ResponseCacheStrategyInterface instead
+ * @deprecated since version 2.6, to be removed in 3.0. Use ResponseCacheStrategyInterface instead.
  */
 interface EsiResponseCacheStrategyInterface extends ResponseCacheStrategyInterface
 {

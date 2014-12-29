@@ -44,7 +44,7 @@ trigger_error('Symfony\Component\Validator\MetadataInterface was deprecated in v
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in Symfony 3.0.
  *             Use {@link Mapping\MetadataInterface} instead.
  */
 interface MetadataInterface

@@ -156,6 +156,39 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\ClassAlias', true));
     }
+
+    /**
+     * @dataProvider provideDeprecatedSuper
+     */
+    public function testDeprecatedSuper($class, $super, $type)
+    {
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_DEPRECATED);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\'.$class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The Test\Symfony\Component\Debug\Tests\\'.$class.' class '.$type.' Symfony\Component\Debug\Tests\Fixtures\\'.$super.' that is deprecated but this is a test deprecation notice.',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
+    public function provideDeprecatedSuper()
+    {
+        return array(
+            array('DeprecatedInterfaceClass', 'DeprecatedInterface', 'implements'),
+            array('DeprecatedParentClass', 'DeprecatedClass', 'extends'),
+        );
+    }
 }
 
 class ClassLoader
@@ -185,6 +218,12 @@ class ClassLoader
             return __DIR__.'/Fixtures/reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
             return __DIR__.'/Fixtures/notPsr0Bis.php';
+        } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
+            return __DIR__.'/Fixtures/DeprecatedInterface.php';
+        } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\DeprecatedInterface {}');
         }
     }
 }

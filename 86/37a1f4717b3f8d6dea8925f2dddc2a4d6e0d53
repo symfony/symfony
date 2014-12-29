@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T16:14:17Z
+
+Just tested with the steps described here: https://github.com/symfony/symfony/issues/11474#issuecomment-50237986 and I confirm that this fixes the issue.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T16:15:14Z
+
+Note to myself: this should be merged in 2.5.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T16:17:56Z
+
+@zulus Can you add a unit test to ensure that we don't have a regression in the future? Thanks.
+
+---------------------------------------------------------------------------
+
+by zulus at 2014-12-21T21:21:55Z
+
+@fabpot  Off course. I also can close this pull request and prepare for 2.5 with tests.
+
+---------------------------------------------------------------------------
+
+by sergionegri at 2014-12-27T14:14:46Z
+
+I think I have a similar issue with Symfony 2.6.1. I created a form (which works perfectly) but when I call the profiler I get:
+
+Key "type" for array with keys "id, name, view_vars, children" does not exist in @WebProfiler/Collector/form.html.twig at line 423
+
+Will the fix also be merged in 2.6.1?
+
+The only thing I don't have the allow_add enabled :/

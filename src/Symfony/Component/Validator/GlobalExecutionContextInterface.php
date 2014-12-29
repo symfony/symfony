@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The '.__NAMESPACE__.'\GlobalExecutionContextInterface interface is deprecated since version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Context\ExecutionContextInterface interface instead', E_USER_DEPRECATED);
-
 /**
  * Stores the node-independent state of a validation run.
  *

@@ -84,7 +84,7 @@ EOT;
 EOT;
 
         $errorMessage = 'An error occurred';
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $successOutputProcessDebug = str_replace("'", '"', $successOutputProcessDebug);
         }
 

@@ -181,6 +181,12 @@
     </div>
 {%- endblock form_row %}
 
+{% block button_row -%}
+    <div class="form-group">
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock button_row %}
+
 {% block choice_row -%}
     {% set force_error = true %}
     {{ block('form_row') }}

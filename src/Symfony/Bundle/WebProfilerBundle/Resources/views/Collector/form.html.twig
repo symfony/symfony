@@ -420,7 +420,7 @@
             {% else %}
                 <div class="toggle-icon empty"></div>
             {% endif %}
-            {{ name|default('(no name)') }} {% if data.type is not empty %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]{% endif %}
             {% if data.errors is defined and data.errors|length > 0 %}
             <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
@@ -440,7 +440,7 @@
     <div class="tree-details" {% if data.id is defined %} id="{{ data.id }}-details"{% endif %}>
         <h2>
             {{ name|default('(no name)') }}
-            {% if data.type_class is defined %}
+            {% if data.type_class is defined and data.type is defined %}
             <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
             {% endif %}
         </h2>

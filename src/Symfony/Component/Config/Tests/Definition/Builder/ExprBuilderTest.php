@@ -192,7 +192,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
      *
      * @param mixed $val The value that the closure must return
      *
-     * @return Closure
+     * @return \Closure
      */
     protected function returnClosure($val)
     {

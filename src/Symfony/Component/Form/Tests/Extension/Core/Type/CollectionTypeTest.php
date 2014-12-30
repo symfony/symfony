@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Form;
-
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     public function testContainsNoChildByDefault()

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Tests\Http\Logout;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Logout\DefaultLogoutSuccessHandler;
 
 class DefaultLogoutSuccessHandlerTest extends \PHPUnit_Framework_TestCase

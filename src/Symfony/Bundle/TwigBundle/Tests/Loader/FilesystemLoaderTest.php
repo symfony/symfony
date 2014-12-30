@@ -13,9 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Loader;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\Templating\TemplateNameParserInterface;
 
 class FilesystemLoaderTest extends TestCase
 {

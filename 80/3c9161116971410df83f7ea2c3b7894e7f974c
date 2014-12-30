@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T21:28:39Z
+
+Wouldn't it be good to explicitly add a dependency on `psr/log` to the `require-dev` section of the FrameworkBundle and the SecurityBundle? Currently, this package only gets installed because on of the dependencies requires monolog if I am not mistaken.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-29T21:33:19Z
+
+technically, it gets installed because symfony/symfony and symfony/http-kernel are both requiring it
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T21:51:28Z
+
+As said, this works with the current dependencies. But is it really good practice to rely on implicit dependencies?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-29T21:53:52Z
+
+@xabbuh FrameworkBundle relies on HttpKernel and this won't change. And it defines the NullLogger to inject it in the HttpKernel classes.
+
+IMO, this is fine here (and the day we remove this dependency, Travis will warn us anyway, and the fix would probably be to alter the test instead if we don't need the logger anymore)

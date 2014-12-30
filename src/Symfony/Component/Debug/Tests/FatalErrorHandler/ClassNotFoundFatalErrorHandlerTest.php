@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
+use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
+use Symfony\Component\ClassLoader\UniversalClassLoader as SymfonyUniversalClassLoader;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
@@ -19,10 +21,24 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideClassNotFoundData
      */
-    public function testClassNotFound($error, $translatedMessage)
+    public function testHandleClassNotFound($error, $translatedMessage, $autoloader = null)
     {
+        if ($autoloader) {
+            // Unregister all autoloaders to ensure the custom provided
+            // autoloader is the only one to be used during the test run.
+            $autoloaders = spl_autoload_functions();
+            array_map('spl_autoload_unregister', $autoloaders);
+            spl_autoload_register($autoloader);
+        }
+
         $handler = new ClassNotFoundFatalErrorHandler();
+
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
+
+        if ($autoloader) {
+            spl_autoload_unregister($autoloader);
+            array_map('spl_autoload_register', $autoloaders);
+        }
 
         $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
         $this->assertSame($translatedMessage, $exception->getMessage());
@@ -33,6 +49,14 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function provideClassNotFoundData()
     {
+        $prefixes = array('Symfony\Component\Debug\Exception\\' => realpath(__DIR__.'/../../Exception'));
+
+        $symfonyAutoloader = new SymfonyClassLoader();
+        $symfonyAutoloader->addPrefixes($prefixes);
+
+        $symfonyUniversalClassLoader = new SymfonyUniversalClassLoader();
+        $symfonyUniversalClassLoader->registerPrefixes($prefixes);
+
         return array(
             array(
                 array(
@@ -78,6 +102,36 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
                 ),
                 'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
+            ),
+            array(
+                array(
+                    'type' => 1,
+                    'line' => 12,
+                    'file' => 'foo.php',
+                    'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
+                ),
+                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
+                array($symfonyAutoloader, 'loadClass'),
+            ),
+            array(
+                array(
+                    'type' => 1,
+                    'line' => 12,
+                    'file' => 'foo.php',
+                    'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
+                ),
+                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace? Perhaps you need to add a use statement for one of the following: Symfony\Component\Debug\Exception\UndefinedFunctionException.',
+                array($symfonyUniversalClassLoader, 'loadClass'),
+            ),
+            array(
+                array(
+                    'type' => 1,
+                    'line' => 12,
+                    'file' => 'foo.php',
+                    'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
+                ),
+                'Attempted to load class "UndefinedFunctionException" from namespace "Foo\Bar" in foo.php line 12. Do you need to "use" it from another namespace?',
+                function ($className) { /* do nothing here */ },
             ),
         );
     }

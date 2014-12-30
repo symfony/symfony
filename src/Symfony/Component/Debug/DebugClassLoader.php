@@ -30,6 +30,7 @@ class DebugClassLoader
     private $isFinder;
     private $wasFinder;
     private static $caseCheck;
+    private static $deprecated = array();
 
     /**
      * Constructor.
@@ -174,6 +175,22 @@ class DebugClassLoader
 
             if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
+            }
+
+            if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
+            } elseif (0 !== strpos($name, 'Symfony\\')) {
+                $parent = $refl->getParentClass();
+
+                if ($parent && isset(self::$deprecated[$parent->name])) {
+                    trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                }
+
+                foreach ($refl->getInterfaceNames() as $interface) {
+                    if (isset(self::$deprecated[$interface]) && !($parent && $parent->implementsInterface($interface))) {
+                        trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                    }
+                }
             }
         }
 

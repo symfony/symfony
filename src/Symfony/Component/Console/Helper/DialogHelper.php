@@ -269,7 +269,7 @@ class DialogHelper extends InputAwareHelper
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 
             // handle code running from a phar

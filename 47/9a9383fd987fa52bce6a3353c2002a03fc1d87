@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-20T06:45:31Z
+
+:+1: now my PR won't fail on Travis anymore
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-21T04:13:25Z
+
+All inter-component dependencies should be updated as well, because currently, each component at 3.0.x dev says it requires 2.x versions of its dependencies (it may be fine to allow both 2.x and 3.x when both work, but it should allow 3.x at least)
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-26T18:34:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-27T11:57:45Z
+
+See also sibling PR on 2.7: #13135
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-29T08:23:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-29T09:55:24Z
+
+Greeeeeeeeeeeeeen ! :)
+If this gets accepted, before merging, please merge #13135 and #13144 and let me rebase on the result.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-29T11:33:57Z
+
+![036b67d34fd7cb1c23dfffb750543f0a652249d60a01aee2b56c8b82a71258c2](https://cloud.githubusercontent.com/assets/667519/5568268/9ae7f26e-8f56-11e4-9ecc-2218685390fe.jpg)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-29T12:36:30Z
+
+@Tobion 2.99.99 versions are for doctrine/common that in turn has `~2.x` requirements. Without this we can't make composer happy. Some of them could be removed after merging #13135. The remaining will need a patch on doctrine.
+
+As a side but important note, I do not expect these requirements, nor those in #13135, to be the definitive ones when `.0` will be tagged on 2.7 and 3.0. It's just a step to make tests greens and allow moving forward with the eyes wide opened.

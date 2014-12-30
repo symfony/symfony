@@ -12,9 +12,10 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class LocaleTypeTest extends TypeTestCase
+class LocaleTypeTest extends TestCase
 {
     protected function setUp()
     {

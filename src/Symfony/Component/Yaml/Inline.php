@@ -194,7 +194,7 @@ class Inline
     /**
      * Parses a scalar to a YAML string.
      *
-     * @param scalar $scalar
+     * @param string $scalar
      * @param string $delimiters
      * @param array  $stringDelimiters
      * @param int    &$i

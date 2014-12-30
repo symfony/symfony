@@ -13,7 +13,6 @@ namespace Symfony\Component\Locale;
 
 trigger_error('\Symfony\Component\Locale\Locale is deprecated since version 2.7, to be removed in Symfony 3.0. Use the methods provided by \Symfony\Component\Intl\Intl instead.', E_USER_DEPRECATED);
 
-use Symfony\Component\Icu\IcuData;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -175,7 +174,7 @@ class Locale extends \Locale
      */
     public static function getIcuDataDirectory()
     {
-        return IcuData::getResourceDirectory();
+        return Intl::getDataDirectory();
     }
 
     /**

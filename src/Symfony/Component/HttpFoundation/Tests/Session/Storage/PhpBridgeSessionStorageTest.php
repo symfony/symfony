@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
  * These tests require separate processes.
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 {

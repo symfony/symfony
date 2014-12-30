@@ -13,9 +13,10 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class DateTypeTest extends TypeTestCase
+class DateTypeTest extends TestCase
 {
     private $defaultTimezone;
 
@@ -355,9 +356,63 @@ class DateTypeTest extends TypeTestCase
         ));
     }
 
-    public function testSetDataWithDifferentTimezoneDateTime()
+    public function testSetDataWithDifferentNegativeUTCTimezoneDateTime()
     {
         date_default_timezone_set('Pacific/Tahiti');
+
+        $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 America/New_York');
+
+        $form->setData($dateTime);
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
+    }
+
+    public function testSetDataWithDifferentPositiveUTCTimezoneDateTime()
+    {
+        date_default_timezone_set('Pacific/Tahiti');
+
+        $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 Australia/Melbourne');
+
+        $form->setData($dateTime);
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
+    }
+
+    public function testSetDataWithSamePositiveUTCTimezoneDateTime()
+    {
+        date_default_timezone_set('Australia/Melbourne');
+
+        $form = $this->factory->create('date', null, array(
+            'format' => \IntlDateFormatter::MEDIUM,
+            'input' => 'datetime',
+            'widget' => 'single_text',
+        ));
+
+        $dateTime = new \DateTime('2010-06-02 Australia/Melbourne');
+
+        $form->setData($dateTime);
+
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertEquals('02.06.2010', $form->getViewData());
+    }
+
+    public function testSetDataWithSameNegativeUTCTimezoneDateTime()
+    {
+        date_default_timezone_set('America/New_York');
 
         $form = $this->factory->create('date', null, array(
             'format' => \IntlDateFormatter::MEDIUM,

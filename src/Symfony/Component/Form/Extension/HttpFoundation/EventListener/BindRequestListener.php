@@ -27,7 +27,7 @@ class BindRequestListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         // High priority in order to supersede other listeners
-        return array(FormEvents::PRE_BIND => array('preBind', 128));
+        return array(FormEvents::PRE_SUBMIT => array('preBind', 128));
     }
 
     public function preBind(FormEvent $event)

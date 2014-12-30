@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/security-core": "~2.4"
+        "symfony/security-core": "~2.4|~3.0.0"
     },
     "require-dev": {
         "doctrine/common": "~2.2",

@@ -131,10 +131,10 @@ class SimpleFormTest extends AbstractFormTest
             }));
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
-        $config->addEventListener(FormEvents::PRE_BIND, array($mock, 'preBind'));
+        $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preBind'));
         $form = new Form($config);
 
-        $form->bind(false);
+        $form->submit(false);
 
         $this->assertTrue($form->isValid());
         $this->assertNull($form->getData());

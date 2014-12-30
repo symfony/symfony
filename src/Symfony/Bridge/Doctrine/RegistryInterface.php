@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry as ManagerRegistryInterface;
-use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 
 /**

@@ -109,12 +109,9 @@ class TwigExtension extends Extension
         }
 
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
-            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference($config['autoescape_service']), $config['autoescape_service_method'])));
-
-            unset($config['autoescape_service'], $config['autoescape_service_method']);
-        } elseif (!isset($config['autoescape'])) {
-            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
+            $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
         }
+        unset($config['autoescape_service'], $config['autoescape_service_method']);
 
         $container->setParameter('twig.options', $config);
 

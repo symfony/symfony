@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionOnAbstractTaggedSubscriber()
     {
@@ -34,7 +34,7 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionOnAbstractTaggedListener()
     {

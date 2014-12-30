@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/intl": ">=2.3"
+        "symfony/intl": "~2.3"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Locale\\": "" }

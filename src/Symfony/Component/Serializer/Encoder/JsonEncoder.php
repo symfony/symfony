@@ -41,7 +41,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      *
      * @return int
      *
-     * @deprecated since version 2.5, JsonEncode throws exception if an error is found, will be removed in 3.0
+     * @deprecated since version 2.5, to be removed in 3.0. JsonEncode throws exception if an error is found.
      */
     public function getLastEncodingError()
     {
@@ -55,7 +55,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      *
      * @return int
      *
-     * @deprecated since version 2.5, JsonDecode throws exception if an error is found, will be removed in 3.0
+     * @deprecated since version 2.5, to be removed in 3.0. JsonDecode throws exception if an error is found.
      */
     public function getLastDecodingError()
     {

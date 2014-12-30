@@ -30,7 +30,7 @@ class SessionHelper extends Helper
      *
      * @param Request|RequestStack $requestStack A RequestStack instance or a Request instance
      *
-     * @deprecated since version 2.5, passing a Request instance is deprecated and support for it will be removed in 3.0
+     * @deprecated since version 2.5, passing a Request instance is deprecated and support for it will be removed in 3.0.
      */
     public function __construct($requestStack)
     {

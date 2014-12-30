@@ -373,7 +373,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      *
      * @param MemberMetadata $metadata
      *
-     * @deprecated since version 2.6, to be in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     protected function addMemberMetadata(MemberMetadata $metadata)
     {

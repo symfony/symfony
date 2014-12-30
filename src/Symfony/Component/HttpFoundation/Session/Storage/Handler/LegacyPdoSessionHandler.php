@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
+trigger_error('The '.__NAMESPACE__.'\LegacyPdoSessionHandler class is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler class instead.', E_USER_DEPRECATED);
+
 /**
  * Session handler using a PDO connection to read and write data.
  *
@@ -76,8 +78,6 @@ class LegacyPdoSessionHandler implements \SessionHandlerInterface
         if (\PDO::ERRMODE_EXCEPTION !== $pdo->getAttribute(\PDO::ATTR_ERRMODE)) {
             throw new \InvalidArgumentException(sprintf('"%s" requires PDO error mode attribute be set to throw Exceptions (i.e. $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION))', __CLASS__));
         }
-
-        trigger_error('"Symfony\Component\HttpFoundation\Session\Storage\Handler\LegacyPdoSessionHandler" is deprecated since version 2.6 and will be removed in 3.0. Use "Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler" instead.', E_USER_DEPRECATED);
 
         $this->pdo = $pdo;
         $dbOptions = array_merge(array(

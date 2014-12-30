@@ -103,7 +103,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @see \IteratorAggregate::getIterator()
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function getIterator()
     {
@@ -121,7 +121,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return bool Whether the offset exists
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function offsetExists($offset)
     {
@@ -141,7 +141,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @throws OutOfBoundsException If the object does not exist
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function offsetGet($offset)
     {
@@ -165,7 +165,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      * @param int    $offset The offset
      * @param string $value  The group name
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function offsetSet($offset, $value)
     {
@@ -187,7 +187,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param int $offset The offset
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function offsetUnset($offset)
     {
@@ -203,7 +203,7 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return int The number of groups
      *
-     * @deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function count()
     {

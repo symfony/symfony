@@ -101,7 +101,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
             if ($function[0] instanceof DebugClassLoader) {
                 $function = $function[0]->getClassLoader();
 
-                // Since 2.5, returning an object from DebugClassLoader::getClassLoader() is @deprecated
+                // @deprecated since version 2.5. Returning an object from DebugClassLoader::getClassLoader() is deprecated.
                 if (is_object($function)) {
                     $function = array($function);
                 }

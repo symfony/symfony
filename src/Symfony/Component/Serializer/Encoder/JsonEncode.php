@@ -33,7 +33,8 @@ class JsonEncode implements EncoderInterface
      *
      * @return int
      *
-     * @deprecated since version 2.5, encode() throws an exception if error found, will be removed in 3.0
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             The {@self encode()} throws an exception if error found.
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */

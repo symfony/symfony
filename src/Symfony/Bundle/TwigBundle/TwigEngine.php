@@ -42,8 +42,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Inject the escaping
-     *             strategy on Twig_Environment instead
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Inject the escaping strategy on \Twig_Environment instead.
      */
     public function setDefaultEscapingStrategy($strategy)
     {
@@ -51,7 +51,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use TwigDefaultEscapingStrategy instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use TwigDefaultEscapingStrategy instead.
      */
     public function guessDefaultEscapingStrategy($filename)
     {

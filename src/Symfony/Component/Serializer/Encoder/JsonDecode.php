@@ -55,7 +55,8 @@ class JsonDecode implements DecoderInterface
      *
      * @return int
      *
-     * @deprecated since version 2.5, decode() throws an exception if error found, will be removed in 3.0
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             The {@self decode()} method throws an exception if error found.
      *
      * @see http://php.net/manual/en/function.json-last-error.php json_last_error
      */

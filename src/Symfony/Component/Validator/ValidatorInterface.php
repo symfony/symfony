@@ -20,7 +20,7 @@ trigger_error('ValidatorInterface was deprecated in version 2.5 and will be remo
  *
  * @api
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in Symfony 3.0.
  *             Use {@link Validator\ValidatorInterface} instead.
  */
 interface ValidatorInterface

@@ -29,7 +29,7 @@ trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderIn
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0. Use
+ * @deprecated since version 2.4, to be removed in Symfony 3.0. Use
  *             {@link \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface}
  *             instead.
  */

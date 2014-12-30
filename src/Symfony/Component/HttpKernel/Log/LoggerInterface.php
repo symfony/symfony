@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface as PsrLogger;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since 2.2, to be removed in 3.0. Type-hint \Psr\Log\LoggerInterface instead.
+ * @deprecated since version 2.2, to be removed in 3.0. Type-hint \Psr\Log\LoggerInterface instead.
  *
  * @api
  */

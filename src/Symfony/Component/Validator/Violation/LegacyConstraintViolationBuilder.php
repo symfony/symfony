@@ -23,7 +23,7 @@ use Symfony\Component\Validator\ExecutionContextInterface;
  * @internal You should not instantiate or use this class. Code against
  *           {@link ConstraintViolationBuilderInterface} instead.
  *
- * @deprecated This class will be removed in Symfony 3.0.
+ * @deprecated since version 2.5.5, to be removed in 3.0.
  */
 class LegacyConstraintViolationBuilder implements ConstraintViolationBuilderInterface
 {

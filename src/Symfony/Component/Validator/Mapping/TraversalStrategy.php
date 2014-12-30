@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
+use Symfony\Component\Validator\Mapping\Deprecated\TraversalStrategy as Deprecated;
+
 /**
  * Specifies whether and how a traversable object should be traversed.
  *
@@ -51,10 +53,11 @@ class TraversalStrategy
      * Specifies that nested instances of {@link \Traversable} should never be
      * iterated. Can be combined with {@link IMPLICIT} or {@link TRAVERSE}.
      *
-     * @deprecated This constant was added for backward compatibility only.
-     *             It will be removed in Symfony 3.0.
+     * This constant was added for backward compatibility only.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
-    const STOP_RECURSION = 8;
+    const STOP_RECURSION = Deprecated::STOP_RECURSION;
 
     /**
      * Not instantiable.

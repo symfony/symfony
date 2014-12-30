@@ -61,7 +61,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      *
-     * @deprecated This method will be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     protected function buildViolation($message, array $parameters = array())
     {
@@ -84,7 +84,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      *
-     * @deprecated This method will be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
     {

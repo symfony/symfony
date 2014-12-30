@@ -25,4 +25,10 @@ namespace Symfony\Component\Form\Util;
  */
 class InheritDataAwareIterator extends VirtualFormAwareIterator
 {
+    public function __construct(\Traversable $iterator)
+    {
+        // Do not trigger deprecation notice in parent construct method
+        // when using this class instead of the deprecated parent one.
+        parent::__construct($iterator, false);
+    }
 }

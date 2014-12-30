@@ -13,7 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Constraints\UuidValidator as Deprecated;
+use Symfony\Component\Validator\Constraints\Deprecated\UuidValidator as Deprecated;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**

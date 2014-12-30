@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale\Stub;
 
-use Symfony\Component\Icu\IcuData;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale\Locale;
 
@@ -86,7 +85,7 @@ class StubLocale extends Locale
 
     public static function getDataDirectory()
     {
-        return IcuData::getResourceDirectory();
+        return Intl::getDataDirectory();
     }
 
     private static function prepareCurrencies($locale)

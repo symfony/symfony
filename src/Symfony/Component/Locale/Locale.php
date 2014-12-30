@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Locale;
 
-use Symfony\Component\Icu\IcuData;
 use Symfony\Component\Intl\Intl;
 
 /**
@@ -173,7 +172,7 @@ class Locale extends \Locale
      */
     public static function getIcuDataDirectory()
     {
-        return IcuData::getResourceDirectory();
+        return Intl::getDataDirectory();
     }
 
     /**

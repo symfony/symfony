@@ -15,7 +15,7 @@ use Symfony\Bridge\Propel1\Tests\Fixtures\Item;
 use Symfony\Bridge\Propel1\Form\PropelExtension;
 use Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItemI18n;
 use Symfony\Bridge\Propel1\Tests\Fixtures\TranslatableItem;
-use Symfony\Component\Form\Tests\Extension\Core\Type\TypeTestCase;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class TranslationCollectionTypeTest extends TypeTestCase
 {

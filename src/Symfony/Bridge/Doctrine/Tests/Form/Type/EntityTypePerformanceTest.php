@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
-use Symfony\Component\Form\Tests\FormPerformanceTestCase;
+use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;

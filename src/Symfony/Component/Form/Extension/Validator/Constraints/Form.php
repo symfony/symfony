@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
+use Symfony\Component\Form\Extension\Validator\Constraints\Deprecated\Form as Deprecated;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -22,10 +23,10 @@ class Form extends Constraint
     const NO_SUCH_FIELD_ERROR = 2;
 
     /**
-     * @deprecated since version 2.6, to be removed in 3.0. Use
-     *             {@self NOT_SYNCHRONIZED_ERROR} instead.
+     * @deprecated since version 2.6, to be removed in 3.0.
+     *             Use {@self NOT_SYNCHRONIZED_ERROR} instead.
      */
-    const ERR_INVALID = 1;
+    const ERR_INVALID = Deprecated::ERR_INVALID;
 
     protected static $errorNames = array(
         self::NOT_SYNCHRONIZED_ERROR => 'NOT_SYNCHRONIZED_ERROR',

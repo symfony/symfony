@@ -297,7 +297,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->add('child', 'text')
             ->getForm();
 
-        $form->bind(array(
+        $form->submit(array(
             'child' => 'foobar',
             'csrf' => 'token',
         ));

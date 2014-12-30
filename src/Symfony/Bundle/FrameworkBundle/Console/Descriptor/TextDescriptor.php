@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -30,10 +30,10 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
+        $table = new Table($this->output);
+
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
-        $table = new TableHelper();
-        $table->setLayout(TableHelper::LAYOUT_COMPACT);
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -59,7 +59,7 @@ class TextDescriptor extends Descriptor
         }
 
         $this->writeText($this->formatSection('router', 'Current routes')."\n", $options);
-        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
+        $table->render();
     }
 
     /**
@@ -100,8 +100,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $table = new TableHelper();
-        $table->setLayout(TableHelper::LAYOUT_COMPACT);
+        $table = new Table($this->output);
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -109,7 +108,7 @@ class TextDescriptor extends Descriptor
         }
 
         $this->writeText($this->formatSection('container', 'List of parameters')."\n", $options);
-        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
+        $table->render();
     }
 
     /**
@@ -201,8 +200,7 @@ class TextDescriptor extends Descriptor
         $tagsCount = count($maxTags);
         $tagsNames = array_keys($maxTags);
 
-        $table = new TableHelper();
-        $table->setLayout(TableHelper::LAYOUT_COMPACT);
+        $table = new Table($this->output);
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -232,7 +230,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $this->renderTable($table);
+        $table->render();
     }
 
     /**
@@ -302,31 +300,30 @@ class TextDescriptor extends Descriptor
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
         $registeredListeners = $eventDispatcher->getListeners($event);
+        $table = new Table($this->output);
+
         if (null !== $event) {
             $this->writeText("\n");
-            $table = new TableHelper();
+
             $table->setHeaders(array('Order', 'Callable'));
 
             foreach ($registeredListeners as $order => $listener) {
                 $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
             }
-
-            $this->renderTable($table);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
 
-                $table = new TableHelper();
                 $table->setHeaders(array('Order', 'Callable'));
 
                 foreach ($eventListeners as $order => $eventListener) {
                     $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
                 }
-
-                $this->renderTable($table);
             }
         }
+
+        $table->render();
     }
 
     /**

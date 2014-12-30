@@ -32,7 +32,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             self::$symlinkOnWindows = true;
             $originDir = tempnam(sys_get_temp_dir(), 'sl');
             $targetDir = tempnam(sys_get_temp_dir(), 'sl');
@@ -798,7 +798,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             array('/a/aab/bb/', '/a/aa/', '../aab/bb/'),
         );
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
         }
 
@@ -960,7 +960,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', file_get_contents($filename));
 
         // skip mode check on Windows
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->assertEquals(753, $this->getFilePermissions($filename));
         }
     }
@@ -975,7 +975,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', file_get_contents($filename));
 
         // skip mode check on Windows
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->assertEquals(600, $this->getFilePermissions($filename));
         }
     }
@@ -1031,21 +1031,21 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('symlink is not supported');
         }
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false === self::$symlinkOnWindows) {
+        if ('\\' === DIRECTORY_SEPARATOR && false === self::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
         }
     }
 
     private function markAsSkippedIfChmodIsMissing()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on Windows');
         }
     }
 
     private function markAsSkippedIfPosixIsMissing()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') || !function_exists('posix_isatty')) {
+        if ('\\' === DIRECTORY_SEPARATOR || !function_exists('posix_isatty')) {
             $this->markTestSkipped('POSIX is not supported');
         }
     }

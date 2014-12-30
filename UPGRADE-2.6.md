@@ -394,7 +394,7 @@ With `LoggingTranslator`, a new translator class is introduced with Symfony
 2.6. By default, the `@translator` service is referring to this class in the
 debug environment.
 
-If you have own services that depend on the `@translator` service and expect
+If you have your own services that depend on the `@translator` service and expect
 this service to be an instance of either
 `Symfony\Component\Translation\Translator` or
 `Symfony\Bundle\FrameworkBundle\Translation\Translator`, e.g. by type-hinting

@@ -113,7 +113,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
      * @param UserInterface  $user  The user
      * @param TokenInterface $token The token
      *
-     * @return Role[] The user roles
+     * @return array The user roles
      */
     private function getRoles(UserInterface $user, TokenInterface $token)
     {

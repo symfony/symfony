@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-27T11:58:25Z
+
+Sibling PR on 3.0: #12522
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-27T14:07:35Z
+
+I don't agree.
+
+> and try to avoid it as much as possible to smoothen the transition to 3.0
+
+What? Then we don't need to releae 3.0 at all and just call it 2.8.
+
+> 2.7 is going to be mostly compatible with 3.0. Lets continuously test this assumption and see when and were we break compat with 2.7
+
+This assumes we have full test coverage which is obviously not true. So why test 2.7 with 3.0 in the first place?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-27T18:55:57Z
+
+> What? Then we don't need to releae 3.0 at all and just call it 2.8.
+
+Of course we do: otherwise we won't be able to remove deprecated interfaces.
+
+> This assumes we have full test coverage which is obviously not true. So why test 2.7 with 3.0 in the first place?
+
+It just account for what we have. It's better than being blind.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-29T08:23:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-29T11:08:03Z
+
+Why `~3.0.0` and not `~3.0`? If 3.0 is compatible with 2.7, then 3.1 as well according to our semantic versioning.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-30T08:55:30Z
+
+@Tobion I chose `~3.0.0` to open the transition to 3.0, but shorten 2.7 lifetime.

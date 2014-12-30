@@ -15,7 +15,6 @@ namespace Symfony\Component\Security\Acl\Dbal;
  */
 interface TablesInterface
 {
-
     /**
      * Adds the class table to the schema.
      */
@@ -39,4 +38,4 @@ interface TablesInterface
      * Adds the security identity table to the schema.
      */
     public function addSecurityIdentitiesTable();
-} 
+}

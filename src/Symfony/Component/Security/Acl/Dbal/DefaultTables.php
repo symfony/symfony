@@ -113,4 +113,4 @@ class DefaultTables implements TablesInterface
         $table->setPrimaryKey(array('id'));
         $table->addUniqueIndex(array('identifier', 'username'));
     }
-} 
+}

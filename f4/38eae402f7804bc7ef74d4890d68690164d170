@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-29T12:22:00Z
+
+For consistency and performance, I'd prefer we'd use `'\\' === DIRECTORY_SEPARATOR` everywhere :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T12:25:13Z
+
+@nicolas-grekas Hm, yeah, we could save a function call. What do the other core team members think?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-29T14:33:36Z
+
+In tests, I would vote for the constant definition check. This makes the check more obvious, and the performance gain in the testsuite would not be noticeable anyway, given that each test runs only a few times (once only most of the time)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T14:42:16Z
+
+So, what about checking for the presence of `PHP_WINDOWS_VERSION` build in tests and checking for the value of `DIRECTORY_SEPARATOR` in the rest of the code?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-30T08:36:28Z
+
+@xabbuh Let's be consistent everywhere and only use the DIRECTORY_SEPERATOR test.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T11:17:17Z
+
+okay, done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-30T13:13:59Z
+
+:+1:

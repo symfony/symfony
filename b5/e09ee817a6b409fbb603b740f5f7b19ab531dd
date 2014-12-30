@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T13:06:22Z
+
+Maybe I misunderstand the issue here, but wasn't this fixed by @fabpot in dbf29c7d85c6ffb16b199c307aea90c44d1d811e on the `2.5` branch?
+
+At least, the [Travis build succeeds](https://travis-ci.org/symfony/symfony/builds/45435815).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-30T13:15:03Z
+
+:+1: @fabpot did not remove the test but make it pass

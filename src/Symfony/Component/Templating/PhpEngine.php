@@ -457,11 +457,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     protected function initializeEscapers()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
+        $flags = ENT_QUOTES | ENT_SUBSTITUTE;
 
         $this->escapers = array(
             'html' =>
@@ -488,11 +484,11 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  * @return string the escaped value
                  */
                 function ($value) {
-                    if ('UTF-8' != $that->getCharset()) {
-                        $value = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
+                    if ('UTF-8' != $this->getCharset()) {
+                        $value = $this->convertEncoding($value, 'UTF-8', $this->getCharset());
                     }
 
-                    $callback = function ($matches) use ($that) {
+                    $callback = function ($matches) {
                         $char = $matches[0];
 
                         // \xHH
@@ -501,7 +497,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         }
 
                         // \uHHHH
-                        $char = $that->convertEncoding($char, 'UTF-16BE', 'UTF-8');
+                        $char = $this->convertEncoding($char, 'UTF-16BE', 'UTF-8');
 
                         return '\\u'.substr('0000'.bin2hex($char), -4);
                     };
@@ -511,7 +507,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     }
 
                     if ('UTF-8' != $this->getCharset()) {
-                        $value = $this->convertEncoding($value, $that->getCharset(), 'UTF-8');
+                        $value = $this->convertEncoding($value, $this->getCharset(), 'UTF-8');
                     }
 
                     return $value;

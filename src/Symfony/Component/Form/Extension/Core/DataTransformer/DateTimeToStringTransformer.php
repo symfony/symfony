@@ -61,17 +61,12 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = true)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
         $this->generateFormat = $this->parseFormat = $format;
-
-        // The pipe in the parser pattern only works as of PHP 5.3.7
-        // See http://bugs.php.net/54316
-        $this->parseUsingPipe = null === $parseUsingPipe
-            ? PHP_VERSION_ID >= 50307
-            : $parseUsingPipe;
+        $this->parseUsingPipe = $parseUsingPipe || null === $parseUsingPipe;
 
         // See http://php.net/manual/en/datetime.createfromformat.php
         // The character "|" in the format makes sure that the parts of a date

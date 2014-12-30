@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/filesystem": "~2.3|~3.0.0"
+        "php": ">=5.5.9",
+        "symfony/filesystem": "~2.7|~3.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Config\\": "" }

@@ -91,7 +91,7 @@ EOF
             $this->warmup($warmupDir, $realCacheDir, !$input->getOption('no-optional-warmers'));
 
             $filesystem->rename($realCacheDir, $oldCacheDir);
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            if ('\\' === DIRECTORY_SEPARATOR) {
                 sleep(1);  // workaround for Windows PHP rename bug
             }
             $filesystem->rename($warmupDir, $realCacheDir);

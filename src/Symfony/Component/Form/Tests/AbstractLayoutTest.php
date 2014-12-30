@@ -101,8 +101,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     abstract protected function renderForm(FormView $view, array $vars = array());
 
-    abstract protected function renderEnctype(FormView $view);
-
     abstract protected function renderLabel(FormView $view, $label = null, array $vars = array());
 
     abstract protected function renderErrors(FormView $view);
@@ -118,24 +116,6 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     abstract protected function renderEnd(FormView $view, array $vars = array());
 
     abstract protected function setTheme(FormView $view, array $themes);
-
-    public function testEnctype()
-    {
-        $form = $this->factory->createNamedBuilder('name', 'form')
-            ->add('file', 'file')
-            ->getForm();
-
-        $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form->createView()));
-    }
-
-    public function testNoEnctype()
-    {
-        $form = $this->factory->createNamedBuilder('name', 'form')
-            ->add('text', 'text')
-            ->getForm();
-
-        $this->assertEquals('', $this->renderEnctype($form->createView()));
-    }
 
     public function testLabel()
     {

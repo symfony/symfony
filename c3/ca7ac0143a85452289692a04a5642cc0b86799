@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-30T14:33:30Z
+
+The `Symfony\Component\ClassLoader\ClassLoader` object was not taken into account in the `Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler` class due to the wrong namespace at the top. This patch fixes this bug and also includes support for the  `Symfony\Component\ClassLoader\UniversalClassLoader` object as well.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-30T14:38:47Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-30T14:40:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-30T16:07:04Z
+
+Good to go!

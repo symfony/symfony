@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Validator;
 
-trigger_error('The '.__NAMESPACE__.'\LegacyValidator class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\RecursiveValidator class instead.', E_USER_DEPRECATED);
-
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -54,7 +52,7 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
             return parent::validate($value, $constraints, $groups);
         }
 
-        trigger_error('Symfony\\Component\\Validator\\ValidatorInterface::validate() was deprecated in version 2.5 and will be removed in version 3.0. Please use Symfony\\Component\\Validator\\Validator\\ValidatorInterface::validate() instead.', E_USER_DEPRECATED);
+        trigger_error('The Symfony\Component\Validator\Validator\ValidatorInterface::validate method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
 
         $constraint = new Valid(array('traverse' => $traverse, 'deep' => $deep));
 
@@ -63,13 +61,15 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
 
     public function validateValue($value, $constraints, $groups = null)
     {
-        trigger_error('Symfony\\Component\\Validator\\ValidatorInterface::validateValue() was deprecated in version 2.5 and will be removed in version 3.0. Please use Symfony\\Component\\Validator\\Validator\\ValidatorInterface::validate() instead.', E_USER_DEPRECATED);
+        trigger_error('The Symfony\Component\Validator\Validator\ValidatorInterface::validateValue method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
 
         return parent::validate($value, $constraints, $groups);
     }
 
     public function getMetadataFactory()
     {
+        trigger_error('The Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFactory method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+
         return $this->metadataFactory;
     }
 

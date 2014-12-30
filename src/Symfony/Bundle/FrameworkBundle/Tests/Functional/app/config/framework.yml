@@ -11,4 +11,4 @@ framework:
         storage_id:     session.storage.mock_file
 
 services:
-    logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }
+    logger: { class: Psr\Log\NullLogger }

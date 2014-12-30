@@ -12,4 +12,4 @@ framework:
     profiler: { only_exceptions: false }
 
 services:
-    logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }
+    logger: { class: Psr\Log\NullLogger }

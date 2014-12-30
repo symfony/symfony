@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Acl\Model;
 
+use Symfony\Component\Security\Acl\Exception\AclAlreadyExistsException;
+
 /**
  * Provides support for creating and storing ACL instances.
  *

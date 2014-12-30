@@ -154,7 +154,7 @@ class SimpleProcessTest extends AbstractProcessTest
             $process->run(function () use ($process) {
                 $process->stop();
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to stop() is not expected to cause wait() to throw a RuntimeException');
         }
     }
@@ -170,7 +170,7 @@ class SimpleProcessTest extends AbstractProcessTest
                     $process->signal(defined('SIGKILL') ? SIGKILL : 9);
                 }
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
         }
     }
@@ -186,7 +186,7 @@ class SimpleProcessTest extends AbstractProcessTest
                     $process->signal(defined('SIGTERM') ? SIGTERM : 15);
                 }
             });
-        } catch (RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->fail('A call to signal() is not expected to cause wait() to throw a RuntimeException');
         }
     }

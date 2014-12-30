@@ -926,16 +926,42 @@ HTML;
         }
     }
 
-    public function testBaseTag()
+    /**
+     * @dataProvider getBaseTagData
+     */
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = null)
     {
-        $crawler = new Crawler('<html><base href="http://base.com"><a href="link"></a></html>');
-        $this->assertEquals('http://base.com/link', $crawler->filterXPath('//a')->link()->getUri());
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
+    }
 
-        $crawler = new Crawler('<html><base href="//base.com"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://base.com/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can use a schema-less URL');
+    public function getBaseTagData()
+    {
+        return array(
+            array('http://base.com', 'link', 'http://base.com/link'),
+            array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
+            array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
+            array('http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'),
+            array('http://base.com', '', 'http://base.com', 'http://domain.com/path/link', '<base> tag does work with empty links'),
+        );
+    }
 
-        $crawler = new Crawler('<html><base href="path/"><a href="link"></a></html>', 'https://domain.com');
-        $this->assertEquals('https://domain.com/path/link', $crawler->filterXPath('//a')->link()->getUri(), '<base> tag can set a path');
+    /**
+     * @dataProvider getBaseTagWithFormData
+     */
+    public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
+    {
+        $crawler = new Crawler('<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
+        $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
+    }
+
+    public function getBaseTagWithFormData()
+    {
+        return array(
+            array('/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'),
+            array('/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'),
+            array('http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'),
+        );
     }
 
     public function createTestCrawler($uri = null)

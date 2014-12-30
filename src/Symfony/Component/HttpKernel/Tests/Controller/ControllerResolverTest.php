@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
-use Symfony\Component\HttpKernel\Tests\Logger;
 use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase

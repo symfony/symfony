@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-30T10:12:48Z
+
+Is it not a duplicate?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T10:18:11Z
+
+@hhamon There were previous attempts like #12889 which did more than the changes here (they tried to fix  #10054 which is similar but not the same as it seems).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-30T11:55:44Z
+
+This only prevents an exception. It doesn't really fix the root cause as the type won't be shown. I still think it should be merged.

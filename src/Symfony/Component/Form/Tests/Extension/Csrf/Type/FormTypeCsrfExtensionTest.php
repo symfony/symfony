@@ -284,15 +284,15 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
      */
     public function testValidateTokenOnBindIfRootAndCompoundUsesTypeClassAsIntentionIfEmptyFormName($valid)
     {
-        $this->csrfProvider->expects($this->once())
-            ->method('isCsrfTokenValid')
-            ->with('Symfony\Component\Form\Extension\Core\Type\FormType', 'token')
+        $this->tokenManager->expects($this->once())
+            ->method('isTokenValid')
+            ->with(new CsrfToken('Symfony\Component\Form\Extension\Core\Type\FormType', 'token'))
             ->will($this->returnValue($valid));
 
         $form = $this->factory
             ->createNamedBuilder('', 'form', null, array(
                 'csrf_field_name' => 'csrf',
-                'csrf_provider' => $this->csrfProvider,
+                'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
             ))
             ->add('child', 'text')

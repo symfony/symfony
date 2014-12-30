@@ -752,7 +752,7 @@ class FilesystemTest extends FilesystemTestCase
             array('/a/aab/bb/', '/a/aa/', '../aab/bb/'),
         );
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $paths[] = array('c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/');
         }
 
@@ -914,7 +914,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame('bar', file_get_contents($filename));
 
         // skip mode check on Windows
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->assertFilePermissions(753, $filename);
         }
     }
@@ -929,7 +929,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertSame('bar', file_get_contents($filename));
 
         // skip mode check on Windows
-        if (!defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->assertFilePermissions(600, $filename);
         }
     }

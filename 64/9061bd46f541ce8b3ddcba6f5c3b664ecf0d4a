@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-26T14:07:09Z
+
+@nicolas-grekas : The tests are ok, but not ok :/ Do you have an idea why travis is saying that the tests are not ok ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-26T14:22:53Z
+
+Green tests are only for 2.x branches. master is not ready to be worked on...
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-26T14:26:24Z
+
+Yep I saw, but we are almost there! :) Look at that https://travis-ci.org/symfony/symfony/builds/45150843
+
+Don't you think we could deactivate tests for 3.x in php 5.3 ?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-29T14:00:09Z
+
+@saro0h 5.3 and 5.4 were disabled previously because of the new minimum version, but this got lost because of the config refactoring done by @nicolas-grekas

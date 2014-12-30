@@ -57,14 +57,14 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         parent::tearDown();
     }
 
+    protected function renderEnctype(FormView $view)
+    {
+        // Kept empty for 2.7 compatibility
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);
-    }
-
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->engine->get('form')->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -119,5 +119,15 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return array(
             array(array('TestBundle:Parent'), array('TestBundle:Child')),
         );
+    }
+
+    public function testEnctype()
+    {
+        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
+    }
+
+    public function testNoEnctype()
+    {
+        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
     }
 }

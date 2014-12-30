@@ -66,7 +66,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
+        // Kept empty for 2.7 compatibility
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -111,5 +111,15 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->extension->renderer->setTheme($view, $themes);
+    }
+
+    public function testEnctype()
+    {
+        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
+    }
+
+    public function testNoEnctype()
+    {
+        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
     }
 }

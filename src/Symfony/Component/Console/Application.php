@@ -770,7 +770,7 @@ class Application
             return $this->terminalDimensions;
         }
 
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             // extract [w, H] from "wxh (WxH)"
             if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
                 return array((int) $matches[1], (int) $matches[2]);

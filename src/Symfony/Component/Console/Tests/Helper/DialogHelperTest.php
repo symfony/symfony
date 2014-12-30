@@ -100,7 +100,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testAskHiddenResponse()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
         }
 

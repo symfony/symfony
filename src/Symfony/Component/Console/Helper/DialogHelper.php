@@ -100,13 +100,13 @@ class DialogHelper extends InputAwareHelper
      * @param OutputInterface $output       An Output instance
      * @param string|array    $question     The question to ask
      * @param string          $default      The default answer if none is given by the user
-     * @param array           $autocomplete List of values to autocomplete
+     * @param array|callable  $autocomplete List of values to autocomplete
      *
      * @return string The user answer
      *
      * @throws \RuntimeException If there is no data to read in the input stream
      */
-    public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
+    public function ask(OutputInterface $output, $question, $default = null, $autocomplete = null)
     {
         if ($this->input && !$this->input->isInteractive()) {
             return $default;
@@ -152,7 +152,7 @@ class DialogHelper extends InputAwareHelper
 
                     if ($i === 0) {
                         $ofs = -1;
-                        $matches = $autocomplete;
+                        $matches = is_callable($autocomplete) ? (array) $autocomplete($ret) : $autocomplete;
                         $numMatches = count($matches);
                     } else {
                         $numMatches = 0;
@@ -202,10 +202,11 @@ class DialogHelper extends InputAwareHelper
 
                     $numMatches = 0;
                     $ofs = 0;
+                    $matches = is_callable($autocomplete) ? (array) $autocomplete($ret) : $autocomplete;
 
-                    foreach ($autocomplete as $value) {
+                    foreach ($matches as $value) {
                         // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                        if (0 === strpos($value, $ret) && $i !== strlen($value)) {
+                        if (0 === strpos(strtolower($value), $ret) && $i !== strlen($value)) {
                             $matches[$numMatches++] = $value;
                         }
                     }

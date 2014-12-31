@@ -314,7 +314,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         while ($p->isRunning()) {
             if ('R' === file_get_contents($lock)) {
-                if(!$shouldWrite) {
+                if (!$shouldWrite) {
                     $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalOutput(), $matches));
                     $shouldWrite = true;
                 } else {
@@ -383,7 +383,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         while ($p->isRunning()) {
             if ('R' === file_get_contents($lock)) {
-                if(!$shouldWrite) {
+                if (!$shouldWrite) {
                     $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
                     $shouldWrite = true;
                 } else {

@@ -1228,7 +1228,7 @@ class Process
             return $result;
         }
 
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             return $result = false;
         }
 

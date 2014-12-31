@@ -122,14 +122,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $pb->setPrefix(array('/usr/bin/php', 'composer.phar'));
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertEquals('"/usr/bin/php" "composer.phar" "-v"', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' 'composer.phar' '-v'", $proc->getCommandLine());
         }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertEquals('"/usr/bin/php" "composer.phar" "-i"', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' 'composer.phar' '-i'", $proc->getCommandLine());

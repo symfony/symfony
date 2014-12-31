@@ -20,6 +20,7 @@
         "psr/log": "~1.0"
     },
     "require-dev": {
+        "symfony/class-loader": "~2.2",
         "symfony/http-kernel": "~2.2",
         "symfony/http-foundation": "~2.1"
     },

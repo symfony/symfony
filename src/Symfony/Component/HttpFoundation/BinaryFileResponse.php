@@ -191,7 +191,7 @@ class BinaryFileResponse extends Response
             $path = $this->file->getRealPath();
             // Fall back to scheme://path for stream wrapped locations.
             if (empty($path)) {
-              $path = $this->file->getPathname();
+                $path = $this->file->getPathname();
             }
             if (strtolower($type) == 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.

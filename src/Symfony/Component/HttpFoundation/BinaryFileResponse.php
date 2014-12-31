@@ -189,6 +189,10 @@ class BinaryFileResponse extends Response
             // Use X-Sendfile, do not send any content.
             $type = $request->headers->get('X-Sendfile-Type');
             $path = $this->file->getRealPath();
+            // Fall back to scheme://path for stream wrapped locations.
+            if (empty($path)) {
+              $path = $this->file->getPathname();
+            }
             if (strtolower($type) == 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.
                 foreach (explode(',', $request->headers->get('X-Accel-Mapping', '')) as $mapping) {

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-31T09:48:30Z
+
+Tests are fine, maybe you missed a composer update before running them?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-31T09:50:49Z
+
+Ok my bad, travis is failing.
+This is not the correct fix.
+Instead, you should require-dev symfony/class-loader ~2.2 in the composer.json of the debug component
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-31T09:51:01Z
+
+Exception message format has changed in #11034. #13173 added few more test cases in 2.5 and [tests started to fail](https://travis-ci.org/symfony/symfony/builds/45528192) after 2.5 was merged to 2.6.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-31T09:52:09Z
+
+I'll double check composer. I've been switching between branches quite a lot.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-31T09:52:24Z
+
+Hum, too fast again, let me check more carefully :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-31T09:53:58Z
+
+Ok, your PR is good, :+1: sorry for the mistake
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-31T09:55:50Z
+
+@nicolas-grekas travis agrees ;)

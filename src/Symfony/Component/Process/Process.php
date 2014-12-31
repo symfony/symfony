@@ -568,7 +568,7 @@ class Process
         if (false === $latest) {
             return '';
         }
-        
+
         $this->incrementalErrorOutputOffset = strlen($data);
 
         return $latest;

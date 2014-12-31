@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-30T13:28:44Z
+
+@xabbuh Can you update this PR?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T13:32:58Z
+
+@fabpot You could maybe merge the `2.3` branch into `2.5` first to avoid conflicts and to ensure that no occurrence of `PHP_WINDOWS_VERSION_BUILD` and `PHP_WINDOWS_VERSION_MAJOR` is missed?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T13:33:14Z
+
+Oh, you did it in the meantime. Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T13:46:51Z
+
+updated

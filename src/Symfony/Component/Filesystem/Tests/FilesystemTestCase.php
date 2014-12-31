@@ -22,7 +22,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             static::$symlinkOnWindows = true;
             $originDir = tempnam(sys_get_temp_dir(), 'sl');
             $targetDir = tempnam(sys_get_temp_dir(), 'sl');
@@ -106,21 +106,21 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('symlink is not supported');
         }
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false === static::$symlinkOnWindows) {
+        if ('\\' === DIRECTORY_SEPARATOR && false === static::$symlinkOnWindows) {
             $this->markTestSkipped('symlink requires "Create symbolic links" privilege on windows');
         }
     }
 
     protected function markAsSkippedIfChmodIsMissing()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('chmod is not supported on windows');
         }
     }
 
     protected function markAsSkippedIfPosixIsMissing()
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') || !function_exists('posix_isatty')) {
+        if ('\\' === DIRECTORY_SEPARATOR || !function_exists('posix_isatty')) {
             $this->markTestSkipped('Posix is not supported');
         }
     }

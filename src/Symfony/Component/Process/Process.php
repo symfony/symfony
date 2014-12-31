@@ -1249,7 +1249,7 @@ class Process
      */
     private function getDescriptors()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->processPipes = WindowsPipes::create($this, $this->input);
         } else {
             $this->processPipes = UnixPipes::create($this, $this->input);

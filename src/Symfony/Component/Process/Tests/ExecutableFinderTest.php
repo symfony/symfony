@@ -120,6 +120,10 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Requires the PHP_BINARY constant');
         }
 
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Cannot run test on windows');
+        }
+
         $this->setPath('');
         ini_set('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
 

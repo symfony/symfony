@@ -59,7 +59,7 @@ class TextDescriptor extends Descriptor
         }
 
         $this->writeText($this->formatSection('router', 'Current routes')."\n", $options);
-        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
+        $table->render();
     }
 
     /**
@@ -109,7 +109,7 @@ class TextDescriptor extends Descriptor
         }
 
         $this->writeText($this->formatSection('container', 'List of parameters')."\n", $options);
-        $this->renderTable($table, !(isset($options['raw_output']) && $options['raw_output']));
+        $table->render();
     }
 
     /**
@@ -232,7 +232,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $this->renderTable($table);
+        $table->render();
     }
 
     /**
@@ -302,6 +302,7 @@ class TextDescriptor extends Descriptor
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
         $registeredListeners = $eventDispatcher->getListeners($event);
+
         if (null !== $event) {
             $this->writeText("\n");
             $table = new Table($this->getOutput());
@@ -312,7 +313,7 @@ class TextDescriptor extends Descriptor
                 $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
             }
 
-            $this->renderTable($table, true);
+            $table->render();
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
@@ -326,7 +327,7 @@ class TextDescriptor extends Descriptor
                     $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
                 }
 
-                $this->renderTable($table, true);
+                $table->render();
             }
         }
     }

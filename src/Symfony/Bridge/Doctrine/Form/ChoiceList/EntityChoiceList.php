@@ -16,6 +16,7 @@ use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices.
@@ -35,7 +36,7 @@ class EntityChoiceList extends ObjectChoiceList
     private $class;
 
     /**
-     * @var \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     * @var ClassMetadata
      */
     private $classMetadata;
 
@@ -132,7 +133,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getChoices()
     {
@@ -148,7 +149,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getValues()
     {
@@ -165,7 +166,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getPreferredViews()
     {
@@ -182,7 +183,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getRemainingViews()
     {
@@ -200,7 +201,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getChoicesForValues(array $values)
     {
@@ -253,7 +254,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getValuesForChoices(array $entities)
     {
@@ -293,7 +294,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getIndicesForChoices(array $entities)
     {
@@ -333,7 +334,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @return array
      *
-     * @see Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface
+     * @see ChoiceListInterface
      */
     public function getIndicesForValues(array $values)
     {
@@ -416,6 +417,8 @@ class EntityChoiceList extends ObjectChoiceList
 
     /**
      * Loads the list with entities.
+     *
+     * @throws StringCastException
      */
     private function load()
     {

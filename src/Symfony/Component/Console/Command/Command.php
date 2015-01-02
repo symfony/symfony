@@ -165,7 +165,7 @@ class Command
      *
      * @throws \LogicException When this abstract method is not implemented
      *
-     * @see    setCode()
+     * @see setCode()
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

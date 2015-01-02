@@ -65,7 +65,7 @@ interface ConstraintViolationInterface
      * @return array A possibly empty list of parameters indexed by the names
      *               that appear in the message template.
      *
-     * @see getMessageTemplate
+     * @see getMessageTemplate()
      *
      * @api
      */

@@ -56,7 +56,7 @@ class EsiFragmentRenderer extends RoutableFragmentRenderer
      *  * alt: an alternative URI to render in case of an error
      *  * comment: a comment to add when returning an esi:include tag
      *
-     * @see Symfony\Component\HttpKernel\HttpCache\ESI
+     * @see Esi
      */
     public function render($uri, Request $request, array $options = array())
     {

@@ -19,7 +19,7 @@
         <parameter key="templating.form.engine.class">Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine</parameter>
         <parameter key="templating.form.renderer.class">Symfony\Component\Form\FormRenderer</parameter>
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
-        <parameter key="templating.asset.path_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PathPackage</parameter>
+        <parameter key="templating.asset.path_package.class">Symfony\Bundle\Component\Templating\Asset\PathPackage</parameter>
         <parameter key="templating.asset.url_package.class">Symfony\Component\Templating\Asset\UrlPackage</parameter>
         <parameter key="templating.asset.package_factory.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory</parameter>
     </parameters>
@@ -44,7 +44,7 @@
         </service>
 
         <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
-            <argument type="expression">service('request_stack').getMasterRequest()</argument>
+            <argument type="expression">service('request_stack').getMasterRequest().getBasePath()</argument>
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>

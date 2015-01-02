@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
+trigger_error('Symfony\Bundle\TwigBundle\Extension\AssetsExtension was deprecated in 2.7 and will be removed in 3.0. Please use Symfony\Component\Twig\Extension\AssetPackagesExtension instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Routing\RequestContext;
  * Twig extension for Symfony assets helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated in 2.7, to be removed in 3.0. Use Symfony\Component\Twig\Extension\AssetPackagesExtension instead.
  */
 class AssetsExtension extends \Twig_Extension
 {

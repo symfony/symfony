@@ -458,6 +458,9 @@ class FrameworkExtension extends Extension
     private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
+        $loader->load('assets.xml');
+
+        $this->createPackageDefinitions($config, $container);
 
         $links = array(
             'textmate' => 'txmt://open?url=file://%%f&line=%%l',
@@ -513,20 +516,7 @@ class FrameworkExtension extends Extension
             $loader->load('templating_php.xml');
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
-
-            // create package definitions and add them to the assets helper
-            $defaultPackage = $this->createPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format']);
-            $container->setDefinition('templating.asset.default_package', $defaultPackage);
-            $namedPackages = array();
-            foreach ($config['packages'] as $name => $package) {
-                $namedPackage = $this->createPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format'], $name);
-                $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
-                $namedPackages[$name] = new Reference('templating.asset.package.'.$name);
-            }
-            $container->getDefinition('templating.helper.assets')->setArguments(array(
-                new Reference('templating.asset.default_package'),
-                $namedPackages,
-            ));
+            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('templating.asset.default_package'));
 
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('templating_debug.xml');
@@ -556,6 +546,19 @@ class FrameworkExtension extends Extension
         }
     }
 
+    private function createPackageDefinitions(array $config, ContainerBuilder $container)
+    {
+        // create package definitions and add them to the assets helper
+        $defaultPackage = $this->createPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format']);
+        $container->setDefinition('templating.asset.default_package', $defaultPackage);
+
+        foreach ($config['packages'] as $name => $package) {
+            $namedPackage = $this->createPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format'], $name);
+            $def = $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
+            $def->addTag('templating.asset_package', array('name' => $name));
+        }
+    }
+
     /**
      * Returns a definition for an asset package.
      */
@@ -575,12 +578,7 @@ class FrameworkExtension extends Extension
 
         if ($httpUrls == $sslUrls) {
             $package = new DefinitionDecorator('templating.asset.url_package');
-            $package
-                ->setPublic(false)
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
+            $package->setPublic(false)->setArguments(array($sslUrls, $version, $format));
 
             return $package;
         }
@@ -588,20 +586,12 @@ class FrameworkExtension extends Extension
         $prefix = $name ? 'templating.asset.package.'.$name : 'templating.asset.default_package';
 
         $httpPackage = new DefinitionDecorator('templating.asset.url_package');
-        $httpPackage
-            ->replaceArgument(0, $httpUrls)
-            ->replaceArgument(1, $version)
-            ->replaceArgument(2, $format)
-        ;
+        $httpPackage->setArguments(array($httpUrls, $version, $format));
         $container->setDefinition($prefix.'.http', $httpPackage);
 
         if ($sslUrls) {
             $sslPackage = new DefinitionDecorator('templating.asset.url_package');
-            $sslPackage
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
+            $sslPackage->setArguments(array($sslUrls, $version, $format));
         } else {
             $sslPackage = new DefinitionDecorator('templating.asset.path_package');
             $sslPackage

@@ -35,7 +35,7 @@ class TemplatingAssetHelperPassTest extends \PHPUnit_Framework_TestCase
         $defaultPackage->setScope($scope);
         $container->setDefinition('default_package', $defaultPackage);
 
-        $definition = new Definition('stdClass', array(new Reference('default_package')));
+        $definition = new Definition('stdClass', array(new Reference('default_package'), array()));
         $container->setDefinition('templating.helper.assets', $definition);
 
         $profilerPass = new TemplatingAssetHelperPass();
@@ -52,7 +52,7 @@ class TemplatingAssetHelperPassTest extends \PHPUnit_Framework_TestCase
         $defaultPackage = new Definition('stdClass');
         $defaultPackage->setScope($scope);
 
-        $definition = new Definition('stdClass', array($defaultPackage));
+        $definition = new Definition('stdClass', array($defaultPackage, array()));
         $container->setDefinition('templating.helper.assets', $definition);
 
         $profilerPass = new TemplatingAssetHelperPass();

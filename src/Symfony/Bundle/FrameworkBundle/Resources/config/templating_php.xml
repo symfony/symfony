@@ -19,9 +19,6 @@
         <parameter key="templating.form.engine.class">Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine</parameter>
         <parameter key="templating.form.renderer.class">Symfony\Component\Form\FormRenderer</parameter>
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
-        <parameter key="templating.asset.path_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PathPackage</parameter>
-        <parameter key="templating.asset.url_package.class">Symfony\Component\Templating\Asset\UrlPackage</parameter>
-        <parameter key="templating.asset.package_factory.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory</parameter>
     </parameters>
 
     <services>
@@ -41,29 +38,6 @@
             <tag name="templating.helper" alias="assets" />
             <argument /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->
-        </service>
-
-        <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
-            <argument type="service" id="request" />
-            <argument /> <!-- version -->
-            <argument /> <!-- version format -->
-        </service>
-
-        <service id="templating.asset.url_package" class="%templating.asset.url_package.class%" abstract="true">
-            <argument /> <!-- base urls -->
-            <argument /> <!-- version -->
-            <argument /> <!-- version format -->
-        </service>
-
-        <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" abstract="true">
-            <factory service="templating.asset.package_factory" method="getPackage" />
-            <argument type="service" id="request" strict="false" />
-            <argument /> <!-- HTTP id -->
-            <argument /> <!-- SSL id -->
-        </service>
-
-        <service id="templating.asset.package_factory" class="%templating.asset.package_factory.class%">
-            <argument type="service" id="service_container" />
         </service>
 
         <service id="templating.helper.request" class="%templating.helper.request.class%">

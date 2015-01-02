@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Bridge\Doctrine\Tests\DoctrineOrmTestCase;
+use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 
@@ -66,7 +66,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
             $this->markTestSkipped('Doctrine ORM is not available.');
         }
 
-        $this->em = DoctrineOrmTestCase::createTestEntityManager();
+        $this->em = DoctrineTestHelper::createTestEntityManager();
 
         parent::setUp();
 

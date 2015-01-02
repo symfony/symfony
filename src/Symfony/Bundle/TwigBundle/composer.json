@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/twig-bridge": "~2.3,>=2.3.10",
-        "symfony/http-kernel": "~2.1"
+        "symfony/http-kernel": "~2.3,>=2.3.24"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2",

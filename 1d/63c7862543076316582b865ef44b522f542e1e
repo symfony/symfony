@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by romqin at 2015-01-01T01:16:52Z
+
+IMO, one PR was enough ^^
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-01T10:23:22Z
+
+It's easier to press merge for 3 branches than to cherry-pick them afterwards tho. But happy new year!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-01T12:02:15Z
+
+@iltar we don't cherry-pick. the 2.3 branch gets merged into newer branch on a regular basis (and so on). This ensures that we never miss a patch which should go in all branches.
+So merging different PRs for each branch means having duplicate commits doing the same in the history.
+
+So this PR should be change to update the year only for components which are new in 2.6 (VarDumper and DebugBundle)
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-01T13:30:38Z
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-01T14:51:57Z
+
+:+1:

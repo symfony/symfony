@@ -208,6 +208,24 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFileNotExists($path);
     }
 
+    /**
+     *
+     */
+    public function testAcceptRangeOnUnsafeMethods()
+    {
+        $request = Request::create('/', 'POST');
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif');
+        $response->prepare($request);
+        $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
+
+        // Don't override when already set
+        $request = Request::create('/', 'POST');
+        $response = BinaryFileResponse::create(__DIR__.'/File/Fixtures/test.gif');
+        $response->headers->set('Accept-Ranges', 'foo');
+        $response->prepare($request);
+        $this->assertEquals('foo', $response->headers->get('Accept-Ranges'));
+    }
+
     public function getSampleXAccelMappings()
     {
         return array(

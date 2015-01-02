@@ -27,27 +27,22 @@ class TemplatingAssetHelperPass implements CompilerPassInterface
         $assetsHelperDefinition = $container->getDefinition('templating.helper.assets');
         $args = $assetsHelperDefinition->getArguments();
 
-        if ('request' === $this->getPackageScope($container, $args[0])) {
-            $assetsHelperDefinition->setScope('request');
-
-            return;
+        // add tagged packages
+        $namedPackages = $args[1];
+        foreach ($container->findTaggedServiceIds('templating.asset_package') as $id => $attributes) {
+            $name = isset($attributes['name']) ? $attributes['name'] : $id;
+            $namedPackages[$name] = $package = new Reference($id);
         }
+        $assetsHelperDefinition->replaceArgument(1, $namedPackages);
 
-        if (!array_key_exists(1, $args)) {
-            return;
-        }
-
-        if (!is_array($args[1])) {
-            return;
-        }
-
-        foreach ($args[1] as $arg) {
-            if ('request' === $this->getPackageScope($container, $arg)) {
-                $assetsHelperDefinition->setScope('request');
-
-                break;
+        // fix helper scope
+        $scope = $this->getPackageScope($container, $args[0]);
+        foreach ($namedPackages as $package) {
+            if ('request' === $this->getPackageScope($container, $package)) {
+                $scope = 'request';
             }
         }
+        $assetsHelperDefinition->setScope($scope);
     }
 
     private function getPackageScope(ContainerBuilder $container, $package)
@@ -59,8 +54,5 @@ class TemplatingAssetHelperPass implements CompilerPassInterface
         if ($package instanceof Definition) {
             return $package->getScope();
         }
-
-        // Someone did some voodoo with a compiler pass. So we ignore this
-        // 'package'. Can we be sure, it's a package anyway?
     }
 }

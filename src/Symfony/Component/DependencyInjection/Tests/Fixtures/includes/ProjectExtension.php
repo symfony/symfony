@@ -4,6 +4,19 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
+//Services have to exist
+class FooClass
+{
+}
+
+class BAR
+{
+}
+
+class Foo
+{
+}
+
 class ProjectExtension implements ExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $configuration)

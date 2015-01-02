@@ -113,4 +113,20 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
+
+    /**
+     * @expectedException        \Symfony\Component\DependencyInjection\Exception\BadServiceClassException
+     * @expectedExceptionMessage Class "\NotExist\InvalidClass" not found. Check the spelling on the "class" configuration for your "a" service.
+     */
+    public function testFriendlyErrorIsThrowedWhenServiceHasBadClassName()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a', '\NotExist\InvalidClass')
+        ;
+
+        $container->compile();
+    }
+
 }

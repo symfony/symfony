@@ -109,8 +109,8 @@ class ControllerResolverTest extends BaseControllerResolverTest
     public function getUndefinedControllers()
     {
         return array(
-            array('foo', '\LogicException', 'Unable to parse the controller name "foo".'),
-            array('foo::bar', '\InvalidArgumentException', 'Class "foo" does not exist.'),
+            array('myfoo', '\LogicException', 'Unable to parse the controller name "myfoo".'),
+            array('myfoo::bar', '\InvalidArgumentException', 'Class "myfoo" does not exist.'),
             array('stdClass', '\LogicException', 'Unable to parse the controller name "stdClass".'),
             array(
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',

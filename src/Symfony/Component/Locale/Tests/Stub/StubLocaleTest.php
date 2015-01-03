@@ -21,9 +21,10 @@ class StubLocaleTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-        parent::setUp();
+        // Locale extends \Locale, so intl must be present
+        IntlTestHelper::requireIntl($this);
     }
 
     public function testGetCurrenciesData()

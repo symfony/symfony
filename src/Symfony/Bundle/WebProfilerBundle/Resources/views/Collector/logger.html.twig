@@ -105,7 +105,7 @@
 
 
 {% macro display_message(log_index, log) %}
-    {% if constant('Symfony\\Component\\HttpKernel\\Debug\\ErrorHandler::TYPE_DEPRECATION') == log.context.type|default(0) %}
+    {% if constant('Symfony\\Component\\Debug\\ErrorHandler::TYPE_DEPRECATION') == log.context.type|default(0) %}
         DEPRECATION -  {{ log.message }}
         {% set id = 'sf-call-stack-' ~ log_index %}
         <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.3.0
+-----
+
+The Locale component is deprecated since version 2.3 and will be removed in
+Symfony 3.0. You should use the more capable Intl component instead.
+
 2.1.0
 -----
 

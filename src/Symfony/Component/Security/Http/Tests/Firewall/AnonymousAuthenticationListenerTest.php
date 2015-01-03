@@ -55,10 +55,6 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandledEventIsLogged()
     {
-        if (!interface_exists('Psr\Log\LoggerInterface')) {
-            $this->markTestSkipped('The "LoggerInterface" is not available');
-        }
-
         $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())

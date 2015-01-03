@@ -159,7 +159,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = new Translator('fr');
         $translator->addLoader('array', new ArrayLoader());
 
-        $translator->setFallbackLocale(array('en'));
+        $translator->setFallbackLocales(array('en'));
 
         $translator->addResource('array', array('foo' => 'foofoo'), 'en');
         $this->assertEquals('foofoo', $translator->trans('foo'));

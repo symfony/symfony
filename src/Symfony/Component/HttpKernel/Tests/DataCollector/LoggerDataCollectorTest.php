@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {

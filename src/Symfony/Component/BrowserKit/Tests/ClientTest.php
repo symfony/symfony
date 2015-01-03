@@ -268,14 +268,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testClick()
     {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            $this->markTestSkipped('The "DomCrawler" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $client = new TestClient();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
         $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -287,14 +279,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testClickForm()
     {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            $this->markTestSkipped('The "DomCrawler" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $client = new TestClient();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -306,14 +290,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmit()
     {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            $this->markTestSkipped('The "DomCrawler" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $client = new TestClient();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -325,14 +301,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmitPreserveAuth()
     {
-        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            $this->markTestSkipped('The "DomCrawler" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\CssSelector\CssSelector')) {
-            $this->markTestSkipped('The "CssSelector" component is not available');
-        }
-
         $client = new TestClient(array('PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar'));
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
         $crawler = $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -581,10 +549,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testInsulatedRequests()
     {
-        if (!class_exists('Symfony\Component\Process\Process')) {
-            $this->markTestSkipped('The "Process" component is not available');
-        }
-
         $client = new TestClient();
         $client->insulate();
         $client->setNextScript("new Symfony\Component\BrowserKit\Response('foobar')");

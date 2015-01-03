@@ -26,18 +26,6 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
-        }
-
         $this->securityContext = new SecurityContext(
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
             $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')

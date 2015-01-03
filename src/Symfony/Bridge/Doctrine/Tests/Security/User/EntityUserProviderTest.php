@@ -18,15 +18,6 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Security\Core\SecurityContext')) {
-            $this->markTestSkipped('The "Security" component is not available');
-        }
-
-        parent::setUp();
-    }
-
     public function testRefreshUserGetsUserByPrimaryKey()
     {
         $em = DoctrineTestHelper::createTestEntityManager();

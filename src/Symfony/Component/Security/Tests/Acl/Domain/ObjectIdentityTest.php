@@ -85,13 +85,6 @@ namespace Symfony\Component\Security\Tests\Acl\Domain
                 array(new ObjectIdentity('1', 'bla'), new ObjectIdentity('1', 'blub'), false),
             );
         }
-
-        protected function setUp()
-        {
-            if (!class_exists('Doctrine\DBAL\DriverManager')) {
-                $this->markTestSkipped('The Doctrine2 DBAL is required for this test');
-            }
-        }
     }
 
     class TestDomainObject

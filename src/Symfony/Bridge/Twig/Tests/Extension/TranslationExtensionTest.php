@@ -19,19 +19,6 @@ use Symfony\Bridge\Twig\Tests\TestCase;
 
 class TranslationExtensionTest extends TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            $this->markTestSkipped('The "Translation" component is not available');
-        }
-
-        if (!class_exists('Twig_Environment')) {
-            $this->markTestSkipped('Twig is not available.');
-        }
-    }
-
     public function testEscaping()
     {
         $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(array('value' => 12, 'msg' => 'approx.'));

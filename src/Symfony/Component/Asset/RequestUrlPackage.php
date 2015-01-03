@@ -14,48 +14,50 @@ namespace Symfony\Component\Asset;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
+ * Package that adds a base URL to asset URLs in addition to a version.
+ *
+ * As this package is aware of the current HTTP request, it can
+ * determine the best base URL to use based on the current request
+ * scheme.
+ *
+ *  * For HTTP request, it chooses between all base URLs;
+ *  * For HTTPs requests, it chooses between HTTPs base URLs and relative protocol URLs
+ *    or falls back to any base URL if no secure ones are available.
+ *
+ * When no request is available, it falls back to choose between all base URLs.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestUrlPackage implements PackageInterface
+class RequestUrlPackage extends UrlPackage
 {
-    private $version;
     private $requestStack;
-    private $package;
     private $sslPackage;
 
     /**
      * @param RequestStack $request The request stack
+     * @param string|array $baseUrls Base asset URLs
      * @param string       $version The version
      * @param string       $format  The version format
      */
     public function __construct(RequestStack $requestStack, $baseUrls = array(), $version = null, $format = null)
     {
         $this->requestStack = $requestStack;
-        $this->version = $version;
 
-        list($allUrls, $sslUrls) = $this->organizeUrls($baseUrls);
-
-        if (!$allUrls) {
-            $this->package = new RequestPathPackage($requestStack, $version, $format);
-        } elseif ($allUrls === $sslUrls) {
-            $this->package = new UrlPackage($allUrls, $version, $format);
-        } else {
-            $this->package = new UrlPackage($allUrls, $version, $format);
-
-            if ($sslUrls) {
-                $this->sslPackage = new UrlPackage($sslUrls, $version, $format);
-            } else {
-                $this->sslPackage = new RequestPathPackage($version, $format);
-            }
+        if (!is_array($baseUrls)) {
+            $baseUrls = (array) $baseUrls;
         }
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getVersion()
-    {
-        return $this->version;
+        if (!$baseUrls) {
+            throw new \LogicException('You must provide at least one base URL.');
+        }
+
+        $sslUrls = $this->getSslUrls($baseUrls);
+
+        parent::__construct($baseUrls, $version, $format);
+
+        if ($sslUrls && $baseUrls !== $sslUrls) {
+            $this->sslPackage = new UrlPackage($sslUrls, $version, $format);
+        }
     }
 
     /**
@@ -64,31 +66,27 @@ class RequestUrlPackage implements PackageInterface
     public function getUrl($path, $version = null)
     {
         if (null === $this->sslPackage) {
-            return $this->package->getUrl($path, $version);
+            return parent::getUrl($path, $version);
         }
 
         if (($request = $this->requestStack->getCurrentRequest()) && $request->isSecure()) {
             return $this->sslPackage->getUrl($path, $version);
         }
 
-        return $this->package->getUrl($path, $version);
+        return parent::getUrl($path, $version);
     }
 
-    private function organizeUrls($urls)
+    private function getSslUrls($urls)
     {
-        $sslUrls =  isset($urls['ssl']) ? $urls['ssl'] : array();
-        $allUrls = array_merge(isset($urls['http']) ? $urls['http'] : array(), $sslUrls);
-        foreach ($urls as $i => $url) {
-            if (!is_integer($i)) {
-                continue;
-            }
-
-            $allUrls[] = $url;
-            if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
+        $sslUrls = array();
+        foreach ($urls as $url) {
+            if ('https://' === substr($url, 0, 8) || '//' === substr($url, 0, 2)) {
                 $sslUrls[] = $url;
+            } elseif ('http://' !== substr($url, 0, 7)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not a valid URL', $url));
             }
         }
 
-        return array($allUrls, $sslUrls);
+        return $sslUrls;
     }
 }

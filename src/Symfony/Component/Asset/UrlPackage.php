@@ -12,7 +12,12 @@
 namespace Symfony\Component\Asset;
 
 /**
- * The URL packages adds a version and a base URL to asset URLs.
+ * Package that adds a base URL to asset URLs in addition to a version.
+ *
+ * The package allows to use more than one base URLs in which case
+ * it randomly chooses one for each asset; it also guarantees that
+ * any given path will always use the same base URL to be nice with
+ * HTTP caching mechanisms.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -35,6 +40,10 @@ class UrlPackage extends Package
             $baseUrls = (array) $baseUrls;
         }
 
+        if (!$baseUrls) {
+            throw new \LogicException('You must provide at least one base URL.');
+        }
+
         $this->baseUrls = array();
         foreach ($baseUrls as $baseUrl) {
             $this->baseUrls[] = rtrim($baseUrl, '/');
@@ -46,7 +55,7 @@ class UrlPackage extends Package
      */
     public function getUrl($path, $version = null)
     {
-        if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
+        if ($this->isAbsoluteUrl($path)) {
             return $path;
         }
 
@@ -69,9 +78,6 @@ class UrlPackage extends Package
     public function getBaseUrl($path)
     {
         switch ($count = count($this->baseUrls)) {
-            case 0:
-                return '';
-
             case 1:
                 return $this->baseUrls[0];
 

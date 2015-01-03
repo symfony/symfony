@@ -12,7 +12,7 @@
 namespace Symfony\Component\Asset;
 
 /**
- * The path packages adds a version and a base path to asset URLs.
+ * Package that adds a base path to asset URLs in addition to a version.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -27,7 +27,7 @@ class PathPackage extends Package
      * @param string $version  The package version
      * @param string $format   The format used to apply the version
      */
-    public function __construct($basePath = null, $version = null, $format = null)
+    public function __construct($basePath, $version = null, $format = null)
     {
         parent::__construct($version, $format);
 
@@ -47,7 +47,7 @@ class PathPackage extends Package
      */
     public function getUrl($path, $version = null)
     {
-        if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
+        if ($this->isAbsoluteUrl($path)) {
             return $path;
         }
 
@@ -55,7 +55,7 @@ class PathPackage extends Package
 
         // apply the base path
         if ('/' !== substr($url, 0, 1)) {
-            $url = $this->getBasePath().$url;
+            return $this->getBasePath().$url;
         }
 
         return $url;

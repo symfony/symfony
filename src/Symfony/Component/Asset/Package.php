@@ -12,7 +12,7 @@
 namespace Symfony\Component\Asset;
 
 /**
- * The basic package will add a version to asset URLs.
+ * Basic package that adds a version to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
  */
@@ -46,11 +46,16 @@ class Package implements PackageInterface
      */
     public function getUrl($path, $version = null)
     {
-        if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
+        if ($this->isAbsoluteUrl($path)) {
             return $path;
         }
 
         return $this->applyVersion($path, $version);
+    }
+
+    protected function isAbsoluteUrl($url)
+    {
+        return false !== strpos($url, '://') || '//' === substr($url, 0, 2);
     }
 
     /**
@@ -63,8 +68,8 @@ class Package implements PackageInterface
      */
     protected function applyVersion($path, $version = null)
     {
-        $version = null !== $version ? $version : $this->version;
-        if (null === $version || false === $version) {
+        $version = $version ?: $this->version;
+        if (!$version) {
             return $path;
         }
 

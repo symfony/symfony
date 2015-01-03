@@ -87,7 +87,7 @@ class AssetExtension extends \Twig_Extension
      */
     private function ensureUrlIsAbsolute($url)
     {
-        if (false !== strpos($url, '://') || 0 === strpos($url, '//')) {
+        if (false !== strpos($url, '://') || '//' === substr($url, 0, 2)) {
             return $url;
         }
 

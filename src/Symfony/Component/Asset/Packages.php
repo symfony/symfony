@@ -26,7 +26,7 @@ class Packages
      * @param PackageInterface   $defaultPackage The default package
      * @param PackageInterface[] $packages       Additional packages indexed by name
      */
-    public function __construct(PackageInterface $defaultPackage, array $packages = array())
+    public function __construct(PackageInterface $defaultPackage = null, array $packages = array())
     {
         $this->defaultPackage = $defaultPackage;
 
@@ -68,6 +68,10 @@ class Packages
     public function getPackage($name = null)
     {
         if (null === $name) {
+            if (null === $this->defaultPackage) {
+                throw new \LogicException('There is no default asset package, configure one first.');
+            }
+
             return $this->defaultPackage;
         }
 

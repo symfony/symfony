@@ -1,7 +1,7 @@
 {
-    "name": "symfony/templating",
+    "name": "symfony/asset",
     "type": "library",
-    "description": "Symfony Templating Component",
+    "description": "Symfony Asset Component",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
@@ -16,19 +16,12 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/asset": "~2.7"
-    },
-    "require-dev": {
-        "psr/log": "~1.0"
-    },
-    "suggest": {
-        "psr/log": "For using debug logging in loaders"
+        "php": ">=5.3.3"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Templating\\": "" }
+        "psr-0": { "Symfony\\Component\\Asset\\": "" }
     },
-    "target-dir": "Symfony/Component/Templating",
+    "target-dir": "Symfony/Component/Asset",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

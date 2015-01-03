@@ -11,72 +11,15 @@
 
 namespace Symfony\Component\Templating\Asset;
 
+use Symfony\Component\Asset\UrlPackage as AssetUrlPackage;
+
 /**
  * The URL packages adds a version and a base URL to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since 2.7, to be removed in 3.0. Use the Asset Component instead.
  */
-class UrlPackage extends Package
+class UrlPackage extends AssetUrlPackage implements PackageInterface
 {
-    private $baseUrls;
-
-    /**
-     * Constructor.
-     *
-     * @param string|array $baseUrls Base asset URLs
-     * @param string       $version  The package version
-     * @param string       $format   The format used to apply the version
-     */
-    public function __construct($baseUrls = array(), $version = null, $format = null)
-    {
-        parent::__construct($version, $format);
-
-        if (!is_array($baseUrls)) {
-            $baseUrls = (array) $baseUrls;
-        }
-
-        $this->baseUrls = array();
-        foreach ($baseUrls as $baseUrl) {
-            $this->baseUrls[] = rtrim($baseUrl, '/');
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUrl($path, $version = null)
-    {
-        if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
-            return $path;
-        }
-
-        $url = $this->applyVersion($path, $version);
-
-        if ($url && '/' != $url[0]) {
-            $url = '/'.$url;
-        }
-
-        return $this->getBaseUrl($path).$url;
-    }
-
-    /**
-     * Returns the base URL for a path.
-     *
-     * @param string $path
-     *
-     * @return string The base URL
-     */
-    public function getBaseUrl($path)
-    {
-        switch ($count = count($this->baseUrls)) {
-            case 0:
-                return '';
-
-            case 1:
-                return $this->baseUrls[0];
-
-            default:
-                return $this->baseUrls[fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
-        }
-    }
 }

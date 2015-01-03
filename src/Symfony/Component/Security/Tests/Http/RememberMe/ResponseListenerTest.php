@@ -102,7 +102,6 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
         $event->expects($this->any())->method('getRequest')->will($this->returnValue($request));
         $event->expects($this->any())->method('getRequestType')->will($this->returnValue($type));
-        $event->expects($this->any())->method('isMasterRequest')->will($this->returnValue($type === HttpKernelInterface::MASTER_REQUEST));
         $event->expects($this->any())->method('getResponse')->will($this->returnValue($response));
 
         return $event;

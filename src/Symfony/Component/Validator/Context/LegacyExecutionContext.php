@@ -58,6 +58,8 @@ class LegacyExecutionContext extends ExecutionContext
     public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         if (func_num_args() > 2) {
+            trigger_error('The parameters $invalidValue, $plural and $code of '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Please use buildViolation() instead.', E_USER_DEPRECATED);
+
             $this
                 ->buildViolation($message, $parameters)
                 ->setInvalidValue($invalidValue)
@@ -77,6 +79,11 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Please use buildViolation() instead.',
+            E_USER_DEPRECATED
+        );
+
         if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
@@ -102,6 +109,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use getValidator() together with inContext() instead.', E_USER_DEPRECATED);
+
         if (is_array($value)) {
             // The $traverse flag is ignored for arrays
             $constraint = new Valid(array('traverse' => true, 'deep' => $deep));
@@ -138,6 +147,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use getValidator() together with inContext() instead.', E_USER_DEPRECATED);
+
         return $this
             ->getValidator()
             ->inContext($this)
@@ -151,6 +162,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function getMetadataFactory()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use getValidator() together with getMetadataFor() or hasMetadataFor instead.', E_USER_DEPRECATED);
+
         return $this->metadataFactory;
     }
 }

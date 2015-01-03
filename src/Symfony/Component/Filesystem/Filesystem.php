@@ -69,9 +69,8 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
 
-            if (is_executable($originFile)) {
-                // User Executable | Group Executable | Other Executable
-                chmod($targetFile, fileperms($targetFile) | 0x0040 | 0x0008 | 0x0001);
+            if (is_file($originFile)) {
+                $this->chmod($targetFile, fileperms($originFile));
             }
 
             if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {

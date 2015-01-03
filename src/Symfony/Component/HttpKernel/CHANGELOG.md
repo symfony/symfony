@@ -23,7 +23,7 @@ CHANGELOG
 
  * [BC BREAK] renamed `Symfony\Component\HttpKernel\EventListener\DeprecationLoggerListener` to `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener` and changed its constructor
  * deprecated `Symfony\Component\HttpKernel\Debug\ErrorHandler`, `Symfony\Component\HttpKernel\Debug\ExceptionHandler`,
-   `Symfony\Component\HttpKernel\Exception\FatalErrorException`, and `Symfony\Component\HttpKernel\Exception\FlattenException`
+   `Symfony\Component\HttpKernel\Exception\FatalErrorException` and `Symfony\Component\HttpKernel\Exception\FlattenException`
  * deprecated `Symfony\Component\HttpKernel\Kernel::init()``
  * added the possibility to specify an id an extra attributes to hinclude tags
  * added the collect of data if a controller is a Closure in the Request collector

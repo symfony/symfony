@@ -39,7 +39,7 @@ final class PropertyAccess
     }
 
     /**
-     * Alias of {@link getPropertyAccessor}.
+     * Alias of {@link createPropertyAccessor}.
      *
      * @return PropertyAccessor The new property accessor
      *

@@ -57,6 +57,8 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the ClassLoader class instead.
  */
 class UniversalClassLoader
 {

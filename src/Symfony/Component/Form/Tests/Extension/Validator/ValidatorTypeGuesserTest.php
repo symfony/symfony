@@ -50,10 +50,6 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Validator\Constraint')) {
-            $this->markTestSkipped('The "Validator" component is not available');
-        }
-
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
         $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $this->metadataFactory->expects($this->any())

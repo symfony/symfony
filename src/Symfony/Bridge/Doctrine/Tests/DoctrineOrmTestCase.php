@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 /**
  * Class DoctrineOrmTestCase.
  *
- * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
+ * @deprecated Deprecated as of Symfony 2.3, to be removed in Symfony 3.0.
  *             Use {@link DoctrineTestHelper} instead.
  */
 abstract class DoctrineOrmTestCase extends \PHPUnit_Framework_TestCase

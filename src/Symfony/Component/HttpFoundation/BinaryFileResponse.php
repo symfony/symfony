@@ -170,7 +170,11 @@ class BinaryFileResponse extends Response
     public function prepare(Request $request)
     {
         $this->headers->set('Content-Length', $this->file->getSize());
-        $this->headers->set('Accept-Ranges', 'bytes');
+
+        if (!$this->headers->has('Accept-Ranges')) {
+            // Only accept ranges on safe HTTP methods
+            $this->headers->set('Accept-Ranges', $request->isMethodSafe() ? 'bytes' : 'none');
+        }
 
         if (!$this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');

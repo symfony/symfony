@@ -139,7 +139,7 @@ class UploadedFile extends File
      *
      * @return string|null The mime type
      *
-     * @see getMimeType
+     * @see getMimeType()
      *
      * @api
      */

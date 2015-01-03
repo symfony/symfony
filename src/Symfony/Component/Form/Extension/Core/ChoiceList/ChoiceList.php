@@ -505,7 +505,7 @@ class ChoiceList implements ChoiceListInterface
      *
      * @return array The fixed choices.
      *
-     * @see fixChoice
+     * @see fixChoice()
      */
     protected function fixChoices(array $choices)
     {

@@ -88,7 +88,7 @@ interface ChoiceListInterface
      *               choice indices as keys on the lowest levels and the choice
      *               group names in the keys of the higher levels
      *
-     * @see getPreferredValues
+     * @see getPreferredValues()
      */
     public function getRemainingViews();
 

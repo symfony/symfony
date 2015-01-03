@@ -27,12 +27,12 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 class ProxyDumper implements DumperInterface
 {
     /**
-     * @var \ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator
+     * @var LazyLoadingValueHolderGenerator
      */
     private $proxyGenerator;
 
     /**
-     * @var \ProxyManager\GeneratorStrategy\BaseGeneratorStrategy
+     * @var BaseGeneratorStrategy
      */
     private $classGenerator;
 

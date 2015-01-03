@@ -162,7 +162,7 @@ EOF;
      * If the size of a file is greater than the allowed size (from php.ini) then
      * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
      *
-     * @see Symfony\Component\HttpFoundation\File\UploadedFile
+     * @see UploadedFile
      *
      * @param array $files An array of files
      *

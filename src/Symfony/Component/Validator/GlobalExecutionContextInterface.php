@@ -44,7 +44,7 @@ interface GlobalExecutionContextInterface
      *
      * @return mixed The root value.
      *
-     * @see ExecutionContextInterface::getRoot
+     * @see ExecutionContextInterface::getRoot()
      */
     public function getRoot();
 

@@ -129,11 +129,11 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
-        if (is_dir($mappingConfig['dir'])) {
-            $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
-        } else {
+        if (!is_dir($mappingConfig['dir'])) {
             throw new \InvalidArgumentException(sprintf('Invalid Doctrine mapping path given. Cannot load Doctrine mapping/bundle named "%s".', $mappingName));
         }
+
+        $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
     }
 
     /**

@@ -120,7 +120,11 @@ class TextDescriptor extends Descriptor
 
         $this->writeText('<comment>Usage:</comment>', $options);
         $this->writeText("\n");
-        $this->writeText(' '.$command->getSynopsis(), $options);
+        $this->writeText('  '.$command->getSynopsis(), $options);
+        foreach ($command->getUsages() as $usage) {
+            $this->writeText("\n");
+            $this->writeText('  '.$usage, $options);
+        }
         $this->writeText("\n");
 
         if (count($command->getAliases()) > 0) {

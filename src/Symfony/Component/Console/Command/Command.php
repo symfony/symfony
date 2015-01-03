@@ -43,6 +43,7 @@ class Command
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
     private $synopsis;
+    private $usages = array();
     private $helperSet;
 
     /**
@@ -582,6 +583,30 @@ class Command
         }
 
         return $this->synopsis;
+    }
+
+    /**
+     * Add a command usage example.
+     *
+     * @param string $usage The usage, it'll be prefixed with the command name
+     */
+    public function addUsage($usage)
+    {
+        if (0 !== strpos($usage, $this->name)) {
+            $usage = sprintf('%s %s', $this->name, $usage);
+        }
+
+        $this->usages[] = $usage;
+    }
+
+    /**
+     * Returns alternative usages of the command.
+     *
+     * @return array
+     */
+    public function getUsages()
+    {
+        return $this->usages;
     }
 
     /**

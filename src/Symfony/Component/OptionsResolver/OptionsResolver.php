@@ -110,6 +110,12 @@ class OptionsResolver implements Options, OptionsResolverInterface
      */
     private $locked = false;
 
+    private static $typeAliases = array(
+        'boolean' => 'bool',
+        'integer' => 'int',
+        'double' => 'float',
+    );
+
     /**
      * Sets the default value of a given option.
      *
@@ -844,6 +850,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
             $valid = false;
 
             foreach ($this->allowedTypes[$option] as $type) {
+                $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
+
                 if (function_exists($isFunction = 'is_'.$type)) {
                     if ($isFunction($value)) {
                         $valid = true;

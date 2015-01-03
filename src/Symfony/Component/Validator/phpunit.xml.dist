@@ -4,7 +4,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="vendor/autoload.php"
+         bootstrap="Tests/bootstrap.php"
 >
     <php>
         <!-- Disable E_USER_DEPRECATED until 3.0 -->

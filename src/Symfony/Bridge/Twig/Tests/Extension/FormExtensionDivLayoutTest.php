@@ -135,11 +135,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderEnctype(FormView $view)
-    {
-        // Kept empty for 2.7 compatibility
-    }
-
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         if ($label !== null) {
@@ -196,15 +191,5 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         return array(
             array(array('parent_label.html.twig'), array('child_label.html.twig')),
         );
-    }
-
-    public function testEnctype()
-    {
-        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
-    }
-
-    public function testNoEnctype()
-    {
-        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
     }
 }

@@ -37,7 +37,7 @@
         "symfony/css-selector": "~2.7|~3.0",
         "symfony/dom-crawler": "~2.7|~3.0",
         "symfony/finder": "~2.7|~3.0",
-        "symfony/locale": "~2.7|~3.0",
+        "symfony/intl": "~2.7|~3.0",
         "symfony/security": "~2.7|~3.0",
         "symfony/form": "~2.7|~3.0",
         "symfony/class-loader": "~2.7|~3.0",

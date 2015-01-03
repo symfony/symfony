@@ -25,7 +25,7 @@ interface PropertyAccessorInterface
      *
      *     use Symfony\Component\PropertyAccess\PropertyAccess;
      *
-     *     $propertyAccessor = PropertyAccess::getPropertyAccessor();
+     *     $propertyAccessor = PropertyAccess::createPropertyAccessor();
      *
      *     echo $propertyAccessor->setValue($object, 'child.name', 'Fabien');
      *     // equals echo $object->getChild()->setName('Fabien');
@@ -57,7 +57,7 @@ interface PropertyAccessorInterface
      *
      *     use Symfony\Component\PropertyAccess\PropertyAccess;
      *
-     *     $propertyAccessor = PropertyAccess::getPropertyAccessor();
+     *     $propertyAccessor = PropertyAccess::createPropertyAccessor();
      *
      *     echo $propertyAccessor->getValue($object, 'child.name);
      *     // equals echo $object->getChild()->getName();

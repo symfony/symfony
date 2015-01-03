@@ -193,11 +193,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testStripComments()
     {
-        if (!function_exists('token_get_all')) {
-            $this->markTestSkipped('The function token_get_all() is not available.');
-
-            return;
-        }
         $source = <<<'EOF'
 <?php
 

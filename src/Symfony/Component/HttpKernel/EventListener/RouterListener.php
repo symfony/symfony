@@ -128,7 +128,7 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s" (parameters: %s)', $parameters['_route'], $this->parametersToString($parameters)));
+                $this->logger->info(sprintf('Matched route "%s"', $parameters['_route']), $parameters);
             }
 
             $request->attributes->add($parameters);
@@ -148,16 +148,6 @@ class RouterListener implements EventSubscriberInterface
 
             throw new MethodNotAllowedHttpException($e->getAllowedMethods(), $message, $e);
         }
-    }
-
-    private function parametersToString(array $parameters)
-    {
-        $pieces = array();
-        foreach ($parameters as $key => $val) {
-            $pieces[] = sprintf('"%s": "%s"', $key, (is_string($val) ? $val : json_encode($val)));
-        }
-
-        return implode(', ', $pieces);
     }
 
     public static function getSubscribedEvents()

@@ -58,11 +58,6 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         parent::tearDown();
     }
 
-    protected function renderEnctype(FormView $view)
-    {
-        // Kept empty for 2.7 compatibility
-    }
-
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);
@@ -106,15 +101,5 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->engine->get('form')->setTheme($view, $themes);
-    }
-
-    public function testEnctype()
-    {
-        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
-    }
-
-    public function testNoEnctype()
-    {
-        $this->markTestSkipped('This test is skipped to keep 2.7 compatibility.');
     }
 }

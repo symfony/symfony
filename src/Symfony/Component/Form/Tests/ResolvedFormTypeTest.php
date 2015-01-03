@@ -57,10 +57,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOptionsResolver()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $i = 0;
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i) {

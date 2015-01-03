@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-02T18:41:28Z
+
+Wow, looks very good to me!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-02T20:06:27Z
+
+btw, the testsuite is catching the first 3 bugs I found when reviewing
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T10:15:32Z
+
+Ready for an other round of review. I added a 2nd commit that removes useless tests for skips that will never occur thanks to composer and require-dev.
+
+"low" and "high" tests are failing but after merge + subtree split, they should become green again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T14:42:33Z
+
+Any vote? Once merged, I can take care of the merge in 2.5

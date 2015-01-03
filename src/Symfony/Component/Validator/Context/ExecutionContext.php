@@ -183,6 +183,12 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The parameters $invalidValue, $pluralization and $code are not supported anymore '.
+            'as of Symfony 2.5 and will be removed in Symfony 3.0. Please use buildViolation() instead.',
+            E_USER_DEPRECATED
+        );
+
         // The parameters $invalidValue and following are ignored by the new
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
@@ -310,6 +316,12 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The parameters $invalidValue, $pluralization and $code are not supported anymore '.
+            'as of Symfony 2.5 and will be removed in Symfony 3.0. Please use buildViolation() instead.',
+            E_USER_DEPRECATED
+        );
+
         throw new BadMethodCallException(
             'addViolationAt() is not supported anymore as of Symfony 2.5. '.
             'Please use buildViolation() instead or enable the legacy mode.'

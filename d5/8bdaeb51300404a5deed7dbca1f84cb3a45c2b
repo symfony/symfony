@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-04T10:07:20Z
+
+I don't like the way such notices are triggered. We should trigger them in **all** places using the deprecated class, not only in the first place when the autoloading of the class is triggered
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-04T10:14:07Z
+
+I don't agree: you're going to have a slow and verbose as hell 2.7 release if you do that.
+Having sparse notices is way more friendly to both users and CPUs
+
+---------------------------------------------------------------------------
+
+by stof at 2014-12-04T10:49:35Z
+
+@nicolas-grekas slow release ? notices will only affect deprecated usages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-04T11:14:16Z
+
+Right, but we do not want to **force** people to upgrade, do we?
+Going 3.0 is an opt-in, same is for looking at deprecation notices.
+2.7 is LTS, and we should make it a shinny LTS, not a bloated one (my opinion)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-12-04T18:15:59Z
+
+You both have good points (I also read the other issue where Stof makes a good point about the messages being more user-friendly if they're not simply triggered by the autoloader). I have a slight preference towards @nicolas-grekas, mostly because I can see some trigger getting hit *many* times by some user-land code and the user getting mad at Symfony for "poorly" implementing these deprecated calls.
+
+So if the class itself is deprecated, my vote is to do it like this - even though it may not be as obvious for the end user where the call is coming from.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-12-04T18:41:46Z
+
+:+1: how it is
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T14:05:48Z
+
+OK, :+1:

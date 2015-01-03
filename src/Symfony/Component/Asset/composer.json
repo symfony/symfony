@@ -18,6 +18,12 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "suggest": {
+        "symfony/http-foundation": ""
+    },
+    "require-dev": {
+        "symfony/http-foundation": "~2.4"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Asset\\": "" }
     },

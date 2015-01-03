@@ -268,7 +268,20 @@ class Request
      */
     public static function createFromGlobals()
     {
-        $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        // With the php's bug #66606, the php's built-in web server
+        // stores the Content-Type and Content-Length header values in
+        // HTTP_CONTENT_TYPE and HTTP_CONTENT_LENGTH fields.
+        $server = $_SERVER;
+        if ('cli-server' === php_sapi_name()) {
+            if (array_key_exists('HTTP_CONTENT_LENGTH', $_SERVER)) {
+                $server['CONTENT_LENGTH'] = $_SERVER['HTTP_CONTENT_LENGTH'];
+            }
+            if (array_key_exists('HTTP_CONTENT_TYPE', $_SERVER)) {
+                $server['CONTENT_TYPE'] = $_SERVER['HTTP_CONTENT_TYPE'];
+            }
+        }
+
+        $request = self::createRequestFromFactory($_GET, $_POST, array(), $_COOKIE, $_FILES, $server);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))

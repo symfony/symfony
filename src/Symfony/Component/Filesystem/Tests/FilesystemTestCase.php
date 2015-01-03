@@ -13,6 +13,8 @@ namespace Symfony\Component\Filesystem\Tests;
 
 class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 {
+    private $umask;
+
     /**
      * @var string $workspace
      */
@@ -37,6 +39,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->umask = umask(0);
         $this->workspace = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.time().rand(0, 1000);
         mkdir($this->workspace, 0777, true);
         $this->workspace = realpath($this->workspace);
@@ -45,6 +48,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->clean($this->workspace);
+        umask($this->umask);
     }
 
     /**

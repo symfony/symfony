@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nyroDev at 2014-11-25T21:41:27Z
+
+@GromNaN I'm running PHP 5.3.3 on the server I'm testing it and the function http_build_url is not defined for this version.
+That's why I used the code from a comment on this function on PHP documentation to recreate it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-26T11:29:35Z
+
+@nyroDev This change will not help when varnish rewrites the query params. The hash is currently also done over the query string (without the hash param). So the order is important and if the order changes, the hash is not valid anymore. So this would also require to change the hashing logic to be independent of the query param order.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-27T09:47:17Z
+
+i looked at the rfc and didn't found any information about how to normalize the param order. amazon aws for example use this strategy for url signing:
+
+Sort the encoded parameter names by character code (that is, in strict ASCII order). For example, a parameter name that begins with the uppercase letter F (ASCII code 70) precedes a parameter name that begins with a lowercase letter b (ASCII code 98).

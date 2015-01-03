@@ -97,6 +97,9 @@ class MarkdownDescriptor extends Descriptor
             .str_repeat('-', strlen($command->getName()))."\n\n"
             .'* Description: '.($command->getDescription() ?: '<none>')."\n"
             .'* Usage: `'.$command->getSynopsis().'`'."\n"
+            .array_reduce($command->getUsages(), function ($carry, $usage) {
+                return $carry .= '         `'.$usage.'`'."\n";
+            })
             .'* Aliases: '.(count($command->getAliases()) ? '`'.implode('`, `', $command->getAliases()).'`' : '<none>')
         );
 

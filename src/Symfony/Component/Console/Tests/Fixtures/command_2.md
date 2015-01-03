@@ -2,7 +2,7 @@ descriptor:command2
 -------------------
 
 * Description: command 2 description
-* Usage: `descriptor:command2 [-o|--option_name] argument_name`
+* Usage: `descriptor:command2 [-o|--option_name] [--] <argument_name>`
 * Aliases: <none>
 
 command 2 help

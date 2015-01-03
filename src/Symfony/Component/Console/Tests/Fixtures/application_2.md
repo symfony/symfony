@@ -15,7 +15,7 @@ help
 ----
 
 * Description: Displays help for a command
-* Usage: `help [--xml] [--format="..."] [--raw] [command_name]`
+* Usage: `help [--xml] [--format FORMAT] [--raw] [--] [<command_name>]`
 * Aliases: <none>
 
 The <info>help</info> command displays help for a given command:
@@ -144,7 +144,7 @@ list
 ----
 
 * Description: Lists commands
-* Usage: `list [--xml] [--raw] [--format="..."] [namespace]`
+* Usage: `list [--xml] [--raw] [--format FORMAT] [--] [<namespace>]`
 * Aliases: <none>
 
 The <info>list</info> command lists all commands:
@@ -290,7 +290,7 @@ descriptor:command2
 -------------------
 
 * Description: command 2 description
-* Usage: `descriptor:command2 [-o|--option_name] argument_name`
+* Usage: `descriptor:command2 [-o|--option_name] [--] <argument_name>`
 * Aliases: <none>
 
 command 2 help

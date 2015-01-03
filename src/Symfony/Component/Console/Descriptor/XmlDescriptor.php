@@ -67,6 +67,10 @@ class XmlDescriptor extends Descriptor
 
         $commandXML->appendChild($usageXML = $dom->createElement('usage'));
         $usageXML->appendChild($dom->createTextNode(sprintf($command->getSynopsis(), '')));
+        
+        foreach ($command->getUsages() as $usage) {
+            $commandXML->appendChild($dom->createElement('usage', $usage));
+        }
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
         $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getDescription())));

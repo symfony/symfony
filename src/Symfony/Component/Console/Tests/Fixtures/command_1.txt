@@ -1,5 +1,5 @@
 <comment>Usage:</comment>
- descriptor:command1
+  descriptor:command1
 
 <comment>Aliases:</comment> <info>alias1, alias2</info>
 

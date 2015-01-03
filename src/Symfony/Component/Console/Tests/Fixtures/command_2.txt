@@ -1,11 +1,11 @@
 <comment>Usage:</comment>
- descriptor:command2 [-o|--option_name] argument_name
+  descriptor:command2 [options] [--] <argument_name>
 
 <comment>Arguments:</comment>
- <info>argument_name     </info> 
+  <info>argument_name</info>      
 
 <comment>Options:</comment>
- <info>--option_name</info> (-o) 
+  <info>-o, --option_name</info>  
 
 <comment>Help:</comment>
  command 2 help

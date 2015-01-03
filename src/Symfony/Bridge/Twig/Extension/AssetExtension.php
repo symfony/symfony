@@ -12,59 +12,26 @@
 namespace Symfony\Component\Twig\Extension;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\Asset\Packages;
 
 /**
- * Twig extension for Symfony asset packages.
+ * Twig extension for the Symfony Asset component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AssetPackagesExtension extends \Twig_Extension
+class AssetExtension extends \Twig_Extension
 {
-    private $defaultPackage;
-    private $namedPackages = array();
+    private $packages;
     private $requestStack;
 
-    /**
-     * @param PackageInterface $defaultPackage The default package
-     * @param array            $namedPackages  Additional packages indexed by name
-     */
-    public function __construct(PackageInterface $defaultPackage, array $namedPackages = array(), RequestStack $requestStack = null)
+    public function __construct(Packages $packages, RequestStack $requestStack = null)
     {
-        $this->defaultPackage = $defaultPackage;
-
-        foreach ($namedPackages as $name => $package) {
-            $this->addPackage($name, $package);
-        }
-
+        $this->packages = $packages;
         $this->requestStack = $requestStack;
     }
 
     /**
-     * Sets the default package.
-     *
-     * @param PackageInterface $defaultPackage The default package
-     */
-    public function setDefaultPackage(PackageInterface $defaultPackage)
-    {
-        $this->defaultPackage = $defaultPackage;
-    }
-
-    /**
-     * Adds an asset package to the helper.
-     *
-     * @param string           $name    The package name
-     * @param PackageInterface $package The package
-     */
-    public function addPackage($name, PackageInterface $package)
-    {
-        $this->namedPackages[$name] = $package;
-    }
-
-    /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -88,7 +55,7 @@ class AssetPackagesExtension extends \Twig_Extension
      */
     public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
-        $url = $this->getPackage($packageName)->getUrl($path, $version);
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if (!$absolute) {
             return $url;
@@ -106,29 +73,7 @@ class AssetPackagesExtension extends \Twig_Extension
      */
     public function getAssetsVersion($packageName = null)
     {
-        return $this->getPackage($packageName)->getVersion();
-    }
-
-    /**
-     * Returns an asset package.
-     *
-     * @param string $name The name of the package or null for the default package
-     *
-     * @return PackageInterface An asset package
-     *
-     * @throws \InvalidArgumentException If there is no package by that name
-     */
-    private function getPackage($name = null)
-    {
-        if (null === $name) {
-            return $this->defaultPackage;
-        }
-
-        if (!isset($this->namedPackages[$name])) {
-            throw new \InvalidArgumentException(sprintf('There is no "%s" asset package.', $name));
-        }
-
-        return $this->namedPackages[$name];
+        return $this->packages->getVersion($packageName);
     }
 
     /**
@@ -146,7 +91,7 @@ class AssetPackagesExtension extends \Twig_Extension
             return $url;
         }
 
-        if (!$this->requestStack) {
+        if (null === $this->requestStack) {
             throw new \RuntimeException('To generate an absolute URL for an asset, the Symfony Routing component is required.');
         }
 

@@ -31,6 +31,10 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.actions')->addTag('twig.extension');
         }
 
+        if ($container->has('templating.asset.packages')) {
+            $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
+        }
+
         if ($container->has('translator')) {
             $container->getDefinition('twig.extension.trans')->addTag('twig.extension');
         }

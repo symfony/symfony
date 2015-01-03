@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added AssetExtension (provides the `asset` function)
+
 2.5.0
 -----
 

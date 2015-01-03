@@ -516,7 +516,6 @@ class FrameworkExtension extends Extension
             $loader->load('templating_php.xml');
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
-            $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('templating.asset.default_package'));
 
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('templating_debug.xml');

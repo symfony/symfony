@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-02T18:35:08Z
+
+I would also add the missing ``@deprecated`` tags on the UniversalClassLoader (the tag is missing in the UniversalClassLoader class, even though the deprecation is mentionned in changelog files, and special flavors of the UniversalClassLoader were forgotten even in the changelog files even though we introduced the better alternatives a long time ago)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-02T18:43:31Z
+
+There are no deprecations in `2.3` for the `ClassLoader` component. They have been introduced in `2.4`. Should I put them anyway in the `2.3` branch?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-02T19:31:39Z
+
+the replacement classes have been added in 2.1. We forgot to mark the old classes as deprecated at this time (otherwise they would have been removed in 2.3 already). Given that we tagged them only in 2.4, it might make sense to tag the forgotten ones in the 2.5 branch to be consistent.
+But Composer was the recommended ClassLoader in 2.1+ projects anyway.
+
+what do you think @fabpot ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-03T07:52:57Z
+
+I would tag the deprecated classes in 2.5.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-03T10:48:15Z
+
+I have updated the documentation in this PR. Deprecation notices will be added to the 2.5 branch.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-03T11:19:34Z
+
+Deprecation notices have been added to https://github.com/symfony/symfony/pull/13205
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T13:20:39Z
+
+:+1:

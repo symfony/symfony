@@ -23,10 +23,6 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');

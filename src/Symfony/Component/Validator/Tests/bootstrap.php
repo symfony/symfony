@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\WebProfilerBundle\Tests;
+$loader = require __DIR__.'/../vendor/autoload.php';
 
-class TestCase extends \PHPUnit_Framework_TestCase
-{
-}
+Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(function ($class) {return class_exists($class);});

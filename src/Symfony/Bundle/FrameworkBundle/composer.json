@@ -35,7 +35,7 @@
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/finder": "~2.0,>=2.0.5",
-        "symfony/locale": "~2.0,>=2.0.5",
+        "symfony/intl": "~2.3",
         "symfony/security": "~2.3",
         "symfony/form": "~2.3.0,>=2.3.5",
         "symfony/class-loader": "~2.1",

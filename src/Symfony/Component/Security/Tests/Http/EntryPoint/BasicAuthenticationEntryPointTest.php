@@ -16,13 +16,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class BasicAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testStart()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');

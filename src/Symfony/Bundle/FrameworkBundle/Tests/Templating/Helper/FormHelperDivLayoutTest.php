@@ -27,19 +27,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
      */
     protected $engine;
 
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper')) {
-            $this->markTestSkipped('The "FrameworkBundle" is not available');
-        }
-
-        if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
-            $this->markTestSkipped('The "Templating" component is not available');
-        }
-
-        parent::setUp();
-    }
-
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -77,7 +64,11 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->engine->get('form')->enctype($view);
+        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
+            $this->markTestSkipped(sprintf("Deprecated method %s->enctype() is not implemented.", get_class($form)));
+        }
+
+        return (string) $form->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())

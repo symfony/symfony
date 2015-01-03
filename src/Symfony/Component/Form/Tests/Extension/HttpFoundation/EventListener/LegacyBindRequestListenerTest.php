@@ -15,14 +15,13 @@ use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestLis
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Test\DeprecationErrorHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
+class LegacyBindRequestListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $values;
 
@@ -37,6 +36,8 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -86,10 +87,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitRequest($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array('author' => $this->values);
         $files = array('author' => $this->filesNested);
         $request = new Request(array(), $values, array(), array(), $files, array(
@@ -102,7 +99,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -115,10 +112,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitRequestWithEmptyName($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), $this->values, array(), array(), $this->filesPlain, array(
             'REQUEST_METHOD' => $method,
         ));
@@ -129,7 +122,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -142,10 +135,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitEmptyRequestToCompoundForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => $method,
         ));
@@ -158,7 +147,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         // Default to empty array
         $this->assertEquals(array(), $event->getData());
@@ -169,10 +158,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubmitEmptyRequestToSimpleForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => $method,
         ));
@@ -184,7 +169,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         // Default to null
         $this->assertNull($event->getData());
@@ -192,10 +177,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmitGetRequest()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array('author' => $this->values);
         $request = new Request($values, array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
@@ -207,7 +188,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -217,10 +198,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmitGetRequestWithEmptyName()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request($this->values, array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));
@@ -231,7 +208,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertEquals(array(
             'name' => 'Bernhard',
@@ -241,10 +218,6 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSubmitEmptyGetRequestToCompoundForm()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));
@@ -257,17 +230,13 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertEquals(array(), $event->getData());
     }
 
     public function testSubmitEmptyGetRequestToSimpleForm()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $request = new Request(array(), array(), array(), array(), array(), array(
             'REQUEST_METHOD' => 'GET',
         ));
@@ -279,7 +248,7 @@ class BindRequestListenerTest extends \PHPUnit_Framework_TestCase
         $event = new FormEvent($form, $request);
 
         $listener = new BindRequestListener();
-        DeprecationErrorHandler::preBind($listener, $event);
+        $listener->preBind($event);
 
         $this->assertNull($event->getData());
     }

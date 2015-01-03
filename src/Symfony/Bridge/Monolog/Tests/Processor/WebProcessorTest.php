@@ -18,13 +18,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Monolog\\Logger')) {
-            $this->markTestSkipped('Monolog is not available.');
-        }
-    }
-
     public function testUsesRequestServerData()
     {
         $server = array(

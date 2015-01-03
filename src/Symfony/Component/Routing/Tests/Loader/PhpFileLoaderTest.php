@@ -16,13 +16,6 @@ use Symfony\Component\Routing\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\FileLocator')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testSupports()
     {
         $loader = new PhpFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));

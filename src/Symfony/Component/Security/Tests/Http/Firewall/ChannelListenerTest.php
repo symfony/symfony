@@ -16,21 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ChannelListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
-        }
-    }
-
     public function testHandleWithNotSecuredRequestAndHttpChannel()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);

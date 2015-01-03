@@ -21,13 +21,6 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
-    }
-
     public function testConstructor()
     {
         $env = 'test_env';
@@ -263,11 +256,6 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testStripComments()
     {
-        if (!function_exists('token_get_all')) {
-            $this->markTestSkipped('The function token_get_all() is not available.');
-
-            return;
-        }
         $source = <<<'EOF'
 <?php
 

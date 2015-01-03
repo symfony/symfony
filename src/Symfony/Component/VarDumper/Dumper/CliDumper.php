@@ -52,7 +52,7 @@ class CliDumper extends AbstractDumper
     {
         parent::__construct($output);
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== @getenv('ANSICON')) {
+        if ('\\' === DIRECTORY_SEPARATOR && false !== @getenv('ANSICON')) {
             // Use only the base 16 xterm colors when using ANSICON
             $this->setStyles(array(
                 'default' => '31',
@@ -394,7 +394,7 @@ class CliDumper extends AbstractDumper
             }
         }
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             static::$defaultColors = @(false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI'));
         } elseif (function_exists('posix_isatty')) {
             $h = stream_get_meta_data($this->outputStream) + array('wrapper_type' => null);

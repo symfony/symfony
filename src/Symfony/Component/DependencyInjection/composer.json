@@ -23,6 +23,9 @@
         "symfony/config": "~2.7|~3.0",
         "symfony/expression-language": "~2.7|~3.0"
     },
+    "conflict": {
+        "symfony/expression-language": "<2.6"
+    },
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",

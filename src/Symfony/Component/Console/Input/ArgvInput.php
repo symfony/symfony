@@ -33,8 +33,8 @@ namespace Symfony\Component\Console\Input;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @see    http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
- * @see    http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
+ * @see http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
+ * @see http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02
  *
  * @api
  */

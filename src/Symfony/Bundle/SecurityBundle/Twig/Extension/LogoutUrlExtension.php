@@ -22,18 +22,13 @@ class LogoutUrlExtension extends \Twig_Extension
 {
     private $helper;
 
-    /**
-     * Constructor.
-     *
-     * @param LogoutUrlHelper $helper
-     */
     public function __construct(LogoutUrlHelper $helper)
     {
         $this->helper = $helper;
     }
 
     /**
-     * @see Twig_Extension::getFunctions()
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -44,7 +39,7 @@ class LogoutUrlExtension extends \Twig_Extension
     }
 
     /**
-     * Generate the relative logout URL for the firewall.
+     * Generates the relative logout URL for the firewall.
      *
      * @param string $key The firewall key
      *
@@ -56,7 +51,7 @@ class LogoutUrlExtension extends \Twig_Extension
     }
 
     /**
-     * Generate the absolute logout URL for the firewall.
+     * Generates the absolute logout URL for the firewall.
      *
      * @param string $key The firewall key
      *
@@ -68,7 +63,7 @@ class LogoutUrlExtension extends \Twig_Extension
     }
 
     /**
-     * @see Twig_ExtensionInterface::getName()
+     * {@inheritdoc}
      */
     public function getName()
     {

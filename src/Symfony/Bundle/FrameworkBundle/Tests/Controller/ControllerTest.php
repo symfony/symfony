@@ -37,10 +37,18 @@ class ControllerTest extends TestCase
         $container->expects($this->at(0))->method('get')->will($this->returnValue($requestStack));
         $container->expects($this->at(1))->method('get')->will($this->returnValue($kernel));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $response = $controller->forward('a_controller');
         $this->assertEquals('xml--fr', $response->getContent());
+    }
+}
+
+class TestController extends Controller
+{
+    public function forward($controller, array $path = array(), array $query = array())
+    {
+        return parent::forward($controller, $path, $query);
     }
 }

@@ -79,8 +79,6 @@ interface OutputInterface
      * Returns whether verbosity is quiet (-q)
      *
      * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
-     *
-     * @api
      */
     public function isQuiet();
 
@@ -88,8 +86,6 @@ interface OutputInterface
      * Returns whether verbosity is verbose (-v)
      *
      * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
-     *
-     * @api
      */
     public function isVerbose();
 
@@ -97,8 +93,6 @@ interface OutputInterface
      * Returns whether verbosity is very verbose (-vv)
      *
      * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
-     *
-     * @api
      */
     public function isVeryVerbose();
 
@@ -106,8 +100,6 @@ interface OutputInterface
      * Returns whether verbosity is debug (-vvv)
      *
      * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
-     *
-     * @api
      */
     public function isDebug();
 

@@ -602,7 +602,6 @@ class FrameworkExtension extends Extension
         $package = new DefinitionDecorator('templating.asset.request_aware_package');
         $package
             ->setPublic(false)
-            ->setScope('request')
             ->replaceArgument(1, $prefix.'.http')
             ->replaceArgument(2, $prefix.'.ssl')
         ;

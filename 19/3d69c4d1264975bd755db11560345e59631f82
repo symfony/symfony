@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-28T17:10:36Z
+
+:+1: I also had this change on my todo list. IMO should be merged into 2.3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-03T09:57:13Z
+
+:+1:
+
+@iltar I think it was done this way because those messages were created before the PSR. Moving stuff to the context is indeed a good idea. Can you work on another PR for 2.7? Thanks.

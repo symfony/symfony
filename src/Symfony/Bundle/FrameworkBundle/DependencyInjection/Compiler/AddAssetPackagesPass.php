@@ -33,29 +33,9 @@ class AddAssetPackagesPass implements CompilerPassInterface
             $namedPackages[$name] = $package = new Reference($id);
         }
 
-        // fix helper scope
-        $scope = $this->getPackageScope($container, $defaultPackage);
-        foreach ($namedPackages as $package) {
-            if ('request' === $this->getPackageScope($container, $package)) {
-                $scope = 'request';
-            }
-        }
-
         $container->getDefinition('templating.asset.packages')
-            ->setScope($scope)
             ->replaceArgument(0, $defaultPackage)
             ->replaceArgument(1, $namedPackages)
         ;
-    }
-
-    private function getPackageScope(ContainerBuilder $container, $package)
-    {
-        if ($package instanceof Reference) {
-            return $container->findDefinition((string) $package)->getScope();
-        }
-
-        if ($package instanceof Definition) {
-            return $package->getScope();
-        }
     }
 }

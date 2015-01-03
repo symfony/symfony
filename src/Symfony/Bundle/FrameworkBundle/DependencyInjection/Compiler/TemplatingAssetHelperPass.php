@@ -29,7 +29,6 @@ class TemplatingAssetHelperPass implements CompilerPassInterface
         $packages = $container->getDefinition('templating.asset.packages');
 
         $container->getDefinition('templating.helper.assets')
-            ->setScope($packages->getScope())
             ->replaceArgument(0, $packages->getArgument(0))
             ->replaceArgument(1, $packages->getArgument(1))
         ;

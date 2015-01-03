@@ -58,7 +58,7 @@ class Stopwatch
      *
      * The id parameter is used to retrieve the events from this section.
      *
-     * @see getSectionEvents
+     * @see getSectionEvents()
      *
      * @param string $id The identifier of the section
      *

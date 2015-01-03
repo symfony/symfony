@@ -287,6 +287,37 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($p->getErrorOutput());
     }
 
+    public function testGetEmptyIncrementalErrorOutput()
+    {
+        // use a lock file to toggle between writing ("W") and reading ("R") the
+        // output stream
+        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
+        file_put_contents($lock, 'W');
+
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+
+        $p->start();
+
+        $shouldWrite = false;
+
+        while ($p->isRunning()) {
+            if ('R' === file_get_contents($lock)) {
+                if (!$shouldWrite) {
+                    $this->assertLessThanOrEqual(1, preg_match_all('/ERROR/', $p->getIncrementalOutput(), $matches));
+                    $shouldWrite = true;
+                } else {
+                    $this->assertSame('', $p->getIncrementalOutput());
+
+                    file_put_contents($lock, 'W');
+                    $shouldWrite = false;
+                }
+            }
+            usleep(100);
+        }
+
+        unlink($lock);
+    }
+
     public function testGetOutput()
     {
         $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { echo \' foo \'; $n++; }')));
@@ -323,6 +354,37 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $p->run();
         $p->clearOutput();
         $this->assertEmpty($p->getOutput());
+    }
+
+    public function testGetEmptyIncrementalOutput()
+    {
+        // use a lock file to toggle between writing ("W") and reading ("R") the
+        // output stream
+        $lock = tempnam(sys_get_temp_dir(), get_class($this).'Lock');
+        file_put_contents($lock, 'W');
+
+        $p = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 0; while ($n < 3) { if (\'W\' === file_get_contents('.var_export($lock, true).')) { echo \' foo \'; $n++; file_put_contents('.var_export($lock, true).', \'R\'); } usleep(100); }')));
+
+        $p->start();
+
+        $shouldWrite = false;
+
+        while ($p->isRunning()) {
+            if ('R' === file_get_contents($lock)) {
+                if (!$shouldWrite) {
+                    $this->assertLessThanOrEqual(1, preg_match_all('/foo/', $p->getIncrementalOutput(), $matches));
+                    $shouldWrite = true;
+                } else {
+                    $this->assertSame('', $p->getIncrementalOutput());
+
+                    file_put_contents($lock, 'W');
+                    $shouldWrite = false;
+                }
+            }
+            usleep(100);
+        }
+
+        unlink($lock);
     }
 
     public function testZeroAsOutput()

@@ -51,7 +51,7 @@ class RequestHelper extends Helper
      *
      * @return mixed
      *
-     * @see Symfony\Component\HttpFoundation\Request::get()
+     * @see Request::get()
      */
     public function getParameter($key, $default = null)
     {

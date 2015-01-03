@@ -123,8 +123,10 @@ class ExceptionHandler
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
      *
-     * @see sendPhpResponse
-     * @see createResponse
+     * @param \Exception $exception An \Exception instance
+     *
+     * @see sendPhpResponse()
+     * @see createResponse()
      */
     private function failSafeHandle(\Exception $exception)
     {

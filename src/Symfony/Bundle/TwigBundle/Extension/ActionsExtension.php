@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Extension;
 
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -41,7 +42,7 @@ class ActionsExtension extends \Twig_Extension
      * @param string $uri     A URI
      * @param array  $options An array of options
      *
-     * @see Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver::render()
+     * @see ActionsHelper::render()
      */
     public function renderUri($uri, array $options = array())
     {
@@ -51,7 +52,7 @@ class ActionsExtension extends \Twig_Extension
     /**
      * Returns the token parser instance to add to the existing list.
      *
-     * @return array An array of Twig_TokenParser instances
+     * @return array An array of \Twig_TokenParser instances
      */
     public function getTokenParsers()
     {

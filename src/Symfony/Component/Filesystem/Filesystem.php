@@ -71,7 +71,7 @@ class Filesystem
 
             if (is_executable($originFile)) {
                 // User Executable | Group Executable | Other Executable
-                chmod($targetFile, fileperms($targetFile) | 0x0040 | 0x0008 | 0x0001);
+                chmod($targetFile, fileperms($targetFile) | 0100 | 0010 | 0001);
             }
 
             if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {

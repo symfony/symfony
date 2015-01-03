@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by DavidBadura at 2014-11-05T09:57:46Z
+
+i think it's better to copy `$_SERVER` into a new variable and modify it. you don't want to change the global variable.
+
+---------------------------------------------------------------------------
+
+by wusuopu at 2014-11-06T02:25:29Z
+
+@DavidBadura Maybe you are right.
+But i think it will take extra spending to copy `$_SERVER`, and it changes the `$_SERVER` variable only in the php's built-in server environment. There's no this issue in production environment.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2014-11-10T02:15:12Z
+
+Would adding `php_sapi_name === 'cli-server'` check not be better since the bug is related only to the buildin server?
+
+---------------------------------------------------------------------------
+
+by wusuopu at 2014-11-10T03:13:33Z
+
+@boekkooi Thanks for advice.
+It fix again, and copy a new variable from `$_SERVER` instead of changing the global variable.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T11:07:18Z
+
+:+1:

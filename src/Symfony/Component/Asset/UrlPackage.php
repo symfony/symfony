@@ -18,7 +18,7 @@ namespace Symfony\Component\Asset;
  */
 class UrlPackage extends Package
 {
-    private $baseUrls;
+    protected $baseUrls;
 
     /**
      * Constructor.

@@ -14,23 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @deprecated since 2.7, will be removed in 3.0
+ */
 class TemplatingAssetHelperPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('templating.helper.assets')) {
-            return;
-        }
-
-        if (!$container->hasDefinition('templating.asset.packages')) {
-            return;
-        }
-
-        $packages = $container->getDefinition('templating.asset.packages');
-
-        $container->getDefinition('templating.helper.assets')
-            ->replaceArgument(0, $packages->getArgument(0))
-            ->replaceArgument(1, $packages->getArgument(1))
-        ;
     }
 }

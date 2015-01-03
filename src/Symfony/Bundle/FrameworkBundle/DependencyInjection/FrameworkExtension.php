@@ -517,6 +517,12 @@ class FrameworkExtension extends Extension
 
             $container->setParameter('templating.helper.form.resources', $config['form']['resources']);
 
+            $packages = $container->getDefinition('templating.asset.packages');
+            $container->getDefinition('templating.helper.assets')
+                ->replaceArgument(0, $packages->getArgument(0))
+                ->replaceArgument(1, $packages->getArgument(1))
+            ;
+
             if ($container->getParameter('kernel.debug')) {
                 $loader->load('templating_debug.xml');
 
@@ -551,62 +557,30 @@ class FrameworkExtension extends Extension
         $defaultPackage = $this->createPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format']);
         $container->setDefinition('templating.asset.default_package', $defaultPackage);
 
+        $namedPackages = array();
         foreach ($config['packages'] as $name => $package) {
-            $namedPackage = $this->createPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format'], $name);
-            $def = $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
-            $def->addTag('templating.asset_package', array('name' => $name));
+            $namedPackage[$name] = $this->createPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format']);
         }
+
+        $container->getDefinition('templating.asset.packages')
+            ->replaceArgument(0, $defaultPackage)
+            ->replaceArgument(1, $namedPackages)
+        ;
     }
 
     /**
      * Returns a definition for an asset package.
      */
-    private function createPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format, $name = null)
+    private function createPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format)
     {
-        if (!$httpUrls) {
-            $package = new DefinitionDecorator('templating.asset.path_package');
-            $package
-                ->setPublic(false)
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
+        $package = new DefinitionDecorator('templating.asset.package');
 
-            return $package;
-        }
-
-        if ($httpUrls == $sslUrls) {
-            $package = new DefinitionDecorator('templating.asset.url_package');
-            $package->setPublic(false)->setArguments(array($sslUrls, $version, $format));
-
-            return $package;
-        }
-
-        $prefix = $name ? 'templating.asset.package.'.$name : 'templating.asset.default_package';
-
-        $httpPackage = new DefinitionDecorator('templating.asset.url_package');
-        $httpPackage->setArguments(array($httpUrls, $version, $format));
-        $container->setDefinition($prefix.'.http', $httpPackage);
-
-        if ($sslUrls) {
-            $sslPackage = new DefinitionDecorator('templating.asset.url_package');
-            $sslPackage->setArguments(array($sslUrls, $version, $format));
-        } else {
-            $sslPackage = new DefinitionDecorator('templating.asset.path_package');
-            $sslPackage
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
-        }
-        $container->setDefinition($prefix.'.ssl', $sslPackage);
-
-        $package = new DefinitionDecorator('templating.asset.request_aware_package');
-        $package
+        return $package
             ->setPublic(false)
-            ->replaceArgument(1, $prefix.'.http')
-            ->replaceArgument(2, $prefix.'.ssl')
+            ->replaceArgument(1, array_merge($httpUrls, $sslUrls), $version)
+            ->replaceArgument(2, $version)
+            ->replaceArgument(3, $format)
         ;
-
-        return $package;
     }
 
     /**

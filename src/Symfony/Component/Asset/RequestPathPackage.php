@@ -12,18 +12,15 @@
 namespace Symfony\Component\Asset;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Asset\PathPackage as BasePathPackage;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestPackage extends BasePathPackage
+class RequestPathPackage extends PathPackage
 {
     private $requestStack;
 
     /**
-     * Constructor.
-     *
      * @param RequestStack $request The request stack
      * @param string       $version The version
      * @param string       $format  The version format

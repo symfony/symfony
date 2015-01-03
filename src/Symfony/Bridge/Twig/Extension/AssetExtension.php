@@ -105,6 +105,6 @@ class AssetExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'asset_packages';
+        return 'asset';
     }
 }

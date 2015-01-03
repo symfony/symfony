@@ -311,6 +311,7 @@ class Configuration implements ConfigurationInterface
 
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
+        /** @deprecated, should be removed in 3.0 */
         $organizeUrls = function ($urls) {
             $urls += array(
                 'http' => array(),

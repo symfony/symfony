@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Asset;
 
-trigger_error('The Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageInterface is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Asset\RequestPackageFactory instead.', E_USER_DEPRECATED);
+trigger_error('The Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageInterface is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ use Symfony\Component\Templating\Asset\PackageInterface;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  *
- * @deprecated since 2.7, will be removed in 3.0. Use Symfony\Component\Asset\RequestPackageFactory instead.
+ * @deprecated since 2.7, will be removed in 3.0.
  */
 class PackageFactory
 {

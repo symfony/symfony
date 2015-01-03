@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Debug\Exception;
 
+use Symfony\Component\HttpKernel\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
@@ -20,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FlattenException
+class FlattenException extends LegacyFlattenException
 {
     private $message;
     private $code;
@@ -247,5 +248,37 @@ class FlattenException
         $array = new \ArrayObject($value);
 
         return $array['__PHP_Incomplete_Class_Name'];
+    }
+}
+
+namespace Symfony\Component\HttpKernel\Exception;
+
+use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
+
+/**
+ * FlattenException wraps a PHP Exception to be able to serialize it.
+ *
+ * Basically, this class removes all objects from the trace.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
+ */
+class FlattenException
+{
+    private $handler;
+
+    public static function __callStatic($method, $args)
+    {
+        return forward_static_call_array(array('Symfony\Component\Debug\Exception\FlattenException', $method), $args);
+    }
+
+    public function __call($method, $args)
+    {
+        if (!isset($this->handler)) {
+            $this->handler = new DebugFlattenException();
+        }
+
+        return call_user_func_array(array($this->handler, $method), $args);
     }
 }

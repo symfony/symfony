@@ -60,7 +60,7 @@ trigger_error('The "Symfony\Component\ClassLoader\UniversalClassLoader" class wa
  *
  * @api
  *
- * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use the ClassLoader class instead.
+ * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use the ClassLoader class instead.
  */
 class UniversalClassLoader
 {

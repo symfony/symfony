@@ -386,6 +386,9 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @param bool $virtual
      *
      * @throws BadMethodCallException
+     *
+     * @deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link setInheritData()} instead.
      */
     public function setVirtual($virtual)
     {
@@ -589,8 +592,8 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @return bool Always returns false.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *              {@link getInheritData()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link getInheritData()} instead.
      */
     public function getVirtual()
     {

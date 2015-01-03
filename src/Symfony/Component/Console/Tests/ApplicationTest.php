@@ -480,8 +480,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testAsText()
+    public function testLegacyAsText()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $application = new Application();
         $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);
@@ -489,8 +491,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/application_astext2.txt', $this->normalizeLineBreaks($application->asText('foo')), '->asText() returns a text representation of the application');
     }
 
-    public function testAsXml()
+    public function testLegacyAsXml()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $application = new Application();
         $application->add(new \FooCommand());
         $this->ensureStaticCommandHelp($application);

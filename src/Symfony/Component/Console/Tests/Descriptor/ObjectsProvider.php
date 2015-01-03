@@ -30,6 +30,7 @@ class ObjectsProvider
             'input_argument_1' => new InputArgument('argument_name', InputArgument::REQUIRED),
             'input_argument_2' => new InputArgument('argument_name', InputArgument::IS_ARRAY, 'argument description'),
             'input_argument_3' => new InputArgument('argument_name', InputArgument::OPTIONAL, 'argument description', 'default_value'),
+            'input_argument_4' => new InputArgument('argument_name', InputArgument::REQUIRED, "multiline\nargument description"),
         );
     }
 
@@ -40,6 +41,7 @@ class ObjectsProvider
             'input_option_2' => new InputOption('option_name', 'o', InputOption::VALUE_OPTIONAL, 'option description', 'default_value'),
             'input_option_3' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, 'option description'),
             'input_option_4' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'option description', array()),
+            'input_option_5' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, "multiline\noption description"),
         );
     }
 

@@ -986,6 +986,13 @@ HTML;
         );
     }
 
+    public function testCountOfNestedElements()
+    {
+        $crawler = new Crawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
+
+        $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
+    }
+
     public function createTestCrawler($uri = null)
     {
         $dom = new \DOMDocument();

@@ -8,8 +8,9 @@ help
 ----
 
 * Description: Displays help for a command
-* Usage: `help [--xml] [--format="..."] [--raw] [command_name]`
-* Aliases: <none>
+* Usage:
+
+  * `help [--xml] [--format FORMAT] [--raw] [--] [<command_name>]`
 
 The <info>help</info> command displays help for a given command:
 
@@ -137,8 +138,9 @@ list
 ----
 
 * Description: Lists commands
-* Usage: `list [--xml] [--raw] [--format="..."] [namespace]`
-* Aliases: <none>
+* Usage:
+
+  * `list [--xml] [--raw] [--format FORMAT] [--] [<namespace>]`
 
 The <info>list</info> command lists all commands:
 

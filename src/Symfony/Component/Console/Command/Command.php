@@ -42,7 +42,8 @@ class Command
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis;
+    private $synopsis = array();
+    private $usages = array();
     private $helperSet;
 
     /**
@@ -215,7 +216,8 @@ class Command
     public function run(InputInterface $input, OutputInterface $output)
     {
         // force the creation of the synopsis before the merge with the app definition
-        $this->getSynopsis();
+        $this->getSynopsis(true);
+        $this->getSynopsis(false);
 
         // add the application arguments and options
         $this->mergeApplicationDefinition();
@@ -573,15 +575,45 @@ class Command
     /**
      * Returns the synopsis for the command.
      *
+     * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
+     *
      * @return string The synopsis
      */
-    public function getSynopsis()
+    public function getSynopsis($short = false)
     {
-        if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
+        $key = $short ? 'short' : 'long';
+
+        if (!isset($this->synopsis[$key])) {
+            $this->synopsis[$key] = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis($short)));
         }
 
-        return $this->synopsis;
+        return $this->synopsis[$key];
+    }
+
+    /**
+     * Add a command usage example.
+     *
+     * @param string $usage The usage, it'll be prefixed with the command name
+     */
+    public function addUsage($usage)
+    {
+        if (0 !== strpos($usage, $this->name)) {
+            $usage = sprintf('%s %s', $this->name, $usage);
+        }
+
+        $this->usages[] = $usage;
+
+        return $this;
+    }
+
+    /**
+     * Returns alternative usages of the command.
+     *
+     * @return array
+     */
+    public function getUsages()
+    {
+        return $this->usages;
     }
 
     /**

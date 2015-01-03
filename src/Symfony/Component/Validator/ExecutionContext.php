@@ -92,6 +92,10 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        if (func_num_args() > 2) {
+            trigger_error('The parameters $invalidValue, $plural and $code of '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Please use buildViolation() of the new validation API instead.', E_USER_DEPRECATED);
+        }
+
         if (null === $plural) {
             $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
         } else {
@@ -120,6 +124,11 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error(
+            'The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Please use buildViolation() of the new validation API instead.',
+            E_USER_DEPRECATED
+        );
+
         $this->globalContext->getViolations()->add(new ConstraintViolation(
             null === $plural
                 ? $this->translator->trans($message, $parameters, $this->translationDomain)

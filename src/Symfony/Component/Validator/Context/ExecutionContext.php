@@ -188,7 +188,7 @@ class ExecutionContext implements ExecutionContextInterface
         // You should use buildViolation() instead.
         if (func_num_args() > 2) {
             throw new BadMethodCallException(
-                'The parameters $invalidValue, $pluralization and $code are '.
+                'The parameters $invalidValue, $plural and $code are '.
                 'not supported anymore as of Symfony 2.5. Please use '.
                 'buildViolation() instead or enable the legacy mode.'
             );
@@ -321,8 +321,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        trigger_error('ExecutionContext::validate() is deprecated since version 2.5 and will be removed in 3.0. Use ExecutionContext::getValidator() together with inContext() instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'validate() is not supported anymore as of Symfony 2.5. '.
             'Please use getValidator() instead or enable the legacy mode.'
@@ -334,8 +332,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        trigger_error('ExecutionContext::validateValue() is deprecated since version 2.5 and will be removed in 3.0. Use ExecutionContext::getValidator() together with inContext() instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'validateValue() is not supported anymore as of Symfony 2.5. '.
             'Please use getValidator() instead or enable the legacy mode.'

@@ -7,8 +7,15 @@ Known Backwards-Compatibility Breaks
 * If you use the `PdoSessionHandler`, the session table now has a different
   schema and must be modified. Look below for more details.
 
+* The `model_timezone` and `view_timezone` options were dropped from certain
+  date form fields. See below for details.
+
 Form
 ----
+
+ * The `model_timezone` and `view_timezone` options were dropped from the
+   `date` and `time` form field types (as well as any others that use these,
+   like `birthday`).
 
  * The "empty_value" option in the types "choice", "date", "datetime" and "time"
    was deprecated and replaced by a new option "placeholder". You should use

@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-29T10:43:48Z
+
+As this is a bug fix, 2.3 is the correct branch. Instead of creating a test file just for this bug, I would include the test in the current ones.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-11-29T11:01:49Z
+
+Moved the test into the other test case and changed the name a bit.
+
+@fabpot should be ready now.
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-11-29T15:53:43Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-29T16:10:39Z
+
+a testcase for "double" is missing?
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-11-29T18:27:40Z
+
+@timglabisch well it tests that it uses the alias map, not sure we need one for **every** entry in the alias map.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-29T18:39:32Z
+
+@henrikbjorn adding such a testcase would prevent me from createing a pull request that removes the double entry. your choice :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T18:47:20Z
+
+Can't the pb be fixed at the error message level? I fear adding this might just add confusion.
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-29T20:31:11Z
+
+:+1: for error message level
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-29T21:19:36Z
+
+As far as I understand the issue it's not about a badly worded error message, but it's a feature that doesn't work at the moment.
+
+You define your option to be of type `boolean `. But when you then turn in the type check, the component fails to validate the value since there is no `is_boolean()` method, but only the `is_book()` method does exist.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-29T21:30:43Z
+
+This is not a bug fix but a new feature.
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2014-11-30T00:24:47Z
+
+In the original issue #12586 I proposed 3 solutions, that's why it wasn't me making a PR. :) But yea, making aliases sounds like a new feature
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T11:59:02Z
+
+:+1: for this. PHP has these aliases when casting, so it makes sense to support them when validating the type.

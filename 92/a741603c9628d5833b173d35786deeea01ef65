@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-11T20:01:29Z
+
+The protected, I can understand. But why the abstract?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-11-11T22:38:28Z
+
+@iltar I agree @hhamon on this point: if all methods are now protected/private, the class shouldn't be intantiable. As an abstract class can't be instantiated, we improve the behavior of the use of this (helper/sugar) class.
+
+Curiously, Travis now complain and want to remove symfony 3.x release ... /c @fabpot
+
+```
+Your requirements could not be resolved to an installable set of packages.
+  Problem 1
+    - Conclusion: remove symfony/symfony 3.0.x-dev
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-11-12T07:36:45Z
+
+I tend to not use abstract on a class if it doesn't provide abstract methods nor missing methods from an interface, it looks weird to me. But I guess there's something to say for that as you shouldn't initiate this class yourself. If for any reason the abstract should be removed in a future patch, it will stay backwards compatible so it won't be a problem either way. :+1:
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-11-12T07:47:55Z
+
+@iltar the ``abstract`` keyword embrace 2 differents concepts:
+* an ``abstract`` class means you can't instanciate it, but only classes that extends it.
+* ``abstract`` method is more than a contract - like interface - enforce you to make your own implementation of this methods in children classes
+
+The point is you don't need to have ``abstract`` methods to be allowed to use ``abstract`` keyword on a class as the ``abstract`` keyword has not the same sense.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-11-23T14:50:59Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-11-24T14:52:47Z
+
+wow, I wasn't stofized o_O  such happy day ^^
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-11-24T18:14:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-12-24T20:59:53Z
+
+Can someone relaunch travis build?
+I confirm tests pass.
+
+ping @fabpot

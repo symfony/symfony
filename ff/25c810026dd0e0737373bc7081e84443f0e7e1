@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-11-29T17:37:14Z
+
+Commits squashed ;)
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-11-29T17:39:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-01T07:03:35Z
+
+This catches only the the calls to the bind() function. Since submit() is also part of the public API you should check for the passed Request object in the submit function.
+
+Since as of the current implementation the functionality bind() is immediately passed to submit() I would do the following checks.
+
+Within the bind() function:
+
+````php
+        // ...
+        if (!$submittedData instanceof \Symfony\Component\HttpFoundation\Request) {
+            trigger_error('Form::bind() is deprecated since 2.3 and will be removed in 3.0. Please use Form::submit() instead.', E_USER_DEPRECATED);
+        }
+````
+
+And within the submit function:
+
+````php
+        // ...
+        if ($submittedData instanceof \Symfony\Component\HttpFoundation\Request) {
+            trigger_error('Form::bind() is deprecated since 2.3 and will be removed in 3.0. Please use Form::handleRequest() to pass a Symfony\Component\HttpFoundation\Request object. If you want to test whether the form was submitted separately, you can use the method Form::isSubmitted()', E_USER_DEPRECATED);
+        }
+````
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-12-01T07:26:45Z
+
+@peterrehm good catch, thanks!
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-01T08:13:16Z
+
+:+1: Looks good now!
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-12-07T16:22:08Z
+
+@stof @weaverryan is it better now?
+
+I also noticed that some tests are failing because some deprecated methods are used. Should I fix that here or in a new PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T14:41:51Z
+
+:+1:

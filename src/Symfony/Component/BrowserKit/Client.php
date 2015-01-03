@@ -198,7 +198,7 @@ abstract class Client
      *
      * @return object|null A response instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */
@@ -227,7 +227,7 @@ abstract class Client
      *
      * @return object|null A Request instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */

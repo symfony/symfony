@@ -36,11 +36,7 @@ class RouterController
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->matcher = $matcher;
-        $this->routes = $routes;
-
-        if (null === $this->routes && $this->matcher instanceof RouterInterface) {
-            $this->routes = $matcher->getRouteCollection();
-        }
+        $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
     }
 
     /**

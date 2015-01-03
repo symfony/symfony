@@ -80,7 +80,7 @@ abstract class AbstractCloner implements ClonerInterface
         ':stream-context' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStreamContext',
     );
 
-    protected $maxItems = 250;
+    protected $maxItems = 2500;
     protected $maxString = -1;
 
     private $casters = array();

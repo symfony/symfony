@@ -16,7 +16,7 @@ namespace Symfony\Component\Validator\Mapping\Loader;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  *
- * @see    Symfony\Component\Validator\Mapping\Loader\FilesLoader
+ * @see FilesLoader
  */
 class YamlFilesLoader extends FilesLoader
 {

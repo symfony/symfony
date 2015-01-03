@@ -28,21 +28,14 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $errorReporting;
 
-    /**
-     * @var string Display errors setting before running tests.
-     */
-    protected $displayErrors;
-
     public function setUp()
     {
         $this->errorReporting = error_reporting(E_ALL | E_STRICT);
-        $this->displayErrors = ini_get('display_errors');
-        ini_set('display_errors', '1');
+        $this->iniSet('display_errors', '1');
     }
 
     public function tearDown()
     {
-        ini_set('display_errors', $this->displayErrors);
         error_reporting($this->errorReporting);
     }
 

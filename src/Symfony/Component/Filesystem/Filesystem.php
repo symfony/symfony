@@ -286,7 +286,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if (defined('PHP_WINDOWS_VERSION_MAJOR') && $copyOnWindows) {
+        if ('\\' === DIRECTORY_SEPARATOR && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
 
             return;

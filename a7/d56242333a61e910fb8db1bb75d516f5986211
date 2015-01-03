@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-02T07:47:58Z
+
+Replacing `ini_set` by `$this->iniSet()` looks like a very good idea, can you do this change in all test files as I suppose it makes sense to always use it, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-02T09:51:00Z
+
+Double :+1:, one for the PR and one for using `$this->iniSet()` everywhere
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-01-02T17:09:35Z
+
+I replaced `ini_set()` with `$this->iniSet()` where applicable for all tests in 2.3. Would it be better to make a separate PR instead of using this one?
+
+There are some tests in later versions that should probably be changed as well, not sure how that should be handled.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-02T18:52:28Z
+
+:+1:

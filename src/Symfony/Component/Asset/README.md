@@ -3,6 +3,9 @@ Asset Component
 
 Asset provides classes to manage asset URLs.
 
+```php
+```
+
 Resources
 ---------
 

@@ -567,7 +567,6 @@ class FrameworkExtension extends Extension
             $package = new DefinitionDecorator('templating.asset.path_package');
             $package
                 ->setPublic(false)
-                ->setScope('request')
                 ->replaceArgument(1, $version)
                 ->replaceArgument(2, $format)
             ;
@@ -594,7 +593,6 @@ class FrameworkExtension extends Extension
         } else {
             $sslPackage = new DefinitionDecorator('templating.asset.path_package');
             $sslPackage
-                ->setScope('request')
                 ->replaceArgument(1, $version)
                 ->replaceArgument(2, $format)
             ;

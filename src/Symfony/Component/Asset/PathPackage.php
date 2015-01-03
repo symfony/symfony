@@ -55,7 +55,7 @@ class PathPackage extends Package
 
         // apply the base path
         if ('/' !== substr($url, 0, 1)) {
-            $url = $this->basePath.$url;
+            $url = $this->getBasePath().$url;
         }
 
         return $url;

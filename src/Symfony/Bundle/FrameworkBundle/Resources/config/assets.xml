@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="templating.asset.path_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PathPackage</parameter>
+        <parameter key="templating.asset.path_package.class">Symfony\Component\Asset\RequestPackage</parameter>
         <parameter key="templating.asset.url_package.class">Symfony\Component\Templating\Asset\UrlPackage</parameter>
         <parameter key="templating.asset.package_factory.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory</parameter>
     </parameters>
@@ -17,7 +17,7 @@
         </service>
 
         <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
-            <argument type="service" id="request" />
+            <argument type="service" id="request_stack" />
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>

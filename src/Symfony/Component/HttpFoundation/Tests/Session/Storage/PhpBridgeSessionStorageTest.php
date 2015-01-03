@@ -30,8 +30,8 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        ini_set('session.save_handler', 'files');
-        ini_set('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
+        $this->iniSet('session.save_handler', 'files');
+        $this->iniSet('session.save_path', $this->savePath = sys_get_temp_dir().'/sf2test');
         if (!is_dir($this->savePath)) {
             mkdir($this->savePath);
         }

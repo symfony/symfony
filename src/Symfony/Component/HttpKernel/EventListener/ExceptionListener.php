@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\DeprecationParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -121,6 +122,11 @@ class ExceptionListener implements EventSubscriberInterface
         );
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');
+
+        $request->attributes = new DeprecationParameterBag(
+            $request->attributes,
+            array('format' => 'The format attribute for exception listener has been deprecated. You should use _format.')
+        );
 
         return $request;
     }

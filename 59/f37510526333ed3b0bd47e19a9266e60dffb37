@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-03T21:06:07Z
+
+IIUC, the goal of the PR that was merged was to mimic the behavior of `cp` where only the executable bit is kept when copying.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T23:03:48Z
+
+updated

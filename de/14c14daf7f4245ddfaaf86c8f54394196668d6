@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-02T09:51:10Z
+
+Why against 2.6 branch instead of 2.7?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-02T09:54:01Z
+
+Because this is where the deprecation has been introduced. The split could (and should) have been done at that time.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-02T09:54:54Z
+
+Ok I see ;)
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-02T12:42:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T15:36:34Z
+
+this needs a rebase
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T15:36:55Z
+
+Otherwise, :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T16:07:44Z
+
+Rebased. Having worked a bit more on the subject, I reverted the split but prefixed the method testing deprecated interfaces with `testLegacy*`, and made it start by `$this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);`
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-04T11:25:38Z
+
+:+1:

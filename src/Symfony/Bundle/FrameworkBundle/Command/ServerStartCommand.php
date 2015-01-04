@@ -41,23 +41,23 @@ class ServerStartCommand extends ServerCommand
             ->setHelp(<<<EOF
 The <info>%command.name%</info> runs PHP's built-in web server:
 
-  <info>%command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 To change the default bind address and the default port use the <info>address</info> argument:
 
-  <info>%command.full_name% 127.0.0.1:8080</info>
+  <info>php %command.full_name% 127.0.0.1:8080</info>
 
 To change the default document root directory use the <info>--docroot</info> option:
 
-  <info>%command.full_name% --docroot=htdocs/</info>
+  <info>php %command.full_name% --docroot=htdocs/</info>
 
 If you have a custom document root directory layout, you can specify your own
 router script using the <info>--router</info> option:
 
-  <info>%command.full_name% --router=app/config/router.php</info>
+  <info>php %command.full_name% --router=app/config/router.php</info>
 
-Specifying a router script is required when the used environment is not "dev" or
-"prod".
+Specifying a router script is required when the used environment is not <comment>"dev"</comment> or
+<comment>"prod"</comment>.
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 

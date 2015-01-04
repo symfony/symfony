@@ -46,9 +46,7 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
-     * @deprecated since version 2.2, to be removed in 3.0.
-     *             The ability to pass file names to the parse() method is
-     *             deprecated. Pass the YAML contents of the file instead.
+     * @deprecated The ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
      *
      * @api
      */

@@ -187,8 +187,6 @@ class ExecutionContext implements ExecutionContextInterface
         // API, as they are not present in the new interface anymore.
         // You should use buildViolation() instead.
         if (func_num_args() > 2) {
-            trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
-
             throw new BadMethodCallException(
                 'The parameters $invalidValue, $plural and $code are '.
                 'not supported anymore as of Symfony 2.5. Please use '.
@@ -288,11 +286,7 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getClassName()
     {
-        if ($this->metadata instanceof ClassBasedInterface) {
-            return $this->metadata->getClassName();
-        }
-
-        return null;
+        return $this->metadata instanceof ClassBasedInterface ? $this->metadata->getClassName() : null;
     }
 
     /**

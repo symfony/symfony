@@ -99,9 +99,7 @@ interface ExecutionContextInterface
      *
      * @api
      *
-     * @deprecated since version 2.5.
-     *             The parameters $invalidValue, $plural and $code will be removed
-     *             in 3.0.
+     * @deprecated the parameters $invalidValue, $plural and $code are deprecated since version 2.5 and will be removed in 3.0.
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null);
 

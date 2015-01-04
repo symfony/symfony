@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\TwigBundle\Extension;
 
-trigger_error('The '.__NAMESPACE__.'\ActionsExtension class is deprecated since version 2.2 and will be removed in Symfony 3.0.', E_USER_DEPRECATED);
-
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
@@ -31,14 +29,14 @@ class ActionsExtension extends \Twig_Extension
     /**
      * @param FragmentHandler|ContainerInterface $handler
      *
-     * @deprecated Passing a ContainerInterface as a first argument is deprecated as of 2.7 and will be removed in 3.0.
+     * @deprecated Passing a ContainerInterface as a first argument is deprecated since 2.7 and will be removed in 3.0.
      */
     public function __construct($handler)
     {
         if ($handler instanceof FragmentHandler) {
             $this->handler = $handler;
         } elseif ($handler instanceof ContainerInterface) {
-            trigger_error(sprintf('The ability to pass a ContainerInterface instance as a first argument to %s was deprecated in 2.7 and will be removed in 3.0. Please, pass a FragmentHandler instance instead.', __METHOD__), E_USER_DEPRECATED);
+            trigger_error('The ability to pass a ContainerInterface instance as a first argument to '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Pass a FragmentHandler instance instead.', E_USER_DEPRECATED);
 
             $this->handler = $handler->get('fragment.handler');
         } else {

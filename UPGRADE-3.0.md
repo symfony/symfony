@@ -1031,3 +1031,7 @@ UPGRADE FROM 2.x to 3.0
 ### Swiftmailer Bridge
 
  * `Symfony\Bridge\Swiftmailer\DataCollector\MessageDataCollector` was removed. Use the `Symfony\Bundle\SwiftmailerBundle\DataCollector\MessageDataCollector` class instead.
+
+### HttpFoundation
+
+* `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` don't implement anymore `\IteratorAggregate` interface

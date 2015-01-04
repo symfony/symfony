@@ -977,6 +977,22 @@ UPGRADE FROM 2.x to 3.0
    $plural = $violation->getPlural();
    ```
 
+ * The class `Symfony\Component\Validator\DefaultTranslator` was removed. You
+   should use `Symfony\Component\Translation\IdentityTranslator` instead.
+
+   Before:
+
+   ```php
+   $translator = new \Symfony\Component\Validator\DefaultTranslator();
+   ```
+
+   After:
+
+   ```php
+   $translator = new \Symfony\Component\Translation\IdentityTranslator();
+   $translator->setLocale('en');
+   ```
+
 ### Yaml
 
  * The ability to pass file names to `Yaml::parse()` has been removed.

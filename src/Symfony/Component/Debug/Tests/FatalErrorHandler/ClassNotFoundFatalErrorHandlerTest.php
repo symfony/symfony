@@ -21,24 +21,38 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideClassNotFoundData
      */
-    public function testHandleClassNotFound($error, $translatedMessage, $autoloader = null)
+    public function testHandleClassNotFound($error, $translatedMessage)
     {
-        if ($autoloader) {
-            // Unregister all autoloaders to ensure the custom provided
-            // autoloader is the only one to be used during the test run.
-            $autoloaders = spl_autoload_functions();
-            array_map('spl_autoload_unregister', $autoloaders);
-            spl_autoload_register($autoloader);
-        }
+        $handler = new ClassNotFoundFatalErrorHandler();
+
+        $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
+
+        $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
+        $this->assertSame($translatedMessage, $exception->getMessage());
+        $this->assertSame($error['type'], $exception->getSeverity());
+        $this->assertSame($error['file'], $exception->getFile());
+        $this->assertSame($error['line'], $exception->getLine());
+    }
+
+    /**
+     * @dataProvider provideLegacyClassNotFoundData
+     */
+    public function testLegacyHandleClassNotFound($error, $translatedMessage, $autoloader)
+    {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
+        // Unregister all autoloaders to ensure the custom provided
+        // autoloader is the only one to be used during the test run.
+        $autoloaders = spl_autoload_functions();
+        array_map('spl_autoload_unregister', $autoloaders);
+        spl_autoload_register($autoloader);
 
         $handler = new ClassNotFoundFatalErrorHandler();
 
         $exception = $handler->handleError($error, new FatalErrorException('', 0, $error['type'], $error['file'], $error['line']));
 
-        if ($autoloader) {
-            spl_autoload_unregister($autoloader);
-            array_map('spl_autoload_register', $autoloaders);
-        }
+        spl_autoload_unregister($autoloader);
+        array_map('spl_autoload_register', $autoloaders);
 
         $this->assertInstanceof('Symfony\Component\Debug\Exception\ClassNotFoundException', $exception);
         $this->assertSame($translatedMessage, $exception->getMessage());
@@ -49,14 +63,6 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function provideClassNotFoundData()
     {
-        $prefixes = array('Symfony\Component\Debug\Exception\\' => realpath(__DIR__.'/../../Exception'));
-
-        $symfonyAutoloader = new SymfonyClassLoader();
-        $symfonyAutoloader->addPrefixes($prefixes);
-
-        $symfonyUniversalClassLoader = new SymfonyUniversalClassLoader();
-        $symfonyUniversalClassLoader->registerPrefixes($prefixes);
-
         return array(
             array(
                 array(
@@ -103,6 +109,20 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ),
                 "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\Bar\".\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
             ),
+        );
+    }
+
+    public function provideLegacyClassNotFoundData()
+    {
+        $prefixes = array('Symfony\Component\Debug\Exception\\' => realpath(__DIR__.'/../../Exception'));
+
+        $symfonyAutoloader = new SymfonyClassLoader();
+        $symfonyAutoloader->addPrefixes($prefixes);
+
+        $symfonyUniversalClassLoader = new SymfonyUniversalClassLoader();
+        $symfonyUniversalClassLoader->registerPrefixes($prefixes);
+
+        return array(
             array(
                 array(
                     'type' => 1,

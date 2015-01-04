@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -338,6 +339,23 @@ class XmlDescriptor extends Descriptor
 
         if ($definition->getFactoryMethod()) {
             $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+        }
+
+        if ($factory = $definition->getFactory()) {
+            $serviceXML->appendChild($factoryXML = $dom->createElement('factory'));
+
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $factoryXML->setAttribute('service', (string) $factory[0]);
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $factoryXML->setAttribute('class', $factory[0]);
+                }
+                $factoryXML->setAttribute('method', $factory[1]);
+            } else {
+                $factoryXML->setAttribute('function', $factory);
+            }
         }
 
         $serviceXML->setAttribute('scope', $definition->getScope());

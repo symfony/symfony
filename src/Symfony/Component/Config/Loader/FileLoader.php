@@ -55,6 +55,14 @@ abstract class FileLoader extends Loader
     }
 
     /**
+     * @return string
+     */
+    public function getCurrentDir()
+    {
+        return $this->currentDir;
+    }
+
+    /**
      * Returns the file locator used by this loader.
      *
      * @return FileLocatorInterface

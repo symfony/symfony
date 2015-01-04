@@ -78,6 +78,13 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
             array(TwigNodeProvider::getTransFilter(self::$message)),
             array(TwigNodeProvider::getTransChoiceFilter(self::$message)),
             array(TwigNodeProvider::getTransTag(self::$message)),
+            // with named arguments
+            array(TwigNodeProvider::getTransFilter(self::$message, null, array(
+                'arguments' => new \Twig_Node_Expression_Array(array(), 0),
+            ))),
+            array(TwigNodeProvider::getTransChoiceFilter(self::$message), null, array(
+                'arguments' => new \Twig_Node_Expression_Array(array(), 0),
+            )),
         );
     }
 }

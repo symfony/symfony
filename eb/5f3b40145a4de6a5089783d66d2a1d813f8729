@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-11-29T13:23:21Z
+
+Please do not remove method, we first need to merge deprecation notices
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-12T21:11:54Z
+
+@FlorianLB are you planning to finish this PR? The method mustn't be removed, but a depreciation error should be triggered instead. Have a look at other PRs of this type and also read [Javier's gist](https://gist.github.com/javiereguiluz/a5514ec6cde2a63be441),
+
+---------------------------------------------------------------------------
+
+by FlorianLB at 2014-12-12T22:28:32Z
+
+No. Depreciation error must be triggered in 2.7 and deprecated method must be removed in 3.0.
+
+This PR is about 3.0 not 2.7. I already did it and it has been merged (#12731).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-12T22:38:02Z
+
+Sorry, didn't notice the target branch. We're not removing the methods just yet.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-04T15:20:04Z
+
+:+1:

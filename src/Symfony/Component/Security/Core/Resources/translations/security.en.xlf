@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Account is locked.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Session has expired.</source>
+                <target>Session has expired.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

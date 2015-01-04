@@ -216,13 +216,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
-    public function testTemplatingAssetsHelperScopeDependsOnPackageArgumentScopes()
-    {
-        $container = $this->createContainerFromFile('templating_url_package');
-
-        $this->assertNotEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() does not set request scope on assets helper if no packages are request-scoped');
-    }
-
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');

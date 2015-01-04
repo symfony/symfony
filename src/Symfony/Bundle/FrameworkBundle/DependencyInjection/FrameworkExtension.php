@@ -496,6 +496,11 @@ class FrameworkExtension extends Extension
             $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
             $namedPackages[$name] = new Reference('templating.asset.package.'.$name);
         }
+        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
+            $bundlePackage = $this->createPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format'], 'bundle.'.$bundle);
+            $container->setDefinition('templating.asset.package.bundle.'.$bundle, $bundlePackage);
+            $namedPackages[$bundle] = new Reference('templating.asset.package.bundle.'.$bundle);
+        }
         $container->getDefinition('templating.helper.assets')->setArguments(array(
             new Reference('templating.asset.default_package'),
             $namedPackages,
@@ -557,6 +562,18 @@ class FrameworkExtension extends Extension
      */
     private function createPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format, $name = null)
     {
+        if (strpos($name, 'bundle.') === 0) {
+            $package = new DefinitionDecorator('templating.asset.bundle_package');
+            $package
+                ->setPublic(false)
+                ->setScope('request')
+                ->replaceArgument(1, substr($name, 7))
+                ->replaceArgument(2, $version)
+                ->replaceArgument(3, $format)
+            ;
+
+            return $package;
+        }
         if (!$httpUrls) {
             $package = new DefinitionDecorator('templating.asset.path_package');
             $package

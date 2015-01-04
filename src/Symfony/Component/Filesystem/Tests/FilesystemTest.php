@@ -1002,23 +1002,10 @@ class FilesystemTest extends FilesystemTestCase
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
-        chmod($sourceFilePath, 0755);
+        chmod($sourceFilePath, 0745);
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $this->assertFilePermissions(755, $targetFilePath);
-    }
-
-    public function testCopyShouldNotKeepWritePermissionOtherThanCurrentUser()
-    {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
-
-        file_put_contents($sourceFilePath, 'SOURCE FILE');
-        chmod($sourceFilePath, 0777);
-
-        $this->filesystem->copy($sourceFilePath, $targetFilePath);
-
-        $this->assertFilePermissions(755, $targetFilePath);
+        $this->assertFilePermissions(767, $targetFilePath);
     }
 }

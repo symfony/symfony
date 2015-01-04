@@ -33,21 +33,21 @@ class LintCommand extends ContainerAwareCommand
 The <info>%command.name%</info> command lints a template and outputs to stdout
 the first encountered syntax error.
 
-<info>php %command.full_name% filename</info>
+  <info>php %command.full_name% filename</info>
 
 The command gets the contents of <comment>filename</comment> and validates its syntax.
 
-<info>php %command.full_name% dirname</info>
+  <info>php %command.full_name% dirname</info>
 
 The command finds all twig templates in <comment>dirname</comment> and validates the syntax
 of each Twig template.
 
-<info>php %command.full_name% @AcmeMyBundle</info>
+  <info>php %command.full_name% @AcmeMyBundle</info>
 
 The command finds all twig templates in the <comment>AcmeMyBundle</comment> bundle and validates
 the syntax of each Twig template.
 
-<info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name%</info>
 
 The command gets the template contents from stdin and validates its syntax.
 EOF

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 /**
- * @author Antonio J. García Lagar <aj@garcialagar.es>
  * @group functional
  */
 class SessionExpirationTest extends WebTestCase

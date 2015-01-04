@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -34,9 +35,15 @@ class PropertyNormalizer extends AbstractNormalizer
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if ($this->isCircularReference($object, $context)) {
+            return $this->handleCircularReference($object);
+        }
+
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
         $allowedAttributes = $this->getAllowedAttributes($object, $context);
@@ -61,7 +68,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $attributeValue = $this->serializer->normalize($attributeValue, $format);
+                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
             $attributes[$property->name] = $attributeValue;

@@ -72,41 +72,16 @@ class PropertyNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $data = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
-
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if ($allowed && !$ignored && isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
-                } elseif (!$constructorParameter->isOptional()) {
-                    throw new RuntimeException(sprintf(
-                        'Cannot create an instance of %s from serialized data because '.
-                        'its constructor requires parameter "%s" to be present.',
-                        $class,
-                        $constructorParameter->name
-                    ));
-                }
-            }
-
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class();
-        }
+        $object = $this->instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($data as $propertyName => $value) {
             $propertyName = lcfirst($this->formatAttribute($propertyName));

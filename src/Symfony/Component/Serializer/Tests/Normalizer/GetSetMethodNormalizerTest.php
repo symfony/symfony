@@ -385,6 +385,23 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy');
         $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
+
+    public function testObjectToPopulate()
+    {
+        $dummy = new GetSetDummy();
+        $dummy->setFoo('foo');
+
+        $obj = $this->normalizer->denormalize(
+            array('bar' => 'bar'),
+            __NAMESPACE__.'\GetSetDummy',
+            null,
+            array('object_to_populate' => $dummy)
+        );
+
+        $this->assertEquals($dummy, $obj);
+        $this->assertEquals('foo', $obj->getFoo());
+        $this->assertEquals('bar', $obj->getBar());
+    }
 }
 
 class GetSetDummy

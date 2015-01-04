@@ -21,9 +21,9 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
         $request
             ->expects($this->once())
             ->method('getSession')
-            ->will($this->returnValue(false));
+            ->will($this->returnValue(null));
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event = $this->getResponseEvent();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -54,7 +54,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue(null));
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event = $this->getResponseEvent();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -97,7 +97,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event = $this->getResponseEvent();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -143,7 +143,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event = $this->getResponseEvent();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -188,7 +188,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
 
-        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
+        $event = $this->getResponseEvent();
         $event
             ->expects($this->any())
             ->method('getRequest')
@@ -231,6 +231,13 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
     private function getHttpUtils()
     {
         return $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    private function getResponseEvent()
+    {
+        return $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
             ->getMock();
     }

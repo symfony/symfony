@@ -15,8 +15,13 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
-class RenderTokenParserTest extends TestCase
+class LegacyRenderTokenParserTest extends TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     /**
      * @dataProvider getTestsForRender
      */

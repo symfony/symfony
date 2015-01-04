@@ -13,10 +13,12 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
 
-class ApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
+class LegacyApcUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         if (!extension_loaded('apc')) {
             $this->markTestSkipped('The apc extension is not available.');
         }

@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
@@ -345,6 +346,13 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
+        $apiVersion = $this->apiVersion;
+
+        if (null === $apiVersion) {
+            $apiVersion = PHP_VERSION_ID < 50309
+                ? Validation::API_VERSION_2_4
+                : Validation::API_VERSION_2_5_BC;
+        }
 
         if (!$metadataFactory) {
             $loaders = array();
@@ -377,18 +385,15 @@ class ValidatorBuilder implements ValidatorBuilderInterface
                 $loader = $loaders[0];
             }
 
-            $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
+            if (Validation::API_VERSION_2_5 === $apiVersion) {
+                $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
+            } else {
+                $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
+            }
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
         $translator = $this->translator ?: new DefaultTranslator();
-        $apiVersion = $this->apiVersion;
-
-        if (null === $apiVersion) {
-            $apiVersion = PHP_VERSION_ID < 50309
-                ? Validation::API_VERSION_2_4
-                : Validation::API_VERSION_2_5_BC;
-        }
 
         if (Validation::API_VERSION_2_4 === $apiVersion) {
             return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);

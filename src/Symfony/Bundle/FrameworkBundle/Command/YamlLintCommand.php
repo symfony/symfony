@@ -43,20 +43,20 @@ the first encountered syntax error.
 
 You can validate the syntax of a file:
 
-<info>php %command.full_name% filename</info>
+  <info>php %command.full_name% filename</info>
 
 Or of a whole directory:
 
-<info>php %command.full_name% dirname</info>
-<info>php %command.full_name% dirname --format=json</info>
+  <info>php %command.full_name% dirname</info>
+  <info>php %command.full_name% dirname --format=json</info>
 
 Or all YAML files in a bundle:
 
-<info>php %command.full_name% @AcmeDemoBundle</info>
+  <info>php %command.full_name% @AcmeDemoBundle</info>
 
 You can also pass the YAML contents from STDIN:
 
-<info>cat filename | php %command.full_name%</info>
+  <info>cat filename | php %command.full_name%</info>
 
 EOF
             )

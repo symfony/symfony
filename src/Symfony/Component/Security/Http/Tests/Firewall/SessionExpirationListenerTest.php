@@ -13,9 +13,6 @@ namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use Symfony\Component\Security\Http\Firewall\SessionExpirationListener;
 
-/**
- * @author Antonio J. García Lagar <aj@garcialagar.es>
- */
 class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testHandleWhenNoSession()

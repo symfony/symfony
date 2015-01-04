@@ -44,6 +44,7 @@ class SessionExpirationListener implements ListenerInterface
      * Handles expired sessions.
      *
      * @param  GetResponseEvent  $event A GetResponseEvent instance
+     *
      * @throws SessionExpiredException If the session has expired
      */
     public function handle(GetResponseEvent $event)

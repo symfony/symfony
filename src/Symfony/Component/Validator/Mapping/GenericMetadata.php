@@ -239,8 +239,6 @@ class GenericMetadata implements MetadataInterface
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException('Not supported.');
     }
 }

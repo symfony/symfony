@@ -47,6 +47,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
      */
     public function setDefaultEscapingStrategy($strategy)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Inject the escaping strategy in the Twig_Environment object instead.', E_USER_DEPRECATED);
+
         $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
     }
 
@@ -56,6 +58,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
      */
     public function guessDefaultEscapingStrategy($filename)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
+
         return TwigDefaultEscapingStrategy::guess($filename);
     }
 

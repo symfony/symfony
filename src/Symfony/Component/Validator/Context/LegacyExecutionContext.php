@@ -41,8 +41,6 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function __construct(ValidatorInterface $validator, $root, MetadataFactoryInterface $metadataFactory, TranslatorInterface $translator, $translationDomain = null)
     {
-        trigger_error('The '.__CLASS__.'  class is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext class instead.', E_USER_DEPRECATED);
-
         parent::__construct(
             $validator,
             $root,

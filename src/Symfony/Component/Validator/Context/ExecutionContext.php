@@ -289,8 +289,6 @@ class ExecutionContext implements ExecutionContextInterface
     public function getClassName()
     {
         if ($this->metadata instanceof ClassBasedInterface) {
-            trigger_error('The Symfony\Component\Validator\ClassBasedInterface interface is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
             return $this->metadata->getClassName();
         }
 
@@ -318,8 +316,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'addViolationAt() is not supported anymore as of Symfony 2.5. '.
             'Please use buildViolation() instead or enable the legacy mode.'
@@ -331,8 +327,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator method together with Symfony\Component\Validator\Validator\ValidatorInterface::inContext method instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'validate() is not supported anymore as of Symfony 2.5. '.
             'Please use getValidator() instead or enable the legacy mode.'
@@ -344,8 +338,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator method together with Symfony\Component\Validator\Validator\ValidatorInterface::inContext method instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'validateValue() is not supported anymore as of Symfony 2.5. '.
             'Please use getValidator() instead or enable the legacy mode.'
@@ -357,8 +349,6 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function getMetadataFactory()
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::getValidator method together with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
-
         throw new BadMethodCallException(
             'getMetadataFactory() is not supported anymore as of Symfony 2.5. '.
             'Please use getValidator() in combination with getMetadataFor() '.

@@ -49,7 +49,7 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
         $this
             ->setName('router:dump-apache')
             ->setDefinition(array(
-                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
+                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
             ->setDescription('Dumps all routes as Apache rewrite rules')

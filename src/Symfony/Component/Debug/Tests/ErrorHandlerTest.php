@@ -23,22 +23,6 @@ use Symfony\Component\Debug\Exception\ContextErrorException;
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var int Error reporting level before running tests.
-     */
-    protected $errorReporting;
-
-    public function setUp()
-    {
-        $this->errorReporting = error_reporting(E_ALL | E_STRICT);
-        $this->iniSet('display_errors', '1');
-    }
-
-    public function tearDown()
-    {
-        error_reporting($this->errorReporting);
-    }
-
     public function testRegister()
     {
         $handler = ErrorHandler::register();
@@ -185,6 +169,8 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleError()
     {
+        $this->iniSet('error_reporting', -1);
+
         try {
             $handler = ErrorHandler::register();
             $handler->throwAt(0, true);
@@ -373,8 +359,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testDeprecatedInterface()
+    public function testLegacyInterface()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         try {
             $handler = ErrorHandler::register(0);
             $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, array()));

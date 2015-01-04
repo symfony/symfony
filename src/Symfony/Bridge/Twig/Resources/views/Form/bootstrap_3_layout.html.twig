@@ -47,7 +47,7 @@
         <div {{ block('widget_container_attributes') }}>
             {{ form_errors(form.date) }}
             {{ form_errors(form.time) }}
-            {{ form_widget(form.date, { datetime: true } ) }}&nbsp;
+            {{ form_widget(form.date, { datetime: true } ) }}
             {{ form_widget(form.time, { datetime: true } ) }}
         </div>
     {% endif %}

@@ -33,6 +33,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 
         $rendererEngine = new TwigRendererEngine(array(
             'bootstrap_3_layout.html.twig',
+            'custom_widgets.html.twig',
         ));
         $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface'));
 
@@ -40,7 +41,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
-            __DIR__,
+            __DIR__.'/Fixtures/templates/form',
         ));
 
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));

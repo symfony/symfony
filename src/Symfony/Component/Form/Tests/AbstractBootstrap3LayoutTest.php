@@ -136,7 +136,21 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testOverrideWidgetBlock()
     {
-        $this->markTestIncomplete('Rewrite');
+        // see custom_widgets.html.twig
+        $form = $this->factory->createNamed('text_id', 'text');
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html,
+'/div
+    [
+        ./input
+        [@type="text"]
+        [@id="text_id"]
+        [@class="form-control"]
+    ]
+    [@id="container"]
+'
+        );
     }
 
     public function testCheckedCheckbox()
@@ -722,27 +736,160 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 
     public function testDateTime()
     {
-        $this->markTestIncomplete('Rewrite');
+        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+            'input' => 'string',
+            'with_seconds' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+'/div
+    [
+        ./select
+            [@id="name_date_month"]
+            [@class="form-control"]
+            [./option[@value="2"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_day"]
+            [@class="form-control"]
+            [./option[@value="3"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_year"]
+            [@class="form-control"]
+            [./option[@value="2011"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_hour"]
+            [@class="form-control"]
+            [./option[@value="4"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_minute"]
+            [@class="form-control"]
+            [./option[@value="5"][@selected="selected"]]
+    ]
+    [count(.//select)=5]
+'
+        );
     }
 
     public function testDateTimeWithPlaceholderGlobal()
     {
-        $this->markTestIncomplete('Rewrite');
+        $form = $this->factory->createNamed('name', 'datetime', null, array(
+            'input' => 'string',
+            'placeholder' => 'Change&Me',
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+'/div
+    [@class="my&class form-inline"]
+    [
+        ./select
+            [@id="name_date_month"]
+            [@class="form-control"]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="name_date_day"]
+            [@class="form-control"]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="name_date_year"]
+            [@class="form-control"]
+            [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="name_time_hour"]
+            [@class="form-control"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+        /following-sibling::select
+            [@id="name_time_minute"]
+            [@class="form-control"]
+            [./option[@value=""][.="[trans]Change&Me[/trans]"]]
+    ]
+    [count(.//select)=5]
+'
+        );
     }
 
     public function testDateTimeWithHourAndMinute()
     {
-        $this->markTestIncomplete('Rewrite');
+        $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5');
+
+        $form = $this->factory->createNamed('name', 'datetime', $data, array(
+            'input' => 'array',
+            'required' => false,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+'/div
+    [@class="my&class form-inline"]
+    [
+        ./select
+            [@id="name_date_month"]
+            [@class="form-control"]
+            [./option[@value="2"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_day"]
+            [@class="form-control"]
+            [./option[@value="3"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_year"]
+            [@class="form-control"]
+            [./option[@value="2011"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_hour"]
+            [@class="form-control"]
+            [./option[@value="4"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_minute"]
+            [@class="form-control"]
+            [./option[@value="5"][@selected="selected"]]
+    ]
+    [count(.//select)=5]
+'
+        );
     }
 
     public function testDateTimeWithSeconds()
     {
-        $this->markTestIncomplete('Rewrite');
+        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+            'input' => 'string',
+            'with_seconds' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+'/div
+    [@class="my&class form-inline"]
+    [
+        ./select
+            [@id="name_date_month"]
+            [@class="form-control"]
+            [./option[@value="2"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_day"]
+            [@class="form-control"]
+            [./option[@value="3"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_date_year"]
+            [@class="form-control"]
+            [./option[@value="2011"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_hour"]
+            [@class="form-control"]
+            [./option[@value="4"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_minute"]
+            [@class="form-control"]
+            [./option[@value="5"][@selected="selected"]]
+        /following-sibling::select
+            [@id="name_time_second"]
+            [@class="form-control"]
+            [./option[@value="6"][@selected="selected"]]
+    ]
+    [count(.//select)=6]
+'
+        );
     }
 
     public function testDateTimeSingleText()
     {
-        $this->markTestIncomplete('TODO: handle &nbsp;');
         $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
             'input' => 'string',
             'date_widget' => 'single_text',

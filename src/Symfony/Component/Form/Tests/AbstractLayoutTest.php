@@ -93,7 +93,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         ), $vars));
 
         if (!isset($vars['id'])) {
-            $xpath = trim($xpath) . '
+            $xpath = trim($xpath).'
     [@id="my&id"]';
         }
 

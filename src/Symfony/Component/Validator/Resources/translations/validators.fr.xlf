@@ -306,6 +306,10 @@
                 <source>The host could not be resolved.</source>
                 <target>Le nom de domaine n'a pas pu être résolu.</target>
             </trans-unit>
+            <trans-unit id="80">
+                <source>"{{ value }}" is not a valid timezone.</source>
+                <target>"{{ value }}" n'est pas un fuseau horaire valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

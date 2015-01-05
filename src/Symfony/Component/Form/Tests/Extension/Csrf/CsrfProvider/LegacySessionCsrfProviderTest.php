@@ -13,13 +13,15 @@ namespace Symfony\Component\Form\Tests\Extension\Csrf\CsrfProvider;
 
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 
-class SessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
+class LegacySessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;
     protected $session;
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->session = $this->getMock(
             'Symfony\Component\HttpFoundation\Session\Session',
             array(),

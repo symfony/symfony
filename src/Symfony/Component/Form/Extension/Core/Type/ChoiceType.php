@@ -62,7 +62,6 @@ class ChoiceType extends AbstractType
                 $placeholderView = new ChoiceView(null, '', $options['empty_value']);
 
                 // "placeholder" is a reserved index
-                // see also ChoiceListInterface::getIndicesForChoices()
                 $this->addSubForms($builder, array('placeholder' => $placeholderView), $options);
             }
 

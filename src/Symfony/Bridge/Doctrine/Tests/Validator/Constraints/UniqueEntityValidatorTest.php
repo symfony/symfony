@@ -23,7 +23,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**

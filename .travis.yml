@@ -3,14 +3,14 @@ language: php
 matrix:
     include:
         - php: 5.3.3
-          env: components=low
-        - php: 5.6
-          env: components=high
-        - php: 5.3.3
         - php: 5.3
         - php: 5.4
         - php: 5.5
         - php: 5.6
+        - php: 5.3.3
+          env: components=low
+        - php: 5.6
+          env: components=high
         - php: hhvm-nightly
     allow_failures:
         - php: hhvm-nightly
@@ -33,7 +33,7 @@ before_install:
     - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then php -i; fi;
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
     # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built
-    - if [ "$TRAVIS_BRANCH" = "master ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
+    - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
 install:
     - if [ "$components" = "no" ]; then composer --prefer-source --dev install; fi;

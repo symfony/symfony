@@ -42,7 +42,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     /**
      * The service container.
      *
-     * @var \Symfony\Component\DependencyInjection\IntrospectableContainerInterface
+     * @var IntrospectableContainerInterface
      */
     private $container;
 
@@ -72,7 +72,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     /**
      * Constructs a container aware event dispatcher.
      *
-     * @param \Symfony\Component\EventDispatcher\IntrospectableContainerInterface $container
+     * @param IntrospectableContainerInterface $container
      *   The service container.
      * @param array $listeners
      *   A nested array of listener definitions keyed by event name and priority.
@@ -94,7 +94,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
      */
     public function dispatch($eventName, Event $event = null)
     {
-        if ($event === NULL) {
+        if (null === $event) {
             $event = new Event();
         }
 
@@ -110,7 +110,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
 
             // Invoke listeners and resolve callables if necessary.
             foreach ($this->listeners[$eventName] as &$definitions) {
-                foreach ($definitions as $key => &$definition) {
+                foreach ($definitions as &$definition) {
                     if (!isset($definition['callable'])) {
                         $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
                     }
@@ -133,7 +133,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
     {
         $result = array();
 
-        if ($eventName === NULL) {
+        if (null === $eventName) {
             // If event name was omitted, collect all listeners of all events.
             foreach (array_keys($this->listeners) as $eventName) {
                 $listeners = $this->getListeners($eventName);
@@ -141,22 +141,28 @@ class CompiledEventDispatcher implements EventDispatcherInterface
                     $result[$eventName] = $listeners;
                 }
             }
-        } elseif (isset($this->listeners[$eventName])) {
-            // Sort listeners if necessary.
-            if (isset($this->unsorted[$eventName])) {
-                krsort($this->listeners[$eventName]);
-                unset($this->unsorted[$eventName]);
-            }
 
-            // Collect listeners and resolve callables if necessary.
-            foreach ($this->listeners[$eventName] as &$definitions) {
-                foreach ($definitions as $key => &$definition) {
-                    if (!isset($definition['callable'])) {
-                        $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
-                    }
+            return $result;
+        }
 
-                    $result[] = $definition['callable'];
+        if (!isset($this->listeners[$eventName])) {
+            return $result;
+        }
+
+        // Sort listeners if necessary.
+        if (isset($this->unsorted[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            unset($this->unsorted[$eventName]);
+        }
+
+        // Collect listeners and resolve callables if necessary.
+        foreach ($this->listeners[$eventName] as &$definitions) {
+            foreach ($definitions as &$definition) {
+                if (!isset($definition['callable'])) {
+                    $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
                 }
+
+                $result[] = $definition['callable'];
             }
         }
 

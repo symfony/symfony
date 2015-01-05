@@ -3,14 +3,14 @@ language: php
 matrix:
     include:
         - php: 5.3.3
-          env: components=low
-        - php: 5.6
-          env: components=high
-        - php: 5.3.3
         - php: 5.3
         - php: 5.4
         - php: 5.5
         - php: 5.6
+        - php: 5.3.3
+          env: components=low
+        - php: 5.6
+          env: components=high
         - php: hhvm-nightly
     allow_failures:
         - php: hhvm-nightly
@@ -32,13 +32,14 @@ before_install:
     - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then php -i; fi;
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
-#    - if [ "$TRAVIS_PHP_VERSION" != "5.3.3" ]; then phpunit --self-update; fi;
+    # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built
+    - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
 install:
-    - if [ "$components" = "no" ]; then COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev install; fi;
+    - if [ "$components" = "no" ]; then composer --prefer-source --dev install; fi;
 
 script:
     - if [ "$components" = "no" ]; then ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$components" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; COMPOSER_ROOT_VERSION=dev-master composer --prefer-source --dev --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --dev update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --dev --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

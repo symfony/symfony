@@ -17,7 +17,7 @@ class SimpleNumericChoiceListTest extends AbstractChoiceListTest
 {
     public function testLegacyGetIndicesForChoicesDealsWithNumericChoices()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         // Pass choices as strings although they are integers
         $choices = array('0', '1');
@@ -26,7 +26,7 @@ class SimpleNumericChoiceListTest extends AbstractChoiceListTest
 
     public function testLegacyGetIndicesForValuesDealsWithNumericValues()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         // Pass values as strings although they are integers
         $values = array('0', '1');

@@ -116,7 +116,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('field_name')
                             ->defaultValue('_token')
-                            ->info('Deprecated since 2.4, to be removed in 3.0. Use form.csrf_protection.field_name instead')
+                            ->info('Deprecated since version 2.4, to be removed in 3.0. Use form.csrf_protection.field_name instead')
                         ->end()
                     ->end()
                 ->end()

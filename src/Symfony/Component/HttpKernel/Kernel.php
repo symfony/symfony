@@ -89,16 +89,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $defClass = $defClass->getDeclaringClass()->name;
 
         if (__CLASS__ !== $defClass) {
-            trigger_error(sprintf('Calling %s::init() was deprecated in Symfony 2.3 and will be removed in 3.0. Move your logic to the constructor instead.', $defClass), E_USER_DEPRECATED);
+            trigger_error(sprintf('Calling the %s::init() method is deprecated since version 2.3 and will be removed in 3.0. Move your logic to the constructor method instead.', $defClass), E_USER_DEPRECATED);
             $this->init();
         }
     }
 
     /**
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
+     * @deprecated since version 2.3, to be removed in 3.0. Move your logic in the constructor instead.
      */
     public function init()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Move your logic to the constructor method instead.', E_USER_DEPRECATED);
     }
 
     public function __clone()
@@ -216,11 +217,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @api
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function isClassInActiveBundle($class)
     {
-        trigger_error('Symfony\\Component\\HttpKernel\\Kernel::isClassInActiveBundle() is deprecated since version 2.6 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
         foreach ($this->getBundles() as $bundle) {
             if (0 === strpos($class, $bundle->getNamespace())) {

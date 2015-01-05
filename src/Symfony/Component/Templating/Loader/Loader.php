@@ -27,7 +27,7 @@ abstract class Loader implements LoaderInterface
     protected $logger;
 
     /**
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. Use $this->logger instead.
+     * @deprecated since version 2.4, to be removed in 3.0. Use $this->logger instead.
      */
     protected $debugger;
 
@@ -46,10 +46,12 @@ abstract class Loader implements LoaderInterface
      *
      * @param DebuggerInterface $debugger A debugger instance
      *
-     * @deprecated Deprecated in 2.4, to be removed in 3.0. Use $this->setLogger() instead.
+     * @deprecated since version 2.4, to be removed in 3.0. Use $this->setLogger() instead.
      */
     public function setDebugger(DebuggerInterface $debugger)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. Use the setLogger() method instead.', E_USER_DEPRECATED);
+
         $this->debugger = $debugger;
     }
 }

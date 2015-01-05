@@ -1011,20 +1011,24 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefault()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function set($option, $value)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefaults() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefault($option, $value);
     }
 
     /**
      * Shortcut for {@link clear()} and {@link setDefaults()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function replace(array $defaults)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the clear() and setDefaults() methods instead.', E_USER_DEPRECATED);
+
         $this->clear();
 
         return $this->setDefaults($defaults);
@@ -1033,40 +1037,48 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefault()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function overload($option, $value)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefault() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefault($option, $value);
     }
 
     /**
      * Alias of {@link offsetGet()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function get($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the ArrayAccess syntax instead to get an option value.', E_USER_DEPRECATED);
+
         return $this->offsetGet($option);
     }
 
     /**
      * Alias of {@link offsetExists()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function has($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the ArrayAccess syntax instead to get an option value.', E_USER_DEPRECATED);
+
         return $this->offsetExists($option);
     }
 
     /**
      * Shortcut for {@link clear()} and {@link setDefaults()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function replaceDefaults(array $defaultValues)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the clear() and setDefaults() methods instead.', E_USER_DEPRECATED);
+
         $this->clear();
 
         return $this->setDefaults($defaultValues);
@@ -1075,20 +1087,24 @@ class OptionsResolver implements Options, OptionsResolverInterface
     /**
      * Alias of {@link setDefined()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setOptional(array $optionNames)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setDefined() method instead.', E_USER_DEPRECATED);
+
         return $this->setDefined($optionNames);
     }
 
     /**
      * Alias of {@link isDefined()}.
      *
-     * @deprecated Deprecated as of Symfony 2.6, to be removed in Symfony 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function isKnown($option)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the isDefined() method instead.', E_USER_DEPRECATED);
+
         return $this->isDefined($option);
     }
 

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link \Symfony\Component\Console\Helper\QuestionHelper} instead.
  */
 class DialogHelper extends InputAwareHelper

@@ -11,10 +11,13 @@
 
 namespace Symfony\Component\Config\Definition;
 
+trigger_error('The '.__NAMESPACE__.'\ReferenceDumper class is deprecated since version 2.4 and will be removed in 3.0. Use the Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 
 /**
- * @deprecated Deprecated since version 2.4, to be removed in 3.0. Use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper} instead.
  */
 class ReferenceDumper extends YamlReferenceDumper
 {

@@ -507,7 +507,7 @@ class Form implements \IteratorAggregate, FormInterface
     public function submit($submittedData, $clearMissing = true)
     {
         if ($submittedData instanceof Request) {
-            trigger_error('Passing a Symfony\Component\HttpFoundation\Request object to '.__CLASS__.'::bind() and '.__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0, please use '.__CLASS__.'::handleRequest(). If you want to test whether the form was submitted separately, you can use the method '.__CLASS__.'::isSubmitted()', E_USER_DEPRECATED);
+            trigger_error('Passing a Symfony\Component\HttpFoundation\Request object to the '.__CLASS__.'::bind and '.__METHOD__.' methods is deprecated since 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::handleRequest method instead. If you want to test whether the form was submitted separately, you can use the '.__CLASS__.'::isSubmitted method.', E_USER_DEPRECATED);
         }
 
         if ($this->submitted) {
@@ -676,15 +676,15 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Alias of {@link submit()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link submit()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link submit()} instead.
      */
     public function bind($submittedData)
     {
         // This method is deprecated for Request too, but the error is
         // triggered in Form::submit() method.
         if (!$submittedData instanceof Request) {
-            trigger_error(__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0. Please use '.__CLASS__.'::submit() instead.', E_USER_DEPRECATED);
+            trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::submit method instead.', E_USER_DEPRECATED);
         }
 
         return $this->submit($submittedData);
@@ -719,12 +719,12 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Alias of {@link isSubmitted()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link isSubmitted()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link isSubmitted()} instead.
      */
     public function isBound()
     {
-        trigger_error(__METHOD__.'() is deprecated since 2.3 and will be removed in 3.0. Please use '.__CLASS__.'::isSubmitted() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the '.__CLASS__.'::isSubmitted method instead.', E_USER_DEPRECATED);
 
         return $this->submitted;
     }
@@ -843,12 +843,12 @@ class Form implements \IteratorAggregate, FormInterface
      *
      * @return string A string representation of all errors
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use
-     *             {@link getErrors()} instead and cast the result to a string.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link getErrors()} instead and cast the result to a string.
      */
     public function getErrorsAsString($level = 0)
     {
-        trigger_error('Form::getErrorsAsString() is deprecated since 2.5 and will be removed in 3.0. Please use Form::getErrors(true, false) instead and cast the result to a string.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the Form::getErrors(true, false) method instead and cast the result to a string.', E_USER_DEPRECATED);
 
         return self::indent((string) $this->getErrors(true, false), $level);
     }

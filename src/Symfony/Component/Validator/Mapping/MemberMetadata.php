@@ -78,10 +78,12 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $visitor->visit($this, $value, $group, $propertyPath);
 
         if ($this->isCascaded()) {
@@ -185,11 +187,13 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getCascadingStrategy()} instead.
      */
     public function isCascaded()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getCascadingStrategy() method instead.', E_USER_DEPRECATED);
+
         return (bool) ($this->cascadingStrategy & CascadingStrategy::CASCADE);
     }
 
@@ -199,11 +203,13 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getTraversalStrategy()} instead.
      */
     public function isCollectionCascaded()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
+
         return (bool) ($this->traversalStrategy & (TraversalStrategy::IMPLICIT | TraversalStrategy::TRAVERSE));
     }
 
@@ -213,11 +219,13 @@ abstract class MemberMetadata extends ElementMetadata implements PropertyMetadat
      *
      * @return bool
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link getTraversalStrategy()} instead.
      */
     public function isCollectionCascadedDeeply()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getTraversalStrategy() method instead.', E_USER_DEPRECATED);
+
         return !($this->traversalStrategy & TraversalStrategy::STOP_RECURSION);
     }
 

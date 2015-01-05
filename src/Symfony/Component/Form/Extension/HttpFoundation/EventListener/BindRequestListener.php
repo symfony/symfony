@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\HttpFoundation\EventListener;
 
+trigger_error('The '.__NAMESPACE__.'\BindRequestListener class is deprecated since version 2.3 and will be removed in 3.0. Pass the Request instance to the \Symfony\Component\Form\Form::handleRequest() method instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -19,8 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Pass the
- *             Request instance to {@link Form::handleRequest()} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Pass the Request instance to {@link Form::handleRequest()} instead.
  */
 class BindRequestListener implements EventSubscriberInterface
 {

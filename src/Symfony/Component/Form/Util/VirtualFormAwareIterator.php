@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Util;
 
-trigger_error('Symfony\Component\Form\Util\VirtualFormAwareIterator is deprecated since Symfony 2.3 and will be removed in 3.0. Use Symfony\Component\Form\Util\InheritDataAwareIterator instead.', E_USER_DEPRECATED);
-
 /**
  * Iterator that traverses an array of forms.
  *
@@ -22,11 +20,26 @@ trigger_error('Symfony\Component\Form\Util\VirtualFormAwareIterator is deprecate
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link InheritDataAwareIterator} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link InheritDataAwareIterator} instead.
  */
 class VirtualFormAwareIterator extends \IteratorIterator implements \RecursiveIterator
 {
+    public function __construct(\Traversable $iterator)
+    {
+        /*
+         * Prevent to trigger deprecation notice when already using the
+         * InheritDataAwareIterator class that extends this deprecated one.
+         * The {@link Symfony\Component\Form\Util\InheritDataAwareIterator::__construct} method
+         * forces this argument to false.
+         */
+        if (__CLASS__ === get_class($this)) {
+            trigger_error('The '.__CLASS__.' class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Util\InheritDataAwareIterator class instead.', E_USER_DEPRECATED);
+        }
+
+        parent::__construct($iterator);
+    }
+
     /**
      * {@inheritdoc}
      */

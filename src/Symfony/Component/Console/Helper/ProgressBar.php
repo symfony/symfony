@@ -171,12 +171,14 @@ class ProgressBar
     /**
      * Gets the progress bar step.
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
      *
      * @return int The progress bar step
      */
     public function getStep()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getProgress() method instead.', E_USER_DEPRECATED);
+
         return $this->getProgress();
     }
 
@@ -358,7 +360,7 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
      *
      * @param int $step The current progress
      *
@@ -366,6 +368,8 @@ class ProgressBar
      */
     public function setCurrent($step)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setProgress() method instead.', E_USER_DEPRECATED);
+
         $this->setProgress($step);
     }
 

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('Symfony\Component\Validator\PropertyMetadataInterface was deprecated in version 2.5 and will be removed in version 3.0. Please use Symfony\Component\Validator\Mapping\PropertyMetadataInterface instead', E_USER_DEPRECATED);
-
 /**
  * A container for validation metadata of a property.
  *
@@ -26,7 +24,7 @@ trigger_error('Symfony\Component\Validator\PropertyMetadataInterface was depreca
  *
  * @see MetadataInterface
  *
- * @deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Mapping\PropertyMetadataInterface} instead.
  */
 interface PropertyMetadataInterface extends MetadataInterface

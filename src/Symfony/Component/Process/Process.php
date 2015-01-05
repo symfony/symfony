@@ -1062,12 +1062,13 @@ class Process
      *
      * @return string|null The current contents
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use setInput() instead.
      *             This method is deprecated in favor of getInput.
      */
     public function getStdin()
     {
-        trigger_error('getStdin() is deprecated since version 2.5 and will be removed in 3.0, use getInput() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the getInput() method instead.', E_USER_DEPRECATED);
 
         return $this->getInput();
     }
@@ -1089,15 +1090,15 @@ class Process
      *
      * @return self The current Process instance
      *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0.
-     *             This method is deprecated in favor of setInput.
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use setInput() instead.
      *
      * @throws LogicException           In case the process is running
      * @throws InvalidArgumentException In case the argument is invalid
      */
     public function setStdin($stdin)
     {
-        trigger_error('setStdin() is deprecated since version 2.5 and will be removed in 3.0, use setInput() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the setInput() method instead.', E_USER_DEPRECATED);
 
         return $this->setInput($stdin);
     }

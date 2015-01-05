@@ -80,7 +80,7 @@ abstract class HttpCache extends BaseHttpCache
      *
      * @return Esi
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
      */
     protected function createEsi()
     {

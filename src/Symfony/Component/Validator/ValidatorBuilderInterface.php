@@ -167,7 +167,7 @@ interface ValidatorBuilderInterface
      *
      * @return ValidatorBuilderInterface The builder object
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 

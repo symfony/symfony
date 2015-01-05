@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * RouterApacheDumperCommand.
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             The performance gains are minimal and it's very hard to replicate
  *             the behavior of PHP implementation.
  *
@@ -74,7 +74,9 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        trigger_error('The router:dump-apache command is deprecated since 2.5 and will be removed in 3.0', E_USER_DEPRECATED);
+        $formatter = $this->getHelper('formatter');
+
+        $output->writeln($formatter->formatSection('warning', 'The router:dump-apache command is deprecated since version 2.5 and will be removed in 3.0', 'comment'));
 
         $router = $this->getContainer()->get('router');
 

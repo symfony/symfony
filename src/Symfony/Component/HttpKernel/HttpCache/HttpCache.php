@@ -170,10 +170,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Esi An Esi instance
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
      */
     public function getEsi()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getSurrogate() method instead.', E_USER_DEPRECATED);
+
         if (!$this->surrogate instanceof Esi) {
             throw new \LogicException('This instance of HttpCache was not set up to use ESI as surrogate handler. You must overwrite and use createSurrogate');
         }

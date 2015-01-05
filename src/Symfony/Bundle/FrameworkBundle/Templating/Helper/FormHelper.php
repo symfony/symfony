@@ -131,8 +131,8 @@ class FormHelper extends Helper
      *
      * @return string The HTML markup
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link start} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link start} instead.
      */
     public function enctype(FormView $view)
     {

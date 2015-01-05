@@ -20,14 +20,12 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated
+ * @deprecated since version 2.5, to be removed in 3.0
  */
 class StubGlobalExecutionContext implements GlobalExecutionContextInterface
 {
     private $violations;
-
     private $root;
-
     private $visitor;
 
     public function __construct($root = null, ValidationVisitorInterface $visitor = null)

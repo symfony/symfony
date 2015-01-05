@@ -300,10 +300,12 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $models)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (empty($models)) {
             return array();
         }
@@ -319,7 +321,7 @@ class ModelChoiceList extends ObjectChoiceList
          * but if they originated from different queries, there are not the same object within the code.
          *
          * This happens when using m:n relations with either sides model as data_class of the form.
-         * The choicelist will retrieve the list of available related models with a different query, resulting in different objects.
+         * The choice list will retrieve the list of available related models with a different query, resulting in different objects.
          */
         $choices = $this->fixChoices($models);
         foreach ($choices as $i => $givenChoice) {
@@ -346,10 +348,12 @@ class ModelChoiceList extends ObjectChoiceList
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (empty($values)) {
             return array();
         }

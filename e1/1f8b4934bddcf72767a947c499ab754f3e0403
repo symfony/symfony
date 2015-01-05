@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-13T12:15:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T16:56:01Z
+
+Any other opinions on this?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-29T17:02:28Z
+
+Do we really need to keep the old `renderTable()` method? It's only used by the `TextDescriptor` and it's unlikely anyone derived from the `Descriptor` and relies on `renderTable()`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T17:06:50Z
+
+@jakzal To me it seems unlikely that someone relies on the existing method, but strictly speaking changing its signature would be a BC break. That's why I introduced the new method.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-29T17:12:23Z
+
+It would indeed be a BC break, but an allowed one. These classes are not part of the API. Given it's unlikely that anyone would rely on them, I don't think it would be a big deal to remove the old method. It is confusing to have `renderTable()` and `renderConsoleTable()`.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2014-12-29T17:15:42Z
+
+We should at least deprecate the old method.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-29T17:38:54Z
+
+Indeed, `protected` non-API methods are not guaranteed to be backward compatible. I removed `renderConsoleTable()`, changed the signature of `renderTable()` and added instructions to the upgrade file.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-30T09:15:23Z
+
+It's fine to break BC here in 2.7, but do we really want to do that in 2.5? I think that nobody should have relied on this part of the code, but I just want to raise the concern once more before merging.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T10:45:15Z
+
+@fabpot Do you want me to revert the last change and introduce the `renderConsoleTable()` method again? Or should we wait on the opinion of the other deciders?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-30T10:46:16Z
+
+I think that merging it as is is the way to go.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-02T12:03:59Z
+
+You have to fix tests (the lowest version of dependencies seems to be not ok).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-02T13:01:44Z
+
+@saro0h Thanks for the hint. I updated the dependencies to make the tests pass again.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-02T18:25:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-04T09:17:16Z
+
+:+1:

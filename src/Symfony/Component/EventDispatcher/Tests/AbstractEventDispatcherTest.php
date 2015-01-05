@@ -121,15 +121,6 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($event, $return);
     }
 
-    public function testLegacyDispatch()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $event = new Event();
-        $return = $this->dispatcher->dispatch(self::preFoo, $event);
-        $this->assertEquals('pre.foo', $event->getName());
-    }
-
     public function testDispatchForClosure()
     {
         $invoked = 0;

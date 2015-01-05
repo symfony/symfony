@@ -70,8 +70,6 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::getToken() instead.
-     *
      * {@inheritdoc}
      */
     public function getToken()
@@ -80,8 +78,6 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::setToken() instead.
-     *
      * {@inheritdoc}
      */
     public function setToken(TokenInterface $token = null)
@@ -90,8 +86,6 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use AuthorizationCheckerInterface::isGranted() instead.
-     *
      * {@inheritdoc}
      */
     public function isGranted($attributes, $object = null)

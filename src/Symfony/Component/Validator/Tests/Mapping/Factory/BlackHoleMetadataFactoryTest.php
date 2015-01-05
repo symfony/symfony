@@ -9,24 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Mapping;
+namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
-use Symfony\Component\Validator\Mapping\BlackholeMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory;
 
-class BlackholeMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class BlackHoleMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \LogicException
      */
     public function testGetMetadataForThrowsALogicException()
     {
-        $metadataFactory = new BlackholeMetadataFactory();
+        $metadataFactory = new BlackHoleMetadataFactory();
         $metadataFactory->getMetadataFor('foo');
     }
 
     public function testHasMetadataForReturnsFalse()
     {
-        $metadataFactory = new BlackholeMetadataFactory();
+        $metadataFactory = new BlackHoleMetadataFactory();
 
         $this->assertFalse($metadataFactory->hasMetadataFor('foo'));
     }

@@ -15,12 +15,14 @@ use Symfony\Component\Validator\Mapping\ElementMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
-class ElementMetadataTest extends \PHPUnit_Framework_TestCase
+class LegacyElementMetadataTest extends \PHPUnit_Framework_TestCase
 {
     protected $metadata;
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $this->metadata = new TestElementMetadata();
     }
 

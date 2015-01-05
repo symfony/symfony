@@ -20,7 +20,7 @@ use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\ValidationVisitor;
 
-class ExecutionContextTest extends \PHPUnit_Framework_TestCase
+class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
 {
     const TRANS_DOMAIN = 'trans_domain';
 
@@ -38,6 +38,8 @@ class ExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $this->visitor = $this->getMockBuilder('Symfony\Component\Validator\ValidationVisitor')
             ->disableOriginalConstructor()
             ->getMock();

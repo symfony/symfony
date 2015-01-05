@@ -14,10 +14,7 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @deprecated Deprecated since Symfony 2.6, to be removed in Symfony 3.0.
- */
-class OptionsTest extends \PHPUnit_Framework_TestCase
+class LegacyOptionsTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var OptionsResolver
@@ -26,6 +23,8 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $this->options = new OptionsResolver();
     }
 

@@ -42,7 +42,7 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         parent::setUp();
 

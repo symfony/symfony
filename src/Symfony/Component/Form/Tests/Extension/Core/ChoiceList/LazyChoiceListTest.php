@@ -59,7 +59,7 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyGetIndicesForChoices()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $choices = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForChoices($choices));
@@ -67,7 +67,7 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyGetIndicesForValues()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $values = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));

@@ -566,7 +566,20 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
     private function getMockExecutionContext()
     {
-        return $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+
+        $validator->expects($this->any())
+            ->method('inContext')
+            ->with($context)
+            ->will($this->returnValue($contextualValidator));
+
+        $context->expects($this->any())
+            ->method('getValidator')
+            ->will($this->returnValue($validator));
+
+        return $context;
     }
 
     /**

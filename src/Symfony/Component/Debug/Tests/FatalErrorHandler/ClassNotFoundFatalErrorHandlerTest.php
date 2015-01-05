@@ -39,7 +39,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyHandleClassNotFound($error, $translatedMessage, $autoloader)
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         // Unregister all autoloaders to ensure the custom provided
         // autoloader is the only one to be used during the test run.

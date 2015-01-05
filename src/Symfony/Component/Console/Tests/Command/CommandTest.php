@@ -320,7 +320,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyAsText()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $command = new \TestCommand();
         $command->setApplication(new Application());
@@ -331,7 +331,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyAsXml()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $command = new \TestCommand();
         $command->setApplication(new Application());

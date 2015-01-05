@@ -375,7 +375,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyAsText()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),
@@ -392,7 +392,7 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyAsXml()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $definition = new InputDefinition(array(
             new InputArgument('foo', InputArgument::OPTIONAL, 'The foo argument'),

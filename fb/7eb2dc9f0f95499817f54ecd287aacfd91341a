@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-23T10:49:30Z
+
+Rebase needed.
+If you want to add notices for deprecated constants in this PR also, here is how:
+https://github.com/symfony/symfony/pull/12968#discussion-diff-21823922
+
+(e.g. Symfony\Component\Debug\ErrorHandler::TYPE_DEPRECATION)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-23T12:30:53Z
+
+This PR has been rebased. Let's see what Travis says now.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-26T10:15:25Z
+
+Tests are green from `5.3.3` to `5.6` but the matrix still reports failures on components `low` and `high`.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-26T10:24:55Z
+
+It seems failing tests are due to PHPUnit.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-26T15:23:46Z
+
+Yeah test suite is finally green! Thanks @nicolas-grekas. Ping @fabpot
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-26T16:20:52Z
+
+Even though tests are passing, this PR is still a WIP as some deprecation messages still need to be normalized.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-26T20:18:29Z
+
+Good for review!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-26T21:40:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-29T12:58:19Z
+
+Green! Good for another pass of review.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-29T16:14:29Z
+
+The second commit refers to the following discussion: https://github.com/symfony/symfony/issues/12945
+
+@nicolas-grekas thinks of handling deprecation notices for deprecated interfaces at runtime in the `DebugClassLoader` class instead using class reflection.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-01T17:11:57Z
+
+Failing test is due to https://github.com/symfony/symfony/commit/649061bd46f541ce8b3ddcba6f5c3b664ecf0d4a
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-03T14:39:08Z
+
+We are almost there. Can you rebase your branch and fix the remaining issues I found @hhamon ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-05T19:32:21Z
+
+I tested this PR locally after rebasing it on latest 2.7, tests are green.
+There is one minor conflict in `src/Symfony/Component/Validator/Mapping/TraversalStrategy.php` that I resolved like this:
+```
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             This constant was added for backward compatibility only.
+     * @internal
+```
+
+:+1: from me. There are places where we'll need to remove/update some deprecation triggers and adding all of them like done here will allow us to see where. I'll enhance the deprecation summary once this gets merged so we can start by the most complaining triggers.

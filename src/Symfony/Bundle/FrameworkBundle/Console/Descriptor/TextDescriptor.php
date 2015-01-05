@@ -304,27 +304,29 @@ class TextDescriptor extends Descriptor
         $registeredListeners = $eventDispatcher->getListeners($event);
         if (null !== $event) {
             $this->writeText("\n");
-            $table = new TableHelper();
+            $table = new Table($this->getOutput());
+            $table->getStyle()->setCellHeaderFormat('%s');
             $table->setHeaders(array('Order', 'Callable'));
 
             foreach ($registeredListeners as $order => $listener) {
                 $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
             }
 
-            $this->renderTable($table);
+            $this->renderTable($table, true);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
 
-                $table = new TableHelper();
+                $table = new Table($this->getOutput());
+                $table->getStyle()->setCellHeaderFormat('%s');
                 $table->setHeaders(array('Order', 'Callable'));
 
                 foreach ($eventListeners as $order => $eventListener) {
                     $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
                 }
 
-                $this->renderTable($table);
+                $this->renderTable($table, true);
             }
         }
     }

@@ -52,31 +52,31 @@ class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
             'test_event.multiple_listeners' => array(
                 128 => array(
                     array(
-                        'service' => array('test_subscriber', 'methodWithHighestPriority'),
+                        'service' => array('id' => 'test_subscriber', 'method' => 'methodWithHighestPriority'),
                     ),
                 ),
                 32 => array(
                     array(
-                        'service' => array('test_listener', 'methodWithMediumPriority'),
+                        'service' => array('id' => 'test_listener', 'method' => 'methodWithMediumPriority'),
                     ),
                 ),
                 0 => array(
                     array(
-                        'service' => array('test_subscriber', 'methodWithoutPriority'),
+                        'service' => array('id' => 'test_subscriber', 'method' => 'methodWithoutPriority'),
                     ),
                 ),
             ),
             'test_event.single_listener_with_priority' => array(
                 64 => array(
                     array(
-                        'service' => array('test_subscriber', 'methodWithHighPriority'),
+                        'service' => array('id' => 'test_subscriber', 'method' => 'methodWithHighPriority'),
                     ),
                 ),
             ),
             'test_event.single_listener_without_priority' => array(
                 0 => array(
                     array(
-                        'service' => array('test_subscriber', 'methodWithoutPriority'),
+                        'service' => array('id' => 'test_subscriber', 'method' => 'methodWithoutPriority'),
                     ),
                 ),
             ),

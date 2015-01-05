@@ -53,7 +53,8 @@ class CompiledEventDispatcher implements EventDispatcherInterface
      * A listener definition is an associative array with one of the following key
      * value pairs:
      * - callable: A callable listener
-     * - service: An array of the form array(service id, method)
+     * - service: An array of the form
+     *     array('id' => service id, 'method' => method name)
      *
      * A service entry will be resolved to a callable only just before its
      * invocation.
@@ -79,7 +80,8 @@ class CompiledEventDispatcher implements EventDispatcherInterface
      *   The array is expected to be ordered by priority. A listener definition is
      *   an associative array with one of the following key value pairs:
      *   - callable: A callable listener
-     *   - service: An array of the form array(service id, method)
+     *   - service: An array of the form
+     *       array('id' => service id, 'method' => method name)
      *   A service entry will be resolved to a callable only just before its
      *   invocation.
      */
@@ -112,7 +114,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
             foreach ($this->listeners[$eventName] as &$definitions) {
                 foreach ($definitions as &$definition) {
                     if (!isset($definition['callable'])) {
-                        $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
+                        $definition['callable'] = array($this->container->get($definition['service']['id']), $definition['service']['method']);
                     }
 
                     call_user_func($definition['callable'], $event, $eventName, $this);
@@ -159,7 +161,7 @@ class CompiledEventDispatcher implements EventDispatcherInterface
         foreach ($this->listeners[$eventName] as &$definitions) {
             foreach ($definitions as &$definition) {
                 if (!isset($definition['callable'])) {
-                    $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
+                    $definition['callable'] = array($this->container->get($definition['service']['id']), $definition['service']['method']);
                 }
 
                 $result[] = $definition['callable'];
@@ -198,10 +200,10 @@ class CompiledEventDispatcher implements EventDispatcherInterface
         foreach ($this->listeners[$eventName] as $priority => $definitions) {
             foreach ($definitions as $key => $definition) {
                 if (!isset($definition['callable'])) {
-                    if (!$this->container->initialized($definition['service'][0])) {
+                    if (!$this->container->initialized($definition['service']['id'])) {
                         continue;
                     }
-                    $definition['callable'] = array($this->container->get($definition['service'][0]), $definition['service'][1]);
+                    $definition['callable'] = array($this->container->get($definition['service']['id']), $definition['service']['method']);
                 }
 
                 if ($definition['callable'] === $listener) {

@@ -92,7 +92,7 @@ class CompiledRegisterListenersPass implements CompilerPassInterface
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
                 }
 
-                $listeners[$event['event']][$priority][] = array('service' => array($id, $event['method']));
+                $listeners[$event['event']][$priority][] = array('service' => array('id' => $id, 'method' => $event['method']));
             }
         }
 
@@ -115,14 +115,14 @@ class CompiledRegisterListenersPass implements CompilerPassInterface
             foreach ($class::getSubscribedEvents() as $eventName => $params) {
                 if (is_string($params)) {
                     $priority = 0;
-                    $listeners[$eventName][$priority][] = array('service' => array($id, $params));
+                    $listeners[$eventName][$priority][] = array('service' => array('id' => $id, 'method' => $params));
                 } elseif (is_string($params[0])) {
                     $priority = isset($params[1]) ? $params[1] : 0;
-                    $listeners[$eventName][$priority][] = array('service' => array($id, $params[0]));
+                    $listeners[$eventName][$priority][] = array('service' => array('id' => $id, 'method' => $params[0]));
                 } else {
                     foreach ($params as $listener) {
                         $priority = isset($listener[1]) ? $listener[1] : 0;
-                        $listeners[$eventName][$priority][] = array('service' => array($id, $listener[0]));
+                        $listeners[$eventName][$priority][] = array('service' => array('id' => $id, 'method' => $listener[0]));
                     }
                 }
             }

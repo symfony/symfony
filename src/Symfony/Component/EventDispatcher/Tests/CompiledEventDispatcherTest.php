@@ -94,7 +94,7 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $listeners = array(
             'test_event' => array(
                 0 => array(
-                    array('service' => array('listener_service', 'preFoo')),
+                    array('service' => array('id' => 'listener_service', 'method' => 'preFoo')),
                 ),
             ),
         );
@@ -120,7 +120,7 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $listeners = array(
             'test_event' => array(
                 0 => array(
-                    array('service' => array('listener_service', 'preFoo')),
+                    array('service' => array('id' => 'listener_service', 'method' => 'preFoo')),
                 ),
             ),
         );
@@ -142,8 +142,8 @@ class CompiledEventDispatcherTest extends AbstractEventDispatcherTest
         $listeners = array(
             'test_event' => array(
                 0 => array(
-                    array('service' => array('listener_service', 'preFoo')),
-                    array('service' => array('other_listener_service', 'preFoo')),
+                    array('service' => array('id' => 'listener_service', 'method' => 'preFoo')),
+                    array('service' => array('id' => 'other_listener_service', 'method' => 'preFoo')),
                 ),
             ),
         );

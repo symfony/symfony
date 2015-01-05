@@ -114,22 +114,6 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // overload()
-    ////////////////////////////////////////////////////////////////////////////
-
-    public function testOverloadReturnsThis()
-    {
-        $this->assertSame($this->resolver, $this->resolver->overload('foo', 'bar'));
-    }
-
-    public function testOverloadCallsSet()
-    {
-        $this->resolver->overload('foo', 'bar');
-
-        $this->assertSame(array('foo' => 'bar'), $this->resolver->resolve());
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
     // lazy setDefault()
     ////////////////////////////////////////////////////////////////////////////
 

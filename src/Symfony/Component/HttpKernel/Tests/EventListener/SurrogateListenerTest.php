@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EsiListenerTest extends \PHPUnit_Framework_TestCase
+class SurrogateListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testFilterDoesNothingForSubRequests()
     {

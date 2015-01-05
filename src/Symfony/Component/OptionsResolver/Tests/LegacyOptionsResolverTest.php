@@ -14,10 +14,7 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
-/**
- * @deprecated Deprecated since Symfony 2.6, to be removed in Symfony 3.0.
- */
-class OptionsResolverTest extends \PHPUnit_Framework_TestCase
+class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var OptionsResolver
@@ -26,6 +23,8 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->resolver = new OptionsResolver();
     }
 
@@ -701,5 +700,17 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
             'one' => '1',
             'three' => '3',
         ), $clone->resolve());
+    }
+
+    public function testOverloadReturnsThis()
+    {
+        $this->assertSame($this->resolver, $this->resolver->overload('foo', 'bar'));
+    }
+
+    public function testOverloadCallsSet()
+    {
+        $this->resolver->overload('foo', 'bar');
+
+        $this->assertSame(array('foo' => 'bar'), $this->resolver->resolve());
     }
 }

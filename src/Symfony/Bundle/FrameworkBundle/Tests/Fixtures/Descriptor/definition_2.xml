@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definition class="Full\Qualified\Class2" factory-service="factory.service" factory-method="get" scope="container" public="false" synthetic="true" lazy="false" synchronized="false" abstract="false" file="/path/to/file">
+<definition class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" synchronized="false" abstract="false" file="/path/to/file">
+  <factory service="factory.service" method="get"/>
   <tags>
     <tag name="tag1">
       <parameter name="attr1">val1</parameter>

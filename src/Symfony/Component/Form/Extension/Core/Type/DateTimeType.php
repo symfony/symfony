@@ -242,7 +242,7 @@ class DateTimeType extends AbstractType
 
         // Don't add some defaults in order to preserve the defaults
         // set in DateType and TimeType
-        $resolver->setOptional(array(
+        $resolver->setDefined(array(
             'empty_value', // deprecated
             'placeholder',
             'years',

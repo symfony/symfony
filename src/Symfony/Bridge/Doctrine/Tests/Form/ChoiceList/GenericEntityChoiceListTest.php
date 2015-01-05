@@ -269,7 +269,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyInitShorthandEntityName()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $item1 = new SingleIntIdEntity(1, 'Foo');
         $item2 = new SingleIntIdEntity(2, 'Bar');

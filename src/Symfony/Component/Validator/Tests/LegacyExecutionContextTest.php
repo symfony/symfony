@@ -38,7 +38,7 @@ class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $this->visitor = $this->getMockBuilder('Symfony\Component\Validator\ValidationVisitor')
             ->disableOriginalConstructor()

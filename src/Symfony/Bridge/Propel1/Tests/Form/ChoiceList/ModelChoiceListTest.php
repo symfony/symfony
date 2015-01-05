@@ -206,7 +206,7 @@ class ModelChoiceListTest extends Propel1TestCase
 
     public function testLegacygetIndicesForChoices()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $item1 = new Item(1, 'Foo');
         $item2 = new Item(2, 'Bar');
@@ -230,7 +230,7 @@ class ModelChoiceListTest extends Propel1TestCase
 
     public function testLegacyDifferentEqualObjectsAreChoosen()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $item = new Item(1, 'Foo');
 
@@ -251,7 +251,7 @@ class ModelChoiceListTest extends Propel1TestCase
 
     public function testLegacyGetIndicesForNullChoices()
     {
-        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $item = new Item(1, 'Foo');
         $choiceList = new ModelChoiceList(

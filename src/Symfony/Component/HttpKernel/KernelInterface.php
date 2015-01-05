@@ -103,15 +103,17 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
      *
      * The resource name must follow the following pattern:
      *
-     *     @BundleName/path/to/a/file.something
+     *     "@BundleName/path/to/a/file.something"
      *
      * where BundleName is the name of the bundle
      * and the remaining part is the relative path in the bundle.
      *
-     * If $dir is passed, and the first segment of the path is Resources,
+     * If $dir is passed, and the first segment of the path is "Resources",
      * this method will look for a file named:
      *
-     *     $dir/BundleName/path/without/Resources
+     *     $dir/<BundleName>/path/without/Resources
+     *
+     * before looking in the bundle resource folder.
      *
      * @param string $name  A resource name to locate
      * @param string $dir   A directory where to look for the resource first

@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.4",
-        "symfony/console": "~2.4,>=2.4.8",
+        "symfony/console": "~2.5,>=2.5.2",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/finder": "~2.0,>=2.0.5",

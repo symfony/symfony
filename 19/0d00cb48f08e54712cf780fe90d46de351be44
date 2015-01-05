@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T12:35:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-03T23:22:32Z
+
+Could you please also put low and high tests at the end of the matrix? I noticed that would give some more time for the subtree split to complete.

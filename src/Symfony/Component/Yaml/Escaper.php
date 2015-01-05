@@ -72,7 +72,7 @@ class Escaper
      */
     public static function requiresSingleQuoting($value)
     {
-        return preg_match('/[ \s \' " \: \{ \} \[ \] , & \* \# \?] | \A[ \- ? | < > = ! % @ ` ]/x', $value);
+        return self::containsCharRequiresSingleQuoting($value) || self::isValueRequiresSingleQuoting($value);
     }
 
     /**
@@ -85,5 +85,29 @@ class Escaper
     public static function escapeWithSingleQuotes($value)
     {
         return sprintf("'%s'", str_replace('\'', '\'\'', $value));
+    }
+
+    /**
+     * Determines if a PHP value contains any single characters that would cause
+     * the value to require single quoting in YAML.
+     *
+     * @param  string $value A PHP value
+     * @return bool          True if the value would require single quotes.
+     */
+    private static function containsCharRequiresSingleQuoting($value)
+    {
+        return preg_match('/[ \s \' " \: \{ \} \[ \] , & \* \# \?] | \A[ \- ? | < > = ! % @ ` ]/x', $value);
+    }
+
+    /**
+     * Determines if a PHP value is entirely composed of a value that would
+     * require require single quoting in YAML.
+     *
+     * @param  string $value A PHP value
+     * @return bool          True if the value would require single quotes.
+     */
+    private static function isValueRequiresSingleQuoting($value)
+    {
+        return in_array(strtolower($value), array('null', '~', 'true', 'false', 'y', 'n', 'yes', 'no', 'on', 'off'));
     }
 }

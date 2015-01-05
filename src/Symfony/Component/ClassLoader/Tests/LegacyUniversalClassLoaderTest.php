@@ -13,8 +13,13 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
-class UniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
+class LegacyUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     /**
      * @dataProvider getLoadClassTests
      */

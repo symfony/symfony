@@ -17,8 +17,13 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class DialogHelperTest extends \PHPUnit_Framework_TestCase
+class LegacyDialogHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     public function testSelect()
     {
         $dialog = new DialogHelper();

@@ -183,7 +183,6 @@ class ModelChoiceListTest extends Propel1TestCase
         );
 
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
-        $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
 
     public function testDifferentEqualObjectsAreChoosen()
@@ -202,12 +201,58 @@ class ModelChoiceListTest extends Propel1TestCase
 
         $choosenItem = new Item(1, 'Foo');
 
-        $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($choosenItem)));
         $this->assertEquals(array('1'), $choiceList->getValuesForChoices(array($choosenItem)));
     }
 
-    public function testGetIndicesForNullChoices()
+    public function testLegacygetIndicesForChoices()
     {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
+        $item1 = new Item(1, 'Foo');
+        $item2 = new Item(2, 'Bar');
+
+        ItemQuery::$result = array(
+            $item1,
+            $item2,
+        );
+
+        $choiceList = new ModelChoiceList(
+            self::ITEM_CLASS,
+            'value',
+            null,
+            null,
+            null,
+            null
+        );
+
+        $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
+    }
+
+    public function testLegacyDifferentEqualObjectsAreChoosen()
+    {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
+        $item = new Item(1, 'Foo');
+
+        ItemQuery::$result = array(
+            $item,
+        );
+
+        $choiceList = new ModelChoiceList(
+            self::ITEM_CLASS,
+            'value',
+            array($item)
+        );
+
+        $choosenItem = new Item(1, 'Foo');
+
+        $this->assertEquals(array(1), $choiceList->getIndicesForChoices(array($choosenItem)));
+    }
+
+    public function testLegacyGetIndicesForNullChoices()
+    {
+        $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);
+
         $item = new Item(1, 'Foo');
         $choiceList = new ModelChoiceList(
             self::ITEM_CLASS,

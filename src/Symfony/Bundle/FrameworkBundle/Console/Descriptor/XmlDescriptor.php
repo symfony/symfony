@@ -21,6 +21,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class XmlDescriptor extends Descriptor
 {

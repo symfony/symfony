@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validation;
  * @since  2.5.4
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LegacyUserPasswordValidatorLegacyApiTest extends UserPasswordValidatorTest
+class LegacyUserPasswordValidatorApiTest extends UserPasswordValidatorTest
 {
     protected function getApiVersion()
     {

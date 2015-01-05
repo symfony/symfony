@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Asset\Packages;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Twig extension for the Symfony HttpFoundation component.
@@ -35,17 +35,20 @@ class HttpFoundationExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('absolute_url', array($this, 'generateAbsoluteUrl')),
+            new \Twig_SimpleFunction('relative_path', array($this, 'generateRelativePath')),
         );
     }
 
     /**
-     * Returns the absolute URL for the given path.
+     * Returns the absolute URL for the given absolute or relative path.
      *
      * This method returns the path unchanged if no request is available.
      *
      * @param string $path The path
      *
      * @return string The absolute URL
+     *
+     * @see Request::getUriForPath()
      */
     public function generateAbsoluteUrl($path)
     {
@@ -57,7 +60,41 @@ class HttpFoundationExtension extends \Twig_Extension
             return $path;
         }
 
+        if (!$path || '/' !== $path[0]) {
+            $prefix = $request->getPathInfo();
+            $last = strlen($prefix) - 1;
+            if ($last !== $pos = strrpos($prefix, '/')) {
+                $prefix = substr($prefix, 0, $pos).'/';
+            }
+
+            $path = $prefix.$path;
+        }
+
         return $request->getUriForPath($path);
+    }
+
+    /**
+     * Returns a relative path based on the current Request.
+     *
+     * This method returns the path unchanged if no request is available.
+     *
+     * @param string $path The path
+     *
+     * @return string The relative path
+     *
+     * @see Request::getRelativeUriForPath()
+     */
+    public function generateRelativePath($path)
+    {
+        if (false !== strpos($path, '://') || '//' === substr($path, 0, 2)) {
+            return $path;
+        }
+
+        if (!$request = $this->requestStack->getMasterRequest()) {
+            return $path;
+        }
+
+        return $request->getRelativeUriForPath($path);
     }
 
     /**

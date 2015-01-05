@@ -4,7 +4,7 @@ CHANGELOG
 2.7.0
 -----
 
- * added an HttpFoundation extension (provides the `absolute_url` function)
+ * added an HttpFoundation extension (provides the `absolute_url` and the `relative_path` functions)
 
 2.5.0
 -----

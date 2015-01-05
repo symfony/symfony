@@ -9,21 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Mapping;
+namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
     const CLASSNAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENTCLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';
 
     public function testLoadClassMetadata()
     {
-        $factory = new ClassMetadataFactory(new TestLoader());
+        $factory = new LazyLoadingMetadataFactory(new TestLoader());
         $metadata = $factory->getMetadataFor(self::PARENTCLASS);
 
         $constraints = array(
@@ -35,7 +35,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testMergeParentConstraints()
     {
-        $factory = new ClassMetadataFactory(new TestLoader());
+        $factory = new LazyLoadingMetadataFactory(new TestLoader());
         $metadata = $factory->getMetadataFor(self::CLASSNAME);
 
         $constraints = array(
@@ -61,7 +61,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testWriteMetadataToCache()
     {
         $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
-        $factory = new ClassMetadataFactory(new TestLoader(), $cache);
+        $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $tester = $this;
         $constraints = array(
@@ -90,7 +90,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $loader = $this->getMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
         $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
-        $factory = new ClassMetadataFactory($loader, $cache);
+        $factory = new LazyLoadingMetadataFactory($loader, $cache);
 
         $tester = $this;
         $metadata = new ClassMetadata(self::PARENTCLASS);

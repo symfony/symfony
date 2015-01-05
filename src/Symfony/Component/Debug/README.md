@@ -24,7 +24,7 @@ if ('cli' !== php_sapi_name()) {
 } elseif (!ini_get('log_errors') || ini_get('error_log')) {
     ini_set('display_errors', 1);
 }
-ErrorHandler::register($errorReportingLevel);
+ErrorHandler::register();
 ```
 
 Note that the `Debug::enable()` call also registers the debug class loader

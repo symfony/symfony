@@ -14,12 +14,13 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
-class TableHelperTest extends \PHPUnit_Framework_TestCase
+class LegacyTableHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $stream;
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
         $this->stream = fopen('php://memory', 'r+');
     }
 

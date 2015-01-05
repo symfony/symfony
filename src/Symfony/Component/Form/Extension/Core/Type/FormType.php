@@ -165,7 +165,7 @@ class FormType extends BaseType
 
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setOptional(array(
+        $resolver->setDefined(array(
             'data',
         ));
 

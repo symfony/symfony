@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Eine leere Datei ist nicht erlaubt.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Der Hostname konnte nicht aufgelöst werden.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

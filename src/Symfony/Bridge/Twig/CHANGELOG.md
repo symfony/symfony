@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added an HttpFoundation extension (provides the `absolute_url` function)
+
 2.5.0
 -----
 

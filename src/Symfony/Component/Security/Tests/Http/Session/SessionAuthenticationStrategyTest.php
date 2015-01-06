@@ -40,7 +40,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
     public function testSessionIsMigrated()
     {
         $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
-        $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
+        $session->expects($this->once())->method('migrate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
         $strategy->onAuthentication($this->getRequest($session), $this->getToken());

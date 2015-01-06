@@ -16,6 +16,7 @@ use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Cache\ArrayCache;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
@@ -398,7 +399,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);
-        $translator = $this->translator ?: new DefaultTranslator();
+        $translator = $this->translator;
+
+        if (null === $translator) {
+            $translator = new IdentityTranslator();
+            // Force the locale to be 'en' when no translator is provided rather than relying on the Intl default locale
+            // This avoids depending on Intl or the stub implementation being available. It also ensures that Symfony
+            // validation messages are pluralized properly even when the default locale gets changed because they are in
+            // English.
+            $translator->setLocale('en');
+        }
 
         if (Validation::API_VERSION_2_4 === $apiVersion) {
             return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);

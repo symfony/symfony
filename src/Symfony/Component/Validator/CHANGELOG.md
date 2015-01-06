@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated `DefaultTranslator` in favor of `Symfony\Component\Translation\IdentityTranslator`
+
 2.6.0
 -----
 

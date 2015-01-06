@@ -101,7 +101,7 @@ class Escaper
 
     /**
      * Determines if a PHP value is entirely composed of a value that would
-     * require require single quoting in YAML.
+     * require single quoting in YAML.
      *
      * @param  string $value A PHP value
      * @return bool          True if the value would require single quotes.

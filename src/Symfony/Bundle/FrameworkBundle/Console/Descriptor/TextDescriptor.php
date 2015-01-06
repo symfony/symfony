@@ -310,6 +310,8 @@ class TextDescriptor extends Descriptor
             foreach ($registeredListeners as $order => $listener) {
                 $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
             }
+
+            $table->render();
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
@@ -320,10 +322,9 @@ class TextDescriptor extends Descriptor
                 foreach ($eventListeners as $order => $eventListener) {
                     $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
                 }
+                $table->render();
             }
         }
-
-        $table->render();
     }
 
     /**

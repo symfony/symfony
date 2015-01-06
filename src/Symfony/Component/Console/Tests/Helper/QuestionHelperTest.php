@@ -158,9 +158,9 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
         $question = new ConfirmationQuestion('Do you like French fries?', false);
         $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false, ['y', 'o']);
+        $question = new ConfirmationQuestion('Do you like French fries?', false, array('y', 'o'));
         $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false, ['yes', 'oui']);
+        $question = new ConfirmationQuestion('Do you like French fries?', false, array('yes', 'oui'));
         $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
 
         $dialog->setInputStream($this->getInputStream("n\nno\n"));

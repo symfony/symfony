@@ -20,6 +20,19 @@ CHANGELOG
  * [BC BREAK] added `Mapping\MetadataInterface::getConstraints()`
  * added generic "payload" option to all constraints for attaching domain-specific data
  * [BC BREAK] added `ConstraintViolationBuilderInterface::setCause()`
+ * deprecated `AbstractComparison` and `AbstractComparisonValidator`
+ * deprecated `Blank` and `BlankValidator`
+ * deprecated `EqualTo` and `EqualToValidator`
+ * deprecated `False` and `FalseValidator`
+ * deprecated `GreaterThan` and `GreaterThanValidator`
+ * deprecated `GreaterThanOrEqual` and `GreaterThanOrEqualValidator`
+ * deprecated `IdenticalTo` and `IdenticalToValidator`
+ * deprecated `LessThan` and `LessThanValidator`
+ * deprecated `LessThanOrEqual` and `LessThanOrEqualValidator`
+ * deprecated `NotEqualTo` and `NotEqualToValidator`
+ * deprecated `NotIdenticalTo` and `NotIdenticalToValidator`
+ * deprecated `Null` and `NullValidator`
+ * deprecated `True` and `TrueValidator`
 
 2.5.0
 -----

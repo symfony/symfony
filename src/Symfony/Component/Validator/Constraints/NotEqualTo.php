@@ -16,6 +16,9 @@ namespace Symfony\Component\Validator\Constraints;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 class NotEqualTo extends AbstractComparison
 {

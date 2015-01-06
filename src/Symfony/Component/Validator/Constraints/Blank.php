@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 class Blank extends Constraint
 {

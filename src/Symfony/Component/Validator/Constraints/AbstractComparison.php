@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * Used for the comparison of values.
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 abstract class AbstractComparison extends Constraint
 {

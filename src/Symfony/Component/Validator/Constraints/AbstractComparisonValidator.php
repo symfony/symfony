@@ -20,6 +20,9 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  *
  * @author Daniel Holmes <daniel@danielholmes.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated as of Symfony 2.6, to be removed in version 3.0.
+ *             Use {@link Expression} instead.
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {

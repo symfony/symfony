@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-02T00:07:46Z
+
+Ping @nicolas-grekas : Can you take a look at that one?
+
+The tests on ``components=high`` pass, but now, it's the ``components=low`` that has problems. The version installed is 2.4.5 (https://travis-ci.org/symfony/symfony/jobs/45641726#L3033) where the ``Table`` that is needed does not exist… I updated the composer.json as i the console component must be at least at 2.5, what do you think about that?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-02T07:44:45Z
+
+@saro0h IMO, and when possible, we should remove usage of deprecated classes in the oldest possible branch.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-02T11:06:52Z
+
+I definitely can but I'll be obliged to do 2 PR (or more) because of the evolution of code between version.
+
+Here is one exemple:
+* 2.7: ``TextDescriptor::describeEventDispatcherListeners()`` exists and uses the TableHelper
+* 2.5: The method does not exist at all.
+
+Do you want me to do the work of removing the deprecated on all branches maintained on Symfony?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-02T11:23:00Z
+
+This is basically the same as #12970.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-02T12:26:23Z
+
+@xabbuh No it's not: the code changed between the two branches.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-02T12:28:22Z
+
+@saro0h Indeed, I missed that change. Thanks.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-05T23:52:13Z
+
+Looks good!

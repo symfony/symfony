@@ -230,7 +230,7 @@ class WindowsPipes extends AbstractPipes
             if (false === $data || (true === $close && feof($r['input']) && '' === $data)) {
                 // no more data to read on input resource
                 // use an empty buffer in the next reads
-                unset($this->input);
+                $this->input = null;
             }
         }
 

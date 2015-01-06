@@ -329,16 +329,18 @@ class XmlDescriptor extends Descriptor
 
         $serviceXML->setAttribute('class', $definition->getClass());
 
-        if ($definition->getFactoryClass()) {
-            $serviceXML->setAttribute('factory-class', $definition->getFactoryClass());
-        }
+        if (method_exists($definition, 'getFactoryMethod')) {
+            if ($definition->getFactoryClass(false)) {
+                $serviceXML->setAttribute('factory-class', $definition->getFactoryClass(false));
+            }
 
-        if ($definition->getFactoryService()) {
-            $serviceXML->setAttribute('factory-service', $definition->getFactoryService());
-        }
+            if ($definition->getFactoryService(false)) {
+                $serviceXML->setAttribute('factory-service', $definition->getFactoryService(false));
+            }
 
-        if ($definition->getFactoryMethod()) {
-            $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+            if ($definition->getFactoryMethod(false)) {
+                $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod(false));
+            }
         }
 
         if ($factory = $definition->getFactory()) {

@@ -61,7 +61,7 @@ class RouterDebugCommand extends ContainerAwareCommand
 The <info>%command.name%</info> displays the configured routes:
 
   <info>php %command.full_name%</info>
-
+  
 EOF
             )
         ;

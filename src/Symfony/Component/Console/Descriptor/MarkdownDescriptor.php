@@ -21,6 +21,8 @@ use Symfony\Component\Console\Input\InputOption;
  * Markdown descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @internal
  */
 class MarkdownDescriptor extends Descriptor
 {

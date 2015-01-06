@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
-trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfTokenManagerAdapter was deprecated in version 2.4 and will be removed in version 3.0. Please use Symfony\Component\Security\Csrf\CsrfTokenManager instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\CsrfTokenManagerAdapter is deprecated since version 2.4 and will be removed in version 3.0. Use the Symfony\Component\Security\Csrf\CsrfTokenManager class instead.', E_USER_DEPRECATED);
 
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * @since  2.4
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.4, to be removed in Symfony 3.0.
+ * @deprecated since version 2.4, to be removed in 3.0.
  */
 class CsrfTokenManagerAdapter implements CsrfProviderInterface
 {

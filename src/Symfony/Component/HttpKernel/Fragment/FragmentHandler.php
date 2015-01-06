@@ -76,10 +76,12 @@ class FragmentHandler
      *
      * @param Request|null $request A Request instance
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function setRequest(Request $request = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $this->request = $request;
     }
 

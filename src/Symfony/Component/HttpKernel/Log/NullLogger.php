@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Log;
 
+trigger_error('The '.__NAMESPACE__.'\NullLogger class is deprecated since version 2.2 and will be removed in 3.0. Use the Psr\Log\NullLogger class instead from the psr/log Composer package.');
+
 use Psr\Log\NullLogger as PsrNullLogger;
 
 /**
@@ -24,41 +26,33 @@ class NullLogger extends PsrNullLogger implements LoggerInterface
 {
     /**
      * @api
-     *
-     * @deprecated since 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
      */
     public function emerg($message, array $context = array())
     {
-        trigger_error('The emerg() method of the NullLogger was removed. You should use the new method emergency() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new emergency() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
     /**
      * @api
-     *
-     * @deprecated since 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
      */
     public function crit($message, array $context = array())
     {
-        trigger_error('The crit() method of the NullLogger was removed. You should use the new method critical() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new critical() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
     /**
      * @api
-     *
-     * @deprecated since 2.2, to be removed in 3.0. Use error() which is PSR-3 compatible.
      */
     public function err($message, array $context = array())
     {
-        trigger_error('The err() method of the NullLogger was removed. You should use the new method error() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new error() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 
     /**
      * @api
-     *
-     * @deprecated since 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
      */
     public function warn($message, array $context = array())
     {
-        trigger_error('The warn() method of the NullLogger was removed. You should use the new method warning() instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. You should use the new warning() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
     }
 }

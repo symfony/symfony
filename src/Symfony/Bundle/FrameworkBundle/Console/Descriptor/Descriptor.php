@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -75,6 +76,16 @@ abstract class Descriptor implements DescriptorInterface
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
         }
+    }
+
+    /**
+     * Returns the output.
+     *
+     * @return OutputInterface The output
+     */
+    protected function getOutput()
+    {
+        return $this->output;
     }
 
     /**

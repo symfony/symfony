@@ -35,16 +35,16 @@ class DebugClassLoader
     /**
      * Constructor.
      *
-     * @param callable|object $classLoader
+     * @param callable|object $classLoader Passing an object is @deprecated since version 2.5 and support for it will be removed in 3.0
      *
      * @api
-     * @deprecated since 2.5, passing an object is deprecated and support for it will be removed in 3.0
      */
     public function __construct($classLoader)
     {
         $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
 
         if ($this->wasFinder) {
+            trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
             $this->classLoader = array($classLoader, 'loadClass');
             $this->isFinder = true;
         } else {
@@ -60,9 +60,7 @@ class DebugClassLoader
     /**
      * Gets the wrapped class loader.
      *
-     * @return callable|object a class loader
-     *
-     * @deprecated since 2.5, returning an object is deprecated and support for it will be removed in 3.0
+     * @return callable|object A class loader. Since version 2.5, returning an object is @deprecated and support for it will be removed in 3.0
      */
     public function getClassLoader()
     {
@@ -124,10 +122,12 @@ class DebugClassLoader
      *
      * @return string|null
      *
-     * @deprecated Deprecated since 2.5, to be removed in 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function findFile($class)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($this->wasFinder) {
             return $this->classLoader[0]->findFile($class);
         }

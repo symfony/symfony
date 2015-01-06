@@ -48,7 +48,7 @@ class ClassUtils
     /**
      * Gets the real class name of a class name that could be a proxy.
      *
-     * @param string|object
+     * @param string|object $object
      *
      * @return string
      */

@@ -30,10 +30,10 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
-        $table = new Table($this->output);
-
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
+
+        $table = new Table($this->output);
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -322,6 +322,7 @@ class TextDescriptor extends Descriptor
                 foreach ($eventListeners as $order => $eventListener) {
                     $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
                 }
+
                 $table->render();
             }
         }

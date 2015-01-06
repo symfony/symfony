@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+ * @deprecated since version 2.6, to be removed in 3.0.
  */
 class SecurityContext implements SecurityContextInterface
 {
@@ -70,26 +70,38 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
+     * @deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::getToken() instead.
+     *
      * {@inheritdoc}
      */
     public function getToken()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::getToken() method instead.', E_USER_DEPRECATED);
+
         return $this->tokenStorage->getToken();
     }
 
     /**
+     * @deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::setToken() instead.
+     *
      * {@inheritdoc}
      */
     public function setToken(TokenInterface $token = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::setToken() method instead.', E_USER_DEPRECATED);
+
         return $this->tokenStorage->setToken($token);
     }
 
     /**
+     * @deprecated since version 2.6, to be removed in 3.0. Use AuthorizationCheckerInterface::isGranted() instead.
+     *
      * {@inheritdoc}
      */
     public function isGranted($attributes, $object = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::isGranted() method instead.', E_USER_DEPRECATED);
+
         return $this->authorizationChecker->isGranted($attributes, $object);
     }
 }

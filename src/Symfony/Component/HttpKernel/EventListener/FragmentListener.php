@@ -88,12 +88,14 @@ class FragmentListener implements EventSubscriberInterface
     }
 
     /**
-     * @deprecated Deprecated since 2.3.19, to be removed in 3.0.
+     * @deprecated since version 2.3.19, to be removed in 3.0.
      *
      * @return string[]
      */
     protected function getLocalIpAddresses()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3.19 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return array('127.0.0.1', 'fe80::1', '::1');
     }
 

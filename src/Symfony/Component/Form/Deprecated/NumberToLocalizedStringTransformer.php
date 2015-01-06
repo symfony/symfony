@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Deprecated;
 
-trigger_error('Constants ROUND_HALFEVEN, ROUND_HALFUP and ROUND_HALFDOWN on class NumberToLocalizedStringTransformer were deprecated in Symfony 2.4 and will be removed in 3.0. Use ROUND_HALF_EVEN, ROUND_HALF_UP and ROUND_HALF_DOWN instead.', E_USER_DEPRECATED);
+trigger_error('Constants ROUND_HALFEVEN, ROUND_HALFUP and ROUND_HALFDOWN in class NumberToLocalizedStringTransformer are deprecated since version 2.4 and will be removed in 3.0. Use ROUND_HALF_EVEN, ROUND_HALF_UP and ROUND_HALF_DOWN instead.', E_USER_DEPRECATED);
 
 /**
- * @deprecated since 2.7, to be removed in 3.0.
+ * @deprecated since version 2.7, to be removed in 3.0.
  * @internal
  */
 final class NumberToLocalizedStringTransformer

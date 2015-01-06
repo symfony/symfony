@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator;
 
-trigger_error('The "Symfony\Component\Validator\ExecutionContextInterface" interface was deprecated in version 2.5 and will be removed in 3.0. Use "Symfony\Component\Validator\Context\ExecutionContextInterface" instead.', E_USER_DEPRECATED);
-
 /**
  * Stores the validator's state during validation.
  *
@@ -85,7 +83,7 @@ trigger_error('The "Symfony\Component\Validator\ExecutionContextInterface" inter
  *
  * @api
  *
- * @deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface ExecutionContextInterface
@@ -101,9 +99,7 @@ interface ExecutionContextInterface
      *
      * @api
      *
-     * @deprecated The parameters $invalidValue, $pluralization and $code are
-     *             deprecated since version 2.5 and will be removed in
-     *             Symfony 3.0.
+     * @deprecated the parameters $invalidValue, $plural and $code are deprecated since version 2.5 and will be removed in 3.0.
      */
     public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null);
 
@@ -120,7 +116,7 @@ interface ExecutionContextInterface
      *
      * @api
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::buildViolation()}
      *             instead.
      */
@@ -165,7 +161,7 @@ interface ExecutionContextInterface
      * @param bool                 $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead.
      */
@@ -198,7 +194,7 @@ interface ExecutionContextInterface
      *                                             groups here, the current group of the context
      *                                             will be used.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead.
      */
@@ -259,7 +255,7 @@ interface ExecutionContextInterface
      *
      * @return MetadataFactoryInterface The metadata factory.
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Context\ExecutionContextInterface::getValidator()}
      *             instead and call
      *             {@link Validator\ValidatorInterface::getMetadataFor()} or

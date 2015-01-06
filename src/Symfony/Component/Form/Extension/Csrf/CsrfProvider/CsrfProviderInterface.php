@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
-trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface was deprecated in version 2.4 and will be removed in version 3.0. Please use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface instead.', E_USER_DEPRECATED);
-
 /**
  * Marks classes able to provide CSRF protection.
  *
@@ -29,9 +27,8 @@ trigger_error('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderIn
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated since version 2.4, to be removed in Symfony 3.0. Use
- *             {@link \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface}
- *             instead.
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface} instead.
  */
 interface CsrfProviderInterface
 {

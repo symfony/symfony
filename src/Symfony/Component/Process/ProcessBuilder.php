@@ -187,7 +187,7 @@ class ProcessBuilder
      *
      * To disable the timeout, set this value to null.
      *
-     * @param float|null
+     * @param float|null $timeout
      *
      * @return ProcessBuilder
      *

@@ -94,11 +94,11 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryClass($factoryClass)
     {
-        trigger_error('Definition::setFactoryClass() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
 
         $this->factoryClass = $factoryClass;
 
@@ -111,10 +111,12 @@ class Definition
      * @return string|null The factory class name
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryClass()
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return $this->factoryClass;
     }
 
@@ -126,11 +128,11 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryMethod($factoryMethod)
     {
-        trigger_error('Definition::setFactoryMethod() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
 
         $this->factoryMethod = $factoryMethod;
 
@@ -178,10 +180,12 @@ class Definition
      * @return string|null The factory method name
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryMethod()
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return $this->factoryMethod;
     }
 
@@ -193,11 +197,11 @@ class Definition
      * @return Definition The current instance
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryService($factoryService)
     {
-        trigger_error('Definition::setFactoryService() is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', E_USER_DEPRECATED);
 
         $this->factoryService = $factoryService;
 
@@ -210,10 +214,12 @@ class Definition
      * @return string|null The factory service id
      *
      * @api
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function getFactoryService()
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         return $this->factoryService;
     }
 

@@ -108,6 +108,8 @@ class Escaper
      */
     private static function isValueRequiresSingleQuoting($value)
     {
+        // Note that whilst 'y' and 'n' are not supported as valid Booleans,
+        // they are escaped here for interoperability.
         return in_array(strtolower($value), array('null', '~', 'true', 'false', 'y', 'n', 'yes', 'no', 'on', 'off'));
     }
 }

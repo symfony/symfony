@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-05T07:49:39Z
+
+I might be wrong, but I think the idea was to only rely on interfaces of the Translator component and not the implementation (in the hope that we would move all interfaces into dedicated libraries).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T01:30:47Z
+
+Well, given that moving interfaces is not planned yet AFAIK, duplicating the implementation (without testing it btw) does not seem a good idea IMO.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T06:37:39Z
+
+@stof ok, fair enough.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T10:48:29Z
+
+I fixed the version to say 2.7 and rebased my branch to fix conflicts
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T10:55:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T11:05:01Z
+
+The test failure for component builds is because the MessageSelector is optional in the IdentityTranslator only as of Symfony 2.4. So I have 2 choices here:
+
+- bump the mimimal version of the translation component to 2.4 in the validator component
+- instantiate the MessageSelector explicitly.
+
+what do you prefer ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T11:06:24Z
+
+Bumping to 2.4 looks like a good idea.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T11:08:32Z
+
+done

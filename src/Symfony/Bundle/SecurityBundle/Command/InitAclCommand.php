@@ -34,13 +34,13 @@ class InitAclCommand extends ContainerAwareCommand
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command mounts ACL tables in the database.
 
-<info>php %command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 The name of the DBAL connection must be configured in your <info>app/config/security.yml</info> configuration file in the <info>security.acl.connection</info> variable.
 
-<info>security:
-    acl:
-        connection: default</info>
+  <info>security:
+      acl:
+          connection: default</info>
 EOF
             )
         ;

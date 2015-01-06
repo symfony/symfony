@@ -48,7 +48,7 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
-With the <info>format</info> option specifies the format of the configuration,
+With the <info>--format</info> option specifies the format of the configuration,
 this is either <comment>yaml</comment> or <comment>xml</comment>.
 When the option is not provided, <comment>yaml</comment> is used.
 

@@ -366,7 +366,9 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
-        $serviceXML->setAttribute('synchronized', $definition->isSynchronized() ? 'true' : 'false');
+        if (method_exists($definition, 'isSynchronized')) {
+            $serviceXML->setAttribute('synchronized', $definition->isSynchronized(false) ? 'true' : 'false');
+        }
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 

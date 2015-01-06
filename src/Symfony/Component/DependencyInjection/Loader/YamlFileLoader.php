@@ -171,7 +171,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['synchronized'])) {
-            $definition->setSynchronized($service['synchronized']);
+            $definition->setSynchronized($service['synchronized'], 'request' !== $id);
         }
 
         if (isset($service['lazy'])) {

@@ -183,8 +183,13 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
-            ."\n".'- Synchronized: '.($definition->isSynchronized() ? 'yes' : 'no')
-            ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
+        ;
+
+        if (method_exists($definition, 'isSynchronized')) {
+            $output .= "\n".'- Synchronized: '.($definition->isSynchronized() ? 'yes' : 'no');
+        }
+
+        $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';

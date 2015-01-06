@@ -661,9 +661,15 @@ class Definition
      * @return Definition The current instance
      *
      * @api
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function setSynchronized($boolean)
+    public function setSynchronized($boolean, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->synchronized = (bool) $boolean;
 
         return $this;
@@ -675,9 +681,15 @@ class Definition
      * @return bool
      *
      * @api
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function isSynchronized()
+    public function isSynchronized($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->synchronized;
     }
 

@@ -683,8 +683,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($a, $container->get('a'));
     }
 
-    public function testSetOnSynchronizedService()
+    public function testLegacySetOnSynchronizedService()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $container = new ContainerBuilder();
         $container->register('baz', 'BazClass')
             ->setSynchronized(true)
@@ -700,8 +702,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($baz, $container->get('bar')->getBaz());
     }
 
-    public function testSynchronizedServiceWithScopes()
+    public function testLegacySynchronizedServiceWithScopes()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $container = new ContainerBuilder();
         $container->addScope(new Scope('foo'));
         $container->register('baz', 'BazClass')

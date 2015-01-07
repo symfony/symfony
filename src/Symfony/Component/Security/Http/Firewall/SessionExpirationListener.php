@@ -80,7 +80,7 @@ class SessionExpirationListener implements ListenerInterface
      */
     private function setMaxIdleTime($maxIdleTime)
     {
-        if ($maxIdleTime > ini_get('session.gc_maxlifetime')) {
+        if ($maxIdleTime > ini_get('session.gc_maxlifetime') && null !== $this->logger) {
             $this->logger->warning("Max idle time should not be greater than 'session.gc_maxlifetime'");
         }
         $this->maxIdleTime = (int) $maxIdleTime;

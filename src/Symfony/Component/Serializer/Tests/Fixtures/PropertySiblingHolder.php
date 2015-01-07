@@ -14,44 +14,26 @@ namespace Symfony\Component\Serializer\Tests\Fixtures;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SiblingHolder
+class PropertySiblingHolder
 {
-    private $sibling0;
-    private $sibling1;
-    private $sibling2;
+    public $sibling0;
+    public $sibling1;
+    public $sibling2;
 
     public function __construct()
     {
-        $sibling = new Sibling();
+        $sibling = new PropertySibling();
 
         $this->sibling0 = $sibling;
         $this->sibling1 = $sibling;
         $this->sibling2 = $sibling;
-    }
-
-    public function getSibling0()
-    {
-        return $this->sibling0;
-    }
-
-    public function getSibling1()
-    {
-        return $this->sibling1;
-    }
-
-    public function getSibling2()
-    {
-        return $this->sibling2;
     }
 }
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Sibling
+class PropertySibling
 {
-    public function getCoopTilleuls()
-    {
-        return 'Les-Tilleuls.coop';
-    }
+    public $coopTilleuls = 'Les-Tilleuls.coop';
 }

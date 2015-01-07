@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -34,9 +35,15 @@ class PropertyNormalizer extends AbstractNormalizer
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if ($this->isCircularReference($object, $context)) {
+            return $this->handleCircularReference($object);
+        }
+
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
         $allowedAttributes = $this->getAllowedAttributes($object, $context);
@@ -61,7 +68,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $attributeValue = $this->serializer->normalize($attributeValue, $format);
+                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
             $attributes[$property->name] = $attributeValue;
@@ -72,41 +79,16 @@ class PropertyNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $data = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
-
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if ($allowed && !$ignored && isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
-                } elseif (!$constructorParameter->isOptional()) {
-                    throw new RuntimeException(sprintf(
-                        'Cannot create an instance of %s from serialized data because '.
-                        'its constructor requires parameter "%s" to be present.',
-                        $class,
-                        $constructorParameter->name
-                    ));
-                }
-            }
-
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class();
-        }
+        $object = $this->instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($data as $propertyName => $value) {
             $propertyName = lcfirst($this->formatAttribute($propertyName));

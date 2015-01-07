@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 
@@ -21,6 +22,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    protected $circularReferenceLimit = 1;
+    protected $circularReferenceHandler;
     protected $classMetadataFactory;
     protected $callbacks = array();
     protected $ignoredAttributes = array();
@@ -34,6 +37,40 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     public function __construct(ClassMetadataFactory $classMetadataFactory = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
+    }
+
+    /**
+     * Set circular reference limit.
+     *
+     * @param $circularReferenceLimit limit of iterations for the same object
+     *
+     * @return self
+     */
+    public function setCircularReferenceLimit($circularReferenceLimit)
+    {
+        $this->circularReferenceLimit = $circularReferenceLimit;
+
+        return $this;
+    }
+
+    /**
+     * Set circular reference handler.
+     *
+     * @param callable $circularReferenceHandler
+     *
+     * @return self
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setCircularReferenceHandler($circularReferenceHandler)
+    {
+        if (!is_callable($circularReferenceHandler)) {
+            throw new InvalidArgumentException('The given circular reference handler is not callable.');
+        }
+
+        $this->circularReferenceHandler = $circularReferenceHandler;
+
+        return $this;
     }
 
     /**
@@ -89,6 +126,56 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
+     * Detects if the configured circular reference limit is reached.
+     *
+     * @param object $object
+     * @param array  $context
+     *
+     * @return bool
+     *
+     * @throws CircularReferenceException
+     */
+    protected function isCircularReference($object, &$context)
+    {
+        $objectHash = spl_object_hash($object);
+
+        if (isset($context['circular_reference_limit'][$objectHash])) {
+            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
+                unset($context['circular_reference_limit'][$objectHash]);
+
+                return true;
+            }
+
+            $context['circular_reference_limit'][$objectHash]++;
+        } else {
+            $context['circular_reference_limit'][$objectHash] = 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Handles a circular reference.
+     *
+     * If a circular reference handler is set, it will be called. Otherwise, a
+     * {@class CircularReferenceException} will be thrown.
+     *
+     * @param object $object
+     *
+     * @return mixed
+     *
+     * @throws CircularReferenceException
+     */
+    protected function handleCircularReference($object)
+    {
+        if ($this->circularReferenceHandler) {
+            return call_user_func($this->circularReferenceHandler, $object);
+        }
+
+        throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
+    }
+
+    /**
      * Format an attribute name, for example to convert a snake_case name to camelCase.
      *
      * @param string $attributeName
@@ -126,5 +213,89 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         }
 
         return array_unique($allowedAttributes);
+    }
+
+    /**
+     * Normalizes the given data to an array. It's particularly useful during
+     * the denormalization process.
+     *
+     * @param object|array $data
+     *
+     * @return array
+     */
+    protected function prepareForDenormalization($data)
+    {
+        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
+            $normalizedData = $data;
+        } elseif (is_object($data)) {
+            $normalizedData = array();
+
+            foreach ($data as $attribute => $value) {
+                $normalizedData[$attribute] = $value;
+            }
+        } else {
+            $normalizedData = array();
+        }
+
+        return $normalizedData;
+    }
+
+    /**
+     * Instantiates an object using contructor parameters when needed.
+     *
+     * This method also allows to denormalize data into an existing object if
+     * it is present in the context with the object_to_populate key.
+     *
+     * @param array            $data
+     * @param string           $class
+     * @param array            $context
+     * @param \ReflectionClass $reflectionClass
+     * @param array|bool       $allowedAttributes
+     *
+     * @return object
+     *
+     * @throws RuntimeException
+     */
+    protected function instantiateObject(array $data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    {
+        if (
+            isset($context['object_to_populate']) &&
+            is_object($context['object_to_populate']) &&
+            $class === get_class($context['object_to_populate'])
+        ) {
+            return $context['object_to_populate'];
+        }
+
+        $constructor = $reflectionClass->getConstructor();
+        if ($constructor) {
+            $constructorParameters = $constructor->getParameters();
+
+            $params = array();
+            foreach ($constructorParameters as $constructorParameter) {
+                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
+
+                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+                $ignored = in_array($paramName, $this->ignoredAttributes);
+                if ($allowed && !$ignored && isset($data[$paramName])) {
+                    $params[] = $data[$paramName];
+                    // don't run set for a parameter passed to the constructor
+                    unset($data[$paramName]);
+                } elseif ($constructorParameter->isOptional()) {
+                    $params[] = $constructorParameter->getDefaultValue();
+                } else {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
+                            $class,
+                            $constructorParameter->name
+                        )
+                    );
+                }
+            }
+
+            return $reflectionClass->newInstanceArgs($params);
+        }
+
+        return new $class();
     }
 }

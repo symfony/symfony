@@ -98,10 +98,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilder()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
@@ -130,10 +126,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderWithDataClassOption()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
@@ -162,10 +154,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $i = 0;
 
         $assertIndex = function ($index) use (&$i) {
@@ -278,7 +266,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $assertIndex = function ($index) use (&$i) {
             return function () use (&$i, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
                 $this->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;

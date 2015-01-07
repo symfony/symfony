@@ -68,7 +68,7 @@ class RouterListener implements EventSubscriberInterface
         }
 
         if (!$requestStack instanceof RequestStack) {
-            trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.');
+            trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
         }
 
         $this->matcher = $matcher;

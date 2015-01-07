@@ -279,7 +279,7 @@ abstract class Controller extends ContainerAware
     }
 
     /**
-     * Get a user from the Security Context.
+     * Get a user from the Security Token Storage.
      *
      * @return mixed
      *
@@ -289,15 +289,16 @@ abstract class Controller extends ContainerAware
      */
     protected function getUser()
     {
-        if (!$this->container->has('security.context')) {
+        if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        if (null === $token = $this->container->get('security.context')->getToken()) {
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return;
         }
 
         if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
             return;
         }
 

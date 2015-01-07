@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -38,64 +37,15 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  */
 class GetSetMethodNormalizer extends AbstractNormalizer
 {
-    protected $circularReferenceLimit = 1;
-    protected $circularReferenceHandler;
-
-    /**
-     * Set circular reference limit.
-     *
-     * @param $circularReferenceLimit limit of iterations for the same object
-     *
-     * @return self
-     */
-    public function setCircularReferenceLimit($circularReferenceLimit)
-    {
-        $this->circularReferenceLimit = $circularReferenceLimit;
-
-        return $this;
-    }
-
-    /**
-     * Set circular reference handler.
-     *
-     * @param callable $circularReferenceHandler
-     *
-     * @return self
-     *
-     * @throws InvalidArgumentException
-     */
-    public function setCircularReferenceHandler($circularReferenceHandler)
-    {
-        if (!is_callable($circularReferenceHandler)) {
-            throw new InvalidArgumentException('The given circular reference handler is not callable.');
-        }
-
-        $this->circularReferenceHandler = $circularReferenceHandler;
-
-        return $this;
-    }
-
     /**
      * {@inheritdoc}
+     *
+     * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $objectHash = spl_object_hash($object);
-
-        if (isset($context['circular_reference_limit'][$objectHash])) {
-            if ($context['circular_reference_limit'][$objectHash] >= $this->circularReferenceLimit) {
-                unset($context['circular_reference_limit'][$objectHash]);
-
-                if ($this->circularReferenceHandler) {
-                    return call_user_func($this->circularReferenceHandler, $object);
-                }
-
-                throw new CircularReferenceException(sprintf('A circular reference has been detected (configured limit: %d).', $this->circularReferenceLimit));
-            }
-
-            $context['circular_reference_limit'][$objectHash]++;
-        } else {
-            $context['circular_reference_limit'][$objectHash] = 1;
+        if ($this->isCircularReference($object, $context)) {
+            return $this->handleCircularReference($object);
         }
 
         $reflectionObject = new \ReflectionObject($object);
@@ -136,54 +86,16 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         $allowedAttributes = $this->getAllowedAttributes($class, $context);
-
-        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
-            $normalizedData = $data;
-        } elseif (is_object($data)) {
-            $normalizedData = array();
-
-            foreach ($data as $attribute => $value) {
-                $normalizedData[$attribute] = $value;
-            }
-        } else {
-            $normalizedData = array();
-        }
+        $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
-
-                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
-                $ignored = in_array($paramName, $this->ignoredAttributes);
-                if ($allowed && !$ignored && isset($normalizedData[$paramName])) {
-                    $params[] = $normalizedData[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($normalizedData[$paramName]);
-                } elseif ($constructorParameter->isOptional()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new RuntimeException(
-                        'Cannot create an instance of '.$class.
-                        ' from serialized data because its constructor requires '.
-                        'parameter "'.$constructorParameter->name.
-                        '" to be present.');
-                }
-            }
-
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class();
-        }
+        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($normalizedData as $attribute => $value) {
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);

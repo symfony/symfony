@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-04T14:03:26Z
+
+I think passing the actual value of `model_timezone` or `view_timezone` to the data transformer is not really needed. If I am not mistaken we can rely on the fix from #12911 and simply ignore these options.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-04T14:22:31Z
+
+Failures don't seem to be related to this change afaics.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T17:20:07Z
+
+I'd like to merge this one fast to be able to release 2.6.2. Everything's ok?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T17:20:19Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T08:12:52Z
+
+I'm going to merge this one today to be able to release 2.6.2. Any other feedback before the merge?

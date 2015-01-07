@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -199,6 +200,21 @@ class MarkdownDescriptor extends Descriptor
 
         if ($definition->getFactoryMethod()) {
             $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod().'`';
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $output .= "\n".'- Factory Service: `'.$factory[0].'`';
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $output .= "\n".'- Factory Class: `'.$factory[0].'`';
+                }
+                $output .= "\n".'- Factory Method: `'.$factory[1].'`';
+            } else {
+                $output .= "\n".'- Factory Function: `'.$factory.'`';
+            }
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {

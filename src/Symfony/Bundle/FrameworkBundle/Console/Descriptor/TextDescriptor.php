@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -281,6 +282,21 @@ class TextDescriptor extends Descriptor
 
         if ($definition->getFactoryMethod()) {
             $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod());
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $description[] = sprintf('<comment>Factory Service</comment>  %s', $factory[0]);
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $description[] = sprintf('<comment>Factory Class</comment>    %s', $factory[0]);
+                }
+                $description[] = sprintf('<comment>Factory Method</comment>   %s', $factory[1]);
+            } else {
+                $description[] = sprintf('<comment>Factory Function</comment>    %s', $factory);
+            }
         }
 
         $this->writeText(implode("\n", $description)."\n", $options);

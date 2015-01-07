@@ -148,7 +148,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'text', null, array())
+            ->with('foo', 'text', array())
         ;
 
         $this->builder->create('foo');
@@ -168,7 +168,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with($expectedName, $expectedType, null, $expectedOptions)
+            ->with($expectedName, $expectedType, $expectedOptions)
             ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder->add($expectedName, $expectedType, $expectedOptions);
@@ -184,7 +184,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->expects($this->once())
             ->method('createBuilderForProperty')
-            ->with('stdClass', $expectedName, null, $expectedOptions)
+            ->with('stdClass', $expectedName, $expectedOptions)
             ->will($this->returnValue($this->getFormBuilder()));
 
         $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);

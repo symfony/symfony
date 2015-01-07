@@ -81,7 +81,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
-        $this->factory->create('choice', null, array(
+        $this->factory->create('choice', array(
             'choice_list' => array('foo' => 'foo'),
         ));
     }
@@ -93,7 +93,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'expanded' => true,
             'choices' => $this->choices,
         ));
@@ -103,7 +103,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -116,7 +116,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderNotPresentIfRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -129,7 +129,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderNotPresentIfMultiple()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'required' => false,
@@ -142,7 +142,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderNotPresentIfEmptyChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -158,7 +158,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedChoicesOptionsAreFlattened()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'expanded' => true,
             'choices' => $this->groupedChoices,
         ));
@@ -177,7 +177,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedCheckboxesAreNeverRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'required' => true,
@@ -191,7 +191,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -205,7 +205,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -219,7 +219,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleNonExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -233,7 +233,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleNonExpandedInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -248,7 +248,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => false,
             'choice_list' => new ObjectChoiceList(
@@ -271,7 +271,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleNonExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -285,7 +285,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleNonExpandedInvalidScalarChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -300,7 +300,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleNonExpandedInvalidArrayChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -315,7 +315,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => false,
             'choice_list' => new ObjectChoiceList(
@@ -337,7 +337,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -371,7 +371,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedRequiredInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -399,7 +399,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNonRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -436,7 +436,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -464,7 +464,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedRequiredNull()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -498,7 +498,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedRequiredEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -532,7 +532,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedRequiredFalse()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -566,7 +566,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredNull()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -603,7 +603,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -640,7 +640,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredFalse()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -677,7 +677,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedWithEmptyChild()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => array(
@@ -697,7 +697,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'choice_list' => new ObjectChoiceList(
@@ -728,7 +728,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitSingleExpandedNumericChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $this->numericChoices,
@@ -751,7 +751,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -784,7 +784,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedInvalidScalarChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -811,7 +811,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedInvalidArrayChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -838,7 +838,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -861,7 +861,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedWithEmptyChild()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => array(
@@ -884,7 +884,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choice_list' => new ObjectChoiceList(
@@ -915,7 +915,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitMultipleExpandedNumericChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->numericChoices,
@@ -942,7 +942,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testSetDataSingleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->numericChoices,
@@ -956,7 +956,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetDataMultipleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->numericChoices,
@@ -970,7 +970,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassRequiredToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choices' => $this->choices,
         ));
         $view = $form->createView();
@@ -980,7 +980,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassNonRequiredToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'required' => false,
             'choices' => $this->choices,
         ));
@@ -991,7 +991,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassMultipleToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => true,
             'choices' => $this->choices,
         ));
@@ -1002,7 +1002,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassExpandedToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'expanded' => true,
             'choices' => $this->choices,
         ));
@@ -1013,7 +1013,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderIsNullByDefaultIfRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'required' => true,
             'choices' => $this->choices,
@@ -1025,7 +1025,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPlaceholderIsEmptyStringByDefaultIfNotRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => false,
             'required' => false,
             'choices' => $this->choices,
@@ -1040,7 +1040,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
@@ -1058,7 +1058,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testPassEmptyValueBC($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
@@ -1078,7 +1078,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
@@ -1138,7 +1138,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPassChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choices' => $choices,
         ));
         $view = $form->createView();
@@ -1154,7 +1154,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPassPreferredChoicesToView()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D');
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choices' => $choices,
             'preferred_choices' => array('b', 'd'),
         ));
@@ -1172,7 +1172,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPassHierarchicalChoicesToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choices' => $this->groupedChoices,
             'preferred_choices' => array('b', 'd'),
         ));
@@ -1203,7 +1203,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $obj2 = (object) array('value' => 'b', 'label' => 'B');
         $obj3 = (object) array('value' => 'c', 'label' => 'C');
         $obj4 = (object) array('value' => 'd', 'label' => 'D');
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choice_list' => new ObjectChoiceList(array($obj1, $obj2, $obj3, $obj4), 'label', array(), null, 'value'),
         ));
         $view = $form->createView();
@@ -1218,7 +1218,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testAdjustFullNameForMultipleNonExpanded()
     {
-        $form = $this->factory->createNamed('name', 'choice', null, array(
+        $form = $this->factory->createNamed('name', 'choice', array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -1231,7 +1231,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->factory->createNamed('name', 'choice', null, array(
+        $this->factory->createNamed('name', 'choice', array(
             'choices' => array(),
         ));
     }
@@ -1239,7 +1239,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     // https://github.com/symfony/symfony/issues/10409
     public function testReuseNonUtf8ChoiceLists()
     {
-        $form1 = $this->factory->createNamed('name', 'choice', null, array(
+        $form1 = $this->factory->createNamed('name', 'choice', array(
             'choices' => array(
                 'meter' => 'm',
                 'millimeter' => 'mm',
@@ -1247,7 +1247,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form2 = $this->factory->createNamed('name', 'choice', null, array(
+        $form2 = $this->factory->createNamed('name', 'choice', array(
             'choices' => array(
                 'meter' => 'm',
                 'millimeter' => 'mm',
@@ -1255,7 +1255,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             ),
         ));
 
-        $form3 = $this->factory->createNamed('name', 'choice', null, array(
+        $form3 = $this->factory->createNamed('name', 'choice', array(
             'choices' => array(
                 'meter' => 'm',
                 'millimeter' => 'mm',
@@ -1284,7 +1284,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $obj3 = (object) array('value' => 'c', 'label' => 'C');
         $obj4 = (object) array('value' => 'd', 'label' => 'D');
 
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create('choice', array(
             'choice_list' => new ObjectChoiceList(array($obj1, $obj2, $obj3, $obj4), 'label', array(), null, 'value'),
             // Used to break because "data_class" was inferred, which needs to
             // remain null in every case (because it refers to the view format)

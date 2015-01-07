@@ -49,14 +49,15 @@ class MarkdownDescriptor extends Descriptor
         unset($requirements['_scheme'], $requirements['_method']);
 
         $output = '- Path: '.$route->getPath()
+            ."\n".'- Path Regex: '.$route->compile()->getRegex()
             ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
+            ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
             ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NONE'
-            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
-            ."\n".'- Path-Regex: '.$route->compile()->getRegex();
+            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
         $this->write(isset($options['name'])
             ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n\n".$output
@@ -176,10 +177,25 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Class: `'.$definition->getClass().'`'
             ."\n".'- Scope: `'.$definition->getScope().'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
-            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no');
+            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
+            ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
+            ."\n".'- Synchronized: '.($definition->isSynchronized() ? 'yes' : 'no')
+            ."\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
+        }
+
+        if ($definition->getFactoryClass()) {
+            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass().'`';
+        }
+
+        if ($definition->getFactoryService()) {
+            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService().'`';
+        }
+
+        if ($definition->getFactoryMethod()) {
+            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod().'`';
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {

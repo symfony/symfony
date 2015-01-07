@@ -169,14 +169,15 @@ class JsonDescriptor extends Descriptor
 
         return array(
             'path' => $route->getPath(),
+            'pathRegex' => $route->compile()->getRegex(),
             'host' => '' !== $route->getHost() ? $route->getHost() : 'ANY',
+            'hostRegex' => '' !== $route->getHost() ? $route->compile()->getHostRegex() : '',
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
             'class' => get_class($route),
             'defaults' => $route->getDefaults(),
             'requirements' => $requirements ?: 'NO CUSTOM',
             'options' => $route->getOptions(),
-            'pathRegex' => $route->compile()->getRegex(),
         );
     }
 
@@ -193,8 +194,23 @@ class JsonDescriptor extends Descriptor
             'scope' => $definition->getScope(),
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
+            'lazy' => $definition->isLazy(),
+            'synchronized' => $definition->isSynchronized(),
+            'abstract' => $definition->isSynchronized(),
             'file' => $definition->getFile(),
         );
+
+        if ($definition->getFactoryClass()) {
+            $data['factory_class'] = $definition->getFactoryClass();
+        }
+
+        if ($definition->getFactoryService()) {
+            $data['factory_service'] = $definition->getFactoryService();
+        }
+
+        if ($definition->getFactoryMethod()) {
+            $data['factory_method'] = $definition->getFactoryMethod();
+        }
 
         if (!$omitTags) {
             $data['tags'] = array();

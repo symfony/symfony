@@ -197,6 +197,8 @@ class TimeType extends AbstractType
             'input' => 'datetime',
             'with_minutes' => true,
             'with_seconds' => false,
+            'model_timezone' => null,
+            'view_timezone' => null,
             'empty_value' => $emptyValue, // deprecated
             'placeholder' => $placeholder,
             'html5' => true,

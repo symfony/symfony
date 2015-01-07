@@ -71,3 +71,19 @@ yaml: |
     'foo #': baz
 php: |
     array('foo #' => 'baz')
+---
+test: 'String literals starting with #'
+brief: >
+    'String literals starting with # are not comments'
+yaml: |
+  collection:
+    - one: |
+        foo
+        # bar
+        baz
+    - two: >-
+        foo
+        # bar
+        bar
+php: |
+    array( 'collection' => array( array( 'one' => "foo\n# bar\nbaz" ), array( 'two' => "foo # bar bar" ) ) )

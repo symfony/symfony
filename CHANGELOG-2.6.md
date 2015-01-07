@@ -7,6 +7,10 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.3 (2015-01-07)
+
+ * bug #13286 [Security] Don't destroy the session on buggy php releases. (derrabus)
+
 * 2.6.2 (2015-01-07)
 
  * feature #13241 [Form] add back model_timezone and view_timezone options (xabbuh)

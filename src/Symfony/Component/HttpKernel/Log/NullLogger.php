@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Log;
 
-trigger_error('The '.__NAMESPACE__.'\NullLogger class is deprecated since version 2.2 and will be removed in 3.0. Use the Psr\Log\NullLogger class instead from the psr/log Composer package.');
+trigger_error('The '.__NAMESPACE__.'\NullLogger class is deprecated since version 2.2 and will be removed in 3.0. Use the Psr\Log\NullLogger class instead from the psr/log Composer package.', E_USER_DEPRECATED);
 
 use Psr\Log\NullLogger as PsrNullLogger;
 

@@ -133,6 +133,9 @@
    You should not rely on these methods in your form type because the parent
    of a form can change after building it.
 
+ * `getChild()` in `FormView` was deprecated and will be removed in 2.3. 
+   You can access the child by public property `children`.
+
  * The class PropertyPath and related classes were deprecated and moved to a
    dedicated component PropertyAccess. If you used any of these classes or
    interfaces, you should adapt the namespaces now. During the move,

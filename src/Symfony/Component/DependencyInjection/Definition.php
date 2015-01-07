@@ -113,9 +113,11 @@ class Definition
      * @api
      * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryClass()
+    public function getFactoryClass($triggerDeprecationError = true)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        if ($triggerDeprecationError) {
+            trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
 
         return $this->factoryClass;
     }
@@ -182,9 +184,11 @@ class Definition
      * @api
      * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryMethod()
+    public function getFactoryMethod($triggerDeprecationError = true)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        if ($triggerDeprecationError) {
+            trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
 
         return $this->factoryMethod;
     }
@@ -216,9 +220,11 @@ class Definition
      * @api
      * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryService()
+    public function getFactoryService($triggerDeprecationError = true)
     {
-        trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        if ($triggerDeprecationError) {
+            trigger_error('The '.__METHOD__.' is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
 
         return $this->factoryService;
     }

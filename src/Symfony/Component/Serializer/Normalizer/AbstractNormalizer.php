@@ -214,4 +214,88 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
         return array_unique($allowedAttributes);
     }
+
+    /**
+     * Normalizes the given data to an array. It's particularly useful during
+     * the denormalization process.
+     *
+     * @param object|array $data
+     *
+     * @return array
+     */
+    protected function prepareForDenormalization($data)
+    {
+        if (is_array($data) || is_object($data) && $data instanceof \ArrayAccess) {
+            $normalizedData = $data;
+        } elseif (is_object($data)) {
+            $normalizedData = array();
+
+            foreach ($data as $attribute => $value) {
+                $normalizedData[$attribute] = $value;
+            }
+        } else {
+            $normalizedData = array();
+        }
+
+        return $normalizedData;
+    }
+
+    /**
+     * Instantiates an object using contructor parameters when needed.
+     *
+     * This method also allows to denormalize data into an existing object if
+     * it is present in the context with the object_to_populate key.
+     *
+     * @param array            $data
+     * @param string           $class
+     * @param array            $context
+     * @param \ReflectionClass $reflectionClass
+     * @param array|bool       $allowedAttributes
+     *
+     * @return object
+     *
+     * @throws RuntimeException
+     */
+    protected function instantiateObject(array $data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    {
+        if (
+            isset($context['object_to_populate']) &&
+            is_object($context['object_to_populate']) &&
+            $class === get_class($context['object_to_populate'])
+        ) {
+            return $context['object_to_populate'];
+        }
+
+        $constructor = $reflectionClass->getConstructor();
+        if ($constructor) {
+            $constructorParameters = $constructor->getParameters();
+
+            $params = array();
+            foreach ($constructorParameters as $constructorParameter) {
+                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
+
+                $allowed = $allowedAttributes === false || in_array($paramName, $allowedAttributes);
+                $ignored = in_array($paramName, $this->ignoredAttributes);
+                if ($allowed && !$ignored && isset($data[$paramName])) {
+                    $params[] = $data[$paramName];
+                    // don't run set for a parameter passed to the constructor
+                    unset($data[$paramName]);
+                } elseif ($constructorParameter->isOptional()) {
+                    $params[] = $constructorParameter->getDefaultValue();
+                } else {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
+                            $class,
+                            $constructorParameter->name
+                        )
+                    );
+                }
+            }
+
+            return $reflectionClass->newInstanceArgs($params);
+        }
+
+        return new $class();
+    }
 }

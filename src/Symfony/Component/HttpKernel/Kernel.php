@@ -59,12 +59,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.6.2';
-    const VERSION_ID = '20602';
+    const VERSION = '2.6.3-DEV';
+    const VERSION_ID = '20603';
     const MAJOR_VERSION = '2';
     const MINOR_VERSION = '6';
-    const RELEASE_VERSION = '2';
-    const EXTRA_VERSION = '';
+    const RELEASE_VERSION = '3';
+    const EXTRA_VERSION = 'DEV';
 
     /**
      * Constructor.

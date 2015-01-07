@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-06T14:49:38Z
+
+This would also "fix" issue #13283 and replaces the reverting PR #13282.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2015-01-06T15:23:05Z
+
+Are we positive Debian has not backported the php fix to their PHP 5.4.4 version? :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-01-06T15:30:02Z
+
+@andrerom Good point. Since the bug does not have a security impact, I doubt that there is a backport. Same with RHEL/CentOS php 5.4.9. But I don't have either distribution as a VM right now to verfiy this.
+
+In general, I'm not a friend of checking against the php version, but I can't see a different way of checking at runtime weather the php distribution is affected or not in this particullar case.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2015-01-06T15:46:52Z
+
+RHEL/CentOS uses 5.4.16 according to [distrowatch](http://distrowatch.com/table.php?distribution=redhat)
+But your right, they tend to only backport non security fixes if they are fatal error / memory issues.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T17:16:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-01-07T08:05:52Z
+
+I have updated the test.

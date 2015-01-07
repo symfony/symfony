@@ -137,11 +137,3 @@ class TestController extends Controller
         return parent::getUser();
     }
 }
-
-class TestController extends Controller
-{
-    public function forward($controller, array $path = array(), array $query = array())
-    {
-        return parent::forward($controller, $path, $query);
-    }
-}

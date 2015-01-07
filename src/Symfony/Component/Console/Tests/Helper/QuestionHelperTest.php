@@ -143,27 +143,39 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
-    public function testAskConfirmation()
+    /**
+     * @dataProvider getAskConfirmationData
+     */
+    public function testAskConfirmation($question, $expected, $default = true)
     {
         $dialog = new QuestionHelper();
 
-        $dialog->setInputStream($this->getInputStream("\n\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?');
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $dialog->setInputStream($this->getInputStream($question."\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', $default);
+        $this->assertEquals($expected, $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question), 'confirmation question should '.($expected ? 'pass' : 'cancel'));
+    }
 
-        $dialog->setInputStream($this->getInputStream("y\nyes\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    public function getAskConfirmationData()
+    {
+        return array(
+            array('', true),
+            array('', false, false),
+            array('y', true),
+            array('yes', true),
+            array('n', false),
+            array('no', false),
+        );
+    }
 
-        $dialog->setInputStream($this->getInputStream("n\nno\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?', true);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', true);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    public function testAskConfirmationWithCustomTrueAnswer()
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream("j\ny\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
     public function testAskAndValidate()

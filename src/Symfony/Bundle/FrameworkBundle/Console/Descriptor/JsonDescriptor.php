@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -229,6 +230,21 @@ class JsonDescriptor extends Descriptor
 
         if ($definition->getFactoryMethod()) {
             $data['factory_method'] = $definition->getFactoryMethod();
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $data['factory_service'] = (string) $factory[0];
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $data['factory_class'] = $factory[0];
+                }
+                $data['factory_method'] = $factory[1];
+            } else {
+                $data['factory_function'] = $factory;
+            }
         }
 
         if (!$omitTags) {

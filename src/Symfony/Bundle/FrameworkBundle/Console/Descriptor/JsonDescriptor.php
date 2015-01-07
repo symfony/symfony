@@ -216,7 +216,7 @@ class JsonDescriptor extends Descriptor
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
             'synchronized' => $definition->isSynchronized(),
-            'abstract' => $definition->isSynchronized(),
+            'abstract' => $definition->isAbstract(),
             'file' => $definition->getFile(),
         );
 

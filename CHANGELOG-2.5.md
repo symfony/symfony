@@ -7,6 +7,38 @@ in 2.5 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.5.0...v2.5.1
 
+* 2.5.9 (2015-01-07)
+
+ * bug #13286 [Security] Don't destroy the session on buggy php releases. (derrabus)
+ * bug #12417 [HttpFoundation] Fix an issue caused by php's Bug #66606. (wusuopu)
+ * bug #13200 Don't add Accept-Range header on unsafe HTTP requests (jaytaph)
+ * bug #12491 [Security] Don't send remember cookie for sub request (blanchonvincent)
+ * bug #12574 [HttpKernel] Fix UriSigner::check when _hash is not at the end of the uri (nyroDev)
+ * bug #13185 Fixes Issue #13184 - incremental output getters now return empty strings (Bailey Parker)
+ * bug #13173 [Debug] fixes ClassNotFoundFatalErrorHandler to correctly handle class not found errors with Symfony ClassLoader component autoloaders. (hhamon)
+ * bug #13145 [DomCrawler] Fix behaviour with <base> tag (dkop, WouterJ)
+ * bug #13027 fix #10054 - form data collector with dynamic fields (zulus)
+ * bug #13141 [TwigBundle] Moved the setting of the default escaping strategy from the Twig engine to the Twig environment (fabpot)
+ * bug #13114 [HttpFoundation] fixed error when an IP in the X-Forwarded-For HTTP head... (fabpot)
+ * bug #12572 [HttpFoundation] fix checkip6 (Neime)
+ * bug #13093 [TwigBundle] added missing absolute URL in Twig exceptions (fabpot)
+ * bug #12975 [FrameworkBundle] Allow custom services for validator mapping cache. (jakzal)
+ * bug #13075 [Config] fix error handler restoration in test (nicolas-grekas)
+ * bug #13085 [FrameworkBundle] Fix dependency on ExtensionInterface over implementation (xphere)
+ * bug #13081 [FrameworkBundle] forward error reporting level to insulated Client (nicolas-grekas)
+ * bug #13053 [FrameworkBundle] Fixed Translation loader and update translation command. (saro0h)
+ * bug #13048 [Security] Delete old session on auth strategy migrate (xelaris)
+ * bug #12999 [FrameworkBundle] fix cache:clear command (nicolas-grekas)
+ * bug #13004 add a limit and a test to FlattenExceptionTest. (Daniel Wehner)
+ * bug #12961 fix session restart on PHP 5.3 (Tobion)
+ * bug #12548 [Form] fixed a maxlength overring on a guessing (origaminal)
+ * bug #12761 [Filesystem] symlink use RealPath instead LinkTarget (aitboudad)
+ * bug #12848 [EventDispatcher] Fixed #12845 adding a listener to an event that is currently being dispatched (Pieter Jordaan)
+ * bug #12855 [DependencyInjection] Perf php dumper (nicolas-grekas)
+ * bug #12894 [FrameworkBundle][Template name] avoid  error message for the shortcut n... (aitboudad)
+ * bug #12806 [Console] Removed the use of $this->getHelperSet() as it is null by default (saro0h)
+ * bug #12858 [ClassLoader] Fix undefined index in ClassCollectionLoader (szicsu)
+
 * 2.5.8 (2014-12-03)
 
  * bug #12811 Configure firewall's kernel exception listener with configured entry point or a default entry point (rjkip)

@@ -40,7 +40,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
     public function testSessionIsMigrated()
     {
         if (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50411) {
-            $this->markTestSkipped('We must not destroy the old session on php 5.4.0 - 5.4.10.');
+            $this->markTestSkipped('We cannot destroy the old session on PHP 5.4.0 - 5.4.10.');
         }
 
         $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
@@ -53,7 +53,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
     public function testSessionIsMigratedWithPhp54Workaround()
     {
         if (PHP_VERSION_ID < 50400 || PHP_VERSION_ID >= 50411) {
-            $this->markTestSkipped('This php version is not affected.');
+            $this->markTestSkipped('This PHP version is not affected.');
         }
 
         $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');

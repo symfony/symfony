@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-03T13:27:43Z
+
+I'm sure that not everyone agrees, but can you add a test for this maybe? Other than that :+1:
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-03T23:26:31Z
+
+@iltar Tests are added
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-04T03:47:30Z
+
+Just noticed that the added tests wont work when merged into master, due to #12457. It must be probably fixed like #13217. What is the right workflow to handle this? Should I change this PR to include the changes made in #13217 or should this change be merged up to master first (providing that this PR is accepted for 2.6) and should a new PR be created to fix it then?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-04T09:24:39Z
+
+You can already make the tests forward compatible by making a controller that extends the base controller and test that one. What you then could do is just call the protected methods as in any case.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-04T09:49:05Z
+
+Thanks @iltar. I have updated the tests. They should be compatible with master now.

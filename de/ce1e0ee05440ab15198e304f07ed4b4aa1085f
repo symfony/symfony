@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T11:00:06Z
+
+Regarding the remaining violations, I think ``Symfony\Component\Validator\ConstraintValidator::buildViolation`` should not trigger a violation. The goal of this method is to make it easy to support both validation APIs in validators (avoiding duplication), so we are not planning to drop its usage in 2.7. Btw, this method could be kept in 3.0 without much harm (as a direct proxy to the similar method in the new execution context)
+
+Should legacy deprecation warnings be reported at all ? We expect to call deprecated APIs in this case. And your handler does not seem to check whether the error reporting level is asking to ignore them or no. I think most of the legacy tests are explicitly ignoring deprecations
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T11:26:45Z
+
+Updated: I now use the color support detection from phpunit (but not the command line argument, I don't want to dig too deep into the source code to find how).
+I also reduced the size of the summary for legacy tests (but it's too early to remove it now imo).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T11:44:32Z
+
+@nicolas-grekas can you make sure that all legacy tests being reported are only the legacy tests which don't have the ``iniSet`` ? I'm not sure about it
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T12:08:31Z
+
+@stof I don't check if iniSet has been called or not but I'll do it now, thanks for the reminder :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T14:35:11Z
+
+I think you need to add a ``error_reporting() & E_USER_DEPRECATED`` check in the condition deciding to handle the error or to forward to the next handler
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T17:39:44Z
+
+Ready: I check `error_reporting() & E_USER_DEPRECATED` but only for legacy tests
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-07T09:58:35Z
+
+@nicolas-grekas why ? If the error_reporting asks to ignore them (or if they are silenced by ``@``), the error handler should respect it IMO
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-07T10:02:20Z
+
+That's not because you use a deprecated method but `@-silenced` it that you should not see the notice inviting you to update your code. This is how the Debug\ErrorHandler works btw: `error_reporting()` is ignored for deprecated notices and they are always logged. And this is a Good Thing (c)

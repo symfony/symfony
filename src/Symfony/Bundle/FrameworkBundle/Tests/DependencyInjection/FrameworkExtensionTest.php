@@ -238,7 +238,7 @@ abstract class FrameworkExtensionTest extends TestCase
         }
 
         $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
-        $ref = new \ReflectionClass('Symfony\Component\Validator\Validator');
+        $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
             strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,
@@ -250,7 +250,7 @@ abstract class FrameworkExtensionTest extends TestCase
             $files,
             '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass('Symfony\Component\Security\Core\SecurityContext');
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
         $this->assertContains(
             strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
             $files,

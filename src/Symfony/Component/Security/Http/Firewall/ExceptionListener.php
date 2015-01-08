@@ -16,6 +16,7 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -39,7 +40,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ExceptionListener
 {
-    private $context;
+    private $tokenStorage;
     private $providerKey;
     private $accessDeniedHandler;
     private $authenticationEntryPoint;
@@ -48,9 +49,14 @@ class ExceptionListener
     private $logger;
     private $httpUtils;
 
-    public function __construct(SecurityContextInterface $context, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
+    /**
+     * @param SecurityContextInterface|TokenStorageInterface
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     */
+    public function __construct($tokenStorage, AuthenticationTrustResolverInterface $trustResolver, HttpUtils $httpUtils, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null, LoggerInterface $logger = null)
     {
-        $this->context = $context;
+        $this->tokenStorage = $tokenStorage;
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->httpUtils = $httpUtils;
         $this->providerKey = $providerKey;
@@ -116,7 +122,7 @@ class ExceptionListener
     {
         $event->setException(new AccessDeniedHttpException($exception->getMessage(), $exception));
 
-        $token = $this->context->getToken();
+        $token = $this->tokenStorage->getToken();
         if (!$this->authenticationTrustResolver->isFullFledged($token)) {
             if (null !== $this->logger) {
                 $this->logger->debug(sprintf('Access is denied (user is not fully authenticated) by "%s" at line %s; redirecting to authentication entry point', $exception->getFile(), $exception->getLine()));
@@ -189,7 +195,7 @@ class ExceptionListener
 
         if ($authException instanceof AccountStatusException) {
             // remove the security token to prevent infinite redirect loops
-            $this->context->setToken(null);
+            $this->tokenStorage->setToken(null);
         }
 
         return $this->authenticationEntryPoint->start($request, $authException);

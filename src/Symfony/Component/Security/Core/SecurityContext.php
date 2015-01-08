@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core;
 
+trigger_error('The '.__NAMESPACE__.'\SecurityContext class is deprecated since version 2.6 and will be removed in 3.0. Use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage or Symfony\Component\Security\Core\Authorization\AuthorizationChecker instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -76,8 +78,6 @@ class SecurityContext implements SecurityContextInterface
      */
     public function getToken()
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::getToken() method instead.', E_USER_DEPRECATED);
-
         return $this->tokenStorage->getToken();
     }
 
@@ -88,8 +88,6 @@ class SecurityContext implements SecurityContextInterface
      */
     public function setToken(TokenInterface $token = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage::setToken() method instead.', E_USER_DEPRECATED);
-
         return $this->tokenStorage->setToken($token);
     }
 
@@ -100,8 +98,6 @@ class SecurityContext implements SecurityContextInterface
      */
     public function isGranted($attributes, $object = null)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::isGranted() method instead.', E_USER_DEPRECATED);
-
         return $this->authorizationChecker->isGranted($attributes, $object);
     }
 }

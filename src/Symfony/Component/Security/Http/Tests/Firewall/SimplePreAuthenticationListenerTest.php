@@ -24,12 +24,12 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     private $event;
     private $logger;
     private $request;
-    private $securityContext;
+    private $tokenStorage;
     private $token;
 
     public function testHandle()
     {
-        $this->securityContext
+        $this->tokenStorage
             ->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo($this->token))
@@ -58,7 +58,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(SecurityEvents::INTERACTIVE_LOGIN), $this->equalTo($loginEvent))
         ;
 
-        $listener = new SimplePreAuthenticationListener($this->securityContext, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
+        $listener = new SimplePreAuthenticationListener($this->tokenStorage, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
 
         $listener->handle($this->event);
     }
@@ -74,7 +74,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($exception))
         ;
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo(null))
         ;
@@ -87,7 +87,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->token))
         ;
 
-        $listener = new SimplePreAuthenticationListener($this->securityContext, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
+        $listener = new SimplePreAuthenticationListener($this->tokenStorage, $this->authenticationManager, 'secured_area', $simpleAuthenticator, $this->logger, $this->dispatcher);
 
         $listener->handle($this->event);
     }
@@ -111,12 +111,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
-
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-
+        $this->tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
     }
 
@@ -127,7 +122,7 @@ class SimplePreAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $this->event = null;
         $this->logger = null;
         $this->request = null;
-        $this->securityContext = null;
+        $this->tokenStorage = null;
         $this->token = null;
     }
 }

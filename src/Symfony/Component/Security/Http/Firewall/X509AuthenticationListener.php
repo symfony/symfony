@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -28,9 +29,14 @@ class X509AuthenticationListener extends AbstractPreAuthenticatedListener
     private $userKey;
     private $credentialKey;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    /**
+     * @param SecurityContextInterface|TokenStorageInterface
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     */
+    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'SSL_CLIENT_S_DN_Email', $credentialKey = 'SSL_CLIENT_S_DN', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
-        parent::__construct($securityContext, $authenticationManager, $providerKey, $logger, $dispatcher);
+        parent::__construct($tokenStorage, $authenticationManager, $providerKey, $logger, $dispatcher);
 
         $this->userKey = $userKey;
         $this->credentialKey = $credentialKey;

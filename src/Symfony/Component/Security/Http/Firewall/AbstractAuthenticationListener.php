@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\SessionUnavailableException;
@@ -56,7 +57,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     protected $providerKey;
     protected $httpUtils;
 
-    private $securityContext;
+    private $tokenStorage;
     private $sessionStrategy;
     private $dispatcher;
     private $successHandler;
@@ -66,27 +67,29 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface               $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
-     * @param SessionAuthenticationStrategyInterface $sessionStrategy
-     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
-     * @param string                                 $providerKey
-     * @param AuthenticationSuccessHandlerInterface  $successHandler
-     * @param AuthenticationFailureHandlerInterface  $failureHandler
-     * @param array                                  $options               An array of options for the processing of a
-     *                                                                      successful, or failed authentication attempt
-     * @param LoggerInterface                        $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
+     * @param SecurityContextInterface|TokenStorageInterface $tokenStorage          A SecurityContext or a TokenStorageInterface instance
+     * @param AuthenticationManagerInterface                 $authenticationManager An AuthenticationManagerInterface instance
+     * @param SessionAuthenticationStrategyInterface         $sessionStrategy
+     * @param HttpUtils                                      $httpUtils             An HttpUtilsInterface instance
+     * @param string                                         $providerKey
+     * @param AuthenticationSuccessHandlerInterface          $successHandler
+     * @param AuthenticationFailureHandlerInterface          $failureHandler
+     * @param array                                          $options               An array of options for the processing of a
+     *                                                                              successful, or failed authentication attempt
+     * @param LoggerInterface                                $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface                       $dispatcher            An EventDispatcherInterface instance
      *
      * @throws \InvalidArgumentException
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->sessionStrategy = $sessionStrategy;
         $this->providerKey = $providerKey;
@@ -196,9 +199,9 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
-            $this->securityContext->setToken(null);
+            $this->tokenStorage->setToken(null);
         }
 
         $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
@@ -216,7 +219,7 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
         }
 
-        $this->securityContext->setToken($token);
+        $this->tokenStorage->setToken($token);
 
         $session = $request->getSession();
         $session->remove(Security::AUTHENTICATION_ERROR);

@@ -14,6 +14,7 @@ namespace Symfony\Component\Security\Core\Validator\Constraints;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -21,12 +22,17 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UserPasswordValidator extends ConstraintValidator
 {
-    private $securityContext;
+    private $tokenStorage;
     private $encoderFactory;
 
-    public function __construct(SecurityContextInterface $securityContext, EncoderFactoryInterface $encoderFactory)
+    /**
+     * @param SecurityContextInterface|TokenStorageInterface
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     */
+    public function __construct($tokenStorage, EncoderFactoryInterface $encoderFactory)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->encoderFactory = $encoderFactory;
     }
 
@@ -39,7 +45,7 @@ class UserPasswordValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');
         }
 
-        $user = $this->securityContext->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
             throw new ConstraintDefinitionException('The User object must implement the UserInterface interface.');

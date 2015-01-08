@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -32,14 +33,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContextListener implements ListenerInterface
 {
-    private $context;
+    private $tokenStorage;
     private $contextKey;
     private $logger;
     private $userProviders;
     private $dispatcher;
     private $registered;
 
-    public function __construct(SecurityContextInterface $context, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    /**
+     * @param SecurityContextInterface|TokenStorageInterface
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     */
+    public function __construct($tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -51,7 +57,7 @@ class ContextListener implements ListenerInterface
             }
         }
 
-        $this->context = $context;
+        $this->tokenStorage = $tokenStorage;
         $this->userProviders = $userProviders;
         $this->contextKey = $contextKey;
         $this->logger = $logger;
@@ -74,7 +80,7 @@ class ContextListener implements ListenerInterface
         $session = $request->hasPreviousSession() ? $request->getSession() : null;
 
         if (null === $session || null === $token = $session->get('_security_'.$this->contextKey)) {
-            $this->context->setToken(null);
+            $this->tokenStorage->setToken(null);
 
             return;
         }
@@ -95,7 +101,7 @@ class ContextListener implements ListenerInterface
             $token = null;
         }
 
-        $this->context->setToken($token);
+        $this->tokenStorage->setToken($token);
     }
 
     /**
@@ -124,7 +130,7 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        if ((null === $token = $this->context->getToken()) || ($token instanceof AnonymousToken)) {
+        if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
             if ($request->hasPreviousSession()) {
                 $session->remove('_security_'.$this->contextKey);
             }

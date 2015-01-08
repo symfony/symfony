@@ -23,6 +23,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\SimpleFormAuthenticatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\HttpUtils;
@@ -40,24 +41,26 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface               $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
-     * @param SessionAuthenticationStrategyInterface $sessionStrategy
-     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
-     * @param string                                 $providerKey
-     * @param AuthenticationSuccessHandlerInterface  $successHandler
-     * @param AuthenticationFailureHandlerInterface  $failureHandler
-     * @param array                                  $options               An array of options for the processing of a
-     *                                                                      successful, or failed authentication attempt
-     * @param LoggerInterface                        $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
-     * @param CsrfTokenManagerInterface              $csrfTokenManager      A CsrfTokenManagerInterface instance
-     * @param SimpleFormAuthenticatorInterface       $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
+     * @param SecurityContextInterface|TokenStorageInterface  $tokenStorage          A SecurityContext or TokenStorageInterface instance
+     * @param AuthenticationManagerInterface                  $authenticationManager An AuthenticationManagerInterface instance
+     * @param SessionAuthenticationStrategyInterface          $sessionStrategy
+     * @param HttpUtils                                       $httpUtils             An HttpUtilsInterface instance
+     * @param string                                          $providerKey
+     * @param AuthenticationSuccessHandlerInterface           $successHandler
+     * @param AuthenticationFailureHandlerInterface           $failureHandler
+     * @param array                                           $options               An array of options for the processing of a
+     *                                                                               successful, or failed authentication attempt
+     * @param LoggerInterface                                 $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface                        $dispatcher            An EventDispatcherInterface instance
+     * @param CsrfTokenManagerInterface                       $csrfTokenManager      A CsrfTokenManagerInterface instance
+     * @param SimpleFormAuthenticatorInterface                $simpleAuthenticator   A SimpleFormAuthenticatorInterface instance
      *
      * @throws \InvalidArgumentException In case no simple authenticator is provided
      * @throws InvalidArgumentException  In case an invalid CSRF token manager is passed
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
+    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $csrfTokenManager = null, SimpleFormAuthenticatorInterface $simpleAuthenticator = null)
     {
         if (!$simpleAuthenticator) {
             throw new \InvalidArgumentException('Missing simple authenticator');
@@ -79,7 +82,8 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
             'intention' => 'authenticate',
             'post_only' => true,
         ), $options);
-        parent::__construct($securityContext, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, $options, $logger, $dispatcher);
+
+        parent::__construct($tokenStorage, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, $options, $logger, $dispatcher);
     }
 
     /**

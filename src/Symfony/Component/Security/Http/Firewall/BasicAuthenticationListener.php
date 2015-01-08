@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -26,20 +27,25 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class BasicAuthenticationListener implements ListenerInterface
 {
-    private $securityContext;
+    private $tokenStorage;
     private $authenticationManager;
     private $providerKey;
     private $authenticationEntryPoint;
     private $logger;
     private $ignoreFailure;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
+    /**
+     * @param SecurityContextInterface|TokenStorageInterface
+     *
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     */
+    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationEntryPointInterface $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
@@ -60,7 +66,7 @@ class BasicAuthenticationListener implements ListenerInterface
             return;
         }
 
-        if (null !== $token = $this->securityContext->getToken()) {
+        if (null !== $token = $this->tokenStorage->getToken()) {
             if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $username) {
                 return;
             }
@@ -72,11 +78,11 @@ class BasicAuthenticationListener implements ListenerInterface
 
         try {
             $token = $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $request->headers->get('PHP_AUTH_PW'), $this->providerKey));
-            $this->securityContext->setToken($token);
+            $this->tokenStorage->setToken($token);
         } catch (AuthenticationException $failed) {
-            $token = $this->securityContext->getToken();
+            $token = $this->tokenStorage->getToken();
             if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
-                $this->securityContext->setToken(null);
+                $this->tokenStorage->setToken(null);
             }
 
             if (null !== $this->logger) {

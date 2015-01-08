@@ -14,29 +14,30 @@ namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * SecurityHelper provides read-only access to the security context.
+ * SecurityHelper provides read-only access to the security checker.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SecurityHelper extends Helper
 {
-    private $context;
+    private $securityChecker;
 
     /**
-     * Constructor.
+     * @param SecurityContextInterface|AuthorizationCheckerInterface
      *
-     * @param SecurityContextInterface $context A SecurityContext instance
+     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
      */
-    public function __construct(SecurityContextInterface $context = null)
+    public function __construct($securityChecker = null)
     {
-        $this->context = $context;
+        $this->securityChecker = $securityChecker;
     }
 
     public function isGranted($role, $object = null, $field = null)
     {
-        if (null === $this->context) {
+        if (null === $this->securityChecker) {
             return false;
         }
 
@@ -44,7 +45,7 @@ class SecurityHelper extends Helper
             $object = new FieldVote($object, $field);
         }
 
-        return $this->context->isGranted($role, $object);
+        return $this->securityChecker->isGranted($role, $object);
     }
 
     /**

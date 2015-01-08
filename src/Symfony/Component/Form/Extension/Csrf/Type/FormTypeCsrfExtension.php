@@ -133,7 +133,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             }
 
             return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
-                ? $options['csrf_provider']->getTokenManager()
+                ? $options['csrf_provider']->getTokenManager(false)
                 : new CsrfProviderAdapter($options['csrf_provider']);
         };
 

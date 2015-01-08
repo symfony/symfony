@@ -11,7 +11,7 @@
 
         <service id="form.type_extension.csrf" class="Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension">
             <tag name="form.type_extension" alias="form" />
-            <argument type="service" id="form.csrf_provider" />
+            <argument type="service" id="security.csrf.token_manager" />
             <argument>%form.type_extension.csrf.enabled%</argument>
             <argument>%form.type_extension.csrf.field_name%</argument>
             <argument type="service" id="translator.default" />

@@ -16,9 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
@@ -123,10 +123,10 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->createEvent($exception);
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context->expects($this->once())->method('getToken')->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')));
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage->expects($this->once())->method('getToken')->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')));
 
-        $listener = $this->createExceptionListener($context, $this->createTrustResolver(false), null, $this->createEntryPoint());
+        $listener = $this->createExceptionListener($tokenStorage, $this->createTrustResolver(false), null, $this->createEntryPoint());
         $listener->onKernelException($event);
 
         $this->assertEquals('OK', $event->getResponse()->getContent());
@@ -169,10 +169,10 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         return new GetResponseForExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::MASTER_REQUEST, $exception);
     }
 
-    private function createExceptionListener(SecurityContextInterface $context = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
+    private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $context ? $context : $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
+            $tokenStorage ? $tokenStorage : $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
             $trustResolver ? $trustResolver : $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'),
             $httpUtils ? $httpUtils : $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
             'key',

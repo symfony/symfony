@@ -19,7 +19,7 @@
     <services>
         <service id="security.authentication.listener.rememberme" class="%security.authentication.listener.rememberme.class%" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.rememberme" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="logger" on-invalid="null" />

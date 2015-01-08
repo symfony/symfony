@@ -205,6 +205,7 @@ class FrameworkExtension extends Extension
             if (null !== $config['form']['csrf_protection']['field_name']) {
                 $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
             } else {
+                trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
                 $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
             }
         } else {
@@ -299,7 +300,7 @@ class FrameworkExtension extends Extension
             'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
             'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
         );
-        list($class,) = explode(':', $config['dsn'], 2);
+        list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }

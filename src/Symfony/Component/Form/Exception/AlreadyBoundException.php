@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-trigger_error('The '.__NAMESPACE__.'\AlreadyBoundException class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Exception\AlreadySubmittedException class instead.', E_USER_DEPRECATED);
-
 /**
  * Alias of {@link AlreadySubmittedException}.
  *
@@ -21,4 +19,12 @@ trigger_error('The '.__NAMESPACE__.'\AlreadyBoundException class is deprecated s
  */
 class AlreadyBoundException extends LogicException
 {
+    public function __construct($message = '', $code = 0, \Exception $previous = null)
+    {
+        if (__CLASS__ === get_class($this)) {
+            trigger_error('The '.__CLASS__.' class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Form\Exception\AlreadySubmittedException class instead.', E_USER_DEPRECATED);
+        }
+
+        parent::__construct($message, $code, $previous);
+    }
 }

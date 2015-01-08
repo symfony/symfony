@@ -294,12 +294,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
         $this->assertSame('setApiVersion', $calls[6][0]);
-
-        if (PHP_VERSION_ID < 50309) {
-            $this->assertEquals(array(Validation::API_VERSION_2_4), $calls[6][1]);
-        } else {
-            $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
-        }
+        $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
     }
 
     public function testFullyConfiguredValidationService()

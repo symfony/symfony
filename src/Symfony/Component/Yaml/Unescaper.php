@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Yaml;
 
-use Symfony\Component\Yaml\Deprecated\Unescaper as Deprecated;
-
 /**
  * Unescaper encapsulates unescaping rules for single and double-quoted
  * YAML strings.
@@ -26,8 +24,9 @@ class Unescaper
      * must be converted to that encoding.
      *
      * @deprecated since version 2.5, to be removed in 3.0
+     * @internal
      */
-    const ENCODING = Deprecated::ENCODING;
+    const ENCODING = 'UTF-8';
 
     /**
      * Regex fragment that matches an escaped character in a double quoted string.

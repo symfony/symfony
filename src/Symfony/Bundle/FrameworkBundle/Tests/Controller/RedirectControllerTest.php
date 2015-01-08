@@ -51,7 +51,7 @@ class RedirectControllerTest extends TestCase
         $request = new Request();
 
         $route = 'new-route';
-        $url   = '/redirect-url';
+        $url = '/redirect-url';
 
         $attributes = array(
             'route' => $route,
@@ -103,8 +103,8 @@ class RedirectControllerTest extends TestCase
 
     public function testRedirectWithQueryParams()
     {
-        $host        = 'www.example.com';
-        $path        = '/redirect-path';
+        $host = 'www.example.com';
+        $path = '/redirect-path';
         $queryString = 'query-parameter=value&query-flag';
         $expectedUrl = "http://$host$path?$queryString";
 

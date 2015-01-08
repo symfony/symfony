@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Psr\Log\LoggerInterface;
@@ -38,12 +37,7 @@ class DigestAuthenticationListener implements ListenerInterface
     private $authenticationEntryPoint;
     private $logger;
 
-    /**
-     * @param SecurityContextInterface|TokenStorageInterface
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
-     */
-    public function __construct($tokenStorage, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');

@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -43,15 +42,13 @@ class LogoutListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface|TokenStorageInterface $tokenStorage
-     * @param HttpUtils                                      $httpUtils        An HttpUtilsInterface instance
-     * @param LogoutSuccessHandlerInterface                  $successHandler   A LogoutSuccessHandlerInterface instance
-     * @param array                                          $options          An array of options to process a logout attempt
-     * @param CsrfTokenManagerInterface                      $csrfTokenManager A CsrfTokenManagerInterface instance
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     * @param TokenStorageInterface         $tokenStorage
+     * @param HttpUtils                     $httpUtils        An HttpUtilsInterface instance
+     * @param LogoutSuccessHandlerInterface $successHandler   A LogoutSuccessHandlerInterface instance
+     * @param array                         $options          An array of options to process a logout attempt
+     * @param CsrfTokenManagerInterface     $csrfTokenManager A CsrfTokenManagerInterface instance
      */
-    public function __construct($tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), $csrfTokenManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage, HttpUtils $httpUtils, LogoutSuccessHandlerInterface $successHandler, array $options = array(), $csrfTokenManager = null)
     {
         if ($csrfTokenManager instanceof CsrfProviderInterface) {
             $csrfTokenManager = new CsrfProviderAdapter($csrfTokenManager);

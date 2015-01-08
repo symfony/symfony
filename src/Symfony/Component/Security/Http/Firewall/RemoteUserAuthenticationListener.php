@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Psr\Log\LoggerInterface;
@@ -29,12 +28,7 @@ class RemoteUserAuthenticationListener extends AbstractPreAuthenticatedListener
 {
     private $userKey;
 
-    /**
-     * @param SecurityContextInterface|TokenStorageInterface
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
-     */
-    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'REMOTE_USER', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, $userKey = 'REMOTE_USER', LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         parent::__construct($tokenStorage, $authenticationManager, $providerKey, $logger, $dispatcher);
 

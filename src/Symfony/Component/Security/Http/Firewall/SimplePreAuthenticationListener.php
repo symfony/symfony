@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -43,16 +42,14 @@ class SimplePreAuthenticationListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface|TokenStorageInterface $tokenStorage          A SecurityContext or TokenStorageInterface instance
-     * @param AuthenticationManagerInterface                 $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                                         $providerKey
-     * @param SimplePreAuthenticatorInterface                $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface                                $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface                       $dispatcher            An EventDispatcherInterface instance
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     * @param TokenStorageInterface           $tokenStorage          A TokenStorageInterface instance
+     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                          $providerKey
+     * @param SimplePreAuthenticatorInterface $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
+     * @param LoggerInterface                 $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface        $dispatcher            An EventDispatcherInterface instance
      */
-    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');

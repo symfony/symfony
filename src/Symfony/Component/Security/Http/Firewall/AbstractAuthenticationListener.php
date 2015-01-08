@@ -16,7 +16,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -67,23 +66,21 @@ abstract class AbstractAuthenticationListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface|TokenStorageInterface $tokenStorage          A SecurityContext or a TokenStorageInterface instance
-     * @param AuthenticationManagerInterface                 $authenticationManager An AuthenticationManagerInterface instance
-     * @param SessionAuthenticationStrategyInterface         $sessionStrategy
-     * @param HttpUtils                                      $httpUtils             An HttpUtilsInterface instance
-     * @param string                                         $providerKey
-     * @param AuthenticationSuccessHandlerInterface          $successHandler
-     * @param AuthenticationFailureHandlerInterface          $failureHandler
-     * @param array                                          $options               An array of options for the processing of a
-     *                                                                              successful, or failed authentication attempt
-     * @param LoggerInterface                                $logger                A LoggerInterface instance
-     * @param EventDispatcherInterface                       $dispatcher            An EventDispatcherInterface instance
+     * @param TokenStorageInterface                  $tokenStorage          A TokenStorageInterface instance
+     * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
+     * @param SessionAuthenticationStrategyInterface $sessionStrategy
+     * @param HttpUtils                              $httpUtils             An HttpUtilsInterface instance
+     * @param string                                 $providerKey
+     * @param AuthenticationSuccessHandlerInterface  $successHandler
+     * @param AuthenticationFailureHandlerInterface  $failureHandler
+     * @param array                                  $options               An array of options for the processing of a
+     *                                                                      successful, or failed authentication attempt
+     * @param LoggerInterface                        $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface               $dispatcher            An EventDispatcherInterface instance
      *
      * @throws \InvalidArgumentException
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
      */
-    public function __construct($tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');

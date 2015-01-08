@@ -16,7 +16,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -39,16 +38,14 @@ class RememberMeListener implements ListenerInterface
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface|TokenStorageInterface $tokenStorage
-     * @param RememberMeServicesInterface                    $rememberMeServices
-     * @param AuthenticationManagerInterface                 $authenticationManager
-     * @param LoggerInterface                                $logger
-     * @param EventDispatcherInterface                       $dispatcher
-     * @param bool                                           $catchExceptions
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
+     * @param TokenStorageInterface          $tokenStorage
+     * @param RememberMeServicesInterface    $rememberMeServices
+     * @param AuthenticationManagerInterface $authenticationManager
+     * @param LoggerInterface                $logger
+     * @param EventDispatcherInterface       $dispatcher
+     * @param bool                           $catchExceptions
      */
-    public function __construct($tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true)
+    public function __construct(TokenStorageInterface $tokenStorage, RememberMeServicesInterface $rememberMeServices, AuthenticationManagerInterface $authenticationManager, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, $catchExceptions = true)
     {
         $this->tokenStorage = $tokenStorage;
         $this->rememberMeServices = $rememberMeServices;

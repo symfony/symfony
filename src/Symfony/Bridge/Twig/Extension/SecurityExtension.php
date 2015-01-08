@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -24,12 +23,7 @@ class SecurityExtension extends \Twig_Extension
 {
     private $securityChecker;
 
-    /**
-     * @param SecurityContextInterface|AuthorizationCheckerInterface
-     *
-     * Passing a SecurityContextInterface as a first argument was deprecated in 2.7 and will be removed in 3.0
-     */
-    public function __construct($securityChecker = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
     {
         $this->securityChecker = $securityChecker;
     }

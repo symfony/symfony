@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Prazna datoteka ni dovoljena.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Gostitelja ni bilo mogoče prepoznati.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

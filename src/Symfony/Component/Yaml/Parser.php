@@ -586,7 +586,7 @@ class Parser
 
         // strip YAML header
         $count = 0;
-        $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#su', '', $value, -1, $count);
+        $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#u', '', $value, -1, $count);
         $this->offset += $count;
 
         // remove leading comments

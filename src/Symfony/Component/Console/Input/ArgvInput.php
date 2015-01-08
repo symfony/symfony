@@ -309,9 +309,11 @@ class ArgvInput extends Input
     public function getParameterOption($values, $default = false)
     {
         $values = (array) $values;
-
         $tokens = $this->tokens;
-        while ($token = array_shift($tokens)) {
+
+        while (0 < count($tokens)) {
+            $token = array_shift($tokens);
+
             foreach ($values as $value) {
                 if ($token === $value || 0 === strpos($token, $value.'=')) {
                     if (false !== $pos = strpos($token, '=')) {

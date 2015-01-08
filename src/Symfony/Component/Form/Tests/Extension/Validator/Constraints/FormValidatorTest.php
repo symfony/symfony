@@ -575,7 +575,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->add($this->getBuilder('child'))
             ->getForm();
 
-        $form->bind(array('foo' => 'bar'));
+        $form->submit(array('foo' => 'bar'));
 
         $context->expects($this->never())
             ->method('addViolation');

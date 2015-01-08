@@ -139,6 +139,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray()
     {
@@ -147,6 +148,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     public function testGetValueThrowsExceptionIfNull()
     {
@@ -155,10 +157,20 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     public function testGetValueThrowsExceptionIfEmpty()
     {
         $this->propertyAccessor->getValue('', 'foobar');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
+     */
+    public function testGetValueNestedExceptionMessage()
+    {
+        $this->propertyAccessor->getValue((object) array('foobar' => null), 'foobar.baz');
     }
 
     /**
@@ -249,6 +261,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     public function testSetValueThrowsExceptionIfNotObjectOrArray()
     {
@@ -259,6 +272,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
      */
     public function testSetValueThrowsExceptionIfNull()
     {
@@ -269,12 +283,24 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
      */
     public function testSetValueThrowsExceptionIfEmpty()
     {
         $value = '';
 
         $this->propertyAccessor->setValue($value, 'foobar', 'bam');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
+     */
+    public function testSetValueNestedExceptionMessage()
+    {
+        $value = (object) array('foobar' => null);
+
+        $this->propertyAccessor->setValue($value, 'foobar.baz', 'bam');
     }
 
     public function testGetValueWhenArrayValueIsNull()

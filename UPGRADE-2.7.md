@@ -83,3 +83,25 @@ Serializer
    $nameConverter = new CamelCaseToSnakeCaseNameConverter(array('fooBar', 'barFoo'));
    $normalizer = new GetSetMethodNormalizer(null, $nameConverter);
    ```
+
+PropertyAccess
+--------------
+
+ * `UnexpectedTypeException` now expects three constructor arguments: The invalid property value,
+   the `PropertyPathInterface` object and the current index of the property path.
+
+   Before:
+
+   ```php
+        use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+
+        new UnexpectedTypeException($value, $expectedType);
+   ```
+
+   After:
+
+   ```php
+        use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+
+        new UnexpectedTypeException($value, $path, $pathIndex);
+   ```

@@ -52,7 +52,6 @@ class RedirectControllerTest extends TestCase
 
         $route = 'new-route';
         $url = '/redirect-url';
-
         $attributes = array(
             'route' => $route,
             'permanent' => $permanent,

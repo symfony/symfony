@@ -19,15 +19,6 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 /**
  * A validator that supports both the API of Symfony < 2.5 and Symfony 2.5+.
  *
- * This class is incompatible with PHP versions < 5.3.9, because it implements
- * two different interfaces specifying the same method validate():
- *
- *   - {@link \Symfony\Component\Validator\ValidatorInterface}
- *   - {@link \Symfony\Component\Validator\Validator\ValidatorInterface}
- *
- * In PHP versions prior to 5.3.9, either use {@link RecursiveValidator} or the
- * deprecated class {@link \Symfony\Component\Validator\Validator} instead.
- *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *

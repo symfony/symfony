@@ -744,19 +744,13 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
 
-        switch ($config['api']) {
-            case '2.4':
-                $api = Validation::API_VERSION_2_4;
-                break;
-            case '2.5':
-                $api = Validation::API_VERSION_2_5;
-                // the validation class needs to be changed only for the 2.5 api since the deprecated interface is
-                // set as the default interface
-                $container->setParameter('validator.class', 'Symfony\Component\Validator\Validator\ValidatorInterface');
-                break;
-            default:
-                $api = Validation::API_VERSION_2_5_BC;
-                break;
+        if ('2.5' === $config['api']) {
+            $api = Validation::API_VERSION_2_5;
+        } else {
+            // 2.4 is now the same as 2.5 BC
+            $api = Validation::API_VERSION_2_5_BC;
+            // the validation class needs to be changed for BC
+            $container->setParameter('validator.class', 'Symfony\Component\Validator\ValidatorInterface');
         }
 
         $validatorBuilder->addMethodCall('setApiVersion', array($api));

@@ -224,14 +224,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -261,14 +259,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -298,13 +294,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 

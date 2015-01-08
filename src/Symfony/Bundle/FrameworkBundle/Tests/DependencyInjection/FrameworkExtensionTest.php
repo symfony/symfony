@@ -382,22 +382,6 @@ abstract class FrameworkExtensionTest extends TestCase
         // no cache, no annotations, no static methods
     }
 
-    public function testValidation2Dot4Api()
-    {
-        $container = $this->createContainerFromFile('validation_2_4_api');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $this->assertCount(6, $calls);
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setApiVersion', $calls[5][0]);
-        $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
-        $this->assertSame('Symfony\Component\Validator\ValidatorInterface', $container->getParameter('validator.class'));
-        // no cache, no annotations
-    }
-
     public function testValidation2Dot5Api()
     {
         $container = $this->createContainerFromFile('validation_2_5_api');
@@ -443,11 +427,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setApiVersion', $calls[5][0]);
         // no cache, no annotations
 
-        if (PHP_VERSION_ID < 50309) {
-            $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
-        } else {
-            $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
-        }
+        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
     }
 
     /**
@@ -467,11 +447,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('setApiVersion', $calls[5][0]);
         // no cache, no annotations
 
-        if (PHP_VERSION_ID < 50309) {
-            $this->assertSame(array(Validation::API_VERSION_2_4), $calls[5][1]);
-        } else {
-            $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
-        }
+        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
     }
 
     public function testFormsCanBeEnabledWithoutCsrfProtection()

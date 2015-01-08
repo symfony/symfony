@@ -34,7 +34,6 @@ use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
-use Symfony\Component\Validator\Validator as ValidatorV24;
 
 /**
  * The default implementation of {@link ValidatorBuilderInterface}.
@@ -332,15 +331,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             ));
         }
 
-        if (PHP_VERSION_ID < 50309 && $apiVersion === Validation::API_VERSION_2_5_BC) {
-            throw new InvalidArgumentException(sprintf(
-                'The Validator API that is compatible with both Symfony 2.4 '.
-                'and Symfony 2.5 can only be used on PHP 5.3.9 and higher. '.
-                'Your current PHP version is %s.',
-                PHP_VERSION
-            ));
-        }
-
         $this->apiVersion = $apiVersion;
 
         return $this;
@@ -355,9 +345,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
         $apiVersion = $this->apiVersion;
 
         if (null === $apiVersion) {
-            $apiVersion = PHP_VERSION_ID < 50309
-                ? Validation::API_VERSION_2_4
-                : Validation::API_VERSION_2_5_BC;
+            $apiVersion = Validation::API_VERSION_2_5_BC;
         }
 
         if (!$metadataFactory) {
@@ -408,10 +396,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             // validation messages are pluralized properly even when the default locale gets changed because they are in
             // English.
             $translator->setLocale('en');
-        }
-
-        if (Validation::API_VERSION_2_4 === $apiVersion) {
-            return new ValidatorV24($metadataFactory, $validatorFactory, $translator, $this->translationDomain, $this->initializers);
         }
 
         if (Validation::API_VERSION_2_5 === $apiVersion) {

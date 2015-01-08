@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-08T14:10:56Z
+
+Tests do not pass for lower/higher because SecurityBundle tests need a 2.7 version of `symfony/security`... but the subtree split won't be available before the merge of this PR :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-08T14:11:11Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-08T16:01:36Z
+
+The whole PR should be reviewed again as I've changed much more than before now that all type hints have been changed. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-08T16:13:28Z
+
+:+1:

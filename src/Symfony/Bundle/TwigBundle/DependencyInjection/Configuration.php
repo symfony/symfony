@@ -54,6 +54,8 @@ class Configuration implements ConfigurationInterface
                     return count($v['form']['resources']) > 0;
                 })
                 ->then(function ($v) {
+                    trigger_error('The twig.form.resources configuration key is deprecated since version 2.6 and will be removed in 3.0. Use the twig.form_themes configuration key instead.', E_USER_DEPRECATED);
+
                     $v['form_themes'] = array_values(array_unique(array_merge($v['form']['resources'], $v['form_themes'])));
 
                     return $v;

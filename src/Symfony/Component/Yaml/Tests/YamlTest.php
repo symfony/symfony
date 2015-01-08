@@ -23,7 +23,7 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $parsed);
     }
 
-    public function testParseFromFile()
+    public function testLegacyParseFromFile()
     {
         $filename = __DIR__.'/Fixtures/index.yml';
         $contents = file_get_contents($filename);

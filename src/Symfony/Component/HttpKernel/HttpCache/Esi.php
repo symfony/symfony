@@ -53,7 +53,7 @@ class Esi implements SurrogateInterface
      */
     public function createCacheStrategy()
     {
-        return new EsiResponseCacheStrategy();
+        return new ResponseCacheStrategy();
     }
 
     /**
@@ -65,7 +65,11 @@ class Esi implements SurrogateInterface
      */
     public function hasSurrogateCapability(Request $request)
     {
-        return $this->hasSurrogateEsiCapability($request);
+        if (null === $value = $request->headers->get('Surrogate-Capability')) {
+            return false;
+        }
+
+        return false !== strpos($value, 'ESI/1.0');
     }
 
     /**
@@ -81,11 +85,7 @@ class Esi implements SurrogateInterface
     {
         trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasSurrogateCapability() method instead.', E_USER_DEPRECATED);
 
-        if (null === $value = $request->headers->get('Surrogate-Capability')) {
-            return false;
-        }
-
-        return false !== strpos($value, 'ESI/1.0');
+        return $this->hasSurrogateCapability($request);
     }
 
     /**
@@ -95,7 +95,10 @@ class Esi implements SurrogateInterface
      */
     public function addSurrogateCapability(Request $request)
     {
-        $this->addSurrogateEsiCapability($request);
+        $current = $request->headers->get('Surrogate-Capability');
+        $new = 'symfony2="ESI/1.0"';
+
+        $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
     }
 
     /**
@@ -109,10 +112,7 @@ class Esi implements SurrogateInterface
     {
         trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addSurrogateCapability() method instead.', E_USER_DEPRECATED);
 
-        $current = $request->headers->get('Surrogate-Capability');
-        $new = 'symfony2="ESI/1.0"';
-
-        $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
+        $this->addSurrogateCapability($request);
     }
 
     /**
@@ -138,7 +138,11 @@ class Esi implements SurrogateInterface
      */
     public function needsParsing(Response $response)
     {
-        return $this->needsEsiParsing($response);
+        if (!$control = $response->headers->get('Surrogate-Control')) {
+            return false;
+        }
+
+        return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
     }
 
     /**
@@ -154,11 +158,7 @@ class Esi implements SurrogateInterface
     {
         trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the needsParsing() method instead.', E_USER_DEPRECATED);
 
-        if (!$control = $response->headers->get('Surrogate-Control')) {
-            return false;
-        }
-
-        return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
+        return $this->needsParsing($response);
     }
 
     /**

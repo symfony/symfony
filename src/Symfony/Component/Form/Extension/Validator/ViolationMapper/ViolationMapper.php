@@ -127,8 +127,8 @@ class ViolationMapper implements ViolationMapperInterface
             $scope->addError(new FormError(
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
-                $violation->getMessageParameters(),
-                $violation->getMessagePluralization(),
+                $violation->getParameters(),
+                $violation->getPlural(),
                 $violation
             ));
         }

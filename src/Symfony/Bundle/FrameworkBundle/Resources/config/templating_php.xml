@@ -114,7 +114,7 @@
 
         <service id="templating.form.renderer" class="%templating.form.renderer.class%" public="false">
             <argument type="service" id="templating.form.engine" />
-            <argument type="service" id="form.csrf_provider" on-invalid="null" />
+            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
         </service>
 
         <service id="templating.globals" class="%templating.globals.class%">

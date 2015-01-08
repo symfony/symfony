@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -31,19 +31,19 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class DigestAuthenticationListener implements ListenerInterface
 {
-    private $securityContext;
+    private $tokenStorage;
     private $provider;
     private $providerKey;
     private $authenticationEntryPoint;
     private $logger;
 
-    public function __construct(SecurityContextInterface $securityContext, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, UserProviderInterface $provider, $providerKey, DigestAuthenticationEntryPoint $authenticationEntryPoint, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->provider = $provider;
         $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
@@ -67,7 +67,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
         $digestAuth = new DigestData($header);
 
-        if (null !== $token = $this->securityContext->getToken()) {
+        if (null !== $token = $this->tokenStorage->getToken()) {
             if ($token instanceof UsernamePasswordToken && $token->isAuthenticated() && $token->getUsername() === $digestAuth->getUsername()) {
                 return;
             }
@@ -119,14 +119,14 @@ class DigestAuthenticationListener implements ListenerInterface
             $this->logger->info(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
         }
 
-        $this->securityContext->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
+        $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
     }
 
     private function fail(GetResponseEvent $event, Request $request, AuthenticationException $authException)
     {
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
-            $this->securityContext->setToken(null);
+            $this->tokenStorage->setToken(null);
         }
 
         if (null !== $this->logger) {

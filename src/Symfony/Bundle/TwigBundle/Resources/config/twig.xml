@@ -114,7 +114,7 @@
 
         <service id="twig.form.renderer" class="%twig.form.renderer.class%" public="false">
             <argument type="service" id="twig.form.engine" />
-            <argument type="service" id="form.csrf_provider" on-invalid="null" />
+            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
         </service>
 
         <service id="twig.translation.extractor" class="%twig.translation.extractor.class%">

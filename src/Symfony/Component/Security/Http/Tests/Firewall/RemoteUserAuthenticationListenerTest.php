@@ -24,12 +24,12 @@ class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request(array(), array(), array(), array(), array(), $serverVars);
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
-            $context,
+            $tokenStorage,
             $authenticationManager,
             'TheProviderKey'
         );
@@ -48,12 +48,12 @@ class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request(array(), array(), array(), array(), array(), array());
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
-            $context,
+            $tokenStorage,
             $authenticationManager,
             'TheProviderKey'
         );
@@ -71,12 +71,12 @@ class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $request = new Request(array(), array(), array(), array(), array(), array(
             'TheUserKey' => 'TheUser',
         ));
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
-            $context,
+            $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
             'TheUserKey'

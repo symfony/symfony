@@ -40,6 +40,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -54,6 +55,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -87,6 +89,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'object')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -123,8 +126,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('data')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -167,8 +171,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('reference.data')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 
@@ -207,8 +212,9 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"2"')
             ->atPath('')
+            ->setParameter('{{ value }}', '"2"')
+            ->setCode(Expression::EXPRESSION_FAILED_ERROR)
             ->assertRaised();
     }
 }

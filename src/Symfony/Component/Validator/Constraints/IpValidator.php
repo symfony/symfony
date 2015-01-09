@@ -97,6 +97,7 @@ class IpValidator extends ConstraintValidator
         if (!filter_var($value, FILTER_VALIDATE_IP, $flag)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Ip::INVALID_IP_ERROR)
                 ->addViolation();
         }
     }

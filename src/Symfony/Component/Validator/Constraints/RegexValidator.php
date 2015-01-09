@@ -47,6 +47,7 @@ class RegexValidator extends ConstraintValidator
         if ($constraint->match xor preg_match($constraint->pattern, $value)) {
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Regex::REGEX_FAILED_ERROR)
                 ->addViolation();
         }
     }

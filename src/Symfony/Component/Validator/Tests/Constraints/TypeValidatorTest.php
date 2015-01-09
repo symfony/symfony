@@ -59,6 +59,7 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
             ->setParameter('{{ type }}', 'integer')
+            ->setCode(Type::INVALID_TYPE_ERROR)
             ->assertRaised();
     }
 
@@ -126,6 +127,7 @@ class TypeValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
             ->setParameter('{{ type }}', $type)
+            ->setCode(Type::INVALID_TYPE_ERROR)
             ->assertRaised();
     }
 

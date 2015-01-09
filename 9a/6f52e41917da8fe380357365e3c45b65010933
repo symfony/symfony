@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-09T06:48:25Z
+
+I've reverted all changes but the fix on the autoloader as I need that to work on the validator component.

@@ -151,16 +151,16 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
             ;
 
             /** @var ConstraintViolationInterface[] $violations */
-            $test->assertCount(1, $violations);
-            $test->assertSame('Message value', $violations[0]->getMessage());
-            $test->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-            $test->assertSame(array('%param%' => 'value'), $violations[0]->getParameters());
-            $test->assertSame('', $violations[0]->getPropertyPath());
+            $this->assertCount(1, $violations);
+            $this->assertSame('Message value', $violations[0]->getMessage());
+            $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
+            $this->assertSame(array('%param%' => 'value'), $violations[0]->getParameters());
+            $this->assertSame('', $violations[0]->getPropertyPath());
             // The root is different as we're in a new context
-            $test->assertSame($entity->reference, $violations[0]->getRoot());
-            $test->assertSame($entity->reference, $violations[0]->getInvalidValue());
-            $test->assertNull($violations[0]->getPlural());
-            $test->assertNull($violations[0]->getCode());
+            $this->assertSame($entity->reference, $violations[0]->getRoot());
+            $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
+            $this->assertNull($violations[0]->getPlural());
+            $this->assertNull($violations[0]->getCode());
 
             // Verify that this method is called
             $context->addViolation('Separate violation');

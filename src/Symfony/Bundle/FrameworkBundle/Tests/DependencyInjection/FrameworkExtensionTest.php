@@ -457,8 +457,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
     }
 
-    public function testFormCsrfFieldNameCanBeSetUnderCsrfSettings()
+    public function testLegacyFormCsrfFieldNameCanBeSetUnderCsrfSettings()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $container = $this->createContainerFromFile('form_csrf_sets_field_name');
 
         $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));

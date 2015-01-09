@@ -58,6 +58,8 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
             // seconds since Unix
             array('U', '1265213106', '2010-02-03 16:05:06 UTC'),
+
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
         );
 
         return $data;

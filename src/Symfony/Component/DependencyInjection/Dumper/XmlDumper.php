@@ -135,7 +135,7 @@ class XmlDumper extends Dumper
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
         }
-        if ($definition->isSynchronized()) {
+        if ($definition->isSynchronized(false)) {
             $service->setAttribute('synchronized', 'true');
         }
         if ($definition->isLazy()) {

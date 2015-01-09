@@ -90,7 +90,7 @@ class FrameworkExtension extends Extension
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validator')) {
+            if (!class_exists('Symfony\Component\Validator\Validation')) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
 
@@ -205,6 +205,7 @@ class FrameworkExtension extends Extension
             if (null !== $config['form']['csrf_protection']['field_name']) {
                 $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
             } else {
+                trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
                 $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
             }
         } else {
@@ -299,7 +300,7 @@ class FrameworkExtension extends Extension
             'memcached' => 'Symfony\Component\HttpKernel\Profiler\MemcachedProfilerStorage',
             'redis' => 'Symfony\Component\HttpKernel\Profiler\RedisProfilerStorage',
         );
-        list($class,) = explode(':', $config['dsn'], 2);
+        list($class, ) = explode(':', $config['dsn'], 2);
         if (!isset($supported[$class])) {
             throw new \LogicException(sprintf('Driver "%s" is not supported for the profiler.', $class));
         }
@@ -643,8 +644,8 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = array();
-        if (class_exists('Symfony\Component\Validator\Validator')) {
-            $r = new \ReflectionClass('Symfony\Component\Validator\Validator');
+        if (class_exists('Symfony\Component\Validator\Validation')) {
+            $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 
             $dirs[] = dirname($r->getFilename()).'/Resources/translations';
         }
@@ -743,19 +744,13 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
 
-        switch ($config['api']) {
-            case '2.4':
-                $api = Validation::API_VERSION_2_4;
-                break;
-            case '2.5':
-                $api = Validation::API_VERSION_2_5;
-                // the validation class needs to be changed only for the 2.5 api since the deprecated interface is
-                // set as the default interface
-                $container->setParameter('validator.class', 'Symfony\Component\Validator\Validator\ValidatorInterface');
-                break;
-            default:
-                $api = Validation::API_VERSION_2_5_BC;
-                break;
+        if ('2.5' === $config['api']) {
+            $api = Validation::API_VERSION_2_5;
+        } else {
+            // 2.4 is now the same as 2.5 BC
+            $api = Validation::API_VERSION_2_5_BC;
+            // the validation class needs to be changed for BC
+            $container->setParameter('validator.class', 'Symfony\Component\Validator\ValidatorInterface');
         }
 
         $validatorBuilder->addMethodCall('setApiVersion', array($api));

@@ -412,7 +412,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         parent::set($id, $service, $scope);
 
-        if (isset($this->obsoleteDefinitions[$id]) && $this->obsoleteDefinitions[$id]->isSynchronized()) {
+        if (isset($this->obsoleteDefinitions[$id]) && $this->obsoleteDefinitions[$id]->isSynchronized(false)) {
             $this->synchronize($id);
         }
     }
@@ -1117,9 +1117,15 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * service by calling all methods referencing it.
      *
      * @param string $id A service id
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
     private function synchronize($id)
     {
+        if ('request' !== $id) {
+            trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
+        }
+
         foreach ($this->definitions as $definitionId => $definition) {
             // only check initialized services
             if (!$this->initialized($definitionId)) {

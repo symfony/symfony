@@ -95,6 +95,10 @@ UPGRADE FROM 2.x to 3.0
    been removed in favor of `Definition::setFactory()`. Services defined using
    YAML or XML use the same syntax as configurators.
 
+ * Synchronized services are deprecated and the following methods have been
+   removed: `ContainerBuilder::synchronize()`, `Definition::isSynchronized()`,
+   and `Definition::setSynchronized()`.
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

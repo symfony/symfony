@@ -103,7 +103,7 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synthetic: true\n");
         }
 
-        if ($definition->isSynchronized()) {
+        if ($definition->isSynchronized(false)) {
             $code .= sprintf("        synchronized: true\n");
         }
 

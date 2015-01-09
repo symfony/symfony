@@ -221,7 +221,6 @@ class IntlDateFormatter
             return false;
         }
 
-        // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
         if ($timestamp instanceof \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }

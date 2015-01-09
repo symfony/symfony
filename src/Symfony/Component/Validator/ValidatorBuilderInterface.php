@@ -178,7 +178,6 @@ interface ValidatorBuilderInterface
      *
      * @return ValidatorBuilderInterface The builder object
      *
-     * @see Validation::API_VERSION_2_4
      * @see Validation::API_VERSION_2_5
      * @see Validation::API_VERSION_2_5_BC
      */

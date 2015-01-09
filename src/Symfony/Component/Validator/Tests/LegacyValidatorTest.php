@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Tests\Fixtures\Entity;
 use Symfony\Component\Validator\Tests\Validator\AbstractLegacyApiTest;
 use Symfony\Component\Validator\Validator as LegacyValidator;
 
-class ValidatorTest extends AbstractLegacyApiTest
+class LegacyValidatorTest extends AbstractLegacyApiTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())
     {

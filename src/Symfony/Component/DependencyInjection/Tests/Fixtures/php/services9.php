@@ -33,7 +33,6 @@ class ProjectServiceContainer extends Container
             'decorated' => 'getDecoratedService',
             'decorator_service' => 'getDecoratorServiceService',
             'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
-            'depends_on_request' => 'getDependsOnRequestService',
             'factory_service' => 'getFactoryServiceService',
             'foo' => 'getFooService',
             'foo.baz' => 'getFoo_BazService',
@@ -142,23 +141,6 @@ class ProjectServiceContainer extends Container
     protected function getDecoratorServiceWithNameService()
     {
         return $this->services['decorator_service_with_name'] = new \stdClass();
-    }
-
-    /**
-     * Gets the 'depends_on_request' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance.
-     */
-    protected function getDependsOnRequestService()
-    {
-        $this->services['depends_on_request'] = $instance = new \stdClass();
-
-        $instance->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-
-        return $instance;
     }
 
     /**
@@ -312,16 +294,6 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
-    }
-
-    /**
-     * Updates the 'request' service.
-     */
-    protected function synchronizeRequestService()
-    {
-        if ($this->initialized('depends_on_request')) {
-            $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        }
     }
 
     /**

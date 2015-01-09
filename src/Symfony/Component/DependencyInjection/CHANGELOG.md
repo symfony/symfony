@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated synchronized services
+
 2.6.0
 -----
 

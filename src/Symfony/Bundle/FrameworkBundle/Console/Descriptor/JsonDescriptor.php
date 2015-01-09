@@ -211,10 +211,13 @@ class JsonDescriptor extends Descriptor
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
-            'synchronized' => $definition->isSynchronized(),
-            'abstract' => $definition->isAbstract(),
-            'file' => $definition->getFile(),
         );
+        if (method_exists($definition, 'isSynchronized')) {
+            $data['synchronized'] = $definition->isSynchronized();
+        }
+
+        $data['abstract'] = $definition->isAbstract();
+        $data['file'] = $definition->getFile();
 
         if ($definition->getFactoryClass()) {
             $data['factory_class'] = $definition->getFactoryClass();

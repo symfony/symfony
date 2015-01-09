@@ -64,9 +64,9 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
         $this->params = array('foo' => 'bar');
     }
 
-    private function getConstraintViolation($code = null)
+    private function getConstraintViolation($code = null, $constraint = null)
     {
-        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, new Form());
+        return new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'prop.path', null, null, $code, $constraint);
     }
 
     private function getBuilder($name = 'name', $propertyPath = null, $dataClass = null)
@@ -93,7 +93,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
     // More specific mapping tests can be found in ViolationMapperTest
     public function testMapViolation()
     {
-        $violation = $this->getConstraintViolation();
+        $violation = $this->getConstraintViolation(null, new Form());
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())
@@ -109,7 +109,28 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testMapViolationAllowsNonSyncIfInvalid()
     {
-        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR);
+        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR, new Form());
+        $form = $this->getForm('street');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue(array($violation)));
+
+        $this->violationMapper->expects($this->once())
+            ->method('mapViolation')
+            // pass true now
+            ->with($violation, $form, true);
+
+        $this->listener->validateForm(new FormEvent($form, null));
+    }
+
+    public function testMapViolationAllowsNonSyncIfInvalidWithoutConstraintReference()
+    {
+        // constraint violations have no reference to the constraint if they are created by
+        //   Symfony\Component\Validator\ExecutionContext
+        // which is deprecated in favor of
+        //   Symfony\Component\Validator\Context\ExecutionContext
+        $violation = $this->getConstraintViolation(Form::NOT_SYNCHRONIZED_ERROR, null);
         $form = $this->getForm('street');
 
         $this->validator->expects($this->once())

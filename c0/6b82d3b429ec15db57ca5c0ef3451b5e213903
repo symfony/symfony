@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T16:53:27Z
+
+No test to "Legacy" split ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-07T16:22:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-07T16:38:20Z
+
+We should probably set a special case for the request service in ``synchronize()`` to avoid triggering the deprecation warning when setting the request service in the container in HttpKernel

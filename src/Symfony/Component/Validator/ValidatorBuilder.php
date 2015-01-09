@@ -23,7 +23,6 @@ use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
@@ -379,11 +378,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
                 $loader = $loaders[0];
             }
 
-            if (Validation::API_VERSION_2_5 === $apiVersion) {
-                $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
-            } else {
-                $metadataFactory = new ClassMetadataFactory($loader, $this->metadataCache);
-            }
+            $metadataFactory = new LazyLoadingMetadataFactory($loader, $this->metadataCache);
         }
 
         $validatorFactory = $this->validatorFactory ?: new ConstraintValidatorFactory($this->propertyAccessor);

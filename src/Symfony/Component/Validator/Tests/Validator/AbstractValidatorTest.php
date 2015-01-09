@@ -766,7 +766,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
         };
 
         $this->metadata->addPropertyConstraint('reference', new Valid(array(
-            'deep' => true,
+            'traverse' => true,
         )));
         $this->referenceMetadata->addConstraint(new Callback(array(
             'callback' => $callback,

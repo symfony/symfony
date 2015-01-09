@@ -506,65 +506,6 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $this->assertCount(0, $violations);
     }
 
-    public function testReferenceTraversalRecursionEnabledOnReferenceTraversalEnabledOnClass()
-    {
-        $entity = new Entity();
-        $entity->reference = new \ArrayIterator(array(
-            2 => new \ArrayIterator(array('key' => new Reference())),
-        ));
-
-        $callback = function ($value, ExecutionContextInterface $context) {
-            $context->addViolation('Message');
-        };
-
-        $traversableMetadata = new ClassMetadata('ArrayIterator');
-        $traversableMetadata->addConstraint(new Traverse(true));
-
-        $this->metadataFactory->addMetadata($traversableMetadata);
-        $this->referenceMetadata->addConstraint(new Callback(array(
-            'callback' => $callback,
-            'groups' => 'Group',
-        )));
-        $this->metadata->addPropertyConstraint('reference', new Valid(array(
-            'deep' => true,
-        )));
-
-        $violations = $this->validate($entity, new Valid(), 'Group');
-
-        /** @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(1, $violations);
-    }
-
-    public function testReferenceTraversalRecursionDisabledOnReferenceTraversalEnabledOnClass()
-    {
-        $test = $this;
-        $entity = new Entity();
-        $entity->reference = new \ArrayIterator(array(
-            2 => new \ArrayIterator(array('key' => new Reference())),
-        ));
-
-        $callback = function ($value, ExecutionContextInterface $context) use ($test) {
-            $test->fail('Should not be called');
-        };
-
-        $traversableMetadata = new ClassMetadata('ArrayIterator');
-        $traversableMetadata->addConstraint(new Traverse(true));
-
-        $this->metadataFactory->addMetadata($traversableMetadata);
-        $this->referenceMetadata->addConstraint(new Callback(array(
-            'callback' => $callback,
-            'groups' => 'Group',
-        )));
-        $this->metadata->addPropertyConstraint('reference', new Valid(array(
-            'deep' => false,
-        )));
-
-        $violations = $this->validate($entity, new Valid(), 'Group');
-
-        /** @var ConstraintViolationInterface[] $violations */
-        $this->assertCount(0, $violations);
-    }
-
     public function testAddCustomizedViolation()
     {
         $entity = new Entity();

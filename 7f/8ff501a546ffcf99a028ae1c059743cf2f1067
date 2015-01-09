@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T11:08:56Z
+
+Still working on the `FrameworkBundle` legacy tests and the PR will be ready for merge.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T14:58:15Z
+
+Not WIP anymore but trying to figure out why the tests suite segfaults on 5.3.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-09T15:10:02Z
+
+@hhamon Have you tried to relaunch the tests on Travis? Sometimes, it segfaults for no obvious reasons.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T15:11:34Z
+
+just forget about 5.3.3 by rebasing the branch, given the min version has just been bumped to 5.3.9 :smile:
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T15:20:01Z
+
+Yep! Looks like the rebase did the trick :D
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T15:22:38Z
+
+Everything is green and ready for review by @symfony/deciders ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T15:23:45Z
+
+:+1:

@@ -43,6 +43,16 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            // Check deprecations before the config is processed to ensure
+            // the setting has been explicitly defined in a configuration file.
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['csrf_protection']['field_name']); })
+                ->then(function ($v) {
+                    trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')

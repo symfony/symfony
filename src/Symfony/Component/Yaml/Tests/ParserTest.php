@@ -650,6 +650,17 @@ map_in_map: { foo: { bar: *var } }
 EOF
         ));
     }
+
+    public function testYamlDirective()
+    {
+        $yaml = <<<EOF
+%YAML 1.2
+---
+foo: 1
+bar: 2
+EOF;
+        $this->assertEquals(array('foo' => 1, 'bar' => 2), $this->parser->parse($yaml));
+    }
 }
 
 class B

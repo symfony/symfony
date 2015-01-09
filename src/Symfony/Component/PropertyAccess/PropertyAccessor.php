@@ -226,10 +226,14 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
-            $isArrayAccess = is_array($objectOrArray) || $objectOrArray instanceof \ArrayAccess;
 
             // Create missing nested arrays on demand
-            if ($isIndex && $isArrayAccess && !isset($objectOrArray[$property])) {
+            if ($isIndex &&
+                (
+                    ($objectOrArray instanceof \ArrayAccess && !isset($objectOrArray[$property])) ||
+                    (is_array($objectOrArray) && !array_key_exists($property, $objectOrArray))
+                )
+            ) {
                 if (!$ignoreInvalidIndices) {
                     if (!is_array($objectOrArray)) {
                         if (!$objectOrArray instanceof \Traversable) {

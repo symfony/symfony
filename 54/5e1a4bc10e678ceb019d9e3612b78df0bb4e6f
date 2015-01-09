@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T17:40:13Z
+
+Squashed! Should be green in a few minutes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-09T17:50:36Z
+
+@hhamon Almost there... but not quite: https://travis-ci.org/symfony/symfony/jobs/46471343#L1742
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-09T18:35:33Z
+
+@fabpot looks good except on 5.3 due to the Process component. Can you please run `18025.1` again?

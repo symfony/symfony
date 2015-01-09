@@ -114,21 +114,8 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-        if (PHP_VERSION_ID < 50309) {
-            // Old implementation on PHP < 5.3.9
-            $this->assertInstanceOf('Symfony\Component\Validator\Validator', $this->builder->getValidator());
-        } else {
-            // Legacy compatible implementation on PHP >= 5.3.9
-            $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
-        }
-    }
-
-    public function testLegacySetApiVersion24()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_4));
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator', $this->builder->getValidator());
+        // Legacy compatible implementation
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
     }
 
     public function testSetApiVersion25()
@@ -140,10 +127,6 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     public function testLegacySetApiVersion24And25()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        if (PHP_VERSION_ID < 50309) {
-            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
-        }
 
         $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_5_BC));
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());

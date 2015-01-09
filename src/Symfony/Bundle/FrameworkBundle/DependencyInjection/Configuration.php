@@ -503,9 +503,7 @@ class Configuration implements ConfigurationInterface
                     // API version already during container configuration
                     // (to adjust service classes etc.)
                     // See https://github.com/symfony/symfony/issues/11580
-                    $v['validation']['api'] = PHP_VERSION_ID < 50309
-                        ? '2.4'
-                        : '2.5-bc';
+                    $v['validation']['api'] = '2.5-bc';
 
                     return $v;
                 })

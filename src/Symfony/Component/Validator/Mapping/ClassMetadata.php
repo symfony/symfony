@@ -138,7 +138,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
         if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
                 && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
             if ($this->hasGroupSequence()) {
-                $groups = $this->getGroupSequence();
+                $groups = $this->getGroupSequence()->groups;
             } else {
                 $groups = $value->getGroupSequence();
             }
@@ -479,7 +479,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function hasGroupSequence()
     {
-        return count($this->groupSequence) > 0;
+        return $this->groupSequence && count($this->groupSequence->groups) > 0;
     }
 
     /**

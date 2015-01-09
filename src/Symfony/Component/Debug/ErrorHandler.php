@@ -401,7 +401,7 @@ class ErrorHandler
                         $e['stack'] = debug_backtrace(true); // Provide object
                     }
                 } elseif ($trace) {
-                    $e['stack'] = debug_backtrace(PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_IGNORE_ARGS : false);
+                    $e['stack'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                 }
             }
 

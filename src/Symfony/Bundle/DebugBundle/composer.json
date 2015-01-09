@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.9",
         "symfony/http-kernel": "~2.6|~3.0.0",
         "symfony/twig-bridge": "~2.6|~3.0.0",
         "symfony/var-dumper": "~2.6|~3.0.0"

@@ -69,12 +69,21 @@ class CollectionValidator extends ConstraintValidator
                     }
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
-                    ->atPath('['.$field.']')
-                    ->setParameter('{{ field }}', $this->formatValue($field))
-                    ->setInvalidValue(null)
-                    ->setCode(Collection::MISSING_FIELD_ERROR)
-                    ->addViolation();
+                if ($context instanceof ExecutionContextInterface) {
+                    $context->buildViolation($constraint->missingFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue(null)
+                        ->setCode(Collection::MISSING_FIELD_ERROR)
+                        ->addViolation();
+                } else {
+                    $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue(null)
+                        ->setCode(Collection::MISSING_FIELD_ERROR)
+                        ->addViolation();
+                }
             }
         }
 

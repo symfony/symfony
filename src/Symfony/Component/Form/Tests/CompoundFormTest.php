@@ -205,6 +205,22 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame(array(0 => $child), $this->form->all());
     }
 
+    public function testAddWithoutType()
+    {
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('foo', 'text')
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo');
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
+    }
+
     public function testAddUsingNameButNoType()
     {
         $this->form = $this->getBuilder('name', null, '\stdClass')

@@ -64,12 +64,6 @@ services:
     request:
         class: Request
         synthetic: true
-        synchronized: true
-    depends_on_request:
-        class: stdClass
-        calls:
-            - [setRequest, ['@?request']]
-
     configurator_service:
         class: ConfClass
         public: false

@@ -265,7 +265,9 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
-        $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized() ? 'yes' : 'no');
+        if (method_exists($definition, 'isSynchronized')) {
+            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized() ? 'yes' : 'no');
+        }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {

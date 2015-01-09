@@ -695,11 +695,17 @@ EOF;
      * @param Definition $definition A Definition instance
      *
      * @return string|null
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
     private function addServiceSynchronizer($id, Definition $definition)
     {
-        if (!$definition->isSynchronized()) {
+        if (!$definition->isSynchronized(false)) {
             return;
+        }
+
+        if ('request' !== $id) {
+            trigger_error('Synchronized services were deprecated in version 2.7 and won\'t work anymore in 3.0.', E_USER_DEPRECATED);
         }
 
         $code = '';

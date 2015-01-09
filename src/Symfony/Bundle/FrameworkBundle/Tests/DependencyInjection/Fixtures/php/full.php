@@ -3,12 +3,15 @@
 $container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
-    'form' => null,
+    'form' => array(
+        'csrf_protection' => array(
+            'field_name' => '_csrf',
+        ),
+    ),
     'http_method_override' => false,
     'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
     'csrf_protection' => array(
         'enabled' => true,
-        'field_name' => '_csrf',
     ),
     'esi' => array(
         'enabled' => true,

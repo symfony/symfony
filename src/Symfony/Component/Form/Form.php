@@ -894,6 +894,10 @@ class Form implements \IteratorAggregate, FormInterface
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 
+            if (null === $type && null === $this->config->getDataClass()) {
+                $type = 'text';
+            }
+
             if (null === $type) {
                 $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
             } else {

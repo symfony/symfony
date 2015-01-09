@@ -175,5 +175,10 @@
             <argument /> <!-- decimal point, set in TwigExtension -->
             <argument /> <!-- thousands separator, set in TwigExtension -->
         </service>
+
+        <service id="debug.exception_processor.twig" class="Symfony\Bridge\Twig\Debug\TwigFlattenExceptionProcessor" public="false">
+            <tag name="exception.processor" />
+            <argument type="service" id="twig" />
+        </service>
     </services>
 </container>

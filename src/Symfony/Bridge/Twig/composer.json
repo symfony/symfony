@@ -35,7 +35,8 @@
         "symfony/stopwatch": "~2.2|~3.0.0",
         "symfony/console": "~2.7|~3.0.0",
         "symfony/var-dumper": "~2.6|~3.0.0",
-        "symfony/expression-language": "~2.4|~3.0.0"
+        "symfony/expression-language": "~2.4|~3.0.0",
+        "symfony/debug": "~2.6|~3.0.0"
     },
     "suggest": {
         "symfony/finder": "",
@@ -48,6 +49,7 @@
         "symfony/yaml": "For using the YamlExtension",
         "symfony/security": "For using the SecurityExtension",
         "symfony/stopwatch": "For using the StopwatchExtension",
+        "symfony/debug": "For using the TwigFlattenExceptionProcessor",
         "symfony/var-dumper": "For using the DumpExtension",
         "symfony/expression-language": "For using the ExpressionExtension"
     },

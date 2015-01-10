@@ -467,7 +467,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('_custom', $container->getParameter('form.type_extension.csrf.field_name'));
     }
 
-    public function testFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
+    public function testLegacyFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
     {
         $container = $this->createContainerFromFile('form_csrf_under_form_sets_field_name');
 

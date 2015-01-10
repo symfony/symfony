@@ -42,5 +42,9 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('fragment.handler')) {
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
         }
+
+        if ($container->has('request_stack')) {
+            $container->getDefinition('twig.extension.httpfoundation')->addTag('twig.extension');
+        }
     }
 }

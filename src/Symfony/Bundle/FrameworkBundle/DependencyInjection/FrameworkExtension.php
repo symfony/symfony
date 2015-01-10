@@ -205,7 +205,6 @@ class FrameworkExtension extends Extension
             if (null !== $config['form']['csrf_protection']['field_name']) {
                 $container->setParameter('form.type_extension.csrf.field_name', $config['form']['csrf_protection']['field_name']);
             } else {
-                trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
                 $container->setParameter('form.type_extension.csrf.field_name', $config['csrf_protection']['field_name']);
             }
         } else {

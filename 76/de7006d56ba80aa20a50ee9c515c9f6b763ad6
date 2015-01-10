@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by pierrre at 2015-01-09T15:58:36Z
+
+Why
+```php
+end($this->rows);
+$rowKey = key($this->rows);
+reset($this->rows);
+```
+instead of
+```php
+$rowKey = count($this->rows) - 1;
+```
+?
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2015-01-09T16:02:01Z
+
+@pierrre because of the way TableHelper->setRow is implemented.
+
+---------------------------------------------------------------------------
+
+by pierrre at 2015-01-09T16:12:14Z
+
+What are the expected values of `$column` in `setRow()`?
+Integer?
+An integer lower than `count($this->rows)`?
+A string?
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2015-01-09T16:24:36Z
+
+@pierrre setRow allows for that. So to avoid BC breaks it's better not to use `count` and use `end`.
+
+---------------------------------------------------------------------------
+
+by pierrre at 2015-01-09T16:28:04Z
+
+OK I understand.
+Thank you.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-10T06:17:14Z
+
+`TableHelper` is deprecated. It would be more useful to make this PR against `Table` class.
+
+---------------------------------------------------------------------------
+
+by boekkooi at 2015-01-10T13:10:10Z
+
+@Tobion I opened another PR for Table (#13355)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-10T15:56:49Z
+
+:+1:

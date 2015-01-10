@@ -47,11 +47,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
      */
     protected $repository;
 
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function setUp()
     {
         $this->em = DoctrineTestHelper::createTestEntityManager();
@@ -459,5 +454,10 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $entity = new SingleIntIdEntity(1, null);
 
         $this->validator->validate($entity, $constraint);
+    }
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5_BC;
     }
 }

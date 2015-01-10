@@ -280,7 +280,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
+        $this->assertCount(6, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals(array(new Reference('validator.validator_factory')), $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
@@ -293,8 +293,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
         $this->assertSame('setMetadataCache', $calls[5][0]);
         $this->assertEquals(array(new Reference('validator.mapping.cache.apc')), $calls[5][1]);
-        $this->assertSame('setApiVersion', $calls[6][0]);
-        $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
     }
 
     public function testFullyConfiguredValidationService()
@@ -305,14 +303,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('full');
 
-        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $container->get('validator'));
     }
 
     public function testValidationService()
     {
         $container = $this->createContainerFromFile('validation_annotations');
 
-        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $container->get('validator'));
     }
 
     public function testAnnotations()
@@ -336,7 +334,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
+        $this->assertCount(6, $calls);
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
         $this->assertEquals(array(new Reference('annotation_reader')), $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
@@ -354,7 +352,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(8, $calls);
+        $this->assertCount(7, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
@@ -377,9 +375,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(5, $calls);
+        $this->assertCount(4, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
-        // no cache, no annotations, no static methods
     }
 
     public function testValidation2Dot5Api()
@@ -388,30 +385,11 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setApiVersion', $calls[5][0]);
-        $this->assertSame(array(Validation::API_VERSION_2_5), $calls[5][1]);
         $this->assertSame('Symfony\Component\Validator\Validator\ValidatorInterface', $container->getParameter('validator.class'));
-        // no cache, no annotations
-    }
-
-    public function testValidation2Dot5BcApi()
-    {
-        $container = $this->createContainerFromFile('validation_2_5_bc_api');
-
-        $calls = $container->getDefinition('validator.builder')->getMethodCalls();
-
-        $this->assertCount(6, $calls);
-        $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setApiVersion', $calls[5][0]);
-        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
-        $this->assertSame('Symfony\Component\Validator\ValidatorInterface', $container->getParameter('validator.class'));
-        // no cache, no annotations
     }
 
     public function testValidationImplicitApi()
@@ -420,14 +398,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setApiVersion', $calls[5][0]);
-        // no cache, no annotations
-
-        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
     }
 
     /**
@@ -440,14 +414,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addMethodMapping', $calls[4][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setApiVersion', $calls[5][0]);
-        // no cache, no annotations
-
-        $this->assertSame(array(Validation::API_VERSION_2_5_BC), $calls[5][1]);
     }
 
     public function testFormsCanBeEnabledWithoutCsrfProtection()

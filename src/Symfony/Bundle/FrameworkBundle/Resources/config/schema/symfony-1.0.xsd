@@ -7,15 +7,6 @@
 
     <xsd:element name="config" type="config" />
 
-    <xsd:simpleType name="validator_api_version">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="auto" />
-            <xsd:enumeration value="2.4" />
-            <xsd:enumeration value="2.5" />
-            <xsd:enumeration value="2.5-bc" />
-        </xsd:restriction>
-    </xsd:simpleType>
-
     <xsd:complexType name="config">
         <xsd:all>
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
@@ -170,7 +161,6 @@
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
-        <xsd:attribute name="api" type="validator_api_version" />
     </xsd:complexType>
 
     <xsd:complexType name="annotations">

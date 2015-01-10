@@ -25,11 +25,6 @@ class CountryValidatorTest extends AbstractConstraintValidatorTest
         parent::setUp();
     }
 
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new CountryValidator();

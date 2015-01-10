@@ -18,11 +18,6 @@ use Symfony\Component\Validator\Validation;
 
 class LanguageValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LanguageValidator();

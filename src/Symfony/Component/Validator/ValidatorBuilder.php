@@ -321,31 +321,10 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setApiVersion($apiVersion)
-    {
-        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
-            throw new InvalidArgumentException(sprintf(
-                'The requested API version is invalid: "%s"',
-                $apiVersion
-            ));
-        }
-
-        $this->apiVersion = $apiVersion;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
         $apiVersion = $this->apiVersion;
-
-        if (null === $apiVersion) {
-            $apiVersion = Validation::API_VERSION_2_5_BC;
-        }
 
         if (!$metadataFactory) {
             $loaders = array();
@@ -393,14 +372,7 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $translator->setLocale('en');
         }
 
-        if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
-
-            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
-        }
-
-        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
-
-        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+        $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }
 }

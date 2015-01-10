@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
 /**
- * GlobalVariables is the entry point for Symfony global variables in Twig templates.
+ * GlobalVariables is the entry point for Symfony global variables in PHP templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -122,6 +122,12 @@
             <argument type="service" id="twig.form.renderer" />
         </service>
 
+        <service id="twig.extension.kernel" class="Symfony\Bridge\Twig\Extension\KernelExtension" public="false">
+            <tag name="twig.extension" />
+            <argument>%kernel.environment%</argument>
+            <argument>%kernel.debug%</argument>
+        </service>
+
         <service id="twig.form.engine" class="%twig.form.engine.class%" public="false">
             <argument>%twig.form.resources%</argument>
         </service>

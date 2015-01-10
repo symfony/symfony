@@ -13,6 +13,8 @@ namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * SecurityExtension exposes security context features.
@@ -22,23 +24,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class SecurityExtension extends \Twig_Extension
 {
     private $securityChecker;
+    private $tokenStorage;
 
-    public function __construct(AuthorizationCheckerInterface $securityChecker = null)
+    public function __construct(AuthorizationCheckerInterface $securityChecker, TokenStorageInterface $tokenStorage)
     {
         $this->securityChecker = $securityChecker;
-    }
-
-    public function isGranted($role, $object = null, $field = null)
-    {
-        if (null === $this->securityChecker) {
-            return false;
-        }
-
-        if (null !== $field) {
-            $object = new FieldVote($object, $field);
-        }
-
-        return $this->securityChecker->isGranted($role, $object);
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -48,7 +39,36 @@ class SecurityExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('is_granted', array($this, 'isGranted')),
+            new \Twig_SimpleFunction('user', array($this, 'getUser')),
         );
+    }
+
+    public function isGranted($role, $object = null, $field = null)
+    {
+        if (null !== $field) {
+            $object = new FieldVote($object, $field);
+        }
+
+        return $this->securityChecker->isGranted($role, $object);
+    }
+
+    /**
+     * Returns the current user.
+     *
+     * @return mixed
+     *
+     * @see TokenInterface::getUser()
+     */
+    public function getUser()
+    {
+        if (!$token = $this->tokenStorage->getToken()) {
+            return;
+        }
+
+        $user = $token->getUser();
+        if (is_object($user)) {
+            return $user;
+        }
     }
 
     /**

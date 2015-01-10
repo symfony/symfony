@@ -25,8 +25,11 @@ class NoTemplatingEntryTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
 
         $container = $kernel->getContainer();
+
         $content = $container->get('twig')->render('index.html.twig');
         $this->assertContains('{ a: b }', $content);
+        $this->assertContains('Debug: 1', $content);
+        $this->assertContains('Env: dev', $content);
     }
 
     protected function setUp()

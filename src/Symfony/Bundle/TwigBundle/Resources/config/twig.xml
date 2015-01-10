@@ -47,9 +47,12 @@
         </service>
 
         <service id="twig.cache_warmer" class="%twig.cache_warmer.class%" public="false">
-            <tag name="kernel.cache_warmer" />
             <argument type="service" id="service_container" />
             <argument type="service" id="templating.finder" />
+        </service>
+
+        <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
+            <argument type="collection" />
         </service>
 
         <service id="twig.loader.filesystem" class="%twig.loader.filesystem.class%" public="false">
@@ -84,7 +87,7 @@
 
         <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">
             <tag name="twig.extension" />
-            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument /> <!-- %templating.helper.code.file_link_format% -->
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>

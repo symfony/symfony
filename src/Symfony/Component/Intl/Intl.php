@@ -265,6 +265,72 @@ final class Intl
     }
 
     /**
+     * Returns all available country names.
+     *
+     * @param string $locale Optional locale to return the name in. Defaults to {@link \Locale::getDefault()}.
+     *
+     * @return string[] The country names
+     */
+    public static function getCountryNames($locale = null)
+    {
+        return self::getRegionBundle()->getCountryNames($locale);
+    }
+
+    /**
+     * Returns all available country codes.
+     *
+     * @return string[] The country codes
+     */
+    public static function getCountryCodes()
+    {
+        return array_keys(self::getRegionBundle()->getCountryNames());
+    }
+
+    /**
+     * Returns all available language names.
+     *
+     * @param string $locale Optional locale to return the name in. Defaults to {@link \Locale::getDefault()}.
+     *
+     * @return string[] The language names
+     */
+    public static function getLanguageNames($locale = null)
+    {
+        return self::getLanguageBundle()->getLanguageNames($locale);
+    }
+
+    /**
+     * Returns all available language codes.
+     *
+     * @return string[] The language codes
+     */
+    public static function getLanguageCodes()
+    {
+        return array_keys(self::getLanguageBundle()->getLanguageNames());
+    }
+
+    /**
+     * Returns all available locale names.
+     *
+     * @param string $locale Optional locale to return the name in. Defaults to {@link \Locale::getDefault()}.
+     *
+     * @return string[] The locale names
+     */
+    public static function getLocaleNames($locale = null)
+    {
+        return self::getLocaleBundle()->getLocaleNames($locale);
+    }
+
+    /**
+     * Returns all available locale codes.
+     *
+     * @return string[] The locale codes
+     */
+    public static function getLocaleCodes()
+    {
+        return array_keys(self::getLocaleBundle()->getLocaleNames());
+    }
+
+    /**
      * Resets the internal state.
      */
     private static function reset()

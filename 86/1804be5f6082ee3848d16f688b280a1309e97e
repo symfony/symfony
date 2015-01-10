@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-05T13:43:39Z
+
+This requires tests
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-05T16:02:05Z
+
+Tests added, behavior more well defined now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-05T16:42:41Z
+
+ping @symfony/deciders What do you think of this new feature? What about the name of the functions?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T12:28:44Z
+
+missing composer.json update: ~2.7 required now:
+- for the bridge in the bundle
+- for http-foundation in the bridge
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T10:50:53Z
+
+Last call for comments before merge.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-01-07T11:58:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-07T12:16:02Z
+
++1 from a OO developer point of view
+-0.7 from a DX point of view
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T12:34:02Z
+
+@WouterJ Can you explain why you think it's not good for DX?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-07T12:56:27Z
+
+@fabpot I was actually still debating with myself of that point (that's why I didn't say a hard -1). My thoughts:
+
+* Having to call 2 functions (`absolute_url(asset_path('img/logo.png'))`for something that was possible with 1 function (`asset('img/logo.png', absolute=true)`) seems not that great.
+* It also means we have to type more, as both the asset function and absolute/relative url transformation is made much more verbose (`asset` to `asset_path` and `true` to `absolute_url`)
+* On the other hand, using the `asset_path()` to make a path relative doesn't seem nice either. Using `relative_path()` sounds more logical here
+
+Can't we add a shortcut to `asset_path`, so it's still possible?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T13:00:26Z
+
+@WouterJ Thanks for your thoughts. I added those functions because I was working on the asset functions, but their usage are much wider than just with asset. As a matter of fact, I think that asking for an absolute URL when using asset is a edge case.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-07T13:14:00Z
+
+@fabpot there is a common use case for that: rendering an HTML email (AFAIK, this one the main reason to ask for this feature). But we can indeed use the new function in this case

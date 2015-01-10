@@ -11,51 +11,54 @@
 
 namespace Symfony\Bridge\Monolog\Tests;
 
+use Monolog\Handler\TestHandler;
+use Symfony\Bridge\Monolog\Handler\DebugHandler;
 use Symfony\Bridge\Monolog\Logger;
 
 class LoggerTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetLogsWithDebugHandler()
     {
-        $expectedLogs = array('foo', 'bar');
+        $handler = new DebugHandler();
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $debugHandler = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
-        $debugHandler
-            ->expects($this->any())
-            ->method('getLogs')
-            ->will($this->returnValue($expectedLogs))
-        ;
-
-        $logger = new Logger('foobar', array($debugHandler));
-        $this->assertEquals($expectedLogs, $logger->getLogs());
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(1, count($logger->getLogs()));
     }
 
     public function testGetLogsWithoutDebugHandler()
     {
-        $handler = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $handler = new TestHandler();
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $logger = new Logger('foobar', array($handler));
-        $this->assertEquals(array(), $logger->getLogs());
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(array(), $logger->getLogs());
     }
 
     public function testCountErrorsWithDebugHandler()
     {
-        $debugHandler = $this->getMock('Symfony\Component\HttpKernel\Log\DebugLoggerInterface');
-        $debugHandler
-            ->expects($this->any())
-            ->method('countErrors')
-            ->will($this->returnValue(5))
-        ;
+        $handler = new DebugHandler();
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $logger = new Logger('foobar', array($debugHandler));
-        $this->assertEquals(5, $logger->countErrors());
+        $this->assertTrue($logger->debug('test message'));
+        $this->assertTrue($logger->info('test message'));
+        $this->assertTrue($logger->notice('test message'));
+        $this->assertTrue($logger->warning('test message'));
+
+        $this->assertTrue($logger->error('test message'));
+        $this->assertTrue($logger->critical('test message'));
+        $this->assertTrue($logger->alert('test message'));
+        $this->assertTrue($logger->emergency('test message'));
+
+        $this->assertSame(4, $logger->countErrors());
     }
 
     public function testCountErrorsWithoutDebugHandler()
     {
-        $handler = $this->getMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $handler = new TestHandler();
+        $logger = new Logger(__METHOD__, array($handler));
 
-        $logger = new Logger('foobar', array($handler));
-        $this->assertEquals(0, $logger->countErrors());
+        $this->assertTrue($logger->error('error message'));
+        $this->assertSame(0, $logger->countErrors());
     }
 }

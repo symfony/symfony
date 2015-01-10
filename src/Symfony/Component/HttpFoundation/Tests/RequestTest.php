@@ -576,6 +576,26 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getRelativeUriForPathData()
+     */
+    public function testGetRelativeUriForPath($expected, $pathinfo, $path)
+    {
+        $this->assertEquals($expected, Request::create($pathinfo)->getRelativeUriForPath($path));
+    }
+
+    public function getRelativeUriForPathData()
+    {
+        return array(
+            array('me.png', '/foo', '/me.png'),
+            array('../me.png', '/foo/bar', '/me.png'),
+            array('me.png', '/foo/bar', '/foo/me.png'),
+            array('../baz/me.png', '/foo/bar/b', '/foo/baz/me.png'),
+            array('../../fooz/baz/me.png', '/foo/bar/b', '/fooz/baz/me.png'),
+            array('baz/me.png', '/foo/bar/b', 'baz/me.png'),
+        );
+    }
+
+    /**
      * @covers Symfony\Component\HttpFoundation\Request::getUserInfo
      */
     public function testGetUserInfo()

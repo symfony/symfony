@@ -1138,6 +1138,61 @@ class Request
     }
 
     /**
+     * Returns the path as relative reference from the current Request path.
+     *
+     * Only the URIs path component (no schema, host etc.) is relevant and must be given.
+     * Both paths must be absolute and not contain relative parts.
+     * Relative URLs from one resource to another are useful when generating self-contained downloadable document archives.
+     * Furthermore, they can be used to reduce the link size in documents.
+     *
+     * Example target paths, given a base path of "/a/b/c/d":
+     * - "/a/b/c/d"     -> ""
+     * - "/a/b/c/"      -> "./"
+     * - "/a/b/"        -> "../"
+     * - "/a/b/c/other" -> "other"
+     * - "/a/x/y"       -> "../../x/y"
+     *
+     * @param string $path The target path
+     *
+     * @return string The relative target path
+     */
+    public function getRelativeUriForPath($path)
+    {
+        // be sure that we are dealing with an absolute path
+        if (!isset($path[0]) || '/' !== $path[0]) {
+            return $path;
+        }
+
+        if ($path === $basePath = $this->getPathInfo()) {
+            return '';
+        }
+
+        $sourceDirs = explode('/', isset($basePath[0]) && '/' === $basePath[0] ? substr($basePath, 1) : $basePath);
+        $targetDirs = explode('/', isset($path[0]) && '/' === $path[0] ? substr($path, 1) : $path);
+        array_pop($sourceDirs);
+        $targetFile = array_pop($targetDirs);
+
+        foreach ($sourceDirs as $i => $dir) {
+            if (isset($targetDirs[$i]) && $dir === $targetDirs[$i]) {
+                unset($sourceDirs[$i], $targetDirs[$i]);
+            } else {
+                break;
+            }
+        }
+
+        $targetDirs[] = $targetFile;
+        $path = str_repeat('../', count($sourceDirs)).implode('/', $targetDirs);
+
+        // A reference to the same base directory or an empty subdirectory must be prefixed with "./".
+        // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
+        // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
+        // (see http://tools.ietf.org/html/rfc3986#section-4.2).
+        return !isset($path[0]) || '/' === $path[0]
+            || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos)
+            ? "./$path" : $path;
+    }
+
+    /**
      * Generates the normalized query string for the Request.
      *
      * It builds a normalized query string, where keys/value pairs are alphabetized

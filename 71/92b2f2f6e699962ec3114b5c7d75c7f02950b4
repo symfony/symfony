@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-10T10:52:28Z
+
+Wouldn't it be better to make `app.debug` a test? `is debug`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-10T11:00:27Z
+
+@WouterJ A test is something you can use to test things like in `a is debug`, which would not make sense here.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-10T13:44:05Z
+
+Having functions to access global objects sounds strange to me as Twig functions are meant to generate/create values if I'm not mistaking. These functions always return the same values everytime they're called.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-10T15:24:16Z
+
+@hhamon I've removed the introduction of the Twig functions for now as it can be done in another PR where we can discuss the concerns you've just raised. Everything else should not be controversial as it's mainly about better decoupling.

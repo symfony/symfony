@@ -103,9 +103,6 @@ class TwigExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
-
-            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
-            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
         }
 
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {

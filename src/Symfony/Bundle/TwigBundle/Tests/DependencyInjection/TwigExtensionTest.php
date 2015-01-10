@@ -99,7 +99,7 @@ class TwigExtensionTest extends TestCase
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('templating.globals'), $calls[0][1][1]);
+        $this->assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
         $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
         $this->assertEquals('baz', $calls[2][1][0], '->load() registers variables as Twig globals');

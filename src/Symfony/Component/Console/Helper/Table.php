@@ -174,8 +174,9 @@ class Table
 
         $this->rows[] = array_values($row);
 
-        $keys = array_keys($this->rows);
-        $rowKey = array_pop($keys);
+        end($this->rows);
+        $rowKey = key($this->rows);
+        reset($this->rows);
 
         foreach ($row as $key => $cellValue) {
             if (!strstr($cellValue, "\n")) {

@@ -47,6 +47,7 @@ class JsonResponse extends Response
         $this->setData($data);
     }
     
+    
     protected function setDefaultEncodingOptions()
     {
         // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.

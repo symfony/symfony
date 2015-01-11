@@ -150,6 +150,13 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
+        if (isset($requirements['_method']) || isset($requirements['_scheme'])) {
+            trigger_error(
+                'The router \'_method\' and \'_scheme\' requirements was removed. You should use the new \'methods\' and \'schemes\' settings instead.',
+                E_USER_DEPRECATED
+            );
+        }
+
         $this->setCurrentDir(dirname($path));
 
         $subCollection = $this->import($config['resource'], $type, false, $file);

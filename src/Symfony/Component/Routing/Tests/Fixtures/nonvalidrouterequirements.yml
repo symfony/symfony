@@ -1,0 +1,4 @@
+blog_show:
+    path:         /blog/{slug}
+    defaults:     { _controller: "MyBundle:Blog:show" }
+    requirements: { '_method': 'POST', '_scheme': 'HTTPS' }

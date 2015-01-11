@@ -135,4 +135,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $route->getDefault('foobar'));
         $this->assertEquals('bar', $route->getDefault('baz'));
     }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Deprecated
+     */
+    public function testLoadThrowsExceptionWithDeprecatedRequirements()
+    {
+        $loader = new XmlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
+        $loader->load('nonvalidrouterequirements.xml');
+    }
 }

@@ -86,6 +86,13 @@ class Route implements \Serializable
      */
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
     {
+        if (isset($requirements['_method']) || isset($requirements['_scheme'])) {
+            trigger_error(
+                'The router \'_method\' and \'_scheme\' requirements was removed. You should use the new \'methods\' and \'schemes\' settings instead.',
+                E_USER_DEPRECATED
+            );
+        }
+
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);

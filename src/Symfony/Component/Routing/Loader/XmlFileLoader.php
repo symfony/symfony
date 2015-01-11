@@ -131,6 +131,13 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
+        if (isset($requirements['_method']) || isset($requirements['_scheme'])) {
+            trigger_error(
+                'The router \'_method\' and \'_scheme\' requirements was removed. You should use the new \'methods\' and \'schemes\' settings instead.',
+                E_USER_DEPRECATED
+            );
+        }
+
         $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
         $collection->add($id, $route);
     }

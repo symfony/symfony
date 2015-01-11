@@ -173,6 +173,9 @@ class JsonResponse extends Response
         return $this->setContent($this->data);
     }
 
+    /**
+     * @return string
+     */
     private function transformJsonError()
     {
         if (function_exists('json_last_error_msg')) {

@@ -26,7 +26,10 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('secure', new Route(
             '/secure',
             array(),
-            array('_scheme' => 'https')
+            array(),
+            array(),
+            '',
+            array('https')
         ));
         $dumper = new PhpMatcherDumper($collection);
         $dumper->dump();
@@ -61,13 +64,21 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('bar', new Route(
             '/bar/{foo}',
             array(),
-            array('_method' => 'GET|head')
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET', 'head')
         ));
         // GET method requirement automatically adds HEAD as valid
         $collection->add('barhead', new Route(
             '/barhead/{foo}',
             array(),
-            array('_method' => 'GET')
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET')
         ));
         // simple
         $collection->add('baz', new Route(
@@ -89,13 +100,21 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz5', new Route(
             '/test/{foo}/',
             array(),
-            array('_method' => 'post')
+            array(),
+            array(),
+            '',
+            array(),
+            array('post')
         ));
         // complex name
         $collection->add('baz.baz6', new Route(
             '/test/{foo}/',
             array(),
-            array('_method' => 'put')
+            array(),
+            array(),
+            '',
+            array(),
+            array('put')
         ));
         // defaults without variable
         $collection->add('foofoo', new Route(
@@ -235,14 +254,20 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $redirectCollection->add('secure', new Route(
             '/secure',
             array(),
-            array('_scheme' => 'https')
+            array(),
+            array(),
+            '',
+            array('https')
         ));
 
         // force HTTP redirection
         $redirectCollection->add('nonsecure', new Route(
             '/nonsecure',
             array(),
-            array('_scheme' => 'http')
+            array(),
+            array(),
+            '',
+            array('http')
         ));
 
         /* test case 3 */

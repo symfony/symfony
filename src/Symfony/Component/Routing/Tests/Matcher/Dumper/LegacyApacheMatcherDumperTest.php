@@ -84,13 +84,21 @@ class LegacyApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('bar', new Route(
             '/bar/{foo}',
             array(),
-            array('_method' => 'GET|head')
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET', 'head')
         ));
         // method requirement (again)
         $collection->add('baragain', new Route(
             '/baragain/{foo}',
             array(),
-            array('_method' => 'get|post')
+            array(),
+            array(),
+            '',
+            array(),
+            array('get', 'post')
         ));
         // simple
         $collection->add('baz', new Route(
@@ -112,13 +120,21 @@ class LegacyApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         $collection->add('baz5', new Route(
             '/test/{foo}/',
             array(),
-            array('_method' => 'get')
+            array(),
+            array(),
+            '',
+            array(),
+            array('GET')
         ));
         // trailing slash and unsafe method
         $collection->add('baz5unsafe', new Route(
             '/testunsafe/{foo}/',
             array(),
-            array('_method' => 'post')
+            array(),
+            array(),
+            '',
+            array(),
+            array('post')
         ));
         // complex
         $collection->add('baz6', new Route(

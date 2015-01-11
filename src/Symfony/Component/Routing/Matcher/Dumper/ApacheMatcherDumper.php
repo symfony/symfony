@@ -90,10 +90,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
             $rules[] = $this->dumpRoute($name, $route, $options, $hostRegexUnique);
 
-            if ($req = $route->getRequirement('_method')) {
-                $methods = explode('|', strtoupper($req));
-                $methodVars = array_merge($methodVars, $methods);
-            }
+            $methodVars = array_merge($methodVars, $route->getMethods());
         }
         if (0 < count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
@@ -200,13 +197,11 @@ class ApacheMatcherDumper extends MatcherDumper
      */
     private function getRouteMethods(Route $route)
     {
-        $methods = array();
-        if ($req = $route->getRequirement('_method')) {
-            $methods = explode('|', strtoupper($req));
-            // GET and HEAD are equivalent
-            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-                $methods[] = 'HEAD';
-            }
+        $methods = $route->getMethods();
+
+        // GET and HEAD are equivalent
+        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
         }
 
         return $methods;

@@ -52,6 +52,7 @@ class CoreExtension extends AbstractExtension
             new Type\CollectionType(),
             new Type\CountryType(),
             new Type\DateType(),
+            new Type\DateIntervalType(),
             new Type\DateTimeType(),
             new Type\EmailType(),
             new Type\HiddenType(),

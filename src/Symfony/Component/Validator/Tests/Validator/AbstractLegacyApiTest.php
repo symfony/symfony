@@ -77,12 +77,11 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
      */
     public function testTraversableTraverseDisabled()
     {
-        $test = $this;
         $entity = new Entity();
         $traversable = new \ArrayIterator(array('key' => $entity));
 
-        $callback = function () use ($test) {
-            $test->fail('Should not be called');
+        $callback = function () {
+            $this->fail('Should not be called');
         };
 
         $this->metadata->addConstraint(new Callback(array(
@@ -98,14 +97,13 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
      */
     public function testRecursiveTraversableRecursiveTraversalDisabled()
     {
-        $test = $this;
         $entity = new Entity();
         $traversable = new \ArrayIterator(array(
             2 => new \ArrayIterator(array('key' => $entity)),
         ));
 
-        $callback = function () use ($test) {
-            $test->fail('Should not be called');
+        $callback = function () {
+            $this->fail('Should not be called');
         };
 
         $this->metadata->addConstraint(new Callback(array(
@@ -118,11 +116,10 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
     public function testValidateInContext()
     {
-        $test = $this;
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+        $callback1 = function ($value, ExecutionContextInterface $context) {
             $previousValue = $context->getValue();
             $previousMetadata = $context->getMetadata();
             $previousPath = $context->getPropertyPath();
@@ -131,22 +128,22 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
             $context->validate($value->reference, 'subpath');
 
             // context changes shouldn't leak out of the validate() call
-            $test->assertSame($previousValue, $context->getValue());
-            $test->assertSame($previousMetadata, $context->getMetadata());
-            $test->assertSame($previousPath, $context->getPropertyPath());
-            $test->assertSame($previousGroup, $context->getGroup());
+            $this->assertSame($previousValue, $context->getValue());
+            $this->assertSame($previousMetadata, $context->getMetadata());
+            $this->assertSame($previousPath, $context->getPropertyPath());
+            $this->assertSame($previousGroup, $context->getGroup());
         };
 
-        $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
-            $test->assertSame($test::REFERENCE_CLASS, $context->getClassName());
-            $test->assertNull($context->getPropertyName());
-            $test->assertSame('subpath', $context->getPropertyPath());
-            $test->assertSame('Group', $context->getGroup());
-            $test->assertSame($test->referenceMetadata, $context->getMetadata());
-            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
-            $test->assertSame($entity, $context->getRoot());
-            $test->assertSame($entity->reference, $context->getValue());
-            $test->assertSame($entity->reference, $value);
+        $callback2 = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('subpath', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($this->metadataFactory, $context->getMetadataFactory());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference, $context->getValue());
+            $this->assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -176,11 +173,10 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
     public function testValidateArrayInContext()
     {
-        $test = $this;
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
+        $callback1 = function ($value, ExecutionContextInterface $context) {
             $previousValue = $context->getValue();
             $previousMetadata = $context->getMetadata();
             $previousPath = $context->getPropertyPath();
@@ -189,22 +185,22 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
             $context->validate(array('key' => $value->reference), 'subpath');
 
             // context changes shouldn't leak out of the validate() call
-            $test->assertSame($previousValue, $context->getValue());
-            $test->assertSame($previousMetadata, $context->getMetadata());
-            $test->assertSame($previousPath, $context->getPropertyPath());
-            $test->assertSame($previousGroup, $context->getGroup());
+            $this->assertSame($previousValue, $context->getValue());
+            $this->assertSame($previousMetadata, $context->getMetadata());
+            $this->assertSame($previousPath, $context->getPropertyPath());
+            $this->assertSame($previousGroup, $context->getGroup());
         };
 
-        $callback2 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
-            $test->assertSame($test::REFERENCE_CLASS, $context->getClassName());
-            $test->assertNull($context->getPropertyName());
-            $test->assertSame('subpath[key]', $context->getPropertyPath());
-            $test->assertSame('Group', $context->getGroup());
-            $test->assertSame($test->referenceMetadata, $context->getMetadata());
-            $test->assertSame($test->metadataFactory, $context->getMetadataFactory());
-            $test->assertSame($entity, $context->getRoot());
-            $test->assertSame($entity->reference, $context->getValue());
-            $test->assertSame($entity->reference, $value);
+        $callback2 = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('subpath[key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($this->metadataFactory, $context->getMetadataFactory());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference, $context->getValue());
+            $this->assertSame($entity->reference, $value);
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -264,7 +260,6 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
     public function testInitializeObjectsOnFirstValidation()
     {
-        $test = $this;
         $entity = new Entity();
         $entity->initialized = false;
 
@@ -291,8 +286,8 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         // prepare constraint which
         // * checks that "initialized" is set to true
         // * validates the object again
-        $callback = function ($object, ExecutionContextInterface $context) use ($test) {
-            $test->assertTrue($object->initialized);
+        $callback = function ($object, ExecutionContextInterface $context) {
+            $this->assertTrue($object->initialized);
 
             // validate again in same group
             $context->validate($object);

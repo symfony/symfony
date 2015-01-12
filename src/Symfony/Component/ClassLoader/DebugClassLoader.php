@@ -110,7 +110,7 @@ class DebugClassLoader
         if ($file = $this->classFinder->findFile($class)) {
             require $file;
 
-            if (!class_exists($class, false) && !interface_exists($class, false) && (!function_exists('trait_exists') || !trait_exists($class, false))) {
+            if (!class_exists($class, false) && !interface_exists($class, false) && !trait_exists($class, false)) {
                 if (false !== strpos($class, '/')) {
                     throw new \RuntimeException(sprintf('Trying to autoload a class with an invalid name "%s". Be careful that the namespace separator is "\" in PHP, not "/".', $class));
                 }

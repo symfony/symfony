@@ -32,7 +32,7 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * {@inheritdoc}
@@ -99,23 +99,6 @@ abstract class Descriptor implements DescriptorInterface
     protected function write($content, $decorated = false)
     {
         $this->output->write($content, false, $decorated ? OutputInterface::OUTPUT_NORMAL : OutputInterface::OUTPUT_RAW);
-    }
-
-    /**
-     * Writes content to output.
-     *
-     * @param Table $table
-     * @param bool  $decorated
-     */
-    protected function renderTable(Table $table, $decorated = false)
-    {
-        if (!$decorated) {
-            $table->getStyle()->setCellRowFormat('%s');
-            $table->getStyle()->setCellRowContentFormat('%s');
-            $table->getStyle()->setCellHeaderFormat('%s');
-        }
-
-        $table->render();
     }
 
     /**

@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/security-core": "~2.4|~3.0.0"
+        "php": ">=5.5.9",
+        "symfony/security-core": "~2.7|~3.0"
     },
     "require-dev": {
         "doctrine/common": "~2.2",
@@ -36,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

@@ -85,54 +85,16 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->proxy->isWrapper());
     }
 
-    public function testIsActivePhp53()
-    {
-        if (PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->assertFalse($this->proxy->isActive());
-    }
-
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    public function testIsActivePhp54()
+    public function testIsActive()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
-        }
 
         $this->assertFalse($this->proxy->isActive());
         session_start();
         $this->assertTrue($this->proxy->isActive());
-    }
-
-    public function testSetActivePhp53()
-    {
-        if (PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->assertTrue($this->proxy->isActive());
-        $this->proxy->setActive(false);
-        $this->assertFalse($this->proxy->isActive());
-    }
-
-    /**
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     * @expectedException \LogicException
-     */
-    public function testSetActivePhp54()
-    {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
-        }
-
-        $this->proxy->setActive(true);
     }
 
     /**
@@ -148,29 +110,12 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     */
-    public function testNameExceptionPhp53()
-    {
-        if (PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->proxy->setName('foo');
-    }
-
-    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      * @expectedException \LogicException
      */
-    public function testNameExceptionPhp54()
+    public function testNameException()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
-        }
-
         session_start();
         $this->proxy->setName('foo');
     }
@@ -188,29 +133,12 @@ class AbstractProxyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     */
-    public function testIdExceptionPhp53()
-    {
-        if (PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $this->proxy->setActive(true);
-        $this->proxy->setId('foo');
-    }
-
-    /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      * @expectedException \LogicException
      */
-    public function testIdExceptionPhp54()
+    public function testIdException()
     {
-        if (PHP_VERSION_ID < 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
-        }
-
         session_start();
         $this->proxy->setId('foo');
     }

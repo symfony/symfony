@@ -70,19 +70,6 @@ interface KernelInterface extends HttpKernelInterface, \Serializable
     public function getBundles();
 
     /**
-     * Checks if a given class name belongs to an active bundle.
-     *
-     * @param string $class A class name
-     *
-     * @return bool true if the class belongs to an active bundle, false otherwise
-     *
-     * @api
-     *
-     * @deprecated since version 2.6, to be removed in 3.0.
-     */
-    public function isClassInActiveBundle($class);
-
-    /**
      * Returns a bundle and optionally its descendants by its name.
      *
      * @param string $name  Bundle name

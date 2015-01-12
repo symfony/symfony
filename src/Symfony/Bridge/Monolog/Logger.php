@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 {
     /**
+     * @see Symfony\Component\HttpKernel\Log\DebugLoggerInterface
      * @deprecated since version 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
      */
     public function emerg($message, array $context = array())
@@ -64,6 +65,7 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 
     /**
      * {@inheritdoc}
+>>>>>>> 2.7
      */
     public function getLogs()
     {

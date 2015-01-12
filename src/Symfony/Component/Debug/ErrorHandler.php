@@ -357,26 +357,12 @@ class ErrorHandler
         $type &= $level | $this->screamedErrors;
 
         if ($type && ($log || $throw)) {
-            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
-                $e = $context;                  // Whatever the signature of the method,
-                unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
-                $context = $e;
-            }
-
             if ($throw) {
                 if (($this->scopedErrors & $type) && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                     // Checking for class existence is a work around for https://bugs.php.net/42098
                     $throw = new ContextErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line, $context);
                 } else {
                     $throw = new \ErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line);
-                }
-
-                if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
-                    // Exceptions thrown from error handlers are sometimes not caught by the exception
-                    // handler and shutdown handlers are bypassed before 5.4.8/5.3.18.
-                    // We temporarily re-enable display_errors to prevent any blank page related to this bug.
-
-                    $throw->errorHandlerCanary = new ErrorHandlerCanary();
                 }
 
                 throw $throw;
@@ -666,32 +652,5 @@ class ErrorHandler
         trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the handleFatalError() method instead.', E_USER_DEPRECATED);
 
         static::handleFatalError();
-    }
-}
-
-/**
- * Private class used to work around https://bugs.php.net/54275
- *
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
- */
-class ErrorHandlerCanary
-{
-    private static $displayErrors = null;
-
-    public function __construct()
-    {
-        if (null === self::$displayErrors) {
-            self::$displayErrors = ini_set('display_errors', 1);
-        }
-    }
-
-    public function __destruct()
-    {
-        if (null !== self::$displayErrors) {
-            ini_set('display_errors', self::$displayErrors);
-            self::$displayErrors = null;
-        }
     }
 }

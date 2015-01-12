@@ -66,7 +66,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         parent::__construct($inputTimezone, $outputTimezone);
 
         $this->generateFormat = $this->parseFormat = $format;
-
         $this->parseUsingPipe = $parseUsingPipe || null === $parseUsingPipe;
 
         // See http://php.net/manual/en/datetime.createfromformat.php

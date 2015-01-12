@@ -539,6 +539,11 @@ class FrameworkExtension extends Extension
             $container->setAlias('templating', 'templating.engine.delegating');
         }
 
+        $container->getDefinition('fragment.renderer.hinclude')
+            ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+            ->replaceArgument(0, new Reference('templating'))
+        ;
+
         // configure the PHP engine if needed
         if (in_array('php', $config['engines'], true)) {
             $loader->load('templating_php.xml');

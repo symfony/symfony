@@ -19,23 +19,7 @@ class FragmentController extends ContainerAware
 {
     public function indexAction(Request $request)
     {
-        $actions = $this->container->get('templating')->get('actions');
-
-        $html1 = $actions->render($actions->controller('TestBundle:Fragment:inlined', array(
-            'options' => array(
-                'bar' => new Bar(),
-                'eleven' => 11,
-            ),
-        )));
-
-        $html2 = $actions->render($actions->controller('TestBundle:Fragment:customformat', array('_format' => 'html')));
-
-        $html3 = $actions->render($actions->controller('TestBundle:Fragment:customlocale', array('_locale' => 'es')));
-
-        $request->setLocale('fr');
-        $html4 = $actions->render($actions->controller('TestBundle:Fragment:forwardlocale'));
-
-        return new Response($html1.'--'.$html2.'--'.$html3.'--'.$html4);
+        return $this->container->get('templating')->renderResponse('fragment.html.php', array('bar' => new Bar()));
     }
 
     public function inlinedAction($options, $_format)

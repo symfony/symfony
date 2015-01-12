@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -41,6 +42,17 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->has('fragment.handler')) {
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
+
+            // inject Twig in the hinclude service if Twig is the only registered templating engine
+            if (
+                !$container->hasParameter('templating.engines')
+                || array('twig') == $container->getParameter('templating.engines')
+            ) {
+                $container->getDefinition('fragment.renderer.hinclude')
+                    ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+                    ->replaceArgument(0, new Reference('twig'))
+                ;
+            }
         }
 
         if ($container->has('request_stack')) {

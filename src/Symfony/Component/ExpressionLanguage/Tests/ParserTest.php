@@ -49,6 +49,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     * @expectedExceptionMessage Variable "foo" is not valid around position 1.
+     */
+    public function testParseWithCallableInvalidName()
+    {
+        $callable = function ($name) {
+            return $name === 'bar';
+        };
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo'), $callable);
+    }
+
+    public function testParseWithCallableValidName()
+    {
+        $callable = function ($name) {
+            return $name === 'bar';
+        };
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('bar'), $callable);
+    }
+
     public function getParseData()
     {
         $arguments = new Node\ArgumentsNode();

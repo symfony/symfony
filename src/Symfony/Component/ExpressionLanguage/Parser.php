@@ -31,6 +31,7 @@ class Parser
     private $binaryOperators;
     private $functions;
     private $names;
+    private $nameValidator;
 
     public function __construct(array $functions)
     {
@@ -77,6 +78,7 @@ class Parser
      *
      * The valid names is an array where the values
      * are the names that the user can use in an expression.
+     * Provide a callable to validate names dynamically.
      *
      * If the variable name in the compiled PHP code must be
      * different, define it as the key.
@@ -85,8 +87,8 @@ class Parser
      * variable 'container' can be used in the expression
      * but the compiled code will use 'this'.
      *
-     * @param TokenStream $stream A token stream instance
-     * @param array       $names  An array of valid names
+     * @param TokenStream    $stream A token stream instance
+     * @param array|callable $names  An array of valid names or a callable to validate a name
      *
      * @return Node A node tree
      *
@@ -95,7 +97,14 @@ class Parser
     public function parse(TokenStream $stream, $names = array())
     {
         $this->stream = $stream;
-        $this->names = $names;
+        if (is_array($names)) {
+            $this->names = $names;
+        } else {
+            $this->names = array();
+            if (is_callable($names)) {
+                $this->nameValidator = $names;
+            }
+        }
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
@@ -201,7 +210,12 @@ class Parser
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!in_array($token->value, $this->names, true)) {
-                                throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
+                                $nameValidator = $this->nameValidator;
+                                if ($nameValidator && $nameValidator($token->value) === true) {
+                                    $this->names[] = $token->value;
+                                } else {
+                                    throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
+                                }
                             }
 
                             // is the name used in the compiled code different

@@ -74,7 +74,7 @@ class ExpressionLanguage
      * Parses an expression.
      *
      * @param Expression|string $expression The expression to parse
-     * @param array             $names      An array of valid names
+     * @param array|callable    $names      An array of valid names or a callable to validate a name
      *
      * @return ParsedExpression A ParsedExpression instance
      */

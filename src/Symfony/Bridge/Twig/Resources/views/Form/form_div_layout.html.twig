@@ -131,6 +131,24 @@
     {%- endif -%}
 {%- endblock time_widget -%}
 
+{% block dateinterval_widget %}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {% else %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_errors(form) }}
+            {% if with_years %}{{ form_widget(form.years) }}{% endif %}
+            {% if with_months %}{{ form_widget(form.months) }}{% endif %}
+            {% if with_weeks %}{{ form_widget(form.weeks) }}{% endif %}
+            {% if with_days %}{{ form_widget(form.days) }}{% endif %}
+            {% if with_hours %}{{ form_widget(form.hours) }}{% endif %}
+            {% if with_minutes %}{{ form_widget(form.minutes) }}{% endif %}
+            {% if with_seconds %}{{ form_widget(form.seconds) }}{% endif %}
+            {% if with_invert %}{{ form_widget(form.invert) }}{% endif %}
+        </div>
+    {% endif %}
+{% endblock dateinterval_widget %}
+
 {%- block number_widget -%}
     {# type="number" doesn't work with floats #}
     {%- set type = type|default('text') -%}

@@ -136,6 +136,14 @@ EOF;
         $tests['Literal block chomping strip with multiple trailing newlines'] = array($expected, $yaml);
 
         $yaml = <<<'EOF'
+{}
+
+
+EOF;
+        $expected = array();
+        $tests['Literal block chomping strip with multiple trailing newlines after a 1-liner'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
 foo: |-
     one
     two

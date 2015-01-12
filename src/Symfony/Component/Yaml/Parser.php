@@ -234,9 +234,11 @@ class Parser
                     throw new ParseException('Multiple documents are not supported.');
                 }
 
-                // 1-liner optionally followed by newline
-                $lineCount = count($this->lines);
-                if (1 === $lineCount || (2 === $lineCount && empty($this->lines[1]))) {
+                // store the last PCRE regex error code
+                $pregLastError = preg_last_error();
+
+                // 1-liner optionally followed by newline(s)
+                if (preg_match('#^.+\s*#i', $value)) {
                     try {
                         $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
                     } catch (ParseException $e) {
@@ -264,7 +266,7 @@ class Parser
                     return $value;
                 }
 
-                switch (preg_last_error()) {
+                switch ($pregLastError) {
                     case PREG_INTERNAL_ERROR:
                         $error = 'Internal PCRE error.';
                         break;

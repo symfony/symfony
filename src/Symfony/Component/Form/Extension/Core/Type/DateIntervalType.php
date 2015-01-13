@@ -205,7 +205,6 @@ class DateIntervalType extends AbstractType
 		'hours' => range(0, 24),
 		'minutes' => range(0, 60),
 		'seconds' => range(0, 60),
-		'invert' => false,
 		'widget' => 'choice',
 		'input' => 'dateinterval',
 		'empty_value' => $emptyValue, // deprecated
@@ -253,7 +252,6 @@ class DateIntervalType extends AbstractType
 		'hours' => 'array',
 		'minutes' => 'array',
 		'seconds' => 'array',
-		'invert' => 'bool',
 	    )
 	);
     }

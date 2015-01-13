@@ -116,7 +116,6 @@ class DateIntervalTypeTest extends TestCase
 	    'input' => 'dateinterval',
 	    'with_invert' => true,
 	));
-	$form->setData(new \DateInterval('P0Y'));
 	$input = array(
 	    'years' => '7',
 	    'months' => '6',

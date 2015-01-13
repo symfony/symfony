@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-11T15:51:54Z
+
+Ready
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-11T16:07:22Z
+
+@fabpot please also merge to master, so I can make a PR to remove the deprecated stuff.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-12T14:52:35Z
+
+@Tobion there seems to be some remaining ones in the FrameworkBundle functional tests: https://travis-ci.org/symfony/symfony/jobs/46636638#L1759
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-12T18:14:06Z
+
+@stof Yes the reason for this was hard to spot. But I found it and fixed it in a BC way. The problem was the container parameter resolving in the framework router that still accessed the deprecated requirements.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-12T21:22:54Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T09:08:33Z
+
+I still think that my suggestion in https://github.com/symfony/symfony/pull/13361#discussion_r22793424 is legitimate. What do you think @fabpot ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-13T12:43:01Z
+
+:+1:

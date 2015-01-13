@@ -164,12 +164,12 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function testAddPrefixOverridesDefaultsAndRequirements()
     {
         $collection = new RouteCollection();
-        $collection->add('foo', $foo = new Route('/foo'));
-        $collection->add('bar', $bar = new Route('/bar', array(), array('_scheme' => 'http')));
-        $collection->addPrefix('/admin', array(), array('_scheme' => 'https'));
+        $collection->add('foo', $foo = new Route('/foo.{_format}'));
+        $collection->add('bar', $bar = new Route('/bar.{_format}', array(), array('_format' => 'json')));
+        $collection->addPrefix('/admin', array(), array('_format' => 'html'));
 
-        $this->assertEquals('https', $collection->get('foo')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
-        $this->assertEquals('https', $collection->get('bar')->getRequirement('_scheme'), '->addPrefix() overrides existing requirements');
+        $this->assertEquals('html', $collection->get('foo')->getRequirement('_format'), '->addPrefix() overrides existing requirements');
+        $this->assertEquals('html', $collection->get('bar')->getRequirement('_format'), '->addPrefix() overrides existing requirements');
     }
 
     public function testResource()

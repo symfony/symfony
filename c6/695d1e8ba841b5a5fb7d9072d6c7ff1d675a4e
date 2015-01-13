@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-09T21:56:34Z
+
+PR is ready. Fabbot is drunk and Travis will be fixed after subtree-splitting (for what is concerned by this)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T22:10:07Z
+
+AFAICT, the PHP-CS-Fixer expects the ``&`` to be near the variable name (or with spaces on both sides), not near the assignment operator, which is why it adds the space everywhere.
+
+for the indentation change at the end, I'm quite sure it is a bug in the PHP-CS-Fixer logic to detect closures, which is not taking into account the possibility to return by reference. I submitted https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/964
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T22:16:36Z
+
+@fabpot what is actually the Symfony coding standard for the placement of the ``&`` for references ? PSR-2 does not talk about spaces around operators at all. Given that Symfony says to put spaces around operators, the PHP-CS-Fixer is enforcing the spaces. It has no special rule for the placement of references after the assignment operator, which is why it requires a space there as well. But is the fixer right for that ?
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-01-11T17:05:04Z
+
+It's a `Operators should be arounded by at least one space.` rule.
+There is `&=` operator (`T_AND_EQUAL`), but no `=&`. It's in fact 2 operators.

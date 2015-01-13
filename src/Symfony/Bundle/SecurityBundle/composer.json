@@ -26,7 +26,7 @@
         "symfony/dependency-injection": "~2.3",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/form": "~2.4",
-        "symfony/framework-bundle": "~2.4,<2.6.0",
+        "symfony/framework-bundle": "~2.4",
         "symfony/http-foundation": "~2.3",
         "symfony/twig-bundle": "~2.2",
         "symfony/twig-bridge": "~2.2,>=2.2.6",

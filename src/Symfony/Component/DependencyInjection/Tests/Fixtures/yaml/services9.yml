@@ -8,7 +8,7 @@ services:
         class: Bar\FooClass
         tags:
             - { name: foo, foo: foo }
-            - { name: foo, bar: bar }
+            - { name: foo, bar: bar, baz: baz }
         factory_class: Bar\FooClass
         factory_method: getInstance
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']

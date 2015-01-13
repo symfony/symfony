@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T13:23:12Z
+
+@fabpot please update fabbot to use the latest 1.4 branch for PHP-CS-Fixer (and please make the 1.4 release which is waiting for you since weeks). The bug with functions returning by reference (which suggests a wrong patch in fabbot here) has been fixed already
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-13T13:27:06Z
+
+@stof Frankly, fixing Symfony is way more important than releasing PHP-CS-Fixer.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T13:28:13Z
+
+@fabpot then it may be a good idea to let @keradus handle the release of the PHP-CS-Fixer as he is doing all the maintenance work on it.

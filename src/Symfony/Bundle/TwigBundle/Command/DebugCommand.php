@@ -57,9 +57,8 @@ class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        preg_match('/:d[a-z]{0,4}$/', $input->getFirstArgument(), $matches);
-        if (count($matches)) {
-            trigger_error('The use of "twig:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:twig" instead.', E_USER_DEPRECATED);
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "twig:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:twig" instead.</comment>');
         }
 
         parent::execute($input, $output);

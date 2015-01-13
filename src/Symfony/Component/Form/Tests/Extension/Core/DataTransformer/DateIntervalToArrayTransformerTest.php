@@ -158,7 +158,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
     public function testReverseTransformRequiresDateTime()
     {
 	$transformer = new DateIntervalToArrayTransformer();
-	$this->assertSame(null, $transformer->reverseTransform(null));
+	$this->assertNull($transformer->reverseTransform(null));
 	$this->setExpectedException('Symfony\Component\Form\Exception\TransformationFailedException', 'Expected an array.');
 	$transformer->reverseTransform('12345');
     }

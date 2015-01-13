@@ -120,6 +120,19 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4_bad_import.yml');
     }
 
+    public function testLegacyLoadServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('legacy-services6.yml');
+        $services = $container->getDefinitions();
+        $this->assertEquals('FooClass', $services['constructor']->getClass());
+        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod());
+        $this->assertEquals('BazClass', $services['factory_service']->getClass());
+        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
+        $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
+    }
+
     public function testLoadServices()
     {
         $container = new ContainerBuilder();
@@ -132,7 +145,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('container', $services['scope.container']->getScope());
         $this->assertEquals('custom', $services['scope.custom']->getScope());
         $this->assertEquals('prototype', $services['scope.prototype']->getScope());
-        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod(), '->load() parses the factory_method attribute');
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
@@ -140,7 +152,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('BazClass', 'configureStatic'), $services['configurator3']->getConfigurator(), '->load() parses the configurator tag');
         $this->assertEquals(array(array('setBar', array()), array('setBar', array()), array('setBar', array(new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")')))), $services['method_call1']->getMethodCalls(), '->load() parses the method_call tag');
         $this->assertEquals(array(array('setBar', array('foo', new Reference('foo'), array(true, false)))), $services['method_call2']->getMethodCalls(), '->load() parses the method_call tag');
-        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');

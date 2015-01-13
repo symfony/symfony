@@ -86,7 +86,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
                 $result['days'] = (string) ($result['days'] % 7);
             }
         }
-        $result['invert'] = $result['invert'] === '-' ? true : false;
+        $result['invert'] = $result['invert'] === '-';
         $result = array_intersect_key($result, array_flip($this->fields));
 
         return $result;

@@ -9,6 +9,10 @@
         {
             "name": "Nicolas Grekas",
             "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
         }
     ],
     "require": {

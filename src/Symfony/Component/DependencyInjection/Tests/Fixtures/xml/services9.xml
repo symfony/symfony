@@ -8,7 +8,7 @@
   <services>
     <service id="foo" class="Bar\FooClass" factory-method="getInstance" factory-class="Bar\FooClass">
       <tag name="foo" foo="foo"/>
-      <tag name="foo" bar="bar"/>
+      <tag name="foo" bar="bar" baz="baz"/>
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument type="collection">

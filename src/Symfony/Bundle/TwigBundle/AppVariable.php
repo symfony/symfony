@@ -86,11 +86,15 @@ class AppVariable
      */
     public function getUser()
     {
-        if (null === $this->tokenStorage) {
+        if (null !== $this->tokenStorage) {
+            $tokenStorage = $this->tokenStorage;
+        } elseif (null !== $this->security) {
+            $tokenStorage = $this->security;
+        } else {
             throw new \RuntimeException('The "app.user" variable is not available.');
         }
 
-        if (!$token = $this->tokenStorage->getToken()) {
+        if (!$token = $tokenStorage->getToken()) {
             return;
         }
 

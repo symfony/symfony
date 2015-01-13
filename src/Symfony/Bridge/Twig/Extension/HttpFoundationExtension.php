@@ -36,6 +36,8 @@ class HttpFoundationExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('absolute_url', array($this, 'generateAbsoluteUrl')),
             new \Twig_SimpleFunction('relative_path', array($this, 'generateRelativePath')),
+            new \Twig_SimpleFunction('request', array($this, 'getRequest')),
+            new \Twig_SimpleFunction('session', array($this, 'getSession')),
         );
     }
 
@@ -95,6 +97,28 @@ class HttpFoundationExtension extends \Twig_Extension
         }
 
         return $request->getRelativeUriForPath($path);
+    }
+
+    /**
+     * Returns the current request.
+     *
+     * @return Request|null The HTTP request object
+     */
+    public function getRequest()
+    {
+        return $this->requestStack->getCurrentRequest();
+    }
+
+    /**
+     * Returns the current session.
+     *
+     * @return Session|null The session
+     */
+    public function getSession()
+    {
+        if ($request = $this->getRequest()) {
+            return $request->getSession();
+        }
     }
 
     /**

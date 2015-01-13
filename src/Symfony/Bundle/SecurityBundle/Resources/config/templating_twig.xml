@@ -17,7 +17,8 @@
 
         <service id="twig.extension.security" class="%twig.extension.security.class%" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
+            <argument type="service" id="security.authorization_checker" />
+            <argument type="service" id="security.token_storage" />
         </service>
     </services>
 </container>

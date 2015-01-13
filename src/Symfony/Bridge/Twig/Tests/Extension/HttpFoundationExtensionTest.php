@@ -71,4 +71,24 @@ class HttpFoundationExtensionTest extends \PHPUnit_Framework_TestCase
             array('//example.com/baz', '//example.com/baz', '/'),
         );
     }
+
+    public function testGetRequest()
+    {
+        $stack = new RequestStack();
+        $stack->push($request = Request::create('/'));
+        $extension = new HttpFoundationExtension($stack);
+
+        $this->assertSame($request, $extension->getRequest());
+    }
+
+    public function testGetSession()
+    {
+        $stack = new RequestStack();
+        $stack->push($request = Request::create('/'));
+        $extension = new HttpFoundationExtension($stack);
+
+        $request->setSession($this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface'));
+
+        $this->assertSame($request->getSession(), $extension->getSession());
+    }
 }

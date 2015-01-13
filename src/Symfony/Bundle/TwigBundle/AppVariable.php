@@ -22,6 +22,8 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  * Exposes some Symfony parameters and services as an "app" global variable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0. Use request(), user(), env(), session(), is_debug() instead.
  */
 class AppVariable
 {
@@ -86,6 +88,8 @@ class AppVariable
      */
     public function getUser()
     {
+        trigger_error('The "app.user" variable is deprecated since version 2.7 and will be removed in 3.0. Use the user() function instead.', E_USER_DEPRECATED);
+
         if (null === $this->tokenStorage) {
             throw new \RuntimeException('The "app.user" variable is not available.');
         }
@@ -107,6 +111,8 @@ class AppVariable
      */
     public function getRequest()
     {
+        trigger_error('The "app.request" variable is deprecated since version 2.7 and will be removed in 3.0. Use the request() function instead.', E_USER_DEPRECATED);
+
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.request" variable is not available.');
         }
@@ -121,6 +127,8 @@ class AppVariable
      */
     public function getSession()
     {
+        trigger_error('The "app.session" variable is deprecated since version 2.7 and will be removed in 3.0. Use the session() function instead.', E_USER_DEPRECATED);
+
         if (null === $this->requestStack) {
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
@@ -137,6 +145,8 @@ class AppVariable
      */
     public function getEnvironment()
     {
+        trigger_error('The "app.environment" variable is deprecated since version 2.7 and will be removed in 3.0. Use the env() function instead.', E_USER_DEPRECATED);
+
         if (null === $this->environment) {
             throw new \RuntimeException('The "app.environment" variable is not available.');
         }
@@ -151,6 +161,8 @@ class AppVariable
      */
     public function getDebug()
     {
+        trigger_error('The "app.debug" variable is deprecated since version 2.7 and will be removed in 3.0. Use the is_debug() function instead.', E_USER_DEPRECATED);
+
         if (null === $this->debug) {
             throw new \RuntimeException('The "app.debug" variable is not available.');
         }

@@ -12,7 +12,7 @@ $container = new ContainerBuilder();
 $container->
     register('foo', 'Bar\FooClass')->
     addTag('foo', array('foo' => 'foo'))->
-    addTag('foo', array('bar' => 'bar'))->
+    addTag('foo', array('bar' => 'bar', 'baz' => 'baz'))->
     setFactoryClass('Bar\\FooClass')->
     setFactoryMethod('getInstance')->
     setArguments(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))->

@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "conflict": {
+        "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
+    },
     "require-dev": {
         "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2",
         "symfony/http-foundation": "~2.1"

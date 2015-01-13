@@ -49,9 +49,6 @@ class MarkdownDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         $output = '- Path: '.$route->getPath()
             ."\n".'- Path Regex: '.$route->compile()->getRegex()
             ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
@@ -60,7 +57,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
-            ."\n".'- Requirements: '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')
+            ."\n".'- Requirements: '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM')
             ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
         $this->write(isset($options['name'])

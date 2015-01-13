@@ -54,13 +54,13 @@ class TwigEngine extends BaseEngine implements EngineInterface
 
     /**
      * @deprecated since version 2.7, to be removed in 3.0.
-     *             Use TwigDefaultEscapingStrategy instead.
+     *             Use the 'filename' strategy instead.
      */
     public function guessDefaultEscapingStrategy($filename)
     {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Twig_FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
 
-        return TwigDefaultEscapingStrategy::guess($filename);
+        return \Twig_FileExtensionEscapingStrategy::guess($filename);
     }
 
     /**

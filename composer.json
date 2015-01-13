@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "doctrine/common": "~2.3",
-        "twig/twig": "~1.12,>=1.12.3",
+        "twig/twig": "~1.17",
         "psr/log": "~1.0"
     },
     "replace": {

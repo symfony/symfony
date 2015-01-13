@@ -149,7 +149,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getParameter('twig.options');
-        $this->assertEquals(array('Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy', 'guess'), $options['autoescape']);
+        $this->assertEquals('filename', $options['autoescape']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()

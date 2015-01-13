@@ -33,6 +33,7 @@
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/asset": "~2.7|~3.0.0",
         "symfony/browser-kit": "~2.4|~3.0.0",
         "symfony/console": "~2.6|~3.0.0",

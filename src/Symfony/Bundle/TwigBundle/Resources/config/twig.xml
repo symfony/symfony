@@ -70,6 +70,13 @@
             <argument type="service" id="templating.locator" />
         </service>
 
+        <service id="twig.extension.profiler" class="Symfony\Bridge\Twig\Extension\ProfilerExtension" public="false">
+            <argument type="service" id="twig.profile" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+        </service>
+
+        <service id="twig.profile" class="Twig_Profiler_Profile" />
+
         <service id="twig.extension.trans" class="%twig.extension.trans.class%" public="false">
             <argument type="service" id="translator" />
         </service>

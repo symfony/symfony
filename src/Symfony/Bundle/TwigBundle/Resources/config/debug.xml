@@ -9,13 +9,6 @@
     </parameters>
 
     <services>
-        <service id="debug.templating.engine.twig" class="%debug.templating.engine.twig.class%" public="false">
-            <argument type="service" id="twig" />
-            <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="templating.locator" />
-            <argument type="service" id="debug.stopwatch" />
-        </service>
-
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false">
             <tag name="twig.extension" />
         </service>

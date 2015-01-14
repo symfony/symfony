@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -25,19 +24,10 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
  */
 class AppVariable
 {
-    private $security;
     private $tokenStorage;
     private $requestStack;
     private $environment;
     private $debug;
-
-    /**
-     * @deprecated since version 2.7, to be removed in 3.0.
-     */
-    public function setSecurity(SecurityContextInterface $security)
-    {
-        $this->security = $security;
-    }
 
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
@@ -60,24 +50,6 @@ class AppVariable
     }
 
     /**
-     * Returns the security context service.
-     *
-     * @deprecated since version 2.6, to be removed in 3.0.
-     *
-     * @return SecurityContext|null The security context
-     */
-    public function getSecurity()
-    {
-        trigger_error('The "app.security" variable is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if (null === $this->security) {
-            throw new \RuntimeException('The "app.security" variable is not available.');
-        }
-
-        return $this->security;
-    }
-
-    /**
      * Returns the current user.
      *
      * @return mixed
@@ -88,8 +60,6 @@ class AppVariable
     {
         if (null !== $this->tokenStorage) {
             $tokenStorage = $this->tokenStorage;
-        } elseif (null !== $this->security) {
-            $tokenStorage = $this->security;
         } else {
             throw new \RuntimeException('The "app.user" variable is not available.');
         }

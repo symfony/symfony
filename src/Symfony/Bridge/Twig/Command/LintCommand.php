@@ -87,6 +87,13 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $twig = $this->getTwigEnvironment();
+
+        if (null === $twig) {
+            $output->writeln('<error>The Twig environment needs to be set.</error>');
+
+            return 1;
+        }
+
         $filename = $input->getArgument('filename');
 
         if (!$filename) {

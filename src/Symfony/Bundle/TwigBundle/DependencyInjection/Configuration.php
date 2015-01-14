@@ -166,9 +166,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')
-                    ->defaultValue(array('Symfony\Bundle\TwigBundle\TwigDefaultEscapingStrategy', 'guess'))
-                ->end()
+                ->variableNode('autoescape')->defaultValue('filename')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->end()

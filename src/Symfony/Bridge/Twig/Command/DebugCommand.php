@@ -83,6 +83,13 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $twig = $this->getTwigEnvironment();
+
+        if (null === $twig) {
+            $output->writeln('<error>The Twig environment needs to be set.</error>');
+
+            return 1;
+        }
+
         $types = array('functions', 'filters', 'tests', 'globals');
 
         if ($input->getOption('format') === 'json') {

@@ -14,17 +14,13 @@ namespace Symfony\Bundle\TwigBundle\Command;
 use Symfony\Bridge\Twig\Command\DebugCommand as BaseDebugCommand;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Lists twig functions, filters, globals and tests present in the current project
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class DebugCommand extends BaseLintCommand implements ContainerAwareInterface
+class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface|null

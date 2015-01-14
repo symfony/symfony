@@ -11,8 +11,12 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
+trigger_error('The '.__NAMESPACE__.'\TwigDefaultEscapingStrategy class is deprecated in version 2.7 and will be removed in version 3.0. Use the "filename" auto-escaping strategy instead.', E_USER_DEPRECATED);
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.7, will be removed in 3.0. Use the "filename" auto-escaping strategy instead.
  */
 class TwigDefaultEscapingStrategy
 {

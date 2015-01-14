@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-01-04T10:59:09Z
+
+Given that `{% render %}` will no longer work, the PR table should say `BC breaks? yes`, right?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-04T11:03:10Z
+
+@javiereguiluz fixed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-04T13:16:16Z
+
+:+1: but it seems like it is missing the deprecation trigger so far. So I guess renderUri should include a trigger_error in branch 2.7
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-14T06:09:19Z
+
+@Tobion You're right, done in #13408

@@ -386,6 +386,31 @@ EOF;
         $this->assertEquals('Fixtures', $kernel->getName());
     }
 
+    public function getGetNameWithWeirdDirectoryTests()
+    {
+        return array(
+            array('app', 12345),
+            array('Application', '12345Application'),
+            array('Application12345', 'Application12345'),
+            array('Application12345', '12345Application12345'),
+        );
+    }
+
+    /** @dataProvider getGetNameWithWeirdDirectoryTests */
+    public function testGetNameWithWeirdDirectory($expected, $rootDir)
+    {
+        $kernel = new KernelForTest('test', true);
+        $p = new \ReflectionProperty($kernel, 'rootDir');
+        $p->setAccessible(true);
+        $p->setValue($kernel, $rootDir);
+
+        $p = new \ReflectionProperty($kernel, 'name');
+        $p->setAccessible(true);
+        $p->setValue($kernel, null);
+
+        $this->assertEquals($expected, $kernel->getName());
+    }
+
     public function testOverrideGetName()
     {
         $kernel = new KernelForOverrideName('test', true);

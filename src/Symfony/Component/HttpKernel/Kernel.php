@@ -242,7 +242,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws \RuntimeException if a custom resource is hidden by a resource in a derived bundle
      */
@@ -308,7 +308,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     public function getName()
     {
         if (null === $this->name) {
-            $this->name = preg_replace('/(^[0-9]*|[^a-zA-Z0-9_]+)/', '', basename($this->rootDir)) ?: 'app';
+            $this->name = preg_replace('/[^a-zA-Z0-9_]+/', '', basename($this->rootDir));
         }
 
         return $this->name;
@@ -502,7 +502,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function getContainerClass()
     {
-        return $this->name.ucfirst($this->environment).($this->debug ? 'Debug' : '').'ProjectContainer';
+        return preg_replace('/(^[0-9]*|[^a-zA-Z0-9_]+)/', '', $this->name.ucfirst($this->environment)).($this->debug ? 'Debug' : '').'ProjectContainer';
     }
 
     /**

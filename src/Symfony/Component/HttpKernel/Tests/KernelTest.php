@@ -389,26 +389,30 @@ EOF;
     public function getGetNameWithWeirdDirectoryTests()
     {
         return array(
-            array('app', 12345),
-            array('Application', '12345Application'),
-            array('Application12345', 'Application12345'),
-            array('Application12345', '12345Application12345'),
+            array('appDevProjectContainer', 'dev', 'app'),
+            array('appFoobarProjectContainer', 'foo bar', 'app'),
+            array('appProjectContainer', '..**..', 'app'),
+            array('ProjectContainer', '..**..', '12345'),
+            array('DevProjectContainer', 'dev', 12345),
+            array('ApplicationDevProjectContainer', 'dev', '12345Application'),
+            array('Application12345DevProjectContainer', 'dev', 'Application12345'),
+            array('Application12345DevProjectContainer', 'dev', '12345Application12345'),
         );
     }
 
     /** @dataProvider getGetNameWithWeirdDirectoryTests */
-    public function testGetNameWithWeirdDirectory($expected, $rootDir)
+    public function testGetContainerClass($expected, $environment, $rootDir)
     {
-        $kernel = new KernelForTest('test', true);
-        $p = new \ReflectionProperty($kernel, 'rootDir');
-        $p->setAccessible(true);
-        $p->setValue($kernel, $rootDir);
+        $kernel = new KernelForTest($environment, false);
 
         $p = new \ReflectionProperty($kernel, 'name');
         $p->setAccessible(true);
-        $p->setValue($kernel, null);
+        $p->setValue($kernel, $rootDir);
 
-        $this->assertEquals($expected, $kernel->getName());
+        $m = new \ReflectionMethod($kernel, 'getContainerClass');
+        $m->setAccessible(true);
+
+        $this->assertEquals($expected, $m->invoke($kernel));
     }
 
     public function testOverrideGetName()

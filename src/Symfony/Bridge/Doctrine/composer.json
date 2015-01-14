@@ -27,7 +27,7 @@
         "symfony/property-access": "~2.3",
         "symfony/security": "~2.2",
         "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.5,>=2.5.5",
+        "symfony/validator": "~2.5,>=2.5.5,<2.7",
         "symfony/translation": "~2.0,>=2.0.5",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",

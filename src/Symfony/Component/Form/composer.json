@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.5,>=2.5.5",
+        "symfony/validator": "~2.5,>=2.5.5,<2.7",
         "symfony/http-foundation": "~2.2",
         "symfony/http-kernel": "~2.4",
         "symfony/security-csrf": "~2.4",

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T13:05:36Z
+
+shouldn't you keep the a class in the bundle extending the new one for BC ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-13T13:07:55Z
+
+The class was introduced in 2.7.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T13:10:13Z
+
+then why do we have a method in it which is deprecated since 2.7 ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-13T13:19:04Z
+
+For compatibility with the GlobalVariables class it replaces.

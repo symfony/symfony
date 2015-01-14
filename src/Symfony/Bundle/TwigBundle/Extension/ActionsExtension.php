@@ -56,6 +56,8 @@ class ActionsExtension extends \Twig_Extension
      */
     public function renderUri($uri, array $options = array())
     {
+        trigger_error('The Twig render tag was deprecated in version 2.2 and will be removed in version 3.0. Use the Twig render function instead.', E_USER_DEPRECATED);
+
         $strategy = isset($options['strategy']) ? $options['strategy'] : 'inline';
         unset($options['strategy']);
 

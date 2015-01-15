@@ -137,7 +137,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
         } catch (AuthenticationException $invalid) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-Me authentication failed: '.$invalid->getMessage());
+                $this->logger->debug('Remember-Me authentication failed', array('exception' => $invalid));
             }
         }
 

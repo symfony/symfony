@@ -74,7 +74,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Digest Authorization header received from user agent: %s', $header));
+            $this->logger->debug('Digest Authorization header received from user agent', array('header' => $header));
         }
 
         try {
@@ -89,7 +89,7 @@ class DigestAuthenticationListener implements ListenerInterface
             $user = $this->provider->loadUserByUsername($digestAuth->getUsername());
 
             if (null === $user) {
-                throw new AuthenticationServiceException('AuthenticationDao returned null, which is an interface contract violation');
+                throw new AuthenticationServiceException('Digest User provider returned null, which is an interface contract violation');
             }
 
             $serverDigestMd5 = $digestAuth->calculateServerDigest($user->getPassword(), $request->getMethod());
@@ -101,7 +101,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
         if ($serverDigestMd5 !== $digestAuth->getResponse()) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is AuthenticationDao returning clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
+                $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is the header returning a clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
             }
 
             $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
@@ -116,7 +116,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
+            $this->logger->info(sprintf('Digest authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
         }
 
         $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
@@ -130,7 +130,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info($authException);
+            $this->logger->info('Digest authentication failed', array('exception' => $authException));
         }
 
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));

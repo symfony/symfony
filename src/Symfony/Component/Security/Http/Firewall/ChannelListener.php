@@ -44,7 +44,7 @@ class ChannelListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+        list(, $channel) = $this->map->getPatterns($request);
 
         if ('https' === $channel && !$request->isSecure()) {
             if (null !== $this->logger) {

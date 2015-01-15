@@ -117,7 +117,7 @@ class Profiler
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
-            $this->logger->warning('Unable to store the profiler information.');
+            $this->logger->warning('Unable to store the profiler information.', array('used_storage' => get_class($this->storage)));
         }
 
         return $ret;

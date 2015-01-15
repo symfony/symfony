@@ -63,7 +63,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Anonymous authentication failed: %s', $failed->getMessage()));
+                $this->logger->info('Anonymous authentication failed', array('exception' => $failed));
             }
         }
     }

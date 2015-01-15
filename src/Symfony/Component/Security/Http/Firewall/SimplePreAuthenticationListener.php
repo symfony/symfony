@@ -73,7 +73,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
+            $this->logger->info(sprintf('Attempting SimplePreAuthentication %s', $this->providerKey));
         }
 
         if (null !== $this->tokenStorage->getToken() && !$this->tokenStorage->getToken() instanceof AnonymousToken) {
@@ -99,7 +99,7 @@ class SimplePreAuthenticationListener implements ListenerInterface
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed: %s', $e->getMessage()));
+                $this->logger->info('SimplePreAuthentication request failed', array('exception' => $e));
             }
 
             if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {

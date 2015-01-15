@@ -282,7 +282,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     protected function cancelCookie(Request $request)
     {
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Clearing remember-me cookie "%s"', $this->options['name']));
+            $this->logger->debug('Clearing remember-me cookie', array('name' => $this->options['name']));
         }
 
         $request->attributes->set(self::COOKIE_ATTR_NAME, new Cookie($this->options['name'], null, 1, $this->options['path'], $this->options['domain']));
@@ -304,7 +304,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
         $parameter = $request->get($this->options['remember_me_parameter'], null, true);
 
         if (null === $parameter && null !== $this->logger) {
-            $this->logger->debug(sprintf('Did not send remember-me cookie (remember-me parameter "%s" was not sent).', $this->options['remember_me_parameter']));
+            $this->logger->debug('Did not send remember-me cookie.', array('parameter' => $this->options['remember_me_parameter']));
         }
 
         return $parameter === 'true' || $parameter === 'on' || $parameter === '1' || $parameter === 'yes';

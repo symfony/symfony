@@ -56,16 +56,16 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Checking secure context token: %s', $this->tokenStorage->getToken()));
-        }
-
         try {
             list($user, $credentials) = $this->getPreAuthenticatedData($request);
         } catch (BadCredentialsException $exception) {
             $this->clearToken($exception);
 
             return;
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->debug('Checking current security token', array('token' => (string) $this->tokenStorage->getToken()));
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
@@ -75,14 +75,14 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Trying to pre-authenticate user "%s"', $user));
+            $this->logger->debug('Trying to pre-authenticate user', array('username' => (string) $user));
         }
 
         try {
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication success: %s', $token));
+                $this->logger->info('Pre-authentication successful', array('token' => (string) $token));
             }
             $this->tokenStorage->setToken($token);
 
@@ -107,7 +107,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info("Cleared security token due to an exception", array('exception' => $exception));
+                $this->logger->info('Cleared security token due to an exception', array('exception' => $exception));
             }
         }
     }

@@ -101,7 +101,7 @@ class DigestAuthenticationListener implements ListenerInterface
 
         if ($serverDigestMd5 !== $digestAuth->getResponse()) {
             if (null !== $this->logger) {
-                $this->logger->debug(sprintf("Expected response: '%s' but received: '%s'; is the header returning a clear text passwords?", $serverDigestMd5, $digestAuth->getResponse()));
+                $this->logger->debug("Unexpected response from the DigestAuth received; is the header returning a clear text passwords?", array('expected' => $serverDigestMd5, 'received' => $digestAuth->getResponse()));
             }
 
             $this->fail($event, $request, new BadCredentialsException('Incorrect response'));
@@ -116,7 +116,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Digest authentication success for user "%s" with response "%s"', $digestAuth->getUsername(), $digestAuth->getResponse()));
+            $this->logger->info('Digest authentication successful', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
         }
 
         $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));

@@ -57,7 +57,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationSuccessHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug(sprintf('Using the %s object as authentication success handler', get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication success handler', array('handler' => get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationSuccess($request, $token);
@@ -84,7 +84,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug(sprintf('Using the %s object as authentication failure handler', get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication failure handler', array('handler' => get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationFailure($request, $exception);

@@ -6,4 +6,8 @@
 - Method: PUT|POST
 - Class: Symfony\Component\Routing\Route
 - Defaults: NONE
-- Requirements: NONE
+- Requirements: NO CUSTOM
+- Options: 
+    - `compiler_class`: Symfony\Component\Routing\RouteCompiler
+    - `opt1`: val1
+    - `opt2`: val2

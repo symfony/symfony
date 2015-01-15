@@ -17,7 +17,7 @@ namespace Symfony\Component\VarDumper\Cloner;
 class Data
 {
     private $data;
-    private $maxDepth = -1;
+    private $maxDepth = 20;
     private $maxItemsPerDepth = -1;
     private $useRefHandles = -1;
 

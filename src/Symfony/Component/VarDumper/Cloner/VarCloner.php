@@ -24,7 +24,7 @@ class VarCloner extends AbstractCloner
      */
     protected function doClone($var)
     {
-        $useExt = extension_loaded('symfony_debug');
+        $useExt = $this->useExt;
         $i = 0;                         // Current iteration position in $queue
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
@@ -120,7 +120,19 @@ class VarCloner extends AbstractCloner
                             $stub->type = Stub::TYPE_ARRAY;
                             $stub->class = Stub::ARRAY_ASSOC;
                             $stub->value = $zval['array_count'] ?: count($v);
+
                             $a = $v;
+                            $a[] = null;
+                            $h = count($v);
+                            array_pop($a);
+
+                            // Happens with copies of $GLOBALS
+                            if ($h !== $stub->value) {
+                                $a = array();
+                                foreach ($v as $gk => &$gv) {
+                                    $a[$gk] =& $gv;
+                                }
+                            }
                         }
                         break;
 

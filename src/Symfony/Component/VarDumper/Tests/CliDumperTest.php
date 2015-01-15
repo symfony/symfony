@@ -104,8 +104,154 @@ array:25 [
 
 EOTXT
             ,
-
             $out
         );
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testSpecialVars56()
+    {
+        if (PHP_VERSION_ID < 50600) {
+            $this->markTestSkipped('PHP 5.6 is required');
+        }
+
+        $var = $this->getSpecialVars();
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar($var);
+        $out = fopen('php://memory', 'r+b');
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertSame(
+            <<<EOTXT
+array:3 [
+  0 => array:1 [
+    0 => &1 array:1 [
+      0 => &1 array:1 [&1]
+    ]
+  ]
+  1 => array:1 [
+    "GLOBALS" => &2 array:1 [
+      "GLOBALS" => &2 array:1 [&2]
+    ]
+  ]
+  2 => &2 array:1 [&2]
+]
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testGlobalsNoExt()
+    {
+        $var = $this->getSpecialVars();
+        unset($var[0]);
+        $out = '';
+
+        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
+            if ($depth >= 0) {
+                $out .= str_repeat('  ', $depth).$line."\n";
+            }
+        });
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $refl = new \ReflectionProperty($cloner, 'useExt');
+        $refl->setAccessible(true);
+        $refl->setValue($cloner, false);
+
+        $data = $cloner->cloneVar($var);
+        $dumper->dump($data);
+
+        $this->assertSame(
+            <<<EOTXT
+array:2 [
+  1 => array:1 [
+    "GLOBALS" => &1 array:1 [
+      "GLOBALS" => &1 array:1 [&1]
+    ]
+  ]
+  2 => &1 array:1 [&1]
+]
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function testBuggyRefs()
+    {
+        if (PHP_VERSION_ID >= 50600) {
+            $this->markTestSkipped('PHP 5.6 fixed refs counting');
+        }
+
+        $var = $this->getSpecialVars();
+        $var = $var[0];
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar($var)->getLimitedClone(3, -1);
+        $out = '';
+        $dumper->dump($data, function ($line, $depth) use (&$out) {
+            if ($depth >= 0) {
+                $out .= str_repeat('  ', $depth).$line."\n";
+            }
+        });
+
+        $this->assertSame(
+            <<<EOTXT
+array:1 [
+  0 => array:1 [
+    0 => array:1 [
+      0 => array:1 [
+         …1
+      ]
+    ]
+  ]
+]
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
+    private function getSpecialVars()
+    {
+        foreach (array_keys($GLOBALS) as $var) {
+            if ('GLOBALS' !== $var) {
+                unset($GLOBALS[$var]);
+            }
+        }
+
+        $var = function &() {
+            $var = array();
+            $var[] =& $var;
+
+            return $var;
+        };
+
+        return array($var(), $GLOBALS, &$GLOBALS);
     }
 }

@@ -108,7 +108,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $this->logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Authentication failure, redirect triggered', array('failure_path' => '/login'));
+            ->with('Authentication failure, redirect triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, array(), $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -125,7 +125,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $this->logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Authentication failure, forward triggered', array('failure_path' => '/login'));
+            ->with('Authentication failure, forward triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);

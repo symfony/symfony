@@ -137,7 +137,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             }
         } catch (AuthenticationException $invalid) {
             if (null !== $this->logger) {
-                $this->logger->debug('Remember-Me authentication failed', array('exception' => $invalid));
+                $this->logger->debug('Remember-Me authentication failed.', array('exception' => $invalid));
             }
         }
 
@@ -282,7 +282,7 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
     protected function cancelCookie(Request $request)
     {
         if (null !== $this->logger) {
-            $this->logger->debug('Clearing remember-me cookie', array('name' => $this->options['name']));
+            $this->logger->debug('Clearing remember-me cookie.', array('name' => $this->options['name']));
         }
 
         $request->attributes->set(self::COOKIE_ATTR_NAME, new Cookie($this->options['name'], null, 1, $this->options['path'], $this->options['domain']));

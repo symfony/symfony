@@ -38,7 +38,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Storing template in cache', array('name' => 'index'));
+            ->with('Storing template in cache.', array('name' => 'index'));
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
 
@@ -46,7 +46,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('Fetching template from cache', array('name' => 'index'));
+            ->with('Fetching template from cache.', array('name' => 'index'));
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
     }

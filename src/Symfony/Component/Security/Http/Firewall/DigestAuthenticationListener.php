@@ -74,7 +74,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug('Digest Authorization header received from user agent', array('header' => $header));
+            $this->logger->debug('Digest Authorization header received from user agent.', array('header' => $header));
         }
 
         try {
@@ -116,7 +116,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Digest authentication successful', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
+            $this->logger->info('Digest authentication successful.', array('username' => $digestAuth->getUsername(), 'received' => $digestAuth->getResponse()));
         }
 
         $this->tokenStorage->setToken(new UsernamePasswordToken($user, $user->getPassword(), $this->providerKey));
@@ -130,7 +130,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info('Digest authentication failed', array('exception' => $authException));
+            $this->logger->info('Digest authentication failed.', array('exception' => $authException));
         }
 
         $event->setResponse($this->authenticationEntryPoint->start($request, $authException));

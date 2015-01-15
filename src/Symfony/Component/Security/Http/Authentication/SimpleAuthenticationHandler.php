@@ -57,7 +57,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationSuccessHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug('Selected an authentication success handler', array('handler' => get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication success handler.', array('handler' => get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationSuccess($request, $token);
@@ -71,7 +71,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
         }
 
         if ($this->logger) {
-            $this->logger->debug('Fallback to the default authentication success handler');
+            $this->logger->debug('Fallback to the default authentication success handler.');
         }
 
         return $this->successHandler->onAuthenticationSuccess($request, $token);
@@ -84,7 +84,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
     {
         if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {
             if ($this->logger) {
-                $this->logger->debug('Selected an authentication failure handler', array('handler' => get_class($this->simpleAuthenticator)));
+                $this->logger->debug('Selected an authentication failure handler.', array('handler' => get_class($this->simpleAuthenticator)));
             }
 
             $response = $this->simpleAuthenticator->onAuthenticationFailure($request, $exception);
@@ -98,7 +98,7 @@ class SimpleAuthenticationHandler implements AuthenticationFailureHandlerInterfa
         }
 
         if ($this->logger) {
-            $this->logger->debug('Fallback to the default authentication failure handler');
+            $this->logger->debug('Fallback to the default authentication failure handler.');
         }
 
         return $this->failureHandler->onAuthenticationFailure($request, $exception);

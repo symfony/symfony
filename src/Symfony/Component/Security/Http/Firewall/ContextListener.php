@@ -84,14 +84,14 @@ class ContextListener implements ListenerInterface
         $token = unserialize($token);
 
         if (null !== $this->logger) {
-            $this->logger->debug('Read existing security token from the session', array('key' => $this->sessionKey));
+            $this->logger->debug('Read existing security token from the session.', array('key' => $this->sessionKey));
         }
 
         if ($token instanceof TokenInterface) {
             $token = $this->refreshUser($token);
         } elseif (null !== $token) {
             if (null !== $this->logger) {
-                $this->logger->warning('Expected a security token from the session, got something else', array('key' => $this->sessionKey, 'received' => $token));
+                $this->logger->warning('Expected a security token from the session, got something else.', array('key' => $this->sessionKey, 'received' => $token));
             }
 
             $token = null;
@@ -130,7 +130,7 @@ class ContextListener implements ListenerInterface
             $session->set($this->sessionKey, serialize($token));
 
             if (null !== $this->logger) {
-                $this->logger->debug('Stored the security token in the session', array('key' => $this->sessionKey));
+                $this->logger->debug('Stored the security token in the session.', array('key' => $this->sessionKey));
             }
         }
     }

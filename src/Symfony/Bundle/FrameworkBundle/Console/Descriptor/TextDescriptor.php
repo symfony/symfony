@@ -83,7 +83,7 @@ class TextDescriptor extends Descriptor
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
             '<comment>Class</comment>        '.get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
-            '<comment>Requirements</comment> '.$this->formatRouterConfig($requirements) ?: 'NO CUSTOM',
+            '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
         );
 
@@ -379,6 +379,10 @@ class TextDescriptor extends Descriptor
      */
     private function formatRouterConfig(array $array)
     {
+        if (!count($array)) {
+            return 'NONE';
+        }
+
         $string = '';
         ksort($array);
         foreach ($array as $name => $value) {

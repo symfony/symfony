@@ -67,7 +67,7 @@ class BasicAuthenticationListener implements ListenerInterface
         }
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Basic Authentication Authorization header found for user "%s"', $username));
+            $this->logger->info('Basic authentication Authorization header found for user.', array('username' => $username));
         }
 
         try {
@@ -80,7 +80,7 @@ class BasicAuthenticationListener implements ListenerInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed for user "%s": %s', $username, $failed->getMessage()));
+                $this->logger->info('Basic authentication failed for user.', array('username' => $username, 'exception' => $failed));
             }
 
             if ($this->ignoreFailure) {

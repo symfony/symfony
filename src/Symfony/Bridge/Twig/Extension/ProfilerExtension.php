@@ -21,7 +21,7 @@ class ProfilerExtension extends \Twig_Extension_Profiler
     private $stopwatch;
     private $events;
 
-    public function __construct(\Twig_Profiler_Profile $profile, Stopwatch $stopwatch)
+    public function __construct(\Twig_Profiler_Profile $profile, Stopwatch $stopwatch = null)
     {
         parent::__construct($profile);
 
@@ -31,7 +31,7 @@ class ProfilerExtension extends \Twig_Extension_Profiler
 
     public function enter(\Twig_Profiler_Profile $profile)
     {
-        if ($profile->isTemplate()) {
+        if ($this->stopwatch && $profile->isTemplate()) {
             $this->events[$profile] = $this->stopwatch->start($profile->getName(), 'template');
         }
 
@@ -42,7 +42,7 @@ class ProfilerExtension extends \Twig_Extension_Profiler
     {
         parent::leave($profile);
 
-        if ($profile->isTemplate()) {
+        if ($this->stopwatch && $profile->isTemplate()) {
             $this->events[$profile]->stop();
             unset($this->events[$profile]);
         }

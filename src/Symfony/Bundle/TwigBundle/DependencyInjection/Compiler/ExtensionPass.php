@@ -63,8 +63,9 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.code')->replaceArgument(0, $container->getParameter('templating.helper.code.file_link_format'));
         }
 
-        if ($container->getParameter('kernel.debug') && $container->has('debug.stopwatch')) {
+        if ($container->getParameter('kernel.debug')) {
             $container->getDefinition('twig.extension.profiler')->addTag('twig.extension');
+            $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
         if ($container->has('templating')) {

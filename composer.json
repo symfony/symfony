@@ -1,10 +1,4 @@
 {
-    "repositories": [
-            {
-                "type": "vcs",
-                "url": "https://github.com/fabpot/Twig"
-            }
-        ],
     "name": "symfony/symfony",
     "type": "library",
     "description": "The Symfony PHP framework",
@@ -24,7 +18,7 @@
     "require": {
         "php": ">=5.3.9",
         "doctrine/common": "~2.3",
-        "twig/twig": "dev-profiler as 1.17.x-dev",
+        "twig/twig": "~1.18",
         "psr/log": "~1.0"
     },
     "replace": {

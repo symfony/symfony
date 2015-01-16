@@ -264,7 +264,7 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
         if (method_exists($definition, 'isSynchronized')) {
-            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized() ? 'yes' : 'no');
+            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized(false) ? 'yes' : 'no');
         }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
@@ -272,16 +272,16 @@ class TextDescriptor extends Descriptor
             $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
         }
 
-        if ($definition->getFactoryClass()) {
-            $description[] = sprintf('<comment>Factory Class</comment>    %s', $definition->getFactoryClass());
+        if ($definition->getFactoryClass(false)) {
+            $description[] = sprintf('<comment>Factory Class</comment>    %s', $definition->getFactoryClass(false));
         }
 
-        if ($definition->getFactoryService()) {
-            $description[] = sprintf('<comment>Factory Service</comment>  %s', $definition->getFactoryService());
+        if ($definition->getFactoryService(false)) {
+            $description[] = sprintf('<comment>Factory Service</comment>  %s', $definition->getFactoryService(false));
         }
 
-        if ($definition->getFactoryMethod()) {
-            $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod());
+        if ($definition->getFactoryMethod(false)) {
+            $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod(false));
         }
 
         if ($factory = $definition->getFactory()) {

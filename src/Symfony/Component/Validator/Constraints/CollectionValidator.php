@@ -90,12 +90,21 @@ class CollectionValidator extends ConstraintValidator
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $this->formatValue($field))
-                        ->setInvalidValue($fieldValue)
-                        ->setCode(Collection::NO_SUCH_FIELD_ERROR)
-                        ->addViolation();
+                    if ($context instanceof ExecutionContextInterface) {
+                        $context->buildViolation($constraint->extraFieldsMessage)
+                            ->atPath('['.$field.']')
+                            ->setParameter('{{ field }}', $this->formatValue($field))
+                            ->setInvalidValue($fieldValue)
+                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+                            ->addViolation();
+                    } else {
+                        $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
+                            ->atPath('['.$field.']')
+                            ->setParameter('{{ field }}', $this->formatValue($field))
+                            ->setInvalidValue($fieldValue)
+                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+                            ->addViolation();
+                    }
                 }
             }
         }

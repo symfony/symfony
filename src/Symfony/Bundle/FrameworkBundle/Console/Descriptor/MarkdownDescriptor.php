@@ -186,7 +186,7 @@ class MarkdownDescriptor extends Descriptor
         ;
 
         if (method_exists($definition, 'isSynchronized')) {
-            $output .= "\n".'- Synchronized: '.($definition->isSynchronized() ? 'yes' : 'no');
+            $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
         }
 
         $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
@@ -195,16 +195,16 @@ class MarkdownDescriptor extends Descriptor
             $output .= "\n".'- File: `'.$definition->getFile().'`';
         }
 
-        if ($definition->getFactoryClass()) {
-            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass().'`';
+        if ($definition->getFactoryClass(false)) {
+            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass(false).'`';
         }
 
-        if ($definition->getFactoryService()) {
-            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService().'`';
+        if ($definition->getFactoryService(false)) {
+            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService(false).'`';
         }
 
-        if ($definition->getFactoryMethod()) {
-            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod().'`';
+        if ($definition->getFactoryMethod(false)) {
+            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod(false).'`';
         }
 
         if ($factory = $definition->getFactory()) {

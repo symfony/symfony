@@ -44,11 +44,11 @@ class ChannelListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+        list(, $channel) = $this->map->getPatterns($request);
 
         if ('https' === $channel && !$request->isSecure()) {
             if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTPS');
+                $this->logger->info('Redirecting to HTTPS.');
             }
 
             $response = $this->authenticationEntryPoint->start($request);
@@ -60,7 +60,7 @@ class ChannelListener implements ListenerInterface
 
         if ('http' === $channel && $request->isSecure()) {
             if (null !== $this->logger) {
-                $this->logger->info('Redirecting to HTTP');
+                $this->logger->info('Redirecting to HTTP.');
             }
 
             $response = $this->authenticationEntryPoint->start($request);

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-05T09:38:41Z
+
+Can you please also update the PR to remove the `setName` and ` getName` methods as well? I don't know if removing these two methods has lots of impact elsewhere or not.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T07:19:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-16T11:27:46Z
+
+:+1:

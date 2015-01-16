@@ -110,7 +110,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @param Request $request A Request instance
      *
-     * @return TokenInterface|null The new TokenInterface if successfully switched, null otherwise
+     * @return TokenInterface
      *
      * @throws \LogicException
      * @throws AccessDeniedException

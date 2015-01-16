@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T07:08:18Z
+
+:+1: after the minor renaming is done.
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-01-16T09:55:55Z
+
+Fixed @fabpot will try to squash all commits in one
+
+I've been looking for docs about logging and log parameter conventions, but couldn't find them.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-16T11:23:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-01-16T11:31:55Z
+
+Squashing all commits into one is done. Had to figure out PhpStorm 8.0.3 did not allow me to force a push, [because the force option was missing](https://www.jetbrains.com/phpstorm/help/push-dialog.html#d182285e304).

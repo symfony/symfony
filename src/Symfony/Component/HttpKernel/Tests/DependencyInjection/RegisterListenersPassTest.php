@@ -154,7 +154,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->setParameter('subscriber.class', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService');
+        $container->setParameter('subscriber.class', 'Symfony\Component\HttpKernel\Tests\DependencyInjection\SubscriberService');
         $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', array());
         $container->register('event_dispatcher', 'stdClass');
 
@@ -167,7 +167,7 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
                 'addSubscriberService',
                 array(
                     'foo',
-                    'Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService',
+                    'Symfony\Component\HttpKernel\Tests\DependencyInjection\SubscriberService',
                 ),
             ),
         );

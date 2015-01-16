@@ -9,24 +9,22 @@ services:
         tags:
             - { name: foo, foo: foo }
             - { name: foo, bar: bar, baz: baz }
-        factory_class: Bar\FooClass
-        factory_method: getInstance
         arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
         properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
         calls:
             - [setBar, ['@bar']]
             - [initialize, {  }]
 
+        factory: [Bar\FooClass, getInstance]
         configurator: sc_configure
+    foo.baz:
+        class: %baz_class%
+        factory: ['%baz_class%', getInstance]
+        configurator: ['%baz_class%', configureStatic1]
     bar:
         class: Bar\FooClass
         arguments: [foo, '@foo.baz', '%foo_bar%']
         configurator: ['@foo.baz', configure]
-    foo.baz:
-        class: %baz_class%
-        factory_class: %baz_class%
-        factory_method: getInstance
-        configurator: ['%baz_class%', configureStatic1]
     foo_bar:
         class: %foo_class%
         scope: prototype
@@ -40,10 +38,6 @@ services:
             - [setBar, ['@?foobaz']]
             - [setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")']]
 
-    factory_service:
-        class: Bar
-        factory_method: getInstance
-        factory_service: foo.baz
     foo_with_inline:
         class: Foo
         calls:
@@ -86,6 +80,9 @@ services:
         class: FactoryClass
         public: false
         properties: { foo: bar }
+    factory_service:
+        class: Bar
+        factory: ['@foo.baz', getInstance]
     new_factory_service:
         class: FooBarBaz
         properties: { foo: bar }

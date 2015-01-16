@@ -4,11 +4,10 @@ digraph sc {
   edge [fontsize="9" fontname="Arial" color="grey" arrowhead="open" arrowsize="0.5"];
 
   node_foo [label="foo (alias_for_foo)\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
-  node_bar [label="bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_baz [label="foo.baz\nBazClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_bar [label="bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_bar [label="foo_bar\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="dotted"];
   node_method_call1 [label="method_call1\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
-  node_factory_service [label="factory_service\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_foo_with_inline [label="foo_with_inline\nFoo\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_inlined [label="inlined\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_baz [label="baz\nBaz\n", shape=record, fillcolor="#eeeeee", style="filled"];
@@ -19,6 +18,7 @@ digraph sc {
   node_decorator_service [label="decorator_service\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_decorator_service_with_name [label="decorator_service_with_name\nstdClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_new_factory [label="new_factory\nFactoryClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_factory_service [label="factory_service\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_new_factory_service [label="new_factory_service\nFooBarBaz\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_from_static_method [label="service_from_static_method\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerBuilder\n", shape=record, fillcolor="#9999ff", style="filled"];

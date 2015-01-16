@@ -6,7 +6,7 @@
     <parameter key="foo">bar</parameter>
   </parameters>
   <services>
-    <service id="foo" class="Bar\FooClass" factory-method="getInstance" factory-class="Bar\FooClass">
+    <service id="foo" class="Bar\FooClass">
       <tag name="foo" foo="foo"/>
       <tag name="foo" bar="bar" baz="baz"/>
       <argument>foo</argument>
@@ -27,16 +27,18 @@
         <argument type="service" id="bar"/>
       </call>
       <call method="initialize"/>
+      <factory class="Bar\FooClass" method="getInstance"/>
       <configurator function="sc_configure"/>
+    </service>
+    <service id="foo.baz" class="%baz_class%">
+      <factory class="%baz_class%" method="getInstance"/>
+      <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="bar" class="Bar\FooClass">
       <argument>foo</argument>
       <argument type="service" id="foo.baz"/>
       <argument>%foo_bar%</argument>
       <configurator service="foo.baz" method="configure"/>
-    </service>
-    <service id="foo.baz" class="%baz_class%" factory-method="getInstance" factory-class="%baz_class%">
-      <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="foo_bar" class="%foo_class%" scope="prototype"/>
     <service id="method_call1" class="Bar\FooClass">
@@ -57,7 +59,6 @@
         <argument type="expression">service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")</argument>
       </call>
     </service>
-    <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
     <service id="foo_with_inline" class="Foo">
       <call method="setBar">
         <argument type="service" id="inlined"/>
@@ -88,6 +89,9 @@
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
     <service id="new_factory" class="FactoryClass" public="false">
       <property name="foo">bar</property>
+    </service>
+    <service id="factory_service" class="Bar">
+      <factory service="foo.baz" method="getInstance"/>
     </service>
     <service id="new_factory_service" class="FooBarBaz">
       <property name="foo">bar</property>

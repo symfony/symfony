@@ -1,0 +1,3 @@
+services:
+    constructor: { class: FooClass, factory_method: getInstance }
+    factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }

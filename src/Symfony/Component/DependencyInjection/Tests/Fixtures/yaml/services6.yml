@@ -4,7 +4,6 @@ services:
     scope.container: { class: FooClass, scope: container }
     scope.custom: { class: FooClass, scope: custom }
     scope.prototype: { class: FooClass, scope: prototype }
-    constructor: { class: FooClass, factory_method: getInstance }
     file: { class: FooClass, file: %path%/foo.php }
     arguments: { class: FooClass, arguments: [foo, @foo, [true, false]] }
     configurator1: { class: FooClass, configurator: sc_configure }
@@ -24,7 +23,6 @@ services:
     another_alias_for_foo:
         alias: foo
         public: false
-    factory_service: { class: BazClass, factory_method: getInstance, factory_service: baz_factory }
     request:
         class: Request
         synthetic: true

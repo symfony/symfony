@@ -216,23 +216,24 @@ class JsonDescriptor extends Descriptor
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
         );
+
         if (method_exists($definition, 'isSynchronized')) {
-            $data['synchronized'] = $definition->isSynchronized();
+            $data['synchronized'] = $definition->isSynchronized(false);
         }
 
         $data['abstract'] = $definition->isAbstract();
         $data['file'] = $definition->getFile();
 
-        if ($definition->getFactoryClass()) {
-            $data['factory_class'] = $definition->getFactoryClass();
+        if ($definition->getFactoryClass(false)) {
+            $data['factory_class'] = $definition->getFactoryClass(false);
         }
 
-        if ($definition->getFactoryService()) {
-            $data['factory_service'] = $definition->getFactoryService();
+        if ($definition->getFactoryService(false)) {
+            $data['factory_service'] = $definition->getFactoryService(false);
         }
 
-        if ($definition->getFactoryMethod()) {
-            $data['factory_method'] = $definition->getFactoryMethod();
+        if ($definition->getFactoryMethod(false)) {
+            $data['factory_method'] = $definition->getFactoryMethod(false);
         }
 
         if ($factory = $definition->getFactory()) {

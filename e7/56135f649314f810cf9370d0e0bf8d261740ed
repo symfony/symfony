@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-20T15:50:52Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-20T16:02:04Z
+
+The phpdoc of `resolve` must be updated. It's outdated now. Also the BC break must be documented.
+
+---------------------------------------------------------------------------
+
+by nikita2206 at 2014-12-20T20:06:54Z
+
+@Tobion you were probably talking about `resolveParameters` method, updated it. Added a note to description about BC break.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-26T13:26:41Z
+
+Please documented the BC break in the upgrade file in the root directory.
+
+---------------------------------------------------------------------------
+
+by nikita2206 at 2014-12-26T15:49:33Z
+
+@Tobion updated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T15:29:13Z
+
+@nikita2206 Ass FrameworkBundle now relies on the `setCondition` to exists in the Router, you must upgrade the `symfony/routing` dependency in the `composer.json` file of the framework bundle (to 2.5 instead of 2.2).
+
+---------------------------------------------------------------------------
+
+by nikita2206 at 2015-01-16T16:07:11Z
+
+@fabpot done (not sure why 2.5 though, PR is aimed at 2.7)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T16:21:42Z
+
+@nikita2206 That's because we test the compatibility of each component/bundle with different other versions (low and high).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T16:21:50Z
+
+Not sure why Travis did not trigger.

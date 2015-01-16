@@ -190,6 +190,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             "'#cfcfcf'" => '#cfcfcf',
             '::form_base.html.twig' => '::form_base.html.twig',
 
+            // Pre-YAML-1.2 booleans
+            "'y'" => 'y',
+            "'n'" => 'n',
+            "'yes'" => 'yes',
+            "'no'" => 'no',
+            "'on'" => 'on',
+            "'off'" => 'off',
+
             '2007-10-30' => mktime(0, 0, 0, 10, 30, 2007),
             '2007-10-30T02:59:43Z' => gmmktime(2, 59, 43, 10, 30, 2007),
             '2007-10-30 02:59:43 Z' => gmmktime(2, 59, 43, 10, 30, 2007),
@@ -256,6 +264,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
             "'-dash'" => '-dash',
             "'-'" => '-',
+
+            // Pre-YAML-1.2 booleans
+            "'y'" => 'y',
+            "'n'" => 'n',
+            "'yes'" => 'yes',
+            "'no'" => 'no',
+            "'on'" => 'on',
+            "'off'" => 'off',
 
             // sequences
             '[foo, bar, false, null, 12]' => array('foo', 'bar', false, null, 12),

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-23T12:57:44Z
+
+:+1: This was indeed on our list of changes for 3.0
+
+---------------------------------------------------------------------------
+
+by frne at 2014-12-23T13:28:51Z
+
+@stof Didn't know. Where do I find that list?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-12-23T13:30:26Z
+
+@frne here you have one list about proposed non-BC changes for 3.0: https://github.com/symfony/symfony/issues/11742
+
+---------------------------------------------------------------------------
+
+by frne at 2014-12-31T08:10:40Z
+
+Will reopen that once there is a 3.0 branch...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-31T08:13:09Z
+
+@frne Why did you close? `master ` is the development branch for `3.0`.
+
+---------------------------------------------------------------------------
+
+by frne at 2015-01-02T10:39:51Z
+
+@xabbuh @stof Sorry, obviously I misunderstood something ;)
+
+---------------------------------------------------------------------------
+
+by frne at 2015-01-02T10:43:11Z
+
+@Tobion For my comprehension: You want me to remove the ```@api``` annotations? ```</dumb-question>```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-02T18:15:46Z
+
+@frne yes

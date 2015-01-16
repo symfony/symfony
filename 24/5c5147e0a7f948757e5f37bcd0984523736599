@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T14:22:56Z
+
+the regex-based condition necessary to support command shortcuts looks weird to me, and makes it hard for people deprecating an alias to do such thing (many people will forget about the possibility to use aliases there).
+Given that the most common use case for command aliases (at least AFAIK) is to provide a BC layer when reorganizing commands, I'm wondering whether it would make sense to register the alias as being a deprecated one, and then having the Application class being responsible for showing a warning when using a deprecated alias to call the function. This would avoid regex-based checks (as the application resolves the name already) and would also avoid triggering wrong warnings when both the new name and the deprecated ones could match the regex if not written carefully
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T18:31:58Z
+
+@stof: Aliases were not introduced for deprecations. I've suggested a simple approach with `strpos`, which should be enough and simple to understand.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-16T18:36:59Z
+
+Changes have been made.

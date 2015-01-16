@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-13T21:03:22Z
+
+I don't remember if `scopes` are also going to be removed in Symfony 3.0. In this case we have to deprecate `setScope` and `getScope` methods. So far, there is no deprecations on these methods.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-14T05:48:26Z
+
+@hhamon As you can see in Travis, there are also notices in other bundles/components that need to be fixed as well.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-14T18:35:53Z
+
+It looks like some remaining `setFactoryClass`, `setFactoryMethod` and `setFactoryService` methods deprecations are not triggered by the Symfony core itself but by `DoctrineBundle`. The `SetAclCommand` command uses the Doctrine DBAL component to connect to the DB to mount the ACL. The `DoctrineBundle` has the following service definition:
+
+    <service id="doctrine.dbal.connection" class="Doctrine\DBAL\Connection" factory-service="doctrine.dbal.connection_factory" factory-method="createConnection" abstract="true" />
+
+It is responsible for raising the deprecation notice on `factory-*` when the unit tested ACL command tries to use the DBAL connection.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-15T08:03:46Z
+
+I don't understand why job `18218.6` fails. @stof and @nicolas-grekas do you have any hints please?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T15:10:29Z
+
+Besides the failing job, is it still WIP?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-16T15:31:00Z
+
+I still have a unit test to fix and it will be good to merge. I will work on it in the train this evening.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-16T19:25:02Z
+
+@fabpot @stof @nicolas-grekas back to green! Good to review & merge! No more WIP. The only remaining deprecation notices for factory attributes are inside the DoctrineBundle we use for testing the ACL command.

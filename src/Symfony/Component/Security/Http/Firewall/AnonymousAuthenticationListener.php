@@ -59,11 +59,11 @@ class AnonymousAuthenticationListener implements ListenerInterface
             $this->tokenStorage->setToken($token);
 
             if (null !== $this->logger) {
-                $this->logger->info('Populated TokenStorage with an anonymous Token');
+                $this->logger->info('Populated the TokenStorage with an anonymous Token.');
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Anonymous authentication failed: %s', $failed->getMessage()));
+                $this->logger->info('Anonymous authentication failed.', array('exception' => $failed));
             }
         }
     }

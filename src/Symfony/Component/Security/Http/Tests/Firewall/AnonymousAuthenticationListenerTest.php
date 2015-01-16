@@ -77,7 +77,7 @@ class AnonymousAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
             ->method('info')
-            ->with('Populated TokenStorage with an anonymous Token')
+            ->with('Populated the TokenStorage with an anonymous Token.')
         ;
 
         $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');

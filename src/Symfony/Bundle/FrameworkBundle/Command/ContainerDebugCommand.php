@@ -94,6 +94,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.</comment>');
+        }
+
         $this->validateInput($input);
 
         if ($input->getOption('parameters')) {

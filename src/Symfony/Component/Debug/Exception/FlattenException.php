@@ -9,6 +9,46 @@
  * file that was distributed with this source code.
  */
 
+namespace Symfony\Component\HttpKernel\Exception;
+
+use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
+
+/**
+ * FlattenException wraps a PHP Exception to be able to serialize it.
+ *
+ * Basically, this class removes all objects from the trace.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
+ */
+class FlattenException
+{
+    private $handler;
+
+    public static function __callStatic($method, $args)
+    {
+        if (!method_exists('Symfony\Component\Debug\Exception\FlattenException', $method)) {
+            throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_called_class(), $method));
+        }
+
+        return call_user_func_array(array('Symfony\Component\Debug\Exception\FlattenException', $method), $args);
+    }
+
+    public function __call($method, $args)
+    {
+        if (!isset($this->handler)) {
+            $this->handler = new DebugFlattenException();
+        }
+
+        if (!method_exists($this->handler, $method)) {
+            throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method));
+        }
+
+        return call_user_func_array(array($this->handler, $method), $args);
+    }
+}
+
 namespace Symfony\Component\Debug\Exception;
 
 use Symfony\Component\HttpKernel\Exception\FlattenException as LegacyFlattenException;
@@ -277,37 +317,5 @@ class FlattenException extends LegacyFlattenException
         $array = new \ArrayObject($value);
 
         return $array['__PHP_Incomplete_Class_Name'];
-    }
-}
-
-namespace Symfony\Component\HttpKernel\Exception;
-
-use Symfony\Component\Debug\Exception\FlattenException as DebugFlattenException;
-
-/**
- * FlattenException wraps a PHP Exception to be able to serialize it.
- *
- * Basically, this class removes all objects from the trace.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @deprecated Deprecated in 2.3, to be removed in 3.0. Use the same class from the Debug component instead.
- */
-class FlattenException
-{
-    private $handler;
-
-    public static function __callStatic($method, $args)
-    {
-        return forward_static_call_array(array('Symfony\Component\Debug\Exception\FlattenException', $method), $args);
-    }
-
-    public function __call($method, $args)
-    {
-        if (!isset($this->handler)) {
-            $this->handler = new DebugFlattenException();
-        }
-
-        return call_user_func_array(array($this->handler, $method), $args);
     }
 }

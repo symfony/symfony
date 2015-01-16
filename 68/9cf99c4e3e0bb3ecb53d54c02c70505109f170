@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by larowlan at 2015-01-06T04:10:29Z
+
+This will move towards interoperability with the pecl yaml extension (which uses libyaml, which is Yaml 1.1 spec). Which is something Drupal wants to make possible for performance reasons - see https://www.drupal.org/node/1920902 - in our current patch we are using a callback in our parsing for booleans to treat other than true/false as strings. One other issue we've seen between pecl/yaml and symfony/yaml is that ```-``` in a sequence is treated as a nested sequence by pecl/yaml but as a string by symfony/yaml - for example http://cgit.drupalcode.org/drupal/tree/core/profiles/standard/config/install/editor.editor.full_html.yml#n15
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T09:08:56Z
+
+> One other issue we've seen between pecl/yaml and symfony/yaml is that - in a sequence is treated as a nested sequence by pecl/yaml but as a string by symfony/yaml
+
+Can you open an issue for that ?
+
+---------------------------------------------------------------------------
+
+by larowlan at 2015-01-06T09:33:40Z
+
+> Can you open an issue for that ?
+
+Let me confirm it first, I suspect it might have been hand-edited, but if not - will open
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T07:17:23Z
+
+:+1: after my small comment is addressed.
+
+---------------------------------------------------------------------------
+
+by petert82 at 2015-01-16T13:18:20Z
+
+@fabpot They're gone. :)

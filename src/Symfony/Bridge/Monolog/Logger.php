@@ -65,7 +65,6 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 
     /**
      * {@inheritdoc}
->>>>>>> 2.7
      */
     public function getLogs()
     {

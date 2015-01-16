@@ -86,9 +86,9 @@ class SwitchUserListener implements ListenerInterface
         try {
 
             if ('_exit' === $usernameParameter) {
-                $token = $this->getTokenOnUserExit($request);
+                $token = $this->exitSwitchUser($request);
             } else {
-                $token = $this->getTokenOnUserSwitch($request);
+                $token = $this->switchUser($request);
             }
 
         } catch (AuthenticationException $e) {
@@ -114,8 +114,9 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws \LogicException
      * @throws AccessDeniedException
+     * @throws UsernameNotFoundException
      */
-    private function getTokenOnUserSwitch(Request $request)
+    private function switchUser(Request $request)
     {
         if (null !== $this->logger) {
             $this->logger->info('Attempting to switch to user.', array('username' => $request->get($this->usernameParameter));
@@ -178,13 +179,13 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException
      */
-    private function getTokenOnUserExit(Request $request)
+    private function exitSwitchUser(Request $request)
     {
         $token = $this->tokenStorage->getToken();
 
         // check if the authenticated user has the right role to exit switching
         if (true !== $this->accessDecisionManager->decide($token, array(self::ROLE_PREVOIUS_ADMIN))) {
-            throw new \LogicException(sprintf("You must have the \"%s\" role to exit user switching.", self::ROLE_PREVOIUS_ADMIN));
+            throw new AccessDeniedException(sprintf("You must have the \"%s\" role to exit user switching.", self::ROLE_PREVOIUS_ADMIN));
         }
 
         $originalToken = $this->getOriginalToken($token);

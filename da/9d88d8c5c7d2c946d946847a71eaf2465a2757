@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-15T13:35:27Z
+
+@stof @fabpot I have processed the remarks. While at it, I want to add or remove the trailing `.`. In exceptions they are present, but not in all the logs. Should I remove them all or add them all? It might be a good idea to add it in this PR as no history will be lost of this change if someone decides to add them later.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-15T14:47:45Z
+
+Seems like a flaky test is making this build fail:
+```
+1) Symfony\Component\Process\Tests\SimpleProcessTest::testStopWithTimeoutIsActuallyWorking
+Failed asserting that 4.0517840385437 is less than 4.
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-15T14:53:38Z
+
+I would add dots everywhere (which is what we do for exception messages).
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-15T15:16:08Z
+
+Dots added and tests updated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T06:34:29Z
+
+:+1:

@@ -26,7 +26,7 @@ class Form extends Constraint
      * @deprecated since version 2.6, to be removed in 3.0.
      *             Use {@self NOT_SYNCHRONIZED_ERROR} instead.
      */
-    const ERR_INVALID = Deprecated::ERR_INVALID;
+    const ERR_INVALID = 1;
 
     protected static $errorNames = array(
         self::NOT_SYNCHRONIZED_ERROR => 'NOT_SYNCHRONIZED_ERROR',

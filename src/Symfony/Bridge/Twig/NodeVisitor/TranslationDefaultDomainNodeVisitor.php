@@ -63,12 +63,12 @@ class TranslationDefaultDomainNodeVisitor implements \Twig_NodeVisitorInterface
 
         if ($node instanceof \Twig_Node_Expression_Filter && in_array($node->getNode('filter')->getAttribute('value'), array('trans', 'transchoice'))) {
             $arguments = $node->getNode('arguments');
+            $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
             if ($this->isNamedArguments($arguments)) {
-                if (!$arguments->hasNode('domain')) {
+                if (!$arguments->hasNode('domain') && !$arguments->hasNode($ind)) {
                     $arguments->setNode('domain', $this->scope->get('domain'));
                 }
             } else {
-                $ind = 'trans' === $node->getNode('filter')->getAttribute('value') ? 1 : 2;
                 if (!$arguments->hasNode($ind)) {
                     if (!$arguments->hasNode($ind - 1)) {
                         $arguments->setNode($ind - 1, new \Twig_Node_Expression_Array(array(), $node->getLine()));

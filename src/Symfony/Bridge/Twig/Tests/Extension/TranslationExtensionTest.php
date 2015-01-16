@@ -152,14 +152,16 @@ class TranslationExtensionTest extends TestCase
     {
         $templates = array(
             'index' => '
-                {%- extends "base" %}
-
                 {%- trans_default_domain "foo" %}
 
                 {%- block content %}
                     {{- "foo"|trans(arguments = {}, domain = "custom") }}
                     {{- "foo"|transchoice(count = 1) }}
                     {{- "foo"|transchoice(count = 1, arguments = {}, domain = "custom") }}
+                    {{- "foo"|trans({}, domain = "custom") }}
+                    {{- "foo"|trans({}, "custom", locale = "fr") }}
+                    {{- "foo"|transchoice(1, arguments = {}, domain = "custom") }}
+                    {{- "foo"|transchoice(1, {}, "custom", locale = "fr") }}
                 {% endblock %}
             ',
 
@@ -173,10 +175,11 @@ class TranslationExtensionTest extends TestCase
         $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
         $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
         $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
+        $translator->addResource('array', array('foo' => 'foo (fr)'), 'fr', 'custom');
 
         $template = $this->getTemplate($templates, $translator);
 
-        $this->assertEquals('foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render(array())));
     }
 
     protected function getTemplate($template, $translator = null)

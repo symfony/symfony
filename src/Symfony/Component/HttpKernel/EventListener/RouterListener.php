@@ -140,7 +140,10 @@ class RouterListener implements EventSubscriberInterface
             }
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Matched route "%s"', $parameters['_route']), $parameters);
+                $this->logger->info(sprintf('Matched route "%s"', $parameters['_route']), array(
+                    'route_parameters' => $parameters,
+                    'request_uri' => $request->getUri(),
+                ));
             }
 
             $request->attributes->add($parameters);

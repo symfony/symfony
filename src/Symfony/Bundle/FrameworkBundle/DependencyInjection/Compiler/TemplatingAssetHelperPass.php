@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+trigger_error('The '.__NAMESPACE__.'\TemplatingAssetHelperPass class is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 /**
  * @deprecated since 2.7, will be removed in 3.0
  */

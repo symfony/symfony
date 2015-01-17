@@ -14,6 +14,8 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
+trigger_error('The '.__NAMESPACE__.'\AssetsExtension class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Bridge\Twig\Extension\AssetExtension class instead.', E_USER_DEPRECATED);
+
 /**
  * Twig extension for Symfony assets helper.
  *
@@ -59,8 +61,6 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
-        trigger_error('The Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_path() instead.', E_USER_DEPRECATED);
-
         $url = $this->container->get('templating.helper.assets')->getUrl($path, $packageName, $version);
 
         if (!$absolute) {
@@ -79,8 +79,6 @@ class AssetsExtension extends \Twig_Extension
      */
     public function getAssetsVersion($packageName = null)
     {
-        trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
-
         return $this->container->get('templating.helper.assets')->getVersion($packageName);
     }
 

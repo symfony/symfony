@@ -7,8 +7,12 @@
     <services>
 
         <service id="assets.packages" class="Symfony\Component\Asset\Packages">
-            <argument /> <!-- default package -->
+            <argument type="service" id="assets.empty_package" /> <!-- default package -->
             <argument type="collection" /> <!-- named packages -->
+        </service>
+
+        <service id="assets.empty_package" class="Symfony\Component\Asset\Package" public="false">
+            <argument type="service" id="assets.empty_version_strategy" />
         </service>
 
         <service id="assets.context" class="Symfony\Component\Asset\Context\RequestStackContext">

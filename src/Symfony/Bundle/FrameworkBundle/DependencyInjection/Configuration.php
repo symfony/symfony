@@ -53,6 +53,44 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['templating']); })
+                ->then(function ($v) {
+                    if ($v['templating']['assets_version']
+                        || count($v['templating']['assets_base_urls']['http'])
+                        || count($v['templating']['assets_base_urls']['ssl'])
+                        || count($v['templating']['packages'])
+                    ) {
+                        trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
+
+                        // convert the old configuration to the new one
+                        if (isset($v['assets'])) {
+                            throw new LogicException('You cannot use assets settings under "templating.templating" and "assets" configurations in the same project.');
+                        }
+
+                        $v['assets'] = array(
+                            'version' => $v['templating']['assets_version'],
+                            'version_format' => $v['templating']['assets_version_format'],
+                            'base_path' => '',
+                            'base_urls' => array_values(array_unique(array_merge($v['templating']['assets_base_urls']['http'], $v['templating']['assets_base_urls']['ssl']))),
+                            'packages' => array(),
+                        );
+
+                        foreach ($v['templating']['packages'] as $name => $config) {
+                            $v['assets']['packages'][$name] = array(
+                                'version' => (string) $config['version'],
+                                'version_format' => $config['version_format'],
+                                'base_path' => '',
+                                'base_urls' => array_values(array_unique(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),
+                            );
+                        }
+                    }
+
+                    unset($v['templating']['assets_version'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')

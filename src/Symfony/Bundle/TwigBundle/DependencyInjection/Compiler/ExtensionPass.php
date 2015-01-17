@@ -82,9 +82,5 @@ class ExtensionPass implements CompilerPassInterface
             // we are on Symfony <3.0, where the setContainer method exists
             $container->getDefinition('twig.app_variable')->addMethodCall('setContainer', array(new Reference('service_container')));
         }
-
-        if ($container->has('assets.packages')) {
-            $container->getDefinition('twig.extension.new_assets')->addTag('twig.extension');
-        }
     }
 }

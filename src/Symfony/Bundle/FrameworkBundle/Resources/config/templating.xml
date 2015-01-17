@@ -14,7 +14,6 @@
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
         <parameter key="templating.finder.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder</parameter>
-        <parameter key="templating.helper.assets.class">Symfony\Component\Templating\Helper\CoreAssetsHelper</parameter>
     </parameters>
 
     <services>
@@ -59,15 +58,5 @@
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
-
-        <!--
-            This should be in templating_php.xml but unfortunately, Twig depends on this helper.
-            As the Twig extension depending on this service is deprecated, this will be removed in 3.0.
-        -->
-        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
-            <tag name="templating.helper" alias="assets" />
-            <argument /> <!-- default package -->
-            <argument type="collection" /> <!-- named packages -->
-        </service>
     </services>
 </container>

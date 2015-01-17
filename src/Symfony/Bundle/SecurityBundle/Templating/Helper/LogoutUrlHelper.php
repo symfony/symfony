@@ -45,7 +45,7 @@ class LogoutUrlHelper extends Helper
     {
         if ($requestStack instanceof ContainerInterface) {
             $this->requestStack = $requestStack->get('request_stack');
-            trigger_error('The '.__CLASS__.' constructor will require a RequestStack instead of a containerInterface instance in 3.0.', E_USER_DEPRECATED);
+            trigger_error('The '.__CLASS__.' constructor will require a RequestStack instead of a ContainerInterface instance in 3.0.', E_USER_DEPRECATED);
         } elseif ($requestStack instanceof RequestStack) {
             $this->requestStack = $requestStack;
         } else {

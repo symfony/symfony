@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>La cuenta está bloqueada.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Nombre de usuario o Contraseña inválido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

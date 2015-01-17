@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>حساب کاربری قفل شده است.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>نام کاربری یا کلمه عبور غیر مجاز.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

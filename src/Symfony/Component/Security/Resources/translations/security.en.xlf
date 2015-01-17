@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Account is locked.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Bad credentials.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

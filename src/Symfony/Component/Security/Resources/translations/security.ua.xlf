@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Обліковий запис заблоковано.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Невірне ім'я користувача або пароль.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

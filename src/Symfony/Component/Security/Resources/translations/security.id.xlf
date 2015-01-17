@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Akun terkunci.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Nama Pengguna atau Password salah.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

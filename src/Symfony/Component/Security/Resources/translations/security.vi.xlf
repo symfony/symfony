@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Tài khoản bị khóa.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Tên người dùng hoặc mật khẩu không chính xác.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

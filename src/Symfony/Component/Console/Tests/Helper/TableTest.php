@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Output\StreamOutput;
 
 class TableTest extends \PHPUnit_Framework_TestCase
@@ -249,6 +250,145 @@ TABLE
 | <strong>99921-58-10-700</strong> | <f>Divine Com</f>    | Dante Alighieri |
 | 9971-5-0210-0                    | A Tale of Two Cities | Charles Dickens |
 +----------------------------------+----------------------+-----------------+
+
+TABLE
+            ),
+            'Cell with colspan' => array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'),
+                    new TableSeparator(),
+                    array(new TableCell('Divine Comedy(Dante Alighieri)', array('colspan' => 3))),
+                    new TableSeparator(),
+                    array(
+                        new TableCell('Arduino: A Quick-Start Guide', array('colspan' => 2)),
+                        'Mark Schmidt',
+                    ),
+                    new TableSeparator(),
+                    array(
+                        '9971-5-0210-0',
+                        new TableCell("A Tale of \nTwo Cities", array('colspan' => 2)),
+                    ),
+                ),
+                'default',
+<<<TABLE
++----------------+---------------+-----------------+
+| ISBN           | Title         | Author          |
++----------------+---------------+-----------------+
+| 99921-58-10-7  | Divine Comedy | Dante Alighieri |
++----------------+---------------+-----------------+
+| Divine Comedy(Dante Alighieri)                   |
++----------------+---------------+-----------------+
+| Arduino: A Quick-Start Guide   | Mark Schmidt    |
++----------------+---------------+-----------------+
+| 9971-5-0210-0  | A Tale of                       |
+|                | Two Cities                      |
++----------------+---------------+-----------------+
+
+TABLE
+            ),
+            'Cell with rowspan' => array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array(
+                        new TableCell('9971-5-0210-0', array('rowspan' => 3)),
+                        'Divine Comedy',
+                        'Dante Alighieri',
+                    ),
+                    array('A Tale of Two Cities', 'Charles Dickens'),
+                    array("The Lord of \nthe Rings", "J. R. \nR. Tolkien"),
+                    new TableSeparator(),
+                    array('80-902734-1-6', new TableCell("And Then \nThere \nWere None", array('rowspan' => 3)), 'Agatha Christie'),
+                    array('80-902734-1-7', 'Test'),
+                ),
+                'default',
+<<<TABLE
++---------------+----------------------+-----------------+
+| ISBN          | Title                | Author          |
++---------------+----------------------+-----------------+
+| 9971-5-0210-0 | Divine Comedy        | Dante Alighieri |
+|               | A Tale of Two Cities | Charles Dickens |
+|               | The Lord of          | J. R.           |
+|               | the Rings            | R. Tolkien      |
++---------------+----------------------+-----------------+
+| 80-902734-1-6 | And Then             | Agatha Christie |
+| 80-902734-1-7 | There                | Test            |
+|               | Were None            |                 |
++---------------+----------------------+-----------------+
+
+TABLE
+            ),
+            'Cell with rowspan and colspan' => array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array(
+                        new TableCell('9971-5-0210-0', array('rowspan' => 2, 'colspan' => 2)),
+                        'Dante Alighieri',
+                    ),
+                    array('Charles Dickens'),
+                    new TableSeparator(),
+                    array(
+                        'Dante Alighieri',
+                        new TableCell('9971-5-0210-0', array('rowspan' => 3, 'colspan' => 2)),
+                    ),
+                    array('J. R. R. Tolkien'),
+                    array('J. R. R'),
+                ),
+                'default',
+<<<TABLE
++------------------+--------+-----------------+
+| ISBN             | Title  | Author          |
++------------------+--------+-----------------+
+| 9971-5-0210-0             | Dante Alighieri |
+|                           | Charles Dickens |
++------------------+--------+-----------------+
+| Dante Alighieri  | 9971-5-0210-0            |
+| J. R. R. Tolkien |                          |
+| J. R. R          |                          |
++------------------+--------+-----------------+
+
+TABLE
+            ),
+            'Cell with rowspan and colspan contains new line break' => array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array(
+                        new TableCell("9971\n-5-\n021\n0-0", array('rowspan' => 2, 'colspan' => 2)),
+                        'Dante Alighieri',
+                    ),
+                    array('Charles Dickens'),
+                    new TableSeparator(),
+                    array(
+                        'Dante Alighieri',
+                        new TableCell("9971\n-5-\n021\n0-0", array('rowspan' => 2, 'colspan' => 2)),
+                    ),
+                    array('Charles Dickens'),
+                    new TableSeparator(),
+                    array(
+                        new TableCell("9971\n-5-\n021\n0-0", array('rowspan' => 2, 'colspan' => 2)),
+                        new TableCell("Dante \nAlighieri", array('rowspan' => 2, 'colspan' => 1)),
+                    ),
+                ),
+                'default',
+<<<TABLE
++-----------------+-------+-----------------+
+| ISBN            | Title | Author          |
++-----------------+-------+-----------------+
+| 9971                    | Dante Alighieri |
+| -5-                     | Charles Dickens |
+| 021                     |                 |
+| 0-0                     |                 |
++-----------------+-------+-----------------+
+| Dante Alighieri | 9971                    |
+| Charles Dickens | -5-                     |
+|                 | 021                     |
+|                 | 0-0                     |
++-----------------+-------+-----------------+
+| 9971                    | Dante           |
+| -5-                     | Alighieri       |
+| 021                     |                 |
+| 0-0                     |                 |
++-----------------+-------+-----------------+
 
 TABLE
             ),

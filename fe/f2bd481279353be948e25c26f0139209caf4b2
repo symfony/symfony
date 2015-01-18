@@ -1,0 +1,213 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-10T08:39:50Z
+
+Your proposal is not BC
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-10T08:43:44Z
+
+@stof What breaks BC?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-12-10T13:49:23Z
+
+@webmozart What is your opinion regarding this?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-04T11:06:01Z
+
+Any opinion on this PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T01:45:51Z
+
+@fabpot I think this is a valuable change:
+
+- ``setDefaultOptions`` is a weird name given that the method is not only about setting the default options, but about configuring the whole OptionsResolver (the name was probably get close of the Symfony 2.0 ``getDefaultOptions`` even though the responsibility was larger)
+- using a different method names allows us to build a forward-compatibility layer for the interface deprecation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T06:57:04Z
+
+Indeed, this looks like a very good change.
+
+@peterrehm Besides the comments from @stof, you must add the deprecation notices where applicable before we can merge this PR. There are some other things to take care of like moving tests for the old version into "legacy" tests, but I will let @nicolas-grekas comment on this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-01-06T07:23:45Z
+
+As @fabpot said, please trigger deprecations notices when the deprecated methods are used (see #13060).
+Please also update any usage of the deprecated methods everywhere in the code base,
+please verify also that composer.json files state correct minimum requirements (if the new methods are used cross-components)
+last but not least, if tests remain that exercise the deprecated methods, please isolate them in test methods or classes with `testLegacy` (for methods) of `Legacy*Test` (for classes) so that we can easily drop them in 3.0.
+I didn't look at the details of your PR, so maybe not all of this is applicable here, but this is the general process.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T08:19:24Z
+
+to be clear, the case needing to throw a notice is when a type is overwriting setDefaultOptions instead of overwriting configureOptions. The code using the types should still call the ``setDefaultOptions`` method because we cannot change the interface until 3.0 (meaning we don't have a BC layer here, but a forward compatibility layer)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T15:30:04Z
+
+I have just added a way to check if the method has been overwritten in the `ResolvedFormType`.
+That is the only way I can think of, however I do not know about the performance implications of this solution. What do you think about that?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T15:35:52Z
+
+Most likely due to my local squash the comment by @stof got lost:
+
+> if someone does not use the AbstractType, they are required to implement setDefaultOptions because of the interface.
+
+> IMO, we should stick to the interface for the external usage of the FormTypeInterface, and build the forward-compatibility layer only in AbstractType, by making setDefaultOptions call configureOptions. This will not break applications
+
+> If someone uses the FormTypeInterface without AbstractType, they will have a hard BC break for 3.0 when we will replace the method in the interface, but I haven't seen any code recreating the implementation from scratch rather than extending the base class with empty implementations.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T15:46:32Z
+
+I have done a rewrite as per @stof's comment in a second commit. It could potentially break if someone has a custom OptionResolver implementation which is i assume unlikely. What do you think now?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T15:53:13Z
+
+> It could potentially break if someone has a custom OptionResolver implementation which is i assume unlikely.
+
+This is totally unlikely (which is why the interface is deprecated btw) and even more in the case of forms given that the OptionsResolver is instantiated by Symfony
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T15:55:08Z
+
+Yes I just wanted to have it mentioned.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T15:59:55Z
+
+Please rebase your branch to fix conflicts. Otherwise Travis is not running the tests
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T17:29:59Z
+
+Rebased. Tests are now showing deprecated warnings which is due to the mock. I am working on this.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T18:16:05Z
+
+I have refactored tests, now it should be good. This way the tests should work also without adjustments after removing the forward compatibility layer and removing the `setDefaultOptions` method.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-06T18:41:57Z
+
+Just added the docs PR. Is all okay now? @stof Are you good with the changes?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-07T17:29:29Z
+
+Rebased. Any further comments? Or are we good to merge, @fabpot?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-08T08:13:26Z
+
+Travis failed on components=high and low which I don't understand. It looks like other PR's against 2.7 are not failing. Do you have any explanation on this?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-08T08:38:42Z
+
+for the components=high, this is because the subtree split of the Form component obviously does not contain the change for configureOptions yet. It should be fixed once the PR is merged and subtrees get updated.
+
+For components=low, this is a combination of 2 things:
+- the subtrees for 2.7 are not updated
+- the low bound for the symfony/form constraints in other components should be bumped to 2.7 as they need the support for this new method, which is not there in 2.6 and older
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-09T07:36:04Z
+
+Thanks for the explanation, that makes it clear. Then I am good from my side.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T11:22:12Z
+
+no you're not. You need to bump the lower bound for the Form component in other components/bridges where you switched to configureOptions
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-09T16:14:40Z
+
+I have adjusted the version requirements, Is this as you expected it?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-10T11:05:39Z
+
+Rebased. Now it looks like just the Tests in the Doctrine and Propel bridge are failing, I assume this is due to the missing subtree split.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-13T17:55:54Z
+
+@fabpot Is there anything blocking this?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-13T18:03:19Z
+
+The UPGRADE-2.7 file should mention the deprecation and describe the way to upgrade
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-13T18:27:57Z
+
+@stof Added the upgrade information
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-14T18:18:10Z
+
+@stof Anything else left?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-16T06:48:22Z
+
+@stof Updated as per your comments.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T08:14:36Z
+
+@peterrehm Tests do not pass (some problems on Propel seems related to this PR). Also, if not done already, rebase on current master. Thanks.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-16T09:32:33Z
+
+@fabpot the only failed tests are on components high and low. @stof mentioned that this is due to a missing subtree split and should be fixed after the merge. I rebased against 2.7, I assume this is what you meant. After this is merge I will update the corresponding PR for the master branch.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-17T17:25:02Z
+
+@fabpot So is it okay now?

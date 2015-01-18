@@ -204,7 +204,13 @@ class Data
     public static function utf8Encode($s)
     {
         if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($s, 'UTF-8', 'CP1252');
+            $availableEncodings = mb_detect_order();
+            if (!in_array('Windows-1252', $availableEncodings)) {
+                array_unshift($availableEncodings, 'Windows-1252');
+            }
+            $encoding = mb_detect_encoding($s, $availableEncodings);
+
+            return mb_convert_encoding($s, 'UTF-8', $encoding);
         }
 
         $s .= $s;

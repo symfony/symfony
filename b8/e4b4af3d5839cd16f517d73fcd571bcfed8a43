@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2014-12-19T17:20:29Z
+
+You can close, the other PR: your patch will come up to master when we will merge branches.
+
+---------------------------------------------------------------------------
+
+by rk3rn3r at 2014-12-20T09:33:48Z
+
+since I saw recent changes on these lines of code from @Seldaek and @fabpot , what do you think?
+
+---------------------------------------------------------------------------
+
+by rk3rn3r at 2014-12-20T09:39:46Z
+
+@Tobion in #13038 wrote this is
+
+Highly related to #7329
+
+---------------------------------------------------------------------------
+
+by rk3rn3r at 2014-12-20T09:43:48Z
+
+@markuspoerschke @andygrunwald @timglabisch FYI, the other PRs were closed, this one will be continued
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T08:25:32Z
+
+Looks good to me. :+1:
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by rk3rn3r at 2014-12-29T08:35:30Z
+
+No progress on this? @fabpot
+
+---------------------------------------------------------------------------
+
+by timglabisch at 2014-12-29T15:04:36Z
+
+@rk3rn3r i played a bit with this issue, it's hard to reproduce. i think you're right, the test was broken, you just fixed it. here are some testcases i played with:
+
+            array(
+                '/foo%20bar',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '',
+                '/foo%20bar',
+            ),
+            array(
+                '/foo%20bar/',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
+                    'SCRIPT_NAME'     => '/foo bar/app.php',
+                    'PHP_SELF'        => '/foo bar/app.php',
+                ),
+                '/foo%20bar',
+                '/',
+            ),
+            array(
+                '/foo%20bar',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo baz/app.php',
+                    'SCRIPT_NAME'     => '/foo baz/app.php',
+                    'PHP_SELF'        => '/foo baz/app.php',
+                ),
+                '',
+                '/foo%20bar',
+            ),
+            array(
+                '/foo',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/foo',
+                    'SCRIPT_NAME'     => '/foo',
+                    'PHP_SELF'        => '/foo',
+                ),
+                '/foo',
+                '/',
+            ),
+            array(
+                '/foo bar/foo/foo bar',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/foo/foo bar',
+                    'SCRIPT_NAME'     => '/foo bar',
+                    'PHP_SELF'        => '/foo bar',
+                ),
+                '/foo bar',
+                '/foo/foo bar',
+            ),
+            array(
+                '/foo bar',
+                array(
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/foo bar/foo/foo bar',
+                    'SCRIPT_NAME'     => '/foo',
+                    'PHP_SELF'        => '/foo',
+                ),
+                '/foo bar',
+                '/',
+            ),
+
+---------------------------------------------------------------------------
+
+by rk3rn3r at 2015-01-15T09:30:02Z
+
+still no progress on this after weeks?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T13:23:49Z
+
+:+1:

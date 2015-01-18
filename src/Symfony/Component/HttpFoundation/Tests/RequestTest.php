@@ -223,6 +223,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('http://test.com/?foo');
         $this->assertEquals('/?foo', $request->getRequestUri());
         $this->assertEquals(array('foo' => ''), $request->query->all());
+
+        ## assume rewrite rule: (.*) --> app/app.php ; app/ is a symlink to a symfony web/ directory
+        $request = Request::create('http://test.com/apparthotel-1234', 'GET', array(), array(), array(),
+            array(
+                'DOCUMENT_ROOT' => '/var/www/www.test.com',
+                'SCRIPT_FILENAME' => '/var/www/www.test.com/app/app.php',
+                'SCRIPT_NAME' => '/app/app.php',
+                'PHP_SELF' => '/app/app.php/apparthotel-1234',
+            ));
+        $this->assertEquals('http://test.com/apparthotel-1234', $request->getUri());
+        $this->assertEquals('/apparthotel-1234', $request->getPathInfo());
+        $this->assertEquals('', $request->getQueryString());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertEquals('test.com', $request->getHttpHost());
+        $this->assertFalse($request->isSecure());
     }
 
     /**
@@ -1302,7 +1317,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                '/foo%20bar',
+                '/foo%20bar/',
                 array(
                     'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo bar/app.php',
                     'SCRIPT_NAME' => '/foo bar/app.php',

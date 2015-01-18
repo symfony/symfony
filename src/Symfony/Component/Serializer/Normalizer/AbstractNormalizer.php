@@ -42,7 +42,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     /**
      * Set circular reference limit.
      *
-     * @param $circularReferenceLimit limit of iterations for the same object
+     * @param int $circularReferenceLimit limit of iterations for the same object
      *
      * @return self
      */

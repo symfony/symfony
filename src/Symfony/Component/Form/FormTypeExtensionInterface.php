@@ -63,6 +63,10 @@ interface FormTypeExtensionInterface
      * Overrides the default options from the extended type.
      *
      * @param OptionsResolverInterface $resolver The resolver for the options.
+     *
+     * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+     *             Use the method configureOptions instead. This method will be
+     *             added to the FormTypeExtensionInterface with Symfony 3.0
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver);
 

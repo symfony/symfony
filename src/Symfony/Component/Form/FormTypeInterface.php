@@ -72,6 +72,10 @@ interface FormTypeInterface
      * Sets the default options for this type.
      *
      * @param OptionsResolverInterface $resolver The resolver for the options.
+     *
+     * @deprecated Deprecated since Symfony 2.7, to be renamed in Symfony 3.0.
+     *             Use the method configureOptions instead. This method will be
+     *             added to the FormTypeInterface with Symfony 3.0.
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver);
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
+ * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
+
 2.6.2
 -----
 

@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-10-19T19:46:23Z
+
+@xabbuh Wow, you're awesome fast today! I just opened an issue for this (#12259), which I'll close now (since you have the PR open).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-10-19T19:48:41Z
+
+@weaverryan Can you leave it open for a while? This fix does only work when you execute ``server:start`` several times. It isn't able to detect if the server was started with ``server:run``, for example.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-12T07:39:43Z
+
+@xabbuh Any news on this one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-12T08:01:49Z
+
+@fabpot I'm actually not sure how we could fix this best. Should we test with `fsockopen` or something similar if the socket is free?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-12-30T10:42:55Z
+
+I updated the pull request. The command now tries to connect to a server listening on the socket to check if the socket is free to be used by the built-in web server.
+
+@fabpot You will be able to rebase this onto the `2.6` branch and apply it there, right?

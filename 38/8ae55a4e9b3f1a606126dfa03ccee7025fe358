@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-09T10:58:47Z
+
+@stof I've implemented your comments, and reverted the BC break.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-09T11:07:41Z
+
+It's still a BC break because of the extra required argument.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-09T11:11:44Z
+
+@Tobion  I see. I thought you were only talking about the container/requeststack change.
+
+Since we already injected the container, we could (ab)use this to fetch the token-storage from that. I agree this would not be a nice thing to (this is why i removed to container in favor of the request-stack in the first place), but it would not break the signature of the constructor.
+
+Would that be a viable option (if not, i'll just add this feature as BC break)?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-09T14:11:40Z
+
+You can write the constructor so that you remove the typehint and allow both the container or the request stack to be passed. So both versions work. And then you can mention in the phpdoc that passing the container is deprecated. And the TokenStorage as third parameter can be made optional ($storage = null) and say document that it will be required in symfony 3.0. If not given, fetch it from the container.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-09T15:04:35Z
+
+@Tobion Thanks, that makes sense.. I'll try and fix that (and also the missing docblocks)..
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-09T18:55:02Z
+
+@Tobion I've fixed the BC break (+squashed the commits).  Does it look all right now or are there still issues?
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-09T22:21:38Z
+
+@Tobion Updated. The `BadMethodCallException` was there for consistency with [ActionsExtension.php](https://github.com/symfony/symfony/blob/fb7eb2dc9f0f95499817f54ecd287aacfd91341a/src/Symfony/Bundle/TwigBundle/Extension/ActionsExtension.php#L43).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-10T00:59:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-10T08:05:05Z
+
+What about triggering a deprecation notice when a `ContainerInterface` is passed to the constructor?
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-10T09:44:07Z
+
+@xabbuh i'll add one today
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-10T21:23:50Z
+
+@fabpot @Tobion Updated. I've added the deprecation notice, and exception. I'm using the same \InvalidArgumentException, since both exceptions require the same user action (changing the provided key). I did not think this would require implementing a new exception.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T06:58:36Z
+
+@jaytaph This PR looks like a mess, something wrong happened. Can you create a new one?
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-16T19:48:46Z
+
+@fabpot  Rebase gone wild, it seems.  I've rebased it correctly and it should be ready.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-17T20:42:06Z
+
+@hhamon Fixed
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T09:51:06Z
+
+:+1:

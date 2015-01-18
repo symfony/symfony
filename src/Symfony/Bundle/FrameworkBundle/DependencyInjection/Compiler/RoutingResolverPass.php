@@ -30,12 +30,6 @@ class RoutingResolverPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('routing.resolver');
 
-        // routing.loader.directory only appears in Routing 2.7
-        $directoryLoaderDefinition = $container->getDefinition('routing.loader.directory');
-        if (!class_exists($directoryLoaderDefinition->getClass())) {
-            $container->removeDefinition('routing.loader.directory');
-        }
-
         foreach ($container->findTaggedServiceIds('routing.loader') as $id => $attributes) {
             $definition->addMethodCall('addLoader', array(new Reference($id)));
         }

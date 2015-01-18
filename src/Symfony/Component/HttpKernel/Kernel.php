@@ -712,20 +712,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function getContainerLoader(ContainerInterface $container)
     {
         $locator = new FileLocator($this);
-        $loaders = array(
+        $resolver = new LoaderResolver(array(
             new XmlFileLoader($container, $locator),
             new YamlFileLoader($container, $locator),
             new IniFileLoader($container, $locator),
             new PhpFileLoader($container, $locator),
+            new DirectoryLoader($container, $locator),
             new ClosureLoader($container),
-        );
-
-        // DirectoryLoader only appears in DI 2.7
-        if (class_exists('Symfony\\Component\\DependencyInjection\\Loader\\DirectoryLoader')) {
-            $loaders[] = new DirectoryLoader($container, $locator);
-        }
-
-        $resolver = new LoaderResolver($loaders);
+        ));
 
         return new DelegatingLoader($resolver);
     }

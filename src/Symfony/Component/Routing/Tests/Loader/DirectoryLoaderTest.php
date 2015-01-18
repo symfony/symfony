@@ -20,17 +20,17 @@ use Symfony\Component\Routing\RouteCollection;
 
 class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
 {
-    protected $loader;
-    protected $reader;
+    private $loader;
+    private $reader;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $locator      = new FileLocator();
+        $locator = new FileLocator();
         $this->reader = $this->getReader();
         $this->loader = new DirectoryLoader($locator);
-        $resolver     = new LoaderResolver(array(
+        $resolver = new LoaderResolver(array(
             new YamlFileLoader($locator),
             new AnnotationFileLoader($locator, $this->getClassLoader($this->reader)),
             $this->loader,
@@ -50,7 +50,7 @@ class DirectoryLoaderTest extends AbstractAnnotationLoaderTest
         $this->verifyCollection($collection);
     }
 
-    protected function verifyCollection(RouteCollection $collection)
+    private function verifyCollection(RouteCollection $collection)
     {
         $routes = $collection->all();
 

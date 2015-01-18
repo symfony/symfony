@@ -31,7 +31,7 @@ class DirectoryLoader extends FileLoader
 
         foreach (scandir($path) as $dir) {
             if ($dir[0] !== '.') {
-                if (is_dir("$path/$dir")) {
+                if (is_dir($path.'/'.$dir)) {
                     $dir .= '/'; // append / to allow recursion
                 }
 
@@ -49,7 +49,9 @@ class DirectoryLoader extends FileLoader
     {
         if ('directory' === $type) {
             return true;
-        } elseif (null === $type) {
+        }
+
+        if (null === $type) {
             return preg_match('/\/$/', $resource) === 1;
         }
 

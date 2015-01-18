@@ -30,9 +30,15 @@ class DirectoryLoader extends FileLoader
         foreach (scandir($path) as $dir) {
             if ($dir[0] !== '.') {
                 $this->setCurrentDir($path);
+                $subPath = $path.'/'.$dir;
+                $subType = null;
 
-                $subType = is_dir("$path/$dir") ? 'directory' : null;
-                $subCollection = $this->import("$path/$dir", $subType, false, $path);
+                if (is_dir($subPath)) {
+                    $subPath .= '/';
+                    $subType = 'directory';
+                }
+
+                $subCollection = $this->import($subPath, $subType, false, $path);
                 $collection->addCollection($subCollection);
             }
         }

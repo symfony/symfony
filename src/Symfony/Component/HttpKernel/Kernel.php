@@ -252,7 +252,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws \RuntimeException if a custom resource is hidden by a resource in a derived bundle
      */

@@ -21,10 +21,10 @@ use Symfony\Component\Config\FileLocator;
 
 class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $fixturesPath;
+    private static $fixturesPath;
 
-    protected $container;
-    protected $loader;
+    private $container;
+    private $loader;
 
     public static function setUpBeforeClass()
     {
@@ -33,10 +33,10 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $locator         = new FileLocator(self::$fixturesPath);
+        $locator = new FileLocator(self::$fixturesPath);
         $this->container = new ContainerBuilder();
-        $this->loader    = new DirectoryLoader($this->container, $locator);
-        $resolver        = new LoaderResolver(array(
+        $this->loader = new DirectoryLoader($this->container, $locator);
+        $resolver = new LoaderResolver(array(
             new PhpFileLoader($this->container, $locator),
             new IniFileLoader($this->container, $locator),
             new YamlFileLoader($this->container, $locator),
@@ -45,10 +45,6 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader->setResolver($resolver);
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\DirectoryLoader::__construct
-     * @covers Symfony\Component\DependencyInjection\Loader\DirectoryLoader::load
-     */
     public function testDirectoryCanBeLoadedRecursively()
     {
         $this->loader->load('directory/');

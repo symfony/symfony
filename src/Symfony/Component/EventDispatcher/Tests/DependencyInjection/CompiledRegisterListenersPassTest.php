@@ -139,6 +139,91 @@ class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
         $registerListenersPass = new CompiledRegisterListenersPass();
         $registerListenersPass->process($container);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The service "foo" must not be abstract as event subscribers are lazy-loaded.
+     */
+    public function testAbstractEventSubscriber()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setAbstract(true)->addTag('kernel.event_subscriber', array());
+        $container->register('event_dispatcher', 'stdClass');
+
+        $registerListenersPass = new CompiledRegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
+
+    public function testEventSubscriberResolvableClassName()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('subscriber.class', 'Symfony\Component\EventDispatcher\Tests\DependencyInjection\CompiledSubscriberService');
+        $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', array());
+        $container->register('event_dispatcher', 'stdClass');
+
+        $registerListenersPass = new CompiledRegisterListenersPass();
+        $registerListenersPass->process($container);
+
+        $definition = $container->getDefinition('event_dispatcher');
+        $expected_arguments = array(
+            array (
+                'test_event.multiple_listeners' => array (
+                    128 => array (
+                        array (
+                            'service' => array (
+                                'id' => 'foo',
+                                'method' => 'methodWithHighestPriority',
+                            ),
+                        ),
+                    ),
+                    0 => array (
+                        array (
+                            'service' => array (
+                                'id' => 'foo',
+                                'method' => 'methodWithoutPriority',
+                            ),
+                        ),
+                    ),
+                ),
+                'test_event.single_listener_with_priority' => array (
+                    64 => array (
+                        array (
+                            'service' => array (
+                                'id' => 'foo',
+                                'method' => 'methodWithHighPriority',
+                            ),
+                        ),
+                    ),
+                ),
+                'test_event.single_listener_without_priority' => array (
+                    0 => array (
+                        array (
+                            'service' => array (
+                                'id' => 'foo',
+                                'method' => 'methodWithoutPriority',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        );
+        $this->assertSame($expected_arguments, $definition->getArguments());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage You have requested a non-existent parameter "subscriber.class"
+     */
+    public function testEventSubscriberUnresolvableClassName()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', '%subscriber.class%')->addTag('kernel.event_subscriber', array());
+        $container->register('event_dispatcher', 'stdClass');
+
+        $registerListenersPass = new CompiledRegisterListenersPass();
+        $registerListenersPass->process($container);
+    }
 }
 
 class CompiledSubscriberService implements EventSubscriberInterface

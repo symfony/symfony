@@ -167,39 +167,39 @@ class CompiledRegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = $container->getDefinition('event_dispatcher');
         $expected_arguments = array(
-            array (
-                'test_event.multiple_listeners' => array (
-                    128 => array (
-                        array (
-                            'service' => array (
+            array(
+                'test_event.multiple_listeners' => array(
+                    128 => array(
+                        array(
+                            'service' => array(
                                 'id' => 'foo',
                                 'method' => 'methodWithHighestPriority',
                             ),
                         ),
                     ),
-                    0 => array (
-                        array (
-                            'service' => array (
+                    0 => array(
+                        array(
+                            'service' => array(
                                 'id' => 'foo',
                                 'method' => 'methodWithoutPriority',
                             ),
                         ),
                     ),
                 ),
-                'test_event.single_listener_with_priority' => array (
-                    64 => array (
-                        array (
-                            'service' => array (
+                'test_event.single_listener_with_priority' => array(
+                    64 => array(
+                        array(
+                            'service' => array(
                                 'id' => 'foo',
                                 'method' => 'methodWithHighPriority',
                             ),
                         ),
                     ),
                 ),
-                'test_event.single_listener_without_priority' => array (
-                    0 => array (
-                        array (
-                            'service' => array (
+                'test_event.single_listener_without_priority' => array(
+                    0 => array(
+                        array(
+                            'service' => array(
                                 'id' => 'foo',
                                 'method' => 'methodWithoutPriority',
                             ),

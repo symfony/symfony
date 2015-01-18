@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T11:16:02Z
+
+the thing is, it should also be loaded only if the profiler is enabled
+
+---------------------------------------------------------------------------
+
+by hason at 2015-01-09T12:21:03Z
+
+@stof It is loaded if the profiler and form are enabled - see https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L284.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T06:57:24Z
+
+:+1:

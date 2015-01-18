@@ -35,7 +35,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ->setName('translation:update')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle where to load the messages, defaults to app/Resources folder', null),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
                 new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
                 new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
@@ -83,16 +83,27 @@ EOF
 
             return 1;
         }
+        $kernel = $this->getContainer()->get('kernel');
 
         // Define Root Path to App folder
-        $rootPath = $this->getApplication()->getKernel()->getRootDir();
+        $rootPath = $kernel->getRootDir();
         $currentName = "app folder";
 
         // Override with provided Bundle info
         if (null !== $input->getArgument('bundle')) {
-            $foundBundle = $this->getApplication()->getKernel()->getBundle($input->getArgument('bundle'));
-            $rootPath = $foundBundle->getPath();
-            $currentName = $foundBundle->getName();
+            try {
+                $foundBundle = $kernel->getBundle($input->getArgument('bundle'));
+                $rootPath = $foundBundle->getPath();
+                $currentName = $foundBundle->getName();
+            } catch (\InvalidArgumentException $e) {
+                // such a bundle does not exist, so treat the argument as path
+                $rootPath = $input->getArgument('bundle');
+                $currentName = $rootPath;
+
+                if (!is_dir($rootPath)) {
+                    throw new \InvalidArgumentException(sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $rootPath));
+                }
+            }
         }
 
         // get bundle directory

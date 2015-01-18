@@ -44,16 +44,16 @@ class TranslationDebugCommand extends ContainerAwareCommand
             ))
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
+                new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages, defaults to app/Resources folder'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
             ))
-            ->setDescription('Displays translation messages informations')
+            ->setDescription('Displays translation messages information')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
-templates and translation files of a given bundle.
+templates and translation files of a given bundle or the app folder.
 
 You can display information about bundle translations in a specific locale:
 
@@ -71,6 +71,10 @@ You can only display unused messages:
 
   <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
+You can display information about app translations in a specific locale:
+
+  <info>php %command.full_name% en</info>
+
 EOF
             )
         ;
@@ -87,17 +91,39 @@ EOF
 
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
-        $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));
         $loader = $this->getContainer()->get('translation.loader');
+        $kernel = $this->getContainer()->get('kernel');
+
+        // Define Root Path to App folder
+        $rootPath = $kernel->getRootDir();
+
+        // Override with provided Bundle info
+        if (null !== $input->getArgument('bundle')) {
+            try {
+                $rootPath = $kernel->getBundle($input->getArgument('bundle'))->getPath();
+            } catch (\InvalidArgumentException $e) {
+                // such a bundle does not exist, so treat the argument as path
+                $rootPath = $input->getArgument('bundle');
+
+                if (!is_dir($rootPath)) {
+                    throw new \InvalidArgumentException(sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $rootPath));
+                }
+            }
+        }
+
+        // get bundle directory
+        $translationsPath = $rootPath.'/Resources/translations';
 
         // Extract used messages
         $extractedCatalogue = new MessageCatalogue($locale);
-        $this->getContainer()->get('translation.extractor')->extract($bundle->getPath().'/Resources/views', $extractedCatalogue);
+        if (is_dir($rootPath.'/Resources/views')) {
+            $this->getContainer()->get('translation.extractor')->extract($rootPath.'/Resources/views', $extractedCatalogue);
+        }
 
         // Load defined messages
         $currentCatalogue = new MessageCatalogue($locale);
-        if (is_dir($bundle->getPath().'/Resources/translations')) {
-            $loader->loadMessages($bundle->getPath().'/Resources/translations', $currentCatalogue);
+        if (is_dir($translationsPath)) {
+            $loader->loadMessages($translationsPath, $currentCatalogue);
         }
 
         // Merge defined and extracted messages to get all message ids
@@ -130,7 +156,7 @@ EOF
                 }
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-                $loader->loadMessages($bundle->getPath().'/Resources/translations', $fallbackCatalogue);
+                $loader->loadMessages($translationsPath, $fallbackCatalogue);
                 $fallbackCatalogues[] = $fallbackCatalogue;
             }
         }

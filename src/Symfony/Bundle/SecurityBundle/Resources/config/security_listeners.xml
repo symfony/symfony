@@ -225,7 +225,7 @@
             <argument type="service" id="event_dispatcher" on-invalid="null"/>
         </service>
 
-        <service id="security.authentication.sessionexpiration_listener" class="Symfony\Component\Security\Http\Firewall\SessionExpirationListener" public="false" abstract="true">
+        <service id="security.authentication.session_expiration_listener" class="Symfony\Component\Security\Http\Firewall\SessionExpirationListener" public="false" abstract="true">
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.http_utils" />

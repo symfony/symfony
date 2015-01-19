@@ -55,12 +55,15 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * Adds a loader.
      *
-     * @param LoaderInterface $loader A LoaderInterface instance
+     * @param  LoaderInterface $loader A LoaderInterface instance
+     * @return LoaderResolver
      */
     public function addLoader(LoaderInterface $loader)
     {
         $this->loaders[] = $loader;
         $loader->setResolver($this);
+
+        return $this;
     }
 
     /**

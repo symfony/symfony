@@ -494,29 +494,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
-                        ->enumNode('api')
-                            ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
-                            ->beforeNormalization()
-                                // XML/YAML parse as numbers, not as strings
-                                ->ifTrue(function ($v) { return is_scalar($v); })
-                                ->then(function ($v) { return (string) $v; })
-                            ->end()
-                        ->end()
                     ->end()
                 ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return !isset($v['validation']['api']) || 'auto' === $v['validation']['api']; })
-                ->then(function ($v) {
-                    // This condition is duplicated in ValidatorBuilder. This
-                    // duplication is necessary in order to know the desired
-                    // API version already during container configuration
-                    // (to adjust service classes etc.)
-                    // See https://github.com/symfony/symfony/issues/11580
-                    $v['validation']['api'] = '2.5-bc';
-
-                    return $v;
-                })
             ->end()
         ;
     }

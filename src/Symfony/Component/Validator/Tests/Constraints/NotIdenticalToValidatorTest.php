@@ -20,10 +20,6 @@ use Symfony\Component\Validator\Validation;
  */
 class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
 
     protected function createValidator()
     {

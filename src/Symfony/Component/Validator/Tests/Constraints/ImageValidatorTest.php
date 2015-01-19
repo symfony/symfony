@@ -30,11 +30,6 @@ class ImageValidatorTest extends AbstractConstraintValidatorTest
     protected $imagePortrait;
     protected $image4By3;
 
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new ImageValidator();

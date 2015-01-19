@@ -17,11 +17,9 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Context\LegacyExecutionContext;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\StubGlobalExecutionContext;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -52,10 +50,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        if (Validation::API_VERSION_2_5 !== $this->getApiVersion()) {
-            $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-        }
-
         $this->group = 'MyGroup';
         $this->metadata = null;
         $this->object = null;
@@ -105,25 +99,11 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
 
-        switch ($this->getApiVersion()) {
-            case Validation::API_VERSION_2_5:
-                $context = new ExecutionContext(
-                    $validator,
-                    $this->root,
-                    $translator
-                );
-                break;
-            case Validation::API_VERSION_2_5_BC:
-                $context = new LegacyExecutionContext(
-                    $validator,
-                    $this->root,
-                    $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface'),
-                    $translator
-                );
-                break;
-            default:
-                throw new \RuntimeException('Invalid API version');
-        }
+        $context = new ExecutionContext(
+            $validator,
+            $this->root,
+            $translator
+        );
 
         $context->setGroup($this->group);
         $context->setNode($this->value, $this->object, $this->metadata, $this->propertyPath);
@@ -301,8 +281,6 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
     {
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
-
-    abstract protected function getApiVersion();
 
     abstract protected function createValidator();
 }

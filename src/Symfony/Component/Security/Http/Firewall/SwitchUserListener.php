@@ -79,7 +79,7 @@ class SwitchUserListener implements ListenerInterface
         $usernameParameter = $request->get($this->usernameParameter);
 
         // listener stops if _switch_user request parameters is not defined
-        if (!$usernameParameter) {
+        if (empty($usernameParameter)) {
             return;
         }
 

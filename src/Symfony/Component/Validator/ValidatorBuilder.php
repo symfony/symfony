@@ -19,7 +19,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
-use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
@@ -31,7 +30,6 @@ use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\XmlFilesLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Mapping\Loader\YamlFilesLoader;
-use Symfony\Component\Validator\Validator\LegacyValidator;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 /**
@@ -393,14 +391,8 @@ class ValidatorBuilder implements ValidatorBuilderInterface
             $translator->setLocale('en');
         }
 
-        if (Validation::API_VERSION_2_5 === $apiVersion) {
-            $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
+        $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
-            return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
-        }
-
-        $contextFactory = new LegacyExecutionContextFactory($metadataFactory, $translator, $this->translationDomain);
-
-        return new LegacyValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers);
     }
 }

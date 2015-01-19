@@ -12,6 +12,7 @@
 namespace Symfony\Component\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\Asset\Context\NullContext;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
@@ -25,9 +26,10 @@ class Package implements PackageInterface
     private $versionStrategy;
     private $context;
 
-    public function __construct(VersionStrategyInterface $versionStrategy)
+    public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
         $this->versionStrategy = $versionStrategy;
+        $this->context = $context ?: new NullContext();
     }
 
     /**
@@ -50,13 +52,8 @@ class Package implements PackageInterface
         return $this->versionStrategy->applyVersion($path);
     }
 
-    public function setContext(ContextInterface $context)
-    {
-        $this->context = $context;
-    }
-
     /**
-     * @return ContextInterface|null
+     * @return ContextInterface
      */
     protected function getContext()
     {

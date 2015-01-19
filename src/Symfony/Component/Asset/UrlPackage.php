@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset;
 
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\Asset\Exception\InvalidArgumentException;
 use Symfony\Component\Asset\Exception\LogicException;
@@ -42,9 +43,9 @@ class UrlPackage extends Package
      * @param string|array             $baseUrls        Base asset URLs
      * @param VersionStrategyInterface $versionStrategy The version strategy
      */
-    public function __construct($baseUrls = array(), VersionStrategyInterface $versionStrategy)
+    public function __construct($baseUrls = array(), VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
-        parent::__construct($versionStrategy);
+        parent::__construct($versionStrategy, $context);
 
         if (!is_array($baseUrls)) {
             $baseUrls = (array) $baseUrls;
@@ -74,7 +75,7 @@ class UrlPackage extends Package
             return $path;
         }
 
-        if (null !== $this->sslPackage && ($context = $this->getContext()) && $context->isSecure()) {
+        if (null !== $this->sslPackage && $this->getContext()->isSecure()) {
             return $this->sslPackage->getUrl($path);
         }
 

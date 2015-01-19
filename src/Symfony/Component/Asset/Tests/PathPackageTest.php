@@ -52,8 +52,8 @@ class PathPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
     {
-        $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
-        $package->setContext($this->getContext($basePathRequest));
+        $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
+
         $this->assertEquals($expected, $package->getUrl($path));
     }
 

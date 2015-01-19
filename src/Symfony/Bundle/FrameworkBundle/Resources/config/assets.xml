@@ -18,17 +18,13 @@
         <service id="assets.path_package" class="Symfony\Component\Asset\PathPackage" abstract="true">
             <argument /> <!-- base path -->
             <argument type="service" /> <!-- version strategy -->
-            <call method="setContext">
-                <argument type="service" id="assets.context" />
-            </call>
+            <argument type="service" id="assets.context" />
         </service>
 
         <service id="assets.url_package" class="Symfony\Component\Asset\UrlPackage" abstract="true">
             <argument /> <!-- base URLs -->
             <argument type="service" /> <!-- version strategy -->
-            <call method="setContext">
-                <argument type="service" id="assets.context" />
-            </call>
+            <argument type="service" id="assets.context" />
         </service>
 
         <service id="assets.static_version_strategy" class="Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy" abstract="true">

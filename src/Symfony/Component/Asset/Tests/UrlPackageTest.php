@@ -57,8 +57,8 @@ class UrlPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUrlWithContext($secure, $baseUrls, $format, $path, $expected)
     {
-        $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
-        $package->setContext($this->getContext($secure));
+        $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
+
         $this->assertEquals($expected, $package->getUrl($path));
     }
 

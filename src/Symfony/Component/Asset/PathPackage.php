@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset;
 
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
@@ -31,9 +32,9 @@ class PathPackage extends Package
      * @param string                   $basePath        The base path to be prepended to relative paths
      * @param VersionStrategyInterface $versionStrategy The version strategy
      */
-    public function __construct($basePath, VersionStrategyInterface $versionStrategy)
+    public function __construct($basePath, VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
-        parent::__construct($versionStrategy);
+        parent::__construct($versionStrategy, $context);
 
         if (!$basePath) {
             $this->basePath = '/';
@@ -65,10 +66,6 @@ class PathPackage extends Package
      */
     public function getBasePath()
     {
-        if (null !== $context = $this->getContext()) {
-            return $context->getBasePath().$this->basePath;
-        }
-
-        return $this->basePath;
+        return $this->getContext()->getBasePath().$this->basePath;
     }
 }

@@ -47,10 +47,21 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
         if (!$this->hasStdoutSupport()) {
             $outputStream = 'php://output';
         }
+        $autodetection = null === $decorated;
 
         parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
 
+        // remember autodetected value for stdout and reset
+        $stdoutIsDecorated = $this->isDecorated();
+        if ($autodetection) {
+            $this->getFormatter()->setDecorated(null);
+        }
+
         $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $this->getFormatter());
+
+        if ($this->stderr->isDecorated() !== $stdoutIsDecorated) {
+            $this->setDecorated(false);
+        }
     }
 
     /**

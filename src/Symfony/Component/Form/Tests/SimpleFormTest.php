@@ -909,6 +909,23 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame($form, $form->handleRequest('REQUEST'));
     }
 
+    public function testSimilarBehaviorOfSubmitAndHandleRequestWhenPassingRequest()
+    {
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $factory = \Symfony\Component\Form\Forms::createFormFactoryBuilder()->getFormFactory();
+        $formBuilder = new \Symfony\Component\Form\FormBuilder(null, null, $dispatcher, $factory);
+        $request = \Symfony\Component\HttpFoundation\Request::create('', 'POST', array());
+
+        $form1 = $formBuilder->setRequestHandler(new \Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler())->getForm();
+        $form2 = $formBuilder->setRequestHandler(new \Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler())->getForm();
+
+        $form1->submit($request);
+        $form2->handleRequest($request);
+
+        $this->assertTrue($form1->isSubmitted());
+        $this->assertTrue($form2->isSubmitted());
+    }
+
     public function testFormInheritsParentData()
     {
         $child = $this->getBuilder('child')

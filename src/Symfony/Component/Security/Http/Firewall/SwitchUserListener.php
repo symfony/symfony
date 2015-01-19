@@ -119,7 +119,7 @@ class SwitchUserListener implements ListenerInterface
     private function switchUser(Request $request)
     {
         if (null !== $this->logger) {
-            $this->logger->info('Attempting to switch to user.', array('username' => $request->get($this->usernameParameter));
+            $this->logger->info('Attempting to switch to user.', array('username' => $request->get($this->usernameParameter)));
         }
 
         // token of the currently authenticated user

@@ -33,11 +33,18 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $providerKey must not be empty
      */
-    public function test__ConstructThrowsExceptionOnInvalidProviderKey()
+    public function test__ConstructThrowsExceptionOnEmptyProviderKey()
     {
         new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function test__ConstructThrowsExceptionOnNullProviderKey()
+    {
+        new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, null, $this->accessDecisionManager);
     }
 
     public function testHandleOnSwitchThrowsExceptionIfUserCanNotSwitch()
@@ -55,13 +62,13 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->markTestIncomplete("not sure if this must be tested");
     }
 
-    public function testHandleWithNullUsernameParameter()
+    public function testHandleWithEmptyUsernameParameter()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->any())
             ->method('get')
             ->with('_switch_user')
-            ->will($this->returnValue(null));
+            ->will($this->returnValue(''));
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
@@ -79,10 +86,17 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleOnSwitch()
     {
+        $role = $this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $role->expects($this->any())
+            ->method('getRole')
+            ->will($this->returnValue('ROLE_ALLOWED_TO_SWITCH'));
+
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
             ->method('getRoles')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue(array($role)));
 
         $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $tokenStorage->expects($this->atLeastOnce())
@@ -95,6 +109,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
         $accessDecisionManager->expects($this->atLeastOnce())
             ->method('decide')
+            ->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
             ->will($this->returnValue(true));
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
@@ -102,11 +117,13 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $userProvider->expects($this->once())
             ->method('loadUserByUsername')
+            ->with('foo')
             ->will($this->returnValue($user));
 
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')
+            ->with($user);
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->any())
@@ -120,7 +137,8 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
         $request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $request->query->expects($this->once())
-            ->method('remove');
+            ->method('remove')
+            ->with('_switch_user');
         $request->query->expects($this->any())
             ->method('all')
             ->will($this->returnValue(array()));
@@ -144,10 +162,17 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleOnSwitchKeepsOtherQueryStringParameters()
     {
+        $role = $this->getMockBuilder('Symfony\Component\Security\Core\Role\RoleInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $role->expects($this->any())
+            ->method('getRole')
+            ->will($this->returnValue('ROLE_ALLOWED_TO_SWITCH'));
+
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
             ->method('getRoles')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue(array($role)));
 
         $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $tokenStorage->expects($this->atLeastOnce())
@@ -160,6 +185,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
         $accessDecisionManager->expects($this->atLeastOnce())
             ->method('decide')
+            ->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
             ->will($this->returnValue(true));
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
@@ -167,11 +193,13 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $userProvider->expects($this->once())
             ->method('loadUserByUsername')
+            ->with('foo')
             ->will($this->returnValue($user));
 
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')
+            ->with($user);
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->any())
@@ -185,7 +213,9 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
         $request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
         $request->query->expects($this->once())
-            ->method('remove');
+            ->method('remove')
+            ->with('_switch_user')
+        ;
         $request->query->expects($this->any())
             ->method('all')
             ->will($this->returnValue(array('page' => 3, 'section' => 2)));
@@ -244,11 +274,13 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $userProvider->expects($this->once())
             ->method('loadUserByUsername')
+            ->with('foo')
             ->will($this->returnValue($user));
 
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
-            ->method('checkPostAuth')->with($user);
+            ->method('checkPostAuth')
+            ->with($user);
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->any())
@@ -309,8 +341,9 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
 
         $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
-        $accessDecisionManager->expects($this->atLeastOnce())
+        $accessDecisionManager->expects($this->once())
             ->method('decide')
+            ->with($token, array(SwitchUserListener::ROLE_PREVOIUS_ADMIN))
             ->will($this->returnValue(true));
 
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
@@ -360,7 +393,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($token));
 
         $accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
-        $accessDecisionManager->expects($this->exactly(2))
+        $accessDecisionManager->expects($this->atLeastOnce())
             ->method('decide')
             ->will($this->returnValue(false));
 

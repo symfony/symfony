@@ -728,8 +728,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
         $process->setTimeout(0.1);
         try {
             $process->run();
-            $this->fail('An exception should have been raised.');
-        } catch (\Exception $e) {
+            $this->fail('A RuntimeException should have been raised.');
+        } catch (RuntimeException $e) {
         }
         $process->start();
         usleep(10000);

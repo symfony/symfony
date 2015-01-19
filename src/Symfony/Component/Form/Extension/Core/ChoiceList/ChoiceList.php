@@ -87,10 +87,18 @@ class ChoiceList implements ChoiceListInterface
      *
      * @throws UnexpectedTypeException If the choices are not an array or \Traversable.
      */
-    public function __construct($choices, array $labels, array $preferredChoices = array())
+    public function __construct($choices, $labels, $preferredChoices = array())
     {
         if (!is_array($choices) && !$choices instanceof \Traversable) {
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
+        }
+
+        if (!is_array($labels) && !$labels instanceof \Traversable) {
+            throw new UnexpectedTypeException($labels, 'array or \Traversable');
+        }
+
+        if (!is_array($preferredChoices) && !$preferredChoices instanceof \Traversable) {
+            throw new UnexpectedTypeException($preferredChoices, 'array or \Traversable');
         }
 
         $this->initialize($choices, $labels, $preferredChoices);
@@ -105,7 +113,7 @@ class ChoiceList implements ChoiceListInterface
      * @param array              $labels           The labels belonging to the choices.
      * @param array              $preferredChoices The choices to display with priority.
      */
-    protected function initialize($choices, array $labels, array $preferredChoices)
+    protected function initialize($choices, $labels, $preferredChoices)
     {
         $this->choices = array();
         $this->values = array();
@@ -271,7 +279,7 @@ class ChoiceList implements ChoiceListInterface
      * @throws InvalidArgumentException      If the structures of the choices and labels array do not match.
      * @throws InvalidConfigurationException If no valid value or index could be created for a choice.
      */
-    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, array $labels, array $preferredChoices)
+    protected function addChoices(array &$bucketForPreferred, array &$bucketForRemaining, $choices, $labels, $preferredChoices)
     {
         // Add choices to the nested buckets
         foreach ($choices as $group => $choice) {

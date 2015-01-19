@@ -1312,16 +1312,20 @@ EOF;
                 }
 
                 if (is_array($factory)) {
+                    $factoryMethod = substr($this->dumpValue($factory[1]), 1, -1);
+
                     if (is_string($factory[0])) {
-                        return sprintf('\\%s::%s(%s)', $factory[0], $factory[1], implode(', ', $arguments));
+                        $factoryClass = substr(str_replace('\\\\', '\\', $this->dumpValue($factory[0])), 1, -1);
+
+                        return sprintf('\\%s::%s(%s)', $factoryClass, $factoryMethod, implode(', ', $arguments));
                     }
 
                     if ($factory[0] instanceof Definition) {
-                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factory[1], count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factoryMethod, count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                     }
 
                     if ($factory[0] instanceof Reference) {
-                        return sprintf('%s->%s(%s)', $this->dumpValue($factory[0]), $factory[1], implode(', ', $arguments));
+                        return sprintf('%s->%s(%s)', $this->dumpValue($factory[0]), $factoryMethod, implode(', ', $arguments));
                     }
                 }
 

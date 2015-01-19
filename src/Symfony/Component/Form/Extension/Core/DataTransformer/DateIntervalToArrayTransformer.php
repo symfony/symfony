@@ -15,7 +15,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * Transforms between a normalized date interval and a interval string/array.
+ * Transforms between a normalized date interval and an interval string/array.
  *
  * @author Steffen Roßkamp <steffen.rosskamp@gimmickmedia.de>
  */
@@ -48,12 +48,11 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a normalized date interval into a interval array.
+     * Transforms a normalized date interval into an interval array.
      *
      * @param  \DateInterval                 $dateInterval Normalized date interval.
      * @return array                         Interval array.
-     * @throws TransformationFailedException If the given value is not an
-     *                                                    instance of \DateInterval.
+     * @throws TransformationFailedException If the given value is not a \DateInterval instance.
      */
     public function transform($dateInterval)
     {
@@ -86,19 +85,19 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
 		$result['days'] = (string) ($result['days'] % 7);
 	    }
 	}
-	$result['invert'] = $result['invert'] === '-';
+	$result['invert'] = '-' === $result['invert'];
 	$result = array_intersect_key($result, array_flip($this->fields));
 
 	return $result;
     }
 
     /**
-     * Transforms a interval array into a normalized date interval.
+     * Transforms an interval array into a normalized date interval.
      *
      * @param  array                         $value Interval array
      * @return \DateInterval                 Normalized date interval
-     * @throws TransformationFailedException If the given value is not an array,
-     *                                             if the value could not be transformed.
+     * @throws TransformationFailedException If the given value is not an array or
+     *                                       if the value could not be transformed.
      */
     public function reverseTransform($value)
     {

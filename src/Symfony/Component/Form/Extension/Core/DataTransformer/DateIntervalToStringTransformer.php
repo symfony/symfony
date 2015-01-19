@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Transforms between a date string and a DateInterval object
@@ -24,6 +23,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
 {
     /**
      * Format used for generating strings
+     *
      * @var string
      */
     private $format;
@@ -39,13 +39,13 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      * Transforms a \DateInterval instance to a string
      *
      * @see \DateInterval::format() for supported formats
-     * @param  string                  $format      The date format
-     * @param  bool                    $parseSigned Whether to parse by as a signed interval
-     * @throws UnexpectedTypeException if a timezone is not a string
+     * @param string $format      The date format
+     * @param bool   $parseSigned Whether to parse as a signed interval
      */
     public function __construct($format = 'P%yY%mM%dDT%hH%iM%sS', $parseSigned = false)
     {
 	$this->format = $format;
+	$this->parseSigned = $parseSigned;
     }
 
     /**
@@ -54,8 +54,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      *
      * @param  \DateInterval                 $value A DateInterval object
      * @return string                        An ISO 8601 or relative date string like date interval presentation
-     * @throws TransformationFailedException If the given value is not a \DateInterval
-     *                                             instance..
+     * @throws TransformationFailedException If the given value is not a \DateInterval instance.
      */
     public function transform($value)
     {
@@ -75,7 +74,7 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
      * @param  string                        $value An ISO 8601 or date string like date interval presentation
      * @return \DateInterval                 An instance of \DateInterval
      * @throws TransformationFailedException If the given value is not a string or
-     *                                             if the date interval could not be parsed.
+     *                                       if the date interval could not be parsed.
      */
     public function reverseTransform($value)
     {
@@ -107,7 +106,9 @@ class DateIntervalToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $string
+     * Checks if a string is a valid ISO 8601 duration string.
+     *
+     * @param  string $string A string
      * @return int
      */
     private function isISO8601($string)

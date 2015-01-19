@@ -144,7 +144,7 @@
                         tbody.appendChild(rows);
 
                         if (infoSpan) {
-                            var text = requestStack.length + ' calls';
+                            var text = requestStack.length + ' call' + (requestStack.length > 1 ? 's' : '');
                             infoSpan.textContent = text;
                         }
                     } else {

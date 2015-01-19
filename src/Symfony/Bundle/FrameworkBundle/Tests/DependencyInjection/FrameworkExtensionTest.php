@@ -306,14 +306,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $container = $this->createContainerFromFile('full');
 
-        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
     }
 
     public function testValidationService()
     {
         $container = $this->createContainerFromFile('validation_annotations');
 
-        $this->assertInstanceOf('Symfony\Component\Validator\ValidatorInterface', $container->get('validator'));
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
     }
 
     public function testAnnotations()

@@ -118,7 +118,7 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         // Legacy compatible implementation
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }
 
     public function testSetApiVersion25()
@@ -135,6 +135,6 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_5_BC));
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }
 }

@@ -41,7 +41,7 @@
         <service id="twig.app_variable" class="Symfony\Bridge\Twig\AppVariable" public="false">
             <call method="setEnvironment"><argument>%kernel.environment%</argument></call>
             <call method="setDebug"><argument>%kernel.debug%</argument></call>
-            <call method="setSecurity"><argument type="service" id="security.context" on-invalid="ignore" /></call>
+            <call method="setContainer"><argument type="service" id="service_container" /></call>
             <call method="setTokenStorage"><argument type="service" id="security.token_storage" on-invalid="ignore" /></call>
             <call method="setRequestStack"><argument type="service" id="request_stack" on-invalid="ignore" /></call>
         </service>

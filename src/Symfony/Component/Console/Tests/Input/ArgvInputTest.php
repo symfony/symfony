@@ -304,6 +304,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(array('app/console', 'foo:bar', '-e', 'dev'), array('-e', '--env'), 'dev'),
             array(array('app/console', 'foo:bar', '--env=dev'), array('-e', '--env'), 'dev'),
             array(array('app/console', 'foo:bar', '--env=dev', '--en=1'), array('--en'), '1'),
+            array(array('app/console', 'foo:bar', '--env=dev', '', '--en=1'), array('--en'), '1'),
         );
     }
 

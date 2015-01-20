@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-use Symfony\Component\Validator\Mapping\Deprecated\TraversalStrategy as Deprecated;
-
 /**
  * Specifies whether and how a traversable object should be traversed.
  *
@@ -57,7 +55,7 @@ class TraversalStrategy
      *
      * @internal
      */
-    const STOP_RECURSION = Deprecated::STOP_RECURSION;
+    const STOP_RECURSION = 8;
 
     /**
      * Not instantiable.

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
-/**
+/*
  * FlattenException wraps a PHP Exception to be able to serialize it.
  *
  * Basically, this class removes all objects from the trace.

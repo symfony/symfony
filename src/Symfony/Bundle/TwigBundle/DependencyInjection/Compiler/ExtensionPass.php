@@ -13,7 +13,6 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -62,10 +61,6 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->hasParameter('templating.helper.code.file_link_format')) {
             $container->getDefinition('twig.extension.code')->replaceArgument(0, $container->getParameter('templating.helper.code.file_link_format'));
-        }
-
-        if (!$container->has('security.token_storage')) {
-            $container->getDefinition('twig.app_variable')->addMethodCall('setSecurity', array(new Reference('security.context', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
         }
 
         if ($container->has('templating')) {

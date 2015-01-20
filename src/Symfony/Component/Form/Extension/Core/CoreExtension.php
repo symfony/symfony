@@ -32,6 +32,7 @@ class CoreExtension extends AbstractExtension
             new Type\CountryType(),
             new Type\DateType(),
             new Type\DateTimeType(),
+            new Type\DayOfWeekType(),
             new Type\EmailType(),
             new Type\HiddenType(),
             new Type\IntegerType(),

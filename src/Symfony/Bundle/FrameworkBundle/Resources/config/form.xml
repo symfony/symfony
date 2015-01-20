@@ -80,6 +80,9 @@
         <service id="form.type.datetime" class="Symfony\Component\Form\Extension\Core\Type\DateTimeType">
             <tag name="form.type" alias="datetime" />
         </service>
+        <service id="form.type.dayofweek" class="Symfony\Component\Form\Extension\Core\Type\DayOfWeekType">
+            <tag name="form.type" alias="dayofweek" />
+        </service>
         <service id="form.type.email" class="Symfony\Component\Form\Extension\Core\Type\EmailType">
             <tag name="form.type" alias="email" />
         </service>

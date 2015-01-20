@@ -28,16 +28,18 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 '_locale' => 'en|es',
-            )
+            ), array(), '', array(), array(), '"%foo%" == "bar"'
         ));
 
         $sc = $this->getServiceContainer($routes);
         $sc->setParameter('locale', 'es');
+        $sc->setParameter('foo', 'bar');
 
         $router = new Router($sc, 'foo');
 
         $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
         $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+        $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
     public function testDefaultsPlaceholders()

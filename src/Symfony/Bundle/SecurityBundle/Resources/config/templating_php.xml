@@ -12,8 +12,9 @@
     <services>
         <service id="templating.helper.logout_url" class="%templating.helper.logout_url.class%">
             <tag name="templating.helper" alias="logout_url" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="router" />
+            <argument type="service" id="security.token_storage" />
         </service>
 
         <service id="templating.helper.security" class="%templating.helper.security.class%">

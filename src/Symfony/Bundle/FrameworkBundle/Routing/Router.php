@@ -113,6 +113,7 @@ class Router extends BaseRouter implements WarmableInterface
                 $methods = array_merge($methods, explode('|', $this->resolve($method)));
             }
             $route->setMethods($methods);
+            $route->setCondition($this->resolve($route->getCondition()));
         }
     }
 

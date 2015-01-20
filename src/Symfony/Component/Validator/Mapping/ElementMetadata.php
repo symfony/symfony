@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Mapping;
 
-trigger_error('The '.__NAMESPACE__.'\ElementMetadata class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Mapping\GenericMetadata class instead.', E_USER_DEPRECATED);
-
 /**
  * Contains the metadata of a structural element.
  *
@@ -23,4 +21,10 @@ trigger_error('The '.__NAMESPACE__.'\ElementMetadata class is deprecated since v
  */
 abstract class ElementMetadata extends GenericMetadata
 {
+    public function __construct()
+    {
+        if (__CLASS__ === get_class($this) || !in_array(get_parent_class($this), array('Symfony\Component\Validator\Mapping\MemberMetadata', 'Symfony\Component\Validator\Mapping\ClassMetadata'))) {
+            trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Mapping\GenericMetadata class instead.', E_USER_DEPRECATED);
+        }
+    }
 }

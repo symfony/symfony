@@ -106,6 +106,11 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The method `AbstractType::setDefaultOptions(OptionsResolverInterface $resolver)` and
+   `AbstractTypeExtension::setDefaultOptions(OptionsResolverInterface $resolver)` have been
+   renamed. You should use `AbstractType::configureOptions(OptionsResolver $resolver)` and
+   `AbstractTypeExtension::configureOptions(OptionsResolver $resolver)` instead.
+
  * The methods `Form::bind()` and `Form::isBound()` were removed. You should
    use `Form::submit()` and `Form::isSubmitted()` instead.
 

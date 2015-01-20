@@ -313,11 +313,11 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 } elseif ($key === '#') {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
-                    /**
+                    /*
                      * Is this array fully numeric keys?
                      */
                     if (ctype_digit(implode('', array_keys($data)))) {
-                        /**
+                        /*
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
                          * From array("item" => array(0,1));.

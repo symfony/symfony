@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
-/**
+/*
  * Adds SessionHandler functionality if available.
  *
  * @see http://php.net/sessionhandler

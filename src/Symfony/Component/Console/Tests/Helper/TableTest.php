@@ -392,6 +392,37 @@ TABLE
 
 TABLE
             ),
+            'Cell with rowspan and colspan without using TableSeparator' => array(
+                array('ISBN', 'Title', 'Author'),
+                array(
+                    array(
+                        new TableCell("9971\n-5-\n021\n0-0", array('rowspan' => 2, 'colspan' => 2)),
+                        'Dante Alighieri',
+                    ),
+                    array('Charles Dickens'),
+                    array(
+                        'Dante Alighieri',
+                        new TableCell("9971\n-5-\n021\n0-0", array('rowspan' => 2, 'colspan' => 2)),
+                    ),
+                    array('Charles Dickens'),
+                ),
+                'default',
+<<<TABLE
++-----------------+-------+-----------------+
+| ISBN            | Title | Author          |
++-----------------+-------+-----------------+
+| 9971                    | Dante Alighieri |
+| -5-                     | Charles Dickens |
+| 021                     |                 |
+| 0-0                     |                 |
+| Dante Alighieri | 9971                    |
+| Charles Dickens | -5-                     |
+|                 | 021                     |
+|                 | 0-0                     |
++-----------------+-------+-----------------+
+
+TABLE
+            ),
         );
     }
 

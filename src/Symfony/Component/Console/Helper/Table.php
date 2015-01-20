@@ -330,6 +330,8 @@ class Table
         $unmergedRows = array();
         for ($rowKey = 0; $rowKey < count($this->rows); $rowKey++) {
             $this->rows = $this->fillNextRows($this->rows, $rowKey);
+
+            // Remove any new line breaks and replace it with a new line
             foreach ($this->rows[$rowKey] as $column => $cell) {
                 $this->rows[$rowKey] = $this->fillCells($this->rows[$rowKey], $column);
                 if (!strstr($cell, "\n")) {
@@ -361,7 +363,7 @@ class Table
     }
 
     /**
-     * fill next rows.
+     * fill rows that contains rowspan > 1.
      *
      * @param array $rows
      * @param array $line
@@ -371,10 +373,9 @@ class Table
     private function fillNextRows($rows, $line)
     {
         $unmergedRows = array();
-        $nbLines = 0;
         foreach ($rows[$line] as $column => $cell) {
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
-                // create a two dimensional array (rowspan x colspan)
+                
                 $nbLines = $cell->getRowspan()-1;
                 $lines = array($cell);
                 if (strstr($cell, "\n")) {
@@ -385,28 +386,30 @@ class Table
                     unset($lines[0]);
                 }
 
+                // create a two dimensional array (rowspan x colspan)
                 $unmergedRows = array_replace_recursive(array_fill($line + 1, $nbLines, ''), $unmergedRows);
-                foreach ($unmergedRows as $nextRowKey => $nextRow) {
-                    $value = isset($lines[$nextRowKey - $line]) ? $lines[$nextRowKey - $line] : '';
-                    $unmergedRows[$nextRowKey][$column] = new TableCell($value, array('colspan' => $cell->getColspan()));
+                foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
+                    $value = isset($lines[$unmergedRowKey - $line]) ? $lines[$unmergedRowKey - $line] : '';
+                    $unmergedRows[$unmergedRowKey][$column] = new TableCell($value, array('colspan' => $cell->getColspan()));
                 }
             }
         }
 
-        foreach ($unmergedRows as $nextRowKey => $nextRow) {
-            if (isset($rows[$nextRowKey]) && is_array($rows[$nextRowKey]) && ($nextRowKey <= $nbLines+$line)  && ($this->getNumberOfColumns($rows[$nextRowKey]) + $this->getNumberOfColumns($unmergedRows[$nextRowKey]) <= $this->numberOfColumns)) {
-                foreach ($unmergedRows[$nextRowKey] as $cellKey => $cell) {
+        foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
+            // we need to know if $unmergedRow will be merged or inserted into $rows
+            if (isset($rows[$unmergedRowKey]) && is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRows[$unmergedRowKey]) <= $this->numberOfColumns)) {
+                foreach ($unmergedRows[$unmergedRowKey] as $cellKey => $cell) {
                     // insert cell into row at cellKey position
-                    array_splice($rows[$nextRowKey], $cellKey, 0, array($cell));
+                    array_splice($rows[$unmergedRowKey], $cellKey, 0, array($cell));
                 }
             } else {
-                $row = $this->copyRow($rows, $nextRowKey-1);
-                foreach ($unmergedRows[$nextRowKey] as $column => $cell) {
+                $row = $this->copyRow($rows, $unmergedRowKey-1);
+                foreach ($unmergedRows[$unmergedRowKey] as $column => $cell) {
                     if (!empty($cell)) {
-                        $row[$column] = $unmergedRows[$nextRowKey][$column];
+                        $row[$column] = $unmergedRows[$unmergedRowKey][$column];
                     }
                 }
-                array_splice($rows, $nextRowKey, 0, array($row));
+                array_splice($rows, $unmergedRowKey, 0, array($row));
             }
         }
 
@@ -437,6 +440,8 @@ class Table
     /**
      * @param array $rows
      * @param int   $line
+     *
+     * @return array
      */
     private function copyRow($rows, $line)
     {

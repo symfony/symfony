@@ -192,7 +192,8 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedException        \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @expectedExceptionMessage The option "foo" does not exist. Defined options are: "one", "three", "two".
      */
     public function testResolveFailsIfNonExistingOption()
     {

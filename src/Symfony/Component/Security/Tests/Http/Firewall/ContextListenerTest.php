@@ -202,6 +202,35 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
+    public function testOnKernelResponseListenerRemovesItself()
+    {
+        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $listener = new ContextListener($context, array(), 'key123', null, $dispatcher);
+
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->expects($this->any())
+            ->method('hasSession')
+            ->will($this->returnValue(true));
+
+        $event->expects($this->any())
+            ->method('getRequestType')
+            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+        $event->expects($this->any())
+            ->method('getRequest')
+            ->will($this->returnValue($request));
+
+        $dispatcher->expects($this->once())
+            ->method('removeListener')
+            ->with(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
+
+        $listener->onKernelResponse($event);
+    }
+
     public function testHandleRemovesTokenIfNoPreviousSessionWasFound()
     {
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');

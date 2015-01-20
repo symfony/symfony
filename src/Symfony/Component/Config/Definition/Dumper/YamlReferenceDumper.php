@@ -14,7 +14,6 @@ namespace Symfony\Component\Config\Definition\Dumper;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
-use Symfony\Component\Config\Definition\ScalarNode;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Yaml\Inline;

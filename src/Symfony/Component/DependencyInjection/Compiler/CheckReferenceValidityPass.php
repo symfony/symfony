@@ -33,7 +33,6 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 {
     private $container;
     private $currentId;
-    private $currentDefinition;
     private $currentScope;
     private $currentScopeAncestors;
     private $currentScopeChildren;

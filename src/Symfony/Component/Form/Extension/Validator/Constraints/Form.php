@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
-use Symfony\Component\Form\Extension\Validator\Constraints\Deprecated\Form as Deprecated;
 use Symfony\Component\Validator\Constraint;
 
 /**

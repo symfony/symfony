@@ -101,7 +101,7 @@ class ArgvInput extends Input
     {
         $name = substr($token, 1);
 
-        if (strlen($name) > 1) {
+        if (isset($name[1])) {
             if ($this->definition->hasShortcut($name[0]) && $this->definition->getOptionForShortcut($name[0])->acceptValue()) {
                 // an option with a value (with no space)
                 $this->addShortOption($name[0], substr($name, 1));

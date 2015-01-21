@@ -183,8 +183,9 @@ EOF
                     continue;
                 }
 
-                if (strlen($definition->getScope()) > $maxScope) {
-                    $maxScope = strlen($definition->getScope());
+                $scope = $definition->getScope();
+                if (isset($scope[$maxScope])) {
+                    $maxScope = strlen($scope);
                 }
 
                 if (null !== $showTagAttributes) {
@@ -194,7 +195,7 @@ EOF
                             if (!isset($maxTags[$key])) {
                                 $maxTags[$key] = strlen($key);
                             }
-                            if (strlen($value) > $maxTags[$key]) {
+                            if (isset($value[$maxTags[$key]])) {
                                 $maxTags[$key] = strlen($value);
                             }
                         }
@@ -202,7 +203,7 @@ EOF
                 }
             }
 
-            if (strlen($serviceId) > $maxName) {
+            if (isset($serviceId[$maxName])) {
                 $maxName = strlen($serviceId);
             }
         }

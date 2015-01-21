@@ -68,7 +68,7 @@ class DbalLogger implements SQLLogger
                         continue;
                     }
                 } else {
-                    if (self::MAX_STRING_LENGTH < strlen($params[$index])) {
+                    if (isset($params[$index][self::MAX_STRING_LENGTH])) {
                         $params[$index] = substr($params[$index], 0, self::MAX_STRING_LENGTH - 6).' [...]';
                         continue;
                     }

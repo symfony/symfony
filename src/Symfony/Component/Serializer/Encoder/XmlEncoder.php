@@ -169,7 +169,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      */
     final protected function appendXMLString(\DOMNode $node, $val)
     {
-        if (strlen($val) > 0) {
+        if ('' !== $val) {
             $frag = $this->dom->createDocumentFragment();
             $frag->appendXML($val);
             $node->appendChild($frag);

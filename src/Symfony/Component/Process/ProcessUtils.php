@@ -99,6 +99,6 @@ class ProcessUtils
 
     private static function isSurroundedBy($arg, $char)
     {
-        return 2 < strlen($arg) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
+        return isset($arg[2]) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
     }
 }

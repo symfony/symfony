@@ -237,7 +237,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $s = '';
         $cLength = strlen($chars);
 
-        while (strlen($s) < $length) {
+        while (!isset($s[$length - 1])) {
             $s .= $chars[mt_rand(0, $cLength-1)];
         }
 

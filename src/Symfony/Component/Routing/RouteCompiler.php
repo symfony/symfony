@@ -92,7 +92,7 @@ class RouteCompiler implements RouteCompilerInterface
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
-            $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : '';
+            $precedingChar = '' !== $precedingText ? substr($precedingText, -1) : '';
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
             if (is_numeric($varName)) {
@@ -102,9 +102,9 @@ class RouteCompiler implements RouteCompilerInterface
                 throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
             }
 
-            if ($isSeparator && strlen($precedingText) > 1) {
+            if ($isSeparator && isset($precedingText[1])) {
                 $tokens[] = array('text', substr($precedingText, 0, -1));
-            } elseif (!$isSeparator && strlen($precedingText) > 0) {
+            } elseif (!$isSeparator && '' !== $precedingText) {
                 $tokens[] = array('text', $precedingText);
             }
 
@@ -138,7 +138,7 @@ class RouteCompiler implements RouteCompilerInterface
             $variables[] = $varName;
         }
 
-        if ($pos < strlen($pattern)) {
+        if (isset($pattern[$pos])) {
             $tokens[] = array('text', substr($pattern, $pos));
         }
 

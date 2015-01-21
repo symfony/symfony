@@ -48,6 +48,12 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
             throw new \InvalidArgumentException('You must at least add one authentication provider.');
         }
 
+        foreach ($providers as $provider) {
+            if (! $provider instanceof AuthenticationProviderInterface) {
+                throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', get_class($provider)));
+            }
+        }
+
         $this->providers = $providers;
         $this->eraseCredentials = (bool) $eraseCredentials;
     }

@@ -4,6 +4,7 @@ CHANGELOG
 2.7.0
 -----
 
+ * added LogoutUrlExtension (provides `logout_url` and `logout_path`)
  * added an HttpFoundation extension (provides the `absolute_url` and the `relative_path` functions)
 
 2.5.0

@@ -9,26 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Twig\Extension;
+namespace Symfony\Bridge\Twig\Extension;
 
-trigger_error('The '.__NAMESPACE__.'\LogoutUrlExtension class is deprecated since version 2.5 and will be removed in 3.0. Use Symfony\Bridge\Twig\Extension\LogoutUrlExtension instead.', E_USER_DEPRECATED);
-
-use Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**
  * LogoutUrlHelper provides generator functions for the logout URL to Twig.
  *
  * @author Jeremy Mikola <jmikola@gmail.com>
- *
- * @deprecated since version 2.7, to be removed in 3.0. Use Symfony\Bridge\Twig\Extension\LogoutUrlExtension instead.
  */
 class LogoutUrlExtension extends \Twig_Extension
 {
-    private $helper;
+    private $generator;
 
-    public function __construct(LogoutUrlHelper $helper)
+    public function __construct(LogoutUrlGenerator $generator)
     {
-        $this->helper = $helper;
+        $this->generator = $generator;
     }
 
     /**
@@ -51,7 +48,7 @@ class LogoutUrlExtension extends \Twig_Extension
      */
     public function getLogoutPath($key = null)
     {
-        return $this->helper->getLogoutPath($key);
+        return $this->generator->getLogoutPath($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
@@ -63,7 +60,7 @@ class LogoutUrlExtension extends \Twig_Extension
      */
     public function getLogoutUrl($key = null)
     {
-        return $this->helper->getLogoutUrl($key);
+        return $this->generator->getLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**

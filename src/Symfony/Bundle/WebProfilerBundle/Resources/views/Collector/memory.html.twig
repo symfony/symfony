@@ -3,7 +3,7 @@
 {% block toolbar %}
     {% set icon %}
         <span>
-            <img width="13" height="28" alt="Memory Usage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAcBAMAAABITyhxAAAAJ1BMVEXNzc3///////////////////////8/Pz////////////+NjY0/Pz9lMO+OAAAADHRSTlMAABAgMDhAWXCvv9e8JUuyAAAAQ0lEQVQI12MQBAMBBmLpMwoMDAw6BxjOOABpHyCdAKRzsNDp5eXl1KBh5oHBAYY9YHoDQ+cqIFjZwGCaBgSpBrjcCwCZgkUHKKvX+wAAAABJRU5ErkJggg==" />
+            <img width="13" height="28" alt="Memory Usage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTMgMjgiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDEzIDI4IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48cmVjdCB4PSIzIiB5PSIxMSIgZmlsbD0iI0JDQkNCQiIgd2lkdGg9IjciIGhlaWdodD0iOSIvPjwvZz48Zz48cGF0aCBmaWxsPSIjM0YzRjNGIiBkPSJNMTEgNlYyMUgyVjZIMFYyMmMwIDAuNiAwLjQgMSAxIDFoMTFjMC42IDAgMS0wLjQgMS0xVjZIMTF6Ii8+PC9nPjwvc3ZnPg==" />
             <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MB</span>
         </span>
     {% endset %}

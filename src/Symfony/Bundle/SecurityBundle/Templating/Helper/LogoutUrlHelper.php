@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class LogoutUrlHelper extends Helper
 {
-    private $requestStack;
+    private $generator;
     private $listeners = array();
     private $router;
     private $tokenStorage;
@@ -42,7 +41,7 @@ class LogoutUrlHelper extends Helper
      */
     public function __construct($generator, UrlGeneratorInterface $router = null, TokenStorageInterface $tokenStorage = null)
     {
-        if ($requestStack instanceof ContainerInterface) {
+        if ($generator instanceof ContainerInterface) {
             trigger_error('The '.__CLASS__.' constructor will require a LogoutUrlGenerator instead of a ContainerInterface instance in 3.0.', E_USER_DEPRECATED);
 
             if ($container->has('security.logout_url_generator')) {

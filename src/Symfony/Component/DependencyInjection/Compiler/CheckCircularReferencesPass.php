@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
-    private $currentId;
     private $currentPath;
     private $checkedNodes;
 
@@ -41,7 +40,6 @@ class CheckCircularReferencesPass implements CompilerPassInterface
 
         $this->checkedNodes = array();
         foreach ($graph->getNodes() as $id => $node) {
-            $this->currentId = $id;
             $this->currentPath = array($id);
 
             $this->checkOutEdges($node->getOutEdges());

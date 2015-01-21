@@ -140,7 +140,12 @@ class Table
 
     public function setHeaders(array $headers)
     {
-        $this->headers = array_values($headers);
+        $headers = array_values($headers);
+        if (!empty($headers) && !is_array($headers[0])) {
+            $headers = array($headers);
+        }
+
+        $this->headers = $headers;
 
         return $this;
     }
@@ -200,12 +205,15 @@ class Table
     public function render()
     {
         $this->calculateNumberOfColumns();
-        $this->buildBodyTable();
+        $this->rows = $this->buildTableRows($this->rows);
+        $this->headers = $this->buildTableRows($this->headers);
 
         $this->renderRowSeparator();
-        $this->renderRow($this->headers, $this->style->getCellHeaderFormat());
         if (!empty($this->headers)) {
-            $this->renderRowSeparator();
+            foreach ($this->headers as $header) {
+                $this->renderRow($header, $this->style->getCellHeaderFormat());
+                $this->renderRowSeparator();
+            }
         }
         foreach ($this->rows as $row) {
             if ($row instanceof TableSeparator) {
@@ -313,8 +321,8 @@ class Table
             return;
         }
 
-        $columns = array(count($this->headers));
-        foreach ($this->rows as $row) {
+        $columns = array(0);
+        foreach (array_merge($this->headers, $this->rows) as $row) {
             if ($row instanceof TableSeparator) {
                 continue;
             }
@@ -325,15 +333,15 @@ class Table
         return $this->numberOfColumns = max($columns);
     }
 
-    private function buildBodyTable()
+    private function buildTableRows($rows)
     {
         $unmergedRows = array();
-        for ($rowKey = 0; $rowKey < count($this->rows); $rowKey++) {
-            $this->rows = $this->fillNextRows($this->rows, $rowKey);
+        for ($rowKey = 0; $rowKey < count($rows); $rowKey++) {
+            $rows = $this->fillNextRows($rows, $rowKey);
 
             // Remove any new line breaks and replace it with a new line
-            foreach ($this->rows[$rowKey] as $column => $cell) {
-                $this->rows[$rowKey] = $this->fillCells($this->rows[$rowKey], $column);
+            foreach ($rows[$rowKey] as $column => $cell) {
+                $rows[$rowKey] = $this->fillCells($rows[$rowKey], $column);
                 if (!strstr($cell, "\n")) {
                     continue;
                 }
@@ -343,7 +351,7 @@ class Table
                         $line = new TableCell($line, array('colspan' => $cell->getColspan()));
                     }
                     if (0 === $lineKey) {
-                        $this->rows[$rowKey][$column] = $line;
+                        $rows[$rowKey][$column] = $line;
                     } else {
                         $unmergedRows[$rowKey][$lineKey][$column] = $line;
                     }
@@ -351,15 +359,15 @@ class Table
             }
         }
 
-        $rows = array();
-        foreach ($this->rows as $rowKey => $row) {
-            $rows[] = $row;
+        $tableRows = array();
+        foreach ($rows as $rowKey => $row) {
+            $tableRows[] = $row;
             if (isset($unmergedRows[$rowKey])) {
-                $rows = array_merge($rows, $unmergedRows[$rowKey]);
+                $tableRows = array_merge($tableRows, $unmergedRows[$rowKey]);
             }
         }
 
-        $this->rows = $rows;
+        return $tableRows;
     }
 
     /**
@@ -375,7 +383,6 @@ class Table
         $unmergedRows = array();
         foreach ($rows[$line] as $column => $cell) {
             if ($cell instanceof TableCell && $cell->getRowspan() > 1) {
-                
                 $nbLines = $cell->getRowspan()-1;
                 $lines = array($cell);
                 if (strstr($cell, "\n")) {
@@ -398,15 +405,15 @@ class Table
         foreach ($unmergedRows as $unmergedRowKey => $unmergedRow) {
             // we need to know if $unmergedRow will be merged or inserted into $rows
             if (isset($rows[$unmergedRowKey]) && is_array($rows[$unmergedRowKey]) && ($this->getNumberOfColumns($rows[$unmergedRowKey]) + $this->getNumberOfColumns($unmergedRows[$unmergedRowKey]) <= $this->numberOfColumns)) {
-                foreach ($unmergedRows[$unmergedRowKey] as $cellKey => $cell) {
+                foreach ($unmergedRow as $cellKey => $cell) {
                     // insert cell into row at cellKey position
                     array_splice($rows[$unmergedRowKey], $cellKey, 0, array($cell));
                 }
             } else {
                 $row = $this->copyRow($rows, $unmergedRowKey-1);
-                foreach ($unmergedRows[$unmergedRowKey] as $column => $cell) {
+                foreach ($unmergedRow as $column => $cell) {
                     if (!empty($cell)) {
-                        $row[$column] = $unmergedRows[$unmergedRowKey][$column];
+                        $row[$column] = $unmergedRow[$column];
                     }
                 }
                 array_splice($rows, $unmergedRowKey, 0, array($row));
@@ -506,8 +513,7 @@ class Table
             return $this->columnWidths[$column];
         }
 
-        $lengths = array($this->getCellWidth($this->headers, $column));
-        foreach ($this->rows as $row) {
+        foreach (array_merge($this->headers, $this->rows) as $row) {
             if ($row instanceof TableSeparator) {
                 continue;
             }

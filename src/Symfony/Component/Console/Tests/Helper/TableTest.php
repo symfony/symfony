@@ -423,6 +423,22 @@ TABLE
 
 TABLE
             ),
+            'Multiple header lines' => array(
+                array(
+                    array(new TableCell('Main title', array('colspan' => 3))),
+                    array('ISBN', 'Title', 'Author'),
+                ),
+                array(),
+                'default',
+<<<TABLE
++------+-------+--------+
+| Main title            |
++------+-------+--------+
+| ISBN | Title | Author |
++------+-------+--------+
+
+TABLE
+            ),
         );
     }
 

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Twig\Extension;
 
-trigger_error('The '.__NAMESPACE__.'\LogoutUrlExtension class is deprecated since version 2.5 and will be removed in 3.0. Use Symfony\Bridge\Twig\Extension\LogoutUrlExtension instead.', E_USER_DEPRECATED);
+trigger_error('The '.__NAMESPACE__.'\LogoutUrlExtension class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Twig\Extension\LogoutUrlExtension instead.', E_USER_DEPRECATED);
 
 use Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper;
 

@@ -4,7 +4,8 @@ CHANGELOG
 2.7.0
 -----
 
-* Added the triggering of the `Symfony\Component\Security\Http\SecurityEvents::INTERACTIVE_LOGIN` in `Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener`
+ * added LogoutUrlGenerator
+ * added the triggering of the `Symfony\Component\Security\Http\SecurityEvents::INTERACTIVE_LOGIN` in `Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener`
 
 2.6.0
 -----

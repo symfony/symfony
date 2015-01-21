@@ -337,9 +337,9 @@ class SecurityExtension extends Extension
                 $listener->addMethodCall('addHandler', array(new Reference($handlerId)));
             }
 
-            // register with LogoutUrlHelper
+            // register with LogoutUrlGenerator
             $container
-                ->getDefinition('templating.helper.logout_url')
+                ->getDefinition('security.logout_url_generator')
                 ->addMethodCall('registerListener', array(
                     $id,
                     $firewall['logout']['path'],

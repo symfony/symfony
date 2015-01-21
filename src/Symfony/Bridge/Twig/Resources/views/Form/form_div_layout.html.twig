@@ -25,7 +25,7 @@
 
 {% block collection_widget -%}
     {% if prototype is defined %}
-        {%- set attr = attr|merge({'data-prototype': form_row(prototype) }) -%}
+        {%- set attr = attr|merge({'data-prototype': form_row(prototype), 'data-prototype-name': form.vars.prototype_name }) -%}
     {% endif %}
     {{- block('form_widget') -}}
 {%- endblock collection_widget %}

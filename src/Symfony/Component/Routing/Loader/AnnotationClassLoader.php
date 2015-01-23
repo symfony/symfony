@@ -145,8 +145,8 @@ abstract class AnnotationClassLoader implements LoaderInterface
         }
         $requirements = array_replace($globals['requirements'], $annot->getRequirements());
         $options = array_replace($globals['options'], $annot->getOptions());
-        $schemes = array_replace($globals['schemes'], $annot->getSchemes());
-        $methods = array_replace($globals['methods'], $annot->getMethods());
+        $schemes = array_merge($globals['schemes'], $annot->getSchemes());
+        $methods = array_merge($globals['methods'], $annot->getMethods());
 
         $host = $annot->getHost();
         if (null === $host) {

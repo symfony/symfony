@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-01-23T17:09:53Z
+
+:+1: And it is ok to merge into 2.6, because if you're using `form_label` now, you already have a big exception. I added an issue in the docs to note this special behavior.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-01-23T17:35:15Z
+
+Thanks Ryan

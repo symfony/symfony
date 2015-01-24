@@ -47,6 +47,16 @@ abstract class Bundle extends ContainerAware implements BundleInterface
     }
 
     /**
+     * Get the current bundle dependencies
+     *
+     * @return BundleInterface[]
+     */
+    public function getBundleDependencies()
+    {
+        return array();
+    }
+
+    /**
      * Builds the bundle.
      *
      * It is only ever called once when the cache is empty.

@@ -59,6 +59,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $name;
     protected $startTime;
     protected $loadClassCache;
+    protected $topMostBundles;
+    protected $directChildrenBundles;
 
     const VERSION = '3.0.0-DEV';
     const VERSION_ID = '30000';
@@ -216,7 +218,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @throws \RuntimeException if a custom resource is hidden by a resource in a derived bundle
      */
@@ -420,26 +422,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         // init bundles
         $this->bundles = array();
-        $topMostBundles = array();
-        $directChildren = array();
+        $this->topMostBundles = array();
+        $this->directChildrenBundles = array();
 
+        // Register root bundles
         foreach ($this->registerBundles() as $bundle) {
-            $name = $bundle->getName();
-            if (isset($this->bundles[$name])) {
-                throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
-            }
-            $this->bundles[$name] = $bundle;
+            $this->addBundle($bundle);
+        }
 
-            if ($parentName = $bundle->getParent()) {
-                if (isset($directChildren[$parentName])) {
-                    throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $directChildren[$parentName]));
-                }
-                if ($parentName == $name) {
-                    throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
-                }
-                $directChildren[$parentName] = $name;
-            } else {
-                $topMostBundles[$name] = $bundle;
+        // Register dependencies
+        foreach ($this->bundles as $bundle) {
+            foreach ($bundle->getBundleDependencies() as $bundleDependency) {
+                $this->addBundle($bundleDependency, true);
             }
         }
 
@@ -452,12 +446,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         // inheritance
         $this->bundleMap = array();
-        foreach ($topMostBundles as $name => $bundle) {
+        foreach ($this->topMostBundles as $name => $bundle) {
             $bundleMap = array($bundle);
             $hierarchy = array($name);
 
-            while (isset($directChildren[$name])) {
-                $name = $directChildren[$name];
+            while (isset($this->directChildrenBundles[$name])) {
+                $name = $this->directChildrenBundles[$name];
                 array_unshift($bundleMap, $this->bundles[$name]);
                 $hierarchy[] = $name;
             }
@@ -466,6 +460,32 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $this->bundleMap[$bundle] = $bundleMap;
                 array_pop($bundleMap);
             }
+        }
+    }
+
+    /**
+     * @param BundleInterface $bundle
+     * @param bool $dependency
+     */
+    protected function addBundle($bundle, $dependency = false)
+    {
+        $name = $bundle->getName();
+
+        if (isset($this->bundles[$name]) && false === $dependency) {
+            throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+        }
+        $this->bundles[$name] = $bundle;
+
+        if ($parentName = $bundle->getParent()) {
+            if (isset($this->directChildrenBundles[$parentName])) {
+                throw new \LogicException(sprintf('Bundle "%s" is directly extended by two bundles "%s" and "%s".', $parentName, $name, $this->directChildrenBundles[$parentName]));
+            }
+            if ($parentName == $name) {
+                throw new \LogicException(sprintf('Bundle "%s" can not extend itself.', $name));
+            }
+            $this->directChildrenBundles[$parentName] = $name;
+        } else {
+            $this->topMostBundles[$name] = $bundle;
         }
     }
 

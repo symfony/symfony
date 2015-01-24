@@ -39,6 +39,15 @@ interface BundleInterface extends ContainerAwareInterface
     public function shutdown();
 
     /**
+     * Get the current bundle dependencies
+     *
+     * @return BundleInterface[]
+     *
+     * @api
+     */
+    public function getBundleDependencies();
+
+    /**
      * Builds the bundle.
      *
      * It is only ever called once when the cache is empty.

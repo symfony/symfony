@@ -305,11 +305,13 @@ class Table
             $width += strlen($cell) - mb_strwidth($cell, $encoding);
         }
 
-        $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
-
-        $content = sprintf($this->style->getCellRowContentFormat(), $cell);
-
-        $this->output->write(sprintf($cellFormat, str_pad($content, $width, $this->style->getPaddingChar(), $this->style->getPadType())));
+        if ($cell instanceof TableSeparator) {
+            $this->output->write(sprintf($this->style->getBorderFormat(), str_repeat($this->style->getHorizontalBorderChar(), $width)));
+        } else {
+            $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+            $content = sprintf($this->style->getCellRowContentFormat(), $cell);
+            $this->output->write(sprintf($cellFormat, str_pad($content, $width, $this->style->getPaddingChar(), $this->style->getPadType())));
+        }
     }
 
     /**

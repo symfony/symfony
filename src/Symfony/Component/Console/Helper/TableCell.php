@@ -33,7 +33,7 @@ class TableCell
      * @param string $value
      * @param array  $options
      */
-    public function __construct($value, array $options = array())
+    public function __construct($value = '', array $options = array())
     {
         $this->value = $value;
 

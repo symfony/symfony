@@ -423,6 +423,28 @@ TABLE
 
 TABLE
             ),
+            'Cell with rowspan and colspan with separator inside a rowspan' => array(
+                array('ISBN', 'Author'),
+                array(
+                    array(
+                        new TableCell("9971-5-0210-0", array('rowspan' => 3, 'colspan' => 1)),
+                        'Dante Alighieri',
+                    ),
+                    array(new TableSeparator()),
+                    array('Charles Dickens'),
+                ),
+                'default',
+<<<TABLE
++---------------+-----------------+
+| ISBN          | Author          |
++---------------+-----------------+
+| 9971-5-0210-0 | Dante Alighieri |
+|               |-----------------|
+|               | Charles Dickens |
++---------------+-----------------+
+
+TABLE
+            ),
             'Multiple header lines' => array(
                 array(
                     array(new TableCell('Main title', array('colspan' => 3))),

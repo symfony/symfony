@@ -761,20 +761,10 @@ class FrameworkExtension extends Extension
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
         }
 
-        if ('2.5' === $config['api']) {
-            $api = Validation::API_VERSION_2_5;
-        } else {
-            // 2.4 is now the same as 2.5 BC
-            $api = Validation::API_VERSION_2_5_BC;
-            // the validation class needs to be changed for BC
-            $container->setParameter('validator.class', 'Symfony\Component\Validator\ValidatorInterface');
-        }
-
-        $validatorBuilder->addMethodCall('setApiVersion', array($api));
-
         // You can use this parameter to check the API version in your own
         // bundle extension classes
-        $container->setParameter('validator.api', $api);
+        // @deprecated since version 2.7, to be removed in 3.0
+        $container->setParameter('validator.api', $config['api']);
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)

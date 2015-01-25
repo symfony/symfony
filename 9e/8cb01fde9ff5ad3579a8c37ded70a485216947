@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by wimleers at 2015-01-16T09:36:00Z
+
+Very much looking forward to having this in Drupal 8! (Via https://www.drupal.org/project/webprofiler .)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-16T10:11:46Z
+
+the composer.json of the TwigBridge needs to be updated to Twig ``~1.18``
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-16T10:35:49Z
+
+Oh yeah! This feature is very welcomed! Really nice to have.
+
+---------------------------------------------------------------------------
+
+by emmanuelballery at 2015-01-16T19:32:38Z
+
+:+1: ! Really great !
+
+---------------------------------------------------------------------------
+
+by Haehnchen at 2015-01-16T19:46:30Z
+
+quick idea: would be nice to dump template context vars also. allows me to provide ide completion.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-18T00:10:12Z
+
+:+1:

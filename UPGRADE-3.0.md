@@ -514,6 +514,9 @@ UPGRADE FROM 2.x to 3.0
 
  * The `Translator::setFallbackLocale()` method has been removed in favor of
    `Translator::setFallbackLocales()`.
+   
+ * The `MessageCatalogue::get()` method has been changed to also dismiss empty
+   translations and return the fallback or original string instead. 
 
 ### Twig Bridge
 

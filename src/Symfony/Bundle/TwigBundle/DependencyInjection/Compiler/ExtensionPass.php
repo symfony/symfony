@@ -78,7 +78,7 @@ class ExtensionPass implements CompilerPassInterface
             $container->setDefinition('twig.loader.filesystem', $loader);
         }
 
-        if ($container->has('request')) {
+        if (method_exists('Symfony\Bridge\Twig\AppVariable', 'setContainer')) {
             // we are on Symfony <3.0, where the setContainer method exists
             $container->getDefinition('twig.app_variable')->addMethodCall('setContainer', array(new Reference('service_container')));
         }

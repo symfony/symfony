@@ -235,7 +235,7 @@ class WindowsPipes extends AbstractPipes
         }
 
         if (null !== $w && 0 < count($w)) {
-            while ($len = strlen($this->inputBuffer)) {
+            while (strlen($this->inputBuffer)) {
                 $written = fwrite($w[0], $this->inputBuffer, 2 << 18);
                 if ($written > 0) {
                     $this->inputBuffer = (string) substr($this->inputBuffer, $written);

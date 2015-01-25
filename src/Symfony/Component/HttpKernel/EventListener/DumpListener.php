@@ -24,7 +24,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListener implements EventSubscriberInterface
 {
-    private $container;
+    private $cloner;
     private $dumper;
 
     /**

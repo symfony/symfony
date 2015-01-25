@@ -74,7 +74,7 @@ class AppVariable
             throw new \RuntimeException('The "app.security" variable is not available.');
         }
 
-        return $this->container->get('security');
+        return $this->container->get('security.context');
     }
 
     /**
@@ -87,7 +87,11 @@ class AppVariable
     public function getUser()
     {
         if (null === $this->tokenStorage) {
-            throw new \RuntimeException('The "app.user" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.user" variable is not available.');
+            }
+
+            $this->tokenStorage = $this->container->get('security.context');
         }
 
         if (!$token = $this->tokenStorage->getToken()) {
@@ -108,7 +112,11 @@ class AppVariable
     public function getRequest()
     {
         if (null === $this->requestStack) {
-            throw new \RuntimeException('The "app.request" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.request" variable is not available.');
+            }
+
+            $this->requestStack = $this->container->get('request_stack');
         }
 
         return $this->requestStack->getCurrentRequest();
@@ -121,7 +129,7 @@ class AppVariable
      */
     public function getSession()
     {
-        if (null === $this->requestStack) {
+        if (null === $this->requestStack && null === $this->container) {
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
 

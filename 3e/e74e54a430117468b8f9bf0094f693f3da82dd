@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-21T14:00:05Z
+
+Shouldn't some of these even be done in 2.3 or 2.5 ?
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-01-21T15:10:38Z
+
+No idea… I'll check once I've reduced the one in https://github.com/symfony/symfony/pull/13470 to not have redoundancy between 2.6 and 2.7.

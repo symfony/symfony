@@ -101,10 +101,6 @@ class TwigExtension extends Extension
             $config['extensions']
         );
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.xml');
-        }
-
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
             $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
         }

@@ -31,9 +31,8 @@ class ConfirmationQuestion extends Question
     {
         parent::__construct($question, (bool) $default);
 
-        $this->setNormalizer($this->getDefaultNormalizer());
-
         $this->trueAnswerRegex = $trueAnswerRegex;
+        $this->setNormalizer($this->getDefaultNormalizer());
     }
 
     /**
@@ -44,13 +43,14 @@ class ConfirmationQuestion extends Question
     private function getDefaultNormalizer()
     {
         $default = $this->getDefault();
+        $regex = $this->trueAnswerRegex;
 
-        return function ($answer) use ($default) {
+        return function ($answer) use ($default, $regex) {
             if (is_bool($answer)) {
                 return $answer;
             }
 
-            $answerIsTrue = (bool) preg_match($this->trueAnswerRegex, $answer);
+            $answerIsTrue = (bool) preg_match($regex, $answer);
             if (false === $default) {
                 return $answer && $answerIsTrue;
             }

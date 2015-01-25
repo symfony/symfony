@@ -48,8 +48,9 @@ class ViolationMapper implements ViolationMapperInterface
         $match = false;
 
         // Don't create a ViolationPath instance for empty property paths
-        if (strlen($violation->getPropertyPath()) > 0) {
-            $violationPath = new ViolationPath($violation->getPropertyPath());
+        $propertyPath = $violation->getPropertyPath();
+        if ('' !== $propertyPath) {
+            $violationPath = new ViolationPath($propertyPath);
             $relativePath = $this->reconstructPath($violationPath, $form);
         }
 

@@ -197,7 +197,7 @@ class StringUtil
         }
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3) {
+        if (false !== ($pos = strpos($plural, 'ee')) && isset($plural[3])) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

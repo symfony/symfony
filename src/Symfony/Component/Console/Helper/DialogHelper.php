@@ -214,7 +214,7 @@ class DialogHelper extends Helper
             shell_exec(sprintf('stty %s', $sttyMode));
         }
 
-        return strlen($ret) > 0 ? $ret : $default;
+        return '' !== $ret ? $ret : $default;
     }
 
     /**

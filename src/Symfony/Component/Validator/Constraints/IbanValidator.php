@@ -42,7 +42,7 @@ class IbanValidator extends ConstraintValidator
         // Remove spaces
         $canonicalized = str_replace(' ', '', $value);
 
-        if (strlen($canonicalized) < 4) {
+        if (!isset($canonicalized[3])) {
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $this->formatValue($value),
             ));
@@ -52,7 +52,7 @@ class IbanValidator extends ConstraintValidator
 
         // The IBAN must have at least 4 characters, start with a country
         // code and contain only digits and (uppercase) characters
-        if (strlen($canonicalized) < 4 || !ctype_upper($canonicalized{0})
+        if (!isset($canonicalized[3]) || !ctype_upper($canonicalized{0})
             || !ctype_upper($canonicalized{1}) || !ctype_alnum($canonicalized)) {
             $this->context->addViolation($constraint->message, array(
                 '{{ value }}' => $this->formatValue($value),

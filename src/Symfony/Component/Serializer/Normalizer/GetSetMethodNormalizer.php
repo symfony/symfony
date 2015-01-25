@@ -236,7 +236,7 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
     {
         return (
             0 === strpos($method->name, 'get') &&
-            3 < strlen($method->name) &&
+            isset($method->name[3]) &&
             0 === $method->getNumberOfRequiredParameters()
         );
     }

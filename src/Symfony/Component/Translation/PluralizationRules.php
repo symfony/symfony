@@ -36,7 +36,7 @@ class PluralizationRules
             $locale = "xbr";
         }
 
-        if (strlen($locale) > 3) {
+        if (isset($locale[3])) {
             $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
         }
 
@@ -202,7 +202,7 @@ class PluralizationRules
             $locale = "xbr";
         }
 
-        if (strlen($locale) > 3) {
+        if (isset($locale[3])) {
             $locale = substr($locale, 0, -strlen(strrchr($locale, '_')));
         }
 

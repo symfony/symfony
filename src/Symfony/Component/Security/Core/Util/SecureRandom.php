@@ -88,7 +88,7 @@ final class SecureRandom implements SecureRandomInterface
         }
 
         $bytes = '';
-        while (strlen($bytes) < $nbBytes) {
+        while (!isset($bytes[$nbBytes - 1])) {
             static $incr = 1;
             $bytes .= hash('sha512', $incr++.$this->seed.uniqid(mt_rand(), true).$nbBytes, true);
             $this->seed = base64_encode(hash('sha512', $this->seed.$bytes.$nbBytes, true));

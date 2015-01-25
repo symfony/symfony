@@ -153,7 +153,7 @@ EOF;
     {
         $code = '';
         $prefix = $collection->getPrefix();
-        $optimizable = 1 < strlen($prefix) && 1 < count($collection->all());
+        $optimizable = isset($prefix[1]) && 1 < count($collection->all());
         $optimizedPrefix = $parentPrefix;
 
         if ($optimizable) {

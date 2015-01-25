@@ -259,8 +259,8 @@ class ProcessPipes
                     $data .= $dataread;
                 }
             }
-            if (0 < $length = strlen($data)) {
-                $this->readBytes[$type] += $length;
+            if (isset($data[0])) {
+                $this->readBytes[$type] += strlen($data);
                 $read[$type] = $data;
             }
 

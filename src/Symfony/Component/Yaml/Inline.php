@@ -45,7 +45,7 @@ class Inline
 
         $value = trim($value);
 
-        if (0 == strlen($value)) {
+        if ('' !== $value) {
             return '';
         }
 

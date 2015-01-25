@@ -74,7 +74,7 @@ class AppVariable
             throw new \RuntimeException('The "app.security" variable is not available.');
         }
 
-        return $this->container->get('security');
+        return $this->container->get('security.context');
     }
 
     /**
@@ -87,7 +87,11 @@ class AppVariable
     public function getUser()
     {
         if (null === $this->tokenStorage) {
-            throw new \RuntimeException('The "app.user" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.user" variable is not available.');
+            }
+
+            $this->tokenStorage = $this->container->get('security.context');
         }
 
         if (!$token = $this->tokenStorage->getToken()) {
@@ -108,7 +112,11 @@ class AppVariable
     public function getRequest()
     {
         if (null === $this->requestStack) {
-            throw new \RuntimeException('The "app.request" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.request" variable is not available.');
+            }
+
+            $this->requestStack = $this->container->get('request_stack');
         }
 
         return $this->requestStack->getCurrentRequest();
@@ -121,10 +129,6 @@ class AppVariable
      */
     public function getSession()
     {
-        if (null === $this->requestStack) {
-            throw new \RuntimeException('The "app.session" variable is not available.');
-        }
-
         if ($request = $this->getRequest()) {
             return $request->getSession();
         }
@@ -138,7 +142,11 @@ class AppVariable
     public function getEnvironment()
     {
         if (null === $this->environment) {
-            throw new \RuntimeException('The "app.environment" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.environment" variable is not available.');
+            }
+
+            $this->environment = $this->container->getParameter('kernel.environment');
         }
 
         return $this->environment;
@@ -152,7 +160,11 @@ class AppVariable
     public function getDebug()
     {
         if (null === $this->debug) {
-            throw new \RuntimeException('The "app.debug" variable is not available.');
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.debug" variable is not available.');
+            }
+
+            $this->debug = $this->container->getParameter('kernel.debug');
         }
 
         return $this->debug;

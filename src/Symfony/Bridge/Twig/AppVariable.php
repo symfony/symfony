@@ -146,11 +146,7 @@ class AppVariable
     public function getEnvironment()
     {
         if (null === $this->environment) {
-            if (null === $this->container) {
-                throw new \RuntimeException('The "app.environment" variable is not available.');
-            }
-
-            $this->environment = $this->container->getParameter('kernel.environment');
+            throw new \RuntimeException('The "app.environment" variable is not available.');
         }
 
         return $this->environment;
@@ -164,11 +160,7 @@ class AppVariable
     public function getDebug()
     {
         if (null === $this->debug) {
-            if (null === $this->container) {
-                throw new \RuntimeException('The "app.debug" variable is not available.');
-            }
-
-            $this->debug = $this->container->getParameter('kernel.debug');
+            throw new \RuntimeException('The "app.debug" variable is not available.');
         }
 
         return $this->debug;

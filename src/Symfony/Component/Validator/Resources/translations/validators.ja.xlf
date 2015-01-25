@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>空のファイルは許可されていません。</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>ホストを解決できませんでした。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

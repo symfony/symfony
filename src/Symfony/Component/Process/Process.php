@@ -1290,8 +1290,7 @@ class Process
     {
         $that = $this;
         $out = self::OUT;
-        $err = self::ERR;
-        $callback = function ($type, $data) use ($that, $callback, $out, $err) {
+        $callback = function ($type, $data) use ($that, $callback, $out) {
             if ($out == $type) {
                 $that->addOutput($data);
             } else {

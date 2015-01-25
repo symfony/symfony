@@ -202,6 +202,7 @@ class Profiler
         $profile->setUrl($request->getUri());
         $profile->setIp($request->getClientIp());
         $profile->setMethod($request->getMethod());
+        $profile->setStatusCode($response->getStatusCode());
 
         $response->headers->set('X-Debug-Token', $profile->getToken());
 

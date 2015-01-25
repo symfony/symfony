@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Deprecated\NumberToLocalizedStringTransformer as Deprecated;
 
 /**
  * Transforms between a number type and a localized number with grouping

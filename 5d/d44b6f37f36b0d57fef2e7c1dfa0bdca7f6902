@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nacmartin at 2015-01-12T12:27:37Z
+
+After the review I have added, as asked, [a comment](https://github.com/symfony/symfony/pull/13309/files#diff-38eebdda7d6ebfcb7405b91167f05c9cR1182), and changed double quotes for single quotes [here](https://github.com/symfony/symfony/pull/13309/files#diff-38eebdda7d6ebfcb7405b91167f05c9cR1188). Changes commited and squashed.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-01-12T22:11:00Z
+
+:+1: nice work @nacmartin ... and thanks for the patience going through the commit review process!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T16:24:34Z
+
+OK, :+1:

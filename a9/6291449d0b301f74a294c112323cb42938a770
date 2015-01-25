@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-21T10:07:35Z
+
+Nice one!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T10:25:58Z
+
+@xelaris The format of the storage has changed in almost all minor versions of Symfony, so I think it's safe to assume the same for 2.7.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-21T10:27:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by elementaire at 2015-01-16T12:27:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-18T17:06:08Z
+
+@fabpot @stof I removed the presentation of the http status text.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T17:46:20Z
+
+:+1: (the failing tests are because the Form changes of 2.7 have not yet been merged into the master branch)

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2015-01-12T16:07:12Z
+
+:+1:
+
+Not sure if this is considered bug fix or new feature though. We’ll see. Update to the docs also should be made.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-14T10:50:28Z
+
+I would consider it as a bug fix.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-15T15:41:34Z
+
+Fyi, a PR to the docs is submitted
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-15T15:55:19Z
+
+The XML schema needs to be updated to support multiple fallbacks too
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-15T23:36:32Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T06:47:32Z
+
+While we are at it, what about allowing `fallbacks` as well like done for many other config items where we can have more than one items?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T17:17:53Z
+
+We should indeed have ``->arrayNode('fallbacks')`` and a ``fixXmlConfig('fallback')`` on the parent
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-18T19:25:45Z
+
+done
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-25T14:08:45Z
+
+@fabpot I added the missing files.

@@ -46,7 +46,7 @@ class IsbnValidator extends ConstraintValidator
         $value = (string) $value;
         $canonical = str_replace('-', '', $value);
 
-        if (null == $constraint->type) {
+        if (null === $constraint->type) {
             if ($constraint->isbn10 && !$constraint->isbn13) {
                 $constraint->type = 'isbn10';
             } elseif ($constraint->isbn13 && !$constraint->isbn10) {

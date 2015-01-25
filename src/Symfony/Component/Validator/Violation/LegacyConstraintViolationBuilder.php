@@ -43,11 +43,6 @@ class LegacyConstraintViolationBuilder implements ConstraintViolationBuilderInte
     /**
      * @var mixed
      */
-    private $root;
-
-    /**
-     * @var mixed
-     */
     private $invalidValue;
 
     /**
@@ -70,7 +65,6 @@ class LegacyConstraintViolationBuilder implements ConstraintViolationBuilderInte
         $this->context = $context;
         $this->message = $message;
         $this->parameters = $parameters;
-        $this->root = $context->getRoot();
         $this->invalidValue = $context->getValue();
     }
 

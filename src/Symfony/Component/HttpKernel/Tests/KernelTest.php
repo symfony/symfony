@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -149,7 +150,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testEnvParametersResourceIsAdded()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = new ContainerBuilder();
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
             ->disableOriginalConstructor()
             ->setMethods(array('getContainerBuilder', 'prepareContainer', 'getCacheDir', 'getLogDir'))
@@ -166,14 +167,21 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->expects($this->any())
             ->method('getLogDir')
             ->will($this->returnValue(sys_get_temp_dir()));
-        $container->expects($this->once())
-            ->method('addResource')
-            ->with(new EnvParametersResource('SYMFONY__'));
 
         $reflection = new \ReflectionClass(get_class($kernel));
         $method = $reflection->getMethod('buildContainer');
         $method->setAccessible(true);
         $method->invoke($kernel);
+
+        $found = false;
+        foreach ($container->getResources() as $resource) {
+            if ($resource instanceof EnvParametersResource) {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($found);
     }
 
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()

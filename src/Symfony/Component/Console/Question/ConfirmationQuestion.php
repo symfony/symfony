@@ -31,9 +31,8 @@ class ConfirmationQuestion extends Question
     {
         parent::__construct($question, (bool) $default);
 
-        $this->setNormalizer($this->getDefaultNormalizer());
-
         $this->trueAnswerRegex = $trueAnswerRegex;
+        $this->setNormalizer($this->getDefaultNormalizer());
     }
 
     /**

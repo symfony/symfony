@@ -113,6 +113,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
                     $translator
                 );
                 break;
+            case Validation::API_VERSION_2_4:
             case Validation::API_VERSION_2_5_BC:
                 $context = new LegacyExecutionContext(
                     $validator,

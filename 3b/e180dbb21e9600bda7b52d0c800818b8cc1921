@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-12-12T07:50:37Z
+
+@weaverryan What do you think about this change? Which one looks more correct?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2014-12-12T14:01:56Z
+
+This looks good to me - I think both are equally understandable. So "defined" as the minor added benefit that it corresponds to a few of the `OptionsResolver` methods.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T13:02:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T13:09:18Z
+
+Actually, you need to update the tests to match the exception message update
+
+---------------------------------------------------------------------------
+
+by issei-m at 2015-01-20T13:21:27Z
+
+@stof I have updated OptionsResolverTest.

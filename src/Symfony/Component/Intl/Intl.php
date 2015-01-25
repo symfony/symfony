@@ -265,20 +265,6 @@ final class Intl
     }
 
     /**
-     * Resets the internal state.
-     */
-    private static function reset()
-    {
-        self::$currencyBundle = null;
-        self::$languageBundle = null;
-        self::$localeBundle = null;
-        self::$regionBundle = null;
-        self::$icuVersion = false;
-        self::$icuDataVersion = false;
-        self::$entryReader = null;
-    }
-
-    /**
      * This class must not be instantiated.
      */
     private function __construct()

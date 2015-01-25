@@ -579,8 +579,6 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars)
     {
-        $exception = null;
-
         foreach ($singulars as $singular) {
             $addMethod = 'add'.$singular;
             $removeMethod = 'remove'.$singular;

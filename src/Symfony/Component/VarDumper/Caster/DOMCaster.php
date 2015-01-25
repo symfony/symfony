@@ -115,8 +115,6 @@ class DOMCaster
 
     public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, Stub $stub, $isNested)
     {
-        // Commented lines denote properties that exist but are better not dumped for clarity.
-
         $a += array(
             'nodeName' => $dom->nodeName,
             'nodeValue' => new CutStub($dom->nodeValue),

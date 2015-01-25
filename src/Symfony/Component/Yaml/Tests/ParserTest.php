@@ -482,6 +482,22 @@ EOF;
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testShortcutKeyUnindentedCollectionException()
+    {
+        $yaml = <<<EOF
+
+collection:
+-  key: foo
+  foo: bar
+
+EOF;
+
+        $this->parser->parse($yaml);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage Multiple documents are not supported.
      */
     public function testMultipleDocumentsNotSupportedException()

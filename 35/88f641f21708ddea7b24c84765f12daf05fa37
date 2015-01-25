@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T07:42:00Z
+
+there should be some validation that it is a 1-char string (otherwise it will never be true)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-06-16T07:49:41Z
+
+@stof done.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T07:53:40Z
+
+This needs to be covered by tests
+
+---------------------------------------------------------------------------
+
+by nkt at 2014-06-16T13:48:49Z
+
+@WouterJ why you creates limitation on answer length? Some languages could have more than one character for "yes" word.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-06-16T13:52:58Z
+
+@WouterJ the ConfirmationQuestion currently handles things the same way than most Unix commands do: anything starting with a ``y`` is considered as ``yes``. If we have several chars being allowed, it means changing the way the logic is implemented, not only allowing longer strings in the current logic (which was the case in the initial version of the PR, thus matching nothing as true answer in these cases)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-06-16T14:54:51Z
+
+@stof however, we might want to change to logic to check for the length for the given string. This way, languages which have the same start letter for yes and no can be validated nicely too
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2014-08-30T10:53:07Z
+
+I've updated it to allow multiple characters to compare
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2014-08-31T13:58:09Z
+
+Could be interested to have a RegExp pattern with default value `$trueAnsmer = '/^y/i'`
+And let the developer use special patterns to enforce some dangerous responses `/^yes$/i`
+Or use multiple answers `/^(yes|oui)$/i`...
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-07T13:29:41Z
+
+Updated to use a regex, great suggestion @jeremy-derusse !
+
+I've also added a test.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T16:21:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2015-01-18T22:12:10Z
+
+A small doc PR (http://symfony.com/doc/current/components/console/helpers/questionhelper.html#asking-the-user-for-confirmation) will be great :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-18T22:21:49Z
+
+See https://github.com/symfony/symfony-docs/pull/4879

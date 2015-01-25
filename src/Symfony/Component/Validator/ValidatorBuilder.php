@@ -95,11 +95,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     private $propertyAccessor;
 
     /**
-     * @var int|null
-     */
-    private $apiVersion;
-
-    /**
      * {@inheritdoc}
      */
     public function addObjectInitializer(ObjectInitializerInterface $initializer)
@@ -318,17 +313,16 @@ class ValidatorBuilder implements ValidatorBuilderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function setApiVersion($apiVersion)
     {
-        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
-            throw new InvalidArgumentException(sprintf(
-                'The requested API version is invalid: "%s"',
-                $apiVersion
-            ));
-        }
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.7 and will be removed in version 3.0.', E_USER_DEPRECATED);
 
-        $this->apiVersion = $apiVersion;
+        if (!in_array($apiVersion, array(Validation::API_VERSION_2_4, Validation::API_VERSION_2_5, Validation::API_VERSION_2_5_BC))) {
+            throw new InvalidArgumentException(sprintf('The requested API version is invalid: "%s"', $apiVersion));
+        }
 
         return $this;
     }
@@ -339,11 +333,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function getValidator()
     {
         $metadataFactory = $this->metadataFactory;
-        $apiVersion = $this->apiVersion;
-
-        if (null === $apiVersion) {
-            $apiVersion = Validation::API_VERSION_2_5_BC;
-        }
 
         if (!$metadataFactory) {
             $loaders = array();

@@ -55,7 +55,7 @@ class AccessListener implements ListenerInterface
 
         $request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+        list($attributes) = $this->map->getPatterns($request);
 
         if (null === $attributes) {
             return;

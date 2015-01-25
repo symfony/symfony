@@ -45,6 +45,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         require_once self::$fixturesPath.'/Foo5Command.php';
         require_once self::$fixturesPath.'/FoobarCommand.php';
         require_once self::$fixturesPath.'/BarBucCommand.php';
+        require_once self::$fixturesPath.'/FooSubnamespaced1Command.php';
+        require_once self::$fixturesPath.'/FooSubnamespaced2Command.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -199,6 +201,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $application->findNamespace('f'), '->findNamespace() finds a namespace given an abbreviation');
         $application->add(new \Foo2Command());
         $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns the given namespace if it exists');
+    }
+
+    public function testFindNamespaceWithSubnamespaces()
+    {
+        $application = new Application();
+        $application->add(new \FooSubnamespaced1Command());
+        $application->add(new \FooSubnamespaced2Command());
+        $this->assertEquals('foo', $application->findNamespace('foo'), '->findNamespace() returns commands even if the commands are only contained in subnamespaces');
     }
 
     /**

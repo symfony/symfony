@@ -12,6 +12,7 @@
                     <th scope="col">Method</th>
                     <th scope="col">URL</th>
                     <th scope="col">Time</th>
+                    <th scope="col">Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,6 +23,13 @@
                         <td>{{ elements.method }}</td>
                         <td>{{ elements.url }}</td>
                         <td>{{ elements.time|date('r') }}</td>
+                        <td>
+                        {% if elements.status_code is defined and elements.status_code %}
+                            {{ elements.status_code }}
+                        {% else %}
+                            unknown
+                        {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

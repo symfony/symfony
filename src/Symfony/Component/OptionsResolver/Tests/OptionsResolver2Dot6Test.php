@@ -33,7 +33,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The option "foo" does not exist. Known options are: "a", "z".
+     * @expectedExceptionMessage The option "foo" does not exist. Defined options are: "a", "z".
      */
     public function testResolveFailsIfNonExistingOption()
     {
@@ -45,7 +45,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Known options are: "a", "z".
+     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Defined options are: "a", "z".
      */
     public function testResolveFailsIfMultipleNonExistingOptions()
     {
@@ -1389,7 +1389,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @expectedExceptionMessage The option "undefined" does not exist. Known options are: "foo", "lazy".
+     * @expectedExceptionMessage The option "undefined" does not exist. Defined options are: "foo", "lazy".
      */
     public function testFailIfGetNonExisting()
     {

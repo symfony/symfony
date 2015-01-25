@@ -1258,8 +1258,7 @@ class Process
     protected function buildCallback($callback)
     {
         $out = self::OUT;
-        $err = self::ERR;
-        $callback = function ($type, $data) use ($callback, $out, $err) {
+        $callback = function ($type, $data) use ($callback, $out) {
             if ($out == $type) {
                 $this->addOutput($data);
             } else {

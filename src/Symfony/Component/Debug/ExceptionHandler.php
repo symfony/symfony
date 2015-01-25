@@ -50,7 +50,7 @@ class ExceptionHandler
      */
     public static function register($debug = true, $fileLinkFormat = null)
     {
-        $handler = new static($debug, $fileLinkFormat = null);
+        $handler = new static($debug, $fileLinkFormat);
 
         $prev = set_exception_handler(array($handler, 'handle'));
         if (is_array($prev) && $prev[0] instanceof ErrorHandler) {

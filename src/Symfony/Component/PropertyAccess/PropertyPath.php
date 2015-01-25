@@ -109,8 +109,7 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
                 $element = $matches[3];
                 $this->isIndex[] = true;
             }
-            // Disabled this behaviour as the syntax is not yet final
-            //$pos = strpos($element, self::SINGULAR_SEPARATOR);
+
             $pos = false;
             $singular = null;
 

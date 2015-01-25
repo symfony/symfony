@@ -931,7 +931,6 @@ QUERY;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        $currentIds = array();
         for ($i = 0, $c = count($new); $i<$c; $i++) {
             $ace = $new[$i];
 
@@ -958,8 +957,6 @@ QUERY;
                 $aceIdProperty = new \ReflectionProperty($ace, 'id');
                 $aceIdProperty->setAccessible(true);
                 $aceIdProperty->setValue($ace, intval($aceId));
-            } else {
-                $currentIds[$ace->getId()] = true;
             }
         }
     }

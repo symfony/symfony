@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,6 +110,35 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->loadClassCache();
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
+    }
+
+    public function testEnvParametersResourceIsAdded()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getContainerBuilder', 'prepareContainer', 'getCacheDir', 'getLogDir'))
+            ->getMock();
+        $kernel->expects($this->any())
+            ->method('getContainerBuilder')
+            ->will($this->returnValue($container));
+        $kernel->expects($this->any())
+            ->method('prepareContainer')
+            ->will($this->returnValue(null));
+        $kernel->expects($this->any())
+            ->method('getCacheDir')
+            ->will($this->returnValue(sys_get_temp_dir()));
+        $kernel->expects($this->any())
+            ->method('getLogDir')
+            ->will($this->returnValue(sys_get_temp_dir()));
+        $container->expects($this->once())
+            ->method('addResource')
+            ->with(new EnvParametersResource('SYMFONY__'));
+
+        $reflection = new \ReflectionClass(get_class($kernel));
+        $method = $reflection->getMethod('buildContainer');
+        $method->setAccessible(true);
+        $method->invoke($kernel);
     }
 
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()

@@ -238,6 +238,37 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    public function testValidateUniquenessWithValidCustomErrorPath()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name', 'name2'),
+            'em' => self::EM_NAME,
+            'errorPath' => "name2",
+        ));
+
+        $entity1 = new DoubleNameEntity(1, 'Foo', "Bar");
+        $entity2 = new DoubleNameEntity(2, 'Foo', "Bar");
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->em->persist($entity1);
+        $this->em->flush();
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
+
+        $this->validator->validate($entity2, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->atPath('property.path.name2')
+            ->setInvalidValue('Bar')
+            ->assertRaised();
+    }
+
     public function testValidateUniquenessUsingCustomRepositoryMethod()
     {
         $constraint = new UniqueEntity(array(

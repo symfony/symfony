@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by stefanosala at 2014-11-29T11:18:45Z
+
+Here is a sample app to test the changes, thanks to Heroku ;)
+http://symfony-toolbar-test.herokuapp.com/
+
+---------------------------------------------------------------------------
+
+by pborreli at 2014-11-29T11:23:37Z
+
+wow great PR experience, screenshots, heroku app to review it, thanks :+1:
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2015-01-03T20:14:38Z
+
+@fabpot done!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T15:43:06Z
+
+According to your sample app, there is some issues where some panels are getting smaller width than what they should on hover, making it impossible to read the content (look at the dump panel for instance)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T15:43:56Z
+
+however, allowing icons to go on several lines when there is not enough space on 1 line to display the whole toolbar is a simple way to fix the issue of items disappearing
+
+---------------------------------------------------------------------------
+
+by stefanosala at 2015-01-20T20:58:35Z
+
+@stof thanks, it wasn't easy, but I spotted the bug :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-26T14:04:28Z
+
+:+1:

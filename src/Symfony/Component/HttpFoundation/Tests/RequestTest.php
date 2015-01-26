@@ -1738,14 +1738,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('[::1]', true),
             array('[::1]:80', true, '[::1]', 80),
             array(str_repeat('.', 101), false),
+            array('a.'.str_repeat('a', 253), false),
+            array('a.'.str_repeat('a', 64), false),
+            array(str_repeat('a', 63).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63), true),
+            array('a'.str_repeat('a', 63).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 63), false),
+            array('áäéë.íïóö.úüçñ', false),
+            array('xn--1cagpi.xn--edaemm.xn--7cauzi', true), // Punycode representation of "áäéë.íïóö.úüçñ"
         );
     }
 
     public function getLongHostNames()
     {
         return array(
-            array('a'.str_repeat('.a', 40000)),
-            array(str_repeat(':', 101)),
+            array('a.'.str_repeat('a', 61).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 63)),
+            array(str_repeat(':', 63)),
         );
     }
 }

@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-08T18:26:03Z
+
+The case experienced in #12809 is not specifically about ``null``. It is about the default value being allowed or no (``null`` just happens to be the default value in HWIOAuthBundle).
+
+you will get the same BC break in 2.6 for any not allowed default value because of the bugfix (which was precisely about default values not being validated)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-09T00:53:17Z
+
+True, then it's even more important not to revert that. The tests I added here show exactly that both invalid values with setDefault() as well as with resolve() throw an exception.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-09T08:46:47Z
+
+but this is already tested (with the test using ``42`` as default value, that you edited in your PR
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-09T10:22:16Z
+
+Yes but there has been no test where the invalid value is passed to `resolve`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-13T15:08:23Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-21T23:33:26Z
+
+@stof you ok with the PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-26T14:22:22Z
+
+:+1:

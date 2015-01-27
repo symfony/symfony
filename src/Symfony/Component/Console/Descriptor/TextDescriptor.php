@@ -164,7 +164,7 @@ class TextDescriptor extends Descriptor
             }
 
             $this->writeText("<comment>Usage:</comment>\n", $options);
-            $this->writeText(" [options] command [arguments]\n\n", $options);
+            $this->writeText(" command [options] [arguments]\n\n", $options);
             $this->writeText('<comment>Options:</comment>', $options);
 
             $inputOptions = $application->getDefinition()->getOptions();

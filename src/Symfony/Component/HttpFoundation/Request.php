@@ -1275,8 +1275,8 @@ class Request
         // and if it honors size limits (63 octets for label, 255 octets for name - see RFC 1035 - 2.3.4)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host) {
-            if ('' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host) ||
-                0 !== preg_match('/(?:^\[)?[a-zA-Z0-9-:\.\]_]{256,}|[a-zA-Z0-9-:\]_]{64,}\.?/', $host)
+            if ('' !== preg_replace('/(?:^\[)?[a-z0-9-:\]_]+\.?/', '', $host) ||
+                0 !== preg_match('/(?:^\[)?[a-z0-9-:\.\]_]{256,257}|[a-z0-9-:\]_]{64,65}\.?/', $host)
             ) {
                 throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
             }

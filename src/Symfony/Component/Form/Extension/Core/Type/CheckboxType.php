@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\EventListener\FixCheckboxDataListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
@@ -33,6 +34,10 @@ class CheckboxType extends AbstractType
         // doing so also calls setDataLocked(true).
         $builder->setData(isset($options['data']) ? $options['data'] : false);
         $builder->addViewTransformer(new BooleanToStringTransformer($options['value']));
+        // When coming from an api for example, form data need to be set to 0 or false
+        // which will end up setting true in the field when object in persisted
+        // since the value is not null
+        $builder->addEventSubscriber(new FixCheckboxDataListener());
     }
 
     /**

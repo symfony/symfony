@@ -23,12 +23,38 @@ class ConsoleFormatter extends LineFormatter
 {
     const SIMPLE_FORMAT = "%start_tag%[%datetime%] %channel%.%level_name%:%end_tag% %message% %context% %extra%\n";
 
+    const INFO = 'info';
+    const ERROR = 'error';
+    const NOTICE = 'comment';
+    const DEBUG  = null;
+
+    /**
+     * @var array
+     */
+    private $formatLevelMap = array(
+        Logger::EMERGENCY => self::ERROR,
+        Logger::ALERT => self::ERROR,
+        Logger::CRITICAL => self::ERROR,
+        Logger::ERROR => self::ERROR,
+        Logger::WARNING => self::NOTICE,
+        Logger::NOTICE => self::NOTICE,
+        Logger::INFO => self::INFO,
+        Logger::DEBUG => self::DEBUG,
+    );
+
     /**
      * {@inheritdoc}
      */
-    public function __construct($format = null, $dateFormat = null, $allowInlineLineBreaks = false, $ignoreEmptyContextAndExtra = true)
-    {
+    public function __construct(
+        $format = null,
+        $dateFormat = null,
+        $allowInlineLineBreaks = false,
+        $ignoreEmptyContextAndExtra = true,
+        Array $formatLevelMap = array()
+    ) {
         parent::__construct($format, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra);
+
+        $this->formatLevelMap = $formatLevelMap + $this->formatLevelMap;
     }
 
     /**
@@ -36,15 +62,9 @@ class ConsoleFormatter extends LineFormatter
      */
     public function format(array $record)
     {
-        if ($record['level'] >= Logger::ERROR) {
-            $record['start_tag'] = '<error>';
-            $record['end_tag'] = '</error>';
-        } elseif ($record['level'] >= Logger::NOTICE) {
-            $record['start_tag'] = '<comment>';
-            $record['end_tag'] = '</comment>';
-        } elseif ($record['level'] >= Logger::INFO) {
-            $record['start_tag'] = '<info>';
-            $record['end_tag'] = '</info>';
+        if ($this->formatLevelMap[$record['level']] && !empty($this->formatLevelMap[$record['level']])) {
+            $record['start_tag'] = '<'.$this->formatLevelMap[$record['level']].'>';
+            $record['end_tag'] = '</'.$this->formatLevelMap[$record['level']].'>';
         } else {
             $record['start_tag'] = '';
             $record['end_tag'] = '';

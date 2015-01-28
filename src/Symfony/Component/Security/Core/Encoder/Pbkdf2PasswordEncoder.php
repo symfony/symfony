@@ -64,11 +64,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
-        if (function_exists('hash_pbkdf2')) {
-            $digest = hash_pbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length, true);
-        } else {
-            $digest = $this->hashPbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length);
-        }
+        $digest = hash_pbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length, true);
 
         return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
     }
@@ -79,25 +75,5 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     public function isPasswordValid($encoded, $raw, $salt)
     {
         return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
-    }
-
-    private function hashPbkdf2($algorithm, $password, $salt, $iterations, $length = 0)
-    {
-        // Number of blocks needed to create the derived key
-        $blocks = ceil($length / strlen(hash($algorithm, null, true)));
-        $digest = '';
-
-        for ($i = 1; $i <= $blocks; $i++) {
-            $ib = $block = hash_hmac($algorithm, $salt.pack('N', $i), $password, true);
-
-            // Iterations
-            for ($j = 1; $j < $iterations; $j++) {
-                $ib ^= ($block = hash_hmac($algorithm, $block, $password, true));
-            }
-
-            $digest .= $ib;
-        }
-
-        return substr($digest, 0, $this->length);
     }
 }

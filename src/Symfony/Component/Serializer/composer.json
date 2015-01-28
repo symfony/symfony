@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.0|~3.0.0",
-        "symfony/config": "~2.2|~3.0.0",
+        "symfony/yaml": "~2.7|~3.0",
+        "symfony/config": "~2.7|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
@@ -37,7 +37,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

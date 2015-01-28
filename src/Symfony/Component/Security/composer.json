@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
-        "symfony/event-dispatcher": "~2.2|~3.0.0",
-        "symfony/http-foundation": "~2.1|~3.0.0",
-        "symfony/http-kernel": "~2.4|~3.0.0"
+        "php": ">=5.5.9",
+        "symfony/event-dispatcher": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0"
     },
     "replace": {
         "symfony/security-acl": "self.version",
@@ -28,15 +28,14 @@
         "symfony/security-http": "self.version"
     },
     "require-dev": {
-        "symfony/intl": "~2.3|~3.0.0",
-        "symfony/routing": "~2.2|~3.0.0",
-        "symfony/translation": "~2.0,>=2.0.5|~3.0.0",
-        "symfony/validator": "~2.5,>=2.5.5|~3.0.0",
+        "symfony/intl": "~2.7|~3.0",
+        "symfony/routing": "~2.7|~3.0",
+        "symfony/translation": "~2.7|~3.0",
+        "symfony/validator": "~2.7|~3.0",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0",
-        "ircmaxell/password-compat": "~1.0",
-        "symfony/expression-language": "~2.6|~3.0.0"
+        "symfony/expression-language": "~2.7|~3.0"
     },
     "suggest": {
         "symfony/class-loader": "For using the ACL generateSql script",
@@ -44,8 +43,7 @@
         "symfony/validator": "For using the user password constraint",
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs",
         "doctrine/dbal": "For using the built-in ACL implementation",
-        "symfony/expression-language": "For using the expression voter",
-        "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
+        "symfony/expression-language": "For using the expression voter"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Security\\": "" }
@@ -54,7 +52,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

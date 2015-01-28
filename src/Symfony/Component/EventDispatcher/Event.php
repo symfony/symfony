@@ -35,16 +35,6 @@ class Event
     private $propagationStopped = false;
 
     /**
-     * @var EventDispatcher Dispatcher that dispatched this event
-     */
-    private $dispatcher;
-
-    /**
-     * @var string This event's name
-     */
-    private $name;
-
-    /**
      * Returns whether further event listeners should be triggered.
      *
      * @see Event::stopPropagation()
@@ -70,65 +60,5 @@ class Event
     public function stopPropagation()
     {
         $this->propagationStopped = true;
-    }
-
-    /**
-     * Stores the EventDispatcher that dispatches this Event.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     *
-     * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
-     *
-     * @api
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    /**
-     * Returns the EventDispatcher that dispatches this Event.
-     *
-     * @return EventDispatcherInterface
-     *
-     * @deprecated since version 2.4, to be removed in 3.0. The event dispatcher is passed to the listener call.
-     *
-     * @api
-     */
-    public function getDispatcher()
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event dispatcher instance can be received in the listener call instead.', E_USER_DEPRECATED);
-
-        return $this->dispatcher;
-    }
-
-    /**
-     * Gets the event's name.
-     *
-     * @return string
-     *
-     * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
-     *
-     * @api
-     */
-    public function getName()
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The event name can be received in the listener call instead.', E_USER_DEPRECATED);
-
-        return $this->name;
-    }
-
-    /**
-     * Sets the event's name property.
-     *
-     * @param string $name The event name.
-     *
-     * @deprecated since version 2.4, to be removed in 3.0. The event name is passed to the listener call.
-     *
-     * @api
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
     }
 }

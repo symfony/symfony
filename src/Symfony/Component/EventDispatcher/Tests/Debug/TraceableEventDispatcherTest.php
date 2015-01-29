@@ -86,6 +86,20 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $tdispatcher->getNotCalledListeners());
     }
 
+    public function testGetCalledListenersNested()
+    {
+        $tdispatcher = null;
+        $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $dispatcher->addListener('foo', function (Event $event, $eventName, $dispatcher) use (&$tdispatcher) {
+            $tdispatcher = $dispatcher;
+            $dispatcher->dispatch('bar');
+        });
+        $dispatcher->addListener('bar', function (Event $event) {});
+        $dispatcher->dispatch('foo');
+        $this->assertSame($dispatcher, $tdispatcher);
+        $this->assertCount(2, $dispatcher->getCalledListeners());
+    }
+
     public function testLogger()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');

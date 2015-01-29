@@ -194,6 +194,25 @@ class Command
     }
 
     /**
+     * Finalizes the command just after the execution.
+     *
+     * This is mainly useful when a lot of commands extends one main command
+     * where some things need to be done at the end of each command execution.
+     * If returned $statusCode is null, then original code returned by execute()
+     * will be used.
+     *
+     * @param InputInterface $input An InputInterface instance
+     * @param OutputInterface $output An OutputInterface instance
+     * @param int|null $statusCode Status code returned after command execution
+     *
+     * @return int|null The command exit code
+     */
+    protected function finalize(InputInterface $input, OutputInterface $output, $statusCode)
+    {
+        return $statusCode;
+    }
+
+    /**
      * Runs the command.
      *
      * The code to execute is either defined directly with the
@@ -251,6 +270,13 @@ class Command
             $statusCode = call_user_func($this->code, $input, $output);
         } else {
             $statusCode = $this->execute($input, $output);
+        }
+
+        $newStatusCode = $this->finalize($input, $output, $statusCode);
+
+        // if finalize() is extended and doesn't return any value then original status code will be used
+        if ($newStatusCode !== null) {
+            $statusCode = $newStatusCode;
         }
 
         return is_numeric($statusCode) ? (int) $statusCode : 0;

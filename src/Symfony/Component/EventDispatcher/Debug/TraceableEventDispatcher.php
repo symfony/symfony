@@ -216,7 +216,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $this->dispatcher->removeListener($eventName, $listener);
             $info = $this->getListenerInfo($listener, $eventName);
             $name = isset($info['class']) ? $info['class'] : $info['type'];
-            $this->dispatcher->addListener($eventName, new WrappedListener($listener, $name, $this->stopwatch));
+            $this->dispatcher->addListener($eventName, new WrappedListener($listener, $name, $this->stopwatch, $this));
         }
     }
 

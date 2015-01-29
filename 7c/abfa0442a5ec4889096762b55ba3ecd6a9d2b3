@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-29T11:37:32Z
+
+This is always the issue when passing ``$this`` to another class: it does not play well with composition.

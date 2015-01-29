@@ -65,11 +65,11 @@ class XmlDescriptor extends Descriptor
         $commandXML->setAttribute('id', $command->getName());
         $commandXML->setAttribute('name', $command->getName());
 
-        $commandXML->appendChild($usageXML = $dom->createElement('usage'));
-        $usageXML->appendChild($dom->createTextNode(sprintf($command->getSynopsis(), '')));
+        $commandXML->appendChild($usagesXML = $dom->createElement('usages'));
+        //$usageXML->appendChild($dom->createTextNode(sprintf($command->getSynopsis(), '')));
         
-        foreach ($command->getUsages() as $usage) {
-            $commandXML->appendChild($dom->createElement('usage', $usage));
+        foreach (array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()) as $usage) {
+            $usagesXML->appendChild($dom->createElement('usage', $usage));
         }
 
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
@@ -77,12 +77,6 @@ class XmlDescriptor extends Descriptor
 
         $commandXML->appendChild($helpXML = $dom->createElement('help'));
         $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
-
-        $commandXML->appendChild($aliasesXML = $dom->createElement('aliases'));
-        foreach ($command->getAliases() as $alias) {
-            $aliasesXML->appendChild($aliasXML = $dom->createElement('alias'));
-            $aliasXML->appendChild($dom->createTextNode($alias));
-        }
 
         $definitionXML = $this->getInputDefinitionDocument($command->getNativeDefinition());
         $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));

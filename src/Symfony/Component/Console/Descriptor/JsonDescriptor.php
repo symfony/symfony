@@ -157,10 +157,9 @@ class JsonDescriptor extends Descriptor
 
         return array(
             'name' => $command->getName(),
-            'usage' => array_merge(array($command->getSynopsis()), $command->getUsages()),
+            'usage' => array_merge(array($command->getSynopsis()), $command->getUsages(), $command->getAliases()),
             'description' => $command->getDescription(),
             'help' => $command->getProcessedHelp(),
-            'aliases' => $command->getAliases(),
             'definition' => $this->getInputDefinitionData($command->getNativeDefinition()),
         );
     }

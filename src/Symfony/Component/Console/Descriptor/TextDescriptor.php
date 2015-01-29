@@ -110,7 +110,7 @@ class TextDescriptor extends Descriptor
 
         if ($definition->getOptions()) {
             $laterOptions = array();
-            
+
             $this->writeText('<comment>Options:</comment>', $options);
             foreach ($definition->getOptions() as $option) {
                 if (strlen($option->getShortcut()) > 1) {
@@ -137,19 +137,11 @@ class TextDescriptor extends Descriptor
         $command->mergeApplicationDefinition(false);
 
         $this->writeText('<comment>Usage:</comment>', $options);
-        $this->writeText("\n");
-        $this->writeText('  '.$command->getSynopsis(true), $options);
-        foreach ($command->getUsages() as $usage) {
+        foreach (array_merge(array($command->getSynopsis(true)), $command->getAliases(), $command->getUsages()) as $usage) {
             $this->writeText("\n");
             $this->writeText('  '.$usage, $options);
         }
         $this->writeText("\n");
-
-        if (count($command->getAliases()) > 0) {
-            $this->writeText("\n");
-            $this->writeText('<comment>Aliases:</comment> <info>'.implode(', ', $command->getAliases()).'</info>', $options);
-            $this->writeText("\n");
-        }
 
         $definition = $command->getNativeDefinition();
         if ($definition->getOptions() || $definition->getArguments()) {
@@ -269,7 +261,7 @@ class TextDescriptor extends Descriptor
      * @return int
      */
     private function calculateTotalWidthForOptions($options)
-    {        
+    {
         $totalWidth = 0;
         foreach ($options as $option) {
             $nameLength = 4 + strlen($option->getName()) + 2; // - + shortcut + , + whitespace + name + --

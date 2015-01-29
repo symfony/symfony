@@ -96,15 +96,14 @@ class MarkdownDescriptor extends Descriptor
             $command->getName()."\n"
             .str_repeat('-', strlen($command->getName()))."\n\n"
             .'* Description: '.($command->getDescription() ?: '<none>')."\n"
-            .'* Usage: `'.$command->getSynopsis().'`'."\n"
-            .array_reduce($command->getUsages(), function ($carry, $usage) {
-                return $carry .= '         `'.$usage.'`'."\n";
+            .'* Usage:'."\n\n"
+            .array_reduce(array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
+                return $carry .= '  * `'.$usage.'`'."\n";
             })
-            .'* Aliases: '.(count($command->getAliases()) ? '`'.implode('`, `', $command->getAliases()).'`' : '<none>')
         );
 
         if ($help = $command->getProcessedHelp()) {
-            $this->write("\n\n");
+            $this->write("\n");
             $this->write($help);
         }
 

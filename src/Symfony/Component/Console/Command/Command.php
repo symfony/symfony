@@ -574,7 +574,7 @@ class Command
 
     /**
      * Returns the synopsis for the command.
-     * 
+     *
      * @param bool $short Whether to show the short version of the synopsis (with options folded) or not
      *
      * @return string The synopsis
@@ -582,7 +582,7 @@ class Command
     public function getSynopsis($short = false)
     {
         $key = $short ? 'short' : 'long';
-        
+
         if (!isset($this->synopsis[$key])) {
             $this->synopsis[$key] = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis($short)));
         }
@@ -602,6 +602,8 @@ class Command
         }
 
         $this->usages[] = $usage;
+
+        return $this;
     }
 
     /**

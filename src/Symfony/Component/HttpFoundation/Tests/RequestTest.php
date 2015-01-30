@@ -1719,7 +1719,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->headers->set('host', $host);
-        $callsPerSecond = 1000;
+        $callsPerSecond = 500;
 
         for ($i = 0; $i < $callsPerSecond; $i++) {
             try {

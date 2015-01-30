@@ -1271,12 +1271,14 @@ class Request
 
         // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
-        // IDNs must be sent as Punycode (see RFC 5890)
         // and if it honors size limits (63 octets for label, 255 octets for name - see RFC 1035 - 2.3.4)
-        // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
+        // IDNs must be sent as Punycode (see RFC 5890)
         if ($host) {
-            if ('' !== preg_replace('/(?:^\[)?[a-z0-9-:\]_]+\.?/', '', $host) ||
-                0 !== preg_match('/(?:^\[)?[a-z0-9-:\.\]_]{256,257}|[a-z0-9-:\]_]{64,65}\.?/', $host)
+            // trimmed $host in order to prevent DoS attacks with long host names
+            $trimmedHost = substr($host, 0, 256);
+            // use preg_replace() instead of preg_match() when possible
+            if ('' !== preg_replace('/(?:^\[)?[a-z0-9-:\]_]+\.?/', '', $trimmedHost) ||
+                0 !== preg_match('/(?:^\[)?[a-z0-9-:\.\]_]{256,257}|[a-z0-9-:\]_]{64,65}\.?/', $trimmedHost)
             ) {
                 throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
             }

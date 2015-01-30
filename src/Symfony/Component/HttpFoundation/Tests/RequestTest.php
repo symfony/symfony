@@ -1705,8 +1705,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->headers->set('host', $host);
-        $this->assertEquals($host, $request->getHost());
+        $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+        $request->getHost();
         $this->assertLessThan(1, microtime(true) - $start);
+    }
+
+    /**
+     * @dataProvider getLongHostNames
+     */
+    public function testDoSAttackTiming($host)
+    {
+        $start = microtime(true);
+
+        $request = Request::create('/');
+        $request->headers->set('host', $host);
+        $callsPerSecond = 1000;
+
+        for ($i = 0; $i < $callsPerSecond; $i++) {
+            try {
+                $request->getHost();
+                $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            } catch (\UnexpectedValueException $ex) {
+            }
+        }
+
+        $this->assertLessThan(1, microtime(true) - $start);
+        $this->assertEquals($callsPerSecond, $i);
     }
 
     /**
@@ -1750,8 +1774,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function getLongHostNames()
     {
         return array(
-            array('a.'.str_repeat('a', 61).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 63)),
-            array(str_repeat(':', 63)),
+            array('a'.str_repeat('.a', 40000)),
+            array(str_repeat(':', 1010)),
         );
     }
 }

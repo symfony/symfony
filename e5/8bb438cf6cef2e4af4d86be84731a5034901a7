@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-20T19:56:05Z
+
+You're actually killing the docblocks, what's the point of this? Better off to just make them single line comments in most cases.
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-01-20T20:02:06Z
+
+Yes, I changed the docblock into comment where it is not a docblock in a meaning of PHPDoc (aka PSR-5 proposal).
+
+Part of regression of CS Fixer to make fabbot.io happy when it update to 1.5.
+
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-01-20T20:02:07Z
+
+There is a subtle change between docblocks and comments. (for one, being tokenized as T_DOCBLOCK instead of T_COMMENT in PHP). In these cases they should be considered comments, and not docblocks.
+
+But, if this change is going to happen, it should be done in every single file through symfony2 (also, i'm not sure if there is anything for this provided in the coding standards?)
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-01-20T20:03:22Z
+
+@jaytaph yeah, it was done for whole 2.3 branch.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-20T20:06:06Z
+
+@keradus I think that as long as `@see` or any other annotations, whether it be build in or custom, should be treated as doc blocks.
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-01-20T20:26:00Z
+
+> @keradus I think that as long as @see or any other annotations, whether it be build in or custom, should be treated as doc blocks.
+
+IMO here there are simple comments, and comments can have annotations too
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-20T21:03:20Z
+
+@keradus except that parsers don't check the comments, but do the check the docblock, there's a difference between the token wise. as @jaytaph just stated:
+> There is a subtle change between docblocks and comments. (for one, being tokenized as T_DOCBLOCK instead of T_COMMENT in PHP)
+
+Parsers such as doctrine only take T_DOCBLOCK.
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-01-20T22:22:09Z
+
+Yes, but I think it is not a case here.

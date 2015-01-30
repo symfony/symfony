@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-21T04:26:18Z
+
+I've also made an additional commit to remove two other unneeded parameters.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-21T09:33:25Z
+
+isn't it a BC break to remove these parameters (for edge cases though) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-25T04:24:22Z
+
+I've removed the second commit to keep BC
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-30T00:03:50Z
+
+:+1:

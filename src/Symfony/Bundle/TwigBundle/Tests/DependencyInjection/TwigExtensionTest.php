@@ -73,10 +73,10 @@ class TwigExtensionTest extends TestCase
         $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
-        $options = $container->getParameter('twig.options');
-        $this->assertEquals(__DIR__.'/twig', $options['cache'], '->load() sets default value for cache option');
-        $this->assertEquals('UTF-8', $options['charset'], '->load() sets default value for charset option');
-        $this->assertFalse($options['debug'], '->load() sets default value for debug option');
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
+        $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
+        $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
     }
 
     /**
@@ -114,7 +114,7 @@ class TwigExtensionTest extends TestCase
         }
 
         // Twig options
-        $options = $container->getParameter('twig.options');
+        $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertTrue($options['autoescape'], '->load() sets the autoescape option');
         $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
@@ -134,7 +134,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'customTemplateEscapingGuesser', $format);
         $this->compileContainer($container);
 
-        $options = $container->getParameter('twig.options');
+        $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
     }
 
@@ -148,7 +148,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'empty', $format);
         $this->compileContainer($container);
 
-        $options = $container->getParameter('twig.options');
+        $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertEquals('filename', $options['autoescape']);
     }
 

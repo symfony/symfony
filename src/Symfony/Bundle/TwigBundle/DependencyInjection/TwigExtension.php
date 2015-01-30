@@ -106,7 +106,7 @@ class TwigExtension extends Extension
         }
         unset($config['autoescape_service'], $config['autoescape_service_method']);
 
-        $container->setParameter('twig.options', $config);
+        $container->getDefinition('twig')->replaceArgument(1, $config);
 
         $this->addClassesToCompile(array(
             'Twig_Environment',

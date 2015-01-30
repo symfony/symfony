@@ -131,4 +131,25 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 ", include $fixturesPath.'/containers/container16.php'),
         );
     }
+
+    public function testDumpAnonymousConfiguratorServices()
+    {
+        include self::$fixturesPath.'/containers/container19.php';
+        $dumper = new XmlDumper($container);
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"foo\" class=\"FooClass\">
+      <configurator-service>
+        <service class=\"BarClass\">
+          <configurator-service>
+            <service class=\"BazClass\"/>
+          </configurator-service>
+        </service>
+      </configurator-service>
+    </service>
+  </services>
+</container>
+", $dumper->dump());
+    }
 }

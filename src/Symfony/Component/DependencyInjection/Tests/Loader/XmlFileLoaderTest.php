@@ -450,4 +450,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('index_0' => 'app'), $container->findDefinition('logger')->getArguments());
     }
+
+    public function testLoadAnonymousConfiguratorServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services19.xml');
+
+        $bar = $container->getDefinition('foo')->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $bar);
+        $this->assertSame('Bar', $bar->getClass());
+
+        $baz = $bar->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $baz);
+        $this->assertSame('Baz', $baz->getClass());
+
+        $this->assertNull($baz->getConfigurator());
+    }
 }

@@ -715,7 +715,7 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param callable $callable A PHP callable
+     * @param callable|Definition $callable A PHP callable or a service definition
      *
      * @return Definition The current instance
      *

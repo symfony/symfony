@@ -207,7 +207,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         $host = $this->context->getHost();
 
-        if (preg_match('#^a\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
             // route1
             if ($pathinfo === '/route1') {
                 return array('_route' => 'route1');
@@ -220,7 +220,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        if (preg_match('#^b\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^b\\.example\\.com$#si', $host, $hostMatches)) {
             // route3
             if ($pathinfo === '/c2/route3') {
                 return array('_route' => 'route3');
@@ -228,7 +228,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        if (preg_match('#^a\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^a\\.example\\.com$#si', $host, $hostMatches)) {
             // route4
             if ($pathinfo === '/route4') {
                 return array('_route' => 'route4');
@@ -236,7 +236,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        if (preg_match('#^c\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^c\\.example\\.com$#si', $host, $hostMatches)) {
             // route5
             if ($pathinfo === '/route5') {
                 return array('_route' => 'route5');
@@ -249,7 +249,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             return array('_route' => 'route6');
         }
 
-        if (preg_match('#^(?P<var1>[^\\.]++)\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^(?P<var1>[^\\.]++)\\.example\\.com$#si', $host, $hostMatches)) {
             if (0 === strpos($pathinfo, '/route1')) {
                 // route11
                 if ($pathinfo === '/route11') {
@@ -275,7 +275,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
         }
 
-        if (preg_match('#^c\\.example\\.com$#s', $host, $hostMatches)) {
+        if (preg_match('#^c\\.example\\.com$#si', $host, $hostMatches)) {
             // route15
             if (0 === strpos($pathinfo, '/route15') && preg_match('#^/route15/(?P<name>[^/]++)$#s', $pathinfo, $matches)) {
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'route15')), array ());

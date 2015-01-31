@@ -278,11 +278,11 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     public function testPrototypeData()
     {
         $form = $this->factory->create('collection', array(), array(
-            'type'           => 'text',
-            'allow_add'      => true,
-            'prototype'      => true,
+            'type' => 'text',
+            'allow_add' => true,
+            'prototype' => true,
             'prototype_data' => 'foo',
-            'options'        => array(
+            'options' => array(
                 'data' => 'bar',
             ),
         ));

@@ -70,9 +70,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         // fixme: values were originally written as raw
         $description = array(
             '<comment>Path</comment>         '.$route->getPath(),
@@ -83,7 +80,7 @@ class TextDescriptor extends Descriptor
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
             '<comment>Class</comment>        '.get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
-            '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
+            '<comment>Requirements</comment> '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'),
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
         );
 

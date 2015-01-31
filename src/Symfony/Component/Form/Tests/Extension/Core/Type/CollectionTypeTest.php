@@ -282,6 +282,9 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'allow_add'      => true,
             'prototype'      => true,
             'prototype_data' => 'foo',
+            'options'        => array(
+                'data' => 'bar',
+            ),
         ));
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);

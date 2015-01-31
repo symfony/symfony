@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-15T12:59:52Z
+
+@fabpot ready
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-16T03:27:46Z
+
+I forgot to remove pattern in `YamlFileLoader::availableKeys`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-16T07:48:41Z
+
+Fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T08:13:07Z
+
+Looks there is a problem somewhere as the tests do not pass.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-16T08:40:52Z
+
+@fabpot I had to update the routing requirement in the frameworkbundle. The component tests should now succeed when the PR is merged.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-23T15:41:02Z
+
+@symfony/deciders ping
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-26T14:45:49Z
+
+:+1:

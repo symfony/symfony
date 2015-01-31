@@ -278,6 +278,10 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Ta vrednost ne bi smela biti identična {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Ta vrednost se ne ujema s pričakovanim naborom znakov {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

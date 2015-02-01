@@ -278,6 +278,10 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Este valor no debería ser idéntico a {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Este valor no coincide con el juego de caracteres esperado {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

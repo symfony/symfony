@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Exception;
 
-/**
+/*
  * Fatal Error Exception.
  *
  * @author Konstanton Myakshin <koc-dp@yandex.ru>

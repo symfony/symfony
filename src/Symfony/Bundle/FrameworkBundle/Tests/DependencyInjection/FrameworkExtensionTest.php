@@ -261,6 +261,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('fr'), $calls[0][1][0]);
     }
 
+    public function testTranslatorMultipleFullback()
+    {
+        $container = $this->createContainerFromFile('translator_fallbacks');
+
+        $calls = $container->getDefinition('translator.default')->getMethodCalls();
+        $this->assertEquals(array('en', 'fr'), $calls[0][1][0]);
+    }
+
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */

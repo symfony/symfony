@@ -278,7 +278,7 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>Cette valeur ne doit pas être identique à {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
-            <trans-unit id="73">
+            <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Cette valeur ne correspond pas au jeu de caractères {{ charset }} attendu.</target>
             </trans-unit>

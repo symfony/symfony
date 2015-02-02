@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-01T18:06:02Z
+
+@phansys I'm not sure if this translation is 100% accurate. It now says: *"this value doesn't match 'UTF-8'"* and it should say *"the charset of this value doesn't match UTF8"* or *"this value doesn't use the UTF8 charset"*.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-02-01T18:56:40Z
+
+@javiereguiluz, it's updated now based on your comments.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-01T19:44:12Z
+
+@phansys thanks!
+
+:+1: the translation is now accurate.

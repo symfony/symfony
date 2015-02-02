@@ -24,7 +24,6 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         require __DIR__.'/Fixtures/dumb-var.php';
 
         $dumper = new HtmlDumper('php://output');
-        $dumper->setColors(false);
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
         $cloner = new VarCloner();
@@ -106,6 +105,36 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   "<span class=sf-dump-key>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
   b"<span class=sf-dump-key>bin-key-&#233;</span>" => ""
 </samp>]
+</bar>
+
+EOTXT
+            ,
+
+            $out
+        );
+    }
+
+    public function testCharset()
+    {
+        if (!extension_loaded('mbstring')) {
+            $this->markTestSkipped('This test requires mbstring.');
+        }
+        $var = mb_convert_encoding('Словарь', 'CP1251', 'UTF-8');
+
+        $dumper = new HtmlDumper('php://output', 'CP1251');
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar($var);
+        $out = fopen('php://memory', 'r+b');
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertStringMatchesFormat(
+            <<<EOTXT
+<foo></foo><bar>b"<span class=sf-dump-str title="7 binary or non-UTF-8 characters">&#1057;&#1083;&#1086;&#1074;&#1072;&#1088;&#1100;</span>"
 </bar>
 
 EOTXT

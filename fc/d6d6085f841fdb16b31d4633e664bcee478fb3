@@ -1,0 +1,153 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-26T14:53:57Z
+
+What is the intention with the serializer component? I think we should not just blindly rebuild all the features that the JMS serializer already has. IMO both serializers should join forces and make one good one that is also faster than the current JMS serializer. There is no point in just reinventing the wheel here.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2014-12-27T22:17:28Z
+
+Hi @Tobion,
+
+My intention is not to blindly copy/reinvent JMS Serializer. I’ve already explained the need here: https://github.com/symfony/symfony/pull/12092#issuecomment-57490423
+
+To summarize, I think we need:
+* a fully featured MIT (so GPLv2 compliant) serializer (this is not the case of JMSSerializer)
+* to be able to develop powerful REST (and non-REST) APIs only with Symfony, without finding and installing a ton of external dependencies
+* something really extensible and high performance
+
+The Symfony Serializer Compnent already has something similar to this feature (it’s why I deprecated it) but it has several drawbacks:
+* it handles only underscore -> CamelCase but is not flexible enough to handle other cases
+* it’s not symmetrical: it converts when deserializing but not when serializing
+* it’s not convenient to use: you must specify the full list of properties you want to convert but you cannot say « convert all properties » (see the ticket linked in the PR).
+
+In fact, the Serializer Component will be lighter and more efficient by default with the Name Converter System than with the current implementation because it will not be enabled/registered without manual setting (so not loaded in memory).
+
+I think converting property names when serializing is a basic feature wanted by many people using a serializer. I've added a doc explaining some of these very common use cases: https://github.com/symfony/symfony-docs/pull/4692/files?diff=split
+
+Naming Strategies of JMSSerializer are similar but not as powerful. AFAIK the JMS implementation as the inverse drawback than the current Serializer Component implementation: it can rename attributes while serializing but not when deserializing.
+
+They are a lot of features I don’t want to see in the Serializer Component because they are redundant or will decrease its speed including:
+* Different ways to pick attributes to serialize (`@Exclude`, `@Expose` and so on): groups are sufficient and only one way to do seems to me better design and easier to use and understand
+* API versioning: can be handled and is similar to serialization groups
+* Annotations (or XML/YAML) for everything such as serialization names: a custom Name Converter is sufficient for such special needs
+* Event system (do we really need events for something like serialization?)
+
+However, JMSSerializer is a very powerful and well thinked library. I think we can study how it works and the experience with it to build something lighter but as powerful.
+We cannot share code between the two projects because of the licensing issue but we can share good ideas and design.
+When reimplementing concepts existing in other libraries such as JMSSerializer or the Django Serializer, I try to go one step further without bloating the code. Check for instance the depth and callback system for the circular reference handler and the symmetry support in this one.
+
+One other thing I would like to see in the Symfony component is a more generic way than the callbacks system to handle special serialization (e.g.: being able to do something when encountering a special type like \DateTime).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-28T03:25:50Z
+
+Thanks for the explanation. I agree having a more lightweight, MIT serializer that covers the JMS use-cases would be good.
+
+> AFAIK the JMS implementation as the inverse drawback than the current Serializer Component implementation: it can rename attributes while serializing but not when deserializing.
+
+No, it works both ways.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-04T20:59:31Z
+
+Should be merged only after #13252 (and will need a rebase).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T12:47:31Z
+
+@dunglas #13252 is merged now, can you rebase?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-09T09:25:05Z
+
+@fabpot rebased.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-11T21:23:32Z
+
+@fabpot BC break reverted.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-12T15:29:30Z
+
+@xabbuh fixed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-12T15:37:42Z
+
+@dunglas You should use the actual version numbers instead of `2.X` and `2.Y`. ;)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-12T15:39:13Z
+
+Oops :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-12T15:40:46Z
+
+fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-16T07:32:54Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T17:22:26Z
+
+Please rebase this to fix conflicts (the logic common to the GetSetNormalizer and the PropertyNormalizer has been moved to their common parent class)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-18T20:52:40Z
+
+Rebased. Thanks @stof for the review.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-23T10:02:21Z
+
+Tests fixed.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-25T03:47:06Z
+
+@dunglas Looks like the tests are not fixed (at least, according to Travis)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-25T20:10:37Z
+
+@fabpot strange Travis issue. Commits squashed, now Travis has detected the changes.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-26T16:07:03Z
+
+@dunglas Tests pass now on Travis as well apparently.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-30T03:59:16Z
+
+The changelog of the component should be updated to mention the changes being done (adding the new feature and deprecating the old one). Otherwise :+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-02T22:13:24Z
+
+Updated the changelog with new features of 2.6. I've also added a new feature of 2.6 missing from the changelog. Should I create a separate PR on the 2.6 branch for that?

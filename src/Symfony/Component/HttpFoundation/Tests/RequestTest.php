@@ -783,16 +783,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
-     */
-    public function testGetHostWithFakeHttpHostValue()
-    {
-        $request = new Request();
-        $request->initialize(array(), array(), array(), array(), array(), array('HTTP_HOST' => 'www.host.com?query=string'));
-        $request->getHost();
-    }
-
-    /**
      * @covers Symfony\Component\HttpFoundation\Request::setMethod
      * @covers Symfony\Component\HttpFoundation\Request::getMethod
      */
@@ -1707,38 +1697,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('host', $host);
         $this->assertEquals($host, $request->getHost());
         $this->assertLessThan(1, microtime(true) - $start);
-    }
-
-    /**
-     * @dataProvider getHostValidities
-     */
-    public function testHostValidity($host, $isValid, $expectedHost = null, $expectedPort = null)
-    {
-        $request = Request::create('/');
-        $request->headers->set('host', $host);
-
-        if ($isValid) {
-            $this->assertSame($expectedHost ?: $host, $request->getHost());
-            if ($expectedPort) {
-                $this->assertSame($expectedPort, $request->getPort());
-            }
-        } else {
-            $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
-            $request->getHost();
-        }
-    }
-
-    public function getHostValidities()
-    {
-        return array(
-            array('.a', false),
-            array('a..', false),
-            array('a.', true),
-            array("\xE9", false),
-            array('[::1]', true),
-            array('[::1]:80', true, '[::1]', 80),
-            array(str_repeat('.', 101), false),
-        );
     }
 
     public function getLongHostNames()

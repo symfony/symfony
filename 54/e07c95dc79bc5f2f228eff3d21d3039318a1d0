@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-03T22:35:46Z
+
+The Travis failure seems not related with this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-04T07:21:55Z
+
+Can you do the same for the Validator component? (in src/Symfony/Component/Validator/Tests/Mapping/Loader/AnnotationLoaderTest.php for instance)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-04T07:23:14Z
+
+@fabpot sure, I'll open another PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-04T07:43:35Z
+
+@fabpot I cannot find any use of `require` nor `include` in that class.

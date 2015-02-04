@@ -66,5 +66,6 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->transformer->reverseTransform('foobar'));
         $this->assertTrue($this->transformer->reverseTransform(''));
         $this->assertFalse($this->transformer->reverseTransform(null));
+        $this->assertFalse($this->transformer->reverseTransform('0'));
     }
 }

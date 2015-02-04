@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -125,13 +126,15 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param array $camelizedAttributes
      *
      * @return self
+     *
+     * @throws LogicException
      */
     public function setCamelizedAttributes(array $camelizedAttributes)
     {
         trigger_error(sprintf('%s is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.', __METHOD__), E_USER_DEPRECATED);
 
         if ($this->nameConverter && !$this->nameConverter instanceof CamelCaseToSnakeCaseNameConverter) {
-            throw new \LogicException(sprintf('%s cannot be called if a custom Name Converter is defined.', __METHOD__));
+            throw new LogicException(sprintf('%s cannot be called if a custom Name Converter is defined.', __METHOD__));
         }
 
         $attributes = array();

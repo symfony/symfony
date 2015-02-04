@@ -16,6 +16,7 @@ if (!defined('JSON_PRETTY_PRINT')) {
 }
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -62,7 +63,7 @@ class LintCommand extends Command
         $this
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
-            ->addArgument('filename')
+            ->addArgument('filename', InputArgument::IS_ARRAY)
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a template and outputs to STDOUT
 the first encountered syntax error.
@@ -94,9 +95,9 @@ EOF
             return 1;
         }
 
-        $filename = $input->getArgument('filename');
+        $filenames = $input->getArgument('filename');
 
-        if (!$filename) {
+        if (0 === count($filenames)) {
             if (0 !== ftell(STDIN)) {
                 throw new \RuntimeException("Please provide a filename or pipe template content to STDIN.");
             }
@@ -109,12 +110,21 @@ EOF
             return $this->display($input, $output, array($this->validate($twig, $template, uniqid('sf_'))));
         }
 
-        $filesInfo = array();
-        foreach ($this->findFiles($filename) as $file) {
-            $filesInfo[] = $this->validate($twig, file_get_contents($file), $file);
-        }
+        $filesInfo = $this->getFilesInfo($twig, $filenames);
 
         return $this->display($input, $output, $filesInfo);
+    }
+
+    private function getFilesInfo(\Twig_Environment $twig, array $filenames)
+    {
+        $filesInfo = array();
+        foreach ($filenames as $filename) {
+            foreach ($this->findFiles($filename) as $file) {
+                $filesInfo[] = $this->validate($twig, file_get_contents($file), $file);
+            }
+        }
+
+        return $filesInfo;
     }
 
     protected function findFiles($filename)

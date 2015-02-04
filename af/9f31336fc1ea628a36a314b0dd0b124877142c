@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by DavidPrevot at 2015-02-04T13:38:55Z
+
+FWIW, the issue was introduced in https://github.com/symfony/symfony/commit/1181bdc63ba6df5460e8181a780244134957eb26.

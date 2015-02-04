@@ -617,6 +617,17 @@ class Form implements \IteratorAggregate, FormInterface
                         $emptyData = $emptyData($this, $viewData);
                     }
 
+                    // Treat false as NULL to support binding false to checkboxes.
+                    // Don't convert NULL to a string here in order to determine later
+                    // whether an empty value has been submitted or whether no value has
+                    // been submitted at all. This is important for processing checkboxes
+                    // and radio buttons with empty values.
+                    if (false === $emptyData) {
+                        $emptyData = null;
+                    } elseif (is_scalar($emptyData)) {
+                        $emptyData = (string) $emptyData;
+                    }
+
                     $viewData = $emptyData;
                 }
 

@@ -33,7 +33,7 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
         $this
             ->setName('debug:event-dispatcher')
             ->setDefinition(array(
-                new InputArgument('event', InputArgument::OPTIONAL, 'An event name (foo)'),
+                new InputArgument('event', InputArgument::OPTIONAL, 'An event name (kernel.request)'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))

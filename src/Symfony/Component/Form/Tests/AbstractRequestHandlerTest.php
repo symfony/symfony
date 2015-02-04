@@ -176,7 +176,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider methodProvider
      */
-    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method)
+    public function testShouldSubmitFormWithEmptyNameIfNoFieldInRequest($method)
     {
         $form = $this->getMockForm('', $method);
         $form->expects($this->any())
@@ -190,7 +190,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
             'paramx' => 'submitted value',
         ));
 
-        $form->expects($this->never())
+        $form->expects($this->once())
             ->method('submit');
 
         $this->requestHandler->handleRequest($form, $this->request);

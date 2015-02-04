@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 
-require_once __DIR__.'/../../Annotation/Groups.php';
-
 class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**

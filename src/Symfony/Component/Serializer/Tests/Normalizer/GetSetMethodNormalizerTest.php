@@ -22,8 +22,6 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 
-require_once __DIR__.'/../../Annotation/Groups.php';
-
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**

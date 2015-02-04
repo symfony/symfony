@@ -306,6 +306,10 @@
                 <source>The host could not be resolved.</source>
                 <target>The host could not be resolved.</target>
             </trans-unit>
+            <trans-unit id="80">
+                <source>"{{ value }}" is not a valid timezone.</source>
+                <target>"{{ value }}" is not a valid timezone.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

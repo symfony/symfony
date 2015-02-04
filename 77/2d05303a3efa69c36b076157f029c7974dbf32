@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T07:56:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-01-10T21:04:32Z
+
+The messages have been changed. I also realized that using a new subclass of `UnexpectedTypeException` is indeed possible. The changes are now fully BC, but had to add a new exception class and skip the parent constructor when using it.
+
+Could even revert the changes to `PropertyPath` now, but using a subclass of `LogicException` there still makes sense.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-11T01:19:14Z
+
+If we go this route with a new subexception, then `UnexpectedTypeException` should get deprecated.
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-01-11T10:32:53Z
+
+Alright, I can add the deprecation notes in that case.
+
+I think this approach produces the cleanest end result. The parent constructor skipping can eventually be removed when the deprecated `UnexpectedTypeException` is removed.
+
+To avoid similar problems in the future, it might be worth considering marking exception constructors internal, or using static factory methods, or avoiding custom constructors altogether.
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-01-13T20:19:57Z
+
+Deprecation comment and error added. Change log updated as well. Should I update the UPGRADE files as well (or even add a file for 2.7)?
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-01-19T21:06:15Z
+
+Adding a new exception class just to deprecate the old one didn't really seem that forward compatible. So I refactored the changes to use `UnexpectedTypeException` once again, but included the option to use the old arguments.
+
+If the user code throws `UnexpectedTypeException` explicitly using the old constructor, there's a deprecation error for 2.7 and the BC layer can easily be removed for 3.0. If the constructor is not used, no user code changes will be required. A separate exception class would eventually force updating of the possible catch statements.
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-02-04T15:03:28Z
+
+Is there something more I can do to get this merged?
+
+(Rebased today.)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-04T15:10:15Z
+
+looks good to me

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2014-12-05T10:01:55Z
+
+It looks to me we are going back and forth between these 2 functions (we used to use ``mb_strwidth`` at some point in the past)
+
+---------------------------------------------------------------------------
+
+by ttsuruoka at 2014-12-08T11:49:13Z
+
+@stof Thank you for your comment!
+I consider that the table cell-padding should be rendered by width of string, not length of string.
+See https://github.com/symfony/symfony/pull/10714.
+That PR fixed the same problem by `mb_strwidth` instead of `mb_strlen`.

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-15T08:15:24Z
+
+What about creating a generic way of allowing custom masks in here? I think it would be very nice to add custom filters here for certain sensitive data (.env maybe?).
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-15T10:14:34Z
+
+What if we change the parameter name using `password_parameter` setting in the `security.yml` file?
+
+---------------------------------------------------------------------------
+
+by iltar at 2014-12-15T10:19:59Z
+
+What if you have passwords or other sensitive data in one of your variables? You will keep adding exceptions to this list

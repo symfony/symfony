@@ -1,7 +1,7 @@
 Debug Component
 ===============
 
-Debug provides tools to make debugging easier.
+Debug provides tools to make debugging easier by using a standard common-sense set of debug flags and output handlers for web and CLI.
 
 Enabling all debug tools is as easy as calling the `enable()` method on the
 main `Debug` class:

@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContextListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -111,7 +112,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             new Response()
         );
 
-        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener = new ContextListener($this->securityContext, array(), 'session', null, new EventDispatcher());
         $listener->onKernelResponse($event);
 
         $this->assertTrue($session->isStarted());
@@ -130,7 +131,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             new Response()
         );
 
-        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener = new ContextListener($this->securityContext, array(), 'session', null, new EventDispatcher());
         $listener->onKernelResponse($event);
 
         $this->assertFalse($session->isStarted());
@@ -269,7 +270,7 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             new Response()
         );
 
-        $listener = new ContextListener($this->securityContext, array(), 'session');
+        $listener = new ContextListener($this->securityContext, array(), 'session', null, new EventDispatcher());
         $listener->onKernelResponse($event);
 
         return $session;

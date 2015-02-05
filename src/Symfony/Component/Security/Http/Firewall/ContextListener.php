@@ -114,7 +114,7 @@ class ContextListener implements ListenerInterface
             return;
         }
 
-        if ($this->registered && null !== $this->dispatcher) {
+        if (null !== $this->dispatcher) {
             $this->registered = false;
             $this->dispatcher->removeListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
         }

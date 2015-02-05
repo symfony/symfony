@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2015-01-22T10:58:47Z
+
+I've just found that this may be a duplicate of PR #5291. A regression happened at 5dee43c186d262c34262094bd52620bdc6f08b94.
+
+So we may:
+
+1. partially rollback the commit and re-add `pre.xdebug-var-dump` rule
+2. and/or merge this commit and not override "pre" tag default white-space behaviour.

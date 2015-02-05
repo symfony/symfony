@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-31T22:39:33Z
+
+fabbot.io failure is false positive because the CS error is in a fixture that is auto-generated.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-03T22:37:31Z
+
+ping @symfony/deciders when this is merged I'll try to rebase and finish #10254
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-04T14:23:48Z
+
+:+1:

@@ -297,8 +297,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
     }
 
-    public function testFullyConfiguredValidationService()
+    public function testLegacyFullyConfiguredValidationService()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         if (!extension_loaded('apc')) {
             $this->markTestSkipped('The apc extension is not available.');
         }

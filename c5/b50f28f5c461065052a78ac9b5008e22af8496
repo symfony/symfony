@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by ifdattic at 2014-11-29T10:16:03Z
+
+Would be nice to get some feedback, ping @fabpot @xabbuh @weaverryan
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-11-29T10:20:00Z
+
+Not sure if it was good to add an additional sentence above it, so that neither of the added references is treated as the class summary.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2014-11-29T10:25:45Z
+
+This should probably use the PHPDoc link annotation instead, shouldn't it?
+
+http://manual.phpdoc.org/HTMLSmartyConverter/HandS/phpDocumentor/tutorial_tags.link.pkg.html
+
+---------------------------------------------------------------------------
+
+by ifdattic at 2014-11-29T10:36:15Z
+
+@magnusnordlander yes, great catch, completely forgot about that, thanks. Update soon

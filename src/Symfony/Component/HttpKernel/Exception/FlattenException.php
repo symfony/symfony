@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Exception;
 
 trigger_error('The '.__NAMESPACE__.'\FlattenException class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Debug\Exception\FlattenException class instead.', E_USER_DEPRECATED);
 
-/**
+/*
  * FlattenException wraps a PHP Exception to be able to serialize it.
  *
  * Basically, this class removes all objects from the trace.

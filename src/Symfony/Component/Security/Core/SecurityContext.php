@@ -60,7 +60,7 @@ class SecurityContext implements SecurityContextInterface
         }
 
         if ($oldSignature) {
-            // renamed for clearity
+            // renamed for clarity
             $authenticationManager = $tokenStorage;
             $accessDecisionManager = $authorizationChecker;
             $tokenStorage = new TokenStorage();

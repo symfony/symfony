@@ -39,13 +39,39 @@ class LengthValidator extends ConstraintValidator
         }
 
         $stringValue = (string) $value;
+        $invalidCharset = false;
 
-        if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
-            $length = grapheme_strlen($stringValue);
+        if ('UTF8' === $charset = strtoupper($constraint->charset)) {
+            $charset = 'UTF-8';
+        }
+
+        if (function_exists('iconv_strlen')) {
+            $length = @iconv_strlen($stringValue, $constraint->charset);
+            $invalidCharset = false === $length;
         } elseif (function_exists('mb_strlen')) {
-            $length = mb_strlen($stringValue, $constraint->charset);
-        } else {
+            if (mb_check_encoding($stringValue, $constraint->charset)) {
+                $length = mb_strlen($stringValue, $constraint->charset);
+            } else {
+                $invalidCharset = true;
+            }
+        } elseif ('UTF-8' !== $charset) {
             $length = strlen($stringValue);
+        } elseif (!preg_match('//u', $stringValue)) {
+            $invalidCharset = true;
+        } elseif (function_exists('utf8_decode')) {
+            $length = strlen(utf8_decode($stringValue));
+        } else {
+            preg_replace('/./u', '', $stringValue, -1, $length);
+        }
+
+        if ($invalidCharset) {
+            $this->buildViolation($constraint->charsetMessage)
+                ->setParameter('{{ value }}', $this->formatValue($stringValue))
+                ->setParameter('{{ charset }}', $constraint->charset)
+                ->setInvalidValue($value)
+                ->addViolation();
+
+            return;
         }
 
         if (null !== $constraint->max && $length > $constraint->max) {

@@ -184,7 +184,7 @@ class ModelChoiceList extends ObjectChoiceList
             return array();
         }
 
-        /**
+        /*
          * This performance optimization reflects a common scenario:
          * * A simple select of a model entry.
          * * The choice option "expanded" is set to false.
@@ -239,7 +239,7 @@ class ModelChoiceList extends ObjectChoiceList
         }
 
         if (!$this->loaded) {
-            /**
+            /*
              * This performance optimization assumes the validation of the respective values will be done by other means.
              *
              * It correlates with the performance optimization in {@link ModelChoiceList::getChoicesForValues()}

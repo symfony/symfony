@@ -244,35 +244,34 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    public function testValidateUniquenessAfterConsideringMultipleQueryResults()
+    public function testValidateUniquenessWithValidCustomErrorPath()
     {
         $constraint = new UniqueEntity(array(
             'message' => 'myMessage',
-            'fields' => array('name'),
+            'fields' => array('name', 'name2'),
             'em' => self::EM_NAME,
+            'errorPath' => "name2",
         ));
 
-        $entity1 = new SingleIntIdEntity(1, 'Foo');
-        $entity2 = new SingleIntIdEntity(2, 'Foo');
+        $entity1 = new DoubleNameEntity(1, 'Foo', "Bar");
+        $entity2 = new DoubleNameEntity(2, 'Foo', "Bar");
+
+        $this->validator->validate($entity1, $constraint);
+
+        $this->assertNoViolation();
 
         $this->em->persist($entity1);
-        $this->em->persist($entity2);
         $this->em->flush();
 
         $this->validator->validate($entity1, $constraint);
 
-        $this->buildViolation('myMessage')
-            ->atPath('property.path.name')
-            ->setInvalidValue('Foo')
-            ->assertRaised();
-
-        $this->context->getViolations()->remove(0);
+        $this->assertNoViolation();
 
         $this->validator->validate($entity2, $constraint);
 
         $this->buildViolation('myMessage')
-            ->atPath('property.path.name')
-            ->setInvalidValue('Foo')
+            ->atPath('property.path.name2')
+            ->setInvalidValue('Bar')
             ->assertRaised();
     }
 

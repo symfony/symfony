@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2014-03-27T09:33:51Z
+
+see #4195
+
+---------------------------------------------------------------------------
+
+by tobiassjosten at 2014-03-27T15:10:45Z
+
+I see. So basically it used to be in the class but got removed because …
+
+>the Security component does not require having such method
+
+Sound and fair. However, there are some use cases where having the method would make developing with the Security component so much easier. So if there's no actual drawbacks from having it, why not be pragmatic about it and put it back in?
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-03-29T08:46:47Z
+
+It's a matter of taste I guess.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-03T10:57:02Z
+
+:+1:

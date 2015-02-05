@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
 
-require_once __DIR__.'/../../Annotation/Groups.php';
-
 class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -64,8 +62,10 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testDenormalizeOnCamelCaseFormat()
+    public function testLegacyDenormalizeOnCamelCaseFormat()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->normalizer->setCamelizedAttributes(array('camel_case'));
         $obj = $this->normalizer->denormalize(
             array('camel_case' => 'value'),
@@ -74,27 +74,50 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('value', $obj->getCamelCase());
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
-    public function testFormatAttribute($attribute, $camelizedAttributes, $result)
+    public function testLegacyCamelizedAttributesNormalize()
     {
-        $r = new \ReflectionObject($this->normalizer);
-        $m = $r->getMethod('formatAttribute');
-        $m->setAccessible(true);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-        $this->normalizer->setCamelizedAttributes($camelizedAttributes);
-        $this->assertEquals($m->invoke($this->normalizer, $attribute, $camelizedAttributes), $result);
+        $obj = new PropertyCamelizedDummy('dunglas.fr');
+        $obj->fooBar = 'les-tilleuls.coop';
+        $obj->bar_foo = 'lostinthesupermarket.fr';
+
+        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
+        $this->assertEquals($this->normalizer->normalize($obj), array(
+            'kevin_dunglas' => 'dunglas.fr',
+            'fooBar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ));
+
+        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
+        $this->assertEquals($this->normalizer->normalize($obj), array(
+            'kevinDunglas' => 'dunglas.fr',
+            'foo_bar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ));
     }
 
-    public function attributeProvider()
+    public function testLegacyCamelizedAttributesDenormalize()
     {
-        return array(
-            array('attribute_test', array('attribute_test'),'AttributeTest'),
-            array('attribute_test', array('any'),'attribute_test'),
-            array('attribute', array('attribute'),'Attribute'),
-            array('attribute', array(), 'attribute'),
-        );
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $obj = new PropertyCamelizedDummy('dunglas.fr');
+        $obj->fooBar = 'les-tilleuls.coop';
+        $obj->bar_foo = 'lostinthesupermarket.fr';
+
+        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
+        $this->assertEquals($this->normalizer->denormalize(array(
+            'kevin_dunglas' => 'dunglas.fr',
+            'fooBar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ), __NAMESPACE__.'\PropertyCamelizedDummy'), $obj);
+
+        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
+        $this->assertEquals($this->normalizer->denormalize(array(
+            'kevinDunglas' => 'dunglas.fr',
+            'foo_bar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ), __NAMESPACE__.'\PropertyCamelizedDummy'), $obj);
     }
 
     public function testConstructorDenormalize()
@@ -358,5 +381,17 @@ class PropertyConstructorDummy
     public function getBar()
     {
         return $this->bar;
+    }
+}
+
+class PropertyCamelizedDummy
+{
+    private $kevinDunglas;
+    public $fooBar;
+    public $bar_foo;
+
+    public function __construct($kevinDunglas = null)
+    {
+        $this->kevinDunglas = $kevinDunglas;
     }
 }

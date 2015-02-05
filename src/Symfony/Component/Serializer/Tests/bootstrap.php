@@ -9,13 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
+$loader = require __DIR__.'/../vendor/autoload.php';
 
-/**
- * Adds SessionHandler functionality if available.
- *
- * @see http://php.net/sessionhandler
- */
-class NativeSessionHandler extends \SessionHandler
-{
-}
+Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(function ($class) { return class_exists($class); });

@@ -30,7 +30,7 @@
     <services>
         <service id="twig" class="%twig.class%">
             <argument type="service" id="twig.loader" />
-            <argument>%twig.options%</argument>
+            <argument /> <!-- Twig options -->
             <call method="addGlobal">
                 <argument>app</argument>
                 <argument type="service" id="twig.app_variable" />

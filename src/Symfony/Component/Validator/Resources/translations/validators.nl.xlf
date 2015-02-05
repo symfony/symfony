@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Lege bestanden zijn niet toegestaan.</target>
             </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Deze waarde is niet in de verwachte tekencodering {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

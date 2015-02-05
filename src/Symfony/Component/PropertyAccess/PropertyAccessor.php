@@ -97,7 +97,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             if ($overwrite) {
                 if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
+                    throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i);
                 }
 
                 $property = $propertyPath->getElement($i);
@@ -221,7 +221,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         for ($i = 0; $i < $lastIndex; ++$i) {
             if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+                throw new UnexpectedTypeException($objectOrArray, $propertyPath, $i);
             }
 
             $property = $propertyPath->getElement($i);

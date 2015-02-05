@@ -35,6 +35,7 @@ class Length extends Constraint
     public $maxMessage = 'This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.';
     public $minMessage = 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.';
     public $exactMessage = 'This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.';
+    public $charsetMessage = 'This value does not match the expected {{ charset }} charset.';
     public $max;
     public $min;
     public $charset = 'UTF-8';

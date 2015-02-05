@@ -172,7 +172,7 @@
         <!-- Validator -->
         <service id="security.validator.user_password" class="%security.validator.user_password.class%">
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
         </service>
     </services>

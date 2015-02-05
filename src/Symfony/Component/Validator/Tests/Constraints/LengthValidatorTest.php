@@ -54,12 +54,12 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array(12),
             array('12'),
-            array('üü', true),
-            array('éé', true),
+            array('üü'),
+            array('éé'),
             array(123),
             array('123'),
-            array('üüü', true),
-            array('ééé', true),
+            array('üüü'),
+            array('ééé'),
         );
     }
 
@@ -68,8 +68,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array(1234),
             array('1234'),
-            array('üüüü', true),
-            array('éééé', true),
+            array('üüüü'),
+            array('éééé'),
         );
     }
 
@@ -78,24 +78,34 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         return array(
             array(12345),
             array('12345'),
-            array('üüüüü', true),
-            array('ééééé', true),
+            array('üüüüü'),
+            array('ééééé'),
             array(123456),
             array('123456'),
-            array('üüüüüü', true),
-            array('éééééé', true),
+            array('üüüüüü'),
+            array('éééééé'),
+        );
+    }
+
+    public function getOneCharset()
+    {
+        if (!function_exists('iconv') && !function_exists('mb_convert_encoding')) {
+            $this->markTestSkipped('Mbstring or iconv is required for this test.');
+        }
+
+        return array(
+            array("é", "utf8", true),
+            array("\xE9", "CP1252", true),
+            array("\xE9", "XXX", false),
+            array("\xE9", "utf8", false),
         );
     }
 
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testValidValuesMin($value, $mbOnly = false)
+    public function testValidValuesMin($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array('min' => 5));
         $this->validator->validate($value, $constraint);
 
@@ -105,12 +115,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testValidValuesMax($value, $mbOnly = false)
+    public function testValidValuesMax($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array('max' => 3));
         $this->validator->validate($value, $constraint);
 
@@ -120,12 +126,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getFourCharacters
      */
-    public function testValidValuesExact($value, $mbOnly = false)
+    public function testValidValuesExact($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(4);
         $this->validator->validate($value, $constraint);
 
@@ -135,12 +137,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesMin($value, $mbOnly = false)
+    public function testInvalidValuesMin($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'min' => 4,
             'minMessage' => 'myMessage',
@@ -160,12 +158,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesMax($value, $mbOnly = false)
+    public function testInvalidValuesMax($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'max' => 4,
             'maxMessage' => 'myMessage',
@@ -185,12 +179,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExactLessThanFour($value, $mbOnly = false)
+    public function testInvalidValuesExactLessThanFour($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'min' => 4,
             'max' => 4,
@@ -211,12 +201,8 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesExactMoreThanFour($value, $mbOnly = false)
+    public function testInvalidValuesExactMoreThanFour($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'min' => 4,
             'max' => 4,
@@ -232,6 +218,31 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setPlural(4)
             ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getOneCharset
+     */
+    public function testOneCharset($value, $charset, $isValid)
+    {
+        $constraint = new Length(array(
+            'min' => 1,
+            'max' => 1,
+            'charset' => $charset,
+            'charsetMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ value }}', '"'.$value.'"')
+                ->setParameter('{{ charset }}', $charset)
+                ->setInvalidValue($value)
+                ->assertRaised();
+        }
     }
 
     public function testConstraintGetDefaultOption()

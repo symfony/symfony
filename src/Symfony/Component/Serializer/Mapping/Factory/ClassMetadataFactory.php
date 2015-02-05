@@ -86,12 +86,12 @@ class ClassMetadataFactory
 
         $reflClass = $metadata->getReflectionClass();
 
-        // Include constraints from the parent class
+        // Include groups from the parent class
         if ($parent = $reflClass->getParentClass()) {
             $metadata->mergeAttributesGroups($this->getMetadataFor($parent->name));
         }
 
-        // Include constraints from all implemented interfaces
+        // Include groups from all implemented interfaces
         foreach ($reflClass->getInterfaces() as $interface) {
             $metadata->mergeAttributesGroups($this->getMetadataFor($interface->name));
         }

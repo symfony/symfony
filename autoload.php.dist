@@ -120,9 +120,11 @@ class DeprecationErrorHandler
     }
 }
 
+/*
 if (class_exists('PHPUnit_Util_ErrorHandler')) {
     DeprecationErrorHandler::register();
 }
+*/
 
 $loader = require_once __DIR__.'/vendor/autoload.php';
 

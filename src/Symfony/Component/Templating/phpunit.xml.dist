@@ -7,9 +7,8 @@
          bootstrap="vendor/autoload.php"
 >
     <php>
-        <!-- Disable E_USER_DEPRECATED until 3.0 -->
-        <!-- php -r 'echo -1 & ~E_USER_DEPRECATED;' -->
-        <ini name="error_reporting" value="-16385"/>
+        <!-- Use -16385 to disable E_USER_DEPRECATED (-1 & ~E_USER_DEPRECATED) -->
+        <ini name="error_reporting" value="-1" />
     </php>
     <testsuites>
         <testsuite name="Symfony Templating Component Test Suite">

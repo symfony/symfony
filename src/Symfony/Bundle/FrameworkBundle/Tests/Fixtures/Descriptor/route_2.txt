@@ -1,7 +1,7 @@
 <comment>Path</comment>         /name/add
 <comment>Path Regex</comment>   #^/name/add$#s
 <comment>Host</comment>         localhost
-<comment>Host Regex</comment>   #^localhost$#s
+<comment>Host Regex</comment>   #^localhost$#si
 <comment>Scheme</comment>       http|https
 <comment>Method</comment>       PUT|POST
 <comment>Class</comment>        Symfony\Component\Routing\Route

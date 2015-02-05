@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-20T06:09:13Z
+
+Rebased, good for review.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-20T13:17:51Z
+
+Also removed the OptionsResolverInterface and it's usages.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-23T19:41:58Z
+
+@stof Can you have a look at those changes? Tests are failing, but looks unrelated...
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2015-01-29T18:34:43Z
+
+Anyone up for a review?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-01-29T19:03:12Z
+
+Looks ok :+1:

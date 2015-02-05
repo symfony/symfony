@@ -101,7 +101,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
             "(\033[32mz>=2.0,<a2.3\033[39m)",
             $formatter->format('(<info>'.$formatter->escape('z>=2.0,<a2.3').'</info>)')
         );
-        
+
         $this->assertEquals(
             "\033[32m<error>some error</error>\033[39m",
             $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')

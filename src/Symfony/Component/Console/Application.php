@@ -253,7 +253,7 @@ class Application
             $this->getLongVersion(),
             '',
             '<comment>Usage:</comment>',
-            '  [options] command [arguments]',
+            '  command [options] [arguments]',
             '',
             '<comment>Options:</comment>',
         );

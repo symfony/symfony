@@ -298,6 +298,10 @@
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>La imagen está orientada verticalmente ({{ width }}x{{ height }}px). Las imágenes orientadas verticalmente no están permitidas.</target>
             </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>La codificación de caracteres para este valor debería ser {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -1107,6 +1107,7 @@ class Process
      * Sets the input.
      *
      * This content will be passed to the underlying process standard input.
+     * Deprecation: As of Symfony 2.5, this method only accepts scalar values.
      *
      * @param string|null $input The content
      *
@@ -1116,6 +1117,13 @@ class Process
      */
     public function setInput($input)
     {
+        if (!is_scalar($input)) {
+            trigger_error(
+                'Passing a non-scalar input is deprecated since version 2.5 and will be removed in 3.0.',
+                E_USER_DEPRECATED
+            );
+        }
+
         if ($this->isRunning()) {
             throw new LogicException('Input can not be set while the process is running.');
         }

@@ -167,7 +167,7 @@ class ProcessBuilder
     /**
      * Sets the input of the process.
      *
-     * Deprecation: As of Symfony 2.5, this method only accepts string values.
+     * Deprecation: As of Symfony 2.5, this method only accepts scalar values.
      *
      * @param string|null $input The input as a string
      *
@@ -177,6 +177,13 @@ class ProcessBuilder
      */
     public function setInput($input)
     {
+        if (!is_scalar($input)) {
+            trigger_error(
+                'Passing a non-scalar input is deprecated since version 2.5 and will be removed in 3.0.',
+                E_USER_DEPRECATED
+            );
+        }
+
         $this->input = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $input);
 
         return $this;

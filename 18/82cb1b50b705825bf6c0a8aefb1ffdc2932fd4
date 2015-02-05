@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-10-09T10:00:38Z
+
+Shouldn't it be better to add the support of the priorities to the ChainLoader? (in this case it's up to the Twig project and you should create a ticket in fabpot/twig)
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-09T10:03:14Z
+
+@Nicofuma putting this in the ChainLoader would mean doing the sorting at runtime, which has an impact on perf. IMO, it is perfectly fine for Twig to assume that you register the loaders in the order which matters for you.
+Using priorities in the tags is a way to control this order in the container, instead of having loaders registered in the order in which they were defined as services.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-10-09T10:21:01Z
+
+I see the point, I was thinking to something similar to the EventDispatcher where the overhead of the priorities is very low.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-09T10:45:46Z
+
+Well, the priority at runtime are logical in the dispatcher, as the registration of event listeners is not expected to happen in a central place, even when not using it in a DI context. For instance, for forms, each form type in the hierarchy can add listeners, and they might want to run either before or after the listener added by the parent type in the hierarchy.
+On the other hand, configuring a chain loader is something you will do in the place configuring your Twig environment. The use case for the priority is not the same

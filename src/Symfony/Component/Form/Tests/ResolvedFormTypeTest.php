@@ -99,7 +99,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -127,7 +127,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))

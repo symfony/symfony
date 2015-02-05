@@ -93,8 +93,10 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testDenormalizeOnCamelCaseFormat()
+    public function testLegacyDenormalizeOnCamelCaseFormat()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->normalizer->setCamelizedAttributes(array('camel_case'));
         $obj = $this->normalizer->denormalize(
             array('camel_case' => 'camelCase'),
@@ -109,8 +111,10 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\GetSetDummy'));
     }
 
-    public function testCamelizedAttributesNormalize()
+    public function testLegacyCamelizedAttributesNormalize()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $obj = new GetCamelizedDummy('dunglas.fr');
         $obj->setFooBar('les-tilleuls.coop');
         $obj->setBar_foo('lostinthesupermarket.fr');
@@ -130,8 +134,10 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    public function testCamelizedAttributesDenormalize()
+    public function testLegacyCamelizedAttributesDenormalize()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $obj = new GetCamelizedDummy('dunglas.fr');
         $obj->setFooBar('les-tilleuls.coop');
         $obj->setBar_foo('lostinthesupermarket.fr');

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by davedevelopment at 2015-01-23T14:49:46Z
+
+@jaytaph added as you suggested, this makes the test a lot more cumbersome, so I merged in to the test that adds the handler.
+
+---------------------------------------------------------------------------
+
+by davedevelopment at 2015-02-05T09:56:05Z
+
+@fabpot fair enough, removed the conditional and add a dispatcher to the tests that need them.

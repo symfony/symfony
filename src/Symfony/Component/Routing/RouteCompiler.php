@@ -46,7 +46,7 @@ class RouteCompiler implements RouteCompilerInterface
             $result = self::compilePattern($route, $host, true);
 
             $hostVariables = $result['variables'];
-            $variables = array_merge($variables, $hostVariables);
+            $variables = $hostVariables;
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];
@@ -163,7 +163,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         return array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
+            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );

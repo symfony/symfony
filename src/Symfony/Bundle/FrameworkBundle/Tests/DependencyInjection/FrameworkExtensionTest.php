@@ -261,7 +261,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array('fr'), $calls[0][1][0]);
     }
 
-    public function testTranslatorMultipleFullback()
+    public function testTranslatorMultipleFallbacks()
     {
         $container = $this->createContainerFromFile('translator_fallbacks');
 

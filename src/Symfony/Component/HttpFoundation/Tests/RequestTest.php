@@ -925,7 +925,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $req = Request::create('test');
 
-        $this->assertEquals('', $req->getContent());
+        $this->assertSame('', $req->getContent());
     }
 
     /**

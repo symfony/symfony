@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-02T15:32:34Z
+
+Any way to test this?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-02T15:37:31Z
+
+why not, I'll try :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-02T19:20:03Z
+
+Test added
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T17:13:34Z
+
+@aitboudad FYI, we are not notified when you push new commits, so it is good to add a comment saying you updated the PR. Otherwise, it is likely that we won't come back to review it (there has been a 16 days delay here)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-18T21:53:49Z
+
+@stof didn't know about that so thank you for the clarification :) ,
+I applied the comments, thanks!

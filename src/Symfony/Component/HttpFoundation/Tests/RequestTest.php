@@ -921,6 +921,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(feof($retval));
     }
 
+    public function testEmptyStringContentReturns()
+    {
+        $req = Request::create('test');
+
+        $this->assertEquals('', $req->getContent());
+    }
+
     /**
      * @expectedException \LogicException
      * @dataProvider getContentCantBeCalledTwiceWithResourcesProvider

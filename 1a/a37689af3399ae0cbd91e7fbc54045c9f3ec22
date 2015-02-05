@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by phansys at 2015-01-28T22:47:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-01-29T08:16:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-01-29T08:18:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-01-29T08:34:58Z
+
+i can't figure out why the CI-build is broken.
+
+any ideas?
+
+seems like ```master```is the problem, not the commit, or?
+
+---------------------------------------------------------------------------
+
+by mvhirsch at 2015-01-29T08:44:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-29T11:41:12Z
+
+I think this should be considered as a bugfix, and so applied in older branches
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-01-29T12:18:31Z
+
+:+1:  i changed the PR header @stof
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-01-29T14:52:11Z
+
+I think it should be applied on top of 2.6, because [these changes](https://github.com/symfony/symfony/commit/28edd30007aee351757260282856fa089d44b6e3) were introduced there: [Choose the right Branch](http://symfony.com/doc/current/contributing/code/patches.html#choose-the-right-branch).
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2015-01-29T15:02:58Z
+
+@stof what do you mean?
+
+@phansys looks like the code was moved there, but not initial written
+https://github.com/symfony/symfony/commit/28edd30007aee351757260282856fa089d44b6e3#diff-38eebdda7d6ebfcb7405b91167f05c9cL258

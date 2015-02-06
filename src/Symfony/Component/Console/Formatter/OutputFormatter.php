@@ -144,17 +144,15 @@ class OutputFormatter implements OutputFormatterInterface
     {
         $offset = 0;
         $output = '';
-        $unescapedMatches = array();
         $tagRegex = '[a-z][a-z0-9_=;-]*';
         preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#isx", $message, $matches, PREG_OFFSET_CAPTURE);
-        foreach ($matches[0] as $match) {
-            if (0 == $match[1] || (0 < $match[1] && '\\' != $message[$match[1] - 1])) {
-                $unescapedMatches[] = $match;
-            }
-        }
-        foreach ($unescapedMatches as $i => $match) {
+        foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
             $text = $match[0];
+
+            if (0 != $pos && '\\' == $message[$pos - 1]) {
+                continue;
+            }
 
             // add the text up to the next tag
             $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));

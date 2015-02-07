@@ -21,7 +21,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
  *
  * @api
  */
-class Form extends Link implements \ArrayAccess
+class Form extends AbstractUriElement implements \ArrayAccess
 {
     /**
      * @var \DOMElement

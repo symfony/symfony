@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* [BC BREAK] All the URI parsing logic have been abstracted in the `AbstractUriElement` class. The `Form` class don't extends `Link` anymore, it's now a child of `AbstractUriElement`. The `UriElementInterface` have been introduced for the common `getNode`, `getMethod` and `getUri` methods.
+
 2.5.0
 -----
 

@@ -672,6 +672,17 @@ EOF
         $this->assertCount(4, $crawler->selectLink('Bar'), '->selectLink() selects links by the node values');
     }
 
+    public function testSelectImage()
+    {
+        $crawler = $this->createTestCrawler();
+        $this->assertNotSame($crawler, $crawler->selectImage('Bar'), '->selectImage() returns a new instance of a crawler');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->selectImage() returns a new instance of a crawler');
+
+        $this->assertCount(1, $crawler->selectImage('Fabien\'s Bar'), '->selectImage() selects images by alt attribute');
+        $this->assertCount(2, $crawler->selectLink('Fabien"s Bar'), '->selectImage() selects images by alt attribute');
+        $this->assertCount(1, $crawler->selectLink('\' Fabien"s Bar'), '->selectImage() selects images by alt attribute');
+    }
+
     public function testSelectButton()
     {
         $crawler = $this->createTestCrawler();
@@ -750,6 +761,21 @@ HTML;
         }
     }
 
+    public function testImage()
+    {
+        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Image', $crawler->image(), '->image() returns an Image instance');
+
+        $this->assertEquals('POST', $crawler->image('post')->getMethod(), '->image() takes a method as its argument');
+
+        try {
+            $this->createTestCrawler()->filterXPath('//ol')->image();
+            $this->fail('->image() throws an \InvalidArgumentException if the node list is empty');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertTrue(true, '->image() throws an \InvalidArgumentException if the node list is empty');
+        }
+    }
+
     public function testSelectLinkAndLinkFiltered()
     {
         $html = <<<HTML
@@ -796,6 +822,18 @@ HTML;
         $this->assertCount(4, $crawler->links(), '->links() returns an array');
         $links = $crawler->links();
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $links[0], '->links() returns an array of Link instances');
+
+        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
+    }
+
+    public function testImages()
+    {
+        $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
+        $this->assertInternalType('array', $crawler->images(), '->images() returns an array');
+
+        $this->assertCount(4, $crawler->images(), '->images() returns an array');
+        $images = $crawler->images();
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Image', $images[0], '->images() returns an array of Image instances');
 
         $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }

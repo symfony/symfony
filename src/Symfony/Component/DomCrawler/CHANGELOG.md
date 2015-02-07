@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
 * [BC BREAK] All the URI parsing logic have been abstracted in the `AbstractUriElement` class. The `Form` class don't extends `Link` anymore, it's now a child of `AbstractUriElement`. The `UriElementInterface` have been introduced for the common `getNode`, `getMethod` and `getUri` methods.
+* Added an `Image` class to crawl images and parse their `src` attribute, and `selectImage`, `image`, `images` methods in `Crawler`, the image version of the equivalent `link` methods.
 
 2.5.0
 -----

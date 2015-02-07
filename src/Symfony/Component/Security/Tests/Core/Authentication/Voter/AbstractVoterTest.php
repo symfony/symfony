@@ -50,6 +50,7 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(AbstractVoter::ACCESS_ABSTAIN, null, array(), 'ACCESS_ABSTAIN for null objects'),
+            array(AbstractVoter::ACCESS_ABSTAIN, 'foo', array(), 'ACCESS_ABSTAIN for strings and other scalar values'),
             array(AbstractVoter::ACCESS_ABSTAIN, new UnsupportedObjectFixture(), array(), 'ACCESS_ABSTAIN for objects with unsupported class'),
             array(AbstractVoter::ACCESS_ABSTAIN, new ObjectFixture(), array(), 'ACCESS_ABSTAIN for no attributes'),
             array(AbstractVoter::ACCESS_ABSTAIN, new ObjectFixture(), array('foobar'), 'ACCESS_ABSTAIN for unsupported attributes'),

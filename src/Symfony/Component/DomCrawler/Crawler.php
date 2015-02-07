@@ -692,6 +692,22 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Selects images by alt value.
+     *
+     * @param string $value The image alt
+     *
+     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     *
+     * @api
+     */
+    public function selectImage($value)
+    {
+        $xpath = sprintf('descendant-or-self::img[contains(normalize-space(string(@alt)), %s)]', static::xpathLiteral($value));
+
+        return $this->filterRelativeXPath($xpath);
+    }
+
+    /**
      * Selects a button by name or alt value for images.
      *
      * @param string $value The button text
@@ -747,6 +763,43 @@ class Crawler extends \SplObjectStorage
         }
 
         return $links;
+    }
+
+    /**
+     * Returns an Image object for the first node in the list.
+     *
+     * @return Image An Image instance
+     *
+     * @throws \InvalidArgumentException If the current node list is empty
+     *
+     * @api
+     */
+    public function image()
+    {
+        if (!count($this)) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        $node = $this->getNode(0);
+
+        return new Image($node, $this->baseHref);
+    }
+
+    /**
+     * Returns an array of Image objects for the nodes in the list.
+     *
+     * @return Image[] An array of Image instances
+     *
+     * @api
+     */
+    public function images()
+    {
+        $images = array();
+        foreach ($this as $node) {
+            $images[] = new Image($node, $this->baseHref);
+        }
+
+        return $images;
     }
 
     /**

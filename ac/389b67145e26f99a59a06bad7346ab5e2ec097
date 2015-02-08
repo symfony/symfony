@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by alexandresalome at 2014-07-13T10:49:47Z
+
+You blindly trust the received headers here, whereas the previous version required the proxy to be configured as "trusted proxies". Should you configure your proxy as "trusted proxy"? see http://symfony.com/doc/current/components/http_foundation/trusting_proxies.html
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-09-24T15:28:40Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-09-24T18:46:56Z
+
+Looks good to me apart from the ipv6 thing I commented on. :+1: when that gets resolved.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2014-09-24T18:48:10Z
+
+Oh yeah another detail, there should be a doc ticket opened to at least change http://symfony.com/doc/master/cookbook/request/load_balancer_reverse_proxy.html#my-reverse-proxy-uses-non-standard-not-x-forwarded-headers to stop advertising X-Forwarded as standard IMO.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2014-09-24T20:37:53Z
+
+@tony-co please reabse your PR
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-05T15:46:14Z
+
+@tony-co Can you add the test case asked by @Seldaek ?
+
+---------------------------------------------------------------------------
+
+by tony-co at 2015-02-05T23:29:02Z
+
+@Seldaek A few weeks ago, Fabien merged a [fix to strip the port](https://github.com/symfony/symfony/pull/13114).
+I rebased and updated the tests to include cases with IPv4/IPv6 with ports.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-02-06T12:34:28Z
+
+Looks good to me I think :)

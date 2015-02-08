@@ -52,12 +52,19 @@ class DayOfWeekType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $choiceList = function (Options $options) {
-            $calendar = \IntlCalendar::createInstance();
-            $days = DayOfWeekType::getOrderedDaysOfWeek($calendar->getFirstDayOfWeek());
-            $transformer = new DayOfWeekTransformer($options['label_format']);
-            $labels = array_map(array($transformer, 'transform'), $days);
+            static $cache = array();
+            $cache_key = \Locale::getDefault().'|'.$options['label_format'];
 
-            return new SimpleChoiceList(array_combine($days, $labels));
+            if (!isset($cache[$cache_key])) {
+                $calendar = \IntlCalendar::createInstance();
+                $days = DayOfWeekType::getOrderedDaysOfWeek($calendar->getFirstDayOfWeek());
+                $transformer = new DayOfWeekTransformer($options['label_format']);
+                $labels = array_map(array($transformer, 'transform'), $days);
+
+                return $cache[$cache_key] = new SimpleChoiceList(array_combine($days, $labels));
+            }
+
+            return $cache[$cache_key];
         };
 
         $resolver->setDefaults(array(

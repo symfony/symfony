@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by phansys at 2015-02-05T17:49:45Z
+
+Recently I had to manage this behavior through form options since I have a lot of choices and performance was seriously degraded with the amount of results.
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-05T17:57:50Z
+
+Does it make sense to merge this into 2.3?
+
+---------------------------------------------------------------------------
+
+by guilhermeblanco at 2015-02-05T19:15:52Z
+
+@fabpot Yes. =) Doctrine 2.3 addressed some issues with `findBy` looking for associations as keys, but you cannot use it inside of EntityType, so it's irrelevant.
+
+I'd say it makes sense to merge in all branches if they're maintained.

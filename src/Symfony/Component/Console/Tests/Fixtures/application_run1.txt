@@ -1,7 +1,7 @@
 Console Tool
 
 Usage:
-  command [options] [arguments]
+  [options] command [arguments]
 
 Options:
   --help           -h Display this help message

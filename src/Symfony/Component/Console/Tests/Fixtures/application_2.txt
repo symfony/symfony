@@ -1,7 +1,7 @@
 <info>My Symfony application</info> version <comment>v1.0</comment>
 
 <comment>Usage:</comment>
-  command [options] [arguments]
+  [options] command [arguments]
 
 <comment>Options:</comment>
   <info>--help</info>           <info>-h</info> Display this help message

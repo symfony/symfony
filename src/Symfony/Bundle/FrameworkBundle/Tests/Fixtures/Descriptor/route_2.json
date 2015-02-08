@@ -2,7 +2,7 @@
     "path": "\/name\/add",
     "pathRegex": "#^\/name\/add$#s",
     "host": "localhost",
-    "hostRegex": "#^localhost$#si",
+    "hostRegex": "#^localhost$#s",
     "scheme": "http|https",
     "method": "PUT|POST",
     "class": "Symfony\\Component\\Routing\\Route",

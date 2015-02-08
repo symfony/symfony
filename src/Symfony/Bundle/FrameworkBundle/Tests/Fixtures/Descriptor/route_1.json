@@ -2,7 +2,7 @@
     "path": "\/hello\/{name}",
     "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#s",
     "host": "localhost",
-    "hostRegex": "#^localhost$#si",
+    "hostRegex": "#^localhost$#s",
     "scheme": "http|https",
     "method": "GET|HEAD",
     "class": "Symfony\\Component\\Routing\\Route",

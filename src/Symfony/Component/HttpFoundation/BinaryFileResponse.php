@@ -167,7 +167,7 @@ class BinaryFileResponse extends Response
     /**
      * {@inheritdoc}
      */
-    public function prepare(Request $request)
+    public function prepare(RequestInterface $request)
     {
         $this->headers->set('Content-Length', $this->file->getSize());
 
@@ -180,7 +180,7 @@ class BinaryFileResponse extends Response
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
         }
 
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' != $request->getServer()->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 
@@ -189,13 +189,13 @@ class BinaryFileResponse extends Response
         $this->offset = 0;
         $this->maxlen = -1;
 
-        if (self::$trustXSendfileTypeHeader && $request->headers->has('X-Sendfile-Type')) {
+        if (self::$trustXSendfileTypeHeader && $request->getHeaders()->has('X-Sendfile-Type')) {
             // Use X-Sendfile, do not send any content.
-            $type = $request->headers->get('X-Sendfile-Type');
+            $type = $request->getHeaders()->get('X-Sendfile-Type');
             $path = $this->file->getRealPath();
             if (strtolower($type) == 'x-accel-redirect') {
                 // Do X-Accel-Mapping substitutions.
-                foreach (explode(',', $request->headers->get('X-Accel-Mapping', '')) as $mapping) {
+                foreach (explode(',', $request->getHeaders()->get('X-Accel-Mapping', '')) as $mapping) {
                     $mapping = explode('=', $mapping, 2);
 
                     if (2 == count($mapping)) {
@@ -211,10 +211,12 @@ class BinaryFileResponse extends Response
             }
             $this->headers->set($type, $path);
             $this->maxlen = 0;
-        } elseif ($request->headers->has('Range')) {
+        } elseif ($request->getHeaders()->has('Range')) {
             // Process the range headers.
-            if (!$request->headers->has('If-Range') || $this->getEtag() == $request->headers->get('If-Range')) {
-                $range = $request->headers->get('Range');
+            if (!$request->getHeaders()->has('If-Range')
+              || $this->getEtag() == $request->getHeaders()->get('If-Range')
+            ) {
+                $range = $request->getHeaders()->get('Range');
                 $fileSize = $this->file->getSize();
 
                 list($start, $end) = explode('-', substr($range, 6), 2) + array(0);

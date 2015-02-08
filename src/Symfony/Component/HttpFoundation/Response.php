@@ -260,11 +260,11 @@ class Response
      * compliant with RFC 2616. Most of the changes are based on
      * the Request that is "associated" with this Response.
      *
-     * @param Request $request A Request instance
+     * @param RequestInterface $request A Request instance
      *
      * @return Response The current response.
      */
-    public function prepare(Request $request)
+    public function prepare(RequestInterface $request)
     {
         $headers = $this->headers;
 
@@ -306,7 +306,7 @@ class Response
         }
 
         // Fix protocol
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' != $request->getServer()->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 
@@ -1064,13 +1064,13 @@ class Response
      * If the Response is not modified, it sets the status code to 304 and
      * removes the actual content by calling the setNotModified() method.
      *
-     * @param Request $request A Request instance
+     * @param RequestInterface $request A Request instance
      *
      * @return bool true if the Response validators match the Request, false otherwise
      *
      * @api
      */
-    public function isNotModified(Request $request)
+    public function isNotModified(RequestInterface $request)
     {
         if (!$request->isMethodSafe()) {
             return false;
@@ -1078,7 +1078,7 @@ class Response
 
         $notModified = false;
         $lastModified = $this->headers->get('Last-Modified');
-        $modifiedSince = $request->headers->get('If-Modified-Since');
+        $modifiedSince = $request->getHeaders()->get('If-Modified-Since');
 
         if ($etags = $request->getEtags()) {
             $notModified = in_array($this->getEtag(), $etags) || in_array('*', $etags);
@@ -1264,9 +1264,12 @@ class Response
      *
      * @link http://support.microsoft.com/kb/323308
      */
-    protected function ensureIEOverSSLCompatibility(Request $request)
+    protected function ensureIEOverSSLCompatibility(RequestInterface $request)
     {
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment')
+          && preg_match('/MSIE (.*?);/i', $request->getServer()->get('HTTP_USER_AGENT'), $match) == 1
+          && true === $request->isSecure()
+        ) {
             if (intval(preg_replace("/(MSIE )(.*?);/", "$2", $match[0])) < 9) {
                 $this->headers->remove('Cache-Control');
             }

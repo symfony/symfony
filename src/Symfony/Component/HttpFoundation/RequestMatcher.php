@@ -147,7 +147,7 @@ class RequestMatcher implements RequestMatcherInterface
      *
      * @api
      */
-    public function matches(Request $request)
+    public function matches(RequestInterface $request)
     {
         if ($this->schemes && !in_array($request->getScheme(), $this->schemes)) {
             return false;
@@ -158,7 +158,7 @@ class RequestMatcher implements RequestMatcherInterface
         }
 
         foreach ($this->attributes as $key => $pattern) {
-            if (!preg_match('{'.$pattern.'}', $request->attributes->get($key))) {
+            if (!preg_match('{'.$pattern.'}', $request->getAttributes()->get($key))) {
                 return false;
             }
         }
@@ -175,7 +175,7 @@ class RequestMatcher implements RequestMatcherInterface
             return true;
         }
 
-        // Note to future implementors: add additional checks above the
+        // Note to future implementers: add additional checks above the
         // foreach above or else your check might not be run!
         return count($this->ips) === 0;
     }

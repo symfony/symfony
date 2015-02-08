@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  *
  * @api
  */
-class Request
+class Request implements RequestInterface
 {
     const HEADER_CLIENT_IP = 'client_ip';
     const HEADER_CLIENT_HOST = 'client_host';
@@ -963,9 +963,7 @@ class Request
     }
 
     /**
-     * Gets the request's scheme.
-     *
-     * @return string
+     * {@inheritdoc}
      *
      * @api
      */
@@ -1210,18 +1208,7 @@ class Request
     }
 
     /**
-     * Checks whether the request is secure or not.
-     *
-     * This method can read the client port from the "X-Forwarded-Proto" header
-     * when trusted proxies were set via "setTrustedProxies()".
-     *
-     * The "X-Forwarded-Proto" header must contain the protocol: "https" or "http".
-     *
-     * If your reverse proxy uses a different header name than "X-Forwarded-Proto"
-     * ("SSL_HTTPS" for instance), configure it via "setTrustedHeaderName()" with
-     * the "client-proto" key.
-     *
-     * @return bool
+     * {@inheritdoc}
      *
      * @api
      */
@@ -1311,17 +1298,7 @@ class Request
     }
 
     /**
-     * Gets the request "intended" method.
-     *
-     * If the X-HTTP-Method-Override header is set, and if the method is a POST,
-     * then it is used to determine the "real" intended HTTP method.
-     *
-     * The _method request parameter can also be used to determine the HTTP method,
-     * but only if enableHttpMethodParameterOverride() has been called.
-     *
-     * The method is always an uppercased string.
-     *
-     * @return string The request method
+     * {@inheritdoc}
      *
      * @api
      *
@@ -1357,11 +1334,7 @@ class Request
     }
 
     /**
-     * Gets the mime type associated with the format.
-     *
-     * @param string $format The format
-     *
-     * @return string The associated mime type (null if not found)
+     * {@inheritdoc}
      *
      * @api
      */
@@ -1418,17 +1391,7 @@ class Request
     }
 
     /**
-     * Gets the request format.
-     *
-     * Here is the process to determine the format:
-     *
-     *  * format defined by the user (with setRequestFormat())
-     *  * _format request parameter
-     *  * $default
-     *
-     * @param string $default The default format
-     *
-     * @return string The request format
+     * {@inheritdoc}
      *
      * @api
      */
@@ -1514,9 +1477,7 @@ class Request
     }
 
     /**
-     * Checks if the request method is of specified type.
-     *
-     * @param string $method Uppercase request method (GET, POST etc).
+     * {@inheritdoc}
      *
      * @return bool
      */
@@ -1566,9 +1527,7 @@ class Request
     }
 
     /**
-     * Gets the Etags.
-     *
-     * @return array The entity tags
+     * {@inheritdoc}
      */
     public function getETags()
     {
@@ -1723,6 +1682,30 @@ class Request
     public function isXmlHttpRequest()
     {
         return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getServer()
+    {
+        return $this->server;
     }
 
     /*
@@ -1963,8 +1946,8 @@ class Request
         if (self::$requestFactory) {
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
-            if (!$request instanceof Request) {
-                throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
+            if (!$request instanceof RequestInterface) {
+                throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\RequestInterface.');
             }
 
             return $request;

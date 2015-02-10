@@ -202,7 +202,7 @@
                     };
 
                     /* check for older browsers */
-                    if (!window.addEventListener) {
+                    if (!this.addEventListener) {
                         this.attachEvent("onreadystatechange", readyStateChangeFunction, false);
                     } else {
                         this.addEventListener("readystatechange", readyStateChangeFunction, false);

@@ -65,11 +65,19 @@ class LengthValidator extends ConstraintValidator
         }
 
         if ($invalidCharset) {
-            $this->buildViolation($constraint->charsetMessage)
-                ->setParameter('{{ value }}', $this->formatValue($stringValue))
-                ->setParameter('{{ charset }}', $constraint->charset)
-                ->setInvalidValue($value)
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->charsetMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($stringValue))
+                    ->setParameter('{{ charset }}', $constraint->charset)
+                    ->setInvalidValue($value)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->charsetMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($stringValue))
+                    ->setParameter('{{ charset }}', $constraint->charset)
+                    ->setInvalidValue($value)
+                    ->addViolation();
+            }
 
             return;
         }

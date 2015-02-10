@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T01:49:28Z
+
+Can you rebase this to solve conflicts ? deprecation warnings have been merged
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-06T09:22:15Z
+
+@stof done :)
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-10T03:16:02Z
+
+I will rebase (again) on sunday.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-10T07:09:16Z
+
+@mickaelandrieu The 3.0 won't be merged until we fix all deprecation notices in 2.7, so no need to rebase now as it won't be merged soon.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-10T14:56:02Z
+
+Ok, so I will try to give you a hand on deprecation notices for 2.7 on sunday :)

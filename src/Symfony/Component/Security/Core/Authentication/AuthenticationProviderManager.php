@@ -49,7 +49,7 @@ class AuthenticationProviderManager implements AuthenticationManagerInterface
         }
 
         foreach ($providers as $provider) {
-            if (! $provider instanceof AuthenticationProviderInterface) {
+            if (!$provider instanceof AuthenticationProviderInterface) {
                 throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', get_class($provider)));
             }
         }

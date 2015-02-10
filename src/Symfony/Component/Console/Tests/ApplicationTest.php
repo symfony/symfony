@@ -405,6 +405,33 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFindAlternativeCommandsWithQuestion()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        putenv('COLUMNS=120');
+        putenv('SHELL_INTERACTIVE=1');
+        $application->add(new \FooCommand());
+        $application->add(new \Foo1Command());
+        $application->add(new \Foo2Command());
+
+        $input = new ArrayInput(array('command' => 'foo'));
+
+        $inputStream = fopen('php://memory', 'r+', false);
+        fwrite($inputStream, "1\n");
+        rewind($inputStream);
+        $input->setStream($inputStream);
+
+        $output = new StreamOutput(fopen('php://memory', 'w', false), StreamOutput::VERBOSITY_NORMAL, false);
+
+        $application->run($input, $output);
+
+        rewind($output->getStream());
+        $display = str_replace(PHP_EOL, "\n", stream_get_contents($output->getStream()));
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/application_unknown_command_question.txt', $display);
+    }
+
     public function testFindAlternativeCommandsWithAnAlias()
     {
         $fooCommand = new \FooCommand();

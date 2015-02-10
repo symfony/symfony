@@ -1749,8 +1749,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $request->headers->set('host', $host);
-        $this->assertEquals($host, $request->getHost());
+        $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+        $request->getHost();
         $this->assertLessThan(1, microtime(true) - $start);
+    }
+
+    /**
+     * @dataProvider getLongHostNames
+     */
+    public function testDoSAttackTiming($host)
+    {
+        $start = microtime(true);
+
+        $request = Request::create('/');
+        $request->headers->set('host', $host);
+        $callsPerSecond = 500;
+
+        for ($i = 0; $i < $callsPerSecond; $i++) {
+            try {
+                $request->getHost();
+                $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            } catch (\UnexpectedValueException $ex) {
+            }
+        }
+
+        $this->assertLessThan(1, microtime(true) - $start);
+        $this->assertEquals($callsPerSecond, $i);
     }
 
     /**
@@ -1782,6 +1806,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('[::1]', true),
             array('[::1]:80', true, '[::1]', 80),
             array(str_repeat('.', 101), false),
+            array('a.'.str_repeat('a', 253), false),
+            array('a.'.str_repeat('a', 64), false),
+            array(str_repeat('a', 63).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63), true),
+            array('a'.str_repeat('a', 63).'.'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 63), false),
+            array('áäéë.íïóö.úüçñ', false),
+            array('xn--1cagpi.xn--edaemm.xn--7cauzi', true), // Punycode representation of "áäéë.íïóö.úüçñ"
         );
     }
 
@@ -1789,7 +1819,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('a'.str_repeat('.a', 40000)),
-            array(str_repeat(':', 101)),
+            array(str_repeat(':', 1010)),
         );
     }
 }

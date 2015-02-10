@@ -145,7 +145,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'translator' => array(
                 'enabled' => false,
                 'fallbacks' => array('en'),
-                'logging' => true,
+                'logging' => array(
+                    'enabled' => true,
+                    'excluded_domains' => array(),
+                ),
             ),
             'validation' => array(
                 'enabled' => false,

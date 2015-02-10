@@ -650,7 +650,8 @@ class FrameworkExtension extends Extension
         $translator = $container->findDefinition('translator.default');
         $translator->addMethodCall('setFallbackLocales', array($config['fallbacks']));
 
-        $container->setParameter('translator.logging', $config['logging']);
+        $container->setParameter('translator.logging', $config['logging']['enabled']);
+        $container->setParameter('translator.logging_excluded_domains', $config['logging']['excluded_domains']);
 
         // Discover translation directories
         $dirs = array();

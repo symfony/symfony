@@ -53,4 +53,24 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
         $loggableTranslator = new LoggingTranslator($translator, $logger);
         $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10));
     }
+
+    public function testSkipLogForExcludedDomains()
+    {
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->never())
+            ->method('warning')
+            ->with('Translation not found.')
+        ;
+
+        $logger->expects($this->never())
+            ->method('debug')
+            ->with('Translation use fallback catalogue.')
+        ;
+
+        $translator = new Translator('ar');
+        $loggableTranslator = new LoggingTranslator($translator, $logger, array('foo', 'bar'));
+
+        $loggableTranslator->transChoice('some_message2', 10, array('%count%' => 10), 'foo');
+        $loggableTranslator->trans('bar', array(), 'bar');
+    }
 }

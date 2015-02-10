@@ -37,7 +37,9 @@ class LoggingTranslatorPass implements CompilerPassInterface
 
             $refClass = new \ReflectionClass($class);
             if ($refClass->implementsInterface('Symfony\Component\Translation\TranslatorInterface') && $refClass->implementsInterface('Symfony\Component\Translation\TranslatorBagInterface')) {
-                $container->getDefinition('translator.logging')->setDecoratedService('translator');
+                $loggingDefinition = $container->getDefinition('translator.logging');
+                $loggingDefinition->replaceArgument(2, $container->getParameter('translator.logging_excluded_domains'));
+                $loggingDefinition->setDecoratedService('translator');
             }
         }
     }

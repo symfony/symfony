@@ -40,4 +40,16 @@ class CommandNotFoundException extends \InvalidArgumentException implements Exce
     {
         return $this->alternatives;
     }
+
+    /**
+     * Returns abbreviated suggestions in string format.
+     *
+     * @param array $abbrevs Abbreviated suggestions to convert
+     *
+     * @return string A formatted string of abbreviated suggestions
+     */
+    protected function getAbbreviationSuggestions($abbrevs)
+    {
+        return sprintf('%s, %s%s', reset($abbrevs), next($abbrevs), count($abbrevs) > 2 ? sprintf(' and %d more', count($abbrevs) - 2) : '');
+    }
 }

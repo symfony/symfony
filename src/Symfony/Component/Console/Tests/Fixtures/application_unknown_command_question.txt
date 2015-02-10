@@ -1,0 +1,10 @@
+Command "foo" is not defined. Please select one of these suggested commands:
+  [0] foo:bar1
+  [1] foo:bar
+  [2] foo1:bar
+  [3] afoobar
+  [4] afoobar1
+  [5] afoobar2
+ > 1[K
+interact called
+called

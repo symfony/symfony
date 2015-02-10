@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by acasademont at 2015-01-05T11:25:25Z
+
+I like the overall simplification, no more weird behaviour depending on wether your packages contain ssl/non-ssl urls.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-05T15:42:41Z
+
+Will this replace `asset()`? So should we use `asset_path()` instead after the merge?
+
+I would also like to ask for a different name. Not that the name doesn't describe what the component is doing, but because this is already a very difficult thing to explain to beginners due to its naming. Lots of people are confusing `asset()` with Assetic. They don't know the difference, what they exactly do and how they work. Now, we add another thing named Asset. I think that'll confuse them even more.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-05T16:26:07Z
+
+@WouterJ I will submit a PR for the docs soon, but basically, `asset_path()` replaces `asset()`. Not sure if we can find another name as asset is used by many popular frameworks out there (Rails being one of them). The "Assetic" name is unfortunate but I don't see a way around it.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-06T01:32:55Z
+
+I found the issue about making asset version work with absolute URLs. It is https://github.com/symfony/symfony/issues/12474
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-06T06:48:58Z
+
+@stof thanks for finding it. As I said before, that's just not possible in a generic way. It's possible with the default version strategy which is to use the version as a query string, but we all know that this is not the way to go if you area serious about asset versioning and CDNs. Instead, you should use the `asset_version` Twig function (or the current `assets_version` one) to manually add the version to your URL. I've added a small paragraph about that in the description of the PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-10T11:12:26Z
+
+The decoupling part of this PR has been moved to #13354. This one will be rebased and merged after #13354
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-10T15:59:46Z
+
+Just rebased this PR so it's now just about adding the new Asset Component.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-19T16:57:55Z
+
+@acasademont @stof I've added a new commit where there is only one `asset` Twig function which tries to support the old and the new behavior. For the configuration, the old one is converted into the new one. The tests show the behavior differences between the two versions, and of course, the BC breaks explained in the description are still true.
+
+---------------------------------------------------------------------------
+
+by acasademont at 2015-01-19T17:16:39Z
+
+Thanks @fabpot, I really think that keeping the old name is much better!
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-19T18:07:12Z
+
+@fabpot the old Twig extension should be marked as deprecated
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-19T18:09:04Z
+
+the description of the PR needs to be updated, as it still talks about ``asset_path``

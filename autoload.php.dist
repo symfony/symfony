@@ -44,19 +44,23 @@ class DeprecationErrorHandler
                 $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
-                $type = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') ? 'legacy' : 'remaining';
+                $deprecationType = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') ? 'legacy' : 'remaining';
 
-                if ('legacy' === $type && 0 === (error_reporting() & E_USER_DEPRECATED)) {
-                    @++$deprecations[$type]['Silenced']['count'];
+                if ('legacy' === $deprecationType && 0 === (error_reporting() & E_USER_DEPRECATED)) {
+                    @++$deprecations[$deprecationType]['Silenced']['count'];
                 } else {
-                    @++$deprecations[$type][$msg]['count'];
-                    @++$deprecations[$type][$msg][$class.'::'.$method];
+                    @++$deprecations[$deprecationType][$msg]['count'];
+                    @++$deprecations[$deprecationType][$msg][$class.'::'.$method];
                 }
             } else {
-                $type = 'other';
-                @++$deprecations[$type][$msg]['count'];
+                $deprecationType = 'other';
+                @++$deprecations[$deprecationType][$msg]['count'];
             }
-            ++$deprecations[$type.'Count'];
+            ++$deprecations[$deprecationType.'Count'];
+
+            if ('legacy' !== $deprecationType) {
+                return PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
+            }
         };
         $oldErrorHandler = set_error_handler($deprecationHandler);
 

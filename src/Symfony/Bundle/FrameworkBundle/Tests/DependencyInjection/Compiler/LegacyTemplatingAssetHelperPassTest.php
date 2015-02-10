@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TemplatingAssetHelperPassTest extends \PHPUnit_Framework_TestCase
+class LegacyTemplatingAssetHelperPassTest extends \PHPUnit_Framework_TestCase
 {
     public function getScopesTests()
     {

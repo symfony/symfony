@@ -13,8 +13,13 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
-class AssetsHelperTest extends \PHPUnit_Framework_TestCase
+class LegacyAssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     public function testGetVersion()
     {
         $helper = new AssetsHelper(null, array(), 'foo');

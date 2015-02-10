@@ -47,6 +47,7 @@
         "symfony/yaml": "~2.7|~3.0"
     },
     "suggest": {
+        "symfony/asset": "",
         "symfony/console": "For using the console commands",
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",

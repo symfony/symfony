@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added support for the new Asset component (from Twig bridge)
+ * deprecated the assets extension (use the one from the Twig bridge instead)
+
 2.6.0
 -----
 

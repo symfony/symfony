@@ -24,21 +24,11 @@
                 <framework:mime-type>application/pdf</framework:mime-type>
             </framework:format>
         </framework:request>
-        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
+        <framework:templating cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>
             <framework:engine>twig</framework:engine>
-            <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
-            <framework:package name="images" version="1.0.0">
-                <framework:base-url>http://images1.example.com</framework:base-url>
-                <framework:base-url>http://images2.example.com</framework:base-url>
-            </framework:package>
-            <framework:package name="foo" version="1.0.0" />
-            <framework:package name="bar">
-                <framework:base-url>http://bar1.example.com</framework:base-url>
-                <framework:base-url>http://bar2.example.com</framework:base-url>
-            </framework:package>
             <framework:form>
                  <framework:resource>theme1</framework:resource>
                  <framework:resource>theme2</framework:resource>

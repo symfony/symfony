@@ -37,6 +37,7 @@
     },
     "suggest": {
         "symfony/finder": "",
+        "symfony/asset": "For using the AssetExtension",
         "symfony/form": "For using the FormExtension",
         "symfony/http-kernel": "For using the HttpKernelExtension",
         "symfony/routing": "For using the RoutingExtension",

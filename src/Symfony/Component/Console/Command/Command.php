@@ -11,13 +11,10 @@
 
 namespace Symfony\Component\Console\Command;
 
-use Symfony\Component\Console\Descriptor\TextDescriptor;
-use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -345,7 +342,7 @@ class Command
     }
 
     /**
-     * Gets the InputDefinition to be used to create XML and Text representations of this Command.
+     * Gets the InputDefinition to be used to create representations of this Command.
      *
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
@@ -598,49 +595,6 @@ class Command
     public function getHelper($name)
     {
         return $this->helperSet->get($name);
-    }
-
-    /**
-     * Returns a text representation of the command.
-     *
-     * @return string A string representing the command
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asText()
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $descriptor = new TextDescriptor();
-        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $descriptor->describe($output, $this, array('raw_output' => true));
-
-        return $output->fetch();
-    }
-
-    /**
-     * Returns an XML representation of the command.
-     *
-     * @param bool $asDom Whether to return a DOM or an XML string
-     *
-     * @return string|\DOMDocument An XML string representing the command
-     *
-     * @deprecated since version 2.3, to be removed in 3.0.
-     */
-    public function asXml($asDom = false)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $descriptor = new XmlDescriptor();
-
-        if ($asDom) {
-            return $descriptor->getCommandDocument($this);
-        }
-
-        $output = new BufferedOutput();
-        $descriptor->describe($output, $this);
-
-        return $output->fetch();
     }
 
     /**

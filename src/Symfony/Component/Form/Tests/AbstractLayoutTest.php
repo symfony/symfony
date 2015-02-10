@@ -1898,4 +1898,18 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
         $this->assertSame('<form method="get" action="http://example.com/directory" class="foobar">', $html);
     }
+
+    public function testTranslatedAttributes()
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('firstName', 'text', array('attr' => array('title' => 'Foo')))
+            ->add('lastName', 'text', array('attr' => array('placeholder' => 'Bar')))
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderForm($view);
+
+        $this->assertMatchesXpath($html, '/form//input[@title="[trans]Foo[/trans]"]');
+        $this->assertMatchesXpath($html, '/form//input[@placeholder="[trans]Bar[/trans]"]');
+    }
 }

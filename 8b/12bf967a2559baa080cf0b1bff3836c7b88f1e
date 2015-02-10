@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-10T16:16:20Z
+
+It does not make sense to put the form icon on the far left of the toolbar; we have some logic in the icon orders.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-10T16:17:12Z
+
+Sorry, looks like you fix a regression.

@@ -189,31 +189,23 @@
 
                     requestStack.push(stackElement);
 
+                    var readyStateChangeFunction = function () {
+                        if (self.readyState == 4) {
+                            stackElement.duration = new Date() - stackElement.start;
+                            stackElement.loading = false;
+                            stackElement.error = self.status < 200 || self.status >= 400;
+                            stackElement.profile = self.getResponseHeader("X-Debug-Token");
+                            stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
+
+                            Sfjs.renderAjaxRequests();
+                        }
+                    };
+
                     /* check for older browsers */
                     if (!window.addEventListener) {
-                        this.attachEvent("readystatechange", function () {
-                            if (self.readyState == 4) {
-                                stackElement.duration = new Date() - stackElement.start;
-                                stackElement.loading = false;
-                                stackElement.error = self.status < 200 || self.status >= 400;
-                                stackElement.profile = self.getResponseHeader("X-Debug-Token");
-                                stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
-
-                                Sfjs.renderAjaxRequests();
-                            }
-                        }, false);
+                        this.attachEvent("onreadystatechange", readyStateChangeFunction, false);
                     } else {
-                        this.addEventListener("readystatechange", function () {
-                            if (self.readyState == 4) {
-                                stackElement.duration = new Date() - stackElement.start;
-                                stackElement.loading = false;
-                                stackElement.error = self.status < 200 || self.status >= 400;
-                                stackElement.profile = self.getResponseHeader("X-Debug-Token");
-                                stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
-
-                                Sfjs.renderAjaxRequests();
-                            }
-                        }, false);
+                        this.addEventListener("readystatechange", readyStateChangeFunction, false);
                     }
 
                     Sfjs.renderAjaxRequests();

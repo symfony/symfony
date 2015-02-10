@@ -43,5 +43,5 @@ which is distributed under the BSD license.
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/CssSelector/
-    $ composer.phar install
+    $ composer install
     $ phpunit

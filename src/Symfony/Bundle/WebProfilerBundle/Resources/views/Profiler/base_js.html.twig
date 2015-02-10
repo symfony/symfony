@@ -189,7 +189,7 @@
 
                     requestStack.push(stackElement);
 
-                    this.addEventListener("readystatechange", function() {
+                    var readyStateChangeFunction = function () {
                         if (self.readyState == 4) {
                             stackElement.duration = new Date() - stackElement.start;
                             stackElement.loading = false;
@@ -199,7 +199,14 @@
 
                             Sfjs.renderAjaxRequests();
                         }
-                    }, false);
+                    };
+
+                    /* check for older browsers */
+                    if (!this.addEventListener) {
+                        this.attachEvent("onreadystatechange", readyStateChangeFunction, false);
+                    } else {
+                        this.addEventListener("readystatechange", readyStateChangeFunction, false);
+                    }
 
                     Sfjs.renderAjaxRequests();
                 }

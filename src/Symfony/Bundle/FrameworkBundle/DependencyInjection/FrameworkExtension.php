@@ -49,6 +49,7 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
+        $loader->load('assets.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -100,6 +101,10 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+
+        if (isset($config['assets'])) {
+            $this->registerAssetsConfiguration($config['assets'], $container, $loader);
+        }
 
         if (isset($config['templating'])) {
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
@@ -469,23 +474,6 @@ class FrameworkExtension extends Extension
         $container->setParameter('templating.helper.code.file_link_format', isset($links[$ide]) ? $links[$ide] : $ide);
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 
-        $loader->load('old_assets.xml');
-
-        // create package definitions and add them to the assets helper
-        $defaultPackage = $this->createTemplatingPackageDefinition($container, $config['assets_base_urls']['http'], $config['assets_base_urls']['ssl'], $config['assets_version'], $config['assets_version_format']);
-        $container->setDefinition('templating.asset.default_package', $defaultPackage);
-        $namedPackages = array();
-        foreach ($config['packages'] as $name => $package) {
-            $namedPackage = $this->createTemplatingPackageDefinition($container, $package['base_urls']['http'], $package['base_urls']['ssl'], $package['version'], $package['version_format'], $name);
-            $container->setDefinition('templating.asset.package.'.$name, $namedPackage);
-            $namedPackages[$name] = new Reference('templating.asset.package.'.$name);
-        }
-
-        $container->getDefinition('templating.helper.assets')->setArguments(array(
-            new Reference('templating.asset.default_package'),
-            $namedPackages,
-        ));
-
         if ($container->getParameter('kernel.debug')) {
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
 
@@ -566,70 +554,80 @@ class FrameworkExtension extends Extension
     }
 
     /**
+     * Loads the assets configuration.
+     *
+     * @param array            $config    A assets configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
+
+        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
+        $container->setDefinition('assets._default_package', $defaultPackage);
+
+        $namedPackages = array();
+        foreach ($config['packages'] as $name => $package) {
+            if (null === $package['version']) {
+                $version = $defaultVersion;
+            } else {
+                $format = $package['version_format'] ?: $config['version_format'];
+                $version = $this->createVersion($container, $package['version'], $format, $name);
+            }
+
+            $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
+            $namedPackages[$name] = new Reference('assets._package_'.$name);
+        }
+
+        $container->getDefinition('assets.packages')
+            ->replaceArgument(0, new Reference('assets._default_package'))
+            ->replaceArgument(1, $namedPackages)
+        ;
+    }
+
+    /**
      * Returns a definition for an asset package.
      */
-    private function createTemplatingPackageDefinition(ContainerBuilder $container, array $httpUrls, array $sslUrls, $version, $format, $name = null)
+    private function createPackageDefinition($basePath, array $baseUrls, Reference $version)
     {
-        if (!$httpUrls) {
-            $package = new DefinitionDecorator('templating.asset.path_package');
-            $package
+        if ($basePath && $baseUrls) {
+            throw new \LogicException('An asset package cannot have base URLs and base paths.');
+        }
+
+        if (!$baseUrls) {
+            $package = new DefinitionDecorator('assets.path_package');
+
+            return $package
                 ->setPublic(false)
-                ->setScope('request')
+                ->replaceArgument(0, $basePath)
                 ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
-
-            return $package;
-        }
-
-        if ($httpUrls == $sslUrls) {
-            $package = new DefinitionDecorator('templating.asset.url_package');
-            $package
-                ->setPublic(false)
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
-
-            return $package;
-        }
-
-        $prefix = $name ? 'templating.asset.package.'.$name : 'templating.asset.default_package';
-
-        $httpPackage = new DefinitionDecorator('templating.asset.url_package');
-        $httpPackage
-            ->replaceArgument(0, $httpUrls)
-            ->replaceArgument(1, $version)
-            ->replaceArgument(2, $format)
-        ;
-        $container->setDefinition($prefix.'.http', $httpPackage);
-
-        if ($sslUrls) {
-            $sslPackage = new DefinitionDecorator('templating.asset.url_package');
-            $sslPackage
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
-            ;
-        } else {
-            $sslPackage = new DefinitionDecorator('templating.asset.path_package');
-            $sslPackage
-                ->setScope('request')
-                ->replaceArgument(1, $version)
-                ->replaceArgument(2, $format)
             ;
         }
-        $container->setDefinition($prefix.'.ssl', $sslPackage);
 
-        $package = new DefinitionDecorator('templating.asset.request_aware_package');
-        $package
+        $package = new DefinitionDecorator('assets.url_package');
+
+        return $package
             ->setPublic(false)
-            ->setScope('request')
-            ->replaceArgument(1, $prefix.'.http')
-            ->replaceArgument(2, $prefix.'.ssl')
+            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(1, $version)
         ;
+    }
 
-        return $package;
+    private function createVersion(ContainerBuilder $container, $version, $format, $name)
+    {
+        if (null === $version) {
+            return new Reference('assets.empty_version_strategy');
+        }
+
+        $def = new DefinitionDecorator('assets.static_version_strategy');
+        $def
+            ->replaceArgument(0, $version)
+            ->replaceArgument(1, $format)
+        ;
+        $container->setDefinition('assets._version_'.$name, $def);
+
+        return new Reference('assets._version_'.$name);
     }
 
     /**

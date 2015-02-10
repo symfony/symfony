@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Validator\Validation;
@@ -186,21 +188,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('templating.name_parser'), '->registerTemplatingConfiguration() loads templating.xml');
 
-        // default package should have one HTTP base URL and path package SSL URL
-        $this->assertTrue($container->hasDefinition('templating.asset.default_package.http'));
-        $package = $container->getDefinition('templating.asset.default_package.http');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\DefinitionDecorator', $package);
-        $this->assertEquals('templating.asset.url_package', $package->getParent());
-        $arguments = array_values($package->getArguments());
-        $this->assertEquals(array('http://cdn.example.com'), $arguments[0]);
-        $this->assertEquals('SomeVersionScheme', $arguments[1]);
-        $this->assertEquals('%%s?%%s', $arguments[2]);
-
-        $this->assertTrue($container->hasDefinition('templating.asset.default_package.ssl'));
-        $package = $container->getDefinition('templating.asset.default_package.ssl');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\DefinitionDecorator', $package);
-        $this->assertEquals('templating.asset.path_package', $package->getParent());
-
         $this->assertEquals('templating.engine.delegating', (string) $container->getAlias('templating'), '->registerTemplatingConfiguration() configures delegating loader if multiple engines are provided');
 
         $this->assertEquals($container->getDefinition('templating.loader.chain'), $container->getDefinition('templating.loader.wrapped'), '->registerTemplatingConfiguration() configures loader chain if multiple loaders are provided');
@@ -216,11 +203,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
-    public function testTemplatingAssetsHelperScopeDependsOnPackageArgumentScopes()
+    public function testLegacyTemplatingAssets()
     {
-        $container = $this->createContainerFromFile('templating_url_package');
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-        $this->assertNotEquals('request', $container->getDefinition('templating.helper.assets')->getScope(), '->registerTemplatingConfiguration() does not set request scope on assets helper if no packages are request-scoped');
+        $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
+    }
+
+    public function testAssets()
+    {
+        $this->checkAssetsPackages($this->createContainerFromFile('assets'));
     }
 
     public function testTranslator()
@@ -527,5 +519,72 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->compile();
 
         return $container;
+    }
+
+    protected function createContainerFromClosure($closure, $data = array())
+    {
+        $container = $this->createContainer($data);
+        $container->registerExtension(new FrameworkExtension());
+        $loader = new ClosureLoader($container);
+        $loader->load($closure);
+
+        $container->getCompilerPassConfig()->setOptimizationPasses(array());
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
+
+        return $container;
+    }
+
+    private function checkAssetsPackages(ContainerBuilder $container, $legacy = false)
+    {
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+
+        // packages
+        $packages = $packages->getArgument(1);
+        $this->assertCount($legacy ? 3 : 4, $packages);
+
+        if (!$legacy) {
+            $package = $container->getDefinition($packages['images_path']);
+            $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
+        }
+
+        $package = $container->getDefinition($packages['images']);
+        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+
+        $package = $container->getDefinition($packages['foo']);
+        $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
+
+        $package = $container->getDefinition($packages['bar']);
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+    }
+
+    private function assertPathPackage(ContainerBuilder $container, Definition $package, $basePath, $version, $format)
+    {
+        $this->assertEquals('assets.path_package', $package->getParent());
+        $this->assertEquals($basePath, $package->getArgument(0));
+        $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
+    }
+
+    private function assertUrlPackage(ContainerBuilder $container, Definition $package, $baseUrls, $version, $format)
+    {
+        $this->assertEquals('assets.url_package', $package->getParent());
+        $this->assertEquals($baseUrls, $package->getArgument(0));
+        $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
+    }
+
+    private function assertVersionStrategy(ContainerBuilder $container, Reference $reference, $version, $format)
+    {
+        $versionStrategy = $container->getDefinition($reference);
+        if (null === $version) {
+            $this->assertEquals('assets.empty_version_strategy', (string) $reference);
+        } else {
+            $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
+            $this->assertEquals($version, $versionStrategy->getArgument(0));
+            $this->assertEquals($format, $versionStrategy->getArgument(1));
+        }
     }
 }

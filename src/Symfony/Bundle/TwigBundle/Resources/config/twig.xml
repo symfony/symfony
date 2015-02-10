@@ -11,7 +11,6 @@
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
         <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
-        <parameter key="twig.extension.assets.class">Symfony\Bundle\TwigBundle\Extension\AssetsExtension</parameter>
         <parameter key="twig.extension.actions.class">Symfony\Bundle\TwigBundle\Extension\ActionsExtension</parameter>
         <parameter key="twig.extension.code.class">Symfony\Bridge\Twig\Extension\CodeExtension</parameter>
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
@@ -86,10 +85,10 @@
             <argument type="service" id="translator" />
         </service>
 
-        <service id="twig.extension.assets" class="%twig.extension.assets.class%" public="false">
+        <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="service_container" />
-            <argument type="service" id="router.request_context" on-invalid="null" />
+            <argument type="service" id="assets.packages" />
+            <argument type="service" id="twig.extension.httpfoundation" />
         </service>
 
         <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">

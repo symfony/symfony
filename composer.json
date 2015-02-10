@@ -22,6 +22,7 @@
         "psr/log": "~1.0"
     },
     "replace": {
+        "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",

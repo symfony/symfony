@@ -7,9 +7,9 @@
          bootstrap="vendor/autoload.php"
 >
     <php>
-        <!-- Silence E_USER_DEPRECATED (-16385 == -1 & ~E_USER_DEPRECATED) -->
-        <ini name="error_reporting" value="-16385"/>
+        <ini name="error_reporting" value="-1"/>
     </php>
+
     <testsuites>
         <testsuite name="Symfony PropertyAccess Component Test Suite">
             <directory>./Tests/</directory>
@@ -22,6 +22,7 @@
             <exclude>
                 <directory>./Resources</directory>
                 <directory>./Tests</directory>
+                <directory>./vendor</directory>
             </exclude>
         </whitelist>
     </filter>

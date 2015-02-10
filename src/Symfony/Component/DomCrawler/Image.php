@@ -20,15 +20,15 @@ class Image extends AbstractUriElement
 {
     protected function getRawUri()
     {
-        return $this->node->getAttribute('src');
+        return $this->getNode()->getAttribute('src');
     }
 
-    protected function setNode(\DOMElement $node)
+    protected function findNode(\DOMElement $node)
     {
         if ('img' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to visualize a "%s" tag.', $node->nodeName));
         }
 
-        $this->node = $node;
+        return $node;
     }
 }

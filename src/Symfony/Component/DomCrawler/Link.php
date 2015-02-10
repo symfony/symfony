@@ -22,15 +22,15 @@ class Link extends AbstractUriElement
 {
     protected function getRawUri()
     {
-        return $this->node->getAttribute('href');
+        return $this->getNode()->getAttribute('href');
     }
 
-    protected function setNode(\DOMElement $node)
+    protected function findNode(\DOMElement $node)
     {
         if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
             throw new \LogicException(sprintf('Unable to navigate from a "%s" tag.', $node->nodeName));
         }
 
-        $this->node = $node;
+        return $node;
     }
 }

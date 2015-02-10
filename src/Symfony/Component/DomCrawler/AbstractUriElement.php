@@ -21,19 +21,19 @@ namespace Symfony\Component\DomCrawler;
 abstract class AbstractUriElement implements UriElementInterface
 {
     /**
+     * @var string The URI of the page where the element is embedded (or the base href)
+     */
+    protected $currentUri;
+
+    /**
      * @var \DOMElement
      */
-    protected $node;
+    private $node;
 
     /**
      * @var string The method to use for the element URI
      */
-    protected $method;
-
-    /**
-     * @var string The URI of the page where the element is embedded (or the base href)
-     */
-    protected $currentUri;
+    private $method;
 
     /**
      * Constructor.
@@ -52,7 +52,7 @@ abstract class AbstractUriElement implements UriElementInterface
             throw new \InvalidArgumentException(sprintf('Current URI must be an absolute URL ("%s").', $currentUri));
         }
 
-        $this->setNode($node);
+        $this->node = $this->findNode($node);
         $this->method = $method ? strtoupper($method) : null;
         $this->currentUri = $currentUri;
     }
@@ -152,8 +152,9 @@ abstract class AbstractUriElement implements UriElementInterface
      * Sets current \DOMElement instance.
      *
      * @param \DOMElement $node A \DOMElement instance
+     * @return \DOMElement
      */
-    abstract protected function setNode(\DOMElement $node);
+    abstract protected function findNode(\DOMElement $node);
 
     /**
      * Removes the query string and the anchor from the given uri.

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+* [BC BREAK] `Form` now extends `AbstractUriElement` instead of `Link`.
+* [BC BREAK] The `node` and `method` properties of `AbstractUriElement` are now private (they already have public getters).
+* [BC BREAK] Since `node` is private, `setNode` in child classes can't set the `node` property directly, thus `setNode` have been renamed to `findNode` and now returns the node instead of setting the property.
+
 2.7.0
 -----
 

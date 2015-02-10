@@ -281,14 +281,7 @@
                     }
 
                     // attach listener for expanding/collapsing the target
-                    buttons[i].addEventListener('click', function (e) {
-                        toggle(this);
-
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        return false;
-                    });
+                    clickHandler(buttons[i], toggle);
 
                     if (states.hasOwnProperty(targetId)) {
                         // open or collapse based on stored data
@@ -380,14 +373,7 @@
                         throw "Tab target " + targetId + " does not exist";
                     }
 
-                    tabs[i].addEventListener('click', function (e) {
-                        select(this);
-
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        return false;
-                    });
+                    clickHandler(buttons[i], select);
 
                     Sfjs.addClass(target, 'hidden');
                 }
@@ -405,7 +391,26 @@
     }
 
     var tabTarget = new TabView(),
-        toggler = new Toggler(new JsonStorage(sessionStorage));
+        toggler = new Toggler(new JsonStorage(sessionStorage)),
+        clickHandler = function (element, callback) {
+            Sfjs.addEventListener(element, 'click', function (e) {
+                if (!e) {
+                    e = window.event;
+                }
+
+                callback(e.target || e.srcElement);
+
+                if (e.preventDefault) {
+                    e.preventDefault();
+                } else {
+                    e.returnValue = false;
+                }
+
+                e.stopPropagation();
+
+                return false;
+            });
+        };
 
     tabTarget.initTabs(document.querySelectorAll('.tree .tree-inner'));
     toggler.initButtons(document.querySelectorAll('a.toggle-button'));

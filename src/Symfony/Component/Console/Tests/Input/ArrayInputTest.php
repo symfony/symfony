@@ -38,6 +38,15 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($input->hasParameterOption('--foo'), '->hasParameterOption() returns true if an option is present in the passed parameters');
     }
 
+    public function testGetParameterOption()
+    {
+        $input = new ArrayInput(array('name' => 'Fabien', '--foo' => 'bar'));
+        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+
+        $input = new ArrayInput(array('Fabien', '--foo' => 'bar'));
+        $this->assertEquals('bar', $input->getParameterOption('--foo'), '->getParameterOption() returns the option of specified name');
+    }
+
     public function testParseArguments()
     {
         $input = new ArrayInput(array('name' => 'foo'), new InputDefinition(array(new InputArgument('name'))));

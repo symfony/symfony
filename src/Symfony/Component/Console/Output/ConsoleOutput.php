@@ -50,7 +50,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
 
         parent::__construct(fopen($outputStream, 'w'), $verbosity, $decorated, $formatter);
 
-        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, $this->getFormatter());
+        $this->stderr = new StreamOutput(fopen('php://stderr', 'w'), $verbosity, $decorated, clone $this->getFormatter());
     }
 
     /**
@@ -68,7 +68,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function setFormatter(OutputFormatterInterface $formatter)
     {
         parent::setFormatter($formatter);
-        $this->stderr->setFormatter($formatter);
+        $this->stderr->setFormatter(clone $formatter);
     }
 
     /**

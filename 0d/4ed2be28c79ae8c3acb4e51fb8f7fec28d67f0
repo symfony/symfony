@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-20T10:15:40Z
+
+@hhamon that should be build into the container itself. I did this in the controller, because the solution is very different for controller and services and it is pretty simple and supported by all Symfony versions.

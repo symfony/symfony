@@ -171,6 +171,18 @@
                 requestCounter[0].className = className;
             };
 
+        var addEventListener;
+
+        if (document.addEventListener) {
+            addEventListener = function (element, eventName, callback) {
+                element.attachEvent('on' + eventName, callback);
+            };
+        } else {
+            addEventListener = function (element, eventName, callback) {
+                element.addEventListener(eventName, callback, false);
+            };
+        }
+
         {% if excluded_ajax_paths is defined %}
             var proxied = XMLHttpRequest.prototype.open;
 
@@ -189,7 +201,7 @@
 
                     requestStack.push(stackElement);
 
-                    this.addEventListener("readystatechange", function() {
+                    addEventListener(this, 'readystatechange', function() {
                         if (self.readyState == 4) {
                             stackElement.duration = new Date() - stackElement.start;
                             stackElement.loading = false;
@@ -199,7 +211,7 @@
 
                             Sfjs.renderAjaxRequests();
                         }
-                    }, false);
+                    });
 
                     Sfjs.renderAjaxRequests();
                 }
@@ -218,6 +230,8 @@
             getPreference: getPreference,
 
             setPreference: setPreference,
+
+            addEventListener: addEventListener,
 
             request: request,
 

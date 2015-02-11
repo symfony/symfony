@@ -30,11 +30,7 @@ class XmlFileLoader extends FileLoader
     protected $classes = null;
 
     /**
-     * Loads validation metadata using the metadata defined in the XML file.
-     *
-     * @param ClassMetadata $metadata The metadata to load
-     *
-     * @return bool Whether the loader succeeded
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

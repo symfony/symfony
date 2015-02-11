@@ -36,11 +36,7 @@ class YamlFileLoader extends FileLoader
     private $yamlParser;
 
     /**
-     * Loads validation metadata using the metadata defined in the YAML file.
-     *
-     * @param ClassMetadata $metadata The metadata to load
-     *
-     * @return bool Whether the loader succeeded
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

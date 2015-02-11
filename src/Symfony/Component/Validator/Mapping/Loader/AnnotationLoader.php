@@ -30,22 +30,13 @@ class AnnotationLoader implements LoaderInterface
      */
     protected $reader;
 
-    /**
-     * Creates a new loader.
-     *
-     * @param Reader $reader The annotation reader to use.
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
     }
 
     /**
-     * Loads the metadata using annotations defined in the class.
-     *
-     * @param ClassMetadata $metadata The class metadata to load
-     *
-     * @return bool Whether the loader succeeded
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

@@ -47,12 +47,7 @@ class LoaderChain implements LoaderInterface
     }
 
     /**
-     * Calls {@link LoaderInterface::loadClassMetadata()} on all loaders in
-     * the chain.
-     *
-     * @param ClassMetadata $metadata The metadata to load
-     *
-     * @return bool Whether the loader succeeded
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

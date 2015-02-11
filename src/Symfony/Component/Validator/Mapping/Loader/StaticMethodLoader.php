@@ -39,13 +39,7 @@ class StaticMethodLoader implements LoaderInterface
     }
 
     /**
-     * Loads validation metadata by calling a static method in the class.
-     *
-     * The name of the static method is passed to {@link __construct()}.
-     *
-     * @param ClassMetadata $metadata The metadata to load
-     *
-     * @return bool Whether the loader succeeded
+     * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadata $metadata)
     {

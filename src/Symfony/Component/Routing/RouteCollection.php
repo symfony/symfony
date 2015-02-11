@@ -122,17 +122,22 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * routes of the added collection.
      *
      * @param RouteCollection $collection A RouteCollection instance
-     * @param string $name
+     * @param string $newName
      *
      * @api
      */
-    public function addCollection(RouteCollection $collection, $name = '')
+    public function addCollection(RouteCollection $collection, $newName = null)
     {
         // we need to remove all routes with the same names first because just replacing them
         // would not place the new route at the end of the merged array
-        foreach ($collection->all() as $oldName => $route) {
-            unset($this->routes[$oldName]);
-            $this->routes[sprintf('%s_%s', $oldName, $name)] = $route;
+        foreach ($collection->all() as $name => $route) {
+            unset($this->routes[$name]);
+
+            if (! $newName) {
+                $name = sprintf('%s_%s', $name, $newName);
+            }
+
+            $this->routes[$name] = $route;
         }
 
         $this->resources = array_merge($this->resources, $collection->getResources());

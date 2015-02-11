@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-10T12:49:27Z
+
+Is there a reason not to use the common polyfill? That would catch more edge cases
+
+---------------------------------------------------------------------------
+
+by aik099 at 2015-02-10T13:42:20Z
+
+> Is there a reason not to use the common polyfill? That would catch more edge cases
+
+I have no idea, why we're using plain JS here. I guess jQuery isn't used to prevent any conflicts with jQuery used from website slice up on which profiler is included.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-10T13:50:01Z
+
+I meant plain polyfills
+
+---------------------------------------------------------------------------
+
+by aik099 at 2015-02-10T14:09:28Z
+
+Some of polyfills, but I don't think that we need one yet:
+
+* http://css-tricks.com/snippets/javascript/addeventlistner-polyfill/
+* https://github.com/jwmcpeak/EventShim
+* https://gist.github.com/2864711/946225eb3822c203e8d6218095d888aac5e1748e
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-10T16:25:59Z
+
+@aik099 Looks like @stof does not have any more comments :)
+
+---------------------------------------------------------------------------
+
+by aik099 at 2015-02-10T16:34:17Z
+
+All done, but polyfill, which is a bit unclear. I must remind, that I haven't tested this anywhere, so if you can please test in IE and any other browser.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-10T16:37:05Z
+
+:+1:

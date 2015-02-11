@@ -46,7 +46,6 @@
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",
-        "symfony/propel1-bridge": "self.version",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",

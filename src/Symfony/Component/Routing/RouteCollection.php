@@ -133,7 +133,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
         foreach ($collection->all() as $name => $route) {
             unset($this->routes[$name]);
 
-            if (! $newName) {
+            if ($newName) {
                 $name = sprintf('%s_%s', $name, $newName);
             }
 

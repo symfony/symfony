@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-01-23T11:10:23Z
+
+Would you be able to cover this with tests?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-23T11:31:26Z
+
+@jakzal tests added.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-26T14:39:19Z
+
+For Traversable objects, it is already possible to customize it
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-26T15:10:47Z
+
+@stof right. Fixed the PR description and the PHPDoc.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-02T22:16:00Z
+
+The Travis failure seems unrelated with this PR.

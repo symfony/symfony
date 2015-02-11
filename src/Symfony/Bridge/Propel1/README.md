@@ -9,5 +9,5 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Bridge/Propel1/
-    $ composer.phar install
+    $ composer install
     $ phpunit

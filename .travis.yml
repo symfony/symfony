@@ -36,10 +36,10 @@ before_install:
     - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
 install:
-    - if [ "$components" = "no" ]; then composer --prefer-source --dev install; fi;
+    - if [ "$components" = "no" ]; then composer --prefer-source install; fi;
 
 script:
     - if [ "$components" = "no" ]; then ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$components" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --dev update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --dev --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

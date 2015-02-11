@@ -23,7 +23,7 @@
         "symfony/http-foundation": "~2.4.9|~2.5,>=2.5.4",
         "symfony/http-kernel": "~2.6",
         "symfony/filesystem": "~2.3",
-        "symfony/routing": "~2.2",
+        "symfony/routing": "~2.3",
         "symfony/security-core": "~2.6",
         "symfony/security-csrf": "~2.6",
         "symfony/stopwatch": "~2.3",

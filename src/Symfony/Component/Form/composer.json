@@ -37,9 +37,8 @@
         "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form\\": "" }
+        "psr-4": { "Symfony\\Component\\Form\\": "" }
     },
-    "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

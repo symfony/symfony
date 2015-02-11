@@ -27,9 +27,8 @@
         "symfony/stopwatch": "~2.2|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Propel1\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Propel1\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Propel1",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

@@ -20,9 +20,8 @@
         "symfony/filesystem": "~2.3|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Config\\": "" }
+        "psr-4": { "Symfony\\Component\\Config\\": "" }
     },
-    "target-dir": "Symfony/Component/Config",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

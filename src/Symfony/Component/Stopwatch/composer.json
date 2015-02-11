@@ -19,9 +19,8 @@
         "php": ">=5.3.9"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Stopwatch\\": "" }
+        "psr-4": { "Symfony\\Component\\Stopwatch\\": "" }
     },
-    "target-dir": "Symfony/Component/Stopwatch",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

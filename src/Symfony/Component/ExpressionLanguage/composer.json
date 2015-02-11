@@ -19,9 +19,8 @@
         "php": ">=5.3.9"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\ExpressionLanguage\\": "" }
+        "psr-4": { "Symfony\\Component\\ExpressionLanguage\\": "" }
     },
-    "target-dir": "Symfony/Component/ExpressionLanguage",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

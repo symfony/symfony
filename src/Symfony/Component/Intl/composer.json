@@ -33,11 +33,10 @@
         "ext-intl": "to use the component with locales other than \"en\""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Intl\\": "" },
-        "classmap": [ "Symfony/Component/Intl/Resources/stubs" ],
-        "files": [ "Symfony/Component/Intl/Resources/stubs/functions.php" ]
+        "psr-4": { "Symfony\\Component\\Intl\\": "" },
+        "classmap": [ "Resources/stubs" ],
+        "files": [ "Resources/stubs/functions.php" ]
     },
-    "target-dir": "Symfony/Component/Intl",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

@@ -31,9 +31,8 @@
         "symfony/framework-bundle": "~2.7|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" }
     },
-    "target-dir": "Symfony/Bundle/TwigBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

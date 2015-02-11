@@ -30,9 +30,8 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\EventDispatcher\\": "" }
+        "psr-4": { "Symfony\\Component\\EventDispatcher\\": "" }
     },
-    "target-dir": "Symfony/Component/EventDispatcher",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

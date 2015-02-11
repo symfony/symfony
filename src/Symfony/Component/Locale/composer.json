@@ -20,9 +20,8 @@
         "symfony/intl": "~2.3|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Locale\\": "" }
+        "psr-4": { "Symfony\\Component\\Locale\\": "" }
     },
-    "target-dir": "Symfony/Component/Locale",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

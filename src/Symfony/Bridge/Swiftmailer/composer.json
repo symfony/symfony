@@ -23,9 +23,8 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Swiftmailer\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Swiftmailer",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

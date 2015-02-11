@@ -35,9 +35,8 @@
         "ircmaxell/password-compat": "For using the BCrypt password encoder in PHP <5.5"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\Core\\": "" }
+        "psr-4": { "Symfony\\Component\\Security\\Core\\": "" }
     },
-    "target-dir": "Symfony/Component/Security/Core",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

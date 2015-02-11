@@ -80,7 +80,7 @@
         "egulias/email-validator": "~1.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\": "src/" },
+        "psr-4": { "Symfony\\": "src/Symfony/" },
         "classmap": [
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"

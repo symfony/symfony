@@ -31,9 +31,8 @@
         "symfony/config": "For using the XML mapping loader."
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Serializer\\": "" }
+        "psr-4": { "Symfony\\Component\\Serializer\\": "" }
     },
-    "target-dir": "Symfony/Component/Serializer",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

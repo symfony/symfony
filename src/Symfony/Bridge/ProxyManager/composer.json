@@ -24,11 +24,8 @@
         "symfony/config": "~2.3|~3.0.0"
     },
     "autoload": {
-        "psr-0": {
-            "Symfony\\Bridge\\ProxyManager\\": ""
-        }
+        "psr-4": { "Symfony\\Bridge\\ProxyManager\\": "" }
     },
-    "target-dir": "Symfony/Bridge/ProxyManager",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

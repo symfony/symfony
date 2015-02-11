@@ -57,9 +57,8 @@
         "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
     },
-    "target-dir": "Symfony/Bundle/FrameworkBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

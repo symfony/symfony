@@ -49,9 +49,8 @@
         "symfony/expression-language": "For using the ExpressionExtension"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Twig\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Twig\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Twig",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

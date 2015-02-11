@@ -47,7 +47,7 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
                 'fileExcerpt' => false,
             ),
         );
-        $this->assertSame($xDump, $dump);
+        $this->assertEquals($xDump, $dump);
 
         $this->assertStringMatchesFormat(
             'a:1:{i:0;a:5:{s:4:"data";O:39:"Symfony\Component\VarDumper\Cloner\Data":4:{s:45:"Symfony\Component\VarDumper\Cloner\Datadata";a:1:{i:0;a:1:{i:0;i:123;}}s:49:"Symfony\Component\VarDumper\Cloner\DatamaxDepth";i:%i;s:57:"Symfony\Component\VarDumper\Cloner\DatamaxItemsPerDepth";i:%i;s:54:"Symfony\Component\VarDumper\Cloner\DatauseRefHandles";i:%i;}s:4:"name";s:25:"DumpDataCollectorTest.php";s:4:"file";s:%a',

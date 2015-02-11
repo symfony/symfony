@@ -49,10 +49,8 @@ class QuestionHelper extends Helper
             return $this->doAsk($output, $question);
         }
 
-        $that = $this;
-
-        $interviewer = function () use ($output, $question, $that) {
-            return $that->doAsk($output, $question);
+        $interviewer = function () use ($output, $question) {
+            return $this->doAsk($output, $question);
         };
 
         return $this->validateAttempts($interviewer, $output, $question);

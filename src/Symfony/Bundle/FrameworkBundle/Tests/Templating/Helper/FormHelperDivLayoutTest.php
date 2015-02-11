@@ -62,15 +62,6 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->form($view, $vars);
     }
 
-    protected function renderEnctype(FormView $view)
-    {
-        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
-            $this->markTestSkipped(sprintf("Deprecated method %s->enctype() is not implemented.", get_class($form)));
-        }
-
-        return (string) $form->enctype($view);
-    }
-
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         return (string) $this->engine->get('form')->label($view, $label, $vars);

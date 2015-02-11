@@ -284,12 +284,12 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $loader->load('profiling.xml');
+        $loader->load('collectors.xml');
+
         if (true === $this->formConfigEnabled) {
             $loader->load('form_debug.xml');
         }
-
-        $loader->load('profiling.xml');
-        $loader->load('collectors.xml');
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
         $container->setParameter('profiler_listener.only_master_requests', $config['only_master_requests']);

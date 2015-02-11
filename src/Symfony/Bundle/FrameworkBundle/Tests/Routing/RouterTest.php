@@ -152,6 +152,24 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testParametersNull()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setHost('%parameter.foo%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getServiceContainer($routes);
+        $sc->setParameter('parameter.foo', null);
+
+        $router = new Router($sc, 'foo');
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertNull($route->getHost());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
      * @expectedExceptionMessage You have requested a non-existent parameter "nope".

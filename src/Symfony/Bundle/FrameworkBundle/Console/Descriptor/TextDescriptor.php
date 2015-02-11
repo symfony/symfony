@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -312,6 +313,13 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameter($parameter, array $options = array())
     {
+        if (!empty($options['expand']) && !is_scalar($parameter)) {
+
+            $this->writeText(Yaml::dump($parameter), $options);
+
+            return;
+        }
+
         $this->writeText($this->formatParameter($parameter), $options);
     }
 

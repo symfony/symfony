@@ -52,6 +52,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
                 new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
+                new InputOption('expand', null, InputOption::VALUE_NONE, 'Display full parameter value'),
             ))
             ->setDescription('Displays current services for an application')
             ->setHelp(<<<EOF
@@ -124,6 +125,7 @@ EOF
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
+        $options['expand'] = $input->getOption('expand');
         $helper->describe($output, $object, $options);
 
         if (!$input->getArgument('name') && $input->isInteractive()) {
@@ -154,6 +156,10 @@ EOF
             throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
         } elseif ((null === $name) && $optionsCount > 1) {
             throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
+        } elseif ($input->getOption('expand') && $input->getOption('parameter') === null) {
+            throw new \InvalidArgumentException('The expand option can only be used with the parameter option.');
+        } elseif ($input->getOption('expand') && $input->getOption('format') !== 'txt') {
+            throw new \InvalidArgumentException('The expand option is only available for dumping parameters in "txt" format.');
         }
     }
 

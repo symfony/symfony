@@ -167,11 +167,13 @@ class ProcessBuilder
     /**
      * Sets the input of the process.
      *
-     * @param string|null $input The input as a string
+     * @param mixed $input The input as a string
      *
      * @return ProcessBuilder
      *
      * @throws InvalidArgumentException In case the argument is invalid
+     *
+     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public function setInput($input)
     {

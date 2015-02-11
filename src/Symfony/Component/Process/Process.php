@@ -1108,11 +1108,13 @@ class Process
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param string|null $input The content
+     * @param mixed $input The content
      *
      * @return self The current Process instance
      *
      * @throws LogicException In case the process is running
+     *
+     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public function setInput($input)
     {

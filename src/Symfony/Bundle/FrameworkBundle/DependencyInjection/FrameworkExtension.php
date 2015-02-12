@@ -49,7 +49,6 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
-        $loader->load('assets.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -562,6 +561,8 @@ class FrameworkExtension extends Extension
      */
     private function registerAssetsConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        $loader->load('assets.xml');
+
         $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);

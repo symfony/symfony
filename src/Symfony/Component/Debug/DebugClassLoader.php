@@ -179,16 +179,19 @@ class DebugClassLoader
 
             if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
-            } elseif (0 !== strpos($name, 'Symfony\\')) {
+            } else {
+                $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'));
                 $parent = $refl->getParentClass();
 
-                if ($parent && isset(self::$deprecated[$parent->name])) {
-                    trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
-                }
+                if (!$parent || $len < 2 || strncmp($name, $parent, $len)) {
+                    if ($parent && isset(self::$deprecated[$parent->name]) && ($len < 2 || strncmp($name, $parent->name, $len))) {
+                        trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                    }
 
-                foreach ($refl->getInterfaceNames() as $interface) {
-                    if (isset(self::$deprecated[$interface]) && !($parent && $parent->implementsInterface($interface))) {
-                        trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                    foreach ($refl->getInterfaceNames() as $interface) {
+                        if (isset(self::$deprecated[$interface]) && ($len < 2 || strncmp($name, $interface, $len)) && !($parent && $parent->implementsInterface($interface))) {
+                            trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                        }
                     }
                 }
             }

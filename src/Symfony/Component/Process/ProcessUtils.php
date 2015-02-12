@@ -83,6 +83,8 @@ class ProcessUtils
      * @return string The validated input
      *
      * @throws InvalidArgumentException In case the input is not valid
+     *
+     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public static function validateInput($caller, $input)
     {
@@ -95,6 +97,8 @@ class ProcessUtils
             }
             // deprecated as of Symfony 2.5, to be removed in 3.0
             if (is_object($input) && method_exists($input, '__toString')) {
+                trigger_error('Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
                 return (string) $input;
             }
 

@@ -326,6 +326,10 @@ abstract class Controller extends ContainerAware
      */
     protected function get($id)
     {
+        if ('request' === $id) {
+            trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
+        }
+        
         return $this->container->get($id);
     }
 

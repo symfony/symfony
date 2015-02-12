@@ -115,6 +115,9 @@ class ContextListener implements ListenerInterface
             return;
         }
 
+        $this->dispatcher->removeListener(KernelEvents::RESPONSE, array($this, 'onKernelResponse'));
+        $this->registered = false;
+
         $request = $event->getRequest();
         $session = $request->getSession();
 

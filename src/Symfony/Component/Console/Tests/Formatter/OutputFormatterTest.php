@@ -103,7 +103,7 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            "\033[32m<error>some error</error>\033[0m",
+            "\033[32m<error>some error</error>\033[39m",
             $formatter->format('<info>'.$formatter->escape('<error>some error</error>').'</info>')
         );
     }

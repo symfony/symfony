@@ -75,7 +75,7 @@ class ExtensionPass implements CompilerPassInterface
         }
 
         if ($container->has('assets.packages')) {
-            $loader->getDefinition('twig.extension.assets')->addTag('twig.extension');
+            $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
 
         if (method_exists('Symfony\Bridge\Twig\AppVariable', 'setContainer')) {

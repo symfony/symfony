@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-11T12:55:28Z
+
+the package name should be ``symfony/propel1-bridge`` actually, as it is the current name.
+
+and I think you should start by submitting a PR to PropelBundle to add this requirement in all branches (it won't hurt yet because the bridge package already exists). This way, PropelBundle users would get it out of the box.
+
+And finally, you need to remove the ``replace`` rule in the root composer.json as symfony/symfony does not contain the propel bridge anymore.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-11T13:13:00Z
+
+see propelorm/PropelBundle#324

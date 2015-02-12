@@ -214,6 +214,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('cookie_domain')->end()
                         ->booleanNode('cookie_secure')->end()
                         ->booleanNode('cookie_httponly')->end()
+                        ->booleanNode('use_cookies')->end()
                         ->scalarNode('gc_divisor')->end()
                         ->scalarNode('gc_probability')->end()
                         ->scalarNode('gc_maxlifetime')->end()

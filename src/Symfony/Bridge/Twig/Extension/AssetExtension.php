@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 /**
  * Twig extension for the Symfony Asset component.

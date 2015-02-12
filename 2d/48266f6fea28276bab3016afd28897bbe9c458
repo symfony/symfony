@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-20T14:06:19Z
+
+Updated the PR.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-20T15:54:32Z
+
+@inso
+@fabpot
+Thank you for all your feedback. Adressed it.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-20T15:54:52Z
+
+PS: We could add a "Drupal" label onto this issue
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-11-20T16:01:35Z
+
+tag added
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-11-22T19:21:54Z
+
+Should we now make PRs against 2.7 for now or is 3.x the proper version and things are just broken atm.?

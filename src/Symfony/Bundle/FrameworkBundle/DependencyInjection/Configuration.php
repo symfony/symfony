@@ -54,6 +54,26 @@ class Configuration implements ConfigurationInterface
                 })
             ->end()
             ->validate()
+                ->ifTrue(function ($v) { return !isset($v['assets']); })
+                ->then(function ($v) {
+                    if (!$v['templating']['assets_version']
+                        && !count($v['templating']['assets_base_urls']['http'])
+                        && !count($v['templating']['assets_base_urls']['ssl'])
+                        && !count($v['templating']['packages'])
+                    ) {
+                        $v['assets'] = array(
+                            'version' => null,
+                            'version_format' => '%%s?%%s',
+                            'base_path' => '',
+                            'base_urls' => array(),
+                            'packages' => array(),
+                        );
+                    }
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
                 ->ifTrue(function ($v) { return isset($v['templating']); })
                 ->then(function ($v) {
                     if ($v['templating']['assets_version']

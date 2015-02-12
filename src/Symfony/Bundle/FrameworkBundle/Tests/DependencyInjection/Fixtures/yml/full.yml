@@ -25,6 +25,7 @@ framework:
         cookie_domain:    example.com
         cookie_secure:    true
         cookie_httponly:  true
+        use_cookies:      true
         gc_probability:  1
         gc_divisor:      108
         gc_maxlifetime:  90000

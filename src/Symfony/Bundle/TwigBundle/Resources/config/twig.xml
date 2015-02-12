@@ -86,7 +86,6 @@
         </service>
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
-            <tag name="twig.extension" />
             <argument type="service" id="assets.packages" />
             <argument type="service" id="twig.extension.httpfoundation" />
         </service>

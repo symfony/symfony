@@ -24,7 +24,7 @@
     <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 38px;"></div>
 {% endif %}
 
-<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset" data-no-turbolink>
+<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
         {{ template.renderblock('toolbar', {
             'collector': profile.getcollector(name),

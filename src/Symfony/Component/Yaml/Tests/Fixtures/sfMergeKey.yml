@@ -1,0 +1,45 @@
+--- %YAML:1.0
+test: Simple In Place Substitution
+brief: >
+    If you want to reuse an entire alias, only overwriting what is different
+    you can use a << in place substitution. This is not part of the official
+    YAML spec, but a widely implemented extension. See the following URL for
+    details: http://yaml.org/type/merge.html
+yaml: |
+    foo: &foo
+        a: Steve
+        b: Clark
+        c: Brian
+    bar:
+        a: before
+        d: other
+        <<: *foo
+        b: new
+        x: Oren
+        c:
+            foo: bar
+            foo: ignore
+            bar: foo
+    duplicate:
+        foo: bar
+        foo: ignore
+    foo2: &foo2
+        a: Ballmer
+    ding: &dong [ fi, fei, fo, fam]
+    check:
+        <<:
+            - *foo
+            - *dong
+        isit: tested
+    head:
+        <<: [ *foo , *dong , *foo2 ]
+php: |
+    array(
+        'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'),
+        'bar' => array('a' => 'before', 'd' => 'other', 'b' => 'new', 'c' => array('foo' => 'bar', 'bar' => 'foo'), 'x' => 'Oren'),
+        'duplicate' => array('foo' => 'bar'),
+        'foo2' => array('a' => 'Ballmer'),
+        'ding' => array('fi', 'fei', 'fo', 'fam'),
+        'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'),
+        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam')
+    )

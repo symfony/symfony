@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.8.19",
+    "Names": {
+        "ARS": [
+            "$",
+            "peso argentino"
+        ],
+        "USD": [
+            "US$",
+            "dólar estadounidense"
+        ]
+    }
+}

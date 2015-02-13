@@ -1,0 +1,53 @@
+framework:
+    secret: s3cr3t
+    default_locale: fr
+    form:
+        csrf_protection:
+            field_name: _csrf
+    http_method_override: false
+    trusted_proxies: ['127.0.0.1', '10.0.0.1']
+    csrf_protection:
+        enabled:    true
+    esi:
+        enabled: true
+    profiler:
+        only_exceptions: true
+        enabled: false
+    router:
+        resource:     %kernel.root_dir%/config/routing.xml
+        type:         xml
+    session:
+        storage_id:      session.storage.native
+        handler_id:      session.handler.native_file
+        name:            _SYMFONY
+        cookie_lifetime:  86400
+        cookie_path:      /
+        cookie_domain:    example.com
+        cookie_secure:    true
+        cookie_httponly:  true
+        gc_probability:  1
+        gc_divisor:      108
+        gc_maxlifetime:  90000
+        save_path:       /path/to/sessions
+    templating:
+        engines:          [php, twig]
+        loader:           [loader.foo, loader.bar]
+        cache:            /path/to/cache
+        form:
+            resources:    [theme1, theme2]
+        hinclude_default_template: global_hinclude_template
+    translator:
+        enabled:  true
+        fallback: fr
+    validation:
+        enabled: true
+        cache:   apc
+    annotations:
+        cache:   file
+        debug:   true
+        file_cache_dir: %kernel.cache_dir%/annotations
+    ide: file%%link%%format
+    request:
+        formats:
+            csv: ['text/csv', 'text/plain']
+            pdf: 'application/pdf'

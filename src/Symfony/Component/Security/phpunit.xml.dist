@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="vendor/autoload.php"
+>
+    <php>
+        <!-- Disable E_USER_DEPRECATED until 3.0 -->
+        <!-- php -r 'echo -1 & ~E_USER_DEPRECATED;' -->
+        <ini name="error_reporting" value="-16385"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Symfony Security Component Test Suite">
+            <directory>./Acl/Tests/</directory>
+            <directory>./Core/Tests/</directory>
+            <directory>./Http/Tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./</directory>
+            <exclude>
+                <directory>./vendor</directory>
+                <directory>./Acl/Tests</directory>
+                <directory>./Core/Tests</directory>
+                <directory>./Http/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>

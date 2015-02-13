@@ -1,0 +1,37 @@
+{
+    "name": "symfony/templating",
+    "type": "library",
+    "description": "Symfony Templating Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9"
+    },
+    "require-dev": {
+        "psr/log": "~1.0"
+    },
+    "suggest": {
+        "psr/log": "For using debug logging in loaders"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Templating\\": "" }
+    },
+    "target-dir": "Symfony/Component/Templating",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7-dev"
+        }
+    }
+}

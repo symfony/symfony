@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="event_dispatcher.class">Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher</parameter>
+        <parameter key="http_kernel.class">Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel</parameter>
+        <parameter key="filesystem.class">Symfony\Component\Filesystem\Filesystem</parameter>
+        <parameter key="cache_warmer.class">Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate</parameter>
+        <parameter key="cache_clearer.class">Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer</parameter>
+        <parameter key="file_locator.class">Symfony\Component\HttpKernel\Config\FileLocator</parameter>
+        <parameter key="uri_signer.class">Symfony\Component\HttpKernel\UriSigner</parameter>
+        <parameter key="request_stack.class">Symfony\Component\HttpFoundation\RequestStack</parameter>
+    </parameters>
+
+    <services>
+        <service id="event_dispatcher" class="%event_dispatcher.class%">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="http_kernel" class="%http_kernel.class%">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="request_stack" class="%request_stack.class%" />
+
+        <service id="cache_warmer" class="%cache_warmer.class%">
+            <argument type="collection" />
+        </service>
+
+        <service id="cache_clearer" class="%cache_clearer.class%">
+            <argument type="collection" />
+        </service>
+
+        <!--
+            If you want to change the Request class, modify the code in
+            your front controller (app.php) so that it passes an instance of
+            YourRequestClass to the Kernel.
+            This service definition only defines the scope of the request.
+            It is used to check references scope.
+
+            This service is deprecated, you should use the request_stack service instead.
+        -->
+        <service id="request" scope="request" synthetic="true" synchronized="true" />
+
+        <service id="service_container" synthetic="true" />
+
+        <service id="kernel" synthetic="true" />
+
+        <service id="filesystem" class="%filesystem.class%"></service>
+
+        <service id="file_locator" class="%file_locator.class%">
+            <argument type="service" id="kernel" />
+            <argument>%kernel.root_dir%/Resources</argument>
+        </service>
+
+        <service id="uri_signer" class="%uri_signer.class%">
+            <argument>%kernel.secret%</argument>
+        </service>
+    </services>
+</container>

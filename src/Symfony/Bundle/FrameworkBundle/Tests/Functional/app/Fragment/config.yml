@@ -1,0 +1,7 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    fragments: ~
+    templating:
+        engines: ['php']

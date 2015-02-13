@@ -1,0 +1,5 @@
+Icons License
+=============
+
+Icons created by Sensio (http://www.sensio.com/) are shared under a Creative
+Commons Attribution license (http://creativecommons.org/licenses/by-sa/3.0/).

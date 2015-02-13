@@ -1,0 +1,44 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    johannes: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        # This firewall doesn't make sense in combination with the rest of the
+        # configuration file, but it's here for testing purposes (do not use
+        # this file in a real world scenario though)
+        login_form:
+            pattern: ^/login$
+            security: false
+
+        default:
+            form_login:
+                check_path: /login_check
+                default_target_path: /profile
+            logout: ~
+            anonymous: ~
+
+        # This firewall is here just to check its the logout functionality
+        second_area:
+            http_basic: ~
+            anonymous: ~
+            logout:
+                target: /second/target
+                path: /second/logout
+
+    access_control:
+        - { path: ^/unprotected_resource$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secure-but-not-covered-by-access-control$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-one-ip$, ip: 10.10.10.10, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/secured-by-two-ips$, ips: [1.1.1.1, 2.2.2.2], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/highly_protected_resource$, roles: IS_ADMIN }
+        - { path: ^/protected-via-expression$, allow_if: "(is_anonymous() and request.headers.get('user-agent') matches '/Firefox/i') or has_role('ROLE_USER')" }
+        - { path: .*, roles: IS_AUTHENTICATED_FULLY }

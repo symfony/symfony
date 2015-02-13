@@ -1,0 +1,94 @@
+parameters:
+    baz_class: BazClass
+    foo_class: Bar\FooClass
+    foo: bar
+
+services:
+    foo:
+        class: Bar\FooClass
+        tags:
+            - { name: foo, foo: foo }
+            - { name: foo, bar: bar, baz: baz }
+        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
+        properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
+        calls:
+            - [setBar, ['@bar']]
+            - [initialize, {  }]
+
+        factory: [Bar\FooClass, getInstance]
+        configurator: sc_configure
+    foo.baz:
+        class: %baz_class%
+        factory: ['%baz_class%', getInstance]
+        configurator: ['%baz_class%', configureStatic1]
+    bar:
+        class: Bar\FooClass
+        arguments: [foo, '@foo.baz', '%foo_bar%']
+        configurator: ['@foo.baz', configure]
+    foo_bar:
+        class: %foo_class%
+        scope: prototype
+    method_call1:
+        class: Bar\FooClass
+        file: %path%foo.php
+        calls:
+            - [setBar, ['@foo']]
+            - [setBar, ['@?foo2']]
+            - [setBar, ['@?foo3']]
+            - [setBar, ['@?foobaz']]
+            - [setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")']]
+
+    foo_with_inline:
+        class: Foo
+        calls:
+            - [setBar, ['@inlined']]
+
+    inlined:
+        class: Bar
+        public: false
+        properties: { pub: pub }
+        calls:
+            - [setBaz, ['@baz']]
+
+    baz:
+        class: Baz
+        calls:
+            - [setFoo, ['@foo_with_inline']]
+
+    request:
+        class: Request
+        synthetic: true
+    configurator_service:
+        class: ConfClass
+        public: false
+        calls:
+            - [setFoo, ['@baz']]
+
+    configured_service:
+        class: stdClass
+        configurator: ['@configurator_service', configureStdClass]
+    decorated:
+        class: stdClass
+    decorator_service:
+        class: stdClass
+        decorates: decorated
+    decorator_service_with_name:
+        class: stdClass
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+    new_factory:
+        class: FactoryClass
+        public: false
+        properties: { foo: bar }
+    factory_service:
+        class: Bar
+        factory: ['@foo.baz', getInstance]
+    new_factory_service:
+        class: FooBarBaz
+        properties: { foo: bar }
+        factory: ['@new_factory', getInstance]
+    service_from_static_method:
+        class: Bar\FooClass
+        factory: [Bar\FooClass, getInstance]
+    alias_for_foo: @foo
+    alias_for_alias: @foo

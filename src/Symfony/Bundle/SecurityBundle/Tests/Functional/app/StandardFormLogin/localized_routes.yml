@@ -1,0 +1,26 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    johannes: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        default:
+            form_login:
+                login_path: localized_login_path
+                check_path: localized_check_path
+                default_target_path: localized_default_target_path
+            logout:
+                path: localized_logout_path
+                target: localized_logout_target_path
+            anonymous: ~
+
+    access_control:
+        - { path: '^/(?:[a-z]{2})/secure/.*', roles: ROLE_USER }

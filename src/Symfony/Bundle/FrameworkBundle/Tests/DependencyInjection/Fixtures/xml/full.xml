@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr" trusted-proxies="127.0.0.1, 10.0.0.1" http-method-override="false">
+        <framework:csrf-protection enabled="true" />
+        <framework:form>
+            <framework:csrf-protection field-name="_csrf"/>
+        </framework:form>
+        <framework:esi enabled="true" />
+        <framework:profiler only-exceptions="true" enabled="false" />
+        <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
+        <framework:session gc-maxlifetime="90000" gc-probability="1" gc-divisor="108" storage-id="session.storage.native" handler-id="session.handler.native_file" name="_SYMFONY" cookie-lifetime="86400" cookie-path="/" cookie-domain="example.com" cookie-secure="true" cookie-httponly="true" save-path="/path/to/sessions" />
+        <framework:request>
+            <framework:format name="csv">
+                <framework:mime-type>text/csv</framework:mime-type>
+                <framework:mime-type>text/plain</framework:mime-type>
+            </framework:format>
+            <framework:format name="pdf">
+                <framework:mime-type>application/pdf</framework:mime-type>
+            </framework:format>
+        </framework:request>
+        <framework:templating cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
+            <framework:loader>loader.foo</framework:loader>
+            <framework:loader>loader.bar</framework:loader>
+            <framework:engine>php</framework:engine>
+            <framework:engine>twig</framework:engine>
+            <framework:form>
+                 <framework:resource>theme1</framework:resource>
+                 <framework:resource>theme2</framework:resource>
+            </framework:form>
+        </framework:templating>
+        <framework:translator enabled="true" fallback="fr" logging="true" />
+        <framework:validation enabled="true" cache="apc" />
+        <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
+    </framework:config>
+</container>

@@ -1,0 +1,8 @@
+framework:
+    csrf_protection: false
+    secret: s3cr3t
+    form:
+        csrf_protection: true
+    session: ~
+    # CSRF is disabled by default
+    # csrf_protection: ~

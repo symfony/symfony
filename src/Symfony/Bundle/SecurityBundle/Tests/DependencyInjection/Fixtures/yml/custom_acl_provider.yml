@@ -1,0 +1,6 @@
+imports:
+    - { resource: container1.yml }
+
+security:
+    acl:
+        provider: foo

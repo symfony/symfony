@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/services"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     targetNamespace="http://symfony.com/schema/dic/services"
+     elementFormDefault="qualified">
+
+  <xsd:annotation>
+    <xsd:documentation><![CDATA[
+      Symfony XML Services Schema, version 1.0
+      Authors: Fabien Potencier
+
+      This defines a way to describe PHP objects (services) and their
+      dependencies.
+    ]]></xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="container" type="container" />
+
+  <xsd:complexType name="container">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        The root element of a service file.
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="services" type="services" minOccurs="0" maxOccurs="1" />
+      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="services">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Enclosing element for the definition of all services
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="imports">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Enclosing element for the import elements
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="import" type="import" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="import">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Import an external resource defining other services or parameters
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="resource" type="xsd:string" use="required" />
+    <xsd:attribute name="ignore-errors" type="boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="callable">
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="service" type="xsd:string" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="method" type="xsd:string" />
+    <xsd:attribute name="function" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="service">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="scope" type="xsd:string" />
+    <xsd:attribute name="public" type="boolean" />
+    <xsd:attribute name="synthetic" type="boolean" />
+    <xsd:attribute name="synchronized" type="boolean" />
+    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="abstract" type="boolean" />
+    <xsd:attribute name="factory-class" type="xsd:string" />
+    <xsd:attribute name="factory-method" type="xsd:string" />
+    <xsd:attribute name="factory-service" type="xsd:string" />
+    <xsd:attribute name="alias" type="xsd:string" />
+    <xsd:attribute name="parent" type="xsd:string" />
+    <xsd:attribute name="decorates" type="xsd:string" />
+    <xsd:attribute name="decoration-inner-name" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="tag">
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:anyAttribute namespace="##any" processContents="lax" />
+  </xsd:complexType>
+
+  <xsd:complexType name="parameters">
+    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="parameter" type="parameter" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="parameter_type" />
+    <xsd:attribute name="key" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="parameter" mixed="true">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="parameter" type="parameter" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="parameter_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="key" type="xsd:string" />
+    <xsd:attribute name="on-invalid" type="invalid_sequence" />
+  </xsd:complexType>
+
+  <xsd:complexType name="property" mixed="true">
+    <xsd:choice minOccurs="0" maxOccurs="1">
+      <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="argument_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="key" type="xsd:string" />
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="on-invalid" type="xsd:string" />
+    <xsd:attribute name="strict" type="boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="argument" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+    <xsd:attribute name="type" type="argument_type" />
+    <xsd:attribute name="id" type="xsd:string" />
+    <xsd:attribute name="key" type="xsd:string" />
+    <xsd:attribute name="index" type="xsd:integer" />
+    <xsd:attribute name="on-invalid" type="xsd:string" />
+    <xsd:attribute name="strict" type="boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="call" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+    <xsd:attribute name="method" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:simpleType name="parameter_type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="collection" />
+      <xsd:enumeration value="string" />
+      <xsd:enumeration value="constant" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="argument_type">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="collection" />
+      <xsd:enumeration value="service" />
+      <xsd:enumeration value="expression" />
+      <xsd:enumeration value="string" />
+      <xsd:enumeration value="constant" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="invalid_sequence">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="null" />
+      <xsd:enumeration value="ignore" />
+      <xsd:enumeration value="exception" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="boolean">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="(%.+%|true|false)" />
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

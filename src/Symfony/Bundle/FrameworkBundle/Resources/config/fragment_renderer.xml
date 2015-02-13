@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="fragment.handler.class">Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler</parameter>
+        <parameter key="fragment.renderer.inline.class">Symfony\Component\HttpKernel\Fragment\InlineFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.hinclude.class">Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer</parameter>
+        <parameter key="fragment.renderer.hinclude.global_template"></parameter>
+        <parameter key="fragment.renderer.esi.class">Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer</parameter>
+        <parameter key="fragment.path">/_fragment</parameter>
+    </parameters>
+
+    <services>
+        <service id="fragment.handler" class="%fragment.handler.class%">
+            <argument type="service" id="service_container" />
+            <argument>%kernel.debug%</argument>
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="fragment.renderer.inline" class="%fragment.renderer.inline.class%">
+            <tag name="kernel.fragment_renderer" alias="inline" />
+            <argument type="service" id="http_kernel" />
+            <argument type="service" id="event_dispatcher" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+
+        <service id="fragment.renderer.hinclude" class="%fragment.renderer.hinclude.class%">
+            <argument /> <!-- templating or Twig service -->
+            <argument type="service" id="uri_signer" />
+            <argument>%fragment.renderer.hinclude.global_template%</argument>
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+
+        <service id="fragment.renderer.esi" class="%fragment.renderer.esi.class%">
+            <tag name="kernel.fragment_renderer" alias="esi" />
+            <argument type="service" id="esi" on-invalid="null" />
+            <argument type="service" id="fragment.renderer.inline" />
+            <argument type="service" id="uri_signer" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+
+        <service id="fragment.renderer.ssi" class="Symfony\Component\HttpKernel\Fragment\SsiFragmentRenderer">
+            <tag name="kernel.fragment_renderer" alias="ssi" />
+            <argument type="service" id="ssi" on-invalid="null" />
+            <argument type="service" id="fragment.renderer.inline" />
+            <argument type="service" id="uri_signer" />
+            <call method="setFragmentPath"><argument>%fragment.path%</argument></call>
+        </service>
+    </services>
+</container>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <config>
+        <acl />
+
+        <encoder class="JMS\FooBundle\Entity\User1" algorithm="plaintext" />
+
+        <encoder class="JMS\FooBundle\Entity\User2" algorithm="sha1" encode-as-base64="false" iterations="5" />
+
+        <encoder class="JMS\FooBundle\Entity\User3" algorithm="md5" />
+
+        <encoder class="JMS\FooBundle\Entity\User4" id="security.encoder.foo" />
+
+        <encoder class="JMS\FooBundle\Entity\User5" algorithm="pbkdf2" hash-algorithm="sha1" encode-as-base64="false" iterations="5" key-length="30" />
+
+        <encoder class="JMS\FooBundle\Entity\User6" algorithm="bcrypt" cost="15" />
+
+        <provider name="default">
+            <memory>
+                <user name="foo" password="foo" roles="ROLE_USER" />
+            </memory>
+        </provider>
+
+        <provider name="digest">
+            <memory>
+                <user name="foo" password="foo" roles="ROLE_USER, ROLE_ADMIN" />
+            </memory>
+        </provider>
+
+        <provider name="basic">
+            <memory>
+                <user name="foo" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_SUPER_ADMIN" />
+                <user name="bar" password="0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33" roles="ROLE_USER, ROLE_ADMIN" />
+            </memory>
+        </provider>
+
+        <provider name="service" id="user.manager" />
+
+        <provider name="chain">
+            <chain providers="service, basic" />
+        </provider>
+
+        <firewall name="simple" pattern="/login" security="false" />
+
+        <firewall name="secure" stateless="true">
+            <http-basic />
+            <http-digest key="TheKey" />
+            <form-login />
+            <anonymous />
+            <switch-user />
+            <x509 />
+            <remote-user />
+            <logout />
+            <remember-me key="TheyKey"/>
+        </firewall>
+
+        <firewall name="host" pattern="/test" host="foo\.example\.org" methods="GET,POST">
+            <anonymous />
+            <http-basic />
+        </firewall>
+
+        <role id="ROLE_ADMIN">ROLE_USER</role>
+        <role id="ROLE_SUPER_ADMIN">ROLE_USER,ROLE_ADMIN,ROLE_ALLOWED_TO_SWITCH</role>
+        <role id="ROLE_REMOTE">ROLE_USER,ROLE_ADMIN</role>
+
+        <rule path="/blog/524" role="ROLE_USER" requires-channel="https" methods="get,POST" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' path="/blog/.*" />
+        <rule role='IS_AUTHENTICATED_ANONYMOUSLY' allow-if="token.getUsername() matches '/^admin/'" path="/blog/524" />
+    </config>
+</srv:container>

@@ -1,0 +1,99 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="templating.engine.php.class">Symfony\Bundle\FrameworkBundle\Templating\PhpEngine</parameter>
+        <parameter key="templating.helper.slots.class">Symfony\Component\Templating\Helper\SlotsHelper</parameter>
+        <parameter key="templating.helper.actions.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\ActionsHelper</parameter>
+        <parameter key="templating.helper.router.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper</parameter>
+        <parameter key="templating.helper.request.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\RequestHelper</parameter>
+        <parameter key="templating.helper.session.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\SessionHelper</parameter>
+        <parameter key="templating.helper.code.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper</parameter>
+        <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
+        <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
+        <parameter key="templating.helper.stopwatch.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper</parameter>
+        <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
+        <parameter key="templating.form.engine.class">Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine</parameter>
+        <parameter key="templating.form.renderer.class">Symfony\Component\Form\FormRenderer</parameter>
+        <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
+    </parameters>
+
+    <services>
+        <service id="templating.engine.php" class="%templating.engine.php.class%" public="false">
+            <argument type="service" id="templating.name_parser" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="templating.loader" />
+            <argument type="service" id="templating.globals" />
+            <call method="setCharset"><argument>%kernel.charset%</argument></call>
+        </service>
+
+        <service id="templating.helper.slots" class="%templating.helper.slots.class%">
+            <tag name="templating.helper" alias="slots" />
+        </service>
+
+        <service id="templating.helper.request" class="%templating.helper.request.class%">
+            <tag name="templating.helper" alias="request" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="templating.helper.session" class="%templating.helper.session.class%">
+            <tag name="templating.helper" alias="session" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="templating.helper.router" class="%templating.helper.router.class%">
+            <tag name="templating.helper" alias="router" />
+            <argument type="service" id="router" />
+        </service>
+
+        <service id="templating.helper.actions" class="%templating.helper.actions.class%">
+            <tag name="templating.helper" alias="actions" />
+            <argument type="service" id="fragment.handler" />
+        </service>
+
+        <service id="templating.helper.code" class="%templating.helper.code.class%">
+            <tag name="templating.helper" alias="code" />
+            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument>%kernel.root_dir%</argument>
+            <argument>%kernel.charset%</argument>
+        </service>
+
+        <service id="templating.helper.translator" class="%templating.helper.translator.class%">
+            <tag name="templating.helper" alias="translator" />
+            <argument type="service" id="translator" />
+        </service>
+
+        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
+            <tag name="templating.helper" alias="assets" />
+            <argument /> <!-- default package -->
+            <argument type="collection" /> <!-- named packages -->
+        </service>
+
+        <service id="templating.helper.form" class="%templating.helper.form.class%">
+            <tag name="templating.helper" alias="form" />
+            <argument type="service" id="templating.form.renderer" />
+        </service>
+
+        <service id="templating.helper.stopwatch" class="%templating.helper.stopwatch.class%">
+            <tag name="templating.helper" alias="stopwatch" />
+            <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
+        </service>
+
+        <service id="templating.form.engine" class="%templating.form.engine.class%" public="false">
+            <argument type="service" id="templating.engine.php" />
+            <argument>%templating.helper.form.resources%</argument>
+        </service>
+
+        <service id="templating.form.renderer" class="%templating.form.renderer.class%" public="false">
+            <argument type="service" id="templating.form.engine" />
+            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
+        </service>
+
+        <service id="templating.globals" class="%templating.globals.class%">
+            <argument type="service" id="service_container" />
+        </service>
+    </services>
+</container>

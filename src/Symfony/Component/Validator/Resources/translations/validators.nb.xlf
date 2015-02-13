@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>Verdien skal være falsk.</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>Verdien skal være sann.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>Verdien skal være av typen {{ type }}.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>Verdien skal være blank.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>Verdien skal være en av de gitte valg.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>Du skal velge minst {{ limit }} valg.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>Du kan maks velge {{ limit }} valg.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>En eller flere av de oppgitte verdier er ugyldige.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>Dette feltet ikke var forventet.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>Dette feltet mangler.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>Verdien er ikke en gyldig dato.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>Verdien er ikke en gyldig dato og tid.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>Verdien er ikke en gyldig e-mail adresse.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>Filen kunne ikke finnes.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>Filen kan ikke leses.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Filen er for stor ({{ size }} {{ suffix }}). Tilatte maksimale størrelse {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>Mimetypen av filen er ugyldig ({{ type }}). Tilatte mimetyper er {{ types }}.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>Verdien skal være {{ limit }} eller mindre.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>Verdien er for lang. Den skal ha {{ limit }} bokstaver eller mindre.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>Verdien skal være {{ limit }} eller mer.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>Verdien er for kort. Den skal ha {{ limit }} tegn eller flere.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>Verdien må ikke være blank.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>Verdien må ikke være tom (null).</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>Verdien skal være tom (null).</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>Verdien er ikke gyldig.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>Verdien er ikke en gyldig tid.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>Verdien er ikke en gyldig URL.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>De to verdier skal være ens.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Filen er for stor. Den maksimale størrelse er {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>Filen er for stor.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>Filen kunne ikke lastes opp.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>Denne verdi skal være et gyldig tall.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>Denne filen er ikke et gyldig bilde.</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>This is not a valid IP address.</source>
+                <target>Dette er ikke en gyldig IP adresse.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>Denne verdi er ikke et gyldig språk.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Denne verdi er ikke en gyldig lokalitet.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Denne verdi er ikke et gyldig land.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

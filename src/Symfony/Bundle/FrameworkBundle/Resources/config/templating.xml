@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="templating.engine.delegating.class">Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine</parameter>
+        <parameter key="templating.name_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser</parameter>
+        <parameter key="templating.filename_parser.class">Symfony\Bundle\FrameworkBundle\Templating\TemplateFilenameParser</parameter>
+        <parameter key="templating.cache_warmer.template_paths.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplatePathsCacheWarmer</parameter>
+        <parameter key="templating.locator.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\TemplateLocator</parameter>
+        <parameter key="templating.loader.filesystem.class">Symfony\Bundle\FrameworkBundle\Templating\Loader\FilesystemLoader</parameter>
+        <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
+        <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
+        <parameter key="templating.finder.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder</parameter>
+    </parameters>
+
+    <services>
+        <service id="templating.engine.delegating" class="%templating.engine.delegating.class%" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- engines -->
+        </service>
+
+        <service id="templating.name_parser" class="%templating.name_parser.class%">
+            <argument type="service" id="kernel" />
+        </service>
+
+        <service id="templating.filename_parser" class="%templating.filename_parser.class%" />
+
+        <service id="templating.locator" class="%templating.locator.class%" public="false">
+            <argument type="service" id="file_locator" />
+            <argument>%kernel.cache_dir%</argument>
+        </service>
+
+        <service id="templating.finder" class="%templating.finder.class%" public="false">
+            <argument type="service" id="kernel" />
+            <argument type="service" id="templating.filename_parser" />
+            <argument>%kernel.root_dir%/Resources</argument>
+        </service>
+
+        <service id="templating.cache_warmer.template_paths" class="%templating.cache_warmer.template_paths.class%" public="false">
+            <tag name="kernel.cache_warmer" priority="20" />
+            <argument type="service" id="templating.finder" />
+            <argument type="service" id="templating.locator" />
+        </service>
+
+        <service id="templating.loader.filesystem" class="%templating.loader.filesystem.class%" public="false">
+            <argument type="service" id="templating.locator" />
+        </service>
+
+        <service id="templating.loader.cache" class="%templating.loader.cache.class%" public="false">
+            <argument type="service" id="templating.loader.wrapped" />
+            <argument>%templating.loader.cache.path%</argument>
+        </service>
+
+        <service id="templating.loader.chain" class="%templating.loader.chain.class%" public="false">
+        </service>
+
+        <service id="templating.loader" alias="templating.loader.filesystem" />
+    </services>
+</container>

@@ -1,0 +1,144 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as logger %}
+
+{% block toolbar %}
+    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
+        {% set icon %}
+            <svg width="16" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 28" enable-background="new 0 0 16 28" xml:space="preserve"><g><path fill="#3F3F3F" d="M15 6h-1V5c0-0.5-0.5-1-1-1H2C1.4 4 1 4.4 1 5v2v13c0 1.6 1.3 3 3 3h11c0.5 0 1-0.5 1-1V7 C16 6.5 15.5 6 15 6z M6 15h3v3H6V15z M6 13V7h3v6H6z M15 21c0 0.6-0.4 1-1 1H5c-0.9 0-1.7-0.4-2.2-1H13c0.6 0 1-0.4 1-1V7 c0.5 0 1 0.5 1 1V21z"/></g></svg>
+            {% if collector.counterrors %}
+                {% set status_color = "red" %}
+            {% elseif collector.countdeprecations %}
+                {% set status_color = "yellow" %}
+            {% endif %}
+            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            <span class="sf-toolbar-status{% if status_color is defined %} sf-toolbar-status-{{ status_color }}{% endif %}">{{ error_count }}</span>
+        {% endset %}
+        {% set text %}
+            {% if collector.counterrors %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Errors</b>
+                    <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.counterrors }}</span>
+                </div>
+            {% endif %}
+            {% if collector.countdeprecations %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Deprecated Calls</b>
+                    <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.countdeprecations }}</span>
+                </div>
+            {% endif %}
+            {% if collector.countscreams %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Silenced Errors</b>
+                    <span class="sf-toolbar-status sf-toolbar-status">{{ collector.countscreams }}</span>
+                </div>
+            {% endif %}
+        {% endset %}
+        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><svg width="26" height="32" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 32" enable-background="new 0 0 26 32" xml:space="preserve"><path fill="#3F3F3F" d="M23.6 3.4h-1.7V1.7c0-0.9-0.8-1.7-1.7-1.7H1.7C0.8 0 0 0.8 0 1.7v3.4v21.9C0 29.7 2.3 32 5.1 32h18.5 c0.9 0 1.7-0.8 1.7-1.7V5.1C25.3 4.1 24.5 3.4 23.6 3.4z M8.4 18.5h5.1v5.1H8.4V18.5z M8.4 15.2V5.1h5.1v10.1H8.4z M23.6 28.6 c0 0.9-0.8 1.7-1.7 1.7H6.7c-1.5 0-2.8-0.7-3.7-1.7h17.2c0.9 0 1.7-0.8 1.7-1.7V5.1c0.9 0 1.7 0.8 1.7 1.7V28.6z"/></svg></span>
+    <strong>Logs</strong>
+    {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
+        {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+        <span class="count">
+            <span>{{ error_count }}</span>
+        </span>
+    {% endif %}
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Logs</h2>
+
+    {% set priority = request.query.get('priority', 0) %}
+
+    <table>
+        <tr>
+            <th>Filter</th>
+            <td>
+                <form id="priority-form" action="" method="get" style="display: inline">
+                    <input type="hidden" name="panel" value="logger">
+                    <label for="priority">Min. Priority</label>
+                    <select id="priority" name="priority" onchange="document.getElementById('priority-form').submit(); ">
+                        {# values < 0 are custom levels #}
+                        {% for value, level in collector.priorities %}
+                            {% if not priority and value > 100 %}
+                                {% set priority = value %}
+                            {% endif %}
+                            <option value="{{ value }}"{{ value == priority ? ' selected' : '' }}>{{ level.name }} ({{ level.count }})</option>
+                        {% endfor %}
+                        {% if collector.countdeprecations %}
+                            {% if not priority %}
+                                {% set priority = "-100" %}
+                            {% endif %}
+                            <option value="-100"{{ "-100" == priority ? ' selected' : '' }}>DEPRECATION only ({{ collector.countdeprecations }})</option>
+                        {% endif %}
+                    </select>
+                    <noscript>
+                        <input type="submit" value="refresh">
+                    </noscript>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    {% if collector.logs %}
+        <ul class="alt">
+            {% for log in collector.logs if priority >= 0 and log.priority >= priority or priority < 0 and log.context.type|default(0) == priority %}
+                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}{% if log.context.scream is defined %} scream{% endif %}">
+                    {{ logger.display_message(loop.index, log) }}
+                </li>
+            {% else %}
+                <li><em>No logs available for this priority.</em></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>
+            <em>No logs available.</em>
+        </p>
+    {% endif %}
+{% endblock %}
+
+
+{% macro display_message(log_index, log) %}
+    {% if log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
+        DEPRECATION -  {{ log.message }}
+        {% set id = 'sf-call-stack-' ~ log_index %}
+        <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
+            <img class="toggle" id="{{ id }}-off" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display:none">
+            <img class="toggle" id="{{ id }}-on" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display:inline">
+        </a>
+        {% for index, call in log.context.stack if index > 1 %}
+            {% if index == 2 %}
+                <ul class="sf-call-stack" id="{{ id }}" style="display: none">
+            {% endif %}
+            {% if call.class is defined %}
+                {% set from = call.class|abbr_class ~ '::' ~ call.function|abbr_method() %}
+            {% elseif call.function is defined %}
+                {% set from = call.function|abbr_method %}
+            {% elseif call.file is defined %}
+                {% set from = call.file %}
+            {% else %}
+                {% set from = '-' %}
+            {% endif %}
+
+            <li>Called from {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
+
+            {% if index == log.context.stack|length - 1 %}
+                </ul>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        {{ log.priorityName }} - {{ log.message }}
+        {% if log.context is defined and log.context is not empty %}
+            <br />
+            <small>
+                <strong>Context</strong>: {{ log.context|json_encode(64 b-or 256) }}
+            </small>
+        {% endif %}
+    {% endif %}
+{% endmacro %}

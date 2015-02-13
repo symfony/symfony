@@ -1,0 +1,19 @@
+{
+    "Version": "2.1.8.19",
+    "Names": {
+        "AG": "Antigua and Barbuda",
+        "BA": "Bosnia and Herzegovina",
+        "BL": "Saint Barthélemy",
+        "EA": "Ceuta and Melilla",
+        "KN": "Saint Kitts and Nevis",
+        "LC": "Saint Lucia",
+        "MF": "Saint Martin",
+        "PM": "Saint Pierre and Miquelon",
+        "SH": "Saint Helena",
+        "SJ": "Svalbard and Jan Mayen",
+        "ST": "São Tomé and Príncipe",
+        "TC": "Turks and Caicos Islands",
+        "TT": "Trinidad and Tobago",
+        "WF": "Wallis and Futuna"
+    }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:project="http://www.example.com/schema/projectwithxsdinphar"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://www.example.com/schema/projectwithxsdinphar http://www.example.com/schema/projectwithxsdinphar/project-1.0.xsd">
+
+    <project:bar bar="foo" />
+
+</container>

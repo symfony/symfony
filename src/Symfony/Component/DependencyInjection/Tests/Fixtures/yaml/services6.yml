@@ -1,0 +1,38 @@
+services:
+    foo: { class: FooClass }
+    baz: { class: BazClass }
+    scope.container: { class: FooClass, scope: container }
+    scope.custom: { class: FooClass, scope: custom }
+    scope.prototype: { class: FooClass, scope: prototype }
+    file: { class: FooClass, file: %path%/foo.php }
+    arguments: { class: FooClass, arguments: [foo, @foo, [true, false]] }
+    configurator1: { class: FooClass, configurator: sc_configure }
+    configurator2: { class: FooClass, configurator: [@baz, configure] }
+    configurator3: { class: FooClass, configurator: [BazClass, configureStatic] }
+    method_call1:
+        class: FooClass
+        calls:
+            - [ setBar, [] ]
+            - [ setBar ]
+            - [ setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'] ]
+    method_call2:
+        class: FooClass
+        calls:
+            - [ setBar, [ foo, @foo, [true, false] ] ]
+    alias_for_foo: @foo
+    another_alias_for_foo:
+        alias: foo
+        public: false
+    request:
+        class: Request
+        synthetic: true
+        synchronized: true
+        lazy: true
+    decorator_service:
+        decorates: decorated
+    decorator_service_with_name:
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+    new_factory1: { class: FooBarClass, factory: factory}
+    new_factory2: { class: FooBarClass, factory: [@baz, getClass]}
+    new_factory3: { class: FooBarClass, factory: [BazClass, getInstance]}

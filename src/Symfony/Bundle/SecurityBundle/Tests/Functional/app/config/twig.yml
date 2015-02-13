@@ -1,0 +1,7 @@
+framework:
+    templating:    { engines: ['twig'] }
+
+# Twig Configuration
+twig:
+    debug:            %kernel.debug%
+    strict_variables: %kernel.debug%

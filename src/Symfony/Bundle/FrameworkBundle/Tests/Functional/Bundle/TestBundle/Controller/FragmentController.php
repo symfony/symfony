@@ -1,0 +1,54 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerAware;
+
+class FragmentController extends ContainerAware
+{
+    public function indexAction(Request $request)
+    {
+        return $this->container->get('templating')->renderResponse('fragment.html.php', array('bar' => new Bar()));
+    }
+
+    public function inlinedAction($options, $_format)
+    {
+        return new Response($options['bar']->getBar().' '.$_format);
+    }
+
+    public function customFormatAction($_format)
+    {
+        return new Response($_format);
+    }
+
+    public function customLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
+    }
+
+    public function forwardLocaleAction(Request $request)
+    {
+        return new Response($request->getLocale());
+    }
+}
+
+class Bar
+{
+    private $bar = 'bar';
+
+    public function getBar()
+    {
+        return $this->bar;
+    }
+}

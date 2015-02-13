@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="debug.event_dispatcher.class">Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher</parameter>
+        <parameter key="debug.container.dump">%kernel.cache_dir%/%kernel.container_class%.xml</parameter>
+        <parameter key="debug.controller_resolver.class">Symfony\Component\HttpKernel\Controller\TraceableControllerResolver</parameter>
+        <parameter key="debug.error_handler.throw_at">-1</parameter>
+    </parameters>
+
+    <services>
+        <service id="debug.event_dispatcher" class="%debug.event_dispatcher.class%">
+            <tag name="monolog.logger" channel="event" />
+            <argument type="service" id="debug.event_dispatcher.parent" />
+            <argument type="service" id="debug.stopwatch" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="debug.controller_resolver" class="%debug.controller_resolver.class%">
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="debug.stopwatch" />
+        </service>
+    </services>
+</container>

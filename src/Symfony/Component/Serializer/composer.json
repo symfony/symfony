@@ -1,0 +1,43 @@
+{
+    "name": "symfony/serializer",
+    "type": "library",
+    "description": "Symfony Serializer Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9"
+    },
+    "require-dev": {
+        "symfony/yaml": "~2.0|~3.0.0",
+        "symfony/config": "~2.2|~3.0.0",
+        "doctrine/annotations": "~1.0",
+        "doctrine/cache": "~1.0"
+    },
+    "suggest": {
+        "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+        "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+        "symfony/yaml": "For using the default YAML mapping loader.",
+        "symfony/config": "For using the XML mapping loader."
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Serializer\\": "" }
+    },
+    "target-dir": "Symfony/Component/Serializer",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7-dev"
+        }
+    }
+}

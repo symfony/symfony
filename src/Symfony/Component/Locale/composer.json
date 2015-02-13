@@ -1,0 +1,32 @@
+{
+    "name": "symfony/locale",
+    "type": "library",
+    "description": "Symfony Locale Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9",
+        "symfony/intl": "~2.3|~3.0.0"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Locale\\": "" }
+    },
+    "target-dir": "Symfony/Component/Locale",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7-dev"
+        }
+    }
+}

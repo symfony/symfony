@@ -1,0 +1,43 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block panel %}
+    <h2>Search Results</h2>
+
+    {% if tokens %}
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Token</th>
+                    <th scope="col">IP</th>
+                    <th scope="col">Method</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elements in tokens %}
+                    <tr>
+                        <td><a href="{{ path('_profiler', { 'token': elements.token }) }}">{{ elements.token }}</a></td>
+                        <td>{{ elements.ip }}</td>
+                        <td>{{ elements.method }}</td>
+                        <td>{{ elements.url }}</td>
+                        <td>{{ elements.time|date('r') }}</td>
+                        <td>
+                        {% if elements.status_code is defined and elements.status_code %}
+                            {{ elements.status_code }}
+                        {% else %}
+                            unknown
+                        {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>
+            <em>The query returned no result.</em>
+        </p>
+    {% endif %}
+
+{% endblock %}

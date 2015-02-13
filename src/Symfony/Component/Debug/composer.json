@@ -1,0 +1,44 @@
+{
+    "name": "symfony/debug",
+    "type": "library",
+    "description": "Symfony Debug Component",
+    "keywords": [],
+    "homepage": "http://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
+    },
+    "require-dev": {
+        "symfony/class-loader": "~2.2|~3.0.0",
+        "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2|~3.0.0",
+        "symfony/http-foundation": "~2.1|~3.0.0"
+    },
+    "suggest": {
+        "symfony/http-foundation": "",
+        "symfony/http-kernel": ""
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Component\\Debug\\": "" }
+    },
+    "target-dir": "Symfony/Component/Debug",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7-dev"
+        }
+    }
+}

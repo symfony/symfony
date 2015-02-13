@@ -1,0 +1,17 @@
+{
+    "event1": [
+        {
+            "type": "function",
+            "name": "global_function"
+        },
+        {
+            "type": "closure"
+        }
+    ],
+    "event2": [
+        {
+            "type": "object",
+            "name": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass"
+        }
+    ]
+}

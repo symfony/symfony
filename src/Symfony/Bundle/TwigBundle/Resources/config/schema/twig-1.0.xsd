@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/twig"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/twig"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:sequence>
+            <!-- @deprecated since version 2.6, to be removed in 3.0 -->
+            <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="form-theme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="path" type="path" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="auto-reload" type="xsd:string" />
+        <xsd:attribute name="autoescape" type="xsd:string" />
+        <xsd:attribute name="autoescape-service" type="xsd:string" />
+        <xsd:attribute name="autoescape-service-method" type="xsd:string" />
+        <xsd:attribute name="base-template-class" type="xsd:string" />
+        <xsd:attribute name="cache" type="xsd:string" />
+        <xsd:attribute name="charset" type="xsd:string" />
+        <xsd:attribute name="debug" type="xsd:string" />
+        <xsd:attribute name="strict-variables" type="xsd:string" />
+        <xsd:attribute name="exception-controller" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="form">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="resource" type="xsd:string" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="path" mixed="true">
+        <xsd:attribute name="namespace" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="global" mixed="true">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="global_type" />
+        <xsd:attribute name="id" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="global_type">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="service" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

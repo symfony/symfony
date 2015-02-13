@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="templating.helper.logout_url.class">Symfony\Bundle\SecurityBundle\Templating\Helper\LogoutUrlHelper</parameter>
+        <parameter key="templating.helper.security.class">Symfony\Bundle\SecurityBundle\Templating\Helper\SecurityHelper</parameter>
+    </parameters>
+
+    <services>
+        <service id="templating.helper.logout_url" class="%templating.helper.logout_url.class%">
+            <tag name="templating.helper" alias="logout_url" />
+            <argument type="service" id="security.logout_url_generator" />
+        </service>
+
+        <service id="templating.helper.security" class="%templating.helper.security.class%">
+            <tag name="templating.helper" alias="security" />
+            <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
+        </service>
+    </services>
+</container>

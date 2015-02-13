@@ -1,0 +1,7 @@
+SVN information
+===============
+
+URL: http://source.icu-project.org/repos/icu/icu/tags/release-54-rc/source
+Revision: 36543
+Author: srl
+Date: 2014-09-17T00:34:36.814122Z

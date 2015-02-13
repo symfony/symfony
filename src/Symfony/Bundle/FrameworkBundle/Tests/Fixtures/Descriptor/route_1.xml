@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<route class="Symfony\Component\Routing\Route">
+  <path regex="#^/hello(?:/(?P&lt;name&gt;[a-z]+))?$#s">/hello/{name}</path>
+  <host regex="#^localhost$#si">localhost</host>
+  <scheme>http</scheme>
+  <scheme>https</scheme>
+  <method>GET</method>
+  <method>HEAD</method>
+  <defaults>
+    <default key="name">Joseph</default>
+  </defaults>
+  <requirements>
+    <requirement key="name">[a-z]+</requirement>
+  </requirements>
+  <options>
+    <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+    <option key="opt1">val1</option>
+    <option key="opt2">val2</option>
+  </options>
+</route>

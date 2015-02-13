@@ -1,0 +1,490 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% from _self import display_timeline, dump_request_data %}
+
+{% if colors is not defined %}
+    {% set colors = {
+        'default':                '#aacd4e',
+        'section':                '#666',
+        'event_listener':         '#3dd',
+        'event_listener_loading': '#add',
+        'template':               '#dd3',
+        'doctrine':               '#d3d',
+        'propel':                 '#f4d',
+        'child_sections':         '#eed',
+    } %}
+{% endif %}
+
+{% block toolbar %}
+    {% set duration = collector.events|length ? '%.0f ms'|format(collector.duration) : 'n/a' %}
+    {% set icon %}
+        <svg width="16" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 16 28" enable-background="new 0 0 16 28" xml:space="preserve"><rect x="6" y="4" fill="#3F3F3F" width="4" height="2"/><path fill="#3F3F3F" d="M8 7c-4.4 0-8 3.6-8 8s3.6 8 8 8s8-3.6 8-8S12.4 7 8 7z M12 16H9H7v-6h2v4h3V16z"/></svg>
+        <span>{{ duration }}</span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Total time</b>
+            <span>{{ duration }}</span>
+        </div>
+    {% endset %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon"><svg width="30" height="33" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 30 33" enable-background="new 0 0 30 33" xml:space="preserve"><rect x="11" y="2" fill="#3F3F3F" width="8" height="3"/><path fill="#3F3F3F" d="M15 6.1c-6.6 0-12 5.4-12 12s5.4 12 12 12s12-5.4 12-12S21.6 6.1 15 6.1z M22 20h-6h-3V10h3v7h6V20z"/></svg></span>
+    <strong>Timeline</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Timeline</h2>
+    {% if collector.events|length %}
+        {{ block('panelContent') }}
+    {% else %}
+        <p>
+            <em>No timing events have been recorded. Are you sure that debugging is enabled in the kernel?</em>
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block panelContent %}
+    <form id="timeline-control" action="" method="get">
+        <input type="hidden" name="panel" value="time">
+        <table>
+            <tr>
+                <th style="width: 20%">Total time</th>
+                <td>{{ '%.0f'|format(collector.duration) }} ms</td>
+            </tr>
+            <tr>
+                <th>Initialization time</th>
+                <td>{{ '%.0f'|format(collector.inittime) }} ms</td>
+            </tr>
+            <tr>
+                <th>Threshold</th>
+                <td><input type="number" size="3" name="threshold" value="1" min="0"> ms</td>
+            </tr>
+        </table>
+    </form>
+
+    <h3>
+        {{ profile.parent ? "Request" : "Main Request" }}
+        <small>
+            - {{ collector.events.__section__.duration }} ms
+            {% if profile.parent %}
+                - <a href="{{ path('_profiler', { 'token': profile.parent.token, 'panel': 'time' }) }}">parent</a>
+            {% endif %}
+        </small>
+    </h3>
+
+    {{ display_timeline('timeline_' ~ token, collector.events, colors) }}
+
+    {% if profile.children|length %}
+        {% for child in profile.children %}
+            {% set events = child.getcollector('time').events %}
+            <h3>
+                Sub-request "<a href="{{ path('_profiler', { 'token': child.token, 'panel': 'time' }) }}">{{ child.getcollector('request').requestattributes.get('_controller') }}</a>"
+                <small> - {{ events.__section__.duration }} ms</small>
+            </h3>
+
+            {{ display_timeline('timeline_' ~ child.token, events, colors) }}
+        {% endfor %}
+    {% endif %}
+
+    <script>{% autoescape 'js' %}//<![CDATA[
+        /**
+         * In-memory key-value cache manager
+         */
+        var cache = new function() {
+            "use strict";
+            var dict = {};
+
+            this.get = function(key) {
+                return dict.hasOwnProperty(key)
+                    ? dict[key]
+                    : null;
+                }
+
+            this.set = function(key, value) {
+                dict[key] = value;
+
+                return value;
+            }
+        };
+
+        /**
+         * Query an element with a CSS selector.
+         *
+         * @param string selector a CSS-selector-compatible query string.
+         *
+         * @return DOMElement|null
+         */
+        function query(selector)
+        {
+            "use strict";
+            var key = 'SELECTOR: ' + selector;
+
+            return cache.get(key) || cache.set(key, document.querySelector(selector));
+        }
+
+        /**
+         * Canvas Manager
+         */
+        function CanvasManager(requests, maxRequestTime) {
+            "use strict";
+
+            var _drawingColors = {{ colors|json_encode|raw }},
+                _storagePrefix = 'timeline/',
+                _threshold = 1,
+                _requests = requests,
+                _maxRequestTime = maxRequestTime;
+
+            /**
+             * Check whether this event is a child event.
+             *
+             * @return true if it is.
+             */
+            function isChildEvent(event)
+            {
+                return '__section__.child' === event.name;
+            }
+
+            /**
+             * Check whether this event is categorized in 'section'.
+             *
+             * @return true if it is.
+             */
+            function isSectionEvent(event)
+            {
+                return 'section' === event.category;
+            }
+
+            /**
+             * Get the width of the container.
+             */
+            function getContainerWidth()
+            {
+                return query('#collector-content h2').clientWidth;
+            }
+
+            /**
+             * Draw one canvas.
+             *
+             * @param request   the request object
+             * @param max       <subjected for removal>
+             * @param threshold the threshold (lower bound) of the length of the timeline (in milliseconds).
+             * @param width     the width of the canvas.
+             */
+            this.drawOne = function(request, max, threshold, width)
+            {
+                "use strict";
+                var text,
+                    ms,
+                    xc,
+                    drawableEvents,
+                    mainEvents,
+                    elementId = 'timeline_' + request.id,
+                    canvasHeight = 0,
+                    gapPerEvent = 38,
+                    colors = _drawingColors,
+                    space = 10.5,
+                    ratio = (width - space * 2) / max,
+                    h = space,
+                    x = request.left * ratio + space, // position
+                    canvas = cache.get(elementId) || cache.set(elementId, document.getElementById(elementId)),
+                    ctx = canvas.getContext("2d"),
+                    scaleRatio,
+                    devicePixelRatio;
+
+                // Filter events whose total time is below the threshold.
+                drawableEvents = request.events.filter(function(event) {
+                    return event.duration >= threshold;
+                });
+
+                canvasHeight += gapPerEvent * drawableEvents.length;
+
+                // For retina displays so text and boxes will be crisp
+                devicePixelRatio = window.devicePixelRatio == "undefined" ? 1 : window.devicePixelRatio;
+                scaleRatio = devicePixelRatio / 1;
+
+                canvas.width = width * scaleRatio;
+                canvas.height = canvasHeight * scaleRatio;
+
+                canvas.style.width = width + 'px';
+                canvas.style.height = canvasHeight + 'px';
+
+                ctx.scale(scaleRatio, scaleRatio);
+
+                ctx.textBaseline = "middle";
+                ctx.lineWidth = 0;
+
+                // For each event, draw a line.
+                ctx.strokeStyle = "#dfdfdf";
+
+                drawableEvents.forEach(function(event) {
+                    event.periods.forEach(function(period) {
+                        var timelineHeadPosition = x + period.start * ratio;
+
+                        if (isChildEvent(event)) {
+                            ctx.fillStyle = colors.child_sections;
+                            ctx.fillRect(timelineHeadPosition, 0, (period.end - period.start) * ratio, canvasHeight);
+                        } else if (isSectionEvent(event)) {
+                            var timelineTailPosition = x + period.end * ratio;
+
+                            ctx.beginPath();
+                            ctx.moveTo(timelineHeadPosition, 0);
+                            ctx.lineTo(timelineHeadPosition, canvasHeight);
+                            ctx.moveTo(timelineTailPosition, 0);
+                            ctx.lineTo(timelineTailPosition, canvasHeight);
+                            ctx.fill();
+                            ctx.closePath();
+                            ctx.stroke();
+                        }
+                    });
+                });
+
+                // Filter for main events.
+                mainEvents = drawableEvents.filter(function(event) {
+                    return !isChildEvent(event)
+                });
+
+                // For each main event, draw the visual presentation of timelines.
+                mainEvents.forEach(function(event) {
+
+                    h += 8;
+
+                    // For each sub event, ...
+                    event.periods.forEach(function(period) {
+                        // Set the drawing style.
+                        ctx.fillStyle = colors['default'];
+                        ctx.strokeStyle = colors['default'];
+
+                        if (colors[event.name]) {
+                            ctx.fillStyle = colors[event.name];
+                            ctx.strokeStyle = colors[event.name];
+                        } else if (colors[event.category]) {
+                            ctx.fillStyle = colors[event.category];
+                            ctx.strokeStyle = colors[event.category];
+                        }
+
+                        // Draw the timeline
+                        var timelineHeadPosition = x + period.start * ratio;
+
+                        if (!isSectionEvent(event)) {
+                            ctx.fillRect(timelineHeadPosition, h + 3, 2, 6);
+                            ctx.fillRect(timelineHeadPosition, h, (period.end - period.start) * ratio || 2, 6);
+                        } else {
+                            var timelineTailPosition = x + period.end * ratio;
+
+                            ctx.beginPath();
+                            ctx.moveTo(timelineHeadPosition, h);
+                            ctx.lineTo(timelineHeadPosition, h + 11);
+                            ctx.lineTo(timelineHeadPosition + 8, h);
+                            ctx.lineTo(timelineHeadPosition, h);
+                            ctx.fill();
+                            ctx.closePath();
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.moveTo(timelineTailPosition, h);
+                            ctx.lineTo(timelineTailPosition, h + 11);
+                            ctx.lineTo(timelineTailPosition - 8, h);
+                            ctx.lineTo(timelineTailPosition, h);
+                            ctx.fill();
+                            ctx.closePath();
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.moveTo(timelineHeadPosition, h);
+                            ctx.lineTo(timelineTailPosition, h);
+                            ctx.lineTo(timelineTailPosition, h + 2);
+                            ctx.lineTo(timelineHeadPosition, h + 2);
+                            ctx.lineTo(timelineHeadPosition, h);
+                            ctx.fill();
+                            ctx.closePath();
+                            ctx.stroke();
+                        }
+                    });
+
+                    h += 30;
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = "#dfdfdf";
+                    ctx.moveTo(0, h - 10);
+                    ctx.lineTo(width, h - 10);
+                    ctx.closePath();
+                    ctx.stroke();
+                });
+
+                h = space;
+
+                // For each event, draw the label.
+                mainEvents.forEach(function(event) {
+
+                    ctx.fillStyle = "#444";
+                    ctx.font = "12px sans-serif";
+                    text = event.name;
+                    ms = " ~ " + (event.duration < 1 ? event.duration : parseInt(event.duration, 10)) + " ms / ~ " + event.memory + " MB";
+                    if (x + event.starttime * ratio + ctx.measureText(text + ms).width > width) {
+                        ctx.textAlign = "end";
+                        ctx.font = "10px sans-serif";
+                        xc = x + event.endtime * ratio - 1;
+                        ctx.fillText(ms, xc, h);
+
+                        xc -= ctx.measureText(ms).width;
+                        ctx.font = "12px sans-serif";
+                        ctx.fillText(text, xc, h);
+                    } else {
+                        ctx.textAlign = "start";
+                        ctx.font = "12px sans-serif";
+                        xc = x + event.starttime * ratio + 1;
+                        ctx.fillText(text, xc, h);
+
+                        xc += ctx.measureText(text).width;
+                        ctx.font = "10px sans-serif";
+                        ctx.fillText(ms, xc, h);
+                    }
+
+                    h += gapPerEvent;
+                });
+            };
+
+            this.drawAll = function(width, threshold)
+            {
+                "use strict";
+
+                width = width || getContainerWidth();
+                threshold = threshold || this.getThreshold();
+
+                var self = this;
+
+                _requests.forEach(function(request) {
+                    self.drawOne(request, _maxRequestTime, threshold, width);
+                });
+            };
+
+            this.getThreshold = function() {
+                var threshold = Sfjs.getPreference(_storagePrefix + 'threshold');
+
+                if (null === threshold) {
+                    return _threshold;
+                }
+
+                _threshold = parseInt(threshold);
+
+                return _threshold;
+            };
+
+            this.setThreshold = function(threshold)
+            {
+                _threshold = threshold;
+
+                Sfjs.setPreference(_storagePrefix + 'threshold', threshold);
+
+                return this;
+            };
+        };
+
+        function canvasAutoUpdateOnResizeAndSubmit(e) {
+            e.preventDefault();
+            canvasManager.drawAll();
+        }
+
+        function canvasAutoUpdateOnThresholdChange(e) {
+            canvasManager
+                .setThreshold(query('input[name="threshold"]').value)
+                .drawAll();
+        }
+
+        var requests_data = {
+            "max": {{ "%F"|format(collector.events.__section__.endtime) }},
+            "requests": [
+{{ dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
+
+{% if profile.children|length %}
+                ,
+{% for child in profile.children %}
+{{ dump_request_data(child.token, child, child.getcollector('time').events, collector.events.__section__.origin) }}{{ loop.last ? '' : ',' }}
+{% endfor %}
+{% endif %}
+            ]
+        };
+
+        var canvasManager = new CanvasManager(requests_data.requests, requests_data.max);
+
+        query('input[name="threshold"]').value = canvasManager.getThreshold();
+        canvasManager.drawAll();
+
+        // Update the colors of legends.
+        var timelineLegends = document.querySelectorAll('.sf-profiler-timeline > .legends > span[data-color]');
+
+        for (var i = 0; i < timelineLegends.length; ++i) {
+            var timelineLegend = timelineLegends[i];
+
+            timelineLegend.style.borderLeftColor = timelineLegend.getAttribute('data-color');
+        }
+
+        // Bind event handlers
+        var elementTimelineControl = query('#timeline-control'),
+            elementThresholdControl = query('input[name="threshold"]');
+
+        window.onresize = canvasAutoUpdateOnResizeAndSubmit;
+        elementTimelineControl.onsubmit = canvasAutoUpdateOnResizeAndSubmit;
+
+        elementThresholdControl.onclick = canvasAutoUpdateOnThresholdChange;
+        elementThresholdControl.onchange = canvasAutoUpdateOnThresholdChange;
+        elementThresholdControl.onkeyup = canvasAutoUpdateOnThresholdChange;
+
+        window.setTimeout(function() {
+            canvasAutoUpdateOnThresholdChange(null);
+        }, 50);
+
+    //]]>{% endautoescape %}</script>
+{% endblock %}
+
+{% macro dump_request_data(token, profile, events, origin) %}
+{% autoescape 'js' %}
+{% from _self import dump_events %}
+                {
+                    "id": "{{ token }}",
+                    "left": {{ "%F"|format(events.__section__.origin - origin) }},
+                    "events": [
+{{ dump_events(events) }}
+                    ]
+                }
+{% endautoescape %}
+{% endmacro %}
+
+{% macro dump_events(events) %}
+{% autoescape 'js' %}
+{% for name, event in events %}
+{% if '__section__' != name %}
+                        {
+                            "name": "{{ name }}",
+                            "category": "{{ event.category }}",
+                            "origin": {{ "%F"|format(event.origin) }},
+                            "starttime": {{ "%F"|format(event.starttime) }},
+                            "endtime": {{ "%F"|format(event.endtime) }},
+                            "duration": {{ "%F"|format(event.duration) }},
+                            "memory": {{ "%.1F"|format(event.memory / 1024 / 1024) }},
+                            "periods": [
+                                {%- for period in event.periods -%}
+                                    {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}
+                                {%- endfor -%}
+                            ]
+                        }{{ loop.last ? '' : ',' }}
+{% endif %}
+{% endfor %}
+{% endautoescape %}
+{% endmacro %}
+
+{% macro display_timeline(id, events, colors) %}
+    <div class="sf-profiler-timeline">
+        <div class="legends">
+            {% for category, color in colors %}
+                <span data-color="{{ color }}">{{ category }}</span>
+            {% endfor %}
+        </div>
+        <canvas width="680" height="" id="{{ id }}" class="timeline"></canvas>
+    </div>
+{% endmacro %}

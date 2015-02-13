@@ -1,0 +1,6 @@
+services:
+    foo_service:
+        class:    FooClass
+        tags:
+          # tag-attribute is not a scalar
+          - { name: foo, bar: { foo: foo, bar: bar } }

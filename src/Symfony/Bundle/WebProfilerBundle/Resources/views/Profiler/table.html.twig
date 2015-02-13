@@ -1,0 +1,16 @@
+<table {% if class is defined %}class='{{ class }}'{% endif %} >
+    <thead>
+        <tr>
+            <th scope="col" style="width: 25%">Key</th>
+            <th scope="col" style="width: 75%">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key in data|keys|sort %}
+            <tr>
+                <th>{{ key }}</th>
+                <td><pre>{{ profiler_dump(data[key]) }}</pre></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,8 @@
+framework:
+    secret: s3cr3t
+    templating:
+        assets_base_urls: https://cdn.example.com
+        engines:          [php, twig]
+        packages:
+            images:
+                base_urls: https://images.example.com

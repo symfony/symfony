@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="controller_resolver.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerResolver</parameter>
+        <parameter key="controller_name_converter.class">Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser</parameter>
+        <parameter key="response_listener.class">Symfony\Component\HttpKernel\EventListener\ResponseListener</parameter>
+        <parameter key="streamed_response_listener.class">Symfony\Component\HttpKernel\EventListener\StreamedResponseListener</parameter>
+        <parameter key="locale_listener.class">Symfony\Component\HttpKernel\EventListener\LocaleListener</parameter>
+    </parameters>
+
+    <services>
+        <service id="controller_name_converter" class="%controller_name_converter.class%" public="false">
+            <tag name="monolog.logger" channel="request" />
+            <argument type="service" id="kernel" />
+        </service>
+
+        <service id="controller_resolver" class="%controller_resolver.class%" public="false">
+            <tag name="monolog.logger" channel="request" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="controller_name_converter" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
+        <service id="response_listener" class="%response_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument>%kernel.charset%</argument>
+        </service>
+
+        <service id="streamed_response_listener" class="%streamed_response_listener.class%">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="locale_listener" class="%locale_listener.class%">
+            <tag name="kernel.event_subscriber" />
+            <argument>%kernel.default_locale%</argument>
+            <argument type="service" id="router" on-invalid="ignore" />
+            <argument type="service" id="request_stack" />
+        </service>
+
+        <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">
+            <argument type="service" id="translator" />
+            <argument type="service" id="request_stack" />
+            <tag name="kernel.event_subscriber" />
+        </service>
+    </services>
+</container>

@@ -19,7 +19,7 @@
         "php": ">=5.3.9",
         "symfony/event-dispatcher": "~2.1|~3.0.0",
         "symfony/intl": "~2.3|~3.0.0",
-        "symfony/options-resolver": "~2.6|~3.0.0",
+        "symfony/options-resolver": "~2.6",
         "symfony/property-access": "~2.3|~3.0.0"
     },
     "require-dev": {

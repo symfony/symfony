@@ -70,7 +70,7 @@ class Filesystem
             }
 
             $bytesOrigin = filesize($originFile);
-            
+
             if (stream_is_local($originFile) && $bytesCopied !== $bytesOrigin) {
                 throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
             }

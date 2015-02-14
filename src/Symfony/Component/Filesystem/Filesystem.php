@@ -69,8 +69,10 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
 
-            if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {
-                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s %g bytes copied".', $originFile, $targetFile, $bytesCopied), 0, null, $originFile);
+            $bytesOrigin = filesize($originFile);
+            
+            if (stream_is_local($originFile) && $bytesCopied !== $bytesOrigin) {
+                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
             }
         }
     }

@@ -174,6 +174,10 @@ class Command
 
     /**
      * Interacts with the user.
+     * 
+     * This method is executed before the InputDefinition is validated.
+     * This means that this is the only place where the command can
+     * interactively ask for values of missing options/arguments.
      *
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance

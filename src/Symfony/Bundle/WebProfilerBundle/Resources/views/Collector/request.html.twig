@@ -10,7 +10,7 @@
                     {{ collector.controller.method }}
                 </span>
             {% else %}
-                <span class="sf-toolbar-info-class" onclick="{% if link %}window.location='{{link|e('js')}}';window.event.stopPropagation();return false;{% endif %}">{{ collector.controller.class|abbr_class }}</span>
+                <span class="sf-toolbar-info-class"{% if link %} onclick="window.location='{{link|e('js')}}';window.event.stopPropagation();return false;"{% endif %}>{{ collector.controller.class|abbr_class }}</span>
             {% endif %}
         {% else %}
             <span class="sf-toolbar-info-class">{{ collector.controller }}</span>

@@ -39,4 +39,11 @@ interface PermissionMapInterface
      * @return bool
      */
     public function contains($permission);
+
+    /**
+     * Returns a new instance of the MaskBuilder used in the permissionMap
+     *
+     * @return MaskBuilderInterface
+     */
+    public function getMaskBuilder();
 }

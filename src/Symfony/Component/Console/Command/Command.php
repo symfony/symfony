@@ -11,13 +11,19 @@
 
 namespace Symfony\Component\Console\Command;
 
+<<<<<<< HEAD
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+<<<<<<< HEAD
 use Symfony\Component\Console\Output\BufferedOutput;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -345,7 +351,11 @@ class Command
     }
 
     /**
+<<<<<<< HEAD
      * Gets the InputDefinition to be used to create XML and Text representations of this Command.
+=======
+     * Gets the InputDefinition to be used to create representations of this Command.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      *
      * Can be overridden to provide the original command representation when it would otherwise
      * be changed by merging with the application InputDefinition.
@@ -601,6 +611,7 @@ class Command
     }
 
     /**
+<<<<<<< HEAD
      * Returns a text representation of the command.
      *
      * @return string A string representing the command
@@ -644,6 +655,8 @@ class Command
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Validates a command name.
      *
      * It must be non-empty and parts can optionally be separated by ":".

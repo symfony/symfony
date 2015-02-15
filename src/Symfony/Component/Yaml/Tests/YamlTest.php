@@ -22,6 +22,7 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $parsed = Yaml::parse($yml);
         $this->assertEquals($data, $parsed);
     }
+<<<<<<< HEAD
 
     public function testLegacyParseFromFile()
     {
@@ -33,4 +34,6 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $parsedByContents = Yaml::parse($contents);
         $this->assertEquals($parsedByFilename, $parsedByContents);
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

@@ -38,7 +38,11 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
+<<<<<<< HEAD
         $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
+=======
+        $closureLabel = 'public method';
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];

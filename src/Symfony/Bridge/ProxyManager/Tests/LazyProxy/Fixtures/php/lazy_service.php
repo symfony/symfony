@@ -46,11 +46,18 @@ class LazyServiceProjectServiceContainer extends Container
     public function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
+<<<<<<< HEAD
             $container = $this;
 
             return $this->services['foo'] = new stdClass_c1d194250ee2e2b7d2eab8b8212368a8(
                 function (& $wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {
                     $wrappedInstance = $container->getFooService(false);
+=======
+
+            return $this->services['foo'] = new stdClass_c1d194250ee2e2b7d2eab8b8212368a8(
+                function (& $wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
+                    $wrappedInstance = $this->getFooService(false);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                     $proxy->setProxyInitializer(null);
 

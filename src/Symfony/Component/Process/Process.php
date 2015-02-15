@@ -1058,6 +1058,7 @@ class Process
     }
 
     /**
+<<<<<<< HEAD
      * Gets the contents of STDIN.
      *
      * @return string|null The current contents
@@ -1074,6 +1075,8 @@ class Process
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Gets the Process input.
      *
      * @return null|string The Process input
@@ -1084,6 +1087,7 @@ class Process
     }
 
     /**
+<<<<<<< HEAD
      * Sets the contents of STDIN.
      *
      * @param string|null $stdin The new contents
@@ -1104,6 +1108,8 @@ class Process
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Sets the input.
      *
      * This content will be passed to the underlying process standard input.
@@ -1295,6 +1301,7 @@ class Process
      */
     protected function buildCallback($callback)
     {
+<<<<<<< HEAD
         $that = $this;
         $out = self::OUT;
         $callback = function ($type, $data) use ($that, $callback, $out) {
@@ -1302,6 +1309,14 @@ class Process
                 $that->addOutput($data);
             } else {
                 $that->addErrorOutput($data);
+=======
+        $out = self::OUT;
+        $callback = function ($type, $data) use ($callback, $out) {
+            if ($out == $type) {
+                $this->addOutput($data);
+            } else {
+                $this->addErrorOutput($data);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             }
 
             if (null !== $callback) {

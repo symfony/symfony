@@ -9,7 +9,11 @@ Resources
 
 Documentation:
 
+<<<<<<< HEAD
 http://symfony.com/doc/2.7/book/security.html
+=======
+http://symfony.com/doc/3.0/book/security.html
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 Tests
 -----

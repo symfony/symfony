@@ -11,7 +11,10 @@
         <parameter key="templating.engine.twig.class">Symfony\Bundle\TwigBundle\TwigEngine</parameter>
         <parameter key="twig.cache_warmer.class">Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheCacheWarmer</parameter>
         <parameter key="twig.extension.trans.class">Symfony\Bridge\Twig\Extension\TranslationExtension</parameter>
+<<<<<<< HEAD
         <parameter key="twig.extension.actions.class">Symfony\Bundle\TwigBundle\Extension\ActionsExtension</parameter>
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         <parameter key="twig.extension.code.class">Symfony\Bridge\Twig\Extension\CodeExtension</parameter>
         <parameter key="twig.extension.routing.class">Symfony\Bridge\Twig\Extension\RoutingExtension</parameter>
         <parameter key="twig.extension.yaml.class">Symfony\Bridge\Twig\Extension\YamlExtension</parameter>
@@ -87,11 +90,14 @@
 
         <service id="twig.extension.assets" class="Symfony\Bridge\Twig\Extension\AssetExtension" public="false">
             <argument type="service" id="assets.packages" />
+<<<<<<< HEAD
             <argument type="service" id="twig.extension.httpfoundation" />
         </service>
 
         <service id="twig.extension.actions" class="%twig.extension.actions.class%" public="false">
             <argument type="service" id="fragment.handler" />
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         </service>
 
         <service id="twig.extension.code" class="%twig.extension.code.class%" public="false">

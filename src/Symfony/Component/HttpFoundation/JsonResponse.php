@@ -120,7 +120,11 @@ class JsonResponse extends Response
         }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
+<<<<<<< HEAD
             throw new \InvalidArgumentException($this->transformJsonError());
+=======
+            throw new \InvalidArgumentException(json_last_error_msg());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
 
         return $this->update();
@@ -172,6 +176,7 @@ class JsonResponse extends Response
 
         return $this->setContent($this->data);
     }
+<<<<<<< HEAD
 
     private function transformJsonError()
     {
@@ -199,4 +204,6 @@ class JsonResponse extends Response
                 return 'Unknown error.';
         }
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

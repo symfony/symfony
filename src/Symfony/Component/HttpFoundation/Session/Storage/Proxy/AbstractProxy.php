@@ -26,11 +26,14 @@ abstract class AbstractProxy
     protected $wrapper = false;
 
     /**
+<<<<<<< HEAD
      * @var bool
      */
     protected $active = false;
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * @var string
      */
     protected $saveHandlerName;
@@ -72,6 +75,7 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
+<<<<<<< HEAD
         if (PHP_VERSION_ID >= 50400) {
             return $this->active = \PHP_SESSION_ACTIVE === session_status();
         }
@@ -98,6 +102,9 @@ abstract class AbstractProxy
         }
 
         $this->active = (bool) $flag;
+=======
+        return \PHP_SESSION_ACTIVE === session_status();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**

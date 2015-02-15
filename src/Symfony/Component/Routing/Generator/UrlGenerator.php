@@ -219,10 +219,13 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $referenceType = self::ABSOLUTE_URL;
                     $scheme = current($requiredSchemes);
                 }
+<<<<<<< HEAD
             } elseif (isset($requirements['_scheme']) && ($req = strtolower($requirements['_scheme'])) && $scheme !== $req) {
                 // We do this for BC; to be removed if _scheme is not supported anymore
                 $referenceType = self::ABSOLUTE_URL;
                 $scheme = $req;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             }
 
             if ($hostTokens) {

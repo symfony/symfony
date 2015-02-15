@@ -111,10 +111,15 @@ class ProcessHelper extends Helper
     {
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
+<<<<<<< HEAD
         $that = $this;
 
         return function ($type, $buffer) use ($output, $process, $callback, $formatter, $that) {
             $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
+=======
+        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
+            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             if (null !== $callback) {
                 call_user_func($callback, $type, $buffer);
@@ -122,12 +127,16 @@ class ProcessHelper extends Helper
         };
     }
 
+<<<<<<< HEAD
     /**
      * This method is public for PHP 5.3 compatibility, it should be private.
      *
      * @internal
      */
     public function escapeString($str)
+=======
+    private function escapeString($str)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return str_replace('<', '\\<', $str);
     }

@@ -13,4 +13,8 @@
     - Attr2: val2
 - Tag: `tag1`
     - Attr3: val3
+<<<<<<< HEAD
 - Tag: `tag2`
+=======
+- Tag: `tag2`
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

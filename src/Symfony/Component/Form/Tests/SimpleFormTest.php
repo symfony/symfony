@@ -134,7 +134,11 @@ class SimpleFormTest extends AbstractFormTest
         $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preSubmit'));
         $form = new Form($config);
 
+<<<<<<< HEAD
         $form->submit(false);
+=======
+        $form->bind(false);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->assertTrue($form->isValid());
         $this->assertNull($form->getData());
@@ -654,12 +658,20 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyDataFromClosure()
     {
+<<<<<<< HEAD
         $test = $this;
         $form = $this->getBuilder()
             ->setEmptyData(function ($form) use ($test) {
             // the form instance is passed to the closure to allow use
             // of form data when creating the empty value
             $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+=======
+        $form = $this->getBuilder()
+            ->setEmptyData(function ($form) {
+            // the form instance is passed to the closure to allow use
+            // of form data when creating the empty value
+            $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             return 'foo';
         })
@@ -901,12 +913,19 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmittingWrongDataIsIgnored()
     {
+<<<<<<< HEAD
         $test = $this;
 
         $child = $this->getBuilder('child', $this->dispatcher);
         $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($test) {
             // child form doesn't receive the wrong data that is submitted on parent
             $test->assertNull($event->getData());
+=======
+        $child = $this->getBuilder('child', $this->dispatcher);
+        $child->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            // child form doesn't receive the wrong data that is submitted on parent
+            $this->assertNull($event->getData());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
 
         $parent = $this->getBuilder('parent', new EventDispatcher())
@@ -1006,10 +1025,16 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testPostSubmitDataIsNullIfInheritData()
     {
+<<<<<<< HEAD
         $test = $this;
         $form = $this->getBuilder()
             ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($test) {
                 $test->assertNull($event->getData());
+=======
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $this->assertNull($event->getData());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             })
             ->setInheritData(true)
             ->getForm();
@@ -1019,10 +1044,16 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testSubmitIsNeverFiredIfInheritData()
     {
+<<<<<<< HEAD
         $test = $this;
         $form = $this->getBuilder()
             ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) use ($test) {
                 $test->fail('The SUBMIT event should not be fired');
+=======
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+                $this->fail('The SUBMIT event should not be fired');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             })
             ->setInheritData(true)
             ->getForm();

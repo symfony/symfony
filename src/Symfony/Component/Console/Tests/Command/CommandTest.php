@@ -317,6 +317,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $output->writeln('from the code...');
     }
+<<<<<<< HEAD
 
     public function testLegacyAsText()
     {
@@ -339,4 +340,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

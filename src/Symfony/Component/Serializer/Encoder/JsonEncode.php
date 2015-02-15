@@ -29,6 +29,7 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
+<<<<<<< HEAD
      * Returns the last encoding error (if any).
      *
      * @return int
@@ -46,6 +47,8 @@ class JsonEncode implements EncoderInterface
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Encodes PHP data to a JSON string.
      *
      * {@inheritdoc}

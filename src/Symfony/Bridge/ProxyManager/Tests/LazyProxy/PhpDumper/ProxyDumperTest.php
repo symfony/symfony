@@ -71,10 +71,17 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
         $code = $this->dumper->getProxyFactoryCode($definition, 'foo');
 
         $this->assertStringMatchesFormat(
+<<<<<<< HEAD
             '%wif ($lazyLoad) {%w$container = $this;%wreturn $this->services[\'foo\'] = new '
             .'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
             .'(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {'
             .'%w$wrappedInstance = $container->getFooService(false);%w$proxy->setProxyInitializer(null);'
+=======
+            '%wif ($lazyLoad) {%wreturn $this->services[\'foo\'] = new '
+            .'SymfonyBridgeProxyManagerTestsLazyProxyPhpDumperProxyDumperTest_%s(%wfunction '
+            .'(&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {'
+            .'%w$wrappedInstance = $this->getFooService(false);%w$proxy->setProxyInitializer(null);'
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             .'%wreturn true;%w}%w);%w}%w',
             $code
         );

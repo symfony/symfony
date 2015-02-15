@@ -53,6 +53,7 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+<<<<<<< HEAD
             ->validate()
                 ->ifTrue(function ($v) { return isset($v['templating']); })
                 ->then(function ($v) {
@@ -91,6 +92,8 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -360,6 +363,7 @@ class Configuration implements ConfigurationInterface
 
     private function addTemplatingSection(ArrayNodeDefinition $rootNode)
     {
+<<<<<<< HEAD
         $organizeUrls = function ($urls) {
             $urls += array(
                 'http' => array(),
@@ -380,15 +384,22 @@ class Configuration implements ConfigurationInterface
             return $urls;
         };
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $rootNode
             ->children()
                 ->arrayNode('templating')
                     ->info('templating configuration')
                     ->canBeUnset()
                     ->children()
+<<<<<<< HEAD
                         ->scalarNode('assets_version')->defaultNull()->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()
+=======
+                        ->scalarNode('hinclude_default_template')->defaultNull()->end()
+                        ->scalarNode('cache')->end()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
                             ->fixXmlConfig('resource')
@@ -406,6 +417,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+<<<<<<< HEAD
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
@@ -431,6 +443,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('cache')->end()
                     ->end()
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                     ->fixXmlConfig('engine')
                     ->children()
                         ->arrayNode('engines')
@@ -454,6 +468,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
+<<<<<<< HEAD
                     ->fixXmlConfig('package')
                     ->children()
                         ->arrayNode('packages')
@@ -488,6 +503,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 ->end()
             ->end()
         ;

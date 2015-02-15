@@ -35,6 +35,7 @@ class JsonBundleWriter implements BundleWriterInterface
             }
         });
 
+<<<<<<< HEAD
         if (PHP_VERSION_ID >= 50400) {
             // Use JSON_PRETTY_PRINT so that we can see what changed in Git diffs
             file_put_contents(
@@ -44,5 +45,10 @@ class JsonBundleWriter implements BundleWriterInterface
         } else {
             file_put_contents($path.'/'.$locale.'.json', json_encode($data)."\n");
         }
+=======
+        $contents = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)."\n";
+
+        file_put_contents($path.'/'.$locale.'.json', $contents);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 }

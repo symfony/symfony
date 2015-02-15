@@ -62,6 +62,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $this->engine->get('form')->form($view, $vars);
     }
 
+<<<<<<< HEAD
     protected function renderEnctype(FormView $view)
     {
         if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
@@ -71,6 +72,8 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return (string) $form->enctype($view);
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         return (string) $this->engine->get('form')->label($view, $label, $vars);

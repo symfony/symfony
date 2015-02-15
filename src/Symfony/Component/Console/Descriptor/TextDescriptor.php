@@ -231,10 +231,13 @@ class TextDescriptor extends Descriptor
      */
     private function formatDefaultValue($default)
     {
+<<<<<<< HEAD
         if (PHP_VERSION_ID < 50400) {
             return str_replace('\/', '/', json_encode($default));
         }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 

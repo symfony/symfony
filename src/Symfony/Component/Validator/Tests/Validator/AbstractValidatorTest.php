@@ -71,6 +71,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidate()
     {
+<<<<<<< HEAD
         $test = $this;
 
         $callback = function ($value, ExecutionContextInterface $context) use ($test) {
@@ -81,6 +82,16 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame('Bernhard', $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
             $test->assertSame('Bernhard', $value);
+=======
+        $callback = function ($value, ExecutionContextInterface $context) {
+            $this->assertNull($context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame('Bernhard', $context->getRoot());
+            $this->assertSame('Bernhard', $context->getValue());
+            $this->assertSame('Bernhard', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -106,6 +117,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testClassConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
 
@@ -118,6 +130,19 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity, $context->getValue());
             $test->assertSame($entity, $value);
+=======
+        $entity = new Entity();
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->metadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity, $context->getValue());
+            $this->assertSame($entity, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -143,6 +168,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testPropertyConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->firstName = 'Bernhard';
@@ -158,6 +184,22 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
             $test->assertSame('Bernhard', $value);
+=======
+        $entity = new Entity();
+        $entity->firstName = 'Bernhard';
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
+
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertSame('firstName', $context->getPropertyName());
+            $this->assertSame('firstName', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Bernhard', $context->getValue());
+            $this->assertSame('Bernhard', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -183,6 +225,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetterConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->setLastName('Schussek');
@@ -198,6 +241,22 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Schussek', $context->getValue());
             $test->assertSame('Schussek', $value);
+=======
+        $entity = new Entity();
+        $entity->setLastName('Schussek');
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->metadata->getPropertyMetadata('lastName');
+
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertSame('lastName', $context->getPropertyName());
+            $this->assertSame('lastName', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Schussek', $context->getValue());
+            $this->assertSame('Schussek', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -223,6 +282,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testArray()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $array = array('key' => $entity);
@@ -236,6 +296,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($array, $context->getRoot());
             $test->assertSame($entity, $context->getValue());
             $test->assertSame($entity, $value);
+=======
+        $entity = new Entity();
+        $array = array('key' => $entity);
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('[key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->metadata, $context->getMetadata());
+            $this->assertSame($array, $context->getRoot());
+            $this->assertSame($entity, $context->getValue());
+            $this->assertSame($entity, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -261,6 +335,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRecursiveArray()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $array = array(2 => array('key' => $entity));
@@ -274,6 +349,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($array, $context->getRoot());
             $test->assertSame($entity, $context->getValue());
             $test->assertSame($entity, $value);
+=======
+        $entity = new Entity();
+        $array = array(2 => array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $array) {
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('[2][key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->metadata, $context->getMetadata());
+            $this->assertSame($array, $context->getRoot());
+            $this->assertSame($entity, $context->getValue());
+            $this->assertSame($entity, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -299,6 +388,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTraversable()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $traversable = new \ArrayIterator(array('key' => $entity));
@@ -312,6 +402,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($traversable, $context->getRoot());
             $test->assertSame($entity, $context->getValue());
             $test->assertSame($entity, $value);
+=======
+        $entity = new Entity();
+        $traversable = new \ArrayIterator(array('key' => $entity));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('[key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->metadata, $context->getMetadata());
+            $this->assertSame($traversable, $context->getRoot());
+            $this->assertSame($entity, $context->getValue());
+            $this->assertSame($entity, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -337,12 +441,16 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testRecursiveTraversable()
     {
+<<<<<<< HEAD
         $test = $this;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $entity = new Entity();
         $traversable = new \ArrayIterator(array(
             2 => new \ArrayIterator(array('key' => $entity)),
         ));
 
+<<<<<<< HEAD
         $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity, $traversable) {
             $test->assertSame($test::ENTITY_CLASS, $context->getClassName());
             $test->assertNull($context->getPropertyName());
@@ -352,6 +460,17 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($traversable, $context->getRoot());
             $test->assertSame($entity, $context->getValue());
             $test->assertSame($entity, $value);
+=======
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity, $traversable) {
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('[2][key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->metadata, $context->getMetadata());
+            $this->assertSame($traversable, $context->getRoot());
+            $this->assertSame($entity, $context->getValue());
+            $this->assertSame($entity, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -377,6 +496,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testReferenceClassConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->reference = new Reference();
@@ -390,6 +510,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity->reference, $context->getValue());
             $test->assertSame($entity->reference, $value);
+=======
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('reference', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference, $context->getValue());
+            $this->assertSame($entity->reference, $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -416,11 +550,15 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testReferencePropertyConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference->value = 'Foobar';
 
+<<<<<<< HEAD
         $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
             $propertyMetadatas = $test->referenceMetadata->getPropertyMetadata('value');
 
@@ -432,6 +570,19 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Foobar', $context->getValue());
             $test->assertSame('Foobar', $value);
+=======
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('value');
+
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertSame('value', $context->getPropertyName());
+            $this->assertSame('reference.value', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Foobar', $context->getValue());
+            $this->assertSame('Foobar', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -458,11 +609,15 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testReferenceGetterConstraint()
     {
+<<<<<<< HEAD
         $test = $this;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $entity = new Entity();
         $entity->reference = new Reference();
         $entity->reference->setPrivateValue('Bamboo');
 
+<<<<<<< HEAD
         $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
             $propertyMetadatas = $test->referenceMetadata->getPropertyMetadata('privateValue');
 
@@ -474,6 +629,19 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Bamboo', $context->getValue());
             $test->assertSame('Bamboo', $value);
+=======
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->referenceMetadata->getPropertyMetadata('privateValue');
+
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertSame('privateValue', $context->getPropertyName());
+            $this->assertSame('reference.privateValue', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Bamboo', $context->getValue());
+            $this->assertSame('Bamboo', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -526,6 +694,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayReference()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->reference = array('key' => new Reference());
@@ -539,6 +708,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity->reference['key'], $context->getValue());
             $test->assertSame($entity->reference['key'], $value);
+=======
+        $entity = new Entity();
+        $entity->reference = array('key' => new Reference());
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('reference[key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference['key'], $context->getValue());
+            $this->assertSame($entity->reference['key'], $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -566,6 +749,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     // https://github.com/symfony/symfony/issues/6246
     public function testRecursiveArrayReference()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->reference = array(2 => array('key' => new Reference()));
@@ -579,6 +763,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity->reference[2]['key'], $context->getValue());
             $test->assertSame($entity->reference[2]['key'], $value);
+=======
+        $entity = new Entity();
+        $entity->reference = array(2 => array('key' => new Reference()));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('reference[2][key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference[2]['key'], $context->getValue());
+            $this->assertSame($entity->reference[2]['key'], $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -671,6 +869,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTraversableReference()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->reference = new \ArrayIterator(array('key' => new Reference()));
@@ -684,6 +883,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity->reference['key'], $context->getValue());
             $test->assertSame($entity->reference['key'], $value);
+=======
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(array('key' => new Reference()));
+
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('reference[key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference['key'], $context->getValue());
+            $this->assertSame($entity->reference['key'], $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -746,12 +959,16 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableRecursiveTraversableTraversal()
     {
+<<<<<<< HEAD
         $test = $this;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $entity = new Entity();
         $entity->reference = new \ArrayIterator(array(
             2 => new \ArrayIterator(array('key' => new Reference())),
         ));
 
+<<<<<<< HEAD
         $callback = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
             $test->assertSame($test::REFERENCE_CLASS, $context->getClassName());
             $test->assertNull($context->getPropertyName());
@@ -761,6 +978,17 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame($entity->reference[2]['key'], $context->getValue());
             $test->assertSame($entity->reference[2]['key'], $value);
+=======
+        $callback = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $this->assertSame($this::REFERENCE_CLASS, $context->getClassName());
+            $this->assertNull($context->getPropertyName());
+            $this->assertSame('reference[2][key]', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($this->referenceMetadata, $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame($entity->reference[2]['key'], $context->getValue());
+            $this->assertSame($entity->reference[2]['key'], $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -789,11 +1017,15 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateProperty()
     {
+<<<<<<< HEAD
         $test = $this;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $entity = new Entity();
         $entity->firstName = 'Bernhard';
         $entity->setLastName('Schussek');
 
+<<<<<<< HEAD
         $callback1 = function ($value, ExecutionContextInterface $context) use ($test, $entity) {
             $propertyMetadatas = $test->metadata->getPropertyMetadata('firstName');
 
@@ -805,6 +1037,19 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
             $test->assertSame('Bernhard', $value);
+=======
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
+
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertSame('firstName', $context->getPropertyName());
+            $this->assertSame('firstName', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Bernhard', $context->getValue());
+            $this->assertSame('Bernhard', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -866,6 +1111,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidatePropertyValue()
     {
+<<<<<<< HEAD
         $test = $this;
         $entity = new Entity();
         $entity->setLastName('Schussek');
@@ -881,6 +1127,22 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame($entity, $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
             $test->assertSame('Bernhard', $value);
+=======
+        $entity = new Entity();
+        $entity->setLastName('Schussek');
+
+        $callback1 = function ($value, ExecutionContextInterface $context) use ($entity) {
+            $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
+
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertSame('firstName', $context->getPropertyName());
+            $this->assertSame('firstName', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame($entity, $context->getRoot());
+            $this->assertSame('Bernhard', $context->getValue());
+            $this->assertSame('Bernhard', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };
@@ -919,6 +1181,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidatePropertyValueWithClassName()
     {
+<<<<<<< HEAD
         $test = $this;
 
         $callback1 = function ($value, ExecutionContextInterface $context) use ($test) {
@@ -932,6 +1195,19 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
             $test->assertSame('Bernhard', $context->getRoot());
             $test->assertSame('Bernhard', $context->getValue());
             $test->assertSame('Bernhard', $value);
+=======
+        $callback1 = function ($value, ExecutionContextInterface $context) {
+            $propertyMetadatas = $this->metadata->getPropertyMetadata('firstName');
+
+            $this->assertSame($this::ENTITY_CLASS, $context->getClassName());
+            $this->assertSame('firstName', $context->getPropertyName());
+            $this->assertSame('', $context->getPropertyPath());
+            $this->assertSame('Group', $context->getGroup());
+            $this->assertSame($propertyMetadatas[0], $context->getMetadata());
+            $this->assertSame('Bernhard', $context->getRoot());
+            $this->assertSame('Bernhard', $context->getValue());
+            $this->assertSame('Bernhard', $value);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $context->addViolation('Message %param%', array('%param%' => 'value'));
         };

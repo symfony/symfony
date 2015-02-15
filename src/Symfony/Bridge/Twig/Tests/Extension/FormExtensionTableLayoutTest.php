@@ -64,11 +64,14 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
     }
 
+<<<<<<< HEAD
     protected function renderEnctype(FormView $view)
     {
         return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         if ($label !== null) {

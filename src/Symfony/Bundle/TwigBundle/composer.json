@@ -16,6 +16,7 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "php": ">=5.3.9",
         "symfony/asset": "~2.7|~3.0.0",
         "symfony/twig-bridge": "~2.7|~3.0.0",
@@ -30,6 +31,21 @@
         "symfony/routing": "~2.1|~3.0.0",
         "symfony/templating": "~2.1|~3.0.0",
         "symfony/framework-bundle": "~2.7|~3.0.0"
+=======
+        "php": ">=5.5.9",
+        "symfony/twig-bridge": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0"
+    },
+    "require-dev": {
+        "symfony/stopwatch": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "symfony/expression-language": "~2.7|~3.0",
+        "symfony/config": "~2.7|~3.0",
+        "symfony/routing": "~2.7|~3.0",
+        "symfony/templating": "~2.7|~3.0",
+        "symfony/framework-bundle": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\TwigBundle\\": "" }
@@ -38,7 +54,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
             "dev-master": "2.7-dev"
+=======
+            "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

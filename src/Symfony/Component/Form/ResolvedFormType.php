@@ -192,7 +192,11 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * Returns the configured options resolver used for this type.
      *
+<<<<<<< HEAD
      * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+=======
+     * @return \Symfony\Component\OptionsResolver\OptionsResolver The options resolver.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      */
     public function getOptionsResolver()
     {
@@ -203,6 +207,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 $this->optionsResolver = new OptionsResolver();
             }
 
+<<<<<<< HEAD
             $this->innerType->setDefaultOptions($this->optionsResolver);
 
             $reflector = new \ReflectionMethod($this->innerType, 'setDefaultOptions');
@@ -221,6 +226,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 if (true === $isOverwritten) {
                     trigger_error('The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
                 }
+=======
+            $this->innerType->configureOptions($this->optionsResolver);
+
+            foreach ($this->typeExtensions as $extension) {
+                $extension->configureOptions($this->optionsResolver);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             }
         }
 

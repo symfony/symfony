@@ -16,7 +16,10 @@ use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\DebugClassLoader;
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
+<<<<<<< HEAD
 use Symfony\Component\ClassLoader\UniversalClassLoader as SymfonyUniversalClassLoader;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * ErrorHandler for classes that do not exist.
@@ -111,7 +114,11 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
                 }
             }
 
+<<<<<<< HEAD
             if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader || $function[0] instanceof SymfonyUniversalClassLoader) {
+=======
+            if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 foreach ($function[0]->getPrefixes() as $prefix => $paths) {
                     foreach ($paths as $path) {
                         $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
@@ -192,6 +199,10 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     private function classExists($class)
     {
+<<<<<<< HEAD
         return class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
+=======
+        return class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 }

@@ -11,10 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
+<<<<<<< HEAD
 if (!defined('JSON_PRETTY_PRINT')) {
     define('JSON_PRETTY_PRINT', 128);
 }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -184,9 +187,12 @@ class JsonDescriptor extends Descriptor
      */
     protected function getRouteData(Route $route)
     {
+<<<<<<< HEAD
         $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return array(
             'path' => $route->getPath(),
             'pathRegex' => $route->compile()->getRegex(),
@@ -196,7 +202,11 @@ class JsonDescriptor extends Descriptor
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
             'class' => get_class($route),
             'defaults' => $route->getDefaults(),
+<<<<<<< HEAD
             'requirements' => $requirements ?: 'NO CUSTOM',
+=======
+            'requirements' => $route->getRequirements() ?: 'NO CUSTOM',
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             'options' => $route->getOptions(),
         );
     }

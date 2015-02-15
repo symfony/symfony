@@ -195,11 +195,17 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
+<<<<<<< HEAD
      * @internal This method is public for PHP 5.3 compatibility, it should not be used.
      *
      * @return int The progress bar step width
      */
     public function getStepWidth()
+=======
+     * @return int     The progress bar step width
+     */
+    private function getStepWidth()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->stepWidth;
     }
@@ -436,6 +442,7 @@ class ProgressBar
             return;
         }
 
+<<<<<<< HEAD
         // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
         $self = $this;
         $output = $this->output;
@@ -445,6 +452,13 @@ class ProgressBar
                 $text = call_user_func($formatter, $self, $output);
             } elseif (isset($messages[$matches[1]])) {
                 $text = $messages[$matches[1]];
+=======
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $this, $this->output);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             } else {
                 return $matches[0];
             }

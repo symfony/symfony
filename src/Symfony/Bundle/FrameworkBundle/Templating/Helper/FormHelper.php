@@ -121,6 +121,7 @@ class FormHelper extends Helper
     }
 
     /**
+<<<<<<< HEAD
      * Renders the HTML enctype in the form tag, if necessary.
      *
      * Example usage templates:
@@ -142,6 +143,8 @@ class FormHelper extends Helper
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Renders the HTML for a given view.
      *
      * Example usage:

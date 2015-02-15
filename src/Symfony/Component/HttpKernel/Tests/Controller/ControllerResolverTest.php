@@ -181,6 +181,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('foobar', 'foobar');
         $controller = array(new self(), 'controllerMethod3');
 
+<<<<<<< HEAD
         if (PHP_VERSION_ID === 50316) {
             $this->markTestSkipped('PHP 5.3.16 has a major bug in the Reflection sub-system');
         } else {
@@ -190,6 +191,13 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
             } catch (\Exception $e) {
                 $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
             }
+=======
+        try {
+            $resolver->getArguments($request, $controller);
+            $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
 
         $request = Request::create('/');

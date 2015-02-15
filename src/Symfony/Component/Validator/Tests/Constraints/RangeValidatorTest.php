@@ -194,11 +194,17 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
             array(new \DateTime('March 20, 2014')),
         );
 
+<<<<<<< HEAD
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
             $tests[] = array(new \DateTimeImmutable('March 10, 2014'));
             $tests[] = array(new \DateTimeImmutable('March 15, 2014'));
             $tests[] = array(new \DateTimeImmutable('March 20, 2014'));
         }
+=======
+        $tests[] = array(new \DateTimeImmutable('March 10, 2014'));
+        $tests[] = array(new \DateTimeImmutable('March 15, 2014'));
+        $tests[] = array(new \DateTimeImmutable('March 20, 2014'));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->restoreDefaultTimezone();
 
@@ -216,10 +222,15 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
             array(new \DateTime('March 9, 2014'), 'Mar 9, 2014, 12:00 AM'),
         );
 
+<<<<<<< HEAD
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
             $tests[] = array(new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM');
             $tests[] = array(new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM');
         }
+=======
+        $tests[] = array(new \DateTimeImmutable('March 20, 2013'), 'Mar 20, 2013, 12:00 AM');
+        $tests[] = array(new \DateTimeImmutable('March 9, 2014'), 'Mar 9, 2014, 12:00 AM');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->restoreDefaultTimezone();
 
@@ -237,10 +248,15 @@ class RangeValidatorTest extends AbstractConstraintValidatorTest
             array(new \DateTime('March 9, 2015'), 'Mar 9, 2015, 12:00 AM'),
         );
 
+<<<<<<< HEAD
         if (version_compare(PHP_VERSION, '5.5.0-dev', '>=')) {
             $tests[] = array(new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM');
             $tests[] = array(new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM');
         }
+=======
+        $tests[] = array(new \DateTimeImmutable('March 21, 2014'), 'Mar 21, 2014, 12:00 AM');
+        $tests[] = array(new \DateTimeImmutable('March 9, 2015'), 'Mar 9, 2015, 12:00 AM');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->restoreDefaultTimezone();
 

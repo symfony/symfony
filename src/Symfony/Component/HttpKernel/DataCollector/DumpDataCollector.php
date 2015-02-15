@@ -63,12 +63,16 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $this->isCollected = false;
         }
 
+<<<<<<< HEAD
         $trace = DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS;
         if (PHP_VERSION_ID >= 50400) {
             $trace = debug_backtrace($trace, 7);
         } else {
             $trace = debug_backtrace($trace);
         }
+=======
+        $trace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS, 7);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $file = $trace[0]['file'];
         $line = $trace[0]['line'];

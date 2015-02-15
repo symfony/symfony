@@ -35,8 +35,13 @@ class TextDescriptor extends Descriptor
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
+<<<<<<< HEAD
         $table = new Table($this->getOutput());
         $table->setStyle('compact');
+=======
+
+        $table = new Table($this->output);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -70,9 +75,12 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
+<<<<<<< HEAD
         $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         // fixme: values were originally written as raw
         $description = array(
             '<comment>Path</comment>         '.$route->getPath(),
@@ -83,7 +91,11 @@ class TextDescriptor extends Descriptor
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
             '<comment>Class</comment>        '.get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
+<<<<<<< HEAD
             '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
+=======
+            '<comment>Requirements</comment> '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'),
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
         );
 
@@ -100,8 +112,12 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
+<<<<<<< HEAD
         $table = new Table($this->getOutput());
         $table->setStyle('compact');
+=======
+        $table = new Table($this->output);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -201,8 +217,12 @@ class TextDescriptor extends Descriptor
         $tagsCount = count($maxTags);
         $tagsNames = array_keys($maxTags);
 
+<<<<<<< HEAD
         $table = new Table($this->getOutput());
         $table->setStyle('compact');
+=======
+        $table = new Table($this->output);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -337,11 +357,19 @@ class TextDescriptor extends Descriptor
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
         $registeredListeners = $eventDispatcher->getListeners($event);
+<<<<<<< HEAD
 
         if (null !== $event) {
             $this->writeText("\n");
             $table = new Table($this->getOutput());
             $table->getStyle()->setCellHeaderFormat('%s');
+=======
+        $table = new Table($this->output);
+
+        if (null !== $event) {
+            $this->writeText("\n");
+
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             $table->setHeaders(array('Order', 'Callable'));
 
             foreach ($registeredListeners as $order => $listener) {
@@ -354,8 +382,11 @@ class TextDescriptor extends Descriptor
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
 
+<<<<<<< HEAD
                 $table = new Table($this->getOutput());
                 $table->getStyle()->setCellHeaderFormat('%s');
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 $table->setHeaders(array('Order', 'Callable'));
 
                 foreach ($eventListeners as $order => $eventListener) {

@@ -16,12 +16,21 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "php": ">=5.3.9",
         "symfony/dependency-injection": "~2.3|~3.0.0",
         "ocramius/proxy-manager": "~0.4|~1.0"
     },
     "require-dev": {
         "symfony/config": "~2.3|~3.0.0"
+=======
+        "php": ">=5.5.9",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "ocramius/proxy-manager": "~0.4|~1.0"
+    },
+    "require-dev": {
+        "symfony/config": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "autoload": {
         "psr-0": {
@@ -32,7 +41,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
             "dev-master": "2.7-dev"
+=======
+            "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

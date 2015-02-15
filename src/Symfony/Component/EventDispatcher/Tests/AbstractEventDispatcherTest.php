@@ -121,6 +121,7 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($event, $return);
     }
 
+<<<<<<< HEAD
     public function testLegacyDispatch()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -130,6 +131,8 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('pre.foo', $event->getName());
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testDispatchForClosure()
     {
         $invoked = 0;
@@ -247,6 +250,7 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
 
+<<<<<<< HEAD
     public function testLegacyEventReceivesTheDispatcherInstance()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -259,6 +263,8 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->dispatcher, $dispatcher);
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testEventReceivesTheDispatcherInstanceAsArgument()
     {
         $listener = new TestWithDispatcher();

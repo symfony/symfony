@@ -46,6 +46,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             array('condition', 'context.getMethod() == "GET"', 'getCondition'),
         );
     }
+<<<<<<< HEAD
 
     public function testLegacyGetPattern()
     {
@@ -54,4 +55,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $route = new Route(array('value' => '/Blog'));
         $this->assertEquals($route->getPattern(), '/Blog');
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

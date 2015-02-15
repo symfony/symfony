@@ -19,7 +19,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
+<<<<<<< HEAD
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -312,6 +315,7 @@ EOF;
         $this->assertEquals($expected, $output);
     }
 
+<<<<<<< HEAD
     public function testLegacyIsClassInActiveBundleFalse()
     {
         $kernel = $this->getKernelMockForIsClassInActiveBundleTest();
@@ -347,6 +351,8 @@ EOF;
         return $kernel;
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testGetRootDir()
     {
         $kernel = new KernelForTest('test', true);

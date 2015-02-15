@@ -43,10 +43,14 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
+<<<<<<< HEAD
         $declared = array_merge(get_declared_classes(), get_declared_interfaces());
         if (function_exists('get_declared_traits')) {
             $declared = array_merge($declared, get_declared_traits());
         }
+=======
+        $declared = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         if ($adaptive) {
             // don't include already declared classes

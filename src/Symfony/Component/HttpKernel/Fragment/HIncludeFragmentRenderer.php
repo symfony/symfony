@@ -107,11 +107,15 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (count($attributes) > 0) {
+<<<<<<< HEAD
             if (PHP_VERSION_ID >= 50400) {
                 $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             } else {
                 $flags = ENT_QUOTES;
             }
+=======
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',

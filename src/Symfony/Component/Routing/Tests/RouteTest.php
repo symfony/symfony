@@ -164,6 +164,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->hasScheme('httpS'));
     }
 
+<<<<<<< HEAD
     public function testLegacySchemeRequirement()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -181,6 +182,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($route->getRequirement('_scheme'));
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testMethod()
     {
         $route = new Route('/');
@@ -191,6 +194,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('GET', 'POST'), $route->getMethods(), '->setMethods() accepts an array of methods and uppercases them');
     }
 
+<<<<<<< HEAD
     public function testLegacyMethodRequirement()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -205,6 +209,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($route->getRequirement('_method'));
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testCondition()
     {
         $route = new Route('/');
@@ -222,6 +228,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
     }
 
+<<<<<<< HEAD
     public function testLegacyPattern()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -233,6 +240,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/bar', $route->getPattern());
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testSerialize()
     {
         $route = new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+'));

@@ -16,10 +16,17 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "php": ">=5.3.9"
     },
     "require-dev": {
         "symfony/css-selector": "~2.3|~3.0.0"
+=======
+        "php": ">=5.5.9"
+    },
+    "require-dev": {
+        "symfony/css-selector": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "suggest": {
         "symfony/css-selector": ""
@@ -31,7 +38,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
             "dev-master": "2.7-dev"
+=======
+            "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

@@ -34,7 +34,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
+<<<<<<< HEAD
 class Controller extends ContainerAware
+=======
+abstract class Controller extends ContainerAware
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 {
     /**
      * Generates a URL from the given parameters.
@@ -47,7 +51,11 @@ class Controller extends ContainerAware
      *
      * @see UrlGeneratorInterface
      */
+<<<<<<< HEAD
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+=======
+    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -61,7 +69,11 @@ class Controller extends ContainerAware
      *
      * @return Response A Response instance
      */
+<<<<<<< HEAD
     public function forward($controller, array $path = array(), array $query = array())
+=======
+    protected function forward($controller, array $path = array(), array $query = array())
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         $path['_controller'] = $controller;
         $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
@@ -77,7 +89,11 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
+<<<<<<< HEAD
     public function redirect($url, $status = 302)
+=======
+    protected function redirect($url, $status = 302)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return new RedirectResponse($url, $status);
     }
@@ -156,7 +172,11 @@ class Controller extends ContainerAware
      *
      * @return string The rendered view
      */
+<<<<<<< HEAD
     public function renderView($view, array $parameters = array())
+=======
+    protected function renderView($view, array $parameters = array())
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->get('templating')->render($view, $parameters);
     }
@@ -170,7 +190,11 @@ class Controller extends ContainerAware
      *
      * @return Response A Response instance
      */
+<<<<<<< HEAD
     public function render($view, array $parameters = array(), Response $response = null)
+=======
+    protected function render($view, array $parameters = array(), Response $response = null)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->get('templating')->renderResponse($view, $parameters, $response);
     }
@@ -184,7 +208,11 @@ class Controller extends ContainerAware
      *
      * @return StreamedResponse A StreamedResponse instance
      */
+<<<<<<< HEAD
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
+=======
+    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         $templating = $this->container->get('templating');
 
@@ -213,7 +241,11 @@ class Controller extends ContainerAware
      *
      * @return NotFoundHttpException
      */
+<<<<<<< HEAD
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+=======
+    protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -230,7 +262,11 @@ class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
+<<<<<<< HEAD
     public function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+=======
+    protected function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -244,7 +280,11 @@ class Controller extends ContainerAware
      *
      * @return Form
      */
+<<<<<<< HEAD
     public function createForm($type, $data = null, array $options = array())
+=======
+    protected function createForm($type, $data = null, array $options = array())
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
@@ -257,12 +297,17 @@ class Controller extends ContainerAware
      *
      * @return FormBuilder
      */
+<<<<<<< HEAD
     public function createFormBuilder($data = null, array $options = array())
+=======
+    protected function createFormBuilder($data = null, array $options = array())
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->get('form.factory')->createBuilder('form', $data, $options);
     }
 
     /**
+<<<<<<< HEAD
      * Shortcut to return the request service.
      *
      * @return Request
@@ -279,13 +324,19 @@ class Controller extends ContainerAware
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Shortcut to return the Doctrine Registry service.
      *
      * @return Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */
+<<<<<<< HEAD
     public function getDoctrine()
+=======
+    protected function getDoctrine()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application.');
@@ -303,7 +354,11 @@ class Controller extends ContainerAware
      *
      * @see TokenInterface::getUser()
      */
+<<<<<<< HEAD
     public function getUser()
+=======
+    protected function getUser()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
@@ -328,7 +383,11 @@ class Controller extends ContainerAware
      *
      * @return bool true if the service id is defined, false otherwise
      */
+<<<<<<< HEAD
     public function has($id)
+=======
+    protected function has($id)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         return $this->container->has($id);
     }
@@ -340,7 +399,11 @@ class Controller extends ContainerAware
      *
      * @return object The service
      */
+<<<<<<< HEAD
     public function get($id)
+=======
+    protected function get($id)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         if ('request' === $id) {
             trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
@@ -365,6 +428,7 @@ class Controller extends ContainerAware
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
+<<<<<<< HEAD
 
     /**
      * Return the entity manager
@@ -485,4 +549,6 @@ class Controller extends ContainerAware
 
         return null;
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

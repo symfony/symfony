@@ -687,6 +687,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $parsedValue = $formatter->parse('-2,147,483,648', NumberFormatter::TYPE_INT64);
 
+<<<<<<< HEAD
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // The negative PHP_INT_MAX was being converted to float
         if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404) {
@@ -694,6 +695,9 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertInternalType('float', $parsedValue);
         }
+=======
+        $this->assertInternalType('int', $parsedValue);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->assertEquals(-2147483648, $parsedValue);
     }
@@ -744,6 +748,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $parsedValue = $formatter->parse('2,147,483,648', NumberFormatter::TYPE_INT64);
         $this->assertInternalType('integer', $parsedValue);
 
+<<<<<<< HEAD
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
         if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
@@ -751,10 +756,14 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
         }
+=======
+        $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $parsedValue = $formatter->parse('-2,147,483,649', NumberFormatter::TYPE_INT64);
         $this->assertInternalType('integer', $parsedValue);
 
+<<<<<<< HEAD
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
         if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
@@ -762,6 +771,9 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
         }
+=======
+        $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**

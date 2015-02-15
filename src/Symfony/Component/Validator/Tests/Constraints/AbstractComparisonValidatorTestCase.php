@@ -36,10 +36,13 @@ abstract class AbstractComparisonValidatorTestCase extends AbstractConstraintVal
 {
     protected static function addPhp5Dot5Comparisons(array $comparisons)
     {
+<<<<<<< HEAD
         if (version_compare(PHP_VERSION, '5.5.0-dev', '<')) {
             return $comparisons;
         }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $result = $comparisons;
 
         // Duplicate all tests involving DateTime objects to be tested with

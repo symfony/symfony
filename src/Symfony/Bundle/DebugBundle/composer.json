@@ -16,6 +16,7 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "php": ">=5.3.9",
         "symfony/http-kernel": "~2.6|~3.0.0",
         "symfony/twig-bridge": "~2.6|~3.0.0",
@@ -24,6 +25,16 @@
     "require-dev": {
         "symfony/config": "~2.3|~3.0.0",
         "symfony/dependency-injection": "~2.3|~3.0.0"
+=======
+        "php": ">=5.5.9",
+        "symfony/http-kernel": "~2.7|~3.0",
+        "symfony/twig-bridge": "~2.7|~3.0",
+        "symfony/var-dumper": "~2.7|~3.0"
+    },
+    "require-dev": {
+        "symfony/config": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "suggest": {
         "symfony/config": "For service container configuration",
@@ -36,7 +47,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
             "dev-master": "2.7-dev"
+=======
+            "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

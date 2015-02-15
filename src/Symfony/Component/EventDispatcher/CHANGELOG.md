@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+<<<<<<< HEAD
+=======
+3.0.0
+-----
+
+  * The methods `Event::setDispatcher()`, `Event::getDispatcher()`, `Event::setName()`
+    and `Event::getName()` have been removed.
+    The event dispatcher and the event name are passed to the listener call.
+
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 2.5.0
 -----
 

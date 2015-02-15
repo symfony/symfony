@@ -25,8 +25,13 @@ $loader->addPrefix('Symfony', __DIR__.'/src');
 $loader->addPrefix('Monolog', __DIR__.'/vendor/monolog/src');
 ```
 
+<<<<<<< HEAD
 The `addPrefix()` method takes a namespace prefix and a path where to
 look for the classes as arguments.
+=======
+The `addPrefix()` method takes a namespace prefix and a path where to look for
+the classes as arguments.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 You can also register a sub-namespaces:
 

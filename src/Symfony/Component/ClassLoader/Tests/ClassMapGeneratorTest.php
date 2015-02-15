@@ -102,18 +102,27 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
                 'ClassMap\\SomeParent' => realpath(__DIR__).'/Fixtures/classmap/SomeParent.php',
                 'ClassMap\\SomeClass' => realpath(__DIR__).'/Fixtures/classmap/SomeClass.php',
             )),
+<<<<<<< HEAD
         );
 
         if (PHP_VERSION_ID >= 50400) {
             $data[] = array(__DIR__.'/Fixtures/php5.4', array(
+=======
+            array(__DIR__.'/Fixtures/php5.4', array(
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 'TFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'CFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\TBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\IBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\TFooBar' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'Foo\\CBar' => __DIR__.'/Fixtures/php5.4/traits.php',
+<<<<<<< HEAD
             ));
         }
+=======
+            )),
+        );
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         return $data;
     }

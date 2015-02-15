@@ -82,10 +82,15 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array($object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'),
         );
 
+<<<<<<< HEAD
         if (version_compare(PHP_VERSION, '>=', '5.5')) {
             $immutableDate = new \DateTimeImmutable('2000-01-01');
             $comparisons[] = array($immutableDate, 'Jan 1, 2000, 12:00 AM', $immutableDate, 'Jan 1, 2000, 12:00 AM', 'DateTime');
         }
+=======
+        $immutableDate = new \DateTimeImmutable('2000-01-01');
+        $comparisons[] = array($immutableDate, 'Jan 1, 2000, 12:00 AM', $immutableDate, 'Jan 1, 2000, 12:00 AM', 'DateTime');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         return $comparisons;
     }

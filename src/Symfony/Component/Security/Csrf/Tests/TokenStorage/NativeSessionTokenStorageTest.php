@@ -52,10 +52,13 @@ class NativeSessionTokenStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testStoreTokenInClosedSessionWithExistingSessionId()
     {
+<<<<<<< HEAD
         if (PHP_VERSION_ID < 50400) {
             $this->markTestSkipped('This test requires PHP 5.4 or later.');
         }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         session_id('foobar');
 
         $this->assertSame(PHP_SESSION_NONE, session_status());

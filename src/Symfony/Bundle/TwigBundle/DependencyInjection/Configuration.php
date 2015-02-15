@@ -38,7 +38,10 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+<<<<<<< HEAD
         $this->addFormSection($rootNode);
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
@@ -46,6 +49,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+<<<<<<< HEAD
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -92,6 +96,8 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     private function addFormThemesSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode

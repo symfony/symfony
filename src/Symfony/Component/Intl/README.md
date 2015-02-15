@@ -22,4 +22,8 @@ You can run the unit tests with the following command:
     $ phpunit
 
 [0]: http://www.php.net/manual/en/intl.setup.php
+<<<<<<< HEAD
 [1]: http://symfony.com/doc/2.7/components/intl.html
+=======
+[1]: http://symfony.com/doc/3.0/components/intl.html
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

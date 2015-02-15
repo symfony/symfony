@@ -1363,9 +1363,14 @@ EOF;
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
             } else {
+<<<<<<< HEAD
                 $that = $this;
                 $replaceParameters = function ($match) use ($that) {
                     return "'.".$that->dumpParameter(strtolower($match[2])).".'";
+=======
+                $replaceParameters = function ($match) {
+                    return "'.".$this->dumpParameter(strtolower($match[2])).".'";
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 };
 
                 $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
@@ -1398,7 +1403,11 @@ EOF;
      *
      * @return string
      */
+<<<<<<< HEAD
     public function dumpParameter($name)
+=======
+    private function dumpParameter($name)
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         if ($this->container->isFrozen() && $this->container->hasParameter($name)) {
             return $this->dumpValue($this->container->getParameter($name), false);

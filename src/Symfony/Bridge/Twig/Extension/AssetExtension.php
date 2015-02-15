@@ -12,7 +12,10 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
+<<<<<<< HEAD
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * Twig extension for the Symfony Asset component.
@@ -22,6 +25,7 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 class AssetExtension extends \Twig_Extension
 {
     private $packages;
+<<<<<<< HEAD
     private $foundationExtension;
 
     /**
@@ -32,6 +36,12 @@ class AssetExtension extends \Twig_Extension
     {
         $this->packages = $packages;
         $this->foundationExtension = $foundationExtension;
+=======
+
+    public function __construct(Packages $packages)
+    {
+        $this->packages = $packages;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**
@@ -42,7 +52,10 @@ class AssetExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
             new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
+<<<<<<< HEAD
             new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         );
     }
 
@@ -57,6 +70,7 @@ class AssetExtension extends \Twig_Extension
      *
      * @return string The public path of the asset
      */
+<<<<<<< HEAD
     public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
     {
         // BC layer to be removed in 3.0
@@ -71,6 +85,10 @@ class AssetExtension extends \Twig_Extension
             return $this->getLegacyAssetUrl($path, $packageName, $args[2], isset($args[3]) ? $args[3] : null);
         }
 
+=======
+    public function getAssetUrl($path, $packageName = null)
+    {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return $this->packages->getUrl($path, $packageName);
     }
 
@@ -87,6 +105,7 @@ class AssetExtension extends \Twig_Extension
         return $this->packages->getVersion($path, $packageName);
     }
 
+<<<<<<< HEAD
     public function getAssetsVersion($packageName = null)
     {
         trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
@@ -132,6 +151,8 @@ class AssetExtension extends \Twig_Extension
         return $url;
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     /**
      * Returns the name of the extension.
      *

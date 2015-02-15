@@ -54,6 +54,7 @@ class Route
         }
     }
 
+<<<<<<< HEAD
     /**
      * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
      */
@@ -74,6 +75,8 @@ class Route
         return $this->path;
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function setPath($path)
     {
         $this->path = $path;

@@ -131,6 +131,7 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
             ), $this->bag->peekAll()
         );
     }
+<<<<<<< HEAD
 
     /**
      * @covers Symfony\Component\HttpFoundation\Session\Flash\FlashBag::getIterator
@@ -153,4 +154,6 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($flashes), $i);
         $this->assertCount(0, $this->bag->all());
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

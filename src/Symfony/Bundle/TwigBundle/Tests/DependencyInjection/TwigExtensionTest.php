@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class TwigExtensionTest extends TestCase
 {
+<<<<<<< HEAD
     /**
      * @dataProvider getFormats
      */
@@ -61,6 +62,8 @@ class TwigExtensionTest extends TestCase
         $this->assertContains('FooBundle:Form:bar.html.twig', $container->getParameter('twig.form.resources'));
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();

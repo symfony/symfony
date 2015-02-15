@@ -335,6 +335,7 @@ class ArgvInput extends Input
      */
     public function __toString()
     {
+<<<<<<< HEAD
         $self = $this;
         $tokens = array_map(function ($token) use ($self) {
             if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
@@ -343,6 +344,15 @@ class ArgvInput extends Input
 
             if ($token && $token[0] !== '-') {
                 return $self->escapeToken($token);
+=======
+        $tokens = array_map(function ($token) {
+            if (preg_match('{^(-[^=]+=)(.+)}', $token, $match)) {
+                return $match[1].$this->escapeToken($match[2]);
+            }
+
+            if ($token && $token[0] !== '-') {
+                return $this->escapeToken($token);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             }
 
             return $token;

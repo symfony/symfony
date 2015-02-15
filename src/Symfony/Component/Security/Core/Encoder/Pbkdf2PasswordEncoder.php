@@ -64,11 +64,15 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
             throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $this->algorithm));
         }
 
+<<<<<<< HEAD
         if (function_exists('hash_pbkdf2')) {
             $digest = hash_pbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length, true);
         } else {
             $digest = $this->hashPbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length);
         }
+=======
+        $digest = hash_pbkdf2($this->algorithm, $raw, $salt, $this->iterations, $this->length, true);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         return $this->encodeHashAsBase64 ? base64_encode($digest) : bin2hex($digest);
     }
@@ -80,6 +84,7 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
     {
         return !$this->isPasswordTooLong($raw) && $this->comparePasswords($encoded, $this->encodePassword($raw, $salt));
     }
+<<<<<<< HEAD
 
     private function hashPbkdf2($algorithm, $password, $salt, $iterations, $length = 0)
     {
@@ -100,4 +105,6 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
 
         return substr($digest, 0, $this->length);
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

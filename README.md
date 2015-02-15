@@ -4,13 +4,18 @@ README
 What is Symfony?
 -----------------
 
+<<<<<<< HEAD
 Symfony is a PHP 5.3 full-stack web framework. It is written with speed and
+=======
+Symfony is a PHP full-stack web framework. It is written with speed and
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 flexibility in mind. It allows developers to build better and easy to maintain
 websites with PHP.
 
 Symfony can be used to develop all kind of websites, from your personal blog
 to high traffic ones like Dailymotion or Yahoo! Answers.
 
+<<<<<<< HEAD
 Requirements
 ------------
 
@@ -19,6 +24,8 @@ Symfony is only supported on PHP 5.3.9 and up.
 Be warned that PHP 5.3.16 has a major bug in the Reflection subsystem and is 
 not suitable to run Symfony (https://bugs.php.net/bug.php?id=62715)
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 Installation
 ------------
 

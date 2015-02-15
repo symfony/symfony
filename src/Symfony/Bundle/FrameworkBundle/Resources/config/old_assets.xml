@@ -12,7 +12,11 @@
 
     <services>
         <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
+<<<<<<< HEAD
             <argument type="service" id="request" />
+=======
+            <argument type="expression">service('request_stack').getMasterRequest()</argument>
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             <argument /> <!-- version -->
             <argument /> <!-- version format -->
         </service>
@@ -25,7 +29,11 @@
 
         <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" abstract="true">
             <factory service="templating.asset.package_factory" method="getPackage" />
+<<<<<<< HEAD
             <argument type="service" id="request" strict="false" />
+=======
+            <argument type="expression">service('request_stack').getMasterRequest()</argument>
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             <argument /> <!-- HTTP id -->
             <argument /> <!-- SSL id -->
         </service>

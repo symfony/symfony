@@ -59,6 +59,7 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
         return $storage;
     }
 
+<<<<<<< HEAD
     public function testPhpSession53()
     {
         if (PHP_VERSION_ID >= 50400) {
@@ -89,6 +90,10 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
         }
 
+=======
+    public function testPhpSession()
+    {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $storage = $this->getStorage();
 
         $this->assertFalse(isset($_SESSION));

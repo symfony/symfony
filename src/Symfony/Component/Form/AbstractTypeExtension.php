@@ -12,7 +12,10 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+<<<<<<< HEAD
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -43,6 +46,7 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
     /**
      * {@inheritdoc}
      */
+<<<<<<< HEAD
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $this->configureOptions($resolver);
@@ -53,6 +57,8 @@ abstract class AbstractTypeExtension implements FormTypeExtensionInterface
      *
      * @param OptionsResolver $resolver The resolver for the options.
      */
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function configureOptions(OptionsResolver $resolver)
     {
     }

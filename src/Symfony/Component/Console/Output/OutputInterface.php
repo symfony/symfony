@@ -76,6 +76,37 @@ interface OutputInterface
     public function getVerbosity();
 
     /**
+<<<<<<< HEAD
+=======
+     * Returns whether verbosity is quiet (-q)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
+     */
+    public function isQuiet();
+
+    /**
+     * Returns whether verbosity is verbose (-v)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
+     */
+    public function isVerbose();
+
+    /**
+     * Returns whether verbosity is very verbose (-vv)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
+     */
+    public function isVeryVerbose();
+
+    /**
+     * Returns whether verbosity is debug (-vvv)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
+     */
+    public function isDebug();
+
+    /**
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Sets the decorated flag.
      *
      * @param bool $decorated Whether to decorate the messages

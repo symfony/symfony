@@ -37,6 +37,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
+<<<<<<< HEAD
      * Returns the last encoding error (if any).
      *
      * @return int
@@ -65,6 +66,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * {@inheritdoc}
      */
     public function encode($data, $format, array $context = array())
@@ -103,6 +106,7 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
      */
     public static function getLastErrorMessage()
     {
+<<<<<<< HEAD
         if (function_exists('json_last_error_msg')) {
             return json_last_error_msg();
         }
@@ -121,5 +125,8 @@ class JsonEncoder implements EncoderInterface, DecoderInterface
             default:
                 return 'Unknown error';
         }
+=======
+        return json_last_error_msg();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 }

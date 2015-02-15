@@ -34,3 +34,7 @@ route_2
     - `compiler_class`: Symfony\Component\Routing\RouteCompiler
     - `opt1`: val1
     - `opt2`: val2
+<<<<<<< HEAD
+=======
+
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

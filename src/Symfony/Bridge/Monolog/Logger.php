@@ -12,7 +12,10 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
+<<<<<<< HEAD
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -20,6 +23,7 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
+<<<<<<< HEAD
 class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
 {
     /**
@@ -63,6 +67,11 @@ class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
     }
 
     /**
+=======
+class Logger extends BaseLogger implements DebugLoggerInterface
+{
+    /**
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * {@inheritdoc}
      */
     public function getLogs()

@@ -12,8 +12,11 @@
 namespace Symfony\Bundle\TwigBundle\Command;
 
 use Symfony\Bridge\Twig\Command\DebugCommand as BaseDebugCommand;
+<<<<<<< HEAD
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
@@ -44,6 +47,7 @@ class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
     {
         return $this->container->get('twig');
     }
+<<<<<<< HEAD
 
     /**
      * {@inheritdoc}
@@ -63,4 +67,6 @@ class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
 
         parent::execute($input, $output);
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

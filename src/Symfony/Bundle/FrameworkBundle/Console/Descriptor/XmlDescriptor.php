@@ -196,11 +196,17 @@ class XmlDescriptor extends Descriptor
             }
         }
 
+<<<<<<< HEAD
         $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
         if (count($requirements)) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
             foreach ($requirements as $attribute => $pattern) {
+=======
+        if (count($route->getRequirements())) {
+            $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
+            foreach ($route->getRequirements() as $attribute => $pattern) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));

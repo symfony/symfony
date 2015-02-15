@@ -163,7 +163,11 @@ class DebugClassLoader
 
         ErrorHandler::unstackErrors();
 
+<<<<<<< HEAD
         $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
+=======
+        $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         if ('\\' === $class[0]) {
             $class = substr($class, 1);

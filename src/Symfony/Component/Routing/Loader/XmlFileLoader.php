@@ -113,6 +113,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
+<<<<<<< HEAD
         if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
         }
@@ -128,6 +129,12 @@ class XmlFileLoader extends FileLoader
             $node->removeAttribute('pattern');
         }
 
+=======
+        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('path')) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
+        }
+
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 

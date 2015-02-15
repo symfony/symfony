@@ -35,6 +35,7 @@ class Event
     private $propagationStopped = false;
 
     /**
+<<<<<<< HEAD
      * @var EventDispatcher Dispatcher that dispatched this event
      */
     private $dispatcher;
@@ -45,6 +46,8 @@ class Event
     private $name;
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Returns whether further event listeners should be triggered.
      *
      * @see Event::stopPropagation()
@@ -71,6 +74,7 @@ class Event
     {
         $this->propagationStopped = true;
     }
+<<<<<<< HEAD
 
     /**
      * Stores the EventDispatcher that dispatches this Event.
@@ -131,4 +135,6 @@ class Event
     {
         $this->name = $name;
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

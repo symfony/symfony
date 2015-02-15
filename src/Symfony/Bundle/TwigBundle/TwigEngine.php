@@ -42,6 +42,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
+<<<<<<< HEAD
      * @deprecated since version 2.7, to be removed in 3.0.
      *             Inject the escaping strategy on \Twig_Environment instead.
      */
@@ -64,6 +65,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * {@inheritdoc}
      */
     public function render($name, array $parameters = array())

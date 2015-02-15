@@ -45,7 +45,11 @@ class SessionHandlerProxyTest extends \PHPUnit_Framework_TestCase
         $this->proxy = null;
     }
 
+<<<<<<< HEAD
     public function testOpen()
+=======
+    public function testOpenTrue()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     {
         $this->mock->expects($this->once())
             ->method('open')
@@ -53,11 +57,15 @@ class SessionHandlerProxyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->proxy->isActive());
         $this->proxy->open('name', 'id');
+<<<<<<< HEAD
         if (PHP_VERSION_ID < 50400) {
             $this->assertTrue($this->proxy->isActive());
         } else {
             $this->assertFalse($this->proxy->isActive());
         }
+=======
+        $this->assertFalse($this->proxy->isActive());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     public function testOpenFalse()

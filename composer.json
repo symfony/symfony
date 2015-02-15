@@ -16,7 +16,11 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
         "php": ">=5.3.9",
+=======
+        "php": ">=5.5.9",
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "doctrine/common": "~2.3",
         "twig/twig": "~1.18",
         "psr/log": "~1.0"
@@ -25,6 +29,7 @@
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
+<<<<<<< HEAD
         "symfony/config": "self.version",
         "symfony/console": "self.version",
         "symfony/css-selector": "self.version",
@@ -39,33 +44,68 @@
         "symfony/finder": "self.version",
         "symfony/form": "self.version",
         "symfony/framework-bundle": "self.version",
+=======
+        "symfony/config": "2.99.99",
+        "symfony/console": "2.99.99",
+        "symfony/css-selector": "self.version",
+        "symfony/dependency-injection": "2.99.99",
+        "symfony/debug": "self.version",
+        "symfony/debug-bundle": "self.version",
+        "symfony/doctrine-bridge": "2.99.99",
+        "symfony/dom-crawler": "self.version",
+        "symfony/event-dispatcher": "2.99.99",
+        "symfony/expression-language": "2.99.99",
+        "symfony/filesystem": "2.99.99",
+        "symfony/finder": "self.version",
+        "symfony/form": "self.version",
+        "symfony/framework-bundle": "2.99.99",
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
         "symfony/intl": "self.version",
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
+<<<<<<< HEAD
         "symfony/process": "self.version",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
         "symfony/security": "self.version",
+=======
+        "symfony/process": "2.99.99",
+        "symfony/property-access": "self.version",
+        "symfony/proxy-manager-bridge": "self.version",
+        "symfony/routing": "self.version",
+        "symfony/security": "2.99.99",
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "symfony/security-acl": "self.version",
         "symfony/security-core": "self.version",
         "symfony/security-csrf": "self.version",
         "symfony/security-http": "self.version",
         "symfony/security-bundle": "self.version",
         "symfony/serializer": "self.version",
+<<<<<<< HEAD
         "symfony/stopwatch": "self.version",
         "symfony/swiftmailer-bridge": "self.version",
+=======
+        "symfony/stopwatch": "2.99.99",
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "symfony/templating": "self.version",
         "symfony/translation": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
+<<<<<<< HEAD
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
         "symfony/web-profiler-bundle": "self.version",
         "symfony/yaml": "self.version"
+=======
+        "symfony/validator": "2.99.99",
+        "symfony/var-dumper": "self.version",
+        "symfony/web-profiler-bundle": "self.version",
+        "symfony/yaml": "2.99.99"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "require-dev": {
         "doctrine/data-fixtures": "1.0.*",
@@ -74,7 +114,10 @@
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
         "propel/propel1": "~1.6",
+<<<<<<< HEAD
         "ircmaxell/password-compat": "~1.0",
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2"
     },
@@ -89,7 +132,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
             "dev-master": "2.7-dev"
+=======
+            "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

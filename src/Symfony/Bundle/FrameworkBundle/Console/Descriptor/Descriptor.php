@@ -32,7 +32,11 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * @var OutputInterface
      */
+<<<<<<< HEAD
     private $output;
+=======
+    protected $output;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
     /**
      * {@inheritdoc}
@@ -102,6 +106,7 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+<<<<<<< HEAD
      * Writes content to output.
      *
      * @param Table $table
@@ -119,6 +124,8 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Describes an InputArgument instance.
      *
      * @param RouteCollection $routes

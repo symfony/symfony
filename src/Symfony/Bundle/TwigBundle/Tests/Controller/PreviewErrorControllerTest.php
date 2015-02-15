@@ -21,8 +21,11 @@ class PreviewErrorControllerTest extends TestCase
 {
     public function testForwardRequestToConfiguredController()
     {
+<<<<<<< HEAD
         $self = $this;
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $request = Request::create('whatever');
         $response = new Response("");
         $code = 123;
@@ -33,6 +36,7 @@ class PreviewErrorControllerTest extends TestCase
             ->expects($this->once())
             ->method('handle')
             ->with(
+<<<<<<< HEAD
                 $this->callback(function (Request $request) use ($self, $logicalControllerName, $code) {
 
                     $self->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
@@ -42,6 +46,16 @@ class PreviewErrorControllerTest extends TestCase
                     $self->assertEquals($code, $exception->getStatusCode());
 
                     $self->assertFalse($request->attributes->get('showException'));
+=======
+                $this->callback(function (Request $request) use ($logicalControllerName, $code) {
+
+                    $this->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
+
+                    $exception = $request->attributes->get('exception');
+                    $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\FlattenException', $exception);
+                    $this->assertEquals($code, $exception->getStatusCode());
+                    $this->assertFalse($request->attributes->get('showException'));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                     return true;
                 }),

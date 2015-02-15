@@ -79,6 +79,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
+<<<<<<< HEAD
     public function testLegacyRouteDefinitionLoading()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -98,6 +99,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testLoadWithResource()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));

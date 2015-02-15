@@ -357,12 +357,15 @@ class ErrorHandler
         $type &= $level | $this->screamedErrors;
 
         if ($type && ($log || $throw)) {
+<<<<<<< HEAD
             if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
                 $e = $context;                  // Whatever the signature of the method,
                 unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
                 $context = $e;
             }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             if ($throw) {
                 if (($this->scopedErrors & $type) && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                     // Checking for class existence is a work around for https://bugs.php.net/42098
@@ -371,6 +374,7 @@ class ErrorHandler
                     $throw = new \ErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line);
                 }
 
+<<<<<<< HEAD
                 if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
                     // Exceptions thrown from error handlers are sometimes not caught by the exception
                     // handler and shutdown handlers are bypassed before 5.4.8/5.3.18.
@@ -379,6 +383,8 @@ class ErrorHandler
                     $throw->errorHandlerCanary = new ErrorHandlerCanary();
                 }
 
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 throw $throw;
             }
 
@@ -668,6 +674,7 @@ class ErrorHandler
         static::handleFatalError();
     }
 }
+<<<<<<< HEAD
 
 /**
  * Private class used to work around https://bugs.php.net/54275
@@ -695,3 +702,5 @@ class ErrorHandlerCanary
         }
     }
 }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

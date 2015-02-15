@@ -53,12 +53,17 @@ class JsonBundleReader implements BundleReaderInterface
                 'The resource bundle "%s/%s.json" contains invalid JSON: %s',
                 $path,
                 $locale,
+<<<<<<< HEAD
                 self::getLastJsonError()
+=======
+                json_last_error_msg()
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             ));
         }
 
         return $data;
     }
+<<<<<<< HEAD
 
     /**
      * @return string The last error message created by {@link json_decode()}
@@ -86,4 +91,6 @@ class JsonBundleReader implements BundleReaderInterface
             ? $errors[$error]
             : sprintf('Unknown error (%s)', $error);
     }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

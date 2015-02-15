@@ -234,7 +234,7 @@ class Finder implements \IteratorAggregate, \Countable
      *   $finder->date('> now - 2 hours');
      *   $finder->date('>= 2005-10-15');
      *
-     * @param string $date A date rage string
+     * @param string $date A date range string
      *
      * @return Finder The current Finder instance
      *

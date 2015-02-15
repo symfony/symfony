@@ -4,7 +4,13 @@ imports:
 services:
     csrf_form_login.form.type:
         class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginFormType
+<<<<<<< HEAD
+        scope: request
+        arguments:
+            - @request
+=======
         arguments: [ @request_stack ]
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         tags:
             - { name: form.type, alias: user_login }
 

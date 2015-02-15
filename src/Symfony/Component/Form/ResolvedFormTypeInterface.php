@@ -11,7 +11,11 @@
 
 namespace Symfony\Component\Form;
 
+<<<<<<< HEAD
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+=======
 use Symfony\Component\OptionsResolver\OptionsResolver;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * A wrapper for a form type and its extensions.
@@ -102,7 +106,11 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the configured options resolver used for this type.
      *
+<<<<<<< HEAD
+     * @return OptionsResolverInterface The options resolver.
+=======
      * @return OptionsResolver The options resolver.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      */
     public function getOptionsResolver();
 }

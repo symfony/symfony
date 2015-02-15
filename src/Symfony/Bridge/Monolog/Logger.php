@@ -12,6 +12,10 @@
 namespace Symfony\Bridge\Monolog;
 
 use Monolog\Logger as BaseLogger;
+<< << <<< HEAD
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
@@ -19,9 +23,55 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
+<<<<<<< HEAD
+class Logger extends BaseLogger implements LoggerInterface, DebugLoggerInterface
+{
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use emergency() which is PSR-3 compatible.
+     */
+    public function emerg($message, array $context = array())
+    {
+        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the emergency() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
+        return parent::addRecord(BaseLogger::EMERGENCY, $message, $context);
+    }
+
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use critical() which is PSR-3 compatible.
+     */
+    public function crit($message, array $context = array())
+    {
+        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the method critical() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
+        return parent::addRecord(BaseLogger::CRITICAL, $message, $context);
+    }
+
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use error() which is PSR-3 compatible.
+     */
+    public function err($message, array $context = array())
+    {
+        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the error() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
+        return parent::addRecord(BaseLogger::ERROR, $message, $context);
+    }
+
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use warning() which is PSR-3 compatible.
+     */
+    public function warn($message, array $context = array())
+    {
+        trigger_error('The '.__METHOD__.' method inherited from the Symfony\Component\HttpKernel\Log\LoggerInterface interface is deprecated since version 2.2 and will be removed in 3.0. Use the warning() method instead, which is PSR-3 compatible.', E_USER_DEPRECATED);
+
+        return parent::addRecord(BaseLogger::WARNING, $message, $context);
+    }
+
+    /**
+=======
 class Logger extends BaseLogger implements DebugLoggerInterface
 {
     /**
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * {@inheritdoc}
      */
     public function getLogs()

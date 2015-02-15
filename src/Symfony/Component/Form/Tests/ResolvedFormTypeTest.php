@@ -56,11 +56,21 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOptionsResolver()
     {
+<<<<<<< HEAD
+        $test = $this;
+        $i = 0;
+
+        $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
+            return function (OptionsResolver $resolver) use (&$i, $test, $index, $option, $default) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
+=======
         $i = 0;
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i) {
             return function (OptionsResolver $resolver) use (&$i, $index, $option, $default) {
                 $this->assertEquals($index, $i, 'Executed at index '.$index);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 ++$i;
 
@@ -99,7 +109,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
+<<<<<<< HEAD
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+=======
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -127,7 +141,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
+<<<<<<< HEAD
+        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+=======
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -153,11 +171,21 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
+<<<<<<< HEAD
+        $test = $this;
+        $i = 0;
+
+        $assertIndex = function ($index) use (&$i, $test) {
+            return function () use (&$i, $test, $index) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
+=======
         $i = 0;
 
         $assertIndex = function ($index) use (&$i) {
             return function () use (&$i, $index) {
                 $this->assertEquals($index, $i, 'Executed at index '.$index);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 ++$i;
             };
@@ -219,11 +247,21 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
 
+<<<<<<< HEAD
+        $test = $this;
+        $i = 0;
+
+        $assertIndex = function ($index) use (&$i, $test) {
+            return function () use (&$i, $test, $index) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
+=======
         $i = 0;
 
         $assertIndex = function ($index) use (&$i) {
             return function () use (&$i, $index) {
                 $this->assertEquals($index, $i, 'Executed at index '.$index);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 ++$i;
             };
@@ -261,11 +299,21 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = $this->getMock('Symfony\Component\Form\FormView');
 
+<<<<<<< HEAD
+        $test = $this;
+        $i = 0;
+
+        $assertIndex = function ($index) use (&$i, $test) {
+            return function () use (&$i, $test, $index) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertEquals($index, $i, 'Executed at index '.$index);
+=======
         $i = 0;
 
         $assertIndex = function ($index) use (&$i) {
             return function () use (&$i, $index) {
                 $this->assertEquals($index, $i, 'Executed at index '.$index);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 ++$i;
             };

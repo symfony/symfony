@@ -54,6 +54,29 @@ class Route
         }
     }
 
+<<<<<<< HEAD
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
+     */
+    public function setPattern($pattern)
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the setPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
+        $this->path = $pattern;
+    }
+
+    /**
+     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
+     */
+    public function getPattern()
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the getPath() method instead and use the "path" option instead of the "pattern" option in the route definition.', E_USER_DEPRECATED);
+
+        return $this->path;
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function setPath($path)
     {
         $this->path = $path;

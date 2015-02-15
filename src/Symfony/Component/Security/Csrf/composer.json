@@ -20,7 +20,11 @@
         "symfony/security-core": "~2.4|~3.0.0"
     },
     "require-dev": {
+<<<<<<< HEAD
+        "symfony/http-foundation": "~2.1|~3.0.0"
+=======
         "symfony/http-foundation": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."
@@ -32,7 +36,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
+            "dev-master": "2.7-dev"
+=======
             "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

@@ -26,6 +26,14 @@ abstract class AbstractProxy
     protected $wrapper = false;
 
     /**
+<<<<<<< HEAD
+     * @var bool
+     */
+    protected $active = false;
+
+    /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * @var string
      */
     protected $saveHandlerName;
@@ -67,7 +75,36 @@ abstract class AbstractProxy
      */
     public function isActive()
     {
+<<<<<<< HEAD
+        if (PHP_VERSION_ID >= 50400) {
+            return $this->active = \PHP_SESSION_ACTIVE === session_status();
+        }
+
+        return $this->active;
+    }
+
+    /**
+     * Sets the active flag.
+     *
+     * Has no effect under PHP 5.4+ as status is detected
+     * automatically in isActive()
+     *
+     * @internal
+     *
+     * @param bool $flag
+     *
+     * @throws \LogicException
+     */
+    public function setActive($flag)
+    {
+        if (PHP_VERSION_ID >= 50400) {
+            throw new \LogicException('This method is disabled in PHP 5.4.0+');
+        }
+
+        $this->active = (bool) $flag;
+=======
         return \PHP_SESSION_ACTIVE === session_status();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**

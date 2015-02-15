@@ -22,4 +22,18 @@ class YamlTest extends \PHPUnit_Framework_TestCase
         $parsed = Yaml::parse($yml);
         $this->assertEquals($data, $parsed);
     }
+<<<<<<< HEAD
+
+    public function testLegacyParseFromFile()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $filename = __DIR__.'/Fixtures/index.yml';
+        $contents = file_get_contents($filename);
+        $parsedByFilename = Yaml::parse($filename);
+        $parsedByContents = Yaml::parse($contents);
+        $this->assertEquals($parsedByFilename, $parsedByContents);
+    }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

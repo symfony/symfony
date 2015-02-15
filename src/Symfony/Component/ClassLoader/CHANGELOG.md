@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+<<<<<<< HEAD
+=======
 3.0.0
 -----
 
@@ -9,6 +11,7 @@ CHANGELOG
  * The UniversalClassLoader class has been removed
  * The ApcUniversalClassLoader class has been removed
 
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 2.4.0
 -----
 

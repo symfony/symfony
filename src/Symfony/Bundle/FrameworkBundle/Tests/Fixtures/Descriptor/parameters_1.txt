@@ -1,4 +1,11 @@
 <info>[container]</info> List of parameters
+<<<<<<< HEAD
+ [32mParameter[39m [32mValue                   [39m 
+ array     [12,"Hello world!",true] 
+ boolean   true                     
+ integer   12                       
+ string    Hello world!             
+=======
 +-----------+--------------------------+
 |[32m Parameter [39m|[32m Value                    [39m|
 +-----------+--------------------------+
@@ -7,3 +14,4 @@
 | integer   | 12                       |
 | string    | Hello world!             |
 +-----------+--------------------------+
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

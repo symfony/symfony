@@ -848,10 +848,18 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testPassesHeadRequestsThroughDirectlyOnPass()
     {
+<<<<<<< HEAD
+        $that = $this;
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+            $response->setContent('');
+            $response->setStatusCode(200);
+            $that->assertEquals('HEAD', $request->getMethod());
+=======
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->setContent('');
             $response->setStatusCode(200);
             $this->assertEquals('HEAD', $request->getMethod());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
 
         $this->request('HEAD', '/', array('HTTP_EXPECT' => 'something ...'));
@@ -861,11 +869,20 @@ class HttpCacheTest extends HttpCacheTestCase
 
     public function testUsesCacheToRespondToHeadRequestsWhenFresh()
     {
+<<<<<<< HEAD
+        $that = $this;
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that) {
+            $response->headers->set('Cache-Control', 'public, max-age=10');
+            $response->setContent('Hello World');
+            $response->setStatusCode(200);
+            $that->assertNotEquals('HEAD', $request->getMethod());
+=======
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->setContent('Hello World');
             $response->setStatusCode(200);
             $this->assertNotEquals('HEAD', $request->getMethod());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
 
         $this->request('GET', '/');
@@ -882,7 +899,12 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testSendsNoContentWhenFresh()
     {
         $time = \DateTime::createFromFormat('U', time());
+<<<<<<< HEAD
+        $that = $this;
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($that, $time) {
+=======
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($time) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             $response->headers->set('Cache-Control', 'public, max-age=10');
             $response->headers->set('Last-Modified', $time->format(DATE_RFC2822));
         });

@@ -839,7 +839,13 @@ class NumberFormatter
      *
      * @param mixed $value The value to be converted
      *
+<<<<<<< HEAD
+     * @return int|float The converted value
+     *
+     * @see https://bugs.php.net/bug.php?id=59597 Bug #59597
+=======
      * @return int|false The converted value
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      */
     private function getInt64Value($value)
     {
@@ -847,6 +853,33 @@ class NumberFormatter
             return false;
         }
 
+<<<<<<< HEAD
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Range['positive'] || $value <= self::$int32Range['negative'])) {
+            // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
+            // The negative PHP_INT_MAX was being converted to float
+            if (
+                $value == self::$int32Range['negative'] &&
+                ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404)
+            ) {
+                return (int) $value;
+            }
+
+            return (float) $value;
+        }
+
+        if (PHP_INT_SIZE === 8) {
+            // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
+            // A 32 bit integer was being generated instead of a 64 bit integer
+            if (
+                  ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) &&
+                  (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404))
+            ) {
+                $value = (-2147483648 - ($value % -2147483648)) * ($value / abs($value));
+            }
+        }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return (int) $value;
     }
 

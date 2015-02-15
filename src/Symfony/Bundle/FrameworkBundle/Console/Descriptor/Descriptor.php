@@ -32,7 +32,11 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * @var OutputInterface
      */
+<<<<<<< HEAD
+    private $output;
+=======
     protected $output;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
     /**
      * {@inheritdoc}
@@ -102,6 +106,26 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+<<<<<<< HEAD
+     * Writes content to output.
+     *
+     * @param Table $table
+     * @param bool  $decorated
+     */
+    protected function renderTable(Table $table, $decorated = false)
+    {
+        if (!$decorated) {
+            $table->getStyle()->setCellRowFormat('%s');
+            $table->getStyle()->setCellRowContentFormat('%s');
+            $table->getStyle()->setCellHeaderFormat('%s');
+        }
+
+        $table->render();
+    }
+
+    /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Describes an InputArgument instance.
      *
      * @param RouteCollection $routes

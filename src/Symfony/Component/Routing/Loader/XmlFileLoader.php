@@ -113,10 +113,28 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
+<<<<<<< HEAD
+        if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
+            throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
+        }
+
+        if ($node->hasAttribute('pattern')) {
+            if ($node->hasAttribute('path')) {
+                throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
+            }
+
+            trigger_error('The "pattern" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', E_USER_DEPRECATED);
+
+            $node->setAttribute('path', $node->getAttribute('pattern'));
+            $node->removeAttribute('pattern');
+        }
+
+=======
         if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('path')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
         }
 
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 

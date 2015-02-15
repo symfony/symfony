@@ -16,10 +16,19 @@ namespace Symfony\Component\ClassLoader;
  *
  * It expects an object implementing a findFile method to find the file. This
  * allows using it as a wrapper around the other loaders of the component (the
+<<<<<<< HEAD
+ * ClassLoader and the UniversalClassLoader for instance) but also around any
+ * other autoloaders following this convention (the Composer one for instance).
+ *
+ *     // with a Symfony autoloader
+ *     use Symfony\Component\ClassLoader\ClassLoader;
+ *
+=======
  * ClassLoader for instance) but also around any other autoloaders following
  * this convention (the Composer one for instance).
  *
  *     // with a Symfony autoloader
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
  *     $loader = new ClassLoader();
  *     $loader->addPrefix('Symfony\Component', __DIR__.'/component');
  *     $loader->addPrefix('Symfony',           __DIR__.'/framework');

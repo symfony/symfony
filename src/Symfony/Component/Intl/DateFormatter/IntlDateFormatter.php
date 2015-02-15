@@ -187,7 +187,12 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string.
      *
+<<<<<<< HEAD
+     * @param int|\DateTime $timestamp The timestamp to format. \DateTime objects
+     *                                 are supported as of PHP 5.3.4.
+=======
      * @param int|\DateTime $timestamp The timestamp to format.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      *
      * @return string|bool The formatted value or false if formatting failed.
      *
@@ -208,7 +213,11 @@ class IntlDateFormatter
         $argumentError = null;
         if (!is_int($timestamp) && !$timestamp instanceof \DateTime) {
             $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+<<<<<<< HEAD
+            if (PHP_VERSION_ID >= 50500 && !is_int($timestamp)) {
+=======
             if (!is_int($timestamp)) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
             }
         }
@@ -369,7 +378,14 @@ class IntlDateFormatter
             return $this->timeZoneId;
         }
 
+<<<<<<< HEAD
+        // In PHP 5.5 default timezone depends on `date_default_timezone_get()` method
+        if (PHP_VERSION_ID >= 50500) {
+            return date_default_timezone_get();
+        }
+=======
         return date_default_timezone_get();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**
@@ -531,7 +547,20 @@ class IntlDateFormatter
     public function setTimeZoneId($timeZoneId)
     {
         if (null === $timeZoneId) {
+<<<<<<< HEAD
+            // In PHP 5.5 if $timeZoneId is null it fallbacks to `date_default_timezone_get()` method
+            if (PHP_VERSION_ID >= 50500) {
+                $timeZoneId = date_default_timezone_get();
+            } else {
+                // TODO: changes were made to ext/intl in PHP 5.4.4 release that need to be investigated since it will
+                // use ini's date.timezone when the time zone is not provided. As a not well tested workaround, uses UTC.
+                // See the first two items of the commit message for more information:
+                // https://github.com/php/php-src/commit/eb346ef0f419b90739aadfb6cc7b7436c5b521d9
+                $timeZoneId = getenv('TZ') ?: 'UTC';
+            }
+=======
             $timeZoneId = date_default_timezone_get();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             $this->unitializedTimeZoneId = true;
         }

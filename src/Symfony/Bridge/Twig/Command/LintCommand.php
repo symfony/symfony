@@ -11,6 +11,13 @@
 
 namespace Symfony\Bridge\Twig\Command;
 
+<<<<<<< HEAD
+if (!defined('JSON_PRETTY_PRINT')) {
+    define('JSON_PRETTY_PRINT', 128);
+}
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

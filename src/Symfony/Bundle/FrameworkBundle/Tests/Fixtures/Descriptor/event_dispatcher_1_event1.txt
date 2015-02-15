@@ -1,7 +1,11 @@
 <info>[event_dispatcher]</info> Registered listeners for event <info>event1</info>
 
 +-------+-------------------+
+<<<<<<< HEAD
+| Order | Callable          |
+=======
 |[32m Order [39m|[32m Callable          [39m|
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 +-------+-------------------+
 | #1    | global_function() |
 | #2    | \Closure()        |

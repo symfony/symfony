@@ -30,7 +30,11 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
+<<<<<<< HEAD
+        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
+=======
         if (defined('HHVM_VERSION')) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             return false;
         }
 

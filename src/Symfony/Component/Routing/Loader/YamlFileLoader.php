@@ -28,7 +28,11 @@ use Symfony\Component\Config\Loader\FileLoader;
 class YamlFileLoader extends FileLoader
 {
     private static $availableKeys = array(
+<<<<<<< HEAD
+        'resource', 'type', 'prefix', 'pattern', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition',
+=======
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition',
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     );
     private $yamlParser;
 
@@ -76,6 +80,20 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($config as $name => $config) {
+<<<<<<< HEAD
+            if (isset($config['pattern'])) {
+                if (isset($config['path'])) {
+                    throw new \InvalidArgumentException(sprintf('The file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
+                }
+
+                trigger_error('The "pattern" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', E_USER_DEPRECATED);
+
+                $config['path'] = $config['pattern'];
+                unset($config['pattern']);
+            }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {

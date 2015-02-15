@@ -23,6 +23,47 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class TwigExtensionTest extends TestCase
 {
+<<<<<<< HEAD
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLegacyFormResourcesConfigurationKey($format)
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'legacy-form-resources-only', $format);
+        $this->compileContainer($container);
+
+        // Form resources
+        $this->assertCount(3, $container->getParameter('twig.form.resources'));
+        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'));
+        $this->assertContains('form_table_layout.html.twig', $container->getParameter('twig.form.resources'));
+        $this->assertContains('MyBundle:Form:my_theme.html.twig', $container->getParameter('twig.form.resources'));
+    }
+
+    /**
+     * @dataProvider getFormats
+     */
+    public function testLegacyMergeFormResourcesConfigurationKeyWithFormThemesConfigurationKey($format)
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $this->loadFromFile($container, 'legacy-merge-form-resources-with-form-themes', $format);
+        $this->compileContainer($container);
+
+        $this->assertCount(4, $container->getParameter('twig.form.resources'));
+        $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'));
+        $this->assertContains('form_table_layout.html.twig', $container->getParameter('twig.form.resources'));
+        $this->assertContains('MyBundle:Form:my_theme.html.twig', $container->getParameter('twig.form.resources'));
+        $this->assertContains('FooBundle:Form:bar.html.twig', $container->getParameter('twig.form.resources'));
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testLoadEmptyConfiguration()
     {
         $container = $this->createContainer();

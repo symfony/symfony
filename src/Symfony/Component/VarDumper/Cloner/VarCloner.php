@@ -277,7 +277,11 @@ class VarCloner extends AbstractCloner
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
             $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
+<<<<<<< HEAD
+            foreach (debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
+=======
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;
                     break;

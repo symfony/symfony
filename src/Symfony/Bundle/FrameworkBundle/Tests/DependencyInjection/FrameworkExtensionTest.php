@@ -203,6 +203,18 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
+<<<<<<< HEAD
+    public function testLegacyTemplatingAssets()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $this->checkAssetsPackages($this->createContainerFromFile('legacy_templating_assets'), true);
+    }
+
+    public function testAssets()
+    {
+        $this->checkAssetsPackages($this->createContainerFromFile('assets'));
+=======
     public function testAssets()
     {
         $container = $this->createContainerFromFile('assets');
@@ -227,6 +239,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition($packages['bar']);
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     public function testTranslator()
@@ -549,6 +562,36 @@ abstract class FrameworkExtensionTest extends TestCase
         return $container;
     }
 
+<<<<<<< HEAD
+    private function checkAssetsPackages(ContainerBuilder $container, $legacy = false)
+    {
+        $packages = $container->getDefinition('assets.packages');
+
+        // default package
+        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
+
+        // packages
+        $packages = $packages->getArgument(1);
+        $this->assertCount($legacy ? 3 : 4, $packages);
+
+        if (!$legacy) {
+            $package = $container->getDefinition($packages['images_path']);
+            $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
+        }
+
+        $package = $container->getDefinition($packages['images']);
+        $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+
+        $package = $container->getDefinition($packages['foo']);
+        $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
+
+        $package = $container->getDefinition($packages['bar']);
+        $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), $legacy ? '' : 'SomeVersionScheme', $legacy ? '%%s?%%s' : '%%s?version=%%s');
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     private function assertPathPackage(ContainerBuilder $container, Definition $package, $basePath, $version, $format)
     {
         $this->assertEquals('assets.path_package', $package->getParent());

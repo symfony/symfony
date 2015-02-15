@@ -164,6 +164,26 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->hasScheme('httpS'));
     }
 
+<<<<<<< HEAD
+    public function testLegacySchemeRequirement()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $route = new Route('/');
+        $route->setRequirement('_scheme', 'http|https');
+        $this->assertEquals('http|https', $route->getRequirement('_scheme'));
+        $this->assertEquals(array('http', 'https'), $route->getSchemes());
+        $this->assertTrue($route->hasScheme('https'));
+        $this->assertTrue($route->hasScheme('http'));
+        $this->assertFalse($route->hasScheme('ftp'));
+        $route->setSchemes(array('hTTp'));
+        $this->assertEquals('http', $route->getRequirement('_scheme'));
+        $route->setSchemes(array());
+        $this->assertNull($route->getRequirement('_scheme'));
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testMethod()
     {
         $route = new Route('/');
@@ -174,6 +194,23 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('GET', 'POST'), $route->getMethods(), '->setMethods() accepts an array of methods and uppercases them');
     }
 
+<<<<<<< HEAD
+    public function testLegacyMethodRequirement()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $route = new Route('/');
+        $route->setRequirement('_method', 'GET|POST');
+        $this->assertEquals('GET|POST', $route->getRequirement('_method'));
+        $this->assertEquals(array('GET', 'POST'), $route->getMethods());
+        $route->setMethods(array('gEt'));
+        $this->assertEquals('GET', $route->getRequirement('_method'));
+        $route->setMethods(array());
+        $this->assertNull($route->getRequirement('_method'));
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testCondition()
     {
         $route = new Route('/');
@@ -191,6 +228,20 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
     }
 
+<<<<<<< HEAD
+    public function testLegacyPattern()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $route = new Route('/{foo}');
+        $this->assertEquals('/{foo}', $route->getPattern());
+
+        $route->setPattern('/bar');
+        $this->assertEquals('/bar', $route->getPattern());
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function testSerialize()
     {
         $route = new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+'));

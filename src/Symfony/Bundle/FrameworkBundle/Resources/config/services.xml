@@ -37,11 +37,29 @@
             <argument type="collection" />
         </service>
 
+<<<<<<< HEAD
+        <!--
+            If you want to change the Request class, modify the code in
+            your front controller (app.php) so that it passes an instance of
+            YourRequestClass to the Kernel.
+            This service definition only defines the scope of the request.
+            It is used to check references scope.
+
+            This service is deprecated, you should use the request_stack service instead.
+        -->
+        <service id="request" scope="request" synthetic="true" synchronized="true" />
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         <service id="service_container" synthetic="true" />
 
         <service id="kernel" synthetic="true" />
 
+<<<<<<< HEAD
+        <service id="filesystem" class="%filesystem.class%"></service>
+=======
         <service id="filesystem" class="%filesystem.class%" />
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         <service id="file_locator" class="%file_locator.class%">
             <argument type="service" id="kernel" />

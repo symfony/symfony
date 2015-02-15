@@ -34,7 +34,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Controller extends ContainerAware
+class Controller extends ContainerAware
 {
     /**
      * Generates a URL from the given parameters.
@@ -47,7 +47,7 @@ abstract class Controller extends ContainerAware
      *
      * @see UrlGeneratorInterface
      */
-    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
         return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
@@ -61,7 +61,7 @@ abstract class Controller extends ContainerAware
      *
      * @return Response A Response instance
      */
-    protected function forward($controller, array $path = array(), array $query = array())
+    public function forward($controller, array $path = array(), array $query = array())
     {
         $path['_controller'] = $controller;
         $subRequest = $this->container->get('request_stack')->getCurrentRequest()->duplicate($query, null, $path);
@@ -77,7 +77,7 @@ abstract class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    protected function redirect($url, $status = 302)
+    public function redirect($url, $status = 302)
     {
         return new RedirectResponse($url, $status);
     }
@@ -156,7 +156,7 @@ abstract class Controller extends ContainerAware
      *
      * @return string The rendered view
      */
-    protected function renderView($view, array $parameters = array())
+    public function renderView($view, array $parameters = array())
     {
         return $this->container->get('templating')->render($view, $parameters);
     }
@@ -170,7 +170,7 @@ abstract class Controller extends ContainerAware
      *
      * @return Response A Response instance
      */
-    protected function render($view, array $parameters = array(), Response $response = null)
+    public function render($view, array $parameters = array(), Response $response = null)
     {
         return $this->container->get('templating')->renderResponse($view, $parameters, $response);
     }
@@ -184,7 +184,7 @@ abstract class Controller extends ContainerAware
      *
      * @return StreamedResponse A StreamedResponse instance
      */
-    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    public function stream($view, array $parameters = array(), StreamedResponse $response = null)
     {
         $templating = $this->container->get('templating');
 
@@ -213,7 +213,7 @@ abstract class Controller extends ContainerAware
      *
      * @return NotFoundHttpException
      */
-    protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -230,7 +230,7 @@ abstract class Controller extends ContainerAware
      *
      * @return AccessDeniedException
      */
-    protected function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
+    public function createAccessDeniedException($message = 'Access Denied', \Exception $previous = null)
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -244,7 +244,7 @@ abstract class Controller extends ContainerAware
      *
      * @return Form
      */
-    protected function createForm($type, $data = null, array $options = array())
+    public function createForm($type, $data = null, array $options = array())
     {
         return $this->container->get('form.factory')->create($type, $data, $options);
     }
@@ -257,9 +257,25 @@ abstract class Controller extends ContainerAware
      *
      * @return FormBuilder
      */
-    protected function createFormBuilder($data = null, array $options = array())
+    public function createFormBuilder($data = null, array $options = array())
     {
         return $this->container->get('form.factory')->createBuilder('form', $data, $options);
+    }
+
+    /**
+     * Shortcut to return the request service.
+     *
+     * @return Request
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
+     *             Ask Symfony to inject the Request object into your controller
+     *             method instead by type hinting it in the method's signature.
+     */
+    public function getRequest()
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0. The only reliable way to get the "Request" object is to inject it in the action method.', E_USER_DEPRECATED);
+
+        return $this->container->get('request_stack')->getCurrentRequest();
     }
 
     /**
@@ -269,7 +285,7 @@ abstract class Controller extends ContainerAware
      *
      * @throws \LogicException If DoctrineBundle is not available
      */
-    protected function getDoctrine()
+    public function getDoctrine()
     {
         if (!$this->container->has('doctrine')) {
             throw new \LogicException('The DoctrineBundle is not registered in your application.');
@@ -287,7 +303,7 @@ abstract class Controller extends ContainerAware
      *
      * @see TokenInterface::getUser()
      */
-    protected function getUser()
+    public function getUser()
     {
         if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
@@ -312,7 +328,7 @@ abstract class Controller extends ContainerAware
      *
      * @return bool true if the service id is defined, false otherwise
      */
-    protected function has($id)
+    public function has($id)
     {
         return $this->container->has($id);
     }
@@ -324,12 +340,12 @@ abstract class Controller extends ContainerAware
      *
      * @return object The service
      */
-    protected function get($id)
+    public function get($id)
     {
         if ('request' === $id) {
             trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
         }
-        
+
         return $this->container->get($id);
     }
 
@@ -348,5 +364,125 @@ abstract class Controller extends ContainerAware
         }
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
+    }
+
+    /**
+     * Return the entity manager
+     *
+     * @return Entity Manager
+     */
+    public function getEntityManager()
+    {
+        return $this->getDoctrine()->getManager();
+    }
+
+    /**
+     * Return the entity manage repository of an entity
+     *
+     * @param String $bundle The bundle containing the entity (required)
+     * @param String $entity The entity to get the entity manager (required)
+     *
+     * @return Entity Manager Repository
+     */
+    public function getEntityRepository($bundle, $entity)
+    {
+        return $this->getEntityManager()->getRepository($bundle . ":" . $entity);
+    }
+
+    /**
+     * Return the view request with whatever array might be passed
+     *
+     * @param String $bundle The bundle containing the view (required)
+     * @param String $view   The view being requested (required)
+     * @param array $array   The array of object instances passed to the view (optional)
+     *
+     * @return The view response
+     */
+    public function getView($bundle, $view, $array = array())
+    {
+        return $this->render($bundle . ":" . $view . ".html.twig", $array);
+    }
+
+    /**
+     * Perform a persist on an entity object (required)
+     *
+     * @param DoctrineEntity $object The object entity to persist
+     *
+     * @return null
+     */
+    public function save($object)
+    {
+        $this->getEntityManager()->persist($object);
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Perform a persist on an array of objects of one or more entities (required) [e.g. array($user, $role, ...)]
+     *
+     * @param array $array An array containing the objects of the several entities to persist
+     *
+     * @return null
+     */
+    public function saveObjects($array)
+    {
+        foreach ($array as $object) {
+            $this->save($object);
+        }
+
+        return null;
+    }
+
+    /**
+     * Perform an update on an entity object
+     *
+     * @return null
+     */
+    public function update()
+    {
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Delete an entity object from database
+     *
+     * @param string $bundle The bundle containing the entity (required) [e.g. AcmeDemoBundle]
+     * @param string $entity The entity to delete from (required) [e.g. User]
+     * @param int $id        The id of the entity object to delete (required)
+     *
+     * @return null
+     */
+    public function delete($bundle, $entity, $id)
+    {
+        $object = $this->getEntityRepository($bundle, $entity)->find($id);
+        if (!$object)
+            throw $this->createNotFoundException();
+
+        $this->getEntityManager()->remove($object);
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Delete more than one array at once from several entities
+     *
+     * @param array $array A multidimensional array containing the objects to delete in the form
+     *                     [ array("AcmeDemoBundle", "User", 1), array("AcmeLiveBundle", "Role", 5)..... ] or
+     *                     array( array("AcmeDemoBundle", "User", 1), array("AcmeLiveBundle", "Role", 5)..... )
+     *                     (required)
+     *
+     * @return null
+     */
+    public function deleteObjects($array)
+    {
+        foreach ($array as $object) {
+            $this->delete($object[0], $object[1], $object[2]);
+        }
+
+        return null;
     }
 }

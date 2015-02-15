@@ -763,6 +763,11 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $helperSet = $application->getHelperSet();
 
         $this->assertTrue($helperSet->has('formatter'));
+<<<<<<< HEAD
+        $this->assertTrue($helperSet->has('dialog'));
+        $this->assertTrue($helperSet->has('progress'));
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     public function testAddingSingleHelperSetOverwritesDefaultValues()

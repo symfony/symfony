@@ -11,6 +11,17 @@
 
 namespace Symfony\Component\ClassLoader;
 
+<<<<<<< HEAD
+if (!defined('SYMFONY_TRAIT')) {
+    if (PHP_VERSION_ID >= 50400) {
+        define('SYMFONY_TRAIT', T_TRAIT);
+    } else {
+        define('SYMFONY_TRAIT', 0);
+    }
+}
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 /**
  * ClassMapGenerator.
  *
@@ -109,7 +120,11 @@ class ClassMapGenerator
                     break;
                 case T_CLASS:
                 case T_INTERFACE:
+<<<<<<< HEAD
+                case SYMFONY_TRAIT:
+=======
                 case T_TRAIT:
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                     // Find the classname
                     while (($t = $tokens[++$i]) && is_array($t)) {
                         if (T_STRING === $t[0]) {

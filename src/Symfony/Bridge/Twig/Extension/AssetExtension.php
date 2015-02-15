@@ -12,6 +12,10 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
+<<<<<<< HEAD
+use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * Twig extension for the Symfony Asset component.
@@ -21,10 +25,23 @@ use Symfony\Component\Asset\Packages;
 class AssetExtension extends \Twig_Extension
 {
     private $packages;
+<<<<<<< HEAD
+    private $foundationExtension;
+
+    /**
+     * Passing an HttpFoundationExtension instance as a second argument must not be relied on
+     * as it's only there to maintain BC with older Symfony version. It will be removed in 3.0.
+     */
+    public function __construct(Packages $packages, HttpFoundationExtension $foundationExtension = null)
+    {
+        $this->packages = $packages;
+        $this->foundationExtension = $foundationExtension;
+=======
 
     public function __construct(Packages $packages)
     {
         $this->packages = $packages;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**
@@ -35,6 +52,10 @@ class AssetExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
             new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
+<<<<<<< HEAD
+            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         );
     }
 
@@ -49,8 +70,25 @@ class AssetExtension extends \Twig_Extension
      *
      * @return string The public path of the asset
      */
+<<<<<<< HEAD
+    public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
+    {
+        // BC layer to be removed in 3.0
+        if (2 < $count = func_num_args()) {
+            trigger_error('Generating absolute URLs with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use absolute_url() instead.', E_USER_DEPRECATED);
+            if (4 === $count) {
+                trigger_error('Forcing a version with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+            }
+
+            $args = func_get_args();
+
+            return $this->getLegacyAssetUrl($path, $packageName, $args[2], isset($args[3]) ? $args[3] : null);
+        }
+
+=======
     public function getAssetUrl($path, $packageName = null)
     {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return $this->packages->getUrl($path, $packageName);
     }
 
@@ -67,6 +105,54 @@ class AssetExtension extends \Twig_Extension
         return $this->packages->getVersion($path, $packageName);
     }
 
+<<<<<<< HEAD
+    public function getAssetsVersion($packageName = null)
+    {
+        trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
+
+        return $this->packages->getVersion('/', $packageName);
+    }
+
+    private function getLegacyAssetUrl($path, $packageName = null, $absolute = false, $version = null)
+    {
+        if ($version) {
+            $package = $this->packages->getPackage($packageName);
+
+            $v = new \ReflectionProperty($package, 'versionStrategy');
+            $v->setAccessible(true);
+
+            $currentVersionStrategy = $v->getValue($package);
+
+            $f = new \ReflectionProperty($currentVersionStrategy, 'format');
+            $f->setAccessible(true);
+            $format = $f->getValue($currentVersionStrategy);
+
+            $v->setValue($package, new StaticVersionStrategy($version, $format));
+        }
+
+        try {
+            $url = $this->packages->getUrl($path, $packageName);
+        } catch (\Exception $e) {
+            if ($version) {
+                $v->setValue($package, $currentVersionStrategy);
+            }
+
+            throw $e;
+        }
+
+        if ($version) {
+            $v->setValue($package, $currentVersionStrategy);
+        }
+
+        if ($absolute) {
+            return $this->foundationExtension->generateAbsoluteUrl($url);
+        }
+
+        return $url;
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     /**
      * Returns the name of the extension.
      *

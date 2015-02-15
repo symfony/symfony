@@ -1,8 +1,14 @@
 <?php
 
+<<<<<<< HEAD
+if (PHP_VERSION_ID >= 50400 && gc_enabled()) {
+    // Disabling Zend Garbage Collection to prevent segfaults with PHP5.4+
+    // https://bugs.php.net/bug.php?id=53976
+=======
 // Disabling Zend Garbage Collection to prevent segfaults
 // https://bugs.php.net/bug.php?id=53976
 if (gc_enabled()) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     gc_disable();
 }
 

@@ -10,6 +10,11 @@
 
 namespace Symfony\Component\Form;
 
+<<<<<<< HEAD
+use Symfony\Component\Form\Deprecated\FormEvents as Deprecated;
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 /**
  * To learn more about how form events work check the documentation
  * entry at {@link http://symfony.com/doc/any/components/form/form_events.html}
@@ -77,6 +82,33 @@ final class FormEvents
      */
     const POST_SET_DATA = 'form.post_set_data';
 
+<<<<<<< HEAD
+    /**
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link PRE_SUBMIT} instead.
+     *
+     * @Event
+     */
+    const PRE_BIND = Deprecated::PRE_BIND;
+
+    /**
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link SUBMIT} instead.
+     *
+     * @Event
+     */
+    const BIND = Deprecated::BIND;
+
+    /**
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link POST_SUBMIT} instead.
+     *
+     * @Event
+     */
+    const POST_BIND = Deprecated::POST_BIND;
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     private function __construct()
     {
     }

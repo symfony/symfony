@@ -131,4 +131,29 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
             ), $this->bag->peekAll()
         );
     }
+<<<<<<< HEAD
+
+    /**
+     * @covers Symfony\Component\HttpFoundation\Session\Flash\FlashBag::getIterator
+     */
+    public function testLegacyGetIterator()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $flashes = array('hello' => 'world', 'beep' => 'boop', 'notice' => 'nope');
+        foreach ($flashes as $key => $val) {
+            $this->bag->set($key, $val);
+        }
+
+        $i = 0;
+        foreach ($this->bag as $key => $val) {
+            $this->assertEquals(array($flashes[$key]), $val);
+            $i++;
+        }
+
+        $this->assertEquals(count($flashes), $i);
+        $this->assertCount(0, $this->bag->all());
+    }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 }

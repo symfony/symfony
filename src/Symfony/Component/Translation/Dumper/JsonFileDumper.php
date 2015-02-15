@@ -13,6 +13,13 @@ namespace Symfony\Component\Translation\Dumper;
 
 use Symfony\Component\Translation\MessageCatalogue;
 
+<<<<<<< HEAD
+if (!defined('JSON_PRETTY_PRINT')) {
+    define('JSON_PRETTY_PRINT', 128);
+}
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 /**
  * JsonFileDumper generates an json formatted string representation of a message catalogue.
  *

@@ -101,7 +101,15 @@ class NativeSessionStorage implements SessionStorageInterface
         session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
 
+<<<<<<< HEAD
+        if (PHP_VERSION_ID >= 50400) {
+            session_register_shutdown();
+        } else {
+            register_shutdown_function('session_write_close');
+        }
+=======
         session_register_shutdown();
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->setMetadataBag($metaBag);
         $this->setOptions($options);
@@ -127,10 +135,22 @@ class NativeSessionStorage implements SessionStorageInterface
             return true;
         }
 
+<<<<<<< HEAD
+        if (PHP_VERSION_ID >= 50400 && \PHP_SESSION_ACTIVE === session_status()) {
+            throw new \RuntimeException('Failed to start the session: already started by PHP.');
+        }
+
+        if (PHP_VERSION_ID < 50400 && !$this->closed && isset($_SESSION) && session_id()) {
+            // not 100% fool-proof, but is the most reliable way to determine if a session is active in PHP 5.3
+            throw new \RuntimeException('Failed to start the session: already started by PHP ($_SESSION is set).');
+        }
+
+=======
         if (\PHP_SESSION_ACTIVE === session_status()) {
             throw new \RuntimeException('Failed to start the session: already started by PHP.');
         }
 
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         if (ini_get('session.use_cookies') && headers_sent($file, $line)) {
             throw new \RuntimeException(sprintf('Failed to start the session because headers have already been sent by "%s" at line %d.', $file, $line));
         }
@@ -141,6 +161,13 @@ class NativeSessionStorage implements SessionStorageInterface
         }
 
         $this->loadSession();
+<<<<<<< HEAD
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
+            // This condition matches only PHP 5.3 with internal save handlers
+            $this->saveHandler->setActive(true);
+        }
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         return true;
     }
@@ -200,6 +227,14 @@ class NativeSessionStorage implements SessionStorageInterface
     {
         session_write_close();
 
+<<<<<<< HEAD
+        if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
+            // This condition matches only PHP 5.3 with internal save handlers
+            $this->saveHandler->setActive(false);
+        }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->closed = true;
         $this->started = false;
     }
@@ -345,12 +380,32 @@ class NativeSessionStorage implements SessionStorageInterface
         if (!$saveHandler instanceof AbstractProxy && $saveHandler instanceof \SessionHandlerInterface) {
             $saveHandler = new SessionHandlerProxy($saveHandler);
         } elseif (!$saveHandler instanceof AbstractProxy) {
+<<<<<<< HEAD
+            $saveHandler = PHP_VERSION_ID >= 50400 ?
+                new SessionHandlerProxy(new \SessionHandler()) : new NativeProxy();
+=======
             $saveHandler = new SessionHandlerProxy(new \SessionHandler());
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
         $this->saveHandler = $saveHandler;
 
         if ($this->saveHandler instanceof \SessionHandlerInterface) {
+<<<<<<< HEAD
+            if (PHP_VERSION_ID >= 50400) {
+                session_set_save_handler($this->saveHandler, false);
+            } else {
+                session_set_save_handler(
+                    array($this->saveHandler, 'open'),
+                    array($this->saveHandler, 'close'),
+                    array($this->saveHandler, 'read'),
+                    array($this->saveHandler, 'write'),
+                    array($this->saveHandler, 'destroy'),
+                    array($this->saveHandler, 'gc')
+                );
+            }
+=======
             session_set_save_handler($this->saveHandler, false);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 

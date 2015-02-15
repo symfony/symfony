@@ -34,7 +34,15 @@ class Yaml
      *   print_r($array);
      *  </code>
      *
+<<<<<<< HEAD
+     * As this method accepts both plain strings and file names as an input,
+     * you must validate the input before calling this method. Passing a file
+     * as an input is a deprecated feature and will be removed in 3.0.
+     *
+     * @param string $input                  Path to a YAML file or a string containing YAML
+=======
      * @param string $input                  A string containing YAML
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
      *
@@ -42,13 +50,45 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
+<<<<<<< HEAD
+     * @deprecated The ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
+     *
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * @api
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false)
     {
+<<<<<<< HEAD
+        // if input is a file, process it
+        $file = '';
+        if (strpos($input, "\n") === false && is_file($input)) {
+            trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
+
+            if (false === is_readable($input)) {
+                throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
+            }
+
+            $file = $input;
+            $input = file_get_contents($file);
+        }
+
+        $yaml = new Parser();
+
+        try {
+            return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport);
+        } catch (ParseException $e) {
+            if ($file) {
+                $e->setParsedFile($file);
+            }
+
+            throw $e;
+        }
+=======
         $yaml = new Parser();
 
         return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     }
 
     /**

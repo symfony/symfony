@@ -51,6 +51,13 @@ class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
     {
         session_id('touti');
 
+<<<<<<< HEAD
+        if (PHP_VERSION_ID < 50400) {
+            $this->markTestSkipped('This test requires PHP >= 5.4');
+        }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->assertSame(PHP_SESSION_NONE, session_status());
 
         $token = $this->provider->generateCsrfToken('foo');

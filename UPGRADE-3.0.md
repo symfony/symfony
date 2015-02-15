@@ -378,8 +378,11 @@ UPGRADE FROM 2.x to 3.0
 
  * The `RouterApacheDumperCommand` was removed.
 
+<<<<<<< HEAD
+=======
  * The `createEsi` method of `Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache` was removed. Use `createSurrogate` instead.
 
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 ### HttpKernel
 
  * The `Symfony\Component\HttpKernel\Log\LoggerInterface` has been removed in
@@ -1025,6 +1028,8 @@ UPGRADE FROM 2.x to 3.0
  * `Process::setStdin()` and `Process::getStdin()` have been removed. Use
    `Process::setInput()` and `Process::getInput()` that works the same way.
  * `Process::setInput()` and `ProcessBuilder::setInput()` do not accept non-scalar types.
+<<<<<<< HEAD
+=======
 
 ### Monolog Bridge
 
@@ -1040,3 +1045,4 @@ UPGRADE FROM 2.x to 3.0
 ### HttpFoundation
 
 * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

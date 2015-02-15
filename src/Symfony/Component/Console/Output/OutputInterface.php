@@ -76,6 +76,8 @@ interface OutputInterface
     public function getVerbosity();
 
     /**
+<<<<<<< HEAD
+=======
      * Returns whether verbosity is quiet (-q)
      *
      * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
@@ -104,6 +106,7 @@ interface OutputInterface
     public function isDebug();
 
     /**
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Sets the decorated flag.
      *
      * @param bool $decorated Whether to decorate the messages

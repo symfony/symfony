@@ -12,6 +12,10 @@
 namespace Symfony\Component\Debug\Tests\FatalErrorHandler;
 
 use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
+<<<<<<< HEAD
+use Symfony\Component\ClassLoader\UniversalClassLoader as SymfonyUniversalClassLoader;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
 
@@ -118,6 +122,12 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $symfonyAutoloader = new SymfonyClassLoader();
         $symfonyAutoloader->addPrefixes($prefixes);
 
+<<<<<<< HEAD
+        $symfonyUniversalClassLoader = new SymfonyUniversalClassLoader();
+        $symfonyUniversalClassLoader->registerPrefixes($prefixes);
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         return array(
             array(
                 array(
@@ -136,6 +146,19 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                     'file' => 'foo.php',
                     'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
                 ),
+<<<<<<< HEAD
+                "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\Bar\".\nDid you forget a \"use\" statement for \"Symfony\Component\Debug\Exception\UndefinedFunctionException\"?",
+                array($symfonyUniversalClassLoader, 'loadClass'),
+            ),
+            array(
+                array(
+                    'type' => 1,
+                    'line' => 12,
+                    'file' => 'foo.php',
+                    'message' => 'Class \'Foo\\Bar\\UndefinedFunctionException\' not found',
+                ),
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
                 "Attempted to load class \"UndefinedFunctionException\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
                 function ($className) { /* do nothing here */ },
             ),

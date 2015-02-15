@@ -166,7 +166,15 @@ class CodeHelper extends Helper
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
+<<<<<<< HEAD
+            if (PHP_VERSION_ID >= 50400) {
+                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            } else {
+                $flags = ENT_QUOTES;
+            }
+=======
             $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
             return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
         }
@@ -193,8 +201,15 @@ class CodeHelper extends Helper
 
     public function formatFileFromText($text)
     {
+<<<<<<< HEAD
+        $that = $this;
+
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
+            return 'in '.$that->formatFile($match[2], $match[3]);
+=======
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
             return 'in '.$this->formatFile($match[2], $match[3]);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }, $text);
     }
 

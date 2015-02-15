@@ -75,6 +75,23 @@ abstract class HttpCache extends BaseHttpCache
         return new Esi();
     }
 
+<<<<<<< HEAD
+    /**
+     * Creates new ESI instance
+     *
+     * @return Esi
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
+     */
+    protected function createEsi()
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use createSurrogate() instead.', E_USER_DEPRECATED);
+
+        return $this->createSurrogate();
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     protected function createStore()
     {
         return new Store($this->cacheDir ?: $this->kernel->getCacheDir().'/http_cache');

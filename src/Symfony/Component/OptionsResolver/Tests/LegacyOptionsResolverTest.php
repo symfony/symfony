@@ -113,13 +113,24 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnMissingOptionalWithoutDefault()
     {
+<<<<<<< HEAD
+        $test = $this;
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
+<<<<<<< HEAD
+            'two' => function (Options $options) use ($test) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertFalse(isset($options['one']));
+=======
             'two' => function (Options $options) {
                 $this->assertFalse(isset($options['one']));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 return '2';
             },
@@ -134,13 +145,24 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyDependencyOnOptionalWithoutDefault()
     {
+<<<<<<< HEAD
+        $test = $this;
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->resolver->setOptional(array(
             'one',
         ));
 
         $this->resolver->setDefaults(array(
+<<<<<<< HEAD
+            'two' => function (Options $options) use ($test) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->assertTrue(isset($options['one']));
+=======
             'two' => function (Options $options) {
                 $this->assertTrue(isset($options['one']));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
                 return $options['one'].'2';
             },
@@ -179,9 +201,18 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveLazyReplaceDefaults()
     {
+<<<<<<< HEAD
+        $test = $this;
+
+        $this->resolver->setDefaults(array(
+            'one' => function (Options $options) use ($test) {
+                /* @var \PHPUnit_Framework_TestCase $test */
+                $test->fail('Previous closure should not be executed');
+=======
         $this->resolver->setDefaults(array(
             'one' => function (Options $options) {
                 $this->fail('Previous closure should not be executed');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             },
         ));
 

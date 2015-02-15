@@ -12,6 +12,10 @@
 namespace Symfony\Component\Form\Extension\HttpFoundation\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+<<<<<<< HEAD
+use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
@@ -22,6 +26,14 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler
 class FormTypeHttpFoundationExtension extends AbstractTypeExtension
 {
     /**
+<<<<<<< HEAD
+     * @var BindRequestListener
+     */
+    private $listener;
+
+    /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * @var RequestHandlerInterface
      */
     private $requestHandler;
@@ -31,6 +43,10 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
      */
     public function __construct(RequestHandlerInterface $requestHandler = null)
     {
+<<<<<<< HEAD
+        $this->listener = new BindRequestListener();
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->requestHandler = $requestHandler ?: new HttpFoundationRequestHandler();
     }
 
@@ -39,6 +55,10 @@ class FormTypeHttpFoundationExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+<<<<<<< HEAD
+        $builder->addEventSubscriber($this->listener);
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $builder->setRequestHandler($this->requestHandler);
     }
 

@@ -57,4 +57,8 @@ alias_2
 Services
 --------
 
+<<<<<<< HEAD
 - `service_container`: `Symfony\Component\DependencyInjection\ContainerBuilder`
+=======
+- `service_container`: `Symfony\Component\DependencyInjection\ContainerBuilder`
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d

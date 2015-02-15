@@ -17,10 +17,17 @@
     ],
     "minimum-stability": "dev",
     "require": {
+<<<<<<< HEAD
+        "php": ">=5.3.9"
+    },
+    "require-dev": {
+        "symfony/finder": "~2.0,>=2.0.5|~3.0.0"
+=======
         "php": ">=5.5.9"
     },
     "require-dev": {
         "symfony/finder": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }
@@ -28,7 +35,11 @@
     "target-dir": "Symfony/Component/ClassLoader",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
+            "dev-master": "2.7-dev"
+=======
             "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

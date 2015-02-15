@@ -28,8 +28,18 @@ class NativeFileSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $storage = new NativeSessionStorage(array('name' => 'TESTING'), new NativeFileSessionHandler(sys_get_temp_dir()));
 
+<<<<<<< HEAD
+        if (PHP_VERSION_ID < 50400) {
+            $this->assertEquals('files', $storage->getSaveHandler()->getSaveHandlerName());
+            $this->assertEquals('files', ini_get('session.save_handler'));
+        } else {
+            $this->assertEquals('files', $storage->getSaveHandler()->getSaveHandlerName());
+            $this->assertEquals('user', ini_get('session.save_handler'));
+        }
+=======
         $this->assertEquals('files', $storage->getSaveHandler()->getSaveHandlerName());
         $this->assertEquals('user', ini_get('session.save_handler'));
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
         $this->assertEquals(sys_get_temp_dir(), ini_get('session.save_path'));
         $this->assertEquals('TESTING', ini_get('session.name'));

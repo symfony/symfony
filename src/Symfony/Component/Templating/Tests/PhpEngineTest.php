@@ -103,15 +103,25 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
+<<<<<<< HEAD
+        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $view[\'foo\'].$foo ?>');
+        $this->loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
+=======
         $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $this[\'foo\'].$foo ?>');
         $this->loader->setTemplate('layout.php', '-<?php echo $this[\'slots\']->get("_content") ?>-');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->assertEquals('-barfoo-', $engine->render('foo.php', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
         $this->loader->setTemplate('bar.php', 'bar');
+<<<<<<< HEAD
+        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $foo ?>');
+        $this->loader->setTemplate('layout.php', '<?php echo $view->render("bar.php") ?>-<?php echo $view[\'slots\']->get("_content") ?>-');
+=======
         $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $foo ?>');
         $this->loader->setTemplate('layout.php', '<?php echo $this->render("bar.php") ?>-<?php echo $this[\'slots\']->get("_content") ?>-');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
     }
 

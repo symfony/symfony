@@ -16,6 +16,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+<<<<<<< HEAD
+use Symfony\Component\DependencyInjection\ContainerInterface;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -24,11 +28,26 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class AppVariable
 {
+<<<<<<< HEAD
+    private $container;
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     private $tokenStorage;
     private $requestStack;
     private $environment;
     private $debug;
 
+<<<<<<< HEAD
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0.
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     public function setTokenStorage(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -50,6 +69,27 @@ class AppVariable
     }
 
     /**
+<<<<<<< HEAD
+     * Returns the security context service.
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
+     *
+     * @return SecurityContext|null The security context
+     */
+    public function getSecurity()
+    {
+        trigger_error('The "app.security" variable is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+        if (null === $this->container) {
+            throw new \RuntimeException('The "app.security" variable is not available.');
+        }
+
+        return $this->container->get('security.context');
+    }
+
+    /**
+=======
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
      * Returns the current user.
      *
      * @return mixed
@@ -58,6 +98,17 @@ class AppVariable
      */
     public function getUser()
     {
+<<<<<<< HEAD
+        if (null === $this->tokenStorage) {
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.user" variable is not available.');
+            }
+
+            $this->tokenStorage = $this->container->get('security.context');
+        }
+
+        if (!$token = $this->tokenStorage->getToken()) {
+=======
         if (null !== $this->tokenStorage) {
             $tokenStorage = $this->tokenStorage;
         } else {
@@ -65,6 +116,7 @@ class AppVariable
         }
 
         if (!$token = $tokenStorage->getToken()) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             return;
         }
 
@@ -82,7 +134,15 @@ class AppVariable
     public function getRequest()
     {
         if (null === $this->requestStack) {
+<<<<<<< HEAD
+            if (null === $this->container) {
+                throw new \RuntimeException('The "app.request" variable is not available.');
+            }
+
+            $this->requestStack = $this->container->get('request_stack');
+=======
             throw new \RuntimeException('The "app.request" variable is not available.');
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
 
         return $this->requestStack->getCurrentRequest();
@@ -95,7 +155,11 @@ class AppVariable
      */
     public function getSession()
     {
+<<<<<<< HEAD
+        if (null === $this->requestStack && null === $this->container) {
+=======
         if (null === $this->requestStack) {
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
 

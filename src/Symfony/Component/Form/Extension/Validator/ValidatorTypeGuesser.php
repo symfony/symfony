@@ -33,8 +33,15 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessType($class, $property)
     {
+<<<<<<< HEAD
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessTypeForConstraint($constraint);
+=======
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessTypeForConstraint($constraint);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
     }
 
@@ -43,8 +50,15 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessRequired($class, $property)
     {
+<<<<<<< HEAD
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessRequiredForConstraint($constraint);
+=======
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessRequiredForConstraint($constraint);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         // If we don't find any constraint telling otherwise, we can assume
         // that a field is not required (with LOW_CONFIDENCE)
         }, false);
@@ -55,8 +69,15 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessMaxLength($class, $property)
     {
+<<<<<<< HEAD
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessMaxLengthForConstraint($constraint);
+=======
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessMaxLengthForConstraint($constraint);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
     }
 
@@ -65,8 +86,15 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessPattern($class, $property)
     {
+<<<<<<< HEAD
+        $guesser = $this;
+
+        return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
+            return $guesser->guessPatternForConstraint($constraint);
+=======
         return $this->guess($class, $property, function (Constraint $constraint) {
             return $this->guessPatternForConstraint($constraint);
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         });
     }
 

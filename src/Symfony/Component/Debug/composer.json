@@ -16,16 +16,26 @@
         }
     ],
     "require": {
+<<<<<<< HEAD
+        "php": ">=5.3.9",
+=======
         "php": ">=5.5.9",
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         "psr/log": "~1.0"
     },
     "conflict": {
         "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
     },
     "require-dev": {
+<<<<<<< HEAD
+        "symfony/class-loader": "~2.2|~3.0.0",
+        "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2|~3.0.0",
+        "symfony/http-foundation": "~2.1|~3.0.0"
+=======
         "symfony/class-loader": "~2.7|~3.0",
         "symfony/http-kernel": "~2.7|~3.0",
         "symfony/http-foundation": "~2.7|~3.0"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
     },
     "suggest": {
         "symfony/http-foundation": "",
@@ -38,7 +48,11 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
+<<<<<<< HEAD
+            "dev-master": "2.7-dev"
+=======
             "dev-master": "3.0-dev"
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
         }
     }
 }

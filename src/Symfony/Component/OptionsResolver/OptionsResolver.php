@@ -24,7 +24,11 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Tobias Schultze <http://tobion.de>
  */
+<<<<<<< HEAD
+class OptionsResolver implements Options, OptionsResolverInterface
+=======
 class OptionsResolver implements Options
+>>>>>>> 22cd78c4a87e94b59ad313d11b99acb50aa17b8d
 {
     /**
      * The fully qualified name of the {@link Options} interface.

@@ -365,4 +365,124 @@ class Controller extends ContainerAware
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
     }
+
+    /**
+     * Returns the doctrine registry manager
+     *
+     * @return Registry Manager
+     */
+    public function getEntityManager()
+    {
+        return $this->getDoctrine()->getManager();
+    }
+
+    /**
+     * Returns the entity repository of a given entity in a bundle
+     *
+     * @param string $bundle The bundle containing the desired entity
+     * @param string $entity The entity to return its repository
+     *
+     * @return Doctrine Repository
+     */
+    public function getEntityRepository($bundle, $entity)
+    {
+        return $this->getEntityManager()->getRepository($bundle . ":" . $entity);
+    }
+
+    /**
+     * Return the view request with whatever array might be passed
+     *
+     * @param String $bundle The bundle containing the view (required)
+     * @param String $view   The view being requested (required)
+     * @param array $array   The array of object instances passed to the view (optional)
+     *
+     * @return The view response
+     */
+    public function getView($bundle, $view, $array = array())
+    {
+        return $this->render($bundle . ":" . $view . ".html.twig", $array);
+    }
+
+    /**
+     * Perform a persist on an entity object (required)
+     *
+     * @param DoctrineEntity $object The object entity to persist
+     *
+     * @return null
+     */
+    public function save($object)
+    {
+        $this->getEntityManager()->persist($object);
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Perform a persist on an array of objects of one or more entities (required) [e.g. array($user, $role, ...)]
+     *
+     * @param array $array An array containing the objects of the several entities to persist
+     *
+     * @return null
+     */
+    public function saveObjects($array)
+    {
+        foreach ($array as $object) {
+            $this->save($object);
+        }
+
+        return null;
+    }
+
+    /**
+     * Perform an update on an entity object
+     *
+     * @return null
+     */
+    public function update()
+    {
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Delete an entity object from database
+     *
+     * @param string $bundle The bundle containing the entity (required) [e.g. AcmeDemoBundle]
+     * @param string $entity The entity to delete from (required) [e.g. User]
+     * @param int $id        The id of the entity object to delete (required)
+     *
+     * @return null
+     */
+    public function delete($bundle, $entity, $id)
+    {
+        $object = $this->getEntityRepository($bundle, $entity)->find($id);
+        if (!$object)
+            throw $this->createNotFoundException();
+
+        $this->getEntityManager()->remove($object);
+        $this->getEntityManager()->flush();
+
+        return null;
+    }
+
+    /**
+     * Delete more than one array at once from several entities
+     *
+     * @param array $array A multidimensional array containing the objects to delete in the form
+     *                     [ array("AcmeDemoBundle", "User", 1), array("AcmeLiveBundle", "Role", 5)..... ] or
+     *                     array( array("AcmeDemoBundle", "User", 1), array("AcmeLiveBundle", "Role", 5)..... )
+     *                     (required)
+     *
+     * @return null
+     */
+    public function deleteObjects($array)
+    {
+        foreach ($array as $object) {
+            $this->delete($object[0], $object[1], $object[2]);
+        }
+
+        return null;
+    }
 }

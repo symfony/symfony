@@ -219,7 +219,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
  * bug #10849 [WIP][Finder] Fix wrong implementation on sortable callback comparator (ProPheT777)
  * bug #10929 [Process] Add validation on Process input (romainneutron)
- * bug #10958 [DomCrawler] Fixed filterXPath() chaining loosing the parent DOM nodes (stof, robbertkl)
+ * bug #10958 [DomCrawler] Fixed filterXPath() chaining losing the parent DOM nodes (stof, robbertkl)
  * bug #10953 [HttpKernel] fixed file uploads in functional tests without file selected (realmfoo)
  * bug #10937 [HttpKernel] Fix "absolute path" when we look to the cache directory (BenoitLeveque)
  * bug #10908 [HttpFoundation] implement session locking for PDO (Tobion)
@@ -237,7 +237,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #10762 [BrowserKit] Allow URLs that don't contain a path when creating a cookie from a string (thewilkybarkid)
  * bug #10863 [Security] Add check for supported attributes in AclVoter (artursvonda)
  * bug #10833 [TwigBridge][Transchoice] set %count% from the current context. (aitboudad)
- * bug #10820 [WebProfilerBundle] Fixed profiler seach/homepage with empty token (tucksaun)
+ * bug #10820 [WebProfilerBundle] Fixed profiler search/homepage with empty token (tucksaun)
  * bug #10815 Fixed issue #5427 (umpirsky)
  * bug #10817 [Debug] fix #10313: FlattenException not found (nicolas-grekas)
  * bug #10803 [Debug] fix ErrorHandlerTest when context is not an array (nicolas-grekas)

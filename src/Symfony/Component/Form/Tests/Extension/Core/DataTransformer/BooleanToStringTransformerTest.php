@@ -22,14 +22,21 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     protected $transformer;
 
+    /**
+     * @var BooleanToStringTransformer
+     */
+    protected $transformerStrict;
+
     protected function setUp()
     {
         $this->transformer = new BooleanToStringTransformer(self::TRUE_VALUE);
+        $this->transformerStrict = new BooleanToStringTransformer(self::TRUE_VALUE, true);
     }
 
     protected function tearDown()
     {
         $this->transformer = null;
+        $this->transformerStrict = null;
     }
 
     public function testTransform()
@@ -60,11 +67,31 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer->reverseTransform(1);
     }
 
-    public function testReverseTransform()
+    /**
+     * @dataProvider reverseTransformDataProvider
+     */
+    public function testReverseTransform($value, $assertion, $strict)
     {
-        $this->assertTrue($this->transformer->reverseTransform(self::TRUE_VALUE));
-        $this->assertTrue($this->transformer->reverseTransform('foobar'));
-        $this->assertTrue($this->transformer->reverseTransform(''));
-        $this->assertFalse($this->transformer->reverseTransform(null));
+        $transformer = $strict ? $this->transformerStrict : $this->transformer;
+
+        if ($assertion) {
+            $this->assertTrue($transformer->reverseTransform($value));
+        } else {
+            $this->assertFalse($transformer->reverseTransform($value));
+        }
+    }
+
+    public function reverseTransformDataProvider()
+    {
+        return array(
+            array(self::TRUE_VALUE, true, false),
+            array('foobar', true, false),
+            array('', true, false),
+            array(null, false, false),
+            array(self::TRUE_VALUE, true, true),
+            array('foobar', false, true),
+            array('', false, true),
+            array(null, false, true),
+        );
     }
 }

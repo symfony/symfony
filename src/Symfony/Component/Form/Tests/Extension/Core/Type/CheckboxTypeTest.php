@@ -81,6 +81,18 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals('foobar', $form->getViewData());
     }
 
+    public function testSubmitWithRandomValueCheckedStrict()
+    {
+        $form = $this->factory->create('checkbox', null, array(
+            'value' => 'foobar',
+            'accept_any_value' => false,
+        ));
+        $form->submit('krixikraxi');
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getViewData());
+    }
+
     public function testSubmitWithValueUnchecked()
     {
         $form = $this->factory->create('checkbox', null, array(

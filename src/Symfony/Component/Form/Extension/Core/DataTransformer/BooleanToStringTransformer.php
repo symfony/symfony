@@ -30,13 +30,22 @@ class BooleanToStringTransformer implements DataTransformerInterface
     private $trueValue;
 
     /**
+     * Perform strict value comparison
+     *
+     * @var bool
+     */
+    private $strict;
+
+    /**
      * Sets the value emitted upon transform if the input is true.
      *
      * @param string $trueValue
+     * @param bool $strict
      */
-    public function __construct($trueValue)
+    public function __construct($trueValue, $strict = false)
     {
         $this->trueValue = $trueValue;
+        $this->strict = $strict;
     }
 
     /**
@@ -80,6 +89,6 @@ class BooleanToStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a string.');
         }
 
-        return true;
+        return $this->strict ? $value === $this->trueValue : true;
     }
 }

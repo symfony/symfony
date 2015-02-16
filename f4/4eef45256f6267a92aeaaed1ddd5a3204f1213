@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-12T17:54:37Z
+
+Given that this is BC break (the change I made earlier today), I think the better fix is to add `symfony/asset` as a dep for FrameworkBundle (as it was included via `symfony/templating` before).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-12T17:58:22Z
+
+Does it also mean that assets should be loaded automatically, without the need to enable them in the config?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-12T18:01:14Z
+
+@jakzal it means that they should be enabled by default in the FrameworkBundle config (we could keep the possibility to disable them explicitly if you don't want the asset system, but I'm not sure it is worth it given it does not add overhead but only defines a few services IIRC)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-12T18:01:23Z
+
+Well, I fear that the answer is yes, to keep BC. We might revisit this decision in 3.0 though.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-12T18:06:07Z
+
+Cool. I'll update this PR.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-12T21:59:04Z
+
+What about disabling all components by default in symfony 3.0.
+I think it's really confusing that some things are enabled by default and others are disabled by default. This way it's really hard to configure a symfony where only the stuff you need is enabled because you have to figure out all the defaults first.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-12T23:13:21Z
+
+This is ready.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-12T23:27:20Z
+
+@Tobion :+1: I'm in favor of disabling everything by default.

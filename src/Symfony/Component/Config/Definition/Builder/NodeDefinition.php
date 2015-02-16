@@ -59,7 +59,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param NodeParentInterface $parent The parent
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function setParent(NodeParentInterface $parent)
     {
@@ -73,7 +73,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param string $info The info text
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function info($info)
     {
@@ -85,7 +85,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param string|array $example
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function example($example)
     {
@@ -98,7 +98,7 @@ abstract class NodeDefinition implements NodeParentInterface
      * @param string $key
      * @param mixed  $value
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function attribute($key, $value)
     {
@@ -149,7 +149,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param mixed $value The default value
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function defaultValue($value)
     {
@@ -162,7 +162,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets the node as required.
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function isRequired()
     {
@@ -176,7 +176,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param mixed $value
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function treatNullLike($value)
     {
@@ -190,7 +190,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param mixed $value
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function treatTrueLike($value)
     {
@@ -204,7 +204,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param mixed $value
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function treatFalseLike($value)
     {
@@ -216,7 +216,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets null as the default value.
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function defaultNull()
     {
@@ -226,7 +226,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets true as the default value.
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function defaultTrue()
     {
@@ -236,7 +236,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Sets false as the default value.
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function defaultFalse()
     {
@@ -256,7 +256,7 @@ abstract class NodeDefinition implements NodeParentInterface
     /**
      * Denies the node value being empty.
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function cannotBeEmpty()
     {
@@ -284,7 +284,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @param bool $deny Whether the overwriting is forbidden or not
      *
-     * @return NodeDefinition
+     * @return NodeDefinition|$this
      */
     public function cannotBeOverwritten($deny = true)
     {

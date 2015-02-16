@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-11T10:42:55Z
+
+Anyone with an IDE willing to validate this one? @Haehnchen @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Rvanlaak at 2015-02-12T08:54:22Z
+
+I thought `@return self` is preferred by IDEs above returning the object, but was unable to find back the source about that. The only thing phpDoc tells us is that `@return $this` is [typically used by fluent interfaces](http://www.phpdoc.org/docs/latest/guides/types.html#keywords).
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-12T10:33:04Z
+
+@Rvanlaak we've discussed this already, see https://github.com/symfony/symfony/issues/12280#issuecomment-72509920 to learn why we can't add it to all the methods.
+
+This PR alters type hints where it makes sense.
+
+I'll test it in the evening, unless someone does it before me.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-12T10:42:56Z
+
+The classname can be omitted, as `$this` is equal to it, isn't it?
+
+---------------------------------------------------------------------------
+
+by Strate at 2015-02-12T11:48:31Z
+
+@WouterJ The class name is fallback for IDEs, which does not recognize `$this` as return type.
+@Rvanlaak `return self` is not the same thing as `return $this`. As you can see, all methods, where I have changed return type definition, actually returns `$this`.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-12T18:08:56Z
+
+This is related to https://github.com/symfony/symfony/issues/11577, with the discussion starting in https://github.com/symfony/symfony/pull/11523
+
+Someone using Netbeans should check whether it supports these return types properly now. If it does, we should then improve the phpdoc on the whole Symfony codebase, not only on a few classes (and doing it in 2.3 to help people using the LTS too and keep the branch merging maintainable)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-13T13:22:44Z
+
+I confirm it improves autocompletion in PhpStorm.
+
+Obviously it only improves it when node level is the same. For example `$arrayNode->isRequried()->add` will suggest ArraNodeDefinition methods, while it wasn't doing it before.
+
+As soon as `end()` is used, autocompletion breaks, but as explained earlier we cannot do anything about it.
+
+---------------------------------------------------------------------------
+
+by Haehnchen at 2015-02-13T15:04:52Z
+
+some tricky java hacks, but i am able to overwrite the `end` phptypes in PhpStorm by the Symfony plugin. Follow external issue: https://github.com/Haehnchen/idea-php-symfony2-plugin/issues/384

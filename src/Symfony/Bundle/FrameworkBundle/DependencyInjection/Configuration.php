@@ -65,7 +65,7 @@ class Configuration implements ConfigurationInterface
 
                         // convert the old configuration to the new one
                         if (isset($v['assets'])) {
-                            throw new LogicException('You cannot use assets settings under "templating.templating" and "assets" configurations in the same project.');
+                            throw new \LogicException('You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.');
                         }
 
                         $v['assets'] = array(

@@ -68,10 +68,14 @@ class RouterController
 
         $request = $profile->getCollector('request');
 
-        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
-            'request' => $request,
-            'router' => $profile->getCollector('router'),
-            'traces' => $matcher->getTraces($request->getPathInfo()),
-        )), 200, array('Content-Type' => 'text/html'));
+        return Response::create(
+            $this->twig->render('@WebProfiler/Router/panel.html.twig', array(
+                'request' => $request,
+                'router' => $profile->getCollector('router'),
+                'traces' => $matcher->getTraces($request->getPathInfo()),
+            )),
+            200,
+            array('Content-Type' => 'text/html')
+        )->setCharset('UTF-8');
     }
 }

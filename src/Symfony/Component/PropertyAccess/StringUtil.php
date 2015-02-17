@@ -61,7 +61,7 @@ class StringUtil
         array('seci', 4, false, true, array('ex', 'ix', 'ice')),
 
         // babies (baby)
-        array('sei', 3, false, true, 'y'),
+        array('sei', 3, false, true, array('y', 'ie')),
 
         // accesses (access), addresses (address), kisses (kiss)
         array('sess', 4, true, false, 'ss'),

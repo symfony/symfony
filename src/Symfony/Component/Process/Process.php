@@ -46,6 +46,7 @@ class Process
     const TIMEOUT_PRECISION = 0.2;
 
     private $callback;
+    /** @var CommandLine */
     private $commandline;
     private $cwd;
     private $env;
@@ -148,7 +149,7 @@ class Process
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
         }
 
-        $this->commandline = $commandline;
+        $this->setCommandLine($commandline);
         $this->cwd = $cwd;
 
         // on Windows, if the cwd changed via chdir(), proc_open defaults to the dir where PHP was started
@@ -194,18 +195,20 @@ class Process
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $parameters
      *
      * @return int The exit status code
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process stopped after receiving signal
      * @throws LogicException   In case a callback is provided and output has been disabled
+     * @throws InvalidArgumentException
      *
      * @api
      */
-    public function run($callback = null)
+    public function run($callback = null, array $parameters = array())
     {
-        $this->start($callback);
+        $this->start($callback, $parameters);
 
         return $this->wait();
     }
@@ -253,14 +256,16 @@ class Process
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $parameters
      *
      * @return Process The process itself
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
      * @throws LogicException   In case a callback is provided and output has been disabled
+     * @throws InvalidArgurmentException
      */
-    public function start($callback = null)
+    public function start($callback = null, array $parameters = array())
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
@@ -272,9 +277,8 @@ class Process
         $this->resetProcessData();
         $this->starttime = $this->lastOutputTime = microtime(true);
         $this->callback = $this->buildCallback($callback);
-        $descriptors = $this->getDescriptors();
-
-        $commandline = $this->commandline;
+        $commandline = $this->commandline->prepare($parameters);
+        list($descriptors, $commandline) = $this->getDescriptors($commandline);
 
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
             $commandline = 'cmd /V:ON /E:ON /C "('.$commandline.')';
@@ -310,22 +314,24 @@ class Process
      *
      * @param callable|null $callback A PHP callback to run whenever there is some
      *                                output available on STDOUT or STDERR
+     * @param array         $parameters
      *
      * @return Process The new process
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
+     * @throws InvalidArgumentException
      *
      * @see start()
      */
-    public function restart($callback = null)
+    public function restart($callback = null, array $parameters = array())
     {
         if ($this->isRunning()) {
             throw new RuntimeException('Process is already running');
         }
 
         $process = clone $this;
-        $process->start($callback);
+        $process->start($callback, $parameters);
 
         return $process;
     }
@@ -853,11 +859,13 @@ class Process
     /**
      * Gets the command line to be executed.
      *
-     * @return string The command to execute
+     * @param bool $asObject
+     *
+     * @return string|CommandLine The command to execute
      */
-    public function getCommandLine()
+    public function getCommandLine($asObject = false)
     {
-        return $this->commandline;
+        return $asObject ? $this->commandline : $this->commandline->getCommandLine();
     }
 
     /**
@@ -869,6 +877,9 @@ class Process
      */
     public function setCommandLine($commandline)
     {
+        if (!$commandline instanceof CommandLine) {
+            $commandline = new CommandLine($commandline);
+        }
         $this->commandline = $commandline;
 
         return $this;
@@ -1262,9 +1273,11 @@ class Process
     /**
      * Creates the descriptors needed by the proc_open.
      *
+     * @param string $commandline
+     *
      * @return array
      */
-    private function getDescriptors()
+    private function getDescriptors($commandline)
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->processPipes = WindowsPipes::create($this, $this->input);
@@ -1277,10 +1290,10 @@ class Process
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors = array_merge($descriptors, array(array('pipe', 'w')));
 
-            $this->commandline = '('.$this->commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
+            $commandline = '('.$commandline.') 3>/dev/null; code=$?; echo $code >&3; exit $code';
         }
 
-        return $descriptors;
+        return array($descriptors, $commandline);
     }
 
     /**

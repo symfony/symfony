@@ -719,7 +719,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
         $termSignal = defined('SIGKILL') ? SIGKILL : 9;
 
-        $process = $this->getProcess('exec php -r "while (true) {}"');
+        $process = $this->getProcess('exec php -r "while (true) { }"');
         $process->start();
         posix_kill($process->getPid(), $termSignal);
 

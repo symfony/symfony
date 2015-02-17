@@ -106,6 +106,24 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
+ * The option "precision" was renamed to "scale".
+
+   Before:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'precision' => 3,
+   ));
+   ```
+
+   After:
+
+   ```php
+   $builder->add('length', 'number', array(
+      'scale' => 3,
+   ));
+   ```
+
  * The method `AbstractType::setDefaultOptions(OptionsResolverInterface $resolver)` and
    `AbstractTypeExtension::setDefaultOptions(OptionsResolverInterface $resolver)` have been
    renamed. You should use `AbstractType::configureOptions(OptionsResolver $resolver)` and

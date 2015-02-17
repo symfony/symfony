@@ -2,7 +2,9 @@
 <symfony>
   <commands>
     <command id="help" name="help">
-  <usage>help [--xml] [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
+    <usages>
+      <usage>help [--xml] [--format FORMAT] [--raw] [--] [&lt;command_name&gt;]</usage>
+    </usages>
   <description>Displays help for a command</description>
   <help>The &lt;info&gt;help&lt;/info&gt; command displays help for a given command:
  
@@ -13,7 +15,6 @@
    &lt;info&gt;php app/console help --format=xml list&lt;/info&gt;
  
  To display the list of available commands, please use the &lt;info&gt;list&lt;/info&gt; command.</help>
-  <aliases />
   <arguments>
     <argument name="command_name" is_required="0" is_array="0">
       <description>The command name</description>
@@ -59,7 +60,9 @@
   </options>
 </command>
     <command id="list" name="list">
-  <usage>list [--xml] [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
+    <usages>
+      <usage>list [--xml] [--raw] [--format FORMAT] [--] [&lt;namespace&gt;]</usage>
+    </usages>
   <description>Lists commands</description>
   <help>The &lt;info&gt;list&lt;/info&gt; command lists all commands:
  
@@ -76,7 +79,6 @@
  It's also possible to get raw list of commands (useful for embedding command runner):
  
    &lt;info&gt;php app/console list --raw&lt;/info&gt;</help>
-  <aliases/>
   <arguments>
     <argument name="namespace" is_required="0" is_array="0">
       <description>The namespace name</description>
@@ -99,12 +101,12 @@
   </options>
 </command>
     <command id="foo:bar" name="foo:bar">
-  <usage>foo:bar</usage>
+    <usages>
+      <usage>foo:bar</usage>
+      <usage>afoobar</usage>
+    </usages>
   <description>The foo:bar command</description>
   <help/>
-  <aliases>
-    <alias>afoobar</alias>
-  </aliases>
   <arguments/>
     <options>
       <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">

@@ -1,7 +1,6 @@
 <comment>Usage:</comment>
   namespace:name
-
-<comment>Aliases:</comment> <info>name</info>
+  name
 
 <comment>Arguments:</comment>
   <info>command</info>               The command to execute

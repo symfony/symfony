@@ -112,6 +112,11 @@ class StringUtil
     );
 
     /**
+     * @var string[]
+     */
+    private static $allowedEes = array('Fleet', 'Street');
+
+    /**
      * This class should not be instantiated.
      */
     private function __construct()
@@ -197,7 +202,7 @@ class StringUtil
         }
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 ! in_array($plural, self::$allowedEes)) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

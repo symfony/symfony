@@ -56,7 +56,8 @@ class Configuration implements ConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return !isset($v['assets']); })
                 ->then(function ($v) {
-                    if (!$v['templating']['assets_version']
+                    if (!isset($v['templating'])
+                        || !$v['templating']['assets_version']
                         && !count($v['templating']['assets_base_urls']['http'])
                         && !count($v['templating']['assets_base_urls']['ssl'])
                         && !count($v['templating']['packages'])

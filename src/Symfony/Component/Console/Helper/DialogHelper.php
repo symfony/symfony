@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -42,6 +43,10 @@ class DialogHelper extends Helper
      */
     public function select(OutputInterface $output, $question, $choices, $default = null, $attempts = false, $errorMessage = 'Value "%s" is invalid', $multiselect = false)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $width = max(array_map('strlen', array_keys($choices)));
 
         $messages = (array) $question;
@@ -98,6 +103,10 @@ class DialogHelper extends Helper
      */
     public function ask(OutputInterface $output, $question, $default = null, array $autocomplete = null)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $output->write($question);
 
         $inputStream = $this->inputStream ?: STDIN;
@@ -230,6 +239,10 @@ class DialogHelper extends Helper
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $answer = 'z';
         while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
             $answer = $this->ask($output, $question);
@@ -255,6 +268,10 @@ class DialogHelper extends Helper
      */
     public function askHiddenResponse(OutputInterface $output, $question, $fallback = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         if ('\\' === DIRECTORY_SEPARATOR) {
             $exe = __DIR__.'/../Resources/bin/hiddeninput.exe';
 
@@ -332,6 +349,10 @@ class DialogHelper extends Helper
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $that = $this;
 
         $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
@@ -361,6 +382,10 @@ class DialogHelper extends Helper
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $that = $this;
 
         $interviewer = function () use ($output, $question, $fallback, $that) {

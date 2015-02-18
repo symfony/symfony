@@ -398,7 +398,7 @@ class InputDefinition
     public function getSynopsis($short = false)
     {
         $elements = array();
-        
+
         if ($short && $this->getOptions()) {
             $elements[] = '[options]';
         } elseif (!$short) {

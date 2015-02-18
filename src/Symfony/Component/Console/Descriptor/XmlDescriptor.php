@@ -66,8 +66,7 @@ class XmlDescriptor extends Descriptor
         $commandXML->setAttribute('name', $command->getName());
 
         $commandXML->appendChild($usagesXML = $dom->createElement('usages'));
-        //$usageXML->appendChild($dom->createTextNode(sprintf($command->getSynopsis(), '')));
-        
+
         foreach (array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()) as $usage) {
             $usagesXML->appendChild($dom->createElement('usage', $usage));
         }

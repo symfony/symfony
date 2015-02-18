@@ -75,10 +75,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             $objectOrArray = & $propertyValues[$i][self::VALUE];
 
             if ($overwrite) {
-                if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
-                }
-
                 $property = $propertyPath->getElement($i);
                 //$singular = $propertyPath->singulars[$i];
                 $singular = null;
@@ -108,13 +104,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
         $propertyValues = array();
 
         for ($i = 0; $i < $lastIndex; ++$i) {
-            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
@@ -136,6 +132,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $objectOrArray = & $propertyValue[self::VALUE];
+
+            // the final value of the path must not be validated
+            if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+            }
 
             $propertyValues[] = & $propertyValue;
         }

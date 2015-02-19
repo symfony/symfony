@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -52,15 +51,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
@@ -73,15 +65,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
@@ -116,15 +101,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isReadable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {
@@ -143,15 +121,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isWritable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {

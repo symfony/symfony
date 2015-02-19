@@ -575,8 +575,8 @@ class Request
      * The following header keys are supported:
      *
      *  * Request::HEADER_CLIENT_IP:    defaults to X-Forwarded-For   (see getClientIp())
-     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getClientHost())
-     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getClientPort())
+     *  * Request::HEADER_CLIENT_HOST:  defaults to X-Forwarded-Host  (see getHost())
+     *  * Request::HEADER_CLIENT_PORT:  defaults to X-Forwarded-Port  (see getPort())
      *  * Request::HEADER_CLIENT_PROTO: defaults to X-Forwarded-Proto (see getScheme() and isSecure())
      *
      * Setting an empty value allows to disable the trusted header for the given key.

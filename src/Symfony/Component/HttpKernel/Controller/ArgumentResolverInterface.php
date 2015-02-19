@@ -28,7 +28,7 @@ interface ArgumentResolverInterface
      * @param Request              $request
      * @param \ReflectionParameter $parameter
      *
-     * @return Boolean
+     * @return bool
      */
     public function supports(Request $request, \ReflectionParameter $parameter);
 

@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestAttributesArgumentResolver implements ArgumentResolverInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function supports(Request $request, \ReflectionParameter $parameter)
     {
@@ -30,7 +30,7 @@ class RequestAttributesArgumentResolver implements ArgumentResolverInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function resolve(Request $request, \ReflectionParameter $parameter)
     {

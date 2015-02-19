@@ -39,8 +39,8 @@ class RegisterArgumentResolversPass implements CompilerPassInterface
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->managerService) && !$container->hasAlias($this->managerService)) {

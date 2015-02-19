@@ -31,7 +31,7 @@ class ArgumentResolverManager
      *
      * @param ArgumentResolverInterface $resolver
      */
-    public function addResolver(ArgumentResolverInterface $resolver)
+    public function add(ArgumentResolverInterface $resolver)
     {
         $this->resolvers[] = $resolver;
     }
@@ -48,6 +48,10 @@ class ArgumentResolverManager
      */
     public function getArguments(Request $request, $controller)
     {
+        if (!is_callable($controller)) {
+            throw new \InvalidArgumentException(sprintf('Expected a callable as second parameter, got "%s".', is_object($controller) ? get_class($controller) : gettype($controller)));
+        }
+
         if (is_array($controller)) {
             $controllerReflection = new \ReflectionMethod($controller[0], $controller[1]);
         } elseif (is_object($controller) && !$controller instanceof \Closure) {
@@ -62,7 +66,7 @@ class ArgumentResolverManager
 
         foreach ($parameters as $parameter) {
             foreach ($this->resolvers as $argumentResolver) {
-                if ($argumentResolver->accepts($request, $parameter)) {
+                if ($argumentResolver->supports($request, $parameter)) {
                     $arguments[] = $argumentResolver->resolve($request, $parameter);
                     continue 2;
                 }

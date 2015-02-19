@@ -304,8 +304,8 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         if (null === $this->argumentResolver) {
             // to keep BC
             $this->argumentResolver = new ArgumentResolverManager();
-            $this->argumentResolver->addResolver(new ArgumentResolver\RequestArgumentResolver());
-            $this->argumentResolver->addResolver(new ArgumentResolver\RequestAttributesArgumentResolver());
+            $this->argumentResolver->add(new ArgumentResolver\RequestArgumentResolver());
+            $this->argumentResolver->add(new ArgumentResolver\RequestAttributesArgumentResolver());
         }
 
         return $this->argumentResolver;

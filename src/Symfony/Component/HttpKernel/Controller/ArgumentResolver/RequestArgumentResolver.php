@@ -24,10 +24,10 @@ class RequestArgumentResolver implements ArgumentResolverInterface
     /**
      * {@inheritDoc}
      */
-    public function accepts(Request $request, \ReflectionParameter $parameter)
+    public function supports(Request $request, \ReflectionParameter $parameter)
     {
         $class = $parameter->getClass();
-        
+
         return $class && $class->isInstance($request);
     }
 

@@ -25,12 +25,12 @@ class RegisterArgumentResolversPass implements CompilerPassInterface
     /**
      * @var string
      */
-    protected $managerService;
+    private $managerService;
 
     /**
      * @var string
      */
-    protected $resolverTag;
+    private $resolverTag;
 
     public function __construct($managerService = 'argument_resolver.manager', $resolverTag = 'kernel.argument_resolver')
     {
@@ -50,7 +50,7 @@ class RegisterArgumentResolversPass implements CompilerPassInterface
         $definition = $container->findDefinition($this->managerService);
 
         foreach ($container->findTaggedServiceIds($this->resolverTag) as $id => $resolvers) {
-            $definition->addMethodCall('addResolver', array(new Reference($id)));
+            $definition->addMethodCall('add', array(new Reference($id)));
         }
     }
 }

@@ -24,9 +24,9 @@ class RequestAttributesArgumentResolver implements ArgumentResolverInterface
     /**
      * {@inheritDoc}
      */
-    public function accepts(Request $request, \ReflectionParameter $parameter)
+    public function supports(Request $request, \ReflectionParameter $parameter)
     {
-        return array_key_exists($parameter->name, $request->attributes->all());
+        return $request->attributes->has($parameter->name);
     }
 
     /**
@@ -34,8 +34,6 @@ class RequestAttributesArgumentResolver implements ArgumentResolverInterface
      */
     public function resolve(Request $request, \ReflectionParameter $parameter)
     {
-        $attributes = $request->attributes->all();
-
-        return $attributes[$parameter->name];
+        return $request->attributes->get($parameter->name);
     }
 }

@@ -25,15 +25,15 @@ class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new ArgumentResolverManager();
         $this->resolver1 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
         $this->resolver2 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
-        $this->manager->addResolver($this->resolver1);
-        $this->manager->addResolver($this->resolver2);
+        $this->manager->add($this->resolver1);
+        $this->manager->add($this->resolver2);
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
     }
 
     public function testGetArgumentsFirstResolverAccepts()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(true)); 
+        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(true));
         $this->resolver1->expects($this->any())
             ->method('resolve')
             ->will($this->returnValue('resolved_value'));

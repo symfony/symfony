@@ -220,8 +220,8 @@ class ContextListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $event->expects($this->any())
-            ->method('getRequestType')
-            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+            ->method('isMasterRequest')
+            ->will($this->returnValue(true));
         $event->expects($this->any())
             ->method('getRequest')
             ->will($this->returnValue($request));

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-19T10:11:24Z
+
+@nicolas-grekas `components=low` tests are failing on 2.6 for route descriptors, since case insensitive matching was introduced in #13567. Technically descriptors work with previous releases of the Routing component, so raising minimum requirement in the FrameworkBundle is probably not the best solution. I'm not sure how we could fix this, other than changing tests (maybe checking for a less specific value). Any suggestions?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-20T09:28:18Z
+
+ping @symfony/deciders

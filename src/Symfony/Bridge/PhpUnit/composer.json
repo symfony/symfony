@@ -1,8 +1,8 @@
 {
-    "name": "symfony/var-dumper",
-    "type": "library",
-    "description": "Symfony mechanism for exploring and dumping PHP variables",
-    "keywords": ["dump", "debug"],
+    "name": "symfony/phpunit-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony PHPUnit Bridge",
+    "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
     "authors": [
@@ -18,17 +18,11 @@
     "require": {
         "php": ">=5.3.9"
     },
-    "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0"
-    },
-    "suggest": {
-        "ext-symfony_debug": ""
-    },
     "autoload": {
-        "files": [ "Resources/functions/dump.php" ],
-        "psr-0": { "Symfony\\Component\\VarDumper\\": "" }
+        "files": [ "bootstrap.php" ],
+        "psr-0": { "Symfony\\Bridge\\PhpUnit\\": "" }
     },
-    "target-dir": "Symfony/Component/VarDumper",
+    "target-dir": "Symfony/Bridge/PhpUnit",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

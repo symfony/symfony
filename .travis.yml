@@ -7,7 +7,7 @@ matrix:
         - php: 5.5
         - php: 5.6
         - php: 5.3
-          env: components=low
+          env: components=low SYMFONY_DEPRECATIONS_HELPER=weak
         - php: 5.6
           env: components=high
         - php: hhvm-nightly
@@ -20,6 +20,7 @@ services: mongodb
 env:
     global:
         - components=no
+        - SYMFONY_DEPRECATIONS_HELPER=strict
 
 before_install:
     - travis_retry sudo apt-get install parallel
@@ -40,5 +41,5 @@ install:
 script:
     - if [ "$components" = "no" ]; then ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$components" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$components" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data,legacy || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$components" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

@@ -1,14 +1,14 @@
 {
-    "name": "symfony/finder",
-    "type": "library",
-    "description": "Symfony Finder Component",
+    "name": "symfony/phpunit-bridge",
+    "type": "symfony-bridge",
+    "description": "Symfony PHPUnit Bridge",
     "keywords": [],
     "homepage": "http://symfony.com",
     "license": "MIT",
     "authors": [
         {
-            "name": "Fabien Potencier",
-            "email": "fabien@symfony.com"
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
         },
         {
             "name": "Symfony Community",
@@ -18,13 +18,11 @@
     "require": {
         "php": ">=5.5.9"
     },
-    "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0"
-    },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Finder\\": "" }
+        "files": [ "bootstrap.php" ],
+        "psr-0": { "Symfony\\Bridge\\PhpUnit\\": "" }
     },
-    "target-dir": "Symfony/Component/Finder",
+    "target-dir": "Symfony/Bridge/PhpUnit",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

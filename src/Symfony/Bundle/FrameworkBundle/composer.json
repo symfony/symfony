@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "symfony/asset": "~2.7|~3.0",
         "symfony/dependency-injection" : "~2.7|~3.0",
         "symfony/config" : "~2.7|~3.0",
         "symfony/event-dispatcher": "~2.7|~3.0",
@@ -32,6 +33,7 @@
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0",
         "symfony/browser-kit": "~2.7|~3.0",
         "symfony/console": "~2.7|~3.0",
         "symfony/css-selector": "~2.7|~3.0",
@@ -47,7 +49,6 @@
         "symfony/yaml": "~2.7|~3.0"
     },
     "suggest": {
-        "symfony/asset": "",
         "symfony/console": "For using the console commands",
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",

@@ -11,7 +11,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Symfony VarDumper Component Test Suite">
+        <testsuite name="Symfony PHPUnit Bridge Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>
@@ -21,7 +21,6 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Tests</directory>
-                <directory>./Resources</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>

@@ -20,6 +20,7 @@
         "symfony/security-core": "~2.7|~3.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0"

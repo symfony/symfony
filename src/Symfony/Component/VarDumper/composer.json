@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.5.9"
     },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0"
+    },
     "suggest": {
         "ext-symfony_debug": ""
     },

@@ -28,6 +28,7 @@
         "symfony/security-http": "self.version"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0",
         "symfony/intl": "~2.7|~3.0",
         "symfony/routing": "~2.7|~3.0",
         "symfony/translation": "~2.7|~3.0",

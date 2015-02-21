@@ -22,6 +22,7 @@
         "symfony/twig-bridge": "~2.7|~3.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0",
         "symfony/config": "~2.7|~3.0",
         "symfony/console": "~2.7|~3.0",
         "symfony/dependency-injection": "~2.7|~3.0",

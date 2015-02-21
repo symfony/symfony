@@ -45,6 +45,7 @@
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
+        "symfony/phpunit-bridge": "self.version",
         "symfony/process": "2.99.99",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
@@ -83,6 +84,9 @@
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
         "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+    },
+    "autoload-dev": {
+        "files": [ "src/Symfony/Bridge/PhpUnit/bootstrap.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

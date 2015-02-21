@@ -19,8 +19,16 @@ use Symfony\Component\Validator\Constraints\GroupSequenceProvider;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * Loads validation metadata using a Doctrine annotation {@link Reader}.
+ *
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
 class AnnotationLoader implements LoaderInterface
 {
+    /**
+     * @var Reader
+     */
     protected $reader;
 
     public function __construct(Reader $reader)
@@ -35,7 +43,7 @@ class AnnotationLoader implements LoaderInterface
     {
         $reflClass = $metadata->getReflectionClass();
         $className = $reflClass->name;
-        $loaded = false;
+        $success = false;
 
         foreach ($this->reader->getClassAnnotations($reflClass) as $constraint) {
             if ($constraint instanceof GroupSequence) {
@@ -46,7 +54,7 @@ class AnnotationLoader implements LoaderInterface
                 $metadata->addConstraint($constraint);
             }
 
-            $loaded = true;
+            $success = true;
         }
 
         foreach ($reflClass->getProperties() as $property) {
@@ -56,7 +64,7 @@ class AnnotationLoader implements LoaderInterface
                         $metadata->addPropertyConstraint($property->name, $constraint);
                     }
 
-                    $loaded = true;
+                    $success = true;
                 }
             }
         }
@@ -77,11 +85,11 @@ class AnnotationLoader implements LoaderInterface
                         }
                     }
 
-                    $loaded = true;
+                    $success = true;
                 }
             }
         }
 
-        return $loaded;
+        return $success;
     }
 }

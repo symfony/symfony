@@ -803,7 +803,7 @@ class FrameworkExtension extends Extension
 
         if ('file' === $config['cache']) {
             $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true)) {
+            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
                 throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
             }
 

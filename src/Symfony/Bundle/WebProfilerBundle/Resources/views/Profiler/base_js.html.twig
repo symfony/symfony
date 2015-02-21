@@ -173,7 +173,7 @@
 
         var addEventListener;
 
-        if (document.addEventListener) {
+        if (document.attachEvent) {
             addEventListener = function (element, eventName, callback) {
                 element.attachEvent('on' + eventName, callback);
             };

@@ -6,11 +6,11 @@
             {% set link = collector.controller.file|file_link(collector.controller.line) %}
             {% if collector.controller.method %}
                 <span class="sf-toolbar-info-class sf-toolbar-info-with-next-pointer">{{ collector.controller.class|abbr_class }}</span>
-                <span class="sf-toolbar-info-method" onclick="{% if link %}window.location='{{link|e('js')}}';window.event.stopPropagation();return false;{% endif %}">
+                <span class="sf-toolbar-info-method"{% if link %} onclick="window.location='{{link|e('js')}}';window.event.stopPropagation();return false;"{% endif %}>
                     {{ collector.controller.method }}
                 </span>
             {% else %}
-                <span class="sf-toolbar-info-class" onclick="{% if link %}window.location='{{link|e('js')}}';window.event.stopPropagation();return false;{% endif %}">{{ collector.controller.class|abbr_class }}</span>
+                <span class="sf-toolbar-info-class"{% if link %} onclick="window.location='{{link|e('js')}}';window.event.stopPropagation();return false;"{% endif %}>{{ collector.controller.class|abbr_class }}</span>
             {% endif %}
         {% else %}
             <span class="sf-toolbar-info-class">{{ collector.controller }}</span>

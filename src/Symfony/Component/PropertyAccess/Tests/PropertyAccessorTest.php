@@ -316,19 +316,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function testIsReadableThrowsExceptionIfNotObjectOrArray()
+    /**
+     * @dataProvider getPathsWithUnexpectedType
+     */
+    public function testIsReadableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->assertFalse($this->propertyAccessor->isReadable('baz', 'foobar'));
-    }
-
-    public function testIsReadableThrowsExceptionIfNull()
-    {
-        $this->assertFalse($this->propertyAccessor->isReadable(null, 'foobar'));
-    }
-
-    public function testIsReadableThrowsExceptionIfEmpty()
-    {
-        $this->assertFalse($this->propertyAccessor->isReadable('', 'foobar'));
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     /**
@@ -384,19 +377,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function testNotObjectOrArrayIsNotWritable()
+    /**
+     * @dataProvider getPathsWithUnexpectedType
+     */
+    public function testIsWritableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->assertFalse($this->propertyAccessor->isWritable('baz', 'foobar'));
-    }
-
-    public function testNullIsNotWritable()
-    {
-        $this->assertFalse($this->propertyAccessor->isWritable(null, 'foobar'));
-    }
-
-    public function testEmptyIsNotWritable()
-    {
-        $this->assertFalse($this->propertyAccessor->isWritable('', 'foobar'));
+        $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     public function getValidPropertyPaths()

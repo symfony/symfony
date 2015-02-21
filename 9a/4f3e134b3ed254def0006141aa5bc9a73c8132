@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-14T11:05:10Z
+
+I don't like it's name, as it doesn't really provide much testing help apart from easing the transition between 2.x and 3.x. Maybe we're going to need more utilities for this transition, what about renaming this component to have all this utilities?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-11T18:08:49Z
+
+Talking a bit with some others, I'm going to move this to `src/Symfony/Bridge/PhpUnit`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-16T10:18:08Z
+
+PR is ready for an other round of review, README updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-17T21:59:57Z
+
+README updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-19T09:32:29Z
+
+Please note that I modified the .travis file to ignore tests in the legacy group. There are no tests tagged `@group legacy` right now, but this should happen because when removing legacy interface from 3.0, the legacy tests will not work anymore, when a 2.7 test uses a 3.0 component.
+We could even add the annotation in all legacy tests right now. What do you think about it?

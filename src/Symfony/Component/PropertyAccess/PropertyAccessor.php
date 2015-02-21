@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess;
 
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
@@ -51,15 +51,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
@@ -72,15 +65,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(&$objectOrArray, $propertyPath, $value)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
@@ -96,10 +82,6 @@ class PropertyAccessor implements PropertyAccessorInterface
             $objectOrArray = & $propertyValues[$i][self::VALUE];
 
             if ($overwrite) {
-                if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                    throw new UnexpectedTypeException($objectOrArray, 'object or array');
-                }
-
                 $property = $propertyPath->getElement($i);
 
                 if ($propertyPath->isIndex($i)) {
@@ -119,24 +101,15 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isReadable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {
             $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
 
             return true;
-        } catch (NoSuchIndexException $e) {
-            return false;
-        } catch (NoSuchPropertyException $e) {
+        } catch (AccessException $e) {
             return false;
         } catch (UnexpectedTypeException $e) {
             return false;
@@ -148,15 +121,8 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isWritable($objectOrArray, $propertyPath)
     {
-        if (is_string($propertyPath)) {
+        if (!$propertyPath instanceof PropertyPathInterface) {
             $propertyPath = new PropertyPath($propertyPath);
-        } elseif (!$propertyPath instanceof PropertyPathInterface) {
-            throw new InvalidArgumentException(sprintf(
-                'The property path should be a string or an instance of '.
-                '"Symfony\Component\PropertyAccess\PropertyPathInterface". '.
-                'Got: "%s"',
-                is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
-            ));
         }
 
         try {
@@ -173,10 +139,6 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $objectOrArray = $propertyValues[$i][self::VALUE];
 
                 if ($overwrite) {
-                    if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                        return false;
-                    }
-
                     $property = $propertyPath->getElement($i);
 
                     if ($propertyPath->isIndex($i)) {
@@ -194,9 +156,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             return true;
-        } catch (NoSuchIndexException $e) {
+        } catch (AccessException $e) {
             return false;
-        } catch (NoSuchPropertyException $e) {
+        } catch (UnexpectedTypeException $e) {
             return false;
         }
     }
@@ -217,13 +179,13 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function &readPropertiesUntil(&$objectOrArray, PropertyPathInterface $propertyPath, $lastIndex, $ignoreInvalidIndices = true)
     {
+        if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
+            throw new UnexpectedTypeException($objectOrArray, 'object or array');
+        }
+
         $propertyValues = array();
 
         for ($i = 0; $i < $lastIndex; ++$i) {
-            if (!is_object($objectOrArray) && !is_array($objectOrArray)) {
-                throw new UnexpectedTypeException($objectOrArray, 'object or array');
-            }
-
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
 
@@ -263,6 +225,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $objectOrArray = & $propertyValue[self::VALUE];
+
+            // the final value of the path must not be validated
+            if ($i + 1 < $propertyPath->getLength() && !is_object($objectOrArray) && !is_array($objectOrArray)) {
+                throw new UnexpectedTypeException($objectOrArray, 'object or array');
+            }
 
             $propertyValues[] = & $propertyValue;
         }

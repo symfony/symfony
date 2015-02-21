@@ -22,6 +22,11 @@ class EnumNodeDefinition extends ScalarNodeDefinition
 {
     private $values;
 
+    /**
+     * @param array $values
+     *
+     * @return EnumNodeDefinition|$this
+     */
     public function values(array $values)
     {
         $values = array_unique($values);

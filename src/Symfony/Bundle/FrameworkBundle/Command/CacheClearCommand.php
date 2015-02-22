@@ -141,7 +141,7 @@ EOF
         $safeTempKernel = str_replace('\\', '\\\\', get_class($tempKernel));
         $realKernelFQN = get_class($realKernel);
 
-        foreach (Finder::create()->files()->name('*.meta')->in($warmupDir) as $file) {
+        foreach (Finder::create()->files()->name('/.*\.meta$/')->in($warmupDir) as $file) {
             file_put_contents($file, preg_replace(
                 '/(C\:\d+\:)"'.$safeTempKernel.'"/',
                 sprintf('$1"%s"', $realKernelFQN),
@@ -160,7 +160,7 @@ EOF
         // fix references to kernel/container related classes
         $search = $tempKernel->getName().ucfirst($tempKernel->getEnvironment());
         $replace = $realKernel->getName().ucfirst($realKernel->getEnvironment());
-        foreach (Finder::create()->files()->name($search.'*')->in($warmupDir) as $file) {
+        foreach (Finder::create()->files()->name('/^'.$search.'.*/')->in($warmupDir) as $file) {
             $content = str_replace($search, $replace, file_get_contents($file));
             file_put_contents(str_replace($search, $replace, $file), $content);
             unlink($file);

@@ -175,7 +175,7 @@ abstract class Bundle extends ContainerAware implements BundleInterface
         }
 
         $finder = new Finder();
-        $finder->files()->name('*Command.php')->in($dir);
+        $finder->files()->name('/.*Command.php/')->in($dir);
 
         $prefix = $this->getNamespace().'\\Command';
         foreach ($finder as $file) {

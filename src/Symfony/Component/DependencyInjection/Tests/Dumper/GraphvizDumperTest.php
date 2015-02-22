@@ -25,6 +25,8 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyDump()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $container = include self::$fixturesPath.'/containers/legacy-container9.php';
         $dumper = new GraphvizDumper($container);
         $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/legacy-services9.dot')), $dumper->dump(), '->dump() dumps services');

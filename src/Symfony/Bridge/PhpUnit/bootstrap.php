@@ -15,15 +15,4 @@ if (class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {
     AnnotationRegistry::registerLoader('class_exists');
 }
 
-switch (getenv('SYMFONY_DEPRECATIONS_HELPER')) {
-    case 'strict':
-        DeprecationErrorHandler::register(true);
-        break;
-
-    case 'weak':
-        error_reporting(error_reporting() & ~E_USER_DEPRECATED);
-        // No break;
-    default:
-        DeprecationErrorHandler::register(false);
-        break;
-}
+DeprecationErrorHandler::register(getenv('SYMFONY_DEPRECATIONS_HELPER'));

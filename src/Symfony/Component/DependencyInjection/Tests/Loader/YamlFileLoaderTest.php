@@ -122,6 +122,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLegacyLoadServices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('legacy-services6.yml');

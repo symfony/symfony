@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.5.9"
     },
+    "suggest": {
+        "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"
+    },
     "autoload": {
         "files": [ "bootstrap.php" ],
         "psr-0": { "Symfony\\Bridge\\PhpUnit\\": "" }

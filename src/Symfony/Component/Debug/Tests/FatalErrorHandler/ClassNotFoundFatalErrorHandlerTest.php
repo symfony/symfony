@@ -34,12 +34,11 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider provideLegacyClassNotFoundData
      */
     public function testLegacyHandleClassNotFound($error, $translatedMessage, $autoloader)
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // Unregister all autoloaders to ensure the custom provided
         // autoloader is the only one to be used during the test run.
         $autoloaders = spl_autoload_functions();
@@ -113,6 +112,8 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function provideLegacyClassNotFoundData()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $prefixes = array('Symfony\Component\Debug\Exception\\' => realpath(__DIR__.'/../../Exception'));
 
         $symfonyAutoloader = new SymfonyClassLoader();

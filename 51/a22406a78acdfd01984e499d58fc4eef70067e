@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-21T14:45:25Z
+
+This is ugly. I think we better rewrite the console descriptor tests to not test against the actual values but instead just the structure, e.g. with preg_match.
+So in https://github.com/symfony/symfony/blob/2.6/src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Descriptor/route_1.md instead of `Host Regex: #^localhost$#si` it just tests `Host Regex: .+`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-21T14:56:47Z
+
+Hum, that's too much work. I updated the PR and took an other approach: raising composer deps a bit up.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-21T15:47:34Z
+
+This needs to be done in 2.3 branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-21T15:57:41Z
+
+Why is 2.3 green then ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-21T16:05:55Z
+
+Ah nvm. The descriptors were added later.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-21T16:06:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-21T16:16:47Z
+
+I [was initially against](https://github.com/symfony/symfony/pull/13738#issuecomment-75026836) raising the for the sake of making these tests pass, as technically the FrameworkBundle can work with previous versions of the Routing component.
+
+However, now that I look at it, there's probably no use case for using FrameworkBundle without the whole stack and raising these deps doesn't make much harm. It still gives me a feeling we're postponing solving the issue.
+
+So I'm +0.

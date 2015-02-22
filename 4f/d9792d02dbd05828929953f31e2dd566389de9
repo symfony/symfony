@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-22T10:13:51Z
+
+Five steps forward in this PR:
+- add some missing "Legacy" prefixes and silencing in tests
+- add the first `@group legacy` annotations, required because of removed class/methods in 3.0 components
+- add SYMFONY_DEPRECATIONS_HELPER=weak to components=high in Travis matrix
+- move deprecations related failure triggering to the shutdown sequence
+- fail in strict mode if a legacy test is not silenced

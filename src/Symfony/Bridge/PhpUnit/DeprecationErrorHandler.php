@@ -20,7 +20,7 @@ class DeprecationErrorHandler
 {
     private static $isRegistered = false;
 
-    public static function register($strict = false)
+    public static function register($mode = false)
     {
         if (self::$isRegistered) {
             return;
@@ -33,7 +33,7 @@ class DeprecationErrorHandler
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $strict) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations) {
             if (E_USER_DEPRECATED !== $type) {
                 return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
@@ -66,21 +66,6 @@ class DeprecationErrorHandler
                 ++$ref;
             }
             ++$deprecations[$group.'Count'];
-            unset($trace, $ref);
-
-            if ('legacy' !== $group) {
-                try {
-                    $e = $strict ? error_reporting(-1) : error_reporting();
-                    $result = \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
-                    error_reporting($e);
-                } catch (\Exception $x) {
-                    error_reporting($e);
-
-                    throw $x;
-                }
-
-                return $result;
-            }
         };
         $oldErrorHandler = set_error_handler($deprecationHandler);
 
@@ -88,7 +73,7 @@ class DeprecationErrorHandler
             restore_error_handler();
             if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler) {
                 restore_error_handler();
-                self::register();
+                self::register($mode);
             }
         } else {
             self::$isRegistered = true;
@@ -101,7 +86,7 @@ class DeprecationErrorHandler
             } else {
                 $colorize = function ($str) {return $str;};
             }
-            register_shutdown_function(function () use (&$deprecations, $deprecationHandler, $colorize) {
+            register_shutdown_function(function () use ($mode, &$deprecations, $deprecationHandler, $colorize) {
                 $currErrorHandler = set_error_handler('var_dump');
                 restore_error_handler();
 
@@ -134,6 +119,14 @@ class DeprecationErrorHandler
                 }
                 if (!empty($notices)) {
                     echo "\n";
+                }
+                if ('weak' !== $mode) {
+                    if ($deprecations['remaining'] || $deprecations['other']) {
+                        exit(1);
+                    }
+                    if ('strict' === $mode && $deprecations['legacy'] && $deprecations['legacyCount'] !== $ref =& $deprecations['legacy']['Silenced']['count']) {
+                        exit(1);
+                    }
                 }
             });
         }

@@ -15,6 +15,11 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class LegacyDefinitionTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     public function testSetGetFactoryClass()
     {
         $def = new Definition('stdClass');

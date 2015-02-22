@@ -12,19 +12,19 @@ It comes with the following features:
 Handling user deprecation notices is sensitive to the SYMFONY_DEPRECATIONS_HELPER
 environment variable. This env var configures 3 behaviors depending on its value:
 
- * when set to `strict`, all but legacy-tagged deprecation notices will make tests
-   fail. This is the recommended mode for best forward compatibility.
+ * when set to `strict`, all but silenced-legacy-tagged deprecation notices will
+   make tests fail. This is the recommended mode for best forward compatibility
  * `weak` on the contrary will make tests ignore all deprecation notices.
    This is the recommended mode for legacy projects that must use deprecated
    interfaces for backward compatibility reasons.
- * any other value will respect the current error reporting level.
+ * with any other value, all but silenced-or-not-legacy-tagged deprecation
+   notices will make tests fail.
 
 All three modes will display a summary of deprecation notices at the end of the
 test suite, split in two groups:
 
  * **Legacy** deprecation notices denote tests that explicitly test some legacy
-   interfaces. In all 3 modes, deprecation notices triggered in a legacy-tagged
-   test do never make a test fail. There are four ways to mark a test as legacy:
+   interfaces. There are four ways to mark a test as legacy:
     - make its class start with the `Legacy` prefix;
     - make its method start with `testLegacy`;
     - make its data provider start with `provideLegacy` or `getLegacy`;

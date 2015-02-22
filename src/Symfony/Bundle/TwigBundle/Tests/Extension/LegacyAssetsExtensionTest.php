@@ -15,10 +15,18 @@ use Symfony\Bundle\TwigBundle\Extension\AssetsExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Routing\RequestContext;
 
+/**
+ * @group legacy
+ */
 class LegacyAssetsExtensionTest extends TestCase
 {
+    public function setUp()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+    }
+
     /**
-     * @dataProvider provideGetGetAssetUrlArguments
+     * @dataProvider provideGetAssetUrlArguments
      */
     public function testGetAssetUrl($path, $packageName, $absolute, $relativeUrl, $expectedUrl, $scheme, $host, $httpPort, $httpsPort)
     {
@@ -46,7 +54,7 @@ class LegacyAssetsExtensionTest extends TestCase
         $this->assertEquals($relativeUrl, $extension->getAssetUrl($path, $packageName, true));
     }
 
-    public function provideGetGetAssetUrlArguments()
+    public function provideGetAssetUrlArguments()
     {
         return array(
             array('/path/to/asset', 'package-name', false, '/bundle-name/path/to/asset', '/bundle-name/path/to/asset', 'http', 'symfony.com', 80, null),

@@ -267,6 +267,29 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitMultipleFiles($method)
+    {
+        $form = $this->getMockForm('param1', $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            'param1' => null,
+        ), array(
+            'param2' => $this->getMockFile('2'),
+            'param1' => $file,
+            'param3' => $this->getMockFile('3'),
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
      * @dataProvider getPostMaxSizeFixtures
      */
     public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())
@@ -314,7 +337,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
 
     abstract protected function getRequestHandler();
 
-    abstract protected function getMockFile();
+    abstract protected function getMockFile($suffix = '');
 
     protected function getMockForm($name, $method = null, $compound = true)
     {

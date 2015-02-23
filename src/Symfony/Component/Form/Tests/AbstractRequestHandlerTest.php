@@ -290,6 +290,27 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider methodExceptGetProvider
+     */
+    public function testSubmitFileWithNamelessForm($method)
+    {
+        $form = $this->getMockForm(null, $method);
+        $file = $this->getMockFile();
+
+        $this->setRequestData($method, array(
+            '' => null,
+        ), array(
+            '' => $file,
+        ));
+
+        $form->expects($this->once())
+             ->method('submit')
+             ->with($file, 'PATCH' !== $method);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+    }
+
+    /**
      * @dataProvider getPostMaxSizeFixtures
      */
     public function testAddFormErrorIfPostMaxSizeExceeded($contentLength, $iniMax, $shouldFail, array $errorParams = array())

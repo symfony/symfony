@@ -18,6 +18,9 @@
     "require": {
         "php": ">=5.3.3"
     },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.7"
+    },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Filesystem\\": "" }
     },

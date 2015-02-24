@@ -27,6 +27,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/filesystem": ">=2.1"
     },
     "suggest": {

@@ -19,6 +19,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/event-dispatcher": "~2.1"
     },
     "suggest": {

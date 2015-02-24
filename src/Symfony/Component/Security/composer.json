@@ -22,6 +22,7 @@
         "symfony/http-kernel": "~2.1"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/form": "~2.0,>=2.0.5",
         "symfony/intl": "~2.3",
         "symfony/routing": "~2.2",

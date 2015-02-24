@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-23T15:40:18Z
+
+What about all libraries which don't have 2 levels of root namespace to identify them ? there is lots of such examples:
+
+- Twig (considering the old PEAR convention)
+- Monolog
+- Composer
+- etc...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-23T15:42:18Z
+
+pear-style are checked only at 1st level of "namespace"
+Lets wait for the first 1-level libs that need this feature and see how we can arrange for them.

@@ -20,6 +20,7 @@
         "php": ">=5.3.3"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/finder": "~2.0,>=2.0.5"
     },
     "autoload": {

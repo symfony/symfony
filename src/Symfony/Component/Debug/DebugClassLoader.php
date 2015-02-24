@@ -180,16 +180,28 @@ class DebugClassLoader
             if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
-                $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'));
+                if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
+                    $len = 0;
+                    $ns = '';
+                } else {
+                    switch ($ns = substr($name, 0, $len)) {
+                        case 'Symfony\Bridge\\':
+                        case 'Symfony\Bundle\\':
+                        case 'Symfony\Component\\':
+                            $ns = 'Symfony\\';
+                            $len = strlen($ns);
+                            break;
+                    }
+                }
                 $parent = $refl->getParentClass();
 
-                if (!$parent || $len < 2 || strncmp($name, $parent, $len)) {
-                    if ($parent && isset(self::$deprecated[$parent->name]) && ($len < 2 || strncmp($name, $parent->name, $len))) {
+                if (!$parent || strncmp($ns, $parent, $len)) {
+                    if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
                         trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
                     }
 
                     foreach ($refl->getInterfaceNames() as $interface) {
-                        if (isset(self::$deprecated[$interface]) && ($len < 2 || strncmp($name, $interface, $len)) && !($parent && $parent->implementsInterface($interface))) {
+                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
                             trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
                         }
                     }

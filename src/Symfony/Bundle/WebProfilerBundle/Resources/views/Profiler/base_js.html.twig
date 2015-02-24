@@ -173,7 +173,8 @@
 
         var addEventListener;
 
-        if (document.attachEvent) {
+        var el = document.createElement('div');
+        if (!'addEventListener' in el) {
             addEventListener = function (element, eventName, callback) {
                 element.attachEvent('on' + eventName, callback);
             };
@@ -184,40 +185,42 @@
         }
 
         {% if excluded_ajax_paths is defined %}
-            var proxied = XMLHttpRequest.prototype.open;
+            if (window.XMLHttpRequest) {
+                var proxied = XMLHttpRequest.prototype.open;
 
-            XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                var self = this;
+                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+                    var self = this;
 
-                /* prevent logging AJAX calls to static and inline files, like templates */
-                if (url.substr(0, 1) === '/' && !url.match(new RegExp("{{ excluded_ajax_paths }}"))) {
-                    var stackElement = {
-                        loading: true,
-                        error: false,
-                        url: url,
-                        method: method,
-                        start: new Date()
-                    };
+                    /* prevent logging AJAX calls to static and inline files, like templates */
+                    if (url.substr(0, 1) === '/' && !url.match(new RegExp("{{ excluded_ajax_paths }}"))) {
+                        var stackElement = {
+                            loading: true,
+                            error: false,
+                            url: url,
+                            method: method,
+                            start: new Date()
+                        };
 
-                    requestStack.push(stackElement);
+                        requestStack.push(stackElement);
 
-                    addEventListener(this, 'readystatechange', function() {
-                        if (self.readyState == 4) {
-                            stackElement.duration = new Date() - stackElement.start;
-                            stackElement.loading = false;
-                            stackElement.error = self.status < 200 || self.status >= 400;
-                            stackElement.profile = self.getResponseHeader("X-Debug-Token");
-                            stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
+                        this.addEventListener('readystatechange', function() {
+                            if (self.readyState == 4) {
+                                stackElement.duration = new Date() - stackElement.start;
+                                stackElement.loading = false;
+                                stackElement.error = self.status < 200 || self.status >= 400;
+                                stackElement.profile = self.getResponseHeader("X-Debug-Token");
+                                stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
 
-                            Sfjs.renderAjaxRequests();
-                        }
-                    });
+                                Sfjs.renderAjaxRequests();
+                            }
+                        }, false);
 
-                    Sfjs.renderAjaxRequests();
-                }
+                        Sfjs.renderAjaxRequests();
+                    }
 
-                proxied.apply(this, Array.prototype.slice.call(arguments));
-            };
+                    proxied.apply(this, Array.prototype.slice.call(arguments));
+                };
+            }
         {% endif %}
 
         return {

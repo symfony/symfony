@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.3"
     },
     "suggest": {
         "symfony/debug": "For tracking deprecated interfaces usages at runtime with DebugClassLoader"

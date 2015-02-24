@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -133,6 +134,18 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
+
+        $vars = array();
+
+        if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/i', $constraint->message, $vars) > 0)
+        {
+            $accessor = PropertyAccess::createPropertyAccessor();
+
+            foreach($vars[1] as $var)
+            {
+                $constraint->message = str_replace(sprintf("{{ %s }}", $var), $accessor->getValue($entity, $var), $constraint->message);
+            }
+        }
 
         $this->buildViolation($constraint->message)
             ->atPath($errorPath)

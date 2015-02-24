@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-24T10:13:50Z
+
+@nicolas-grekas this does not work because the phpunit-bridge requires PHP 5.3.9+ (like all Symfony 2.7+ components)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-24T10:15:30Z
+
+it would be great to fix the deps=high tests too btw.

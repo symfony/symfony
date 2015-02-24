@@ -88,6 +88,10 @@ UPGRADE FROM 2.x to 3.0
    $table->render();
    ```
 
+* Parameters of `renderException()` method of the
+  `Symfony\Component\Console\Application` are type hinted.
+  You must add the type hint to your implementations.
+
 ### DependencyInjection
 
  * The methods `Definition::setFactoryClass()`,

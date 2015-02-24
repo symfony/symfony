@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-23T11:52:54Z
+
+The exception message changes should be done on the 2.7 branch (this is not a bug fix).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-23T11:56:34Z
+
+Why that? This will make merging and mainting branches even harder.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-23T12:00:21Z
+
+Because we don't change things that do not fix bugs in older branches. What if someone relies on the message? It is acceptable to break that in minor versions but not in a patch version.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-23T12:17:24Z
+
+The exception message has never been part of our bc promise. And we changed messages alot in the past. Just a few examples from the last days: #13431 (by yourself) and #13509
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-23T12:24:02Z
+
+And seriously, whoever relies on specific exception messages from symfony has code smell.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-24T08:18:44Z
+
+Fair enough... even if I think it's not a good thing to do non-bug-fixes in "old" branches.

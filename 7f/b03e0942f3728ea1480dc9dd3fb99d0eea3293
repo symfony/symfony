@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-02-19T16:39:49Z
+
+Hello and thanks for this pull request!
+
+I'm not a big fan of a getter that modifies the inner property. Actually, I'd prefer to move the PHP binary detection in the constructor, and throw an exception in the `start` method in case `getCommandLine` returns `null`
+
+That way, we don't change `getCommandLine` behavior and I'd be much more happy :)
+
+Are you okay with this?
+
+---------------------------------------------------------------------------
+
+by francisbesset at 2015-02-20T19:30:10Z
+
+@romainneutron No problem for me. It's fixed :)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-02-21T09:57:40Z
+
+Cool :+1:

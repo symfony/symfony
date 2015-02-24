@@ -949,6 +949,9 @@ class Process
         if ('\\' === DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
+        if ($tty && (!file_exists('/dev/tty') || !is_readable('/dev/tty'))) {
+            throw new RuntimeException('TTY mode requires /dev/tty to be readable.');
+        }
 
         $this->tty = (bool) $tty;
 

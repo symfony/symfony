@@ -200,8 +200,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     if (!is_array($objectOrArray)) {
                         if (!$objectOrArray instanceof \Traversable) {
                             throw new NoSuchIndexException(sprintf(
-                                'Cannot read property "%s".',
-                                $property
+                                'Cannot read index "%s" while trying to traverse path "%s".',
+                                $property,
+                                (string) $propertyPath
                             ));
                         }
 
@@ -209,8 +210,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                     }
 
                     throw new NoSuchIndexException(sprintf(
-                        'Cannot read property "%s". Available properties are "%s"',
+                        'Cannot read index "%s" while trying to traverse path "%s". Available indices are "%s".',
                         $property,
+                        (string) $propertyPath,
                         print_r(array_keys($objectOrArray), true)
                     ));
                 }
@@ -250,7 +252,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function &readIndex(&$array, $index)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Index "%s" cannot be read from object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Cannot read index "%s" from object of type "%s" because it doesn\'t implement \ArrayAccess.', $index, get_class($array)));
         }
 
         // Use an array instead of an object since performance is very crucial here
@@ -294,7 +296,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         );
 
         if (!is_object($object)) {
-            throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you should write the property path as "[%s]" instead?', $property, $property));
+            throw new NoSuchPropertyException(sprintf('Cannot read property "%s" from an array. Maybe you intended to write the property path as "[%s]" instead.', $property, $property));
         }
 
         $camelized = $this->camelize($property);
@@ -364,7 +366,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private function writeIndex(&$array, $index, $value)
     {
         if (!$array instanceof \ArrayAccess && !is_array($array)) {
-            throw new NoSuchIndexException(sprintf('Index "%s" cannot be modified in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
+            throw new NoSuchIndexException(sprintf('Cannot modify index "%s" in object of type "%s" because it doesn\'t implement \ArrayAccess', $index, get_class($array)));
         }
 
         $array[$index] = $value;

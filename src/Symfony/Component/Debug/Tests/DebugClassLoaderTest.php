@@ -193,7 +193,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
         $e = error_reporting(0);
         trigger_error('', E_USER_NOTICE);
 
-        class_exists(__NAMESPACE__.'\Fixtures\ExtendsDeprecatedParent', true);
+        class_exists('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent', true);
 
         error_reporting($e);
         restore_error_handler();
@@ -239,8 +239,8 @@ class ClassLoader
             return __DIR__.'/Fixtures/notPsr0Bis.php';
         } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
             return __DIR__.'/Fixtures/DeprecatedInterface.php';
-        } elseif (__NAMESPACE__.'\Fixtures\ExtendsDeprecatedParent' === $class) {
-            eval('namespace '.__NAMESPACE__.'\Fixtures; class ExtendsDeprecatedParent extends DeprecatedClass {}');
+        } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
+            eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-18T11:15:00Z
+
+ For people reviewing this, most of the diff is just an indentation change in the JS code. Look at it with [whitespace change ignore](https://github.com/symfony/symfony/pull/13729/files?w=1)
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-02-19T13:20:23Z
+
+This patch fixes the issue in FF and Chrome with ```readystatechange```.
+:+1:
+
+---------------------------------------------------------------------------
+
+by maximecolin at 2015-02-20T08:36:15Z
+
+Works well in Chrome and Firefox. Thanks.

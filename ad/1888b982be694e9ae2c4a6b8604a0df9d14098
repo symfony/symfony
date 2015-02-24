@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-22T00:19:48Z
+
+Isn't this considered a BC break?
+
+---------------------------------------------------------------------------
+
+by francisbesset at 2015-02-22T07:02:26Z
+
+@WouterJ If you override `Application::renderException()` you should specify `$e` and `$output` without type hint.
+This PR fix the type hint and you will update your `renderException` method to add the type hint.
+
+For me it's a BC break.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-22T12:29:15Z
+
+The [BC promise](http://symfony.com/bc) says:
+
+ > Add type hint to an argument: NO (in case of an API method)
+
+As this is an API method, it can't be done in the 2.x releases. That means this PR should be merged into Symfony 3.0 (the master branch). You don't have to open a PR, as the mergers have tools that can switch the branches quite easily when merging.
+
+Btw, I'm +1 for adding the type hints :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-22T18:02:12Z
+
++1 to merge this in 3.0 too. Accordingly, the content of the `UPGRADE` file must be moved in 3.0.
+
+---------------------------------------------------------------------------
+
+by francisbesset at 2015-02-22T18:10:24Z
+
+@fabpot It's a BC break or not? Ready for 2.7 or 3.0?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-22T18:21:49Z
+
+It's a BC break yes: any class specializing renderException by inheritance will need an update
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-23T11:04:58Z
+
+@francisbesset This is indeed a BC break and can only be merged in 3.0... but is it worth it?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-23T11:43:03Z
+
+I'm in favor of merging it in 3.0
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-23T11:45:25Z
+
+I don't see why not to merge it into 3.0.
+
+---------------------------------------------------------------------------
+
+by francisbesset at 2015-02-23T12:20:36Z
+
+I updated the title of the PR to specify 3.0 but I can't update the base branch for the merge.

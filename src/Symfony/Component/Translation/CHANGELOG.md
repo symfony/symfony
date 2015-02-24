@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added XliffUtils class with utility methods for operations with xliff files
+
 2.7.0
 -----
 
- * added DataCollectorTranslator for collecting the translated messages.
+ * added DataCollectorTranslator for collecting the translated messages
 
 2.6.0
 -----

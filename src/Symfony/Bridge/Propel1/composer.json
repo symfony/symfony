@@ -24,6 +24,7 @@
         "propel/propel1": "~1.6,>=1.6.5"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {

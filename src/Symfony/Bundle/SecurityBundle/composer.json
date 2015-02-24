@@ -21,6 +21,7 @@
         "symfony/http-kernel": "~2.2"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/browser-kit": "~2.4",
         "symfony/console": "~2.3",
         "symfony/css-selector": "~2.0,>=2.0.5",

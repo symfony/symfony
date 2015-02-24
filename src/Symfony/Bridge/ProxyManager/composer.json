@@ -21,6 +21,7 @@
         "ocramius/proxy-manager": "~0.4|~1.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.3"
     },
     "autoload": {

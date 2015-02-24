@@ -22,6 +22,7 @@
         "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
         "symfony/expression-language": "~2.4",

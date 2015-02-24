@@ -20,6 +20,7 @@
         "monolog/monolog": "~1.11"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/http-kernel": "~2.4",
         "symfony/console": "~2.4",
         "symfony/event-dispatcher": "~2.2"

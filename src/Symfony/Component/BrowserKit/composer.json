@@ -20,6 +20,7 @@
         "symfony/dom-crawler": "~2.0,>=2.0.5"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/process": "~2.0,>=2.0.5",
         "symfony/css-selector": "~2.0,>=2.0.5"
     },

@@ -22,6 +22,7 @@
         "symfony/var-dumper": "~2.6"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.3",
         "symfony/dependency-injection": "~2.3"
     },

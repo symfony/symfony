@@ -20,6 +20,7 @@
         "symfony/security-core": "~2.4"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/http-foundation": "~2.1"
     },
     "suggest": {

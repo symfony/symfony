@@ -20,6 +20,7 @@
         "doctrine/common": "~2.3"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/stopwatch": "~2.2",
         "symfony/dependency-injection": "~2.2",
         "symfony/form": "~2.3,>=2.3.8",

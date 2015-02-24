@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-17T20:43:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-17T20:45:15Z
+
+Maybe a few assertions added ProfilerControllerTest could help prevent breaking the fix
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-02-18T07:37:41Z
+
+You can use the syntax Response::create() to chain the setCharset.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-19T22:12:50Z
+
+Thanks for the great suggestions, @nicolas-grekas and @GromNaN! I've now updated the PR to use `Request::create()` and I've added an assertion to the `ProfilerControllerTest` and `ExceptionControllerTest`.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-20T10:21:42Z
+
+Fixed the typos

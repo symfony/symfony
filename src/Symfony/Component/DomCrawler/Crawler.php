@@ -755,7 +755,7 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $form = new Form($this->getNode(0), $this->uri, $method);
+        $form = new Form($this->getNode(0), $this->uri, $method, $this->baseHref);
 
         if (null !== $values) {
             $form->setValues($values);

@@ -37,11 +37,11 @@ class File extends \SplFileInfo
      */
     public function __construct($path, $checkPath = true)
     {
-        if ($checkPath && !is_file($path)) {
+        parent::__construct($path);
+        
+        if ($checkPath && !parent::isFile($path)) {
             throw new FileNotFoundException($path);
         }
-
-        parent::__construct($path);
     }
 
     /**

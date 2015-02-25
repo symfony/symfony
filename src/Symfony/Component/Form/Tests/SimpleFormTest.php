@@ -134,7 +134,7 @@ class SimpleFormTest extends AbstractFormTest
         $config->addEventListener(FormEvents::PRE_SUBMIT, array($mock, 'preSubmit'));
         $form = new Form($config);
 
-        $form->bind(false);
+        $form->submit(false);
 
         $this->assertTrue($form->isValid());
         $this->assertNull($form->getData());

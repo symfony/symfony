@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-23T10:39:58Z
+
+Please note that this PR is not meant to be merged asis. The current code in 2.3 eats double-bounce exceptions, and this can be fixed by the added `throw $e` XOR checking for `NullLogger`. I implemented both so we can talk and decide what is the best.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-25T08:54:21Z
+
+PR is now ready

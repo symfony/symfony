@@ -43,6 +43,21 @@ class HttpFoundationExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGenerateAbsoluteUrlWithScriptFileName()
+    {
+        $request = Request::create('http://localhost/app/web/app_dev.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/app/web/app_dev.php');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+        $extension = new HttpFoundationExtension($stack);
+
+        $this->assertEquals(
+            'http://localhost/app/web/bundles/framework/css/structure.css',
+            $extension->generateAbsoluteUrl('/app/web/bundles/framework/css/structure.css')
+        );
+    }
+
     /**
      * @dataProvider getGenerateRelativePathData()
      */

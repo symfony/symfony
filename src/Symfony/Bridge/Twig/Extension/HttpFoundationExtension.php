@@ -67,10 +67,10 @@ class HttpFoundationExtension extends \Twig_Extension
                 $prefix = substr($prefix, 0, $pos).'/';
             }
 
-            $path = $prefix.$path;
+            return $request->getUriForPath($prefix.$path);
         }
 
-        return $request->getUriForPath($path);
+        return $request->getSchemeAndHttpHost().$path;
     }
 
     /**

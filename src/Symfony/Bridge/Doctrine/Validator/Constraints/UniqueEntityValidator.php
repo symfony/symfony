@@ -137,12 +137,11 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $vars = array();
 
-        if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/i', $constraint->message, $vars) > 0)
-        {
+        if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/i', $constraint->message, $vars) > 0) {
+
             $accessor = PropertyAccess::createPropertyAccessor();
 
-            foreach($vars[1] as $var)
-            {
+            foreach($vars[1] as $var) {
                 $constraint->message = str_replace(sprintf("{{ %s }}", $var), $accessor->getValue($entity, $var), $constraint->message);
             }
         }

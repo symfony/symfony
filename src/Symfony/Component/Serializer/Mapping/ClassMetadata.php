@@ -12,31 +12,29 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 /**
- * Stores all metadata needed for serializing objects of specific class.
- *
- * Primarily, the metadata stores serialization groups.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ClassMetadata
+class ClassMetadata implements ClassMetadataInterface
 {
     /**
      * @var string
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getClassName()} instead.
+     *           {@link getName()} instead.
      */
     public $name;
 
     /**
-     * @var array
+     * @var AttributeMetadataInterface[]
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getGroups()} instead.
+     *           {@link getAttributesMetadata()} instead.
      */
-    public $attributesGroups = array();
+    public $attributesMetadata = array();
 
     /**
      * @var \ReflectionClass
@@ -54,66 +52,50 @@ class ClassMetadata
     }
 
     /**
-     * Returns the name of the backing PHP class.
-     *
-     * @return string The name of the backing class.
+     * {@inheritdoc}
      */
-    public function getClassName()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Gets serialization groups.
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getAttributesGroups()
+    public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata)
     {
-        return $this->attributesGroups;
+        $this->attributesMetadata[$attributeMetadata->getName()] = $attributeMetadata;
     }
 
     /**
-     * Adds an attribute to a serialization group
-     *
-     * @param string $attribute
-     * @param string $group
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
-    public function addAttributeGroup($attribute, $group)
+    public function getAttributesMetadata()
     {
-        if (!is_string($attribute) || !is_string($group)) {
-            throw new \InvalidArgumentException('Arguments must be strings.');
-        }
-
-        if (!isset($this->groups[$group]) || !in_array($attribute, $this->attributesGroups[$group])) {
-            $this->attributesGroups[$group][] = $attribute;
-        }
+        return $this->attributesMetadata;
     }
 
     /**
-     * Merges attributes' groups.
-     *
-     * @param ClassMetadata $classMetadata
+     * {@inheritdoc}
      */
-    public function mergeAttributesGroups(ClassMetadata $classMetadata)
+    public function merge(ClassMetadataInterface $classMetadata)
     {
-        foreach ($classMetadata->getAttributesGroups() as $group => $attributes) {
-            foreach ($attributes as $attribute) {
-                $this->addAttributeGroup($attribute, $group);
+        foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
+            if (isset($this->attributesMetadata[$attributeMetadata->getName()])) {
+                $this->attributesMetadata[$attributeMetadata->getName()]->merge($attributeMetadata);
+            } else {
+                $this->addAttributeMetadata($attributeMetadata);
             }
         }
     }
 
     /**
-     * Returns a ReflectionClass instance for this class.
-     *
-     * @return \ReflectionClass
+     * {@inheritdoc}
      */
     public function getReflectionClass()
     {
         if (!$this->reflClass) {
-            $this->reflClass = new \ReflectionClass($this->getClassName());
+            $this->reflClass = new \ReflectionClass($this->getName());
         }
 
         return $this->reflClass;
@@ -128,7 +110,7 @@ class ClassMetadata
     {
         return array(
             'name',
-            'attributesGroups',
+            'attributes',
         );
     }
 }

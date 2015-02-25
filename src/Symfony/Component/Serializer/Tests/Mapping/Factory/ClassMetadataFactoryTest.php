@@ -14,21 +14,26 @@ namespace Symfony\Component\Serializer\Tests\Mapping\Factory;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
-
-require_once __DIR__.'/../../../Annotation/Groups.php';
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    public function testInterface()
+    {
+        $classMetadata = new ClassMetadataFactory(new LoaderChain(array()));
+        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory', $classMetadata);
+    }
+
     public function testGetMetadataFor()
     {
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $metadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+        $classMetadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
 
-        $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true, true), $metadata);
+        $this->assertEquals(TestClassMetadataFactory::createClassMetadata(true, true), $classMetadata);
     }
 
     public function testHasMetadataFor()

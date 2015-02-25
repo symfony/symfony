@@ -15,7 +15,8 @@ use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -26,21 +27,42 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @var int
+     */
     protected $circularReferenceLimit = 1;
+    /**
+     * @var callable
+     */
     protected $circularReferenceHandler;
+    /**
+     * @var ClassMetadataFactoryInterface|null
+     */
     protected $classMetadataFactory;
+    /**
+     * @var NameConverterInterface|null
+     */
     protected $nameConverter;
+    /**
+     * @var array
+     */
     protected $callbacks = array();
+    /**
+     * @var array
+     */
     protected $ignoredAttributes = array();
+    /**
+     * @var array
+     */
     protected $camelizedAttributes = array();
 
     /**
-     * Sets the {@link ClassMetadataFactory} to use.
+     * Sets the {@link ClassMetadataFactoryInterface} to use.
      *
-     * @param ClassMetadataFactory|null   $classMetadataFactory
+     * @param ClassMetadataFactoryInterface|null   $classMetadataFactory
      * @param NameConverterInterface|null $nameConverter
      */
-    public function __construct(ClassMetadataFactory $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
     {
         $this->classMetadataFactory = $classMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -219,19 +241,21 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * Gets attributes to normalize using groups.
      *
      * @param string|object $classOrObject
-     * @param array $context
-     * @return array|bool
+     * @param array         $context
+     * @param bool          $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
+     *
+     * @return string[]|AttributeMetadataInterface[]|bool
      */
-    protected function getAllowedAttributes($classOrObject, array $context)
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
         if (!$this->classMetadataFactory || !isset($context['groups']) || !is_array($context['groups'])) {
             return false;
         }
 
         $allowedAttributes = array();
-        foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesGroups() as $group => $attributes) {
-            if (in_array($group, $context['groups'])) {
-                $allowedAttributes = array_merge($allowedAttributes, $attributes);
+        foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
+            if (count(array_intersect($attributeMetadata->getGroups(), $context['groups']))) {
+                $allowedAttributes[] = $attributesAsString ? $attributeMetadata->getName() : $attributeMetadata;
             }
         }
 

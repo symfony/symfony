@@ -18,6 +18,12 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 class CamelCaseToSnakeCaseNameConverterTest extends \PHPUnit_Framework_TestCase
 {
+    public function testInterface()
+    {
+        $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
+        $this->assertInstanceOf('Symfony\Component\Serializer\NameConverter\NameConverterInterface', $attributeMetadata);
+    }
+
     /**
      * @dataProvider attributeProvider
      */

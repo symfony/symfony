@@ -40,6 +40,12 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
+    public function testInterface()
+    {
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
+    }
+
     public function testNormalize()
     {
         $obj = new GetSetDummy();

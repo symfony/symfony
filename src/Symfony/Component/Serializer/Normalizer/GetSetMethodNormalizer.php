@@ -52,7 +52,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $allowedAttributes = $this->getAllowedAttributes($object, $context);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -97,7 +97,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);

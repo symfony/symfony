@@ -128,7 +128,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     private function makeCacheStale()
     {
-        touch($this->cacheFile, time() - 3600);
+        touch($this->cacheFile, filemtime($this->resourceFile) - 3600);
     }
 
     private function generateMetaFile()

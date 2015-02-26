@@ -11,8 +11,10 @@ matrix:
           env: deps=low
         - php: 5.6
           env: deps=high
+        - php: nightly
         - php: hhvm-nightly
     allow_failures:
+        - php: nightly
         - php: hhvm-nightly
     fast_finish: true
 
@@ -26,12 +28,12 @@ env:
 before_install:
     - travis_retry sudo apt-get install parallel
     - composer self-update
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then phpenv config-rm xdebug.ini; fi;
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then pecl install -f memcached-2.1.0; fi;
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm-nightly" ]; then php -i; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then phpenv config-rm xdebug.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then pecl install -f memcached-2.1.0; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then php -i; fi;
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
     # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built
     - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;

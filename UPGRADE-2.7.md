@@ -84,6 +84,9 @@ Serializer
    $normalizer = new GetSetMethodNormalizer(null, $nameConverter);
    ```
 
+ * `Symfony\Component\Serializer\Exception\ExceptionInterface` is the new name for the now
+   deprecated `Symfony\Component\Serializer\Exception\Exception` interface.
+
 PropertyAccess
 --------------
 

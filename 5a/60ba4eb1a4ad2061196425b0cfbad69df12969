@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-26T10:24:01Z
+
+Looks good! Just take this https://github.com/symfony/symfony/pull/13762/files#diff-571d03a9961a555687c1d3dd971b56daL137 and master should be green
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-26T10:27:50Z
+
+To actually make the build green, we also need #13801.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-26T10:34:19Z
+
+Ok, I just made all the build fixes part of this PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-26T10:37:04Z
+
+:+1:

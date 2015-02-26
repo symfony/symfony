@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-26T09:43:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-26T09:49:44Z
+
+Apparently, xdebug is not available and our setup fails before running the tests for PHP nightly. The travis file should be fixed before we can merge this one.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-26T09:53:37Z
+
+XDebug is indeed not available on PHP 7 currently (it does not support PHP 7 yet).
+
+The code removing the xdebug.ini config should check for ``nightly`` too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-26T10:22:01Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by stof at 2015-02-26T10:52:27Z
+
+next steps (but probably in separate PRs though): debugging the issues on PHP 7 to know whether they are legitimate changes due to BC breaks in PHP 7 (the failure in the parsing of hexadecimal strings in Yaml is because of https://wiki.php.net/rfc/remove_hex_support_in_numeric_strings for instance) or whether they are highlighting bugs in PHP 7 (which should be reported to the PHP team).
+
+Having the testsuite output for PHP 7 is great though.

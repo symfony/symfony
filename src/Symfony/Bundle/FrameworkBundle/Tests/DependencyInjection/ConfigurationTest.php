@@ -86,6 +86,23 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testAssetsCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(
@@ -144,13 +161,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'property_access' => array(
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
-            ),
-            'assets' => array(
-                'version' => null,
-                'version_format' => '%%s?%%s',
-                'base_path' => '',
-                'base_urls' => array(),
-                'packages' => array(),
             ),
         );
     }

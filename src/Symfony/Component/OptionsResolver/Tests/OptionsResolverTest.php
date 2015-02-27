@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
+class OptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var OptionsResolver

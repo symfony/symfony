@@ -51,8 +51,8 @@ class ExpressionVoterTest extends \PHPUnit_Framework_TestCase
 
     protected function getToken(array $roles, $tokenExpectsGetRoles = true)
     {
-        foreach ($roles as $i => &$role) {
-            $role = new Role($role);
+        foreach ($roles as $i => $role) {
+            $roles[$i] = new Role($role);
         }
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 

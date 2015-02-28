@@ -175,14 +175,10 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setRequired(array('class'));
 
-        $resolver->setNormalizers(array(
-            'em' => $emNormalizer,
-        ));
+        $resolver->setNormalizer('em', $emNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'em' => array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'),
-            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
-        ));
+        $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
+        $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
     }
 
     /**

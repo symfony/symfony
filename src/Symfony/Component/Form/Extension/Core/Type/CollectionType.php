@@ -90,9 +90,7 @@ class CollectionType extends AbstractType
             'delete_empty' => false,
         ));
 
-        $resolver->setNormalizers(array(
-            'options' => $optionsNormalizer,
-        ));
+        $resolver->setNormalizer('options', $optionsNormalizer);
     }
 
     /**

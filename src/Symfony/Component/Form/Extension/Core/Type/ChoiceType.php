@@ -233,14 +233,10 @@ class ChoiceType extends AbstractType
             'data_class' => null,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
-        ));
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
-        ));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
     }
 
     /**

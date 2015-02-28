@@ -224,31 +224,25 @@ class DateType extends AbstractType
             'compound' => $compound,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'format' => array('int', 'string'),
-            'years' => 'array',
-            'months' => 'array',
-            'days' => 'array',
-        ));
+        $resolver->setAllowedTypes('format', array('int', 'string'));
+        $resolver->setAllowedTypes('years', 'array');
+        $resolver->setAllowedTypes('months', 'array');
+        $resolver->setAllowedTypes('days', 'array');
     }
 
     /**

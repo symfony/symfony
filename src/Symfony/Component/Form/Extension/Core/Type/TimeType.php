@@ -214,30 +214,24 @@ class TimeType extends AbstractType
             'compound' => $compound,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'hours' => 'array',
-            'minutes' => 'array',
-            'seconds' => 'array',
-        ));
+        $resolver->setAllowedTypes('hours', 'array');
+        $resolver->setAllowedTypes('minutes', 'array');
+        $resolver->setAllowedTypes('seconds', 'array');
     }
 
     /**

@@ -49,8 +49,6 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
             'validation_groups' => null,
         ));
 
-        $resolver->setNormalizers(array(
-            'validation_groups' => $validationGroupsNormalizer,
-        ));
+        $resolver->setNormalizer('validation_groups', $validationGroupsNormalizer);
     }
 }

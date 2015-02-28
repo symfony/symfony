@@ -58,7 +58,7 @@ class PropertyNormalizer extends AbstractNormalizer
             }
 
             // Override visibility
-            if (! $property->isPublic()) {
+            if (!$property->isPublic()) {
                 $property->setAccessible(true);
             }
 
@@ -71,10 +71,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
-            $propertyName = $property->name;
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->normalize($propertyName);
-            }
+            $propertyName = $this->normalizeName($property->name);
 
             $attributes[$propertyName] = $attributeValue;
         }
@@ -96,9 +93,7 @@ class PropertyNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($data as $propertyName => $value) {
-            if ($this->nameConverter) {
-                $propertyName = $this->nameConverter->denormalize($propertyName);
-            }
+            $propertyName = $this->denormalizeName($propertyName);
 
             $allowed = $allowedAttributes === false || in_array($propertyName, $allowedAttributes);
             $ignored = in_array($propertyName, $this->ignoredAttributes);
@@ -106,7 +101,7 @@ class PropertyNormalizer extends AbstractNormalizer
                 $property = $reflectionClass->getProperty($propertyName);
 
                 // Override visibility
-                if (! $property->isPublic()) {
+                if (!$property->isPublic()) {
                     $property->setAccessible(true);
                 }
 
@@ -146,7 +141,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
         // We look for at least one non-static property
         foreach ($class->getProperties() as $property) {
-            if (! $property->isStatic()) {
+            if (!$property->isStatic()) {
                 return true;
             }
         }

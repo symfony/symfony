@@ -200,6 +200,30 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
+     * Converts a value for denormalization. If no name converter is set, the plain value is returned
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function denormalizeName($name)
+    {
+        return $this->nameConverter ? $this->nameConverter->denormalize($name) : $name;
+    }
+
+    /**
+     * Converts a value for normalization. If no name converter is set, the plain value is returned
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function normalizeName($name)
+    {
+        return $this->nameConverter ? $this->nameConverter->normalize($name) : $name;
+    }
+
+    /**
      * Format an attribute name, for example to convert a snake_case name to camelCase.
      *
      * @deprecated Deprecated since version 2.7, to be removed in 3.0. Use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter instead.

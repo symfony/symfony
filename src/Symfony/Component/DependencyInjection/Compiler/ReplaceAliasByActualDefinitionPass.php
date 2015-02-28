@@ -109,12 +109,12 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
      */
     private function updateArgumentReferences(array $arguments, $currentId, $newId)
     {
-        foreach ($arguments as $k => $argument) {
+        foreach ($arguments as $k => &$argument) {
             if (is_array($argument)) {
-                $arguments[$k] = $this->updateArgumentReferences($argument, $currentId, $newId);
+                $argument = $this->updateArgumentReferences($argument, $currentId, $newId);
             } elseif ($argument instanceof Reference) {
                 if ($currentId === (string) $argument) {
-                    $arguments[$k] = new Reference($newId, $argument->getInvalidBehavior());
+                    $argument = new Reference($newId, $argument->getInvalidBehavior());
                     $this->compiler->addLogMessage($this->formatter->formatUpdateReference($this, $this->sourceId, $currentId, $newId));
                 }
             }

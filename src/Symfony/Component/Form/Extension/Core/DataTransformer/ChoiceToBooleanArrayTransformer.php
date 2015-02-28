@@ -62,8 +62,8 @@ class ChoiceToBooleanArrayTransformer implements DataTransformerInterface
 
         $valueMap = array_flip($this->choiceList->getValuesForChoices(array($choice)));
 
-        foreach ($values as $i => $value) {
-            $values[$i] = isset($valueMap[$value]);
+        foreach ($values as $i => &$value) {
+            $value = isset($valueMap[$value]);
         }
 
         if ($this->placeholderPresent) {

@@ -479,7 +479,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testGetMessages($resources, $locale, $expected)
     {
         $locales = array_keys($resources);
-        $_locale = !is_null($locale) ? $locale : reset($locales);
+        $_locale = (null !== $locale) ? $locale : reset($locales);
         $locales = array_slice($locales, 0, array_search($_locale, $locales));
 
         $translator = new Translator($_locale, new MessageSelector());

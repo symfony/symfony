@@ -173,7 +173,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // Is it time to load the current batch?
-            if ((self::MAX_BATCH_SIZE === count($currentBatch) || ($i + 1) === $c) && count($currentBatch) > 0) {
+            $intCurrentBatchesCount = count($currentBatch);
+            if ($intCurrentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $intCurrentBatchesCount || ($i + 1) === $c)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $aclNotFoundException) {
@@ -192,7 +193,8 @@ class AclProvider implements AclProviderInterface
                         $this->cache->putInCache($loadedAcl);
                     }
 
-                    if (isset($oidLookup[$loadedOid->getIdentifier().$loadedOid->getType()])) {
+                    $strOidLookupKey = $loadedOid->getIdentifier() . $loadedOid->getType();
+                    if (isset($oidLookup[$strOidLookupKey])) {
                         $result->attach($loadedOid, $loadedAcl);
                     }
                 }
@@ -559,10 +561,11 @@ QUERY;
                 // attach ACL to the result set; even though we do not enforce that every
                 // object identity has only one instance, we must make sure to maintain
                 // referential equality with the oids passed to findAcls()
-                if (!isset($oidCache[$objectIdentifier.$classType])) {
-                    $oidCache[$objectIdentifier.$classType] = $acl->getObjectIdentity();
+                $strOidCacheKey = $objectIdentifier . $classType;
+                if (!isset($oidCache[$strOidCacheKey])) {
+                    $oidCache[$strOidCacheKey] = $acl->getObjectIdentity();
                 }
-                $result->attach($oidCache[$objectIdentifier.$classType], $acl);
+                $result->attach($oidCache[$strOidCacheKey], $acl);
             // so, this hasn't been hydrated yet
             } else {
                 // create object identity if we haven't done so yet
@@ -670,7 +673,7 @@ QUERY;
             // let's see if we have already hydrated this
             if (isset($acls[$parentId])) {
                 $aclParentAclProperty->setValue($acl, $acls[$parentId]);
-                $processed += 1;
+                ++$processed;
 
                 continue;
             }

@@ -171,7 +171,7 @@ class XliffFileLoader implements LoaderInterface
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),
-                $error->file ? $error->file : 'n/a',
+                $error->file ?: 'n/a',
                 $error->line,
                 $error->column
             );

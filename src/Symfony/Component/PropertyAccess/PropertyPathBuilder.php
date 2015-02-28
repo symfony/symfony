@@ -264,8 +264,10 @@ class PropertyPathBuilder
 
             // All remaining elements should be removed
             for (; $i < $length; ++$i) {
-                unset($this->elements[$i]);
-                unset($this->isIndex[$i]);
+                unset(
+                    $this->elements[$i],
+                    $this->isIndex[$i]
+                );
             }
         } else {
             $diff = $insertionLength - $cutLength;

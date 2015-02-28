@@ -61,14 +61,14 @@ class ResolveReferencesToAliasesPass implements CompilerPassInterface
      */
     private function processArguments(array $arguments)
     {
-        foreach ($arguments as $k => $argument) {
+        foreach ($arguments as $k => &$argument) {
             if (is_array($argument)) {
-                $arguments[$k] = $this->processArguments($argument);
+                $argument = $this->processArguments($argument);
             } elseif ($argument instanceof Reference) {
                 $defId = $this->getDefinitionId($id = (string) $argument);
 
                 if ($defId !== $id) {
-                    $arguments[$k] = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict());
+                    $argument = new Reference($defId, $argument->getInvalidBehavior(), $argument->isStrict());
                 }
             }
         }

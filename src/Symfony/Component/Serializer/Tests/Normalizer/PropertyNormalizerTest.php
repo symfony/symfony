@@ -333,6 +333,11 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $expected = array('me' => 'Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy');
         $this->assertEquals($expected, $this->normalizer->normalize($obj));
     }
+
+    public function testDenormalizeNonExistingAttribute()
+    {
+        $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy');
+    }
 }
 
 class PropertyDummy

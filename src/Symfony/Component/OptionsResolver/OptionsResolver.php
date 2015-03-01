@@ -663,7 +663,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
         }
 
         foreach ((array) $optionNames as $option) {
-            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option], $this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
+            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
+            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
         }
 
         return $this;

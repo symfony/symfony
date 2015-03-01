@@ -336,7 +336,10 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizeNonExistingAttribute()
     {
-        $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy');
+        $this->assertEquals(
+            new PropertyDummy(),
+            $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy')
+        );
     }
 }
 

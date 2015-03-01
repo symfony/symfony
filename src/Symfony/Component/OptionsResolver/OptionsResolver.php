@@ -418,7 +418,18 @@ class OptionsResolver implements Options, OptionsResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the normalizers for an array of options.
+     *
+     * @param array $normalizers An array of closures
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     *
+     * @see setNormalizer()
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setNormalizers(array $normalizers)
     {

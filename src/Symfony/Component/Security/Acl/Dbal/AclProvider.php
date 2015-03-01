@@ -173,8 +173,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // Is it time to load the current batch?
-            $intCurrentBatchesCount = count($currentBatch);
-            if ($intCurrentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $intCurrentBatchesCount || ($i + 1) === $c)) {
+            $currentBatchesCount = count($currentBatch);
+            if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $c)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $aclNotFoundException) {
@@ -193,8 +193,7 @@ class AclProvider implements AclProviderInterface
                         $this->cache->putInCache($loadedAcl);
                     }
 
-                    $strOidLookupKey = $loadedOid->getIdentifier().$loadedOid->getType();
-                    if (isset($oidLookup[$strOidLookupKey])) {
+                    if (isset($oidLookup[$loadedOid->getIdentifier().$loadedOid->getType()])) {
                         $result->attach($loadedOid, $loadedAcl);
                     }
                 }
@@ -561,11 +560,11 @@ QUERY;
                 // attach ACL to the result set; even though we do not enforce that every
                 // object identity has only one instance, we must make sure to maintain
                 // referential equality with the oids passed to findAcls()
-                $strOidCacheKey = $objectIdentifier.$classType;
-                if (!isset($oidCache[$strOidCacheKey])) {
-                    $oidCache[$strOidCacheKey] = $acl->getObjectIdentity();
+                $oidCacheKey = $objectIdentifier.$classType;
+                if (!isset($oidCache[$oidCacheKey])) {
+                    $oidCache[$oidCacheKey] = $acl->getObjectIdentity();
                 }
-                $result->attach($oidCache[$strOidCacheKey], $acl);
+                $result->attach($oidCache[$oidCacheKey], $acl);
             // so, this hasn't been hydrated yet
             } else {
                 // create object identity if we haven't done so yet

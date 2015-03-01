@@ -52,12 +52,12 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
+    public function __construct($entryType, array $entryOptions = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
-        $this->type = $type;
+        $this->type = $entryType;
         $this->allowAdd = $allowAdd;
         $this->allowDelete = $allowDelete;
-        $this->options = $options;
+        $this->options = $entryOptions;
         $this->deleteEmpty = $deleteEmpty;
     }
 

@@ -755,7 +755,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitSingleExpandedRequiredFalse()
+    public function testSubmiCollectiontSingleExpandedRequiredFalse()
     {
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,

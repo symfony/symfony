@@ -352,8 +352,8 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     {
         $prototypeView = $this->factory
             ->create('collection', null, array(
-                'type' => new FormTypeCsrfExtensionTest_ChildType(),
-                'options' => array(
+                'entry_type' => new FormTypeCsrfExtensionTest_ChildType(),
+                'entry_options' => array(
                     'csrf_field_name' => 'csrf',
                 ),
                 'prototype' => true,

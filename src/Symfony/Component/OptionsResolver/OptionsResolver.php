@@ -484,7 +484,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ));
         }
 
-        $this->allowedValues[$option] = $allowedValues instanceof \Closure ? array($allowedValues) : (array) $allowedValues;
+        $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -538,12 +538,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ));
         }
 
-        if ($allowedValues instanceof \Closure) {
-            $this->allowedValues[$option][] = $allowedValues;
-        } elseif (!isset($this->allowedValues[$option])) {
-            $this->allowedValues[$option] = (array) $allowedValues;
+        if (!is_array($allowedValues)) {
+            $allowedValues = array($allowedValues);
+        }
+
+        if (!isset($this->allowedValues[$option])) {
+            $this->allowedValues[$option] = $allowedValues;
         } else {
-            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], (array) $allowedValues);
+            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], $allowedValues);
         }
 
         // Make sure the option is processed

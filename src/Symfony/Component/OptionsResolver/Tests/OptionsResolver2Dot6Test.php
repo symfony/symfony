@@ -724,6 +724,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
     }
 
+    public function testResolveSucceedsIfValidValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The option "foo" with value 42 is invalid. Accepted values are: "bar", false, null.
@@ -845,6 +853,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->addAllowedValues('foo', 'bar');
 
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfValidAddedValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->addAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
     }
 
     /**

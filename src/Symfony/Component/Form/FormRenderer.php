@@ -296,10 +296,7 @@ class FormRenderer implements FormRendererInterface
         // Clear the caches if they were filled for the first time within
         // this function call
         if ($hierarchyInit) {
-            unset(
-                $this->blockNameHierarchyMap[$viewAndSuffixCacheKey],
-                $this->hierarchyLevelMap[$viewAndSuffixCacheKey]
-            );
+            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
         }
 
         if ($varInit) {

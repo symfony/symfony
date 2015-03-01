@@ -193,7 +193,7 @@ class AclProvider implements AclProviderInterface
                         $this->cache->putInCache($loadedAcl);
                     }
 
-                    $strOidLookupKey = $loadedOid->getIdentifier() . $loadedOid->getType();
+                    $strOidLookupKey = $loadedOid->getIdentifier().$loadedOid->getType();
                     if (isset($oidLookup[$strOidLookupKey])) {
                         $result->attach($loadedOid, $loadedAcl);
                     }
@@ -561,7 +561,7 @@ QUERY;
                 // attach ACL to the result set; even though we do not enforce that every
                 // object identity has only one instance, we must make sure to maintain
                 // referential equality with the oids passed to findAcls()
-                $strOidCacheKey = $objectIdentifier . $classType;
+                $strOidCacheKey = $objectIdentifier.$classType;
                 if (!isset($oidCache[$strOidCacheKey])) {
                     $oidCache[$strOidCacheKey] = $acl->getObjectIdentity();
                 }

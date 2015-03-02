@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-02-28T09:39:42Z
+
+You forgot to remove the OptionsResolverInterface here
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-28T11:33:05Z
+
+@stof it has already been removed by another PR

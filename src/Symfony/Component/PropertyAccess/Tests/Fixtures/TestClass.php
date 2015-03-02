@@ -169,7 +169,8 @@ class TestClass
         return 'foobar';
     }
 
-    public function getPublicGetter() {
+    public function getPublicGetter()
+    {
         return $this->publicGetter;
     }
 }

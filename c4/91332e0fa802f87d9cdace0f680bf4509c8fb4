@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by unkind at 2015-02-26T18:23:46Z
+
+This empty interface looks oddly. Maybe it makes sense to add base class of Serializer exceptions for 3.0 and remove interface completely?
+
+I think extending SPL exceptions like `\UnexpectedValueException`, `\InvalidArgumentException`, etc. is pointless: I'd never try to catch them if I know package specific exception like `\Symfony\Component\Serializer\Exception\InvalidArgumentException`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-27T10:01:55Z
+
+@unkind the SPL exception give semantic meaning (logic vs runtime). so they are not useless IMO.
+
+---------------------------------------------------------------------------
+
+by unkind at 2015-02-27T10:39:29Z
+
+I don't say they are useless, I don't like idea of having this structure:
+`\Symfony\Component\Serializer\Exception\InvalidArgumentException extends \InvalidArgumentException`
+`\Symfony\Component\Serializer\Exception\UnexpectedValueException extends \UnexpectedValueException`
+etc.
+What's the point?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-02-27T12:25:10Z
+
+The point is domain separation - each domain should have its own domain-specific exceptions, so that you can layer domains and still know which layer is at fault. That's also the reason for wrapping exceptions in domain specific exceptions (thus ->getPrevious() on the base Exception class)
+
+---------------------------------------------------------------------------
+
+by unkind at 2015-02-27T13:08:54Z
+
+> The point is domain separation - each domain should have its own domain-specific exceptions
+
+Right, but why do you need SPL exceptions then? Any case when you would try to catch generic `\UnexpectedValueException`? I suggest to inherit something like `SerializerException` instead in order to allow to catch all serializer exceptions (I guess empty exception interface has the same purpose).
+
+My point is that empty interface indicates a problem. I know concept of a marker interface, but it's different case IMO.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-01T15:59:55Z
+
+:+1: for this change.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-01T16:20:06Z
+
+As explained by @nicolas-grekas, use cases are:
+- being to able to catch only exception thrown by the Serializer Component
+- being able to catch all logic or runtime exceptions thrown by different libraries
+
+Think about a generic Logger, not aware of libraries used in the project, and logging only runtime exceptions (ignoring logic exceptions). Thanks to `\RuntimeException`, this logger will catch both `Assetic\Exception\FilterException` and `Symfony\Component\Serializer\Exception\RuntimeException`.
+
+If `Symfony\Component\Serializer\Exception\RuntimeException` doesn't extend  `\RuntimeException` it's not possible.
+
+Btw, this is done the same way in other Symfony components: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Validator/Exception/RuntimeException.php
+
+---------------------------------------------------------------------------
+
+by unkind at 2015-03-01T16:40:58Z
+
+> being able to catch all logic or runtime exceptions thrown by different libraries
+
+I can understand catching just `\RuntimeException`, because it's a little bit special one: like in Java, I usually use it for exceptions which is not documented in the `@throws` annotation, i.e. some programmer's mistakes, it's not API's one. By the way, in Java, there are subclasses of `RuntimeException` like `IllegalArgumentException` and `UnsupportedOperationException` which are similar to SPL's ones AFAIU. It makes more sense than SPL's ones `\LogicException` which extends `\Exception`, IMO. For me, `LogicException` is kind of runtime's one.
+
+But seriously, I fail to find any case for `\InvalidArgumentException` and `\UnexpectedValueException`. They tell me literally nothing about context: somewhere we've passed invalid value... OK, so what?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-01T16:59:29Z
+
+@unkind To be able to catch `\RuntimeException`, we need the `Symfony\Component\Serializer\Exception\ExceptionInterface` and we need to extend SPL exceptions.
+
+So it's better leverage the SPL and extends the more precise exceptions such as `\UnexpectedValueException`. Even if there are lesser interest in catching them, what's the point not extending them but extending directly `\RuntimeException`? For instance `\UnexpectedValueException` extends `\RuntimeException`.
+
+---------------------------------------------------------------------------
+
+by unkind at 2015-03-01T17:28:30Z
+
+OK, I have to clarify my opinion: I don't like idea of inheriting `\RuntimeException` and `\LogicException` at all: they are "bad" exceptions, programmer's mistakes, like misconfigured Serializer. Usually, at application level you can't "fix" it, program should fail with error. So you are able to omit them in the `@throws` annotation. If you are pretty sure that you don't want to fail, you can just catch `\Exception`:
+```php
+try {
+    return $serializer->serialize($foo);
+} catch (\Exception $e) {
+    $this->logger->error('We are screwed and I have no idea why', ['exception' => $e]);
+
+    return '';
+}
+```
+but usually I'd prefer to fail by default, because ignoring error can lead serious bugs in the future (http://en.wikipedia.org/wiki/Fail-fast). Well, you *can* inherit them, but thanks to they are runtime, you don't have to.
+
+For example, `Serializer::normalizeObject` throws an `UnexpectedValueException`, but it's a private method. Who catches it on Serializer component level? No one. Who declares it in the `@throws` annotation in some public interface of Serializer component? No one. So to be consistent you have to either put `@throws UnexpectedValueException` in the `NormalizerInterface::normalize` or remove runtime/logic exceptions from public contracts at all. I like the last one.
+
+But for bad incoming data you have to throw regular (non-runtime) exception which would extend `SerializerException`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-01T17:50:33Z
+
+I'm not sure I understand where you want to go @unkind. Anyway, this discussion is not related to this PR. Here I only want to fix a class that does not respect a naming convention applied everywhere otherwise (Interface suffix for interfaces).
+Feel free to open an issue, or better, a PR, to expose your arguments.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-02T09:25:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-02T09:26:23Z
+
+Before merging, @nicolas-grekas Can you add a note in the CHANGELOG of the component and a note in the UPGRADE file for 3.0?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-02T09:37:24Z
+
+Notes added (is it enough?)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-02T13:09:23Z
+
+Looks good to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-02T13:55:39Z
+
+:+1:

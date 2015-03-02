@@ -85,6 +85,18 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Get lookup directories
+     *
+     * @return array List of directories
+     *
+     * @api
+     */
+    public static function getDirs()
+    {
+        return $this->dirs;
+    }
+
+    /**
      * Creates a new Finder.
      *
      * @return Finder A new Finder instance

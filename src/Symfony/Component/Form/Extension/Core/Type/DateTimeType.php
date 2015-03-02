@@ -253,32 +253,30 @@ class DateTimeType extends AbstractType
             'seconds',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'date_widget' => array(
-                null, // inherit default from DateType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            'time_widget' => array(
-                null, // inherit default from TimeType
-                'single_text',
-                'text',
-                'choice',
-            ),
-            // This option will overwrite "date_widget" and "time_widget" options
-            'widget' => array(
-                null, // default, don't overwrite options
-                'single_text',
-                'text',
-                'choice',
-            ),
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('date_widget', array(
+            null, // inherit default from DateType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        $resolver->setAllowedValues('time_widget', array(
+            null, // inherit default from TimeType
+            'single_text',
+            'text',
+            'choice',
+        ));
+        // This option will overwrite "date_widget" and "time_widget" options
+        $resolver->setAllowedValues('widget', array(
+            null, // default, don't overwrite options
+            'single_text',
+            'text',
+            'choice',
         ));
     }
 

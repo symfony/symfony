@@ -424,10 +424,23 @@ class OptionsResolver implements Options
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the normalizers for an array of options.
+     *
+     * @param array $normalizers An array of closures
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     *
+     * @see setNormalizer()
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setNormalizers(array $normalizers)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use setNormalizer() instead.', E_USER_DEPRECATED);
+
         foreach ($normalizers as $option => $normalizer) {
             $this->setNormalizer($option, $normalizer);
         }
@@ -464,6 +477,8 @@ class OptionsResolver implements Options
 
         // BC
         if (is_array($option) && null === $allowedValues) {
+            trigger_error('Calling the '.__METHOD__.' method with an array of options is deprecated since version 2.6 and will be removed in 3.0. Use the new signature with a single option instead.', E_USER_DEPRECATED);
+
             foreach ($option as $optionName => $optionValues) {
                 $this->setAllowedValues($optionName, $optionValues);
             }
@@ -479,7 +494,7 @@ class OptionsResolver implements Options
             ));
         }
 
-        $this->allowedValues[$option] = $allowedValues instanceof \Closure ? array($allowedValues) : (array) $allowedValues;
+        $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -518,6 +533,8 @@ class OptionsResolver implements Options
 
         // BC
         if (is_array($option) && null === $allowedValues) {
+            trigger_error('Calling the '.__METHOD__.' method with an array of options is deprecated since version 2.6 and will be removed in 3.0. Use the new signature with a single option instead.', E_USER_DEPRECATED);
+
             foreach ($option as $optionName => $optionValues) {
                 $this->addAllowedValues($optionName, $optionValues);
             }
@@ -533,12 +550,14 @@ class OptionsResolver implements Options
             ));
         }
 
-        if ($allowedValues instanceof \Closure) {
-            $this->allowedValues[$option][] = $allowedValues;
-        } elseif (!isset($this->allowedValues[$option])) {
-            $this->allowedValues[$option] = (array) $allowedValues;
+        if (!is_array($allowedValues)) {
+            $allowedValues = array($allowedValues);
+        }
+
+        if (!isset($this->allowedValues[$option])) {
+            $this->allowedValues[$option] = $allowedValues;
         } else {
-            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], (array) $allowedValues);
+            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], $allowedValues);
         }
 
         // Make sure the option is processed
@@ -570,6 +589,8 @@ class OptionsResolver implements Options
 
         // BC
         if (is_array($option) && null === $allowedTypes) {
+            trigger_error('Calling the '.__METHOD__.' method with an array of options is deprecated since version 2.6 and will be removed in 3.0. Use the new signature with a single option instead.', E_USER_DEPRECATED);
+
             foreach ($option as $optionName => $optionTypes) {
                 $this->setAllowedTypes($optionName, $optionTypes);
             }
@@ -618,6 +639,8 @@ class OptionsResolver implements Options
 
         // BC
         if (is_array($option) && null === $allowedTypes) {
+            trigger_error('Calling the '.__METHOD__.' method with an array of options is deprecated since version 2.6 and will be removed in 3.0. Use the new signature with a single option instead.', E_USER_DEPRECATED);
+
             foreach ($option as $optionName => $optionTypes) {
                 $this->addAllowedTypes($optionName, $optionTypes);
             }

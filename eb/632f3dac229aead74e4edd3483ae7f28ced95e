@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-18T07:45:57Z
+
+You forgot to read the contribution notice, can you add those headers?
+
+I was wondering if it would be a better idea to just change all usages of `list()`:
+```
++ list($a, , ,$b) = $this->getVoter();
+- list($a, , , $b, , , ) = $this->getVoter();
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-18T07:53:01Z
+
+@keradus in case you need it, here you have an example of the table that must be included in the pull request description: http://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-02-18T10:01:38Z
+
+It's not my first PR here, just forgot to add it, thanks.

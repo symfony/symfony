@@ -70,7 +70,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $propertyValues = & $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
-        $overwrite = true;
 
         // Add the root object to the list
         array_unshift($propertyValues, array(
@@ -81,18 +80,19 @@ class PropertyAccessor implements PropertyAccessorInterface
         for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
             $objectOrArray = & $propertyValues[$i][self::VALUE];
 
-            if ($overwrite) {
-                $property = $propertyPath->getElement($i);
+            $property = $propertyPath->getElement($i);
 
-                if ($propertyPath->isIndex($i)) {
-                    $this->writeIndex($objectOrArray, $property, $value);
-                } else {
-                    $this->writeProperty($objectOrArray, $property, $value);
-                }
+            if ($propertyPath->isIndex($i)) {
+                $this->writeIndex($objectOrArray, $property, $value);
+            } else {
+                $this->writeProperty($objectOrArray, $property, $value);
+            }
+
+            if ($propertyValues[$i][self::IS_REF]) {
+                return;
             }
 
             $value = & $objectOrArray;
-            $overwrite = !$propertyValues[$i][self::IS_REF];
         }
     }
 
@@ -127,7 +127,6 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         try {
             $propertyValues = $this->readPropertiesUntil($objectOrArray, $propertyPath, $propertyPath->getLength() - 1);
-            $overwrite = true;
 
             // Add the root object to the list
             array_unshift($propertyValues, array(
@@ -138,21 +137,21 @@ class PropertyAccessor implements PropertyAccessorInterface
             for ($i = count($propertyValues) - 1; $i >= 0; --$i) {
                 $objectOrArray = $propertyValues[$i][self::VALUE];
 
-                if ($overwrite) {
-                    $property = $propertyPath->getElement($i);
+                $property = $propertyPath->getElement($i);
 
-                    if ($propertyPath->isIndex($i)) {
-                        if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
-                            return false;
-                        }
-                    } else {
-                        if (!$this->isPropertyWritable($objectOrArray, $property)) {
-                            return false;
-                        }
+                if ($propertyPath->isIndex($i)) {
+                    if (!$objectOrArray instanceof \ArrayAccess && !is_array($objectOrArray)) {
+                        return false;
+                    }
+                } else {
+                    if (!$this->isPropertyWritable($objectOrArray, $property)) {
+                        return false;
                     }
                 }
 
-                $overwrite = !$propertyValues[$i][self::IS_REF];
+                if ($propertyValues[$i][self::IS_REF]) {
+                    return true;
+                }
             }
 
             return true;

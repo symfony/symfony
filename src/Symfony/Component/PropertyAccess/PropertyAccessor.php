@@ -89,10 +89,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } else {
                     $this->writeProperty($objectOrArray, $property, $value);
                 }
+
+                $overwrite = !$propertyValues[$i][self::IS_REF];
             }
 
             $value = & $objectOrArray;
-            $overwrite = !$propertyValues[$i][self::IS_REF];
         }
     }
 
@@ -150,9 +151,9 @@ class PropertyAccessor implements PropertyAccessorInterface
                             return false;
                         }
                     }
-                }
 
-                $overwrite = !$propertyValues[$i][self::IS_REF];
+                    $overwrite = !$propertyValues[$i][self::IS_REF];
+                }
             }
 
             return true;

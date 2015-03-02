@@ -430,4 +430,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foobar', $object->getProperty());
     }
+
+    public function testPublicGetter()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $this->assertTrue($this->propertyAccessor->isReadable(new TestClass('foo'), 'publicGetter'));
+        $this->assertEquals('foo', $this->propertyAccessor->getValue(new TestClass('foo'), 'publicGetter'));
+    }
 }

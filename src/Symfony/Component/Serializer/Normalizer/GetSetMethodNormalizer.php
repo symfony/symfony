@@ -68,7 +68,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                 }
 
                 $attributeValue = $method->invoke($object);
-                if (array_key_exists($attributeName, $this->callbacks)) {
+                if (isset($this->callbacks[$attributeName])) {
                     $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {

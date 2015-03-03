@@ -64,7 +64,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
             $attributeValue = $property->getValue($object);
 
-            if (array_key_exists($property->name, $this->callbacks)) {
+            if (isset($this->callbacks[$property->name])) {
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {

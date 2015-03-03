@@ -59,9 +59,10 @@ class ClassMetadataFactory
      * configuration. At last, the new object is returned.
      *
      * @param string|object $value
+     *
      * @return ClassMetadata
+     *
      * @throws \InvalidArgumentException
-
      */
     public function getMetadataFor($value)
     {
@@ -111,6 +112,7 @@ class ClassMetadataFactory
      * Checks if class has metadata.
      *
      * @param mixed $value
+     *
      * @return bool
      */
     public function hasMetadataFor($value)
@@ -123,7 +125,8 @@ class ClassMetadataFactory
     /**
      * Gets a class name for a given class or instance.
      *
-     * @param $value
+     * @param mixed $value
+     *
      * @return string|bool
      */
     private function getClass($value)

@@ -88,5 +88,10 @@ interface OutputFormatterStyleInterface
      */
     public function setOptions(array $options);
 
+    /**
+     * Gets the style definition.
+     *
+     * @return string
+     */
     public function getDefinition();
 }

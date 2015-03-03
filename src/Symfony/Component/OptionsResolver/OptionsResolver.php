@@ -252,7 +252,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new AccessException('Options cannot be made required from a lazy option or normalizer.');
         }
 
-        foreach ((array) $optionNames as $key => $option) {
+        foreach ((array) $optionNames as $option) {
             $this->defined[$option] = true;
             $this->required[$option] = true;
         }
@@ -333,7 +333,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new AccessException('Options cannot be defined from a lazy option or normalizer.');
         }
 
-        foreach ((array) $optionNames as $key => $option) {
+        foreach ((array) $optionNames as $option) {
             $this->defined[$option] = true;
         }
 

@@ -17,7 +17,7 @@
         </service>
 
         <!-- Normalizer -->
-        <service id="serializer.normalizer.get_set_method" class="Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer" public="false">
+        <service id="serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
 
             <!-- Run after all custom serializers -->

@@ -235,4 +235,19 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
 
         return implode(';', $definition);
     }
+
+    /**
+     * Applies the style to a given text.
+     *
+     * @param string $text The text to style
+     * @param OutputFormatterDecorator $decorator The decorator to use or NULL to use the default decorator
+     *
+     * @return string
+     */
+    public function apply($text, OutputFormatterDecorator $decorator = null)
+    {
+        $decorator = $decorator !== null ? $decorator : new OutputFormatterDecorator();
+
+        return $decorator->decorate($text, $this);
+    }
 }

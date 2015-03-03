@@ -94,4 +94,14 @@ interface OutputFormatterStyleInterface
      * @return string
      */
     public function getDefinition();
+
+    /**
+     * Applies the style to a given text.
+     *
+     * @param string $text The text to style
+     * @param OutputFormatterDecorator $decorator The decorator to use or NULL to use the default decorator
+     *
+     * @return string
+     */
+    public function apply($text, OutputFormatterDecorator $decorator = null);
 }

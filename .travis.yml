@@ -36,11 +36,14 @@ before_install:
     - if [ "$TRAVIS_BRANCH" = "master" ]; then export COMPOSER_ROOT_VERSION=dev-master; else export COMPOSER_ROOT_VERSION="$TRAVIS_BRANCH".x-dev; fi;
 
 install:
+    - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
+    - components=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+    - for c in $components; do sed -i -z "s#\"name\"#\"repositories\": \\[{ \"type\": \"composer\", \"url\": \"file://$(pwd)/\" }\\],\\n    \\0#" $c/composer.json; done;
+    - echo "$components" | parallel "cd {} && tar -cf package$TRAVIS_BRANCH.tar --exclude='package*.tar' *"
 
 script:
-    - if [ "$deps" = "no" ]; then export SYMFONY_DEPRECATIONS_HELPER=strict; fi;
-    - if [ "$deps" = "no" ]; then ls -d src/Symfony/*/* | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$deps" = "high" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data,legacy || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
-    - if [ "$deps" = "low" ]; then find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist | sed 's#\(.*\)/.*#\1#' | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data,legacy || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

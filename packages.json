@@ -1,0 +1,14 @@
+{
+    "packages": {
+        "$package_name": {
+            "$TRAVIS_BRANCH": {
+                "name": "$package_name",
+                "version": "$TRAVIS_BRANCH",
+                "dist": {
+                    "url": "file://$(pwd)/src/Symfony/Bridge/PhpUnit/package$TRAVIS_BRANCH.tar",
+                    "type": "tar"
+                }
+            }
+        }
+    }
+}

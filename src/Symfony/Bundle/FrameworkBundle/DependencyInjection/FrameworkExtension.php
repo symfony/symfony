@@ -792,6 +792,17 @@ class FrameworkExtension extends Extension
                 $files[1][] = realpath($file);
                 $container->addResource(new FileResource($file));
             }
+
+            if (is_dir($dir = $dirname.'/Resources/config/validation')) {
+                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                    $files[0][] = $file->getRealpath();
+                }
+                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                    $files[1][] = $file->getRealpath();
+                }
+
+                $container->addResource(new DirectoryResource($dir));
+            }
         }
 
         return $files;

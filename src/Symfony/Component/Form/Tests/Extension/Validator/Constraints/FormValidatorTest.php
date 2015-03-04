@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\SubmitButtonBuilder;
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
@@ -225,14 +225,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -262,14 +260,12 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -299,13 +295,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($form, new Form());
 
-        $is2Dot4Api = Validation::API_VERSION_2_4 === $this->getApiVersion();
-
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue('foo')
             ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
-            ->setCause($is2Dot4Api ? null : $form->getTransformationFailure())
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -376,7 +370,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $object = $this->getMock('\stdClass');
         $options = array('validation_groups' => function (FormInterface $form) {
             return array('group1', 'group2');
-        },);
+        });
         $form = $this->getBuilder('name', '\stdClass', $options)
             ->setData($object)
             ->getForm();
@@ -576,7 +570,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->add($this->getBuilder('child'))
             ->getForm();
 
-        $form->bind(array('foo' => 'bar'));
+        $form->submit(array('foo' => 'bar'));
 
         $context->expects($this->never())
             ->method('addViolation');
@@ -590,7 +584,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     /**
      * Access has to be public, as this method is called via callback array
      * in {@link testValidateFormDataCanHandleCallbackValidationGroups()}
-     * and {@link testValidateFormDataUsesInheritedCallbackValidationGroup()}
+     * and {@link testValidateFormDataUsesInheritedCallbackValidationGroup()}.
      */
     public function getValidationGroups(FormInterface $form)
     {
@@ -599,7 +593,20 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
     private function getMockExecutionContext()
     {
-        return $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+
+        $validator->expects($this->any())
+            ->method('inContext')
+            ->with($context)
+            ->will($this->returnValue($contextualValidator));
+
+        $context->expects($this->any())
+            ->method('getValidator')
+            ->will($this->returnValue($validator));
+
+        return $context;
     }
 
     /**

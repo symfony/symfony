@@ -36,13 +36,12 @@ names are lower-cased, the following extra pseudo-classes are supported:
 Resources
 ---------
 
-This component is a port of the Python lxml library, which is copyright Infrae
-and distributed under the BSD license.
-
-Current code is a port of https://github.com/SimonSapin/cssselect/releases/tag/v0.7.1
+This component is a port of the Python cssselect library
+[v0.7.1](https://github.com/SimonSapin/cssselect/releases/tag/v0.7.1),
+which is distributed under the BSD license.
 
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/CssSelector/
-    $ composer.phar install
+    $ composer install
     $ phpunit

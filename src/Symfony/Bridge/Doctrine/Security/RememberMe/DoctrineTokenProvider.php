@@ -39,16 +39,16 @@ class DoctrineTokenProvider implements TokenProviderInterface
 {
     /**
      * Doctrine DBAL database connection
-     * F.ex. service id: doctrine.dbal.default_connection
+     * F.ex. service id: doctrine.dbal.default_connection.
      *
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $conn;
 
     /**
-     * new DoctrineTokenProvider for the RememberMe authentication service
+     * new DoctrineTokenProvider for the RememberMe authentication service.
      *
-     * @param \Doctrine\DBAL\Connection $conn
+     * @param Connection $conn
      */
     public function __construct(Connection $conn)
     {
@@ -65,14 +65,10 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $paramValues = array('series' => $series);
         $paramTypes = array('series' => \PDO::PARAM_STR);
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row =  $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
         if ($row) {
-            return new PersistentToken($row['class'],
-                                       $row['username'],
-                                       $series,
-                                       $row['value'],
-                                       new \DateTime($row['lastUsed'])
-                                       );
+            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['lastUsed']));
         }
 
         throw new TokenNotFoundException('No token found.');

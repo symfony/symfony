@@ -17,7 +17,7 @@ namespace Symfony\Component\VarDumper\Cloner;
 class Data
 {
     private $data;
-    private $maxDepth = -1;
+    private $maxDepth = 20;
     private $maxItemsPerDepth = -1;
     private $useRefHandles = -1;
 
@@ -176,7 +176,7 @@ class Data
                 $cursor->hashCut = $hashCut;
                 foreach ($children as $key => $child) {
                     $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-                    $cursor->hashKey = $cursor->hashKeyIsBinary ? self::utf8Encode($key) : $key;
+                    $cursor->hashKey = $key;
                     $this->dumpItem($dumper, $cursor, $refs, $child);
                     if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
                         $parentCursor->stop = true;
@@ -190,34 +190,5 @@ class Data
         }
 
         return $hashCut;
-    }
-
-    /**
-     * Portable variant of utf8_encode()
-     *
-     * @param string $s
-     *
-     * @return string
-     *
-     * @internal
-     */
-    public static function utf8Encode($s)
-    {
-        if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($s, 'UTF-8', 'CP1252');
-        }
-
-        $s .= $s;
-        $len = strlen($s);
-
-        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
-            switch (true) {
-                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                default: $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
-            }
-        }
-
-        return substr($s, 0, $j);
     }
 }

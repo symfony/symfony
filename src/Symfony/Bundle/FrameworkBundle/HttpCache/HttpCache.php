@@ -72,7 +72,7 @@ abstract class HttpCache extends BaseHttpCache
 
     protected function createSurrogate()
     {
-        return $this->createEsi();
+        return new Esi();
     }
 
     /**
@@ -80,11 +80,13 @@ abstract class HttpCache extends BaseHttpCache
      *
      * @return Esi
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
      */
     protected function createEsi()
     {
-        return new Esi();
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use createSurrogate() instead.', E_USER_DEPRECATED);
+
+        return $this->createSurrogate();
     }
 
     protected function createStore()

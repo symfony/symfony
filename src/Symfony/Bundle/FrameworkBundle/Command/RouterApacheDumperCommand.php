@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * RouterApacheDumperCommand.
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             The performance gains are minimal and it's very hard to replicate
  *             the behavior of PHP implementation.
  *
@@ -53,10 +53,10 @@ class RouterApacheDumperCommand extends ContainerAwareCommand
         $this
             ->setName('router:dump-apache')
             ->setDefinition(array(
-                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller.'),
+                new InputArgument('script_name', InputArgument::OPTIONAL, 'The script name of the application\'s front controller'),
                 new InputOption('base-uri', null, InputOption::VALUE_REQUIRED, 'The base URI'),
             ))
-            ->setDescription('Dumps all routes as Apache rewrite rules')
+            ->setDescription('[DEPRECATED] Dumps all routes as Apache rewrite rules')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> dumps all routes as Apache rewrite rules.
 These can then be used with the ApacheUrlMatcher to use Apache for route
@@ -74,6 +74,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $formatter = $this->getHelper('formatter');
+
+        $output->writeln($formatter->formatSection('warning', 'The router:dump-apache command is deprecated since version 2.5 and will be removed in 3.0', 'comment'));
+
         $router = $this->getContainer()->get('router');
 
         $dumpOptions = array();

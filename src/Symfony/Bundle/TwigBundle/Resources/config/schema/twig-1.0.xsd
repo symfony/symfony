@@ -9,7 +9,7 @@
 
     <xsd:complexType name="config">
         <xsd:sequence>
-            <!-- @deprecated since 2.6, to be removed in 3.0 -->
+            <!-- @deprecated since version 2.6, to be removed in 3.0 -->
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form-theme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />

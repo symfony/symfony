@@ -67,10 +67,6 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testRouterResetWithParentRequestOnKernelFinishRequest()
     {
-        if (!class_exists('Symfony\Component\Routing\Router')) {
-            $this->markTestSkipped('The "Routing" component is not available');
-        }
-
         // the request context is updated
         $context = $this->getMock('Symfony\Component\Routing\RequestContext');
         $context->expects($this->once())->method('setParameter')->with('_locale', 'es');

@@ -17,13 +17,13 @@ namespace Symfony\Component\EventDispatcher;
  * Listeners are registered on the manager and events are dispatched through the
  * manager.
  *
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
- * @author  Bernhard Schussek <bschussek@gmail.com>
- * @author  Fabien Potencier <fabien@symfony.com>
- * @author  Jordi Boggiano <j.boggiano@seld.be>
- * @author  Jordan Alliot <jordan.alliot@gmail.com>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @author Jordi Boggiano <j.boggiano@seld.be>
+ * @author Jordan Alliot <jordan.alliot@gmail.com>
  *
  * @api
  */
@@ -33,7 +33,7 @@ class EventDispatcher implements EventDispatcherInterface
     private $sorted = array();
 
     /**
-     * @see EventDispatcherInterface::dispatch
+     * @see EventDispatcherInterface::dispatch()
      *
      * @api
      */
@@ -56,7 +56,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::getListeners
+     * @see EventDispatcherInterface::getListeners()
      */
     public function getListeners($eventName = null)
     {
@@ -78,7 +78,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::hasListeners
+     * @see EventDispatcherInterface::hasListeners()
      */
     public function hasListeners($eventName = null)
     {
@@ -86,7 +86,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addListener
+     * @see EventDispatcherInterface::addListener()
      *
      * @api
      */
@@ -97,7 +97,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeListener
+     * @see EventDispatcherInterface::removeListener()
      */
     public function removeListener($eventName, $listener)
     {
@@ -113,7 +113,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::addSubscriber
+     * @see EventDispatcherInterface::addSubscriber()
      *
      * @api
      */
@@ -133,7 +133,7 @@ class EventDispatcher implements EventDispatcherInterface
     }
 
     /**
-     * @see EventDispatcherInterface::removeSubscriber
+     * @see EventDispatcherInterface::removeSubscriber()
      */
     public function removeSubscriber(EventSubscriberInterface $subscriber)
     {

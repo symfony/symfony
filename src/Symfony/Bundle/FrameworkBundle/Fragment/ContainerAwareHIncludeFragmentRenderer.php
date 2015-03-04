@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Fragment;
 
+trigger_error('The '.__NAMESPACE__.'\ContainerAwareHIncludeFragmentRenderer class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bundle\FrameworkBundle\Fragment\HIncludeFragmentRenderer instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\UriSigner;
@@ -20,6 +22,8 @@ use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
  * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0. Use Symfony\Bundle\FrameworkBundle\Fragment\HIncludeFragmentRenderer instead.
  */
 class ContainerAwareHIncludeFragmentRenderer extends HIncludeFragmentRenderer
 {

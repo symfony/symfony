@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Encoder;
 
 /**
- * A generic encoder factory implementation
+ * A generic encoder factory implementation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -59,7 +59,7 @@ class EncoderFactory implements EncoderFactoryInterface
     }
 
     /**
-     * Creates the actual encoder instance
+     * Creates the actual encoder instance.
      *
      * @param array $config
      *

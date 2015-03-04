@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -59,9 +60,33 @@ class UrlValidator extends ConstraintValidator
         $pattern = sprintf(static::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            $this->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->addViolation();
+            }
+
+            return;
+        }
+
+        if ($constraint->checkDNS) {
+            $host = parse_url($value, PHP_URL_HOST);
+
+            if (!checkdnsrr($host, 'ANY')) {
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($constraint->dnsMessage)
+                       ->setParameter('{{ value }}', $this->formatValue($host))
+                       ->addViolation();
+                } else {
+                    $this->buildViolation($constraint->dnsMessage)
+                       ->setParameter('{{ value }}', $this->formatValue($host))
+                       ->addViolation();
+                }
+            }
         }
     }
 }

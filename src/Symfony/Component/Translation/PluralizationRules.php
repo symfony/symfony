@@ -23,10 +23,10 @@ class PluralizationRules
     /**
      * Returns the plural position to use for the given locale and number.
      *
-     * @param int     $number The number
-     * @param string  $locale The locale
+     * @param int    $number The number
+     * @param string $locale The locale
      *
-     * @return int     The plural position
+     * @return int The plural position
      */
     public static function get($number, $locale)
     {

@@ -19,9 +19,13 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
+    /**
+     * @var \DOMDocument
+     */
     private $dom;
     private $format;
     private $context;
@@ -132,18 +136,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * {@inheritdoc}
      */
-     public function supportsEncoding($format)
-     {
-         return 'xml' === $format;
-     }
+    public function supportsEncoding($format)
+    {
+        return 'xml' === $format;
+    }
 
-     /**
+    /**
      * {@inheritdoc}
      */
-     public function supportsDecoding($format)
-     {
-         return 'xml' === $format;
-     }
+    public function supportsDecoding($format)
+    {
+        return 'xml' === $format;
+    }
 
     /**
      * Sets the root node name.
@@ -370,14 +374,12 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 } elseif ($key === '#') {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
-                    /**
-                     * Is this array fully numeric keys?
-                     */
+                    // Is this array fully numeric keys?
                     if (ctype_digit(implode('', array_keys($data)))) {
-                        /**
+                        /*
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
-                         * From array("item" => array(0,1));
+                         * From array("item" => array(0,1));.
                          */
                         foreach ($data as $subData) {
                             $append = $this->appendNode($parentNode, $subData, $key);
@@ -514,6 +516,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         // Set an attribute on the DOM document specifying, as part of the XML declaration,
         $xmlOptions = array(
+            // nicely formats output with indentation and extra space
+            'xml_format_output' => 'formatOutput',
             // the version number of the document
             'xml_version' => 'xmlVersion',
             // the encoding of the document

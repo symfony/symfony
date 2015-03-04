@@ -21,7 +21,7 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -58,7 +58,7 @@ abstract class DoctrineType extends AbstractType
         }
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
@@ -175,14 +175,10 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setRequired(array('class'));
 
-        $resolver->setNormalizers(array(
-            'em' => $emNormalizer,
-        ));
+        $resolver->setNormalizer('em', $emNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'em' => array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'),
-            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
-        ));
+        $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
+        $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
     }
 
     /**

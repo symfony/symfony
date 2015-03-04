@@ -91,7 +91,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $this->data = array(
             'format' => $request->getRequestFormat(),
             'content' => $content,
-            'content_type' => $response->headers->get('Content-Type') ? $response->headers->get('Content-Type') : 'text/html',
+            'content_type' => $response->headers->get('Content-Type', 'text/html'),
             'status_text' => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
             'status_code' => $statusCode,
             'request_query' => $request->query->all(),
@@ -115,6 +115,10 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         if (isset($this->data['request_server']['PHP_AUTH_PW'])) {
             $this->data['request_server']['PHP_AUTH_PW'] = '******';
+        }
+
+        if (isset($this->data['request_request']['_password'])) {
+            $this->data['request_request']['_password'] = '******';
         }
 
         if (isset($this->controllers[$request])) {
@@ -145,6 +149,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                     'class' => $r->getName(),
                     'method' => null,
                     'file' => $r->getFilename(),
+                    'line' => $r->getStartLine(),
+                );
+            } elseif (is_object($controller)) {
+                $r = new \ReflectionClass($controller);
+                $this->data['controller'] = array(
+                    'class' => $r->getName(),
+                    'method' => null,
+                    'file' => $r->getFileName(),
                     'line' => $r->getStartLine(),
                 );
             } else {

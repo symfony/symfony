@@ -9,10 +9,17 @@
         {
             "name": "Nicolas Grekas",
             "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "http://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.9"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0"
     },
     "suggest": {
         "ext-symfony_debug": ""

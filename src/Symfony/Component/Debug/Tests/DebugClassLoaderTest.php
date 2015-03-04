@@ -62,17 +62,14 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     public function testUnsilencing()
     {
         ob_start();
-        $bak = array(
-            ini_set('log_errors', 0),
-            ini_set('display_errors', 1),
-        );
+
+        $this->iniSet('log_errors', 0);
+        $this->iniSet('display_errors', 1);
 
         // See below: this will fail with parse error
         // but this should not be @-silenced.
         @class_exists(__NAMESPACE__.'\TestingUnsilencing', true);
 
-        ini_set('log_errors', $bak[0]);
-        ini_set('display_errors', $bak[1]);
         $output = ob_get_clean();
 
         $this->assertStringMatchesFormat('%aParse error%a', $output);
@@ -156,6 +153,61 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\ClassAlias', true));
     }
+
+    /**
+     * @dataProvider provideDeprecatedSuper
+     */
+    public function testDeprecatedSuper($class, $super, $type)
+    {
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_DEPRECATED);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\'.$class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The Test\Symfony\Component\Debug\Tests\\'.$class.' class '.$type.' Symfony\Component\Debug\Tests\Fixtures\\'.$super.' that is deprecated but this is a test deprecation notice.',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
+
+    public function provideDeprecatedSuper()
+    {
+        return array(
+            array('DeprecatedInterfaceClass', 'DeprecatedInterface', 'implements'),
+            array('DeprecatedParentClass', 'DeprecatedClass', 'extends'),
+        );
+    }
+
+    public function testDeprecatedSuperInSameNamespace()
+    {
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_NOTICE,
+            'message' => '',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
 }
 
 class ClassLoader
@@ -185,6 +237,14 @@ class ClassLoader
             return __DIR__.'/Fixtures/reallyNotPsr0.php';
         } elseif (__NAMESPACE__.'\Fixtures\NotPSR0bis' === $class) {
             return __DIR__.'/Fixtures/notPsr0Bis.php';
+        } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
+            return __DIR__.'/Fixtures/DeprecatedInterface.php';
+        } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
+            eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\DeprecatedInterface {}');
         }
     }
 }

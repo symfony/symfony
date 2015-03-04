@@ -1,7 +1,6 @@
 <info>[container]</info> List of parameters
- Parameter Value                    
+ [32mParameter[39m [32mValue                   [39m 
  array     [12,"Hello world!",true] 
  boolean   true                     
  integer   12                       
  string    Hello world!             
-                                    

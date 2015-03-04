@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Reference;
@@ -79,6 +78,28 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($ref, $refs[0]->getValue());
     }
 
+    public function testProcessDetectsReferencesFromInlinedFactoryDefinitions()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('a')
+        ;
+
+        $factory = new Definition();
+        $factory->setFactory(array(new Reference('a'), 'a'));
+
+        $container
+            ->register('b')
+            ->addArgument($factory)
+        ;
+
+        $graph = $this->process($container);
+
+        $this->assertTrue($graph->hasNode('a'));
+        $this->assertCount(1, $refs = $graph->getNode('a')->getInEdges());
+    }
+
     public function testProcessDoesNotSaveDuplicateReferences()
     {
         $container = new ContainerBuilder();
@@ -103,13 +124,11 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('foo', 'stdClass')
-            ->setFactoryClass('stdClass')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array('stdClass', 'getInstance'));
 
         $container
             ->register('bar', 'stdClass')
-            ->setFactoryService('foo')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('foo'), 'getInstance'));
 
         $graph = $this->process($container);
 

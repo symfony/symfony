@@ -36,11 +36,7 @@ class RouterController
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->matcher = $matcher;
-        $this->routes = $routes;
-
-        if (null === $this->routes && $this->matcher instanceof RouterInterface) {
-            $this->routes = $matcher->getRouteCollection();
-        }
+        $this->routes = (null === $routes && $matcher instanceof RouterInterface) ? $matcher->getRouteCollection() : $routes;
     }
 
     /**
@@ -72,10 +68,14 @@ class RouterController
 
         $request = $profile->getCollector('request');
 
-        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', array(
-            'request' => $request,
-            'router' => $profile->getCollector('router'),
-            'traces' => $matcher->getTraces($request->getPathInfo()),
-        )), 200, array('Content-Type' => 'text/html'));
+        return Response::create(
+            $this->twig->render('@WebProfiler/Router/panel.html.twig', array(
+                'request' => $request,
+                'router' => $profile->getCollector('router'),
+                'traces' => $matcher->getTraces($request->getPathInfo()),
+            )),
+            200,
+            array('Content-Type' => 'text/html')
+        )->setCharset('UTF-8');
     }
 }

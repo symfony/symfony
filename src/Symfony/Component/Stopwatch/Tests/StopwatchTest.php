@@ -14,7 +14,7 @@ namespace Symfony\Component\Stopwatch\Tests;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * StopwatchTest
+ * StopwatchTest.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -57,14 +57,13 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
         $events = new \ReflectionProperty('Symfony\Component\Stopwatch\Section', 'events');
         $events->setAccessible(true);
-        $events->setValue(
-            end($section),
-            array(
-                'foo' =>
-                $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
-                    ->setConstructorArgs(array(microtime(true) * 1000))
-                    ->getMock(),)
-        );
+
+        $stopwatchMockEvent = $this->getMockBuilder('Symfony\Component\Stopwatch\StopwatchEvent')
+            ->setConstructorArgs(array(microtime(true) * 1000))
+            ->getMock()
+        ;
+
+        $events->setValue(end($section), array('foo' => $stopwatchMockEvent));
 
         $this->assertFalse($stopwatch->isStarted('foo'));
     }

@@ -497,16 +497,21 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
         $form2 = $this->createForm('form2');
 
         $form1->add($childForm1);
-
-        $this->dataExtractor->expects($this->at(0))
+        $this->dataExtractor
+             ->method('extractConfiguration')
+             ->will($this->returnValue(array()));
+        $this->dataExtractor
+             ->method('extractDefaultData')
+             ->will($this->returnValue(array()));
+        $this->dataExtractor->expects($this->at(4))
             ->method('extractSubmittedData')
             ->with($form1)
             ->will($this->returnValue(array('errors' => array('foo'))));
-        $this->dataExtractor->expects($this->at(1))
+        $this->dataExtractor->expects($this->at(5))
             ->method('extractSubmittedData')
             ->with($childForm1)
             ->will($this->returnValue(array('errors' => array('bar', 'bam'))));
-        $this->dataExtractor->expects($this->at(2))
+        $this->dataExtractor->expects($this->at(8))
             ->method('extractSubmittedData')
             ->with($form2)
             ->will($this->returnValue(array('errors' => array('baz'))));

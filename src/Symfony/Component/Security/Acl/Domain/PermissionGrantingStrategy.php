@@ -32,7 +32,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     private $auditLogger;
 
     /**
-     * Sets the audit logger
+     * Sets the audit logger.
      *
      * @param AuditLoggerInterface $auditLogger
      */
@@ -130,7 +130,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @param SecurityIdentityInterface[] $sids               An array of SecurityIdentityInterface implementations
      * @param bool                        $administrativeMode True turns off audit logging
      *
-     * @return bool    true, or false; either granting, or denying access respectively.
+     * @return bool true, or false; either granting, or denying access respectively.
      *
      * @throws NoAceFoundException
      */

@@ -15,12 +15,15 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class MarkdownDescriptor extends Descriptor
 {
@@ -50,14 +53,15 @@ class MarkdownDescriptor extends Descriptor
         unset($requirements['_scheme'], $requirements['_method']);
 
         $output = '- Path: '.$route->getPath()
+            ."\n".'- Path Regex: '.$route->compile()->getRegex()
             ."\n".'- Host: '.('' !== $route->getHost() ? $route->getHost() : 'ANY')
+            ."\n".'- Host Regex: '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')
             ."\n".'- Scheme: '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')
             ."\n".'- Method: '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')
             ."\n".'- Class: '.get_class($route)
             ."\n".'- Defaults: '.$this->formatRouterConfig($route->getDefaults())
-            ."\n".'- Requirements: '.$this->formatRouterConfig($requirements) ?: 'NONE'
-            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions())
-            ."\n".'- Path-Regex: '.$route->compile()->getRegex();
+            ."\n".'- Requirements: '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')
+            ."\n".'- Options: '.$this->formatRouterConfig($route->getOptions());
 
         $this->write(isset($options['name'])
             ? $options['name']."\n".str_repeat('-', strlen($options['name']))."\n\n".$output
@@ -177,10 +181,45 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Class: `'.$definition->getClass().'`'
             ."\n".'- Scope: `'.$definition->getScope().'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
-            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no');
+            ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
+            ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
+        ;
+
+        if (method_exists($definition, 'isSynchronized')) {
+            $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
+        }
+
+        $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
+        }
+
+        if ($definition->getFactoryClass(false)) {
+            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass(false).'`';
+        }
+
+        if ($definition->getFactoryService(false)) {
+            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService(false).'`';
+        }
+
+        if ($definition->getFactoryMethod(false)) {
+            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod(false).'`';
+        }
+
+        if ($factory = $definition->getFactory()) {
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $output .= "\n".'- Factory Service: `'.$factory[0].'`';
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $output .= "\n".'- Factory Class: `'.$factory[0].'`';
+                }
+                $output .= "\n".'- Factory Method: `'.$factory[1].'`';
+            } else {
+                $output .= "\n".'- Factory Function: `'.$factory.'`';
+            }
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {

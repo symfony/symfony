@@ -121,7 +121,7 @@ class UnixPipes extends AbstractPipes
             $r = $this->pipes;
         }
         // discard read on stdin
-        unset ($r[0]);
+        unset($r[0]);
 
         $w = isset($this->pipes[0]) ? array($this->pipes[0]) : null;
         $e = null;
@@ -172,7 +172,7 @@ class UnixPipes extends AbstractPipes
         }
 
         if (null !== $w && 0 < count($w)) {
-            while ($len = strlen($this->inputBuffer)) {
+            while (strlen($this->inputBuffer)) {
                 $written = fwrite($w[0], $this->inputBuffer, 2 << 18); // write 512k
                 if ($written > 0) {
                     $this->inputBuffer = (string) substr($this->inputBuffer, $written);

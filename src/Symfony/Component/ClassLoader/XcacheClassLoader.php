@@ -17,11 +17,19 @@ namespace Symfony\Component\ClassLoader;
  * It expects an object implementing a findFile method to find the file. This
  * allows using it as a wrapper around the other loaders of the component (the
  * ClassLoader and the UniversalClassLoader for instance) but also around any
- * other autoloader following this convention (the Composer one for instance)
+ * other autoloaders following this convention (the Composer one for instance).
+ *
+ *     // with a Symfony autoloader
+ *     use Symfony\Component\ClassLoader\ClassLoader;
  *
  *     $loader = new ClassLoader();
+ *     $loader->addPrefix('Symfony\Component', __DIR__.'/component');
+ *     $loader->addPrefix('Symfony',           __DIR__.'/framework');
  *
- *     // register classes with namespaces
+ *     // or with a Composer autoloader
+ *     use Composer\Autoload\ClassLoader;
+ *
+ *     $loader = new ClassLoader();
  *     $loader->add('Symfony\Component', __DIR__.'/component');
  *     $loader->add('Symfony',           __DIR__.'/framework');
  *
@@ -45,15 +53,17 @@ class XcacheClassLoader
     private $prefix;
 
     /**
-     * @var object A class loader object that implements the findFile() method
+     * A class loader object that implements the findFile() method.
+     *
+     * @var object
      */
     private $decorated;
 
     /**
      * Constructor.
      *
-     * @param string $prefix      The XCache namespace prefix to use.
-     * @param object $decorated   A class loader object that implements the findFile() method.
+     * @param string $prefix    The XCache namespace prefix to use.
+     * @param object $decorated A class loader object that implements the findFile() method.
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -77,7 +87,7 @@ class XcacheClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param bool    $prepend Whether to prepend the autoloader or not
+     * @param bool $prepend Whether to prepend the autoloader or not
      */
     public function register($prepend = false)
     {
@@ -97,7 +107,7 @@ class XcacheClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return bool|null    True, if loaded
+     * @return bool|null True, if loaded
      */
     public function loadClass($class)
     {

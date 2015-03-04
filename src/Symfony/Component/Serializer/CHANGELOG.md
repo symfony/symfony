@@ -1,11 +1,27 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added support for serialization and deserialization groups including
+   annotations, XML and YAML mapping.
+ * added `AbstractNormalizer` to factorise code and ease normalizers development
+ * added circular references handling for `PropertyNormalizer`
+ * added support for a context key called `object_to_populate` in `AbstractNormalizer`
+   to reuse existing objects in the deserialization process
+ * added `NameConverterInterface` and `CamelCaseToSnakeCaseNameConverter`
+ * [DEPRECATION] `GetSetMethodNormalizer::setCamelizedAttributes()` and
+   `PropertyNormalizer::setCamelizedAttributes()` are replaced by
+   `CamelCaseToSnakeCaseNameConverter`
+ * [DEPRECATION] the `Exception` interface has been renamed to `ExceptionInterface`
+
 2.6.0
 -----
 
  * added a new serializer: `PropertyNormalizer`. Like `GetSetMethodNormalizer`,
    this normalizer will map an object's properties to an array.
+ * added circular references handling for `GetSetMethodNormalizer`
 
 2.5.0
 -----

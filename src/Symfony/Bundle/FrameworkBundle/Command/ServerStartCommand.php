@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
@@ -32,7 +33,7 @@ class ServerStartCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:start')
@@ -40,23 +41,23 @@ class ServerStartCommand extends ServerCommand
             ->setHelp(<<<EOF
 The <info>%command.name%</info> runs PHP's built-in web server:
 
-  <info>%command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 To change the default bind address and the default port use the <info>address</info> argument:
 
-  <info>%command.full_name% 127.0.0.1:8080</info>
+  <info>php %command.full_name% 127.0.0.1:8080</info>
 
 To change the default document root directory use the <info>--docroot</info> option:
 
-  <info>%command.full_name% --docroot=htdocs/</info>
+  <info>php %command.full_name% --docroot=htdocs/</info>
 
 If you have a custom document root directory layout, you can specify your own
 router script using the <info>--router</info> option:
 
-  <info>%command.full_name% --router=app/config/router.php</info>
+  <info>php %command.full_name% --router=app/config/router.php</info>
 
-Specifying a router script is required when the used environment is not "dev" or
-"prod".
+Specifying a router script is required when the used environment is not <comment>"dev"</comment> or
+<comment>"prod"</comment>.
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 
@@ -77,7 +78,32 @@ EOF
             return 1;
         }
 
+        $documentRoot = $input->getOption('docroot');
+
+        if (null === $documentRoot) {
+            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+        }
+
+        if (!is_dir($documentRoot)) {
+            $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
+
+            return 1;
+        }
+
         $env = $this->getContainer()->getParameter('kernel.environment');
+        $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
+
+            return 1;
+        }
+
+        if ($this->isOtherServerProcessRunning($address)) {
+            $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+
+            return 1;
+        }
 
         if ('prod' === $env) {
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
@@ -91,8 +117,6 @@ EOF
             return 1;
         }
 
-        $address = $input->getArgument('address');
-
         if ($pid > 0) {
             $output->writeln(sprintf('<info>Web server listening on http://%s</info>', $address));
 
@@ -105,13 +129,10 @@ EOF
             return 1;
         }
 
-        $process = $this->createServerProcess(
-            $address,
-            $input->getOption('docroot'),
-            $input->getOption('router'),
-            $env,
-            null
-        );
+        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $input->getOption('router'), $env, null)) {
+            return 1;
+        }
+
         $process->disableOutput();
         $process->start();
         $lockFile = $this->getLockFile($address);
@@ -134,26 +155,56 @@ EOF
         }
     }
 
+    private function isOtherServerProcessRunning($address)
+    {
+        $lockFile = $this->getLockFile($address);
+
+        if (file_exists($lockFile)) {
+            return true;
+        }
+
+        list($hostname, $port) = explode(':', $address);
+
+        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
+
+        if (false !== $fp) {
+            fclose($fp);
+
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Creates a process to start PHP's built-in web server.
      *
-     * @param string $address      IP address and port to listen to
-     * @param string $documentRoot The application's document root
-     * @param string $router       The router filename
-     * @param string $env          The application environment
-     * @param int    $timeout      Process timeout
+     * @param OutputInterface $output       A OutputInterface instance
+     * @param string          $address      IP address and port to listen to
+     * @param string          $documentRoot The application's document root
+     * @param string          $router       The router filename
+     * @param string          $env          The application environment
+     * @param int             $timeout      Process timeout
      *
      * @return Process The process
      */
-    private function createServerProcess($address, $documentRoot, $router, $env, $timeout = null)
+    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router, $env, $timeout = null)
     {
         $router = $router ?: $this
             ->getContainer()
             ->get('kernel')
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
         ;
+
+        $finder = new PhpExecutableFinder();
+        if (false === $binary = $finder->find()) {
+            $output->writeln('<error>Unable to find PHP binary to start server</error>');
+
+            return;
+        }
+
         $script = implode(' ', array_map(array('Symfony\Component\Process\ProcessUtils', 'escapeArgument'), array(
-            PHP_BINARY,
+            $binary,
             '-S',
             $address,
             $router,

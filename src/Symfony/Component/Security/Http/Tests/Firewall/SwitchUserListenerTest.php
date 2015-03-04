@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
 class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 {
-    private $securityContext;
+    private $tokenStorage;
 
     private $userProvider;
 
@@ -29,7 +29,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $this->accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
@@ -45,7 +45,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProviderKeyIsRequired()
     {
-        new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
+        new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
     }
 
     public function testEventIsIgnoredIfUsernameIsNotPassedWithTheRequest()
@@ -53,9 +53,9 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue(null));
 
         $this->event->expects($this->never())->method('setResponse');
-        $this->securityContext->expects($this->never())->method('setToken');
+        $this->tokenStorage->expects($this->never())->method('setToken');
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 
@@ -66,10 +66,10 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     {
         $token = $this->getToken(array($this->getMock('Symfony\Component\Security\Core\Role\RoleInterface')));
 
-        $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('_exit'));
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 
@@ -81,7 +81,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $role->expects($this->any())->method('getSource')->will($this->returnValue($originalToken));
 
-        $this->securityContext->expects($this->any())
+        $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($this->getToken(array($role))));
 
@@ -91,12 +91,12 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array()));
         $this->request->server->expects($this->once())->method('set')->with('QUERY_STRING', '');
 
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('setToken')->with($originalToken);
         $this->event->expects($this->once())
             ->method('setResponse')->with($this->isInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse'));
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 
@@ -107,14 +107,14 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     {
         $token = $this->getToken(array($this->getMock('Symfony\Component\Security\Core\Role\RoleInterface')));
 
-        $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
 
         $this->accessDecisionManager->expects($this->once())
             ->method('decide')->with($token, array('ROLE_ALLOWED_TO_SWITCH'))
             ->will($this->returnValue(false));
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 
@@ -124,7 +124,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 
-        $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
         $this->request->query->expects($this->once())->method('remove', '_switch_user');
         $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array()));
@@ -141,10 +141,10 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user));
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('setToken')->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'));
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 
@@ -154,10 +154,10 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 
-        $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
+        $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue('kuba'));
         $this->request->query->expects($this->once())->method('remove', '_switch_user');
-        $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array('page' => 3,'section' => 2)));
+        $this->request->query->expects($this->any())->method('all')->will($this->returnValue(array('page' => 3, 'section' => 2)));
         $this->request->expects($this->any())->method('getUri')->will($this->returnValue('/'));
         $this->request->server->expects($this->once())->method('set')->with('QUERY_STRING', 'page=3&section=2');
 
@@ -170,10 +170,10 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user));
         $this->userChecker->expects($this->once())
             ->method('checkPostAuth')->with($user);
-        $this->securityContext->expects($this->once())
+        $this->tokenStorage->expects($this->once())
             ->method('setToken')->with($this->isInstanceOf('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'));
 
-        $listener = new SwitchUserListener($this->securityContext, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);
     }
 

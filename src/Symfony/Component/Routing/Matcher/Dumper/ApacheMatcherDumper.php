@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+trigger_error('The '.__NAMESPACE__.'\ApacheMatcherDumper class is deprecated since version 2.5 and will be removed in 3.0. It\'s hard to replicate the behaviour of the PHP implementation and the performance gains are minimal.', E_USER_DEPRECATED);
+
 use Symfony\Component\Routing\Route;
 
 /**
  * Dumps a set of Apache mod_rewrite rules.
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             The performance gains are minimal and it's very hard to replicate
  *             the behavior of PHP implementation.
  *
@@ -88,10 +90,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
             $rules[] = $this->dumpRoute($name, $route, $options, $hostRegexUnique);
 
-            if ($req = $route->getRequirement('_method')) {
-                $methods = explode('|', strtoupper($req));
-                $methodVars = array_merge($methodVars, $methods);
-            }
+            $methodVars = array_merge($methodVars, $route->getMethods());
         }
         if (0 < count($methodVars)) {
             $rule = array('# 405 Method Not Allowed');
@@ -111,12 +110,12 @@ class ApacheMatcherDumper extends MatcherDumper
     }
 
     /**
-     * Dumps a single route
+     * Dumps a single route.
      *
-     * @param  string $name Route name
-     * @param  Route  $route The route
-     * @param  array  $options Options
-     * @param  bool   $hostRegexUnique Unique identifier for the host regex
+     * @param string $name            Route name
+     * @param Route  $route           The route
+     * @param array  $options         Options
+     * @param bool   $hostRegexUnique Unique identifier for the host regex
      *
      * @return string The compiled route
      */
@@ -190,30 +189,28 @@ class ApacheMatcherDumper extends MatcherDumper
     }
 
     /**
-     * Returns methods allowed for a route
+     * Returns methods allowed for a route.
      *
-     * @param Route  $route The route
+     * @param Route $route The route
      *
      * @return array The methods
      */
     private function getRouteMethods(Route $route)
     {
-        $methods = array();
-        if ($req = $route->getRequirement('_method')) {
-            $methods = explode('|', strtoupper($req));
-            // GET and HEAD are equivalent
-            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-                $methods[] = 'HEAD';
-            }
+        $methods = $route->getMethods();
+
+        // GET and HEAD are equivalent
+        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
         }
 
         return $methods;
     }
 
     /**
-     * Converts a regex to make it suitable for mod_rewrite
+     * Converts a regex to make it suitable for mod_rewrite.
      *
-     * @param string  $regex The regex
+     * @param string $regex The regex
      *
      * @return string The converted regex
      */

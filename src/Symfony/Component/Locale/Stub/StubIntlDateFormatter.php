@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub;
 
+trigger_error('The '.__NAMESPACE__.'\StubIntlDateFormatter class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\IntlDateFormatter class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
 
 /**
@@ -18,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\IntlDateFormatter;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\IntlDateFormatter}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\IntlDateFormatter}
  *             instead.
  */
 class StubIntlDateFormatter extends IntlDateFormatter

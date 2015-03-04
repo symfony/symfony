@@ -70,9 +70,9 @@ class MaskBuilder
     private $mask;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param int     $mask optional; defaults to 0
+     * @param int $mask optional; defaults to 0
      *
      * @throws \InvalidArgumentException
      */
@@ -86,7 +86,7 @@ class MaskBuilder
     }
 
     /**
-     * Adds a mask to the permission
+     * Adds a mask to the permission.
      *
      * @param mixed $mask
      *
@@ -102,7 +102,7 @@ class MaskBuilder
     }
 
     /**
-     * Returns the mask of this permission
+     * Returns the mask of this permission.
      *
      * @return int
      */
@@ -112,7 +112,7 @@ class MaskBuilder
     }
 
     /**
-     * Returns a human-readable representation of the permission
+     * Returns a human-readable representation of the permission.
      *
      * @return string
      */
@@ -136,7 +136,7 @@ class MaskBuilder
     }
 
     /**
-     * Removes a mask from the permission
+     * Removes a mask from the permission.
      *
      * @param mixed $mask
      *
@@ -152,7 +152,7 @@ class MaskBuilder
     }
 
     /**
-     * Resets the PermissionBuilder
+     * Resets the PermissionBuilder.
      *
      * @return MaskBuilder
      */
@@ -164,11 +164,13 @@ class MaskBuilder
     }
 
     /**
-     * Returns the code for the passed mask
+     * Returns the code for the passed mask.
      *
-     * @param int     $mask
+     * @param int $mask
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     *
      * @return string
      */
     public static function getCode($mask)

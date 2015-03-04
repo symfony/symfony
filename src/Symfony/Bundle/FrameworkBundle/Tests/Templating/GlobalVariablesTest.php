@@ -26,8 +26,10 @@ class GlobalVariablesTest extends TestCase
         $this->globals = new GlobalVariables($this->container);
     }
 
-    public function testGetSecurity()
+    public function testLegacyGetSecurity()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $this->assertNull($this->globals->getSecurity());

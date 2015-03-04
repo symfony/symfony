@@ -34,7 +34,7 @@ class BundleEntryReader implements BundleEntryReaderInterface
     private $reader;
 
     /**
-     * A mapping of locale aliases to locales
+     * A mapping of locale aliases to locales.
      *
      * @var array
      */

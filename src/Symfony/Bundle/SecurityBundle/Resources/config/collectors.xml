@@ -11,7 +11,8 @@
     <services>
         <service id="data_collector.security" class="%data_collector.security.class%" public="false">
             <tag name="data_collector" template="@Security/Collector/security.html.twig" id="security" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
+            <argument type="service" id="security.token_storage" on-invalid="ignore" />
+            <argument type="service" id="security.role_hierarchy" />
         </service>
     </services>
 </container>

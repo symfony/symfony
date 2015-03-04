@@ -15,10 +15,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
- * Runs Symfony2 application using PHP built-in web server.
+ * Runs Symfony application using PHP built-in web server.
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
@@ -29,7 +30,7 @@ class ServerRunCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        if (version_compare(phpversion(), '5.4.0', '<') || defined('HHVM_VERSION')) {
+        if (PHP_VERSION_ID < 50400 || defined('HHVM_VERSION')) {
             return false;
         }
 
@@ -44,7 +45,7 @@ class ServerRunCommand extends ContainerAwareCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', 'web/'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
@@ -67,8 +68,8 @@ router script using <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
 
-Specifing a router script is required when the used environment is not "dev" or
-"prod".
+Specifing a router script is required when the used environment is not "dev",
+"prod", or "test".
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 
@@ -83,6 +84,10 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $documentRoot = $input->getOption('docroot');
+
+        if (null === $documentRoot) {
+            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+        }
 
         if (!is_dir($documentRoot)) {
             $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
@@ -99,7 +104,10 @@ EOF
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
         $output->writeln('Quit the server with CONTROL-C.');
 
-        $builder = $this->createPhpProcessBuilder($input, $output, $env);
+        if (null === $builder = $this->createPhpProcessBuilder($input, $output, $env)) {
+            return 1;
+        }
+
         $builder->setWorkingDirectory($documentRoot);
         $builder->setTimeout(null);
         $process = $builder->getProcess();
@@ -134,11 +142,18 @@ EOF
         if (!file_exists($router)) {
             $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
 
-            return 1;
+            return;
         }
 
         $router = realpath($router);
+        $finder = new PhpExecutableFinder();
 
-        return new ProcessBuilder(array(PHP_BINARY, '-S', $input->getArgument('address'), $router));
+        if (false === $binary = $finder->find()) {
+            $output->writeln('<error>Unable to find PHP binary to run server</error>');
+
+            return;
+        }
+
+        return new ProcessBuilder(array($binary, '-S', $input->getArgument('address'), $router));
     }
 }

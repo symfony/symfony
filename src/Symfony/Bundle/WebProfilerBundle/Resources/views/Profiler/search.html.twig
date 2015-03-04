@@ -15,16 +15,16 @@
         </select>
         <div class="clear-fix"></div>
         <label for="url">URL</label>
-        <input type="url" name="url" id="url" value="{{ url }}" placeholder="e.g. {{ app.request.baseUrl }}">
+        <input type="url" name="url" id="url" value="{{ url }}" placeholder="e.g. {{ request.baseUrl }}">
         <div class="clear-fix"></div>
         <label for="token">Token</label>
         <input type="text" name="token" id="token" value="{{ token }}" placeholder="e.g. 1f321b">
         <div class="clear-fix"></div>
         <label for="start">From</label>
-        <input type="date" name="start" id="start" value="{{ start }}" placeholder="e.g. {{ '-2days'|date('dd.mm.YYYY') }}">
+        <input type="date" name="start" id="start" value="{{ start }}" placeholder="e.g. {{ '-2days'|date('d.m.Y') }}">
         <div class="clear-fix"></div>
         <label for="end">Until</label>
-        <input type="date" name="end" id="end" value="{{ end }}" placeholder="e.g. {{ 'now'|date('dd.mm.YYYY') }}">
+        <input type="date" name="end" id="end" value="{{ end }}" placeholder="e.g. {{ 'now'|date('d.m.Y') }}">
         <div class="clear-fix"></div>
         <label for="limit">Limit</label>
         <select name="limit" id="limit">

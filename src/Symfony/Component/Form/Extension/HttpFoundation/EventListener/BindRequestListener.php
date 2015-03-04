@@ -19,15 +19,15 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Pass the
- *             Request instance to {@link Form::handleRequest()} instead.
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Pass the Request instance to {@link Form::handleRequest()} instead.
  */
 class BindRequestListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
         // High priority in order to supersede other listeners
-        return array(FormEvents::PRE_BIND => array('preBind', 128));
+        return array(FormEvents::PRE_SUBMIT => array('preBind', 128));
     }
 
     public function preBind(FormEvent $event)
@@ -41,6 +41,8 @@ class BindRequestListener implements EventSubscriberInterface
         if (!$request instanceof Request) {
             return;
         }
+
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.3 and will be removed in 3.0. Pass the Request instance to the \Symfony\Component\Form\Form::handleRequest() method instead.', E_USER_DEPRECATED);
 
         // Uncomment this as soon as the deprecation note should be shown
         // trigger_error('Passing a Request instance to Form::submit() is deprecated since version 2.3 and will be disabled in 3.0. Call Form::process($request) instead.', E_USER_DEPRECATED);

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -33,14 +33,14 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 abstract class AbstractPreAuthenticatedListener implements ListenerInterface
 {
     protected $logger;
-    private $securityContext;
+    private $tokenStorage;
     private $authenticationManager;
     private $providerKey;
     private $dispatcher;
 
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->logger = $logger;
@@ -56,10 +56,6 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Checking secure context token: %s', $this->securityContext->getToken()));
-        }
-
         try {
             list($user, $credentials) = $this->getPreAuthenticatedData($request);
         } catch (BadCredentialsException $exception) {
@@ -68,23 +64,27 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
             return;
         }
 
-        if (null !== $token = $this->securityContext->getToken()) {
+        if (null !== $this->logger) {
+            $this->logger->debug('Checking current security token.', array('token' => (string) $this->tokenStorage->getToken()));
+        }
+
+        if (null !== $token = $this->tokenStorage->getToken()) {
             if ($token instanceof PreAuthenticatedToken && $this->providerKey == $token->getProviderKey() && $token->isAuthenticated() && $token->getUsername() === $user) {
                 return;
             }
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug(sprintf('Trying to pre-authenticate user "%s"', $user));
+            $this->logger->debug('Trying to pre-authenticate user.', array('username' => (string) $user));
         }
 
         try {
             $token = $this->authenticationManager->authenticate(new PreAuthenticatedToken($user, $credentials, $this->providerKey));
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication success: %s', $token));
+                $this->logger->info('Pre-authentication successful.', array('token' => (string) $token));
             }
-            $this->securityContext->setToken($token);
+            $this->tokenStorage->setToken($token);
 
             if (null !== $this->dispatcher) {
                 $loginEvent = new InteractiveLoginEvent($request, $token);
@@ -96,18 +96,18 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     }
 
     /**
-     * Clears a PreAuthenticatedToken for this provider (if present)
+     * Clears a PreAuthenticatedToken for this provider (if present).
      *
      * @param AuthenticationException $exception
      */
     private function clearToken(AuthenticationException $exception)
     {
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token instanceof PreAuthenticatedToken && $this->providerKey === $token->getProviderKey()) {
-            $this->securityContext->setToken(null);
+            $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf("Cleared security context due to exception: %s", $exception->getMessage()));
+                $this->logger->info('Cleared security token due to an exception.', array('exception' => $exception));
             }
         }
     }

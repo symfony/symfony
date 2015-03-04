@@ -336,7 +336,7 @@ class Parser
 
                 $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
             } elseif ('[' === $token->value) {
-                if ($node instanceof Node\GetAttrNode && Node\GetAttrNode::METHOD_CALL === $node->attributes['type'] && version_compare(PHP_VERSION, '5.4.0', '<')) {
+                if ($node instanceof Node\GetAttrNode && Node\GetAttrNode::METHOD_CALL === $node->attributes['type'] && PHP_VERSION_ID < 50400) {
                     throw new SyntaxError('Array calls on a method call is only supported on PHP 5.4+', $token->cursor);
                 }
 

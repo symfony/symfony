@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
@@ -49,6 +49,16 @@ class Configuration implements ConfigurationInterface
     private function addFormSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
+            // Check deprecation before the config is processed to ensure
+            // the setting has been explicitly defined in a configuration file.
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['form']['resources']); })
+                ->then(function ($v) {
+                    trigger_error('The twig.form.resources configuration key is deprecated since version 2.6 and will be removed in 3.0. Use the twig.form_themes configuration key instead.', E_USER_DEPRECATED);
+
+                    return $v;
+                })
+            ->end()
             ->validate()
                 ->ifTrue(function ($v) {
                     return count($v['form']['resources']) > 0;
@@ -61,7 +71,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->children()
                 ->arrayNode('form')
-                    ->info('Deprecated since 2.6, to be removed in 3.0. Use twig.form_themes instead')
+                    ->info('Deprecated since version 2.6, to be removed in 3.0. Use twig.form_themes instead')
                     ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()
@@ -156,7 +166,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->scalarNode('autoescape')->end()
+                ->variableNode('autoescape')->defaultValue('filename')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->end()

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+trigger_error('The '.__NAMESPACE__.'\Transformer class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\Transformer class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Intl\DateFormatter\DateFormat\Transformer as BaseTransformer;
 
 /**
@@ -18,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\Transformer as BaseTransform
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Transformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Transformer}
  *             instead.
  */
 abstract class Transformer extends BaseTransformer

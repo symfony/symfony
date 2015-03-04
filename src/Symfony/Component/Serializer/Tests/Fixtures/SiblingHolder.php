@@ -23,6 +23,7 @@ class SiblingHolder
     public function __construct()
     {
         $sibling = new Sibling();
+
         $this->sibling0 = $sibling;
         $this->sibling1 = $sibling;
         $this->sibling2 = $sibling;

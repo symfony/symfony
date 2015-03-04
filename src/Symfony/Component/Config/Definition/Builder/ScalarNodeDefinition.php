@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\ScalarNode;
 class ScalarNodeDefinition extends VariableNodeDefinition
 {
     /**
-     * Instantiate a Node
+     * Instantiate a Node.
      *
      * @return ScalarNode The node
      */

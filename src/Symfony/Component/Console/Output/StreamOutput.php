@@ -90,7 +90,7 @@ class StreamOutput extends Output
      *  -  Windows without Ansicon and ConEmu
      *  -  non tty consoles
      *
-     * @return bool    true if the stream supports colorization, false otherwise
+     * @return bool true if the stream supports colorization, false otherwise
      */
     protected function hasColorSupport()
     {

@@ -230,12 +230,12 @@ class WindowsPipes extends AbstractPipes
             if (false === $data || (true === $close && feof($r['input']) && '' === $data)) {
                 // no more data to read on input resource
                 // use an empty buffer in the next reads
-                unset($this->input);
+                $this->input = null;
             }
         }
 
         if (null !== $w && 0 < count($w)) {
-            while ($len = strlen($this->inputBuffer)) {
+            while (strlen($this->inputBuffer)) {
                 $written = fwrite($w[0], $this->inputBuffer, 2 << 18);
                 if ($written > 0) {
                     $this->inputBuffer = (string) substr($this->inputBuffer, $written);

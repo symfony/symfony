@@ -13,10 +13,6 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 /**
  * CodeHelper.
  *
@@ -150,9 +146,9 @@ class CodeHelper extends Helper
     /**
      * Formats a file path.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
-     * @param string  $text Use this text for the link rather than the file path
+     * @param string $file An absolute file path
+     * @param int    $line The line number
+     * @param string $text Use this text for the link rather than the file path
      *
      * @return string
      */
@@ -170,7 +166,13 @@ class CodeHelper extends Helper
         }
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);
+            if (PHP_VERSION_ID >= 50400) {
+                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            } else {
+                $flags = ENT_QUOTES;
+            }
+
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
         }
 
         return $text;
@@ -179,8 +181,8 @@ class CodeHelper extends Helper
     /**
      * Returns the link for a given file/line pair.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
+     * @param string $file An absolute file path
+     * @param int    $line The line number
      *
      * @return string A link of false
      */

@@ -19,7 +19,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests ProcessFailedException throws exception if the process was successful
+     * tests ProcessFailedException throws exception if the process was successful.
      */
     public function testProcessFailedExceptionThrowsException()
     {
@@ -42,7 +42,7 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * tests ProcessFailedException uses information from process output
-     * to generate exception message
+     * to generate exception message.
      */
     public function testProcessFailedExceptionPopulatesInformationFromProcessOutput()
     {

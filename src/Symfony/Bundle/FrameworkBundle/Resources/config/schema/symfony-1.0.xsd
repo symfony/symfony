@@ -18,6 +18,7 @@
 
     <xsd:complexType name="config">
         <xsd:all>
+            <xsd:element name="assets" type="assets" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="csrf-protection" type="csrf_protection" minOccurs="0" maxOccurs="1" />
             <xsd:element name="esi" type="esi" minOccurs="0" maxOccurs="1" />
@@ -125,12 +126,34 @@
         <xsd:attribute name="name" type="xsd:string" use="required"/>
     </xsd:complexType>
 
+    <xsd:complexType name="assets">
+        <xsd:sequence>
+            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="base-path" type="xsd:string" />
+        <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="version-format" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="package">
+        <xsd:sequence>
+            <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="base-path" type="xsd:string" />
+        <xsd:attribute name="version" type="xsd:string" />
+        <xsd:attribute name="version-format" type="xsd:string" />
+    </xsd:complexType>
+
     <xsd:complexType name="templating">
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="assets-base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="package" type="package" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="package" type="old-package" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
@@ -146,7 +169,7 @@
         </xsd:choice>
     </xsd:complexType>
 
-    <xsd:complexType name="package">
+    <xsd:complexType name="old-package">
         <xsd:sequence>
             <xsd:element name="base-url" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
@@ -157,8 +180,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="translator">
+        <xsd:sequence>
+            <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />
+        <xsd:attribute name="logging" type="xsd:boolean" />
     </xsd:complexType>
 
     <xsd:complexType name="validation">

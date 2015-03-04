@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -96,11 +97,40 @@ class ObjectsProvider
                 ->setPublic(true)
                 ->setSynthetic(false)
                 ->setLazy(true)
+                ->setAbstract(true)
+                ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
+            'definition_2' => $definition2
+                ->setPublic(false)
+                ->setSynthetic(true)
+                ->setFile('/path/to/file')
+                ->setLazy(false)
+                ->setAbstract(false)
+                ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
+                ->addTag('tag1', array('attr3' => 'val3'))
+                ->addTag('tag2')
+                ->setFactory(array(new Reference('factory.service'), 'get')),
+        );
+    }
+
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0
+     * @internal
+     */
+    public static function getLegacyContainerDefinitions()
+    {
+        $definition1 = new Definition('Full\\Qualified\\Class1');
+        $definition2 = new Definition('Full\\Qualified\\Class2');
+
+        return array(
+            'legacy_synchronized_service_definition_1' => $definition1
+                ->setPublic(true)
+                ->setSynthetic(false)
+                ->setLazy(true)
                 ->setSynchronized(true)
                 ->setAbstract(true)
-                ->setFactoryClass('Full\\Qualified\\FactoryClass')
+                ->setFactoryClass('Full\\Qualified\\FactoryClass', 'get')
                 ->setFactoryMethod('get'),
-            'definition_2' => $definition2
+            'legacy_synchronized_service_definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')

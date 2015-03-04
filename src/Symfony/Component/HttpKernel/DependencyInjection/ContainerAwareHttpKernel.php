@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Scope;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0.
  */
 class ContainerAwareHttpKernel extends HttpKernel
 {
@@ -55,8 +57,6 @@ class ContainerAwareHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        $request->headers->set('X-Php-Ob-Level', ob_get_level());
-
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 

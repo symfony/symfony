@@ -16,12 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "doctrine/common": "~2.2",
-        "twig/twig": "~1.12",
+        "php": ">=5.3.9",
+        "doctrine/common": "~2.3",
+        "twig/twig": "~1.18",
         "psr/log": "~1.0"
     },
     "replace": {
+        "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
@@ -44,8 +45,8 @@
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
+        "symfony/phpunit-bridge": "self.version",
         "symfony/process": "self.version",
-        "symfony/propel1-bridge": "self.version",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
         "symfony/routing": "self.version",
@@ -73,9 +74,9 @@
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
         "monolog/monolog": "~1.11",
-        "propel/propel1": "1.6.*",
-        "ircmaxell/password-compat": "1.0.*",
-        "ocramius/proxy-manager": ">=0.3.1,<0.6-dev",
+        "propel/propel1": "~1.6",
+        "ircmaxell/password-compat": "~1.0",
+        "ocramius/proxy-manager": "~0.4|~1.0",
         "egulias/email-validator": "~1.2"
     },
     "autoload": {
@@ -85,6 +86,9 @@
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
         "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
+    },
+    "autoload-dev": {
+        "files": [ "src/Symfony/Bridge/PhpUnit/bootstrap.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

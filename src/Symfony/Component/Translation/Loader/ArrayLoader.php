@@ -37,7 +37,7 @@ class ArrayLoader implements LoaderInterface
     }
 
     /**
-     * Flattens an nested array of translations
+     * Flattens an nested array of translations.
      *
      * The scheme used is:
      *   'key' => array('key2' => array('key3' => 'value'))
@@ -47,8 +47,8 @@ class ArrayLoader implements LoaderInterface
      * This function takes an array by reference and will modify it
      *
      * @param array  &$messages The array that will be flattened
-     * @param array  $subnode Current subnode being parsed, used internally for recursive calls
-     * @param string $path    Current path being parsed, used internally for recursive calls
+     * @param array  $subnode   Current subnode being parsed, used internally for recursive calls
+     * @param string $path      Current path being parsed, used internally for recursive calls
      */
     private function flatten(array &$messages, array $subnode = null, $path = null)
     {

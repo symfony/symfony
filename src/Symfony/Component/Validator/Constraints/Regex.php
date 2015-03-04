@@ -47,7 +47,7 @@ class Regex extends Constraint
     /**
      * Converts the htmlPattern to a suitable format for HTML5 pattern.
      * Example: /^[a-z]+$/ would be converted to [a-z]+
-     * However, if options are specified, it cannot be converted
+     * However, if options are specified, it cannot be converted.
      *
      * Pattern is also ignored if match=false since the pattern should
      * then be reversed before application.

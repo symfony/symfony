@@ -14,11 +14,6 @@
     {{- parent() -}}
 {%- endblock textarea_widget %}
 
-{% block submit_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn')|trim}) %}
-    {{- parent() -}}
-{%- endblock %}
-
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn')|trim}) %}
     {{- parent() -}}
@@ -161,19 +156,22 @@
 {%- endblock radio_label %}
 
 {% block checkbox_radio_label %}
-    {% if required %}
-        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
+    {# Do no display the label if widget is not defined in order to prevent double label rendering #}
+    {% if widget is defined %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if parent_label_class is defined %}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                {{ widget|raw }}
+                {{ label|trans({}, translation_domain) }}
+        </label>
     {% endif %}
-    {% if parent_label_class is defined %}
-        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ parent_label_class)|trim}) %}
-    {% endif %}
-    {% if label is empty %}
-        {% set label = name|humanize %}
-    {% endif %}
-    <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-        {{ widget|raw }}
-        {{ label|trans({}, translation_domain) }}
-    </label>
 {% endblock checkbox_radio_label %}
 
 {# Rows #}
@@ -185,6 +183,12 @@
         {{ form_errors(form) }}
     </div>
 {%- endblock form_row %}
+
+{% block button_row -%}
+    <div class="form-group">
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock button_row %}
 
 {% block choice_row -%}
     {% set force_error = true %}

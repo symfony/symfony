@@ -34,7 +34,7 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+        if (PHP_VERSION_ID < 50400) {
             $this->markTestSkipped('This test requires at least PHP 5.4.0.');
         }
 
@@ -47,7 +47,7 @@ class JsonBundleWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
+        if (PHP_VERSION_ID < 50400) {
             return;
         }
 

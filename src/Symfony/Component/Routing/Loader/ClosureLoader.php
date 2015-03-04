@@ -37,7 +37,7 @@ class ClosureLoader extends Loader
      */
     public function load($closure, $type = null)
     {
-        return call_user_func($closure);
+        return $closure();
     }
 
     /**

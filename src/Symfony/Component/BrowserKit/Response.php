@@ -30,9 +30,9 @@ class Response
      * The headers array is a set of key/value pairs. If a header is present multiple times
      * then the value is an array of all the values.
      *
-     * @param string  $content The content of the response
-     * @param int     $status  The response status code
-     * @param array   $headers An array of headers
+     * @param string $content The content of the response
+     * @param int    $status  The response status code
+     * @param array  $headers An array of headers
      *
      * @api
      */
@@ -92,7 +92,7 @@ class Response
     /**
      * Gets the response status code.
      *
-     * @return int     The response status code
+     * @return int The response status code
      *
      * @api
      */
@@ -116,8 +116,8 @@ class Response
     /**
      * Gets a response header.
      *
-     * @param string  $header The header name
-     * @param bool    $first  Whether to return the first value or all header values
+     * @param string $header The header name
+     * @param bool   $first  Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */

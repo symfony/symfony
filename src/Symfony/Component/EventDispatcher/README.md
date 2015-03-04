@@ -1,7 +1,7 @@
 EventDispatcher Component
 =========================
 
-The Symfony2 EventDispatcher component implements the Mediator pattern in a
+The Symfony EventDispatcher component implements the Mediator pattern in a
 simple and effective way to make your projects truly extensible.
 
 ```php
@@ -23,5 +23,5 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/EventDispatcher/
-    $ composer.phar install
+    $ composer install
     $ phpunit

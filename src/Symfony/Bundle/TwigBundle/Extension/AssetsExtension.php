@@ -14,10 +14,14 @@ namespace Symfony\Bundle\TwigBundle\Extension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RequestContext;
 
+trigger_error('The '.__NAMESPACE__.'\AssetsExtension class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Bridge\Twig\Extension\AssetExtension class instead.', E_USER_DEPRECATED);
+
 /**
- * Twig extension for Symfony assets helper
+ * Twig extension for Symfony assets helper.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since 2.7, to be removed in 3.0. Use Symfony\Component\Twig\Extension\AssetExtension instead.
  */
 class AssetsExtension extends \Twig_Extension
 {
@@ -48,10 +52,10 @@ class AssetsExtension extends \Twig_Extension
      *
      * Absolute paths (i.e. http://...) are returned unmodified.
      *
-     * @param string              $path        A public path
-     * @param string              $packageName The name of the asset package to use
-     * @param bool                $absolute    Whether to return an absolute URL or a relative one
-     * @param string|bool|null    $version     A specific version
+     * @param string           $path        A public path
+     * @param string           $packageName The name of the asset package to use
+     * @param bool             $absolute    Whether to return an absolute URL or a relative one
+     * @param string|bool|null $version     A specific version
      *
      * @return string A public path which takes into account the base path and URL path
      */
@@ -93,8 +97,9 @@ class AssetsExtension extends \Twig_Extension
      *
      * @param string $url The URL that has to be absolute
      *
-     * @return string The absolute URL
      * @throws \RuntimeException
+     *
+     * @return string The absolute URL
      */
     private function ensureUrlIsAbsolute($url)
     {

@@ -16,14 +16,15 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/http-kernel": "~2.6",
-        "symfony/twig-bridge": "~2.6",
-        "symfony/var-dumper": "~2.6"
+        "php": ">=5.3.9",
+        "symfony/http-kernel": "~2.6|~3.0.0",
+        "symfony/twig-bridge": "~2.6|~3.0.0",
+        "symfony/var-dumper": "~2.6|~3.0.0"
     },
     "require-dev": {
-        "symfony/config": "~2.3",
-        "symfony/dependency-injection": "~2.3"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/config": "~2.3|~3.0.0",
+        "symfony/dependency-injection": "~2.3|~3.0.0"
     },
     "suggest": {
         "symfony/config": "For service container configuration",

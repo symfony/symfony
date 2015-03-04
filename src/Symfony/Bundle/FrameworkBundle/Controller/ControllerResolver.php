@@ -48,7 +48,7 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @return mixed A PHP callable
      *
-     * @throws \LogicException When the name could not be parsed
+     * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
      */
     protected function createController($controller)
@@ -76,7 +76,7 @@ class ControllerResolver extends BaseControllerResolver
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        $controller = new $class();
+        $controller = $this->instantiateController($class);
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }

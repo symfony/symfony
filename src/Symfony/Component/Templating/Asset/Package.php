@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Asset;
 
+trigger_error('The Symfony\Component\Templating\Asset\Package is deprecated since version 2.7 and will be removed in 3.0. Use the Asset component instead.', E_USER_DEPRECATED);
+
 /**
  * The basic package will add a version to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since 2.7, will be removed in 3.0. Use the Asset component instead.
  */
 class Package implements PackageInterface
 {
@@ -56,8 +60,8 @@ class Package implements PackageInterface
     /**
      * Applies version to the supplied path.
      *
-     * @param string              $path    A path
-     * @param string|bool|null    $version A specific version
+     * @param string           $path    A path
+     * @param string|bool|null $version A specific version
      *
      * @return string The versionized path
      */

@@ -16,9 +16,15 @@ namespace Symfony\Component\Validator\Mapping;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Extend {@link GenericMetadata} instead.
  */
 abstract class ElementMetadata extends GenericMetadata
 {
+    public function __construct()
+    {
+        if (!$this instanceof MemberMetadata && !$this instanceof ClassMetadata) {
+            trigger_error('The '.__CLASS__.' class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Mapping\GenericMetadata class instead.', E_USER_DEPRECATED);
+        }
+    }
 }

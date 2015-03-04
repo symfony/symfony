@@ -137,14 +137,14 @@ class FormExtension extends \Twig_Extension
      * @param ChoiceView   $choice        The choice to check.
      * @param string|array $selectedValue The selected value to compare.
      *
-     * @return bool    Whether the choice is selected.
+     * @return bool Whether the choice is selected.
      *
      * @see ChoiceView::isSelected()
      */
     public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
         if (is_array($selectedValue)) {
-            return false !== array_search($choice->value, $selectedValue, true);
+            return in_array($choice->value, $selectedValue, true);
         }
 
         return $choice->value === $selectedValue;

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Base class for events thrown in the HttpKernel component
+ * Base class for events thrown in the HttpKernel component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -25,20 +25,23 @@ use Symfony\Component\EventDispatcher\Event;
 class KernelEvent extends Event
 {
     /**
-     * The kernel in which this event was thrown
+     * The kernel in which this event was thrown.
+     *
      * @var HttpKernelInterface
      */
     private $kernel;
 
     /**
-     * The request the kernel is currently processing
+     * The request the kernel is currently processing.
+     *
      * @var Request
      */
     private $request;
 
     /**
      * The request type the kernel is currently processing.  One of
-     * HttpKernelInterface::MASTER_REQUEST and HttpKernelInterface::SUB_REQUEST
+     * HttpKernelInterface::MASTER_REQUEST and HttpKernelInterface::SUB_REQUEST.
+     *
      * @var int
      */
     private $requestType;
@@ -51,7 +54,7 @@ class KernelEvent extends Event
     }
 
     /**
-     * Returns the kernel in which this event was thrown
+     * Returns the kernel in which this event was thrown.
      *
      * @return HttpKernelInterface
      *
@@ -63,7 +66,7 @@ class KernelEvent extends Event
     }
 
     /**
-     * Returns the request the kernel is currently processing
+     * Returns the request the kernel is currently processing.
      *
      * @return Request
      *
@@ -75,10 +78,10 @@ class KernelEvent extends Event
     }
 
     /**
-     * Returns the request type the kernel is currently processing
+     * Returns the request type the kernel is currently processing.
      *
-     * @return int      One of HttpKernelInterface::MASTER_REQUEST and
-     *                  HttpKernelInterface::SUB_REQUEST
+     * @return int One of HttpKernelInterface::MASTER_REQUEST and
+     *             HttpKernelInterface::SUB_REQUEST
      *
      * @api
      */
@@ -90,7 +93,7 @@ class KernelEvent extends Event
     /**
      * Checks if this is a master request.
      *
-     * @return bool    True if the request is a master request
+     * @return bool True if the request is a master request
      *
      * @api
      */

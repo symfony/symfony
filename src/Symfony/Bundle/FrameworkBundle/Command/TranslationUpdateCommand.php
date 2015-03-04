@@ -36,30 +36,12 @@ class TranslationUpdateCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle where to load the messages, defaults to app/Resources folder', null),
-                new InputOption(
-                    'prefix', null, InputOption::VALUE_OPTIONAL,
-                    'Override the default prefix', '__'
-                ),
-                new InputOption(
-                    'output-format', null, InputOption::VALUE_OPTIONAL,
-                    'Override the default output format', 'yml'
-                ),
-                new InputOption(
-                    'dump-messages', null, InputOption::VALUE_NONE,
-                    'Should the messages be dumped in the console'
-                ),
-                new InputOption(
-                    'force', null, InputOption::VALUE_NONE,
-                    'Should the update be done'
-                ),
-                new InputOption(
-                    'no-backup', null, InputOption::VALUE_NONE,
-                    'Should backup be disabled'
-                ),
-                new InputOption(
-                    'clean', null, InputOption::VALUE_NONE,
-                    'Should clean not found messages'
-                ),
+                new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
+                new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'yml'),
+                new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
+                new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
+                new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
+                new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<EOF
@@ -69,13 +51,12 @@ When new translation strings are found it can automatically add a prefix to the 
 message.
 
 Example running against a Bundle (AcmeBundle)
-<info>php %command.full_name% --dump-messages en AcmeBundle</info>
-<info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+  <info>php %command.full_name% --dump-messages en AcmeBundle</info>
+  <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 
 Example running against app messages (app/Resources folder)
-<info>php %command.full_name% --dump-messages en</info>
-<info>php %command.full_name% --force --prefix="new_" fr</info>
-
+  <info>php %command.full_name% --dump-messages en</info>
+  <info>php %command.full_name% --force --prefix="new_" fr</info>
 EOF
             )
         ;
@@ -135,6 +116,13 @@ EOF
         $operation = $input->getOption('clean')
             ? new DiffOperation($currentCatalogue, $extractedCatalogue)
             : new MergeOperation($currentCatalogue, $extractedCatalogue);
+
+        // Exit if no messages found.
+        if (!count($operation->getDomains())) {
+            $output->writeln("\n<comment>No translation found.</comment>");
+
+            return;
+        }
 
         // show compiled list of messages
         if ($input->getOption('dump-messages') === true) {

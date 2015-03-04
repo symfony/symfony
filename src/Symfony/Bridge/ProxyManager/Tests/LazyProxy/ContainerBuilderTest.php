@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Integration tests for {@see \Symfony\Component\DependencyInjection\ContainerBuilder} combined
- * with the ProxyManager bridge
+ * with the ProxyManager bridge.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */

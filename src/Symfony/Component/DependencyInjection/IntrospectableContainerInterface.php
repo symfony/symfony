@@ -16,7 +16,6 @@ namespace Symfony\Component\DependencyInjection;
  * for containers, allowing logic to be implemented based on a Container's state.
  *
  * @author Evan Villemez <evillemez@gmail.com>
- *
  */
 interface IntrospectableContainerInterface extends ContainerInterface
 {
@@ -25,8 +24,7 @@ interface IntrospectableContainerInterface extends ContainerInterface
      *
      * @param string $id
      *
-     * @return bool    true if the service has been initialized, false otherwise
-     *
+     * @return bool true if the service has been initialized, false otherwise
      */
     public function initialized($id);
 }

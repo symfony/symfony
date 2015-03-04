@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Util\SecureRandom;
 class SecureRandomTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * T1: Monobit test
+     * T1: Monobit test.
      *
      * @dataProvider getSecureRandoms
      */
@@ -27,7 +27,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * T2: Chi-square test with 15 degrees of freedom (chi-Quadrat-Anpassungstest)
+     * T2: Chi-square test with 15 degrees of freedom (chi-Quadrat-Anpassungstest).
      *
      * @dataProvider getSecureRandoms
      */
@@ -55,7 +55,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Run test
+     * Run test.
      *
      * @dataProvider getSecureRandoms
      */
@@ -103,7 +103,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Long-run test
+     * Long-run test.
      *
      * @dataProvider getSecureRandoms
      */
@@ -132,7 +132,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Serial Correlation (Autokorrelationstest)
+     * Serial Correlation (Autokorrelationstest).
      *
      * @dataProvider getSecureRandoms
      */

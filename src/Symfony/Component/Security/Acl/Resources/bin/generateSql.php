@@ -20,7 +20,7 @@ $loader->addPrefixes(array(
     'Symfony' => __DIR__.'/../../../../../..',
     'Doctrine\\Common' => __DIR__.'/../../../../../../../vendor/doctrine-common/lib',
     'Doctrine\\DBAL\\Migrations' => __DIR__.'/../../../../../../../vendor/doctrine-migrations/lib',
-    'Doctrine\\DBAL' => __DIR__.'/../../../../../../../vendor/doctrine-dbal/lib',
+    'Doctrine\\DBAL' => __DIR__.'/../../../../../../../vendor/doctrine/dbal/lib',
     'Doctrine' => __DIR__.'/../../../../../../../vendor/doctrine/lib',
 ));
 $loader->register();
@@ -46,6 +46,6 @@ foreach ($finder as $file) {
     }
 
     $platform = $reflection->newInstance();
-    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->name);
+    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->getName());
     file_put_contents($targetFile, implode("\n\n", $schema->toSql($platform)));
 }

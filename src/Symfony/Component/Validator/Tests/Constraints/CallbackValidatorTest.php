@@ -58,7 +58,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Callback(array('foo')));
+        $this->validator->validate(null, new Callback());
 
         $this->assertNoViolation();
     }
@@ -186,8 +186,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testSingleMethodBc()
+    public function testLegacySingleMethodBc()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array('validate'));
 
@@ -199,8 +201,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testSingleMethodBcExplicitName()
+    public function testLegacySingleMethodBcExplicitName()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array('methods' => array('validate')));
 
@@ -212,8 +216,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testMultipleMethodsBc()
+    public function testLegacyMultipleMethodsBc()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array('validate', 'validateStatic'));
 
@@ -227,8 +233,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testMultipleMethodsBcExplicitName()
+    public function testLegacyMultipleMethodsBcExplicitName()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array(
             'methods' => array('validate', 'validateStatic'),
@@ -244,8 +252,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testSingleStaticMethodBc()
+    public function testLegacySingleStaticMethodBc()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array(
             array(__CLASS__.'_Class', 'validateCallback'),
@@ -259,8 +269,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
-    public function testSingleStaticMethodBcExplicitName()
+    public function testLegacySingleStaticMethodBcExplicitName()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
         $constraint = new Callback(array(
             'methods' => array(array(__CLASS__.'_Class', 'validateCallback')),
@@ -296,8 +308,10 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testExpectEitherCallbackOrMethods()
+    public function testLegacyExpectEitherCallbackOrMethods()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $object = new CallbackValidatorTest_Object();
 
         $this->validator->validate($object, new Callback(array(
@@ -308,7 +322,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
 
     public function testConstraintGetTargets()
     {
-        $constraint = new Callback(array('foo'));
+        $constraint = new Callback(array());
         $targets = array(Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT);
 
         $this->assertEquals($targets, $constraint->getTargets());

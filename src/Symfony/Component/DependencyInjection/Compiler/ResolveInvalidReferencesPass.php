@@ -69,8 +69,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     /**
      * Processes arguments to determine invalid references.
      *
-     * @param array   $arguments    An array of Reference objects
-     * @param bool    $inMethodCall
+     * @param array $arguments    An array of Reference objects
+     * @param bool  $inMethodCall
      *
      * @return array
      *

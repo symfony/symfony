@@ -92,7 +92,7 @@ EOF;
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
      *
-     * @param bool    $supportsRedirections Whether redirections are supported by the base class
+     * @param bool $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string Match method as PHP code
      */
@@ -157,7 +157,7 @@ EOF;
     }
 
     /**
-     * Generates PHP code recursively to match a tree of routes
+     * Generates PHP code recursively to match a tree of routes.
      *
      * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
      * @param bool                   $supportsRedirections Whether redirections are supported by the base class
@@ -215,14 +215,11 @@ EOF;
         $hasTrailingSlash = false;
         $matches = false;
         $hostMatches = false;
-        $methods = array();
+        $methods = $route->getMethods();
 
-        if ($req = $route->getRequirement('_method')) {
-            $methods = explode('|', strtoupper($req));
-            // GET and HEAD are equivalent
-            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-                $methods[] = 'HEAD';
-            }
+        // GET and HEAD are equivalent
+        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
         }
 
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));

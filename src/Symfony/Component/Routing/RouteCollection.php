@@ -106,7 +106,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Removes a route or an array of routes by name from the collection
+     * Removes a route or an array of routes by name from the collection.
      *
      * @param string|array $name The route name or an array of route names
      */
@@ -121,7 +121,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds a route collection at the end of the current set by appending all
      * routes of the added collection.
      *
-     * @param RouteCollection $collection      A RouteCollection instance
+     * @param RouteCollection $collection A RouteCollection instance
      *
      * @api
      */

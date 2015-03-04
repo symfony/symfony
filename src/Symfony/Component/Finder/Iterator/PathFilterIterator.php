@@ -22,13 +22,13 @@ class PathFilterIterator extends MultiplePcreFilterIterator
     /**
      * Filters the iterator values.
      *
-     * @return bool    true if the value should be kept, false otherwise
+     * @return bool true if the value should be kept, false otherwise
      */
     public function accept()
     {
         $filename = $this->current()->getRelativePathname();
 
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $filename = strtr($filename, '\\', '/');
         }
 

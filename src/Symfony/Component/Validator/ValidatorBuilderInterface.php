@@ -167,18 +167,17 @@ interface ValidatorBuilderInterface
      *
      * @return ValidatorBuilderInterface The builder object
      *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor);
 
     /**
      * Sets the API version that the returned validator should support.
      *
-     * @param int     $apiVersion The required API version
+     * @param int $apiVersion The required API version
      *
      * @return ValidatorBuilderInterface The builder object
      *
-     * @see Validation::API_VERSION_2_4
      * @see Validation::API_VERSION_2_5
      * @see Validation::API_VERSION_2_5_BC
      */

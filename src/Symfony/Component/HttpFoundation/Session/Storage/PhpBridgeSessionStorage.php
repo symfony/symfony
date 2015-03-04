@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
 
 /**
- * Allows session to be started by PHP and managed by Symfony2
+ * Allows session to be started by PHP and managed by Symfony.
  *
  * @author Drak <drak@zikula.org>
  */
@@ -38,7 +38,7 @@ class PhpBridgeSessionStorage extends NativeSessionStorage
      */
     public function start()
     {
-        if ($this->started && !$this->closed) {
+        if ($this->started) {
             return true;
         }
 

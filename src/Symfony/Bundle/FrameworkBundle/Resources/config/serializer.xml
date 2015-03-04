@@ -15,6 +15,13 @@
             <argument type="collection" />
             <argument type="collection" />
         </service>
+
+        <!-- Normalizer -->
+        <service id="serializer.normalizer.get_set_method" class="Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer" public="false">
+            <!-- Run after all custom serializers -->
+            <tag name="serializer.normalizer" priority="-1000" />
+        </service>
+
         <!-- Encoders -->
         <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false" >
             <tag name="serializer.encoder" />

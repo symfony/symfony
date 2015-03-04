@@ -21,7 +21,7 @@ interface SecureRandomInterface
     /**
      * Generates the specified number of secure random bytes.
      *
-     * @param int     $nbBytes
+     * @param int $nbBytes
      *
      * @return string
      */

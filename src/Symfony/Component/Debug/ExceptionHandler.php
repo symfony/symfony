@@ -15,10 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 /**
  * ExceptionHandler converts an exception to a Response object.
  *
@@ -54,7 +50,7 @@ class ExceptionHandler
      */
     public static function register($debug = true, $fileLinkFormat = null)
     {
-        $handler = new static($debug, $fileLinkFormat = null);
+        $handler = new static($debug, $fileLinkFormat);
 
         $prev = set_exception_handler(array($handler, 'handle'));
         if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
@@ -146,8 +142,10 @@ class ExceptionHandler
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
      *
-     * @see sendPhpResponse
-     * @see createResponse
+     * @param \Exception $exception An \Exception instance
+     *
+     * @see sendPhpResponse()
+     * @see createResponse()
      */
     private function failSafeHandle(\Exception $exception)
     {
@@ -253,7 +251,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }
@@ -428,7 +426,7 @@ EOF;
             $str = iconv($charset, 'UTF-8', $str);
         }
 
-        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        return htmlspecialchars($str, ENT_QUOTES | (PHP_VERSION_ID >= 50400 ? ENT_SUBSTITUTE : 0), 'UTF-8');
     }
 
     /**

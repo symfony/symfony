@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Lazily loads listeners and subscribers from the dependency injection
- * container
+ * container.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -24,19 +24,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContainerAwareEventDispatcher extends EventDispatcher
 {
     /**
-     * The container from where services are loaded
+     * The container from where services are loaded.
+     *
      * @var ContainerInterface
      */
     private $container;
 
     /**
-     * The service IDs of the event listeners and subscribers
+     * The service IDs of the event listeners and subscribers.
+     *
      * @var array
      */
     private $listenerIds = array();
 
     /**
-     * The services registered as listeners
+     * The services registered as listeners.
+     *
      * @var array
      */
     private $listeners = array();
@@ -52,14 +55,14 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * Adds a service as event listener
+     * Adds a service as event listener.
      *
      * @param string $eventName Event for which the listener is added
      * @param array  $callback  The service ID of the listener service & the method
-     *                            name that has to be called
-     * @param int     $priority The higher this value, the earlier an event listener
-     *                            will be triggered in the chain.
-     *                            Defaults to 0.
+     *                          name that has to be called
+     * @param int    $priority  The higher this value, the earlier an event listener
+     *                          will be triggered in the chain.
+     *                          Defaults to 0.
      *
      * @throws \InvalidArgumentException
      */
@@ -97,7 +100,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * @see EventDispatcherInterface::hasListeners
+     * @see EventDispatcherInterface::hasListeners()
      */
     public function hasListeners($eventName = null)
     {
@@ -113,7 +116,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * @see EventDispatcherInterface::getListeners
+     * @see EventDispatcherInterface::getListeners()
      */
     public function getListeners($eventName = null)
     {
@@ -129,7 +132,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
-     * Adds a service as event subscriber
+     * Adds a service as event subscriber.
      *
      * @param string $serviceId The service ID of the subscriber service
      * @param string $class     The service's class name (which must implement EventSubscriberInterface)

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * Validates that a value is a valid IP address
+ * Validates that a value is a valid IP address.
  *
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})

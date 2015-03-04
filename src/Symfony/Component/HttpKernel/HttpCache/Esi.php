@@ -34,7 +34,7 @@ class Esi implements SurrogateInterface
      * Constructor.
      *
      * @param array $contentTypes An array of content-type that should be parsed for ESI information.
-     *                           (default: text/html, text/xml, application/xhtml+xml, and application/xml)
+     *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
      */
     public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
     {
@@ -53,7 +53,7 @@ class Esi implements SurrogateInterface
      */
     public function createCacheStrategy()
     {
-        return new EsiResponseCacheStrategy();
+        return new ResponseCacheStrategy();
     }
 
     /**
@@ -61,23 +61,9 @@ class Esi implements SurrogateInterface
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if one surrogate has ESI/1.0 capability, false otherwise
+     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      */
     public function hasSurrogateCapability(Request $request)
-    {
-        return $this->hasSurrogateEsiCapability($request);
-    }
-
-    /**
-     * Checks that at least one surrogate has ESI/1.0 capability.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return bool    true if one surrogate has ESI/1.0 capability, false otherwise
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
-     */
-    public function hasSurrogateEsiCapability(Request $request)
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
@@ -87,13 +73,32 @@ class Esi implements SurrogateInterface
     }
 
     /**
+     * Checks that at least one surrogate has ESI/1.0 capability.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
+     */
+    public function hasSurrogateEsiCapability(Request $request)
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasSurrogateCapability() method instead.', E_USER_DEPRECATED);
+
+        return $this->hasSurrogateCapability($request);
+    }
+
+    /**
      * Adds ESI/1.0 capability to the given Request.
      *
      * @param Request $request A Request instance
      */
     public function addSurrogateCapability(Request $request)
     {
-        $this->addSurrogateEsiCapability($request);
+        $current = $request->headers->get('Surrogate-Capability');
+        $new = 'symfony2="ESI/1.0"';
+
+        $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
     }
 
     /**
@@ -101,14 +106,13 @@ class Esi implements SurrogateInterface
      *
      * @param Request $request A Request instance
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
      */
     public function addSurrogateEsiCapability(Request $request)
     {
-        $current = $request->headers->get('Surrogate-Capability');
-        $new = 'symfony2="ESI/1.0"';
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addSurrogateCapability() method instead.', E_USER_DEPRECATED);
 
-        $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
+        $this->addSurrogateCapability($request);
     }
 
     /**
@@ -130,23 +134,9 @@ class Esi implements SurrogateInterface
      *
      * @param Response $response A Response instance
      *
-     * @return bool    true if the Response needs to be parsed, false otherwise
+     * @return bool true if the Response needs to be parsed, false otherwise
      */
     public function needsParsing(Response $response)
-    {
-        return $this->needsEsiParsing($response);
-    }
-
-    /**
-     * Checks that the Response needs to be parsed for ESI tags.
-     *
-     * @param Response $response A Response instance
-     *
-     * @return bool    true if the Response needs to be parsed, false otherwise
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
-     */
-    public function needsEsiParsing(Response $response)
     {
         if (!$control = $response->headers->get('Surrogate-Control')) {
             return false;
@@ -156,12 +146,28 @@ class Esi implements SurrogateInterface
     }
 
     /**
+     * Checks that the Response needs to be parsed for ESI tags.
+     *
+     * @param Response $response A Response instance
+     *
+     * @return bool true if the Response needs to be parsed, false otherwise
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
+     */
+    public function needsEsiParsing(Response $response)
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the needsParsing() method instead.', E_USER_DEPRECATED);
+
+        return $this->needsParsing($response);
+    }
+
+    /**
      * Renders an ESI tag.
      *
-     * @param string  $uri          A URI
-     * @param string  $alt          An alternate URI
-     * @param bool    $ignoreErrors Whether to ignore errors or not
-     * @param string  $comment      A comment to add as an esi:include tag
+     * @param string $uri          A URI
+     * @param string $alt          An alternate URI
+     * @param bool   $ignoreErrors Whether to ignore errors or not
+     * @param string $comment      A comment to add as an esi:include tag
      *
      * @return string
      */

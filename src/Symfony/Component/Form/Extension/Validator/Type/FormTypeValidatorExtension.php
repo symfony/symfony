@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -58,9 +58,9 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
@@ -77,9 +77,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'extra_fields_message' => 'This form should not contain extra fields.',
         ));
 
-        $resolver->setNormalizers(array(
-            'constraints' => $constraintsNormalizer,
-        ));
+        $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 
     /**

@@ -52,7 +52,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     }
 
     /**
-     * Resolves the definition
+     * Resolves the definition.
      *
      * @param string              $id         The definition identifier
      * @param DefinitionDecorator $definition
@@ -81,9 +81,16 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setArguments($parentDef->getArguments());
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
-        $def->setFactoryClass($parentDef->getFactoryClass());
-        $def->setFactoryMethod($parentDef->getFactoryMethod());
-        $def->setFactoryService($parentDef->getFactoryService());
+        if ($parentDef->getFactoryClass(false)) {
+            $def->setFactoryClass($parentDef->getFactoryClass(false));
+        }
+        if ($parentDef->getFactoryMethod(false)) {
+            $def->setFactoryMethod($parentDef->getFactoryMethod(false));
+        }
+        if ($parentDef->getFactoryService(false)) {
+            $def->setFactoryService($parentDef->getFactoryService(false));
+        }
+        $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
@@ -95,13 +102,13 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             $def->setClass($definition->getClass());
         }
         if (isset($changes['factory_class'])) {
-            $def->setFactoryClass($definition->getFactoryClass());
+            $def->setFactoryClass($definition->getFactoryClass(false));
         }
         if (isset($changes['factory_method'])) {
-            $def->setFactoryMethod($definition->getFactoryMethod());
+            $def->setFactoryMethod($definition->getFactoryMethod(false));
         }
         if (isset($changes['factory_service'])) {
-            $def->setFactoryService($definition->getFactoryService());
+            $def->setFactoryService($definition->getFactoryService(false));
         }
         if (isset($changes['factory'])) {
             $def->setFactory($definition->getFactory());

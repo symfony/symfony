@@ -2,8 +2,11 @@
 <container>
   <alias id="alias_1" service="service_1" public="true"/>
   <alias id="alias_2" service="service_2" public="false"/>
-  <definition id="definition_1" class="Full\Qualified\Class1" factory-class="Full\Qualified\FactoryClass" factory-method="get" scope="container" public="true" synthetic="false" lazy="true" synchronized="true" abstract="true" file=""/>
-  <definition id="definition_2" class="Full\Qualified\Class2" factory-service="factory.service" factory-method="get" scope="container" public="false" synthetic="true" lazy="false" synchronized="false" abstract="false" file="/path/to/file">
+  <definition id="definition_1" class="Full\Qualified\Class1" scope="container" public="true" synthetic="false" lazy="true" synchronized="false" abstract="true" file="">
+    <factory class="Full\Qualified\FactoryClass" method="get"/>
+  </definition>
+  <definition id="definition_2" class="Full\Qualified\Class2" scope="container" public="false" synthetic="true" lazy="false" synchronized="false" abstract="false" file="/path/to/file">
+    <factory service="factory.service" method="get"/>
     <tags>
       <tag name="tag1">
         <parameter name="attr1">val1</parameter>

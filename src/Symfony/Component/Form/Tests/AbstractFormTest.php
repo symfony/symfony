@@ -67,7 +67,7 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

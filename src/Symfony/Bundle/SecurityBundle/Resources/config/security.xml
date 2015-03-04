@@ -152,6 +152,12 @@
             <argument type="service" id="security.exception_listener" />
         </service>
 
+        <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator" public="false">
+            <argument type="service" id="request_stack" on-invalid="null" />
+            <argument type="service" id="router" on-invalid="null" />
+            <argument type="service" id="security.token_storage" on-invalid="null" />
+        </service>
+
         <!-- Provisioning -->
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
@@ -166,7 +172,7 @@
         <!-- Validator -->
         <service id="security.validator.user_password" class="%security.validator.user_password.class%">
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
         </service>
     </services>

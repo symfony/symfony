@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * SessionAuthenticationStrategyInterface
+ * SessionAuthenticationStrategyInterface.
  *
  * Implementation are responsible for updating the session after an interactive
  * authentication attempt was successful.

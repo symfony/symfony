@@ -22,11 +22,11 @@ class RedisMock
     private $storage = array();
 
     /**
-     * Add a server to connection pool
+     * Add a server to connection pool.
      *
-     * @param string  $host
-     * @param int     $port
-     * @param float   $timeout
+     * @param string $host
+     * @param int    $port
+     * @param float  $timeout
      *
      * @return bool
      */
@@ -44,8 +44,8 @@ class RedisMock
     /**
      * Set client option.
      *
-     * @param int     $name
-     * @param int     $value
+     * @param int $name
+     * @param int $value
      *
      * @return bool
      */
@@ -77,9 +77,9 @@ class RedisMock
     /**
      * Store data at the server with expiration time.
      *
-     * @param string  $key
-     * @param int     $ttl
-     * @param mixed   $value
+     * @param string $key
+     * @param int    $ttl
+     * @param mixed  $value
      *
      * @return bool
      */
@@ -97,8 +97,8 @@ class RedisMock
     /**
      * Sets an expiration time on an item.
      *
-     * @param string  $key
-     * @param int     $ttl
+     * @param string $key
+     * @param int    $ttl
      *
      * @return bool
      */
@@ -132,12 +132,12 @@ class RedisMock
     }
 
     /**
-     * Append data to an existing item
+     * Append data to an existing item.
      *
      * @param string $key
      * @param string $value
      *
-     * @return int     Size of the value after the append.
+     * @return int Size of the value after the append.
      */
     public function append($key, $value)
     {
@@ -205,7 +205,7 @@ class RedisMock
     }
 
     /**
-     * Close Redis server connection
+     * Close Redis server connection.
      *
      * @return bool
      */

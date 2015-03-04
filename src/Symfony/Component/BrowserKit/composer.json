@@ -16,12 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/dom-crawler": "~2.0"
+        "php": ">=5.3.9",
+        "symfony/dom-crawler": "~2.0,>=2.0.5|~3.0.0"
     },
     "require-dev": {
-        "symfony/process": "~2.0",
-        "symfony/css-selector": "~2.0"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/process": "~2.0,>=2.0.5|~3.0.0",
+        "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0"
     },
     "suggest": {
         "symfony/process": ""

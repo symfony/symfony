@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="_twig_error_test" path="/{code}.{_format}">
-        <default key="_controller">twig.controller.exception:testErrorPageAction</default>
+        <default key="_controller">twig.controller.preview_error:previewErrorPageAction</default>
         <default key="_format">html</default>
         <requirement key="code">\d+</requirement>
     </route>

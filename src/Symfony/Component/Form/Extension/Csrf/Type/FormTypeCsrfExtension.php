@@ -21,7 +21,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -119,7 +119,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         // BC clause for the "intention" option
         $csrfTokenId = function (Options $options) {
@@ -128,8 +128,12 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
 
         // BC clause for the "csrf_provider" option
         $csrfTokenManager = function (Options $options) {
+            if ($options['csrf_provider'] instanceof CsrfTokenManagerInterface) {
+                return $options['csrf_provider'];
+            }
+
             return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
-                ? $options['csrf_provider']->getTokenManager()
+                ? $options['csrf_provider']->getTokenManager(false)
                 : new CsrfProviderAdapter($options['csrf_provider']);
         };
 
@@ -139,7 +143,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $csrfTokenManager,
             'csrf_token_id' => $csrfTokenId,
-            'csrf_provider' => new CsrfTokenManagerAdapter($this->defaultTokenManager),
+            'csrf_provider' => $this->defaultTokenManager,
             'intention' => null,
         ));
     }

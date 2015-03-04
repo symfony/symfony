@@ -16,36 +16,13 @@ use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**
- * ErrorHandlerTest
+ * ErrorHandlerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var int Error reporting level before running tests.
-     */
-    protected $errorReporting;
-
-    /**
-     * @var string Display errors setting before running tests.
-     */
-    protected $displayErrors;
-
-    public function setUp()
-    {
-        $this->errorReporting = error_reporting(E_ALL | E_STRICT);
-        $this->displayErrors = ini_get('display_errors');
-        ini_set('display_errors', '1');
-    }
-
-    public function tearDown()
-    {
-        ini_set('display_errors', $this->displayErrors);
-        error_reporting($this->errorReporting);
-    }
-
     public function testRegister()
     {
         $handler = ErrorHandler::register();
@@ -192,6 +169,8 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleError()
     {
+        $this->iniSet('error_reporting', -1);
+
         try {
             $handler = ErrorHandler::register();
             $handler->throwAt(0, true);
@@ -380,8 +359,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testDeprecatedInterface()
+    public function testLegacyInterface()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         try {
             $handler = ErrorHandler::register(0);
             $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, array()));
@@ -405,7 +386,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             ;
 
             $handler = ErrorHandler::register(E_NOTICE);
-            $handler->setLogger($logger, 'scream');
+            @$handler->setLogger($logger, 'scream');
             unset($undefVar);
             @$undefVar++;
 

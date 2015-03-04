@@ -11,11 +11,6 @@
 
 namespace Symfony\Component\Yaml\Exception;
 
-if (!defined('JSON_UNESCAPED_UNICODE')) {
-    define('JSON_UNESCAPED_SLASHES', 64);
-    define('JSON_UNESCAPED_UNICODE', 256);
-}
-
 /**
  * Exception class thrown when an error occurs during parsing.
  *
@@ -33,10 +28,10 @@ class ParseException extends RuntimeException
     /**
      * Constructor.
      *
-     * @param string    $message    The error message
-     * @param int       $parsedLine The line where the error occurred
-     * @param int       $snippet    The snippet of code near the problem
-     * @param string    $parsedFile The file name where the error occurred
+     * @param string     $message    The error message
+     * @param int        $parsedLine The line where the error occurred
+     * @param int        $snippet    The snippet of code near the problem
+     * @param string     $parsedFile The file name where the error occurred
      * @param \Exception $previous   The previous exception
      */
     public function __construct($message, $parsedLine = -1, $snippet = null, $parsedFile = null, \Exception $previous = null)
@@ -100,7 +95,7 @@ class ParseException extends RuntimeException
     /**
      * Gets the line where the error occurred.
      *
-     * @return int     The file line
+     * @return int The file line
      */
     public function getParsedLine()
     {
@@ -110,7 +105,7 @@ class ParseException extends RuntimeException
     /**
      * Sets the line where the error occurred.
      *
-     * @param int     $parsedLine The file line
+     * @param int $parsedLine The file line
      */
     public function setParsedLine($parsedLine)
     {
@@ -130,7 +125,12 @@ class ParseException extends RuntimeException
         }
 
         if (null !== $this->parsedFile) {
-            $this->message .= sprintf(' in %s', json_encode($this->parsedFile, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            if (PHP_VERSION_ID >= 50400) {
+                $jsonOptions = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+            } else {
+                $jsonOptions = 0;
+            }
+            $this->message .= sprintf(' in %s', json_encode($this->parsedFile, $jsonOptions));
         }
 
         if ($this->parsedLine >= 0) {

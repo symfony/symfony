@@ -26,14 +26,16 @@ interface PermissionMapInterface
      *
      * @param string $permission
      * @param object $object
+     *
      * @return array may return null if permission/object combination is not supported
      */
     public function getMasks($permission, $object);
 
     /**
-     * Whether this map contains the given permission
+     * Whether this map contains the given permission.
      *
      * @param string $permission
+     *
      * @return bool
      */
     public function contains($permission);

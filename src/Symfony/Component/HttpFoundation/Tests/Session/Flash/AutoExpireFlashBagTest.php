@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Flash;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag as FlashBag;
 
 /**
- * AutoExpireFlashBagTest
+ * AutoExpireFlashBagTest.
  *
  * @author Drak <drak@zikula.org>
  */

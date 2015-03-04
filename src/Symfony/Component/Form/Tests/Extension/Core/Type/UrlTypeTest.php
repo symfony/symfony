@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class UrlTypeTest extends TypeTestCase
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
+
+class UrlTypeTest extends TestCase
 {
     public function testSubmitAddsDefaultProtocolIfNoneIsIncluded()
     {

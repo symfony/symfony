@@ -1,12 +1,26 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
+ * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
+
+2.6.2
+-----
+
+ * Added back the `model_timezone` and `view_timezone` options for `TimeType`, `DateType`
+   and `BirthdayType`
+
 2.6.0
 -----
 
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
  * added "label_format" option with possible placeholders "%name%" and "%id%"
+ * [BC BREAK] drop support for model_timezone and view_timezone options in TimeType, DateType and BirthdayType,
+   update to 2.6.2 to get back support for these options
 
 2.5.0
 ------

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ClassLoader;
 
+trigger_error('The '.__NAMESPACE__.'\UniversalClassLoader class is deprecated since version 2.7 and will be removed in 3.0. Use the Symfony\Component\ClassLoader\ClassLoader class instead.', E_USER_DEPRECATED);
+
 /**
  * UniversalClassLoader implements a "universal" autoloader for PHP 5.3.
  *
@@ -57,6 +59,9 @@ namespace Symfony\Component\ClassLoader;
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @api
+ *
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use the {@link ClassLoader} class instead.
  */
 class UniversalClassLoader
 {
@@ -68,9 +73,9 @@ class UniversalClassLoader
 
     /**
      * Turns on searching the include for class files. Allows easy loading
-     * of installed PEAR packages
+     * of installed PEAR packages.
      *
-     * @param bool    $useIncludePath
+     * @param bool $useIncludePath
      */
     public function useIncludePath($useIncludePath)
     {
@@ -173,7 +178,7 @@ class UniversalClassLoader
     }
 
     /**
-     * Registers an array of namespaces
+     * Registers an array of namespaces.
      *
      * @param array $namespaces An array of namespaces (namespaces as keys and locations as values)
      *
@@ -229,7 +234,7 @@ class UniversalClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param bool    $prepend Whether to prepend the autoloader or not
+     * @param bool $prepend Whether to prepend the autoloader or not
      *
      * @api
      */
@@ -243,7 +248,7 @@ class UniversalClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return bool|null    True, if loaded
+     * @return bool|null True, if loaded
      */
     public function loadClass($class)
     {

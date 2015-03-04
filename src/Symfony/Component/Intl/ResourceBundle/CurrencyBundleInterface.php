@@ -21,9 +21,9 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
     /**
      * Returns the symbol used for a currency.
      *
-     * @param string $currency A currency code (e.g. "EUR").
-     * @param string $displayLocale   Optional. The locale to return the result in.
-     *                         Defaults to {@link \Locale::getDefault()}.
+     * @param string $currency      A currency code (e.g. "EUR").
+     * @param string $displayLocale Optional. The locale to return the result in.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The currency symbol or NULL if not found.
      */
@@ -32,9 +32,9 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
     /**
      * Returns the name of a currency.
      *
-     * @param string $currency A currency code (e.g. "EUR").
-     * @param string $displayLocale   Optional. The locale to return the name in.
-     *                         Defaults to {@link \Locale::getDefault()}.
+     * @param string $currency      A currency code (e.g. "EUR").
+     * @param string $displayLocale Optional. The locale to return the name in.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the currency or NULL if not found.
      */
@@ -44,7 +44,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      * Returns the names of all known currencies.
      *
      * @param string $displayLocale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getDefault()}.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of currency names indexed by currency codes.
      */
@@ -55,7 +55,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return int|null     The number of digits after the comma or NULL if not found.
+     * @return int|null The number of digits after the comma or NULL if not found.
      */
     public function getFractionDigits($currency);
 
@@ -68,7 +68,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return float|int|null     The rounding increment or NULL if not found.
+     * @return float|int|null The rounding increment or NULL if not found.
      */
     public function getRoundingIncrement($currency);
 }

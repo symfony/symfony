@@ -101,22 +101,12 @@ class TwigExtension extends Extension
             $config['extensions']
         );
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.xml');
-
-            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
-            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
-        }
-
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
-            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference($config['autoescape_service']), $config['autoescape_service_method'])));
-
-            unset($config['autoescape_service'], $config['autoescape_service_method']);
-        } elseif (!isset($config['autoescape'])) {
-            $container->findDefinition('templating.engine.twig')->addMethodCall('setDefaultEscapingStrategy', array(array(new Reference('templating.engine.twig'), 'guessDefaultEscapingStrategy')));
+            $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
         }
+        unset($config['autoescape_service'], $config['autoescape_service_method']);
 
-        $container->setParameter('twig.options', $config);
+        $container->getDefinition('twig')->replaceArgument(1, $config);
 
         $this->addClassesToCompile(array(
             'Twig_Environment',

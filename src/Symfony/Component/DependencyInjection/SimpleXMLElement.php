@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+trigger_error('The '.__NAMESPACE__.'\SimpleXMLElement method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -19,7 +21,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class SimpleXMLElement extends \SimpleXMLElement
 {
@@ -38,8 +40,8 @@ class SimpleXMLElement extends \SimpleXMLElement
     /**
      * Returns arguments as valid PHP types.
      *
-     * @param string  $name
-     * @param bool    $lowercase
+     * @param string $name
+     * @param bool   $lowercase
      *
      * @return mixed
      */

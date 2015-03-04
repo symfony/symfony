@@ -22,8 +22,8 @@ class Form extends Constraint
     const NO_SUCH_FIELD_ERROR = 2;
 
     /**
-     * @deprecated Deprecated since Symfony 2.6, to be removed in 3.0. Use
-     *             {@self NOT_SYNCHRONIZED_ERROR} instead.
+     * @deprecated since version 2.6, to be removed in 3.0.
+     *             Use {@self NOT_SYNCHRONIZED_ERROR} instead.
      */
     const ERR_INVALID = 1;
 

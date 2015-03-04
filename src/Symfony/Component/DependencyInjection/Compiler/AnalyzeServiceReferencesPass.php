@@ -36,7 +36,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * Constructor.
      *
-     * @param bool    $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
+     * @param bool $onlyConstructorArguments Sets this Service Reference pass to ignore method calls
      */
     public function __construct($onlyConstructorArguments = false)
     {
@@ -71,8 +71,11 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
             $this->currentDefinition = $definition;
 
             $this->processArguments($definition->getArguments());
-            if ($definition->getFactoryService()) {
-                $this->processArguments(array(new Reference($definition->getFactoryService())));
+            if ($definition->getFactoryService(false)) {
+                $this->processArguments(array(new Reference($definition->getFactoryService(false))));
+            }
+            if (is_array($definition->getFactory())) {
+                $this->processArguments($definition->getFactory());
             }
 
             if (!$this->onlyConstructorArguments) {
@@ -80,9 +83,6 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->processArguments($definition->getProperties());
                 if ($definition->getConfigurator()) {
                     $this->processArguments(array($definition->getConfigurator()));
-                }
-                if ($definition->getFactory()) {
-                    $this->processArguments(array($definition->getFactory()));
                 }
             }
         }
@@ -114,6 +114,13 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
                 $this->processArguments($argument->getArguments());
                 $this->processArguments($argument->getMethodCalls());
                 $this->processArguments($argument->getProperties());
+
+                if (is_array($argument->getFactory())) {
+                    $this->processArguments($argument->getFactory());
+                }
+                if ($argument->getFactoryService(false)) {
+                    $this->processArguments(array(new Reference($argument->getFactoryService(false))));
+                }
             }
         }
     }

@@ -1,6 +1,13 @@
 ﻿UPGRADE FROM 2.4 to 2.5
 =======================
 
+FrameworkBundle
+---------------
+
+* The `Symfony\Bundle\FrameworkBundle\Console\Descriptor\Descriptor::renderTable()`
+  method expects the table to be an instance of `Symfony\Component\Console\Helper\Table`
+  instead of `Symfony\Component\Console\Helper\TableHelper`.
+
 Routing
 -------
 

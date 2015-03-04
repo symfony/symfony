@@ -20,6 +20,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**
      * The variables assigned to this view.
+     *
      * @var array
      */
     public $vars = array(
@@ -29,12 +30,14 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
 
     /**
      * The parent view.
+     *
      * @var FormView
      */
     public $parent;
 
     /**
      * The child views.
+     *
      * @var FormView[]
      */
     public $children = array();
@@ -58,7 +61,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Returns whether the view was already rendered.
      *
-     * @return bool    Whether this view's widget is rendered.
+     * @return bool Whether this view's widget is rendered.
      */
     public function isRendered()
     {
@@ -138,7 +141,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns an iterator to iterate over children (implements \IteratorAggregate)
+     * Returns an iterator to iterate over children (implements \IteratorAggregate).
      *
      * @return \ArrayIterator The iterator
      */

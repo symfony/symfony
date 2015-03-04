@@ -13,13 +13,14 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
 {
     public function testOnlyClearOwnOutputBuffers()
     {
-        $flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
+        $flatten = $this->getMock('Symfony\Component\Debug\Exception\FlattenException');
         $flatten
             ->expects($this->once())
             ->method('getStatusCode')
@@ -39,30 +40,28 @@ class ExceptionControllerTest extends TestCase
         $request->headers->set('X-Php-Ob-Level', 1);
 
         $controller = new ExceptionController($twig, false);
-        $controller->showAction($request, $flatten);
+        $response = $controller->showAction($request, $flatten);
+        $this->assertEquals('UTF-8', $response->getCharset(), 'Request charset is explicitly set to UTF-8');
     }
 
-    public function testErrorPagesInDebugMode()
+    public function testShowActionCanBeForcedToShowErrorPage()
     {
         $twig = new \Twig_Environment(
             new \Twig_Loader_Array(array(
-                'TwigBundle:Exception:error404.html.twig' => '
-                    {%- if exception is defined and status_text is defined and status_code is defined -%}
-                        OK
-                    {%- else -%}
-                        "exception" variable is missing
-                    {%- endif -%}
-                ',
+                'TwigBundle:Exception:error404.html.twig' => 'ok',
             ))
         );
 
-        $request = Request::create('whatever');
+        $request = Request::create('whatever', 'GET');
+        $request->headers->set('X-Php-Ob-Level', 1);
+        $request->attributes->set('showException', false);
+        $exception = FlattenException::create(new \Exception(), 404);
+        $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
 
-        $controller = new ExceptionController($twig, /* "debug" set to --> */ true);
-        $response = $controller->testErrorPageAction($request, 404);
+        $response = $controller->showAction($request, $exception, null);
 
         $this->assertEquals(200, $response->getStatusCode()); // successful request
-        $this->assertEquals('OK', $response->getContent());  // content of the error404.html template
+        $this->assertEquals('ok', $response->getContent());  // content of the error404.html template
     }
 
     public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
@@ -74,10 +73,12 @@ class ExceptionControllerTest extends TestCase
         );
 
         $request = Request::create('whatever');
+        $request->headers->set('X-Php-Ob-Level', 1);
         $request->setRequestFormat('txt');
-
+        $exception = FlattenException::create(new \Exception());
         $controller = new ExceptionController($twig, false);
-        $response = $controller->testErrorPageAction($request, 42);
+
+        $response = $controller->showAction($request, $exception);
 
         $this->assertEquals('html', $request->getRequestFormat());
     }

@@ -16,7 +16,7 @@ use Symfony\Component\ClassLoader\ClassMapGenerator;
 class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var string $workspace
+     * @var string|null
      */
     private $workspace = null;
 
@@ -104,7 +104,7 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
             )),
         );
 
-        if (version_compare(PHP_VERSION, '5.4', '>=')) {
+        if (PHP_VERSION_ID >= 50400) {
             $data[] = array(__DIR__.'/Fixtures/php5.4', array(
                 'TFoo' => __DIR__.'/Fixtures/php5.4/traits.php',
                 'CFoo' => __DIR__.'/Fixtures/php5.4/traits.php',

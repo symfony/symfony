@@ -15,7 +15,7 @@ use Symfony\Component\Translation\PluralizationRules;
 
 /**
  * Test should cover all languages mentioned on http://translate.sourceforge.net/wiki/l10n/pluralforms
- * and Plural forms mentioned on http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms
+ * and Plural forms mentioned on http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms.
  *
  * See also https://developer.mozilla.org/en/Localization_and_Plurals which mentions 15 rules having a maximum of 6 forms.
  * The mozilla code is also interesting to check for.
@@ -55,18 +55,18 @@ class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
      *
      * As it is impossible to have this ever complete we should try as hard as possible to have it almost complete.
      *
-     * @return type
+     * @return array
      */
     public function successLangcodes()
     {
         return array(
-        array('1' , array('ay','bo', 'cgg','dz','id', 'ja', 'jbo', 'ka','kk','km','ko','ky')),
-        array('2' , array('nl', 'fr', 'en', 'de', 'de_GE')),
-        array('3' , array('be','bs','cs','hr')),
-        array('4' , array('cy','mt', 'sl')),
-        array('5' , array()),
-        array('6' , array('ar')),
-      );
+            array('1', array('ay','bo', 'cgg','dz','id', 'ja', 'jbo', 'ka','kk','km','ko','ky')),
+            array('2', array('nl', 'fr', 'en', 'de', 'de_GE')),
+            array('3', array('be','bs','cs','hr')),
+            array('4', array('cy','mt', 'sl')),
+            array('5', array()),
+            array('6', array('ar')),
+        );
     }
 
     /**
@@ -80,21 +80,21 @@ class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
     public function failingLangcodes()
     {
         return array(
-        array('1' , array('fa')),
-        array('2' , array('jbo')),
-        array('3' , array('cbs')),
-        array('4' , array('gd','kw')),
-        array('5' , array('ga')),
-        array('6' , array()),
-      );
+            array('1', array('fa')),
+            array('2', array('jbo')),
+            array('3', array('cbs')),
+            array('4', array('gd','kw')),
+            array('5', array('ga')),
+            array('6', array()),
+        );
     }
 
     /**
      * We validate only on the plural coverage. Thus the real rules is not tested.
      *
-     * @param string  $nplural       plural expected
-     * @param array   $matrix        containing langcodes and their plural index values.
-     * @param bool    $expectSuccess
+     * @param string $nplural       plural expected
+     * @param array  $matrix        containing langcodes and their plural index values.
+     * @param bool   $expectSuccess
      */
     protected function validateMatrix($nplural, $matrix, $expectSuccess = true)
     {
@@ -112,7 +112,7 @@ class PluralizationRulesTest  extends \PHPUnit_Framework_TestCase
     {
         $matrix = array();
         foreach ($langCodes as $langCode) {
-            for ($count = 0; $count<200; $count++) {
+            for ($count = 0; $count < 200; $count++) {
                 $plural = PluralizationRules::get($count, $langCode);
                 $matrix[$langCode][$count] = $plural;
             }

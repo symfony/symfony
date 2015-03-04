@@ -57,19 +57,19 @@ templates and translation files of a given bundle.
 
 You can display information about bundle translations in a specific locale:
 
-<info>php %command.full_name% en AcmeDemoBundle</info>
+  <info>php %command.full_name% en AcmeDemoBundle</info>
 
 You can also specify a translation domain for the search:
 
-<info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+  <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
 
 You can only display missing messages:
 
-<info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
+  <info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
 
 You can only display unused messages:
 
-<info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
+  <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
 EOF
             )
@@ -81,6 +81,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.</comment>');
+        }
+
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
         $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));

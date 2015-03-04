@@ -10,7 +10,7 @@
  */
 
 /**
- * SessionHandlerInterface for PHP < 5.4
+ * SessionHandlerInterface for PHP < 5.4.
  *
  * The order in which these methods are invoked by PHP are:
  * 1. open [session_start]

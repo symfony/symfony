@@ -19,19 +19,19 @@ namespace Symfony\Component\HttpFoundation;
 class IpUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
     }
 
     /**
-     * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets
+     * Checks if an IPv4 or IPv6 address is contained in the list of given IPs or subnets.
      *
-     * @param string       $requestIp   IP to check
-     * @param string|array $ips         List of IPs or subnets (can be a string if only a single one)
+     * @param string       $requestIp IP to check
+     * @param string|array $ips       List of IPs or subnets (can be a string if only a single one)
      *
-     * @return bool    Whether the IP is valid
+     * @return bool Whether the IP is valid
      */
     public static function checkIp($requestIp, $ips)
     {
@@ -39,7 +39,7 @@ class IpUtils
             $ips = array($ips);
         }
 
-        $method = false !== strpos($requestIp, ':') ? 'checkIp6' : 'checkIp4';
+        $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
 
         foreach ($ips as $ip) {
             if (self::$method($requestIp, $ip)) {
@@ -57,7 +57,7 @@ class IpUtils
      * @param string $requestIp IPv4 address to check
      * @param string $ip        IPv4 address or subnet in CIDR notation
      *
-     * @return bool    Whether the IP is valid
+     * @return bool Whether the IP is valid
      */
     public static function checkIp4($requestIp, $ip)
     {
@@ -80,12 +80,13 @@ class IpUtils
      * In case a subnet is given, it checks if it contains the request IP.
      *
      * @author David Soria Parra <dsp at php dot net>
+     *
      * @see https://github.com/dsp/v6tools
      *
      * @param string $requestIp IPv6 address to check
      * @param string $ip        IPv6 address or subnet in CIDR notation
      *
-     * @return bool    Whether the IP is valid
+     * @return bool Whether the IP is valid
      *
      * @throws \RuntimeException When IPV6 support is not enabled
      */

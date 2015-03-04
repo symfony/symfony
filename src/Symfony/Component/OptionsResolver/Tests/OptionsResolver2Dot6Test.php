@@ -33,7 +33,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The option "foo" does not exist. Known options are: "a", "z".
+     * @expectedExceptionMessage The option "foo" does not exist. Defined options are: "a", "z".
      */
     public function testResolveFailsIfNonExistingOption()
     {
@@ -45,7 +45,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Known options are: "a", "z".
+     * @expectedExceptionMessage The options "baz", "foo", "ping" do not exist. Defined options are: "a", "z".
      */
     public function testResolveFailsIfMultipleNonExistingOptions()
     {
@@ -111,22 +111,6 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->resolver->hasDefault('foo'));
         $this->resolver->setDefault('foo', null);
         $this->assertTrue($this->resolver->hasDefault('foo'));
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // overload()
-    ////////////////////////////////////////////////////////////////////////////
-
-    public function testOverloadReturnsThis()
-    {
-        $this->assertSame($this->resolver, $this->resolver->overload('foo', 'bar'));
-    }
-
-    public function testOverloadCallsSet()
-    {
-        $this->resolver->overload('foo', 'bar');
-
-        $this->assertSame(array('foo' => 'bar'), $this->resolver->resolve());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -520,7 +504,19 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
      */
     public function testResolveFailsIfInvalidType()
     {
-        $this->resolver->setDefault('foo', 42);
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string');
+
+        $this->resolver->resolve(array('foo' => 42));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value null is expected to be of type "string", but is of type "NULL".
+     */
+    public function testResolveFailsIfInvalidTypeIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
         $this->resolver->setAllowedTypes('foo', 'string');
 
         $this->resolver->resolve();
@@ -691,7 +687,19 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
      */
     public function testResolveFailsIfInvalidValue()
     {
-        $this->resolver->setDefault('foo', 42);
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedValues('foo', 'bar');
+
+        $this->resolver->resolve(array('foo' => 42));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value null is invalid. Accepted values are: "bar".
+     */
+    public function testResolveFailsIfInvalidValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->resolver->resolve();
@@ -714,6 +722,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfValidValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
     }
 
     /**
@@ -837,6 +853,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->addAllowedValues('foo', 'bar');
 
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfValidAddedValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->addAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
     }
 
     /**
@@ -1405,7 +1429,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @expectedExceptionMessage The option "undefined" does not exist. Known options are: "foo", "lazy".
+     * @expectedExceptionMessage The option "undefined" does not exist. Defined options are: "foo", "lazy".
      */
     public function testFailIfGetNonExisting()
     {

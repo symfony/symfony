@@ -36,11 +36,11 @@ class ServerStopCommand extends ServerCommand
             ->setHelp(<<<EOF
 The <info>%command.name%</info> stops PHP's built-in web server:
 
-  <info>%command.full_name%</info>
+  <info>php %command.full_name%</info>
 
 To change the default bind address and the default port use the <info>address</info> argument:
 
-  <info>%command.full_name% 127.0.0.1:8080</info>
+  <info>php %command.full_name% 127.0.0.1:8080</info>
 
 EOF
             )

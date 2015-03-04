@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\TwigBundle\Debug;
 
+trigger_error('The '.__NAMESPACE__.'\TimedTwigEngine class is deprecated since version 2.7 and will be removed in 3.0. Use the Twig native profiler instead.', E_USER_DEPRECATED);
+
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -20,6 +22,8 @@ use Symfony\Component\Config\FileLocatorInterface;
  * Times the time spent to render a template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0. Use the Twig native profiler instead.
  */
 class TimedTwigEngine extends TwigEngine
 {

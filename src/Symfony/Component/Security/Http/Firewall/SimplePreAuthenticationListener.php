@@ -11,16 +11,19 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SimplePreAuthenticationListener implements simple proxying to an authenticator.
@@ -29,32 +32,35 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
  */
 class SimplePreAuthenticationListener implements ListenerInterface
 {
-    private $securityContext;
+    private $tokenStorage;
     private $authenticationManager;
     private $providerKey;
     private $simpleAuthenticator;
     private $logger;
+    private $dispatcher;
 
     /**
      * Constructor.
      *
-     * @param SecurityContextInterface         $securityContext       A SecurityContext instance
-     * @param AuthenticationManagerInterface   $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                           $providerKey
-     * @param SimplePreAuthenticatorInterface  $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
-     * @param LoggerInterface                  $logger                A LoggerInterface instance
+     * @param TokenStorageInterface           $tokenStorage          A TokenStorageInterface instance
+     * @param AuthenticationManagerInterface  $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                          $providerKey
+     * @param SimplePreAuthenticatorInterface $simpleAuthenticator   A SimplePreAuthenticatorInterface instance
+     * @param LoggerInterface                 $logger                A LoggerInterface instance
+     * @param EventDispatcherInterface        $dispatcher            An EventDispatcherInterface instance
      */
-    public function __construct(SecurityContextInterface $securityContext, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, SimplePreAuthenticatorInterface $simpleAuthenticator, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
         $this->providerKey = $providerKey;
         $this->simpleAuthenticator = $simpleAuthenticator;
         $this->logger = $logger;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -67,10 +73,10 @@ class SimplePreAuthenticationListener implements ListenerInterface
         $request = $event->getRequest();
 
         if (null !== $this->logger) {
-            $this->logger->info(sprintf('Attempting simple pre-authorization %s', $this->providerKey));
+            $this->logger->info('Attempting SimplePreAuthentication.', array('key' => $this->providerKey, 'authenticator' => get_class($this->simpleAuthenticator)));
         }
 
-        if (null !== $this->securityContext->getToken() && !$this->securityContext->getToken() instanceof AnonymousToken) {
+        if (null !== $this->tokenStorage->getToken() && !$this->tokenStorage->getToken() instanceof AnonymousToken) {
             return;
         }
 
@@ -83,12 +89,17 @@ class SimplePreAuthenticationListener implements ListenerInterface
             }
 
             $token = $this->authenticationManager->authenticate($token);
-            $this->securityContext->setToken($token);
+            $this->tokenStorage->setToken($token);
+
+            if (null !== $this->dispatcher) {
+                $loginEvent = new InteractiveLoginEvent($request, $token);
+                $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+            }
         } catch (AuthenticationException $e) {
-            $this->securityContext->setToken(null);
+            $this->tokenStorage->setToken(null);
 
             if (null !== $this->logger) {
-                $this->logger->info(sprintf('Authentication request failed: %s', $e->getMessage()));
+                $this->logger->info('SimplePreAuthentication request failed.', array('exception' => $e, 'authenticator' => get_class($this->simpleAuthenticator)));
             }
 
             if ($this->simpleAuthenticator instanceof AuthenticationFailureHandlerInterface) {

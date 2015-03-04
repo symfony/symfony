@@ -122,6 +122,8 @@ class XmlFileLoader extends FileLoader
                 throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
             }
 
+            trigger_error('The "pattern" is deprecated since version 2.2 and will be removed in 3.0. Use the "path" option in the route definition instead.', E_USER_DEPRECATED);
+
             $node->setAttribute('path', $node->getAttribute('pattern'));
             $node->removeAttribute('pattern');
         }

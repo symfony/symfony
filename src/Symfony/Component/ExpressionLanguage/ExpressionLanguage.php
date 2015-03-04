@@ -32,7 +32,7 @@ class ExpressionLanguage
     protected $functions = array();
 
     /**
-     * @param ParserCacheInterface $cache
+     * @param ParserCacheInterface                  $cache
      * @param ExpressionFunctionProviderInterface[] $providers
      */
     public function __construct(ParserCacheInterface $cache = null, array $providers = array())

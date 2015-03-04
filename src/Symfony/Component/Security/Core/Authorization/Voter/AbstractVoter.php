@@ -54,7 +54,7 @@ abstract class AbstractVoter implements VoterInterface
      * @param object         $object     The object to secure
      * @param array          $attributes An array of attributes associated with the method being invoked
      *
-     * @return int     either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
+     * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
@@ -85,14 +85,14 @@ abstract class AbstractVoter implements VoterInterface
     /**
      * Return an array of supported classes. This will be called by supportsClass
      *
-     * @return array    an array of supported classes, i.e. array('Acme\DemoBundle\Model\Product')
+     * @return array an array of supported classes, i.e. array('Acme\DemoBundle\Model\Product')
      */
     abstract protected function getSupportedClasses();
 
     /**
      * Return an array of supported attributes. This will be called by supportsAttribute
      *
-     * @return array    an array of supported attributes, i.e. array('CREATE', 'READ')
+     * @return array an array of supported attributes, i.e. array('CREATE', 'READ')
      */
     abstract protected function getSupportedAttributes();
 

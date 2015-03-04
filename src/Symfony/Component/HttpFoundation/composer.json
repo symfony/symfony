@@ -16,10 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/expression-language": "~2.4"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/expression-language": "~2.4|~3.0.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpFoundation\\": "" },

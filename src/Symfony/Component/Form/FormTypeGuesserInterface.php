@@ -17,7 +17,7 @@ namespace Symfony\Component\Form;
 interface FormTypeGuesserInterface
 {
     /**
-     * Returns a field guess for a property name of a class
+     * Returns a field guess for a property name of a class.
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
@@ -27,7 +27,7 @@ interface FormTypeGuesserInterface
     public function guessType($class, $property);
 
     /**
-     * Returns a guess whether a property of a class is required
+     * Returns a guess whether a property of a class is required.
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
@@ -37,7 +37,7 @@ interface FormTypeGuesserInterface
     public function guessRequired($class, $property);
 
     /**
-     * Returns a guess about the field's maximum length
+     * Returns a guess about the field's maximum length.
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
@@ -47,12 +47,13 @@ interface FormTypeGuesserInterface
     public function guessMaxLength($class, $property);
 
     /**
-     * Returns a guess about the field's pattern
+     * Returns a guess about the field's pattern.
      *
      * - When you have a min value, you guess a min length of this min (LOW_CONFIDENCE) , lines below
      * - If this value is a float type, this is wrong so you guess null with MEDIUM_CONFIDENCE to override the previous guess.
      * Example:
      *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
+     *
      * @link https://github.com/symfony/symfony/pull/3927
      *
      * @param string $class    The fully qualified class name

@@ -29,14 +29,14 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 interface ChoiceListInterface
 {
     /**
-     * Returns the list of choices
+     * Returns the list of choices.
      *
      * @return array The choices with their indices as keys
      */
     public function getChoices();
 
     /**
-     * Returns the values for the choices
+     * Returns the values for the choices.
      *
      * @return array The values with the corresponding choice indices as keys
      */
@@ -88,7 +88,7 @@ interface ChoiceListInterface
      *               choice indices as keys on the lowest levels and the choice
      *               group names in the keys of the higher levels
      *
-     * @see getPreferredValues
+     * @see getPreferredValues()
      */
     public function getRemainingViews();
 
@@ -139,7 +139,7 @@ interface ChoiceListInterface
      *
      * @return array An array of indices with ascending, 0-based numeric keys
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices);
 
@@ -159,7 +159,7 @@ interface ChoiceListInterface
      *
      * @return array An array of indices with ascending, 0-based numeric keys
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values);
 }

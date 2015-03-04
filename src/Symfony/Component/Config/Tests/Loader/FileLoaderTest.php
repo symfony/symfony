@@ -13,7 +13,6 @@ namespace Symfony\Component\Config\Tests\Loader;
 
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 
 class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {

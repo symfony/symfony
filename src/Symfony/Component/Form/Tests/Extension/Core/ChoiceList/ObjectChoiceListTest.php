@@ -185,8 +185,10 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         );
     }
 
-    public function testGetIndicesForChoicesWithValuePath()
+    public function testLegacyGetIndicesForChoicesWithValuePath()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
             'name',
@@ -200,8 +202,10 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testGetIndicesForChoicesWithValuePathPreservesKeys()
+    public function testLegacyGetIndicesForChoicesWithValuePathPreservesKeys()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
             'name',
@@ -214,8 +218,10 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testGetIndicesForChoicesWithValuePathPreservesOrder()
+    public function testLegacyGetIndicesForChoicesWithValuePathPreservesOrder()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
             'name',
@@ -228,8 +234,10 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testGetIndicesForChoicesWithValuePathIgnoresNonExistingChoices()
+    public function testLegacyGetIndicesForChoicesWithValuePathIgnoresNonExistingChoices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
             'name',

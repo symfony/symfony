@@ -12,10 +12,8 @@
 namespace Symfony\Component\Form\Tests;
 
 use Symfony\Component\Form\ResolvedFormType;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\Form;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -58,15 +56,11 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOptionsResolver()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $test = $this;
         $i = 0;
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
-            return function (OptionsResolverInterface $resolver) use (&$i, $test, $index, $option, $default) {
+            return function (OptionsResolver $resolver) use (&$i, $test, $index, $option, $default) {
                 /* @var \PHPUnit_Framework_TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
@@ -78,21 +72,21 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         // First the default options are generated for the super type
         $this->parentType->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->will($this->returnCallback($assertIndexAndAddOption(0, 'a', 'a_default')));
 
         // The form type itself
         $this->type->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->will($this->returnCallback($assertIndexAndAddOption(1, 'b', 'b_default')));
 
         // And its extensions
         $this->extension1->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->will($this->returnCallback($assertIndexAndAddOption(2, 'c', 'c_default')));
 
         $this->extension2->expects($this->once())
-            ->method('setDefaultOptions')
+            ->method('configureOptions')
             ->will($this->returnCallback($assertIndexAndAddOption(3, 'd', 'd_default')));
 
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
@@ -105,10 +99,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilder()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
@@ -137,10 +127,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderWithDataClassOption()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
         $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
@@ -169,10 +155,6 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        if (version_compare(\PHPUnit_Runner_Version::id(), '3.7', '<')) {
-            $this->markTestSkipped('This test requires PHPUnit 3.7.');
-        }
-
         $test = $this;
         $i = 0;
 
@@ -328,7 +310,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormType()
     {
-        return $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        return $this->getMock('Symfony\Component\Form\AbstractType', array('getName', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
     }
 
     /**
@@ -336,7 +318,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormTypeExtension()
     {
-        return $this->getMock('Symfony\Component\Form\FormTypeExtensionInterface');
+        return $this->getMock('Symfony\Component\Form\AbstractTypeExtension', array('getExtendedType', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
     }
 
     /**
@@ -349,7 +331,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @param array $options
+     * @param array  $options
      *
      * @return FormBuilder
      */

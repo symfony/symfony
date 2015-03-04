@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
+trigger_error('The '.__NAMESPACE__.'\RegisterListenersPass is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass as BaseRegisterListenersPass;
 
 /**
  * Compiler pass to register tagged services for an event dispatcher.
  *
- * @deprecated Deprecated in 2.5, to be removed in 3.0. Use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass instead.
+ * @deprecated since version 2.5, to be removed in 3.0. Use the Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass class instead.
  */
 class RegisterListenersPass extends BaseRegisterListenersPass
 {

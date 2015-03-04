@@ -42,6 +42,8 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         parent::setUp();
 
         $this->validator = $this->createValidator($this->metadataFactory);
@@ -164,11 +166,11 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->assertCount(1, $violations);
         $this->assertSame('Message value', $violations[0]->getMessage());
         $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getParameters());
         $this->assertSame('subpath', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getPlural());
         $this->assertNull($violations[0]->getCode());
     }
 
@@ -222,11 +224,11 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->assertCount(1, $violations);
         $this->assertSame('Message value', $violations[0]->getMessage());
         $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getParameters());
         $this->assertSame('subpath[key]', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame($entity->reference, $violations[0]->getInvalidValue());
-        $this->assertNull($violations[0]->getMessagePluralization());
+        $this->assertNull($violations[0]->getPlural());
         $this->assertNull($violations[0]->getCode());
     }
 
@@ -252,11 +254,11 @@ abstract class AbstractLegacyApiTest extends AbstractValidatorTest
         $this->assertCount(1, $violations);
         $this->assertSame('Message value', $violations[0]->getMessage());
         $this->assertSame('Message %param%', $violations[0]->getMessageTemplate());
-        $this->assertSame(array('%param%' => 'value'), $violations[0]->getMessageParameters());
+        $this->assertSame(array('%param%' => 'value'), $violations[0]->getParameters());
         $this->assertSame('', $violations[0]->getPropertyPath());
         $this->assertSame($entity, $violations[0]->getRoot());
         $this->assertSame('Invalid value', $violations[0]->getInvalidValue());
-        $this->assertSame(2, $violations[0]->getMessagePluralization());
+        $this->assertSame(2, $violations[0]->getPlural());
         $this->assertSame('Code', $violations[0]->getCode());
     }
 

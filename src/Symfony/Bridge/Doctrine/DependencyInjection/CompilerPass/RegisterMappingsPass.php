@@ -35,12 +35,14 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * DI object for the driver to use, either a service definition for a
      * private service or a reference for a public service.
+     *
      * @var Definition|Reference
      */
     protected $driver;
 
     /**
-     * List of namespaces handled by the driver
+     * List of namespaces handled by the driver.
+     *
      * @var string[]
      */
     protected $namespaces;
@@ -48,14 +50,16 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
     /**
      * List of potential container parameters that hold the object manager name
      * to register the mappings with the correct metadata driver, for example
-     * array('acme.manager', 'doctrine.default_entity_manager')
+     * array('acme.manager', 'doctrine.default_entity_manager').
+     *
      * @var string[]
      */
     protected $managerParameters;
 
     /**
      * Naming pattern of the metadata chain driver service ids, for example
-     * 'doctrine.orm.%s_metadata_driver'
+     * 'doctrine.orm.%s_metadata_driver'.
+     *
      * @var string
      */
     protected $driverPattern;
@@ -64,6 +68,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * A name for a parameter in the container. If set, this compiler pass will
      * only do anything if the parameter is present. (But regardless of the
      * value of that parameter.
+     *
      * @var string
      */
     protected $enabledParameter;
@@ -168,7 +173,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @return string The name of the chain driver service
      *
      * @throws ParameterNotFoundException if non of the managerParameters has a
-     *      non-empty value.
+     *                                    non-empty value.
      */
     protected function getChainDriverServiceName(ContainerBuilder $container)
     {
@@ -179,7 +184,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Create the service definition for the metadata driver.
      *
      * @param ContainerBuilder $container passed on in case an extending class
-     *      needs access to the container.
+     *                                    needs access to the container.
      *
      * @return Definition|Reference the metadata driver to add to all chain drivers
      */
@@ -196,7 +201,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @return string a service definition name
      *
      * @throws ParameterNotFoundException if none of the managerParameters has a
-     *      non-empty value.
+     *                                    non-empty value.
      */
     private function getConfigurationServiceName(ContainerBuilder $container)
     {

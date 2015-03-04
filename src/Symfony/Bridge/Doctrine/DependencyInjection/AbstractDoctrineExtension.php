@@ -129,11 +129,11 @@ abstract class AbstractDoctrineExtension extends Extension
      */
     protected function setMappingDriverConfig(array $mappingConfig, $mappingName)
     {
-        if (is_dir($mappingConfig['dir'])) {
-            $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
-        } else {
+        if (!is_dir($mappingConfig['dir'])) {
             throw new \InvalidArgumentException(sprintf('Invalid Doctrine mapping path given. Cannot load Doctrine mapping/bundle named "%s".', $mappingName));
         }
+
+        $this->drivers[$mappingConfig['type']][$mappingConfig['prefix']] = realpath($mappingConfig['dir']);
     }
 
     /**
@@ -310,10 +310,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a cache driver.
      *
-     * @param string                                                    $cacheDriverServiceId   The cache driver name.
-     * @param string                                                    $objectManagerName      The object manager name.
-     * @param array                                                     $cacheDriver            The cache driver mapping.
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder   $container              The ContainerBuilder instance.
+     * @param string                                                  $cacheDriverServiceId The cache driver name.
+     * @param string                                                  $objectManagerName    The object manager name.
+     * @param array                                                   $cacheDriver          The cache driver mapping.
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container            The ContainerBuilder instance.
      *
      * @return string
      *
@@ -398,9 +398,12 @@ abstract class AbstractDoctrineExtension extends Extension
 
     /**
      * Returns a modified version of $managerConfigs.
+     *
      * The manager called $autoMappedManager will map all bundles that are not mepped by other managers.
+     *
      * @param array $managerConfigs
      * @param array $bundles
+     *
      * @return array The modified version of $managerConfigs.
      */
     protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)

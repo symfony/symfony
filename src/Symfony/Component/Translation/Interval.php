@@ -36,8 +36,8 @@ class Interval
     /**
      * Tests if the given number is in the math interval.
      *
-     * @param int     $number   A number
-     * @param string  $interval An interval
+     * @param int    $number   A number
+     * @param string $interval An interval
      *
      * @return bool
      *

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Acl\Model\FieldEntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
- * Field-aware ACE implementation which is auditable
+ * Field-aware ACE implementation which is auditable.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -25,7 +25,7 @@ class FieldEntry extends Entry implements FieldEntryInterface
     private $field;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int                       $id
      * @param AclInterface              $acl

@@ -13,14 +13,15 @@ namespace Symfony\Component\PropertyAccess;
 
 /**
  * Traverses a property path and provides additional methods to find out
- * information about the current element
+ * information about the current element.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class PropertyPathIterator extends \ArrayIterator implements PropertyPathIteratorInterface
 {
     /**
-     * The traversed property path
+     * The traversed property path.
+     *
      * @var PropertyPathInterface
      */
     protected $path;

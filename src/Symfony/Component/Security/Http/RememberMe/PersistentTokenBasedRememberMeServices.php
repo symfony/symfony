@@ -52,7 +52,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
     }
 
     /**
-     * Sets the token provider
+     * Sets the token provider.
      *
      * @param TokenProviderInterface $tokenProvider
      */
@@ -73,7 +73,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         if (null !== ($cookie = $request->cookies->get($this->options['name']))
             && count($parts = $this->decodeCookie($cookie)) === 2
         ) {
-            list($series, $tokenValue) = $parts;
+            list($series) = $parts;
             $this->tokenProvider->deleteTokenBySeries($series);
         }
     }

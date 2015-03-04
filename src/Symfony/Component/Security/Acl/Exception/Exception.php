@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Exception;
 
 /**
- * Base ACL exception
+ * Base ACL exception.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

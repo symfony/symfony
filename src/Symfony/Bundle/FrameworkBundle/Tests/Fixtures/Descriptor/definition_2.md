@@ -2,7 +2,12 @@
 - Scope: `container`
 - Public: no
 - Synthetic: yes
+- Lazy: no
+- Synchronized: no
+- Abstract: no
 - File: `/path/to/file`
+- Factory Service: `factory.service`
+- Factory Method: `get`
 - Tag: `tag1`
     - Attr1: val1
     - Attr2: val2

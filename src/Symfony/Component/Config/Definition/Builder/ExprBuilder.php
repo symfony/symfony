@@ -26,7 +26,7 @@ class ExprBuilder
     public $thenPart;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param NodeDefinition $node The related node
      */
@@ -196,7 +196,7 @@ class ExprBuilder
     }
 
     /**
-     * Returns the related node
+     * Returns the related node.
      *
      * @return NodeDefinition
      *
@@ -225,8 +225,10 @@ class ExprBuilder
     {
         foreach ($expressions as $k => $expr) {
             if ($expr instanceof ExprBuilder) {
-                $expressions[$k] = function ($v) use ($expr) {
-                    return call_user_func($expr->ifPart, $v) ? call_user_func($expr->thenPart, $v) : $v;
+                $if = $expr->ifPart;
+                $then = $expr->thenPart;
+                $expressions[$k] = function ($v) use ($if, $then) {
+                    return $if($v) ? $then($v) : $v;
                 };
             }
         }

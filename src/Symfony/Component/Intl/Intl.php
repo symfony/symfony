@@ -11,15 +11,11 @@
 
 namespace Symfony\Component\Intl;
 
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BufferedBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\PhpBundleReader;
 use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
-use Symfony\Component\Intl\Exception\InvalidArgumentException;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundle;
 use Symfony\Component\Intl\ResourceBundle\CurrencyBundleInterface;
 use Symfony\Component\Intl\ResourceBundle\LanguageBundle;
@@ -266,20 +262,6 @@ final class Intl
         }
 
         return self::$entryReader;
-    }
-
-    /**
-     * Resets the internal state.
-     */
-    private static function reset()
-    {
-        self::$currencyBundle = null;
-        self::$languageBundle = null;
-        self::$localeBundle = null;
-        self::$regionBundle = null;
-        self::$icuVersion = false;
-        self::$icuDataVersion = false;
-        self::$entryReader = null;
     }
 
     /**

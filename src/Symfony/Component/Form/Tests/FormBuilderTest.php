@@ -16,9 +16,7 @@ use Symfony\Component\Form\FormBuilder;
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
-
     private $factory;
-
     private $builder;
 
     protected function setUp()
@@ -37,9 +35,9 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Changing the name is not allowed, otherwise the name and property path
-     * are not synchronized anymore
+     * are not synchronized anymore.
      *
-     * @see FormType::buildForm
+     * @see FormType::buildForm()
      */
     public function testNoSetName()
     {

@@ -84,7 +84,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Convert a UTF8 string to the specified encoding
+     * Convert a UTF8 string to the specified encoding.
      *
      * @param string $content  String to decode
      * @param string $encoding Target encoding
@@ -109,7 +109,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Validates and parses the given file into a SimpleXMLElement
+     * Validates and parses the given file into a SimpleXMLElement.
      *
      * @param string $file
      *
@@ -157,7 +157,7 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Returns the XML errors of the internal XML parser
+     * Returns the XML errors of the internal XML parser.
      *
      * @param bool $internalErrors
      *

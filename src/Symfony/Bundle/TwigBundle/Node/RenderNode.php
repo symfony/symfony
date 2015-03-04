@@ -15,6 +15,8 @@ namespace Symfony\Bundle\TwigBundle\Node;
  * Represents a render node.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.2, to be removed in 3.0.
  */
 class RenderNode extends \Twig_Node
 {

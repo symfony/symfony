@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
 {
@@ -34,7 +34,7 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             // default precision is locale specific (usually around 3)
@@ -45,16 +45,14 @@ class IntegerType extends AbstractType
             'compound' => false,
         ));
 
-        $resolver->setAllowedValues(array(
-            'rounding_mode' => array(
-                IntegerToLocalizedStringTransformer::ROUND_FLOOR,
-                IntegerToLocalizedStringTransformer::ROUND_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
-                IntegerToLocalizedStringTransformer::ROUND_UP,
-                IntegerToLocalizedStringTransformer::ROUND_CEILING,
-            ),
+        $resolver->setAllowedValues('rounding_mode', array(
+            IntegerToLocalizedStringTransformer::ROUND_FLOOR,
+            IntegerToLocalizedStringTransformer::ROUND_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
+            IntegerToLocalizedStringTransformer::ROUND_UP,
+            IntegerToLocalizedStringTransformer::ROUND_CEILING,
         ));
     }
 

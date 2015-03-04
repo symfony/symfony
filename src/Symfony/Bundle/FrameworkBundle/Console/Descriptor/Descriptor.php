@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
-use Symfony\Component\Console\Helper\TableHelper;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,6 +24,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 abstract class Descriptor implements DescriptorInterface
 {
@@ -79,10 +81,20 @@ abstract class Descriptor implements DescriptorInterface
     }
 
     /**
+     * Returns the output.
+     *
+     * @return OutputInterface The output
+     */
+    protected function getOutput()
+    {
+        return $this->output;
+    }
+
+    /**
      * Writes content to output.
      *
-     * @param string  $content
-     * @param bool    $decorated
+     * @param string $content
+     * @param bool   $decorated
      */
     protected function write($content, $decorated = false)
     {
@@ -92,17 +104,18 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Writes content to output.
      *
-     * @param TableHelper $table
-     * @param bool        $decorated
+     * @param Table $table
+     * @param bool  $decorated
      */
-    protected function renderTable(TableHelper $table, $decorated = false)
+    protected function renderTable(Table $table, $decorated = false)
     {
         if (!$decorated) {
-            $table->setCellRowFormat('%s');
-            $table->setCellHeaderFormat('%s');
+            $table->getStyle()->setCellRowFormat('%s');
+            $table->getStyle()->setCellRowContentFormat('%s');
+            $table->getStyle()->setCellHeaderFormat('%s');
         }
 
-        $table->render($this->output);
+        $table->render();
     }
 
     /**
@@ -189,16 +202,16 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * name: name of listened event
      *
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param array                     $options
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param array                    $options
      */
     abstract protected function describeEventDispatcherListeners(EventDispatcherInterface $eventDispatcher, array $options = array());
 
     /**
      * Describes a callable.
      *
-     * @param callable  $callable
-     * @param array     $options
+     * @param callable $callable
+     * @param array    $options
      */
     abstract protected function describeCallable($callable, array $options = array());
 

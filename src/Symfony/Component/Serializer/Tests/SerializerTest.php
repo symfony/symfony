@@ -73,6 +73,15 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->serializer->denormalize(json_encode($data), 'stdClass', 'json'));
     }
 
+    public function testCustomNormalizerCanNormalizeCollectionsAndScalar()
+    {
+        $this->serializer = new Serializer(array(new TestNormalizer()), array());
+        $this->assertNull($this->serializer->normalize(array('a', 'b')));
+        $this->assertNull($this->serializer->normalize(new \ArrayObject(array('c', 'd'))));
+        $this->assertNull($this->serializer->normalize(array()));
+        $this->assertNull($this->serializer->normalize('test'));
+    }
+
     public function testSerialize()
     {
         $this->serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));

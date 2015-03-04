@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+trigger_error('The '.__NAMESPACE__.'\SecondTransformer class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer as BaseSecondTransformer;
 
 /**
@@ -18,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer as BaseSec
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\SecondTransformer}
  *             instead.
  */
 class SecondTransformer extends BaseSecondTransformer

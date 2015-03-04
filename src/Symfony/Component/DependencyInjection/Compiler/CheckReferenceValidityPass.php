@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ScopeCrossingInjectionExcept
 use Symfony\Component\DependencyInjection\Exception\ScopeWideningInjectionException;
 
 /**
- * Checks the validity of references
+ * Checks the validity of references.
  *
  * The following checks are performed by this pass:
  * - target definitions are not abstract
@@ -33,7 +33,6 @@ class CheckReferenceValidityPass implements CompilerPassInterface
 {
     private $container;
     private $currentId;
-    private $currentDefinition;
     private $currentScope;
     private $currentScopeAncestors;
     private $currentScopeChildren;

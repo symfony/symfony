@@ -34,7 +34,7 @@ class PrototypedArrayNode extends ArrayNode
      * Sets the minimum number of elements that a prototype based node must
      * contain. By default this is zero, meaning no elements.
      *
-     * @param int     $number
+     * @param int $number
      */
     public function setMinNumberOfElements($number)
     {
@@ -62,8 +62,8 @@ class PrototypedArrayNode extends ArrayNode
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
      *
-     * @param string  $attribute The name of the attribute which value is to be used as a key
-     * @param bool    $remove    Whether or not to remove the key
+     * @param string $attribute The name of the attribute which value is to be used as a key
+     * @param bool   $remove    Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -110,7 +110,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Adds default children when none are set.
      *
-     * @param int|string|array|null     $children The number of children|The child name|The children names to be added
+     * @param int|string|array|null $children The number of children|The child name|The children names to be added
      */
     public function setAddChildrenIfNoneSet($children = array('defaults'))
     {
@@ -155,7 +155,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Retrieves the prototype
+     * Retrieves the prototype.
      *
      * @return PrototypeNodeInterface The prototype
      */

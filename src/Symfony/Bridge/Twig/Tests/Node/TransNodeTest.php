@@ -38,7 +38,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
     }
     protected function getVariableGetterWithoutStrictCheck($name)
     {
-        if (version_compare(phpversion(), '5.4.0RC1', '>=')) {
+        if (PHP_VERSION_ID >= 50400) {
             return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
         }
 
@@ -47,7 +47,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
 
     protected function getVariableGetterWithStrictCheck($name)
     {
-        if (version_compare(phpversion(), '5.4.0RC1', '>=')) {
+        if (PHP_VERSION_ID >= 50400) {
             return sprintf('(isset($context["%s"]) ? $context["%s"] : $this->getContext($context, "%s"))', $name, $name, $name);
         }
 

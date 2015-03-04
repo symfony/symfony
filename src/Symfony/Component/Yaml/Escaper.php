@@ -44,7 +44,7 @@ class Escaper
      *
      * @param string $value A PHP value
      *
-     * @return bool    True if the value would require double quotes.
+     * @return bool True if the value would require double quotes.
      */
     public static function requiresDoubleQuoting($value)
     {
@@ -68,10 +68,18 @@ class Escaper
      *
      * @param string $value A PHP value
      *
-     * @return bool    True if the value would require single quotes.
+     * @return bool True if the value would require single quotes.
      */
     public static function requiresSingleQuoting($value)
     {
+        // Determines if a PHP value is entirely composed of a value that would
+        // require single quoting in YAML.
+        if (in_array(strtolower($value), array('null', '~', 'true', 'false', 'y', 'n', 'yes', 'no', 'on', 'off'))) {
+            return true;
+        }
+
+        // Determines if the PHP value contains any single characters that would
+        // cause it to require single quoting in YAML.
         return preg_match('/[ \s \' " \: \{ \} \[ \] , & \* \# \?] | \A[ \- ? | < > = ! % @ ` ]/x', $value);
     }
 

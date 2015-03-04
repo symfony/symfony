@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Locale\Stub\DateFormat;
 
+trigger_error('The '.__NAMESPACE__.'\Hour2401Transformer class is deprecated since version 2.3 and will be removed in 3.0. Use the Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer as BaseHour2401Transformer;
 
 /**
@@ -18,8 +20,8 @@ use Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer as BaseH
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
- *             {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer}
+ * @deprecated since version 2.3, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Intl\DateFormatter\DateFormat\Hour2401Transformer}
  *             instead.
  */
 class Hour2401Transformer extends BaseHour2401Transformer

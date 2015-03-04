@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
 use Symfony\Component\Intl\Globals\IntlGlobals;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -233,6 +232,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * The parse() method works differently with integer out of the 32 bit range. format() works fine.
+     *
      * @dataProvider formatTypeInt64Provider
      */
     public function testFormatTypeInt64($formatter, $value, $expected)
@@ -689,10 +689,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // The negative PHP_INT_MAX was being converted to float
-        if (
-            (version_compare(PHP_VERSION, '5.4.0', '<') && version_compare(PHP_VERSION, '5.3.14', '>=')) ||
-            version_compare(PHP_VERSION, '5.4.4', '>=')
-        ) {
+        if ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404) {
             $this->assertInternalType('int', $parsedValue);
         } else {
             $this->assertInternalType('float', $parsedValue);
@@ -749,10 +746,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
-        if (
-            (version_compare(PHP_VERSION, '5.3.14', '<')) ||
-            (version_compare(PHP_VERSION, '5.4.0', '>=') && version_compare(PHP_VERSION, '5.4.4', '<'))
-        ) {
+        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
             $this->assertEquals(-2147483648, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range (PHP < 5.3.14 and PHP < 5.4.4).');
         } else {
             $this->assertEquals(2147483648, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
@@ -763,10 +757,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
         // A 32 bit integer was being generated instead of a 64 bit integer
-        if (
-            (version_compare(PHP_VERSION, '5.3.14', '<')) ||
-            (version_compare(PHP_VERSION, '5.4.0', '>=') && version_compare(PHP_VERSION, '5.4.4', '<'))
-        ) {
+        if (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) {
             $this->assertEquals(2147483647, $parsedValue, '->parse() TYPE_INT64 does not use true 64 bit integers, using only the 32 bit range  (PHP < 5.3.14 and PHP < 5.4.4).');
         } else {
             $this->assertEquals(-2147483649, $parsedValue, '->parse() TYPE_INT64 uses true 64 bit integers (PHP >= 5.3.14 and PHP >= 5.4.4).');
@@ -812,8 +803,8 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $locale
-     * @param null $style
-     * @param null $pattern
+     * @param null   $style
+     * @param null   $pattern
      *
      * @return \NumberFormatter
      */
@@ -830,7 +821,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     abstract protected function getIntlErrorCode();
 
     /**
-     * @param int     $errorCode
+     * @param int $errorCode
      *
      * @return bool
      */

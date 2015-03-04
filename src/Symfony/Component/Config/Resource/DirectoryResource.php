@@ -50,7 +50,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
     }
 
     /**
-     * Returns the pattern to restrict monitored files
+     * Returns the pattern to restrict monitored files.
      *
      * @return string|null
      */

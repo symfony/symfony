@@ -21,7 +21,7 @@ class NotImplementedException extends RuntimeException
     const INTL_INSTALL_MESSAGE = 'Please install the "intl" extension for full localization capabilities.';
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $message The exception message. A note to install the intl extension is appended to this string
      */

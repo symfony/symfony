@@ -18,8 +18,6 @@ use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTemplate
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
-
-// should probably be moved to the Translation component
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
 
 class FormHelperTableLayoutTest extends AbstractTableLayoutTest
@@ -67,7 +65,11 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 
     protected function renderEnctype(FormView $view)
     {
-        return (string) $this->engine->get('form')->enctype($view);
+        if (!method_exists($form = $this->engine->get('form'), 'enctype')) {
+            $this->markTestSkipped(sprintf("Deprecated method %s->enctype() is not implemented.", get_class($form)));
+        }
+
+        return (string) $form->enctype($view);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())

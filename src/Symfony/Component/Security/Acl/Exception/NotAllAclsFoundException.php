@@ -25,7 +25,7 @@ class NotAllAclsFoundException extends AclNotFoundException
     private $partialResult;
 
     /**
-     * Sets the partial result
+     * Sets the partial result.
      *
      * @param \SplObjectStorage $result
      */
@@ -35,7 +35,7 @@ class NotAllAclsFoundException extends AclNotFoundException
     }
 
     /**
-     * Returns the partial result
+     * Returns the partial result.
      *
      * @return \SplObjectStorage
      */

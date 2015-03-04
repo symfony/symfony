@@ -128,7 +128,7 @@ class HelperSetTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-   /**
+    /**
      * Create a generic mock for the helper interface. Optionally check for a call to setHelperSet with a specific
      * helperset instance.
      *

@@ -17,7 +17,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
- * to work with the Symfony2 paths and template references.
+ * to work with the Symfony paths and template references.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

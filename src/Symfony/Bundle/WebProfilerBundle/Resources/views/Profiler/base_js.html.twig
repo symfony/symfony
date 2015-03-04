@@ -90,6 +90,9 @@
                             rows.appendChild(row);
 
                             var methodCell = document.createElement('td');
+                            if (request.error) {
+                                methodCell.className = 'sf-ajax-request-error';
+                            }
                             methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 

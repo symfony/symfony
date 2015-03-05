@@ -164,12 +164,12 @@
         {% if parent_label_class is defined %}
             {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ parent_label_class)|trim}) %}
         {% endif %}
-        {% if label is empty %}
+        {% if label is not sameas(false) and label is empty %}
             {% set label = name|humanize %}
         {% endif %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
                 {{ widget|raw }}
-                {{ label|trans({}, translation_domain) }}
+                {{ label is not sameas(false) ? label|trans({}, translation_domain) }}
         </label>
     {% endif %}
 {% endblock checkbox_radio_label %}

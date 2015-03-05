@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-03T08:33:48Z
+
+@ogizanagi Can you test it before we merge?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-03T08:45:44Z
+
+@fabpot : Sure, I will.
+Maybe @qferr could test it too regarding its own case.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-03T10:24:30Z
+
+@fabpot : I confirm through my own tests that everything should work as expected. You could have a look at [test_pr_13806](https://github.com/ogizanagi/sf2SE_demos/tree/test_pr_13806) in order to test it easily.
+
+---------------------------------------------------------------------------
+
+by qferr at 2015-03-05T12:00:53Z
+
+It works !
+
+Thank you @ogizanagi .

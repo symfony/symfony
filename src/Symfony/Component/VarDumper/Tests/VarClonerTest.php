@@ -18,6 +18,49 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
  */
 class VarClonerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testMaxIntBoundary()
+    {
+        $data = array(PHP_INT_MAX => 123);
+
+        $cloner = new VarCloner();
+        $clone = $cloner->cloneVar($data);
+
+        $expected = <<<EOTXT
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => array
+                            [class] => assoc
+                            [value] => 1
+                            [cut] => 0
+                            [handle] => 0
+                            [refCount] => 0
+                            [position] => 1
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [%s] => 123
+                )
+
+        )
+
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+)
+
+EOTXT;
+        $this->assertSame(sprintf($expected, PHP_INT_MAX), print_r($clone, true));
+    }
+
     public function testClone()
     {
         $json = json_decode('{"1":{"var":"val"},"2":{"var":"val"}}');

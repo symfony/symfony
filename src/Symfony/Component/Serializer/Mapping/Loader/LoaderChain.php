@@ -12,24 +12,28 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Serializer\Exception\MappingException;
-use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
- * Calls multiple LoaderInterface instances in a chain
+ * Calls multiple {@link LoaderInterface} instances in a chain.
  *
  * This class accepts multiple instances of LoaderInterface to be passed to the
- * constructor. When loadClassMetadata() is called, the same method is called
+ * constructor. When {@link loadClassMetadata()} is called, the same method is called
  * in <em>all</em> of these loaders, regardless of whether any of them was
  * successful or not.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class LoaderChain implements LoaderInterface
 {
-    protected $loaders;
+    /**
+     * @var LoaderInterface[]
+     */
+    private $loaders;
 
     /**
-     * Accepts a list of LoaderInterface instances
+     * Accepts a list of LoaderInterface instances.
      *
      * @param LoaderInterface[] $loaders An array of LoaderInterface instances
      *
@@ -49,7 +53,7 @@ class LoaderChain implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadataInterface $metadata)
     {
         $success = false;
 

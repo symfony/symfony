@@ -22,6 +22,17 @@ use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 
 class SerializerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testInterface()
+    {
+        $serializer = new Serializer();
+
+        $this->assertInstanceOf('Symfony\Component\Serializer\SerializerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\EncoderInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\DecoderInterface', $serializer);
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */

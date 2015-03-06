@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Mapping\Factory;
 
 use Doctrine\Common\Cache\Cache;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ClassMetadataFactory
+class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
     /**
      * @var LoaderInterface
@@ -46,29 +47,13 @@ class ClassMetadataFactory
     }
 
     /**
-     * If the method was called with the same class name (or an object of that
-     * class) before, the same metadata instance is returned.
-     *
-     * If the factory was configured with a cache, this method will first look
-     * for an existing metadata instance in the cache. If an existing instance
-     * is found, it will be returned without further ado.
-     *
-     * Otherwise, a new metadata instance is created. If the factory was
-     * configured with a loader, the metadata is passed to the
-     * {@link LoaderInterface::loadClassMetadata()} method for further
-     * configuration. At last, the new object is returned.
-     *
-     * @param string|object $value
-     *
-     * @return ClassMetadata
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getMetadataFor($value)
     {
         $class = $this->getClass($value);
         if (!$class) {
-            throw new \InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: "%s"', gettype($value)));
         }
 
         if (isset($this->loadedClasses[$class])) {
@@ -80,40 +65,33 @@ class ClassMetadataFactory
         }
 
         if (!class_exists($class) && !interface_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
+            throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
-        $metadata = new ClassMetadata($class);
+        $classMetadata = new ClassMetadata($class);
+        $this->loader->loadClassMetadata($classMetadata);
 
-        $reflClass = $metadata->getReflectionClass();
+        $reflectionClass = $classMetadata->getReflectionClass();
 
-        // Include groups from the parent class
-        if ($parent = $reflClass->getParentClass()) {
-            $metadata->mergeAttributesGroups($this->getMetadataFor($parent->name));
+        // Include metadata from the parent class
+        if ($parent = $reflectionClass->getParentClass()) {
+            $classMetadata->merge($this->getMetadataFor($parent->name));
         }
 
-        // Include groups from all implemented interfaces
-        foreach ($reflClass->getInterfaces() as $interface) {
-            $metadata->mergeAttributesGroups($this->getMetadataFor($interface->name));
-        }
-
-        if ($this->loader) {
-            $this->loader->loadClassMetadata($metadata);
+        // Include metadata from all implemented interfaces
+        foreach ($reflectionClass->getInterfaces() as $interface) {
+            $classMetadata->merge($this->getMetadataFor($interface->name));
         }
 
         if ($this->cache) {
-            $this->cache->save($class, $metadata);
+            $this->cache->save($class, $classMetadata);
         }
 
-        return $this->loadedClasses[$class] = $metadata;
+        return $this->loadedClasses[$class] = $classMetadata;
     }
 
     /**
-     * Checks if class has metadata.
-     *
-     * @param mixed $value
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {

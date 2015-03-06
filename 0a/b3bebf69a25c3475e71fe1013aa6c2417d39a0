@@ -1,0 +1,115 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-06T22:10:13Z
+
+If you want to play with this new normalizer (or hack it), I've created a branch including all Serializer PR waiting to be merged (including this one): https://github.com/dunglas/symfony/tree/new_serializer
+
+To use it in a standard edition install, add the following lines to your `composer.json`:
+```json
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dunglas/symfony"
+        }
+    ],
+```
+
+Then replace with Symfony line to use this experimental branch:
+```json
+        "symfony/symfony": "dev-new_serializer as 2.7.0",
+```
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-06T22:41:10Z
+
+hi @dunglas, can you provide a practical sample of what this feature can do ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-06T23:06:33Z
+
+```php
+class MyObj
+{
+    public $foo = 'foo';
+
+    public getBar()
+    {
+       return 'bar';
+    }
+
+    public isBaz()
+    {
+        return true;
+    }
+}
+
+$normalizer = new \Symfony\Component\Serializer\Normalizer\PropertyAccessNormalizer();
+var_dump($normalizer->normalize(new MyObj()));
+// Should output something like ['foo' => 'foo', 'bar' => 'bar', 'baz' => true]
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-06T23:14:42Z
+
+This normalizer also supports denormalization (for gettters / setters **and** properties), serialization groups (http://symfony.com/blog/new-in-symfony-2-7-serialization-groups), name converters (symfony/symfony-docs#4692), circular references handlers (symfony/symfony-docs#4299) and existing object population (#13252).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T06:51:26Z
+
+:+1:
+
+The only "issue" I see is the name; I understand that you named your class after the property access component but I find it confusing as at first, I thought it was about "just" supporting class properties. If it becomes the default one (which I think is a good idea), we should find a better name.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-07T07:10:31Z
+
+I agree, the name is confusing. What about `ObjectNormalizer`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-01-07T07:17:49Z
+
+@dunglas If this is the "definitive" serializer, that sounds much better to me.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-07T09:15:03Z
+
+totaly agree with @fabpot , this should become the default serializer!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-01-17T09:10:20Z
+
+What do you think about moving the code listing accessible "properties" (trough public properties and methods) - https://github.com/dunglas/symfony/blob/seriaizer_property_access_normalizer/src/Symfony/Component/Serializer/Normalizer/ObjectNormalizer.php#L62-L89 - in the PropertyAccess Component?
+
+It can be useful in other contexts (in fact, I've an use case in a private project right now). cc @fabpot @webmozart
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-04T13:01:16Z
+
+Rebased. Should be ready for the merge now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-22T17:57:11Z
+
+I've fixed tests with `components=low`. Is there any more work to be done before getting this PR merged?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-03T14:59:42Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-03T17:59:18Z
+
+ping @symfony/deciders

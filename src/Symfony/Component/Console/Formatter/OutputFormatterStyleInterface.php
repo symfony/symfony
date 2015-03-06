@@ -21,6 +21,15 @@ namespace Symfony\Component\Console\Formatter;
 interface OutputFormatterStyleInterface
 {
     /**
+     * Gets style foreground color.
+     *
+     * @return string
+     *
+     * @api
+     */
+    public function getForeground();
+
+    /**
      * Sets style foreground color.
      *
      * @param string $color The color name
@@ -30,6 +39,15 @@ interface OutputFormatterStyleInterface
     public function setForeground($color = null);
 
     /**
+     * Gets style background color.
+     *
+     * @return string
+     *
+     * @api
+     */
+    public function getBackground();
+
+    /**
      * Sets style background color.
      *
      * @param string $color The color name
@@ -37,6 +55,15 @@ interface OutputFormatterStyleInterface
      * @api
      */
     public function setBackground($color = null);
+
+    /**
+     * Gets style options.
+     *
+     * @return array
+     *
+     * @api
+     */
+    public function getOptions();
 
     /**
      * Sets some specific style option.
@@ -62,11 +89,19 @@ interface OutputFormatterStyleInterface
     public function setOptions(array $options);
 
     /**
-     * Applies the style to a given text.
-     *
-     * @param string $text The text to style
+     * Gets the style definition.
      *
      * @return string
      */
-    public function apply($text);
+    public function getDefinition();
+
+    /**
+     * Applies the style to a given text.
+     *
+     * @param string $text The text to style
+     * @param OutputFormatterDecorator $decorator The decorator to use or NULL to use the default decorator
+     *
+     * @return string
+     */
+    public function apply($text, OutputFormatterDecorator $decorator = null);
 }

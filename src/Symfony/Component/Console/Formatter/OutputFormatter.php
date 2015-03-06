@@ -20,7 +20,7 @@ namespace Symfony\Component\Console\Formatter;
  */
 class OutputFormatter implements OutputFormatterInterface
 {
-    private $decorated;
+    private $decorator;
     private $styles = array();
     private $styleStack;
 
@@ -39,14 +39,14 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param bool                            $decorated Whether this formatter should actually decorate strings
-     * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
+     * @param OutputFormatterDecoratorInterface|bool $decorated The output decorator to use or FALSE if the output shall not be decorated
+     * @param OutputFormatterStyleInterface[]        $styles    Array of "name => FormatterStyle" instances
      *
      * @api
      */
     public function __construct($decorated = false, array $styles = array())
     {
-        $this->decorated = (bool) $decorated;
+        $this->setDecorated($decorated);
 
         $this->setStyle('error', new OutputFormatterStyle('white', 'red'));
         $this->setStyle('info', new OutputFormatterStyle('green'));
@@ -63,13 +63,19 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param bool $decorated Whether to decorate the messages or not
+     * @param OutputFormatterDecoratorInterface|bool $decorated The output decorator to use, TRUE to use the default decorator or FALSE if the output shall not be decorated
      *
      * @api
      */
     public function setDecorated($decorated)
     {
-        $this->decorated = (bool) $decorated;
+        if ($decorated instanceof OutputFormatterDecoratorInterface) {
+            $this->decorator = $decorated;
+        } elseif ($decorated) {
+            $this->decorator = new OutputFormatterDecorator();
+        } else {
+            $this->decorator = null;
+        }
     }
 
     /**
@@ -81,7 +87,7 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public function isDecorated()
     {
-        return $this->decorated;
+        return null !== $this->decorator;
     }
 
     /**
@@ -236,6 +242,6 @@ class OutputFormatter implements OutputFormatterInterface
      */
     private function applyCurrentStyle($text)
     {
-        return $this->isDecorated() && strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
+        return $this->isDecorated() && strlen($text) > 0 ? $this->decorator->decorate($text, $this->styleStack->getCurrent()) : $text;
     }
 }

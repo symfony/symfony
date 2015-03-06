@@ -18,13 +18,13 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $style = new OutputFormatterStyle('green', 'black', array('bold', 'underscore'));
-        $this->assertEquals("\033[32;40;1;4mfoo\033[39;49;22;24m", $style->apply('foo'));
+        $this->assertEquals('fg=green;bg=black;options=bold;underscore', $style->getDefinition());
 
         $style = new OutputFormatterStyle('red', null, array('blink'));
-        $this->assertEquals("\033[31;5mfoo\033[39;25m", $style->apply('foo'));
+        $this->assertEquals('fg=red;options=blink', $style->getDefinition());
 
         $style = new OutputFormatterStyle(null, 'white');
-        $this->assertEquals("\033[47mfoo\033[49m", $style->apply('foo'));
+        $this->assertEquals('bg=white', $style->getDefinition());
     }
 
     public function testForeground()
@@ -32,10 +32,10 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $style = new OutputFormatterStyle();
 
         $style->setForeground('black');
-        $this->assertEquals("\033[30mfoo\033[39m", $style->apply('foo'));
+        $this->assertEquals('fg=black', $style->getDefinition());
 
         $style->setForeground('blue');
-        $this->assertEquals("\033[34mfoo\033[39m", $style->apply('foo'));
+        $this->assertEquals('fg=blue', $style->getDefinition());
 
         $this->setExpectedException('InvalidArgumentException');
         $style->setForeground('undefined-color');
@@ -46,10 +46,10 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $style = new OutputFormatterStyle();
 
         $style->setBackground('black');
-        $this->assertEquals("\033[40mfoo\033[49m", $style->apply('foo'));
+        $this->assertEquals('bg=black', $style->getDefinition());
 
         $style->setBackground('yellow');
-        $this->assertEquals("\033[43mfoo\033[49m", $style->apply('foo'));
+        $this->assertEquals('bg=yellow', $style->getDefinition());
 
         $this->setExpectedException('InvalidArgumentException');
         $style->setBackground('undefined-color');
@@ -60,19 +60,19 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $style = new OutputFormatterStyle();
 
         $style->setOptions(array('reverse', 'conceal'));
-        $this->assertEquals("\033[7;8mfoo\033[27;28m", $style->apply('foo'));
+        $this->assertEquals('options=reverse;conceal', $style->getDefinition());
 
         $style->setOption('bold');
-        $this->assertEquals("\033[7;8;1mfoo\033[27;28;22m", $style->apply('foo'));
+        $this->assertEquals('options=reverse;conceal;bold', $style->getDefinition());
 
         $style->unsetOption('reverse');
-        $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
+        $this->assertEquals('options=conceal;bold', $style->getDefinition());
 
         $style->setOption('bold');
-        $this->assertEquals("\033[8;1mfoo\033[28;22m", $style->apply('foo'));
+        $this->assertEquals('options=conceal;bold', $style->getDefinition());
 
         $style->setOptions(array('bold'));
-        $this->assertEquals("\033[1mfoo\033[22m", $style->apply('foo'));
+        $this->assertEquals('options=bold', $style->getDefinition());
 
         try {
             $style->setOption('foo');

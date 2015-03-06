@@ -159,7 +159,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
+        fwrite($stream, $input);
         rewind($stream);
 
         return $stream;

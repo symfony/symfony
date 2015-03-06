@@ -177,9 +177,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     private function createExceptionListener(SecurityContextInterface $context = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $context ? $context : $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
-            $trustResolver ? $trustResolver : $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'),
-            $httpUtils ? $httpUtils : $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
+            $context ?: $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
+            $trustResolver ?: $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'),
+            $httpUtils ?: $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
             'key',
             $authenticationEntryPoint,
             $errorPage,

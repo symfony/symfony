@@ -89,8 +89,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $container = new ContainerBuilder();
         $container->setDefinition('test', $definition);
-        $container->setParameter('foo', 'wiz'.dirname(dirname(__FILE__)));
-        $container->setParameter('bar', dirname(__FILE__));
+        $container->setParameter('foo', 'wiz'.dirname(__DIR__));
+        $container->setParameter('bar', __DIR__);
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
         $container->setParameter('buz', dirname(dirname(__DIR__)));
         $container->compile();

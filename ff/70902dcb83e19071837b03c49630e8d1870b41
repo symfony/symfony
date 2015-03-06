@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-03T14:57:45Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-03T17:59:00Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-03-03T20:40:00Z
+
+i wonder if the handling for different formats could be made more generic, ie. into a component of its own. @schmittjoh also created a lib for this once upon a time.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-03T21:11:05Z
+
+@lsmith77 the two way have their advantages. Here having a single `AttributeMetadata` gathering data both from properties and accessor methods make sense IMO: they match the structure of the serialized document and allows to keep the code clean and simple.
+
+However, maybe some formats loaders related code from Serializer, Validator, Routing and Config can be merged (but not especially metadata). cc @webmozart @Tobion @fabpot @stof.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-03T21:14:47Z
+
+The loaders for the DIC and the Routing for instance share code (to be found in Config). I don't know if it would be worth it to go further down this road. Anyway, I think that's something that should be discussed independently of this PR.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-03-03T21:40:23Z
+
+yeah .. its certainly beyond the scope of this PR
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-03-03T21:40:58Z
+
+BTW for the record I am talking about https://github.com/schmittjoh/metadata
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-05T21:33:57Z
+
+@lsmith77 can I merge this PR or do you think this issue is blocking?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-03-06T06:32:15Z
+
+no. this was more a forward thinking point i made
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2015-03-06T06:32:25Z
+
+so merge :)

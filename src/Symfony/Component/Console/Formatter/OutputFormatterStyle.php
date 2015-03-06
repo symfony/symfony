@@ -149,7 +149,7 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
             ));
         }
 
-        if (false === array_search(static::$availableOptions[$option], $this->options)) {
+        if (!in_array(static::$availableOptions[$option], $this->options)) {
             $this->options[] = static::$availableOptions[$option];
         }
     }

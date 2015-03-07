@@ -233,7 +233,7 @@ class Configuration implements ConfigurationInterface
             );
 
             foreach ($urls as $i => $url) {
-                if (is_integer($i)) {
+                if (is_int($i)) {
                     if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
                         $urls['http'][] = $urls['ssl'][] = $url;
                     } else {

@@ -13,7 +13,8 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Serializer\Exception\MappingException;
-use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * Loads XML mapping files.
@@ -23,7 +24,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 class XmlFileLoader extends FileLoader
 {
     /**
-     * An array of SimpleXMLElement instances.
+     * An array of {@class \SimpleXMLElement} instances.
      *
      * @var \SimpleXMLElement[]|null
      */
@@ -32,7 +33,7 @@ class XmlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
     {
         if (null === $this->classes) {
             $this->classes = array();
@@ -43,12 +44,23 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $xml = $this->classes[$metadata->getClassName()];
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        if (isset($this->classes[$classMetadata->getName()])) {
+            $xml = $this->classes[$classMetadata->getName()];
 
             foreach ($xml->attribute as $attribute) {
+                $attributeName = (string) $attribute['name'];
+
+                if (isset($attributesMetadata[$attributeName])) {
+                    $attributeMetadata = $attributesMetadata[$attributeName];
+                } else {
+                    $attributeMetadata = new AttributeMetadata($attributeName);
+                    $classMetadata->addAttributeMetadata($attributeMetadata);
+                }
+
                 foreach ($attribute->group as $group) {
-                    $metadata->addAttributeGroup((string) $attribute['name'], (string) $group);
+                    $attributeMetadata->addGroup((string) $group);
                 }
             }
 
@@ -59,7 +71,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parse a XML File.
+     * Parses a XML File.
      *
      * @param string $file Path of file
      *

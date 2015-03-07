@@ -62,7 +62,7 @@ img {
     width: 970px;
     margin: 0 auto;
 }
-pre {
+#content pre {
     white-space: normal;
     font-family: Arial, Helvetica, sans-serif;
 }

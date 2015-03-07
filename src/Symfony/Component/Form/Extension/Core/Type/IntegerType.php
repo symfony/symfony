@@ -45,16 +45,14 @@ class IntegerType extends AbstractType
             'compound' => false,
         ));
 
-        $resolver->setAllowedValues(array(
-            'rounding_mode' => array(
-                IntegerToLocalizedStringTransformer::ROUND_FLOOR,
-                IntegerToLocalizedStringTransformer::ROUND_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
-                IntegerToLocalizedStringTransformer::ROUND_UP,
-                IntegerToLocalizedStringTransformer::ROUND_CEILING,
-            ),
+        $resolver->setAllowedValues('rounding_mode', array(
+            IntegerToLocalizedStringTransformer::ROUND_FLOOR,
+            IntegerToLocalizedStringTransformer::ROUND_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
+            IntegerToLocalizedStringTransformer::ROUND_UP,
+            IntegerToLocalizedStringTransformer::ROUND_CEILING,
         ));
     }
 

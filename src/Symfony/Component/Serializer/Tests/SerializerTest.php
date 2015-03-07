@@ -22,6 +22,17 @@ use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 
 class SerializerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testInterface()
+    {
+        $serializer = new Serializer();
+
+        $this->assertInstanceOf('Symfony\Component\Serializer\SerializerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\EncoderInterface', $serializer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Encoder\DecoderInterface', $serializer);
+    }
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
@@ -71,6 +82,15 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->serializer = new Serializer(array(new TestNormalizer()), array());
         $data = array('title' => 'foo', 'numbers' => array(5, 3));
         $this->assertTrue($this->serializer->denormalize(json_encode($data), 'stdClass', 'json'));
+    }
+
+    public function testCustomNormalizerCanNormalizeCollectionsAndScalar()
+    {
+        $this->serializer = new Serializer(array(new TestNormalizer()), array());
+        $this->assertNull($this->serializer->normalize(array('a', 'b')));
+        $this->assertNull($this->serializer->normalize(new \ArrayObject(array('c', 'd'))));
+        $this->assertNull($this->serializer->normalize(array()));
+        $this->assertNull($this->serializer->normalize('test'));
     }
 
     public function testSerialize()

@@ -7,6 +7,28 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.25 (2015-01-30)
+
+ * bug #13528 [Validator] reject ill-formed strings (nicolas-grekas)
+ * bug #13525 [Validator] UniqueEntityValidator - invalidValue fixed. (Dawid Sajdak)
+ * bug #13527 [Validator] drop grapheme_strlen in LengthValidator (nicolas-grekas)
+ * bug #13376 [FrameworkBundle][config] allow multiple fallback locales. (aitboudad)
+ * bug #12972 Make the container considered non-fresh if the environment parameters are changed (thewilkybarkid)
+ * bug #13309 [Console] fixed 10531 (nacmartin)
+ * bug #13352 [Yaml] fixed parse shortcut Key after unindented collection. (aitboudad)
+ * bug #13039 [HttpFoundation] [Request] fix baseUrl parsing to fix wrong path_info (rk3rn3r)
+ * bug #13250 [Twig][Bridge][TranslationDefaultDomain] add support of named arguments. (aitboudad)
+ * bug #13332 [Console] ArgvInput and empty tokens (Taluu)
+ * bug #13293 [EventDispatcher] Add missing checks to RegisterListenersPass (znerol)
+ * bug #13262 [Yaml] Improve YAML boolean escaping (petert82, larowlan)
+ * bug #13420 [Debug] fix loading order for legacy classes (nicolas-grekas)
+ * bug #13371 fix missing comma in YamlDumper (garak)
+ * bug #13365 [HttpFoundation] Make use of isEmpty() method (xelaris)
+ * bug #13347 [Console] Helper\TableHelper->addRow optimization (boekkooi)
+ * bug #13346 [PropertyAccessor] Allow null value for a array (2.3) (boekkooi)
+ * bug #13170 [Form] Set a child type to text if added to the form without a type. (jakzal)
+ * bug #13334 [Yaml] Fixed #10597: Improved Yaml directive parsing (VictoriaQ)
+
 * 2.3.24 (2015-01-07)
 
  * bug #13286 [Security] Don't destroy the session on buggy php releases. (derrabus)

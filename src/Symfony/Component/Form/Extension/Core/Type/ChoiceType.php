@@ -110,7 +110,7 @@ class ChoiceType extends AbstractType
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
             $view->vars['is_selected'] = function ($choice, array $values) {
-                return false !== array_search($choice, $values, true);
+                return in_array($choice, $values, true);
             };
         } else {
             $view->vars['is_selected'] = function ($choice, $value) {
@@ -233,14 +233,10 @@ class ChoiceType extends AbstractType
             'data_class' => null,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
-        ));
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
-        ));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
     }
 
     /**

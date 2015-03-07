@@ -17,10 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/security-csrf": "~2.6|~3.0.0",
         "twig/twig": "~1.18"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/asset": "~2.7|~3.0.0",
         "symfony/finder": "~2.3|~3.0.0",
         "symfony/form": "~2.6|~3.0.0",
         "symfony/http-kernel": "~2.3|~3.0.0",
@@ -37,6 +38,7 @@
     },
     "suggest": {
         "symfony/finder": "",
+        "symfony/asset": "For using the AssetExtension",
         "symfony/form": "For using the FormExtension",
         "symfony/http-kernel": "For using the HttpKernelExtension",
         "symfony/routing": "For using the RoutingExtension",

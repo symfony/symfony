@@ -186,6 +186,28 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             array('DeprecatedParentClass', 'DeprecatedClass', 'extends'),
         );
     }
+
+    public function testDeprecatedSuperInSameNamespace()
+    {
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_NOTICE,
+            'message' => '',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
 }
 
 class ClassLoader
@@ -217,6 +239,8 @@ class ClassLoader
             return __DIR__.'/Fixtures/notPsr0Bis.php';
         } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
             return __DIR__.'/Fixtures/DeprecatedInterface.php';
+        } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
+            eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {

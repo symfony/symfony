@@ -949,6 +949,9 @@ class Process
         if ('\\' === DIRECTORY_SEPARATOR && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
+        if ($tty && (!file_exists('/dev/tty') || !is_readable('/dev/tty'))) {
+            throw new RuntimeException('TTY mode requires /dev/tty to be readable.');
+        }
 
         $this->tty = (bool) $tty;
 
@@ -1108,11 +1111,13 @@ class Process
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param string|null $input The content
+     * @param mixed $input The content
      *
      * @return self The current Process instance
      *
      * @throws LogicException In case the process is running
+     *
+     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public function setInput($input)
     {

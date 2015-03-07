@@ -229,7 +229,24 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             array(null, null),
             array('24.5', 24.5),
             array('input data', 'input data'),
-            // to maintain BC, supposed to be removed in 3.0
+        );
+    }
+
+    /**
+     * @dataProvider provideLegacyInputValues
+     */
+    public function testLegacyValidInput($expected, $value)
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $process = $this->getProcess('php -v');
+        $process->setInput($value);
+        $this->assertSame($expected, $process->getInput());
+    }
+
+    public function provideLegacyInputValues()
+    {
+        return array(
             array('stringifiable', new Stringifiable()),
         );
     }
@@ -841,13 +858,13 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testStartAfterATimeout()
     {
-        $process = $this->getProcess('php -r "$n = 1000; while ($n--) {echo \'\'; usleep(1000); }"');
+        $process = $this->getProcess(sprintf('php -r %s', escapeshellarg('$n = 1000; while ($n--) {echo \'\'; usleep(1000); }')));
         $process->setTimeout(0.1);
 
         try {
             $process->run();
-            $this->fail('An exception should have been raised.');
-        } catch (\Exception $e) {
+            $this->fail('A RuntimeException should have been raised.');
+        } catch (RuntimeException $e) {
         }
         $process->start();
         usleep(1000);

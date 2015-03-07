@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Asset;
 
+trigger_error('The Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory is deprecated since version 2.7 and will be removed in 3.0. Use the Asset component instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Asset\PackageInterface;
@@ -19,6 +21,8 @@ use Symfony\Component\Templating\Asset\PackageInterface;
  * Creates packages based on whether the current request is secure.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since 2.7, will be removed in 3.0. Use the Asset component instead.
  */
 class PackageFactory
 {

@@ -33,13 +33,9 @@ class UrlType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'default_protocol' => 'http',
-        ));
+        $resolver->setDefault('default_protocol', 'http');
 
-        $resolver->setAllowedTypes(array(
-            'default_protocol' => array('null', 'string'),
-        ));
+        $resolver->setAllowedTypes('default_protocol', array('null', 'string'));
     }
 
     /**

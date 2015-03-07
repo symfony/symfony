@@ -31,6 +31,30 @@
                 }
 
                 Sfjs.renderAjaxRequests();
+
+                /* Handle toolbar-info position */
+                var toolbarBlocks = document.getElementsByClassName('sf-toolbar-block');
+                for (var i = 0; i < toolbarBlocks.length; i += 1) {
+                    toolbarBlocks[i].onmouseover = function () {
+                        var toolbarInfo = this.getElementsByClassName('sf-toolbar-info')[0];
+                        var pageWidth = document.body.clientWidth;
+                        var elementWidth = toolbarInfo.offsetWidth;
+                        var leftValue = (elementWidth + this.offsetLeft) - pageWidth;
+                        var rightValue = (elementWidth + (pageWidth - this.offsetLeft)) - pageWidth;
+
+                        /* Reset right and left value, useful on window resize */
+                        toolbarInfo.style.right = '';
+                        toolbarInfo.style.left = '';
+
+                        if (leftValue > 0 && rightValue > 0) {
+                            toolbarInfo.style.right = (rightValue * -1) + 'px';
+                        } else if (leftValue < 0) {
+                            toolbarInfo.style.left = 0;
+                        } else {
+                            toolbarInfo.style.right = '-1px';
+                        }
+                    };
+                }
             },
             function(xhr) {
                 if (xhr.status !== 0) {

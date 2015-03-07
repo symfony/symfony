@@ -17,13 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.9",
+        "symfony/asset": "~2.7|~3.0.0",
         "symfony/dependency-injection" : "~2.6,>=2.6.2",
         "symfony/config" : "~2.4",
         "symfony/event-dispatcher": "~2.5|~3.0.0",
         "symfony/http-foundation": "~2.4.9|~2.5,>=2.5.4|~3.0.0",
         "symfony/http-kernel": "~2.7|~3.0.0",
         "symfony/filesystem": "~2.3|~3.0.0",
-        "symfony/routing": "~2.5|~3.0.0",
+        "symfony/routing": "~2.6,>2.6.4|~3.0.0",
         "symfony/security-core": "~2.6|~3.0.0",
         "symfony/security-csrf": "~2.6|~3.0.0",
         "symfony/stopwatch": "~2.3|~3.0.0",
@@ -32,6 +33,8 @@
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/asset": "~2.7|~3.0.0",
         "symfony/browser-kit": "~2.4|~3.0.0",
         "symfony/console": "~2.6|~3.0.0",
         "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0",

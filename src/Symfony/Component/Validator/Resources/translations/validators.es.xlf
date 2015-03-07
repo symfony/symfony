@@ -306,6 +306,10 @@
                 <source>The host could not be resolved.</source>
                 <target>No se puede resolver el host.</target>
             </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>La codificación de caracteres para este valor debería ser {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

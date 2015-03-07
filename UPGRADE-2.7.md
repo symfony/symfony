@@ -59,3 +59,52 @@ Form
             }
         }
    ```
+
+Serializer
+----------
+
+ * The `setCamelizedAttributes()` method of the
+   `Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer` and
+   `Symfony\Component\Serializer\Normalizer\PropertyNormalizer` classes is marked
+   as deprecated in favor of the new NameConverter system.
+
+   Before:
+
+   ```php
+   $normalizer->setCamelizedAttributes(array('foo_bar', 'bar_foo'));
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+   use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+
+   $nameConverter = new CamelCaseToSnakeCaseNameConverter(array('fooBar', 'barFoo'));
+   $normalizer = new GetSetMethodNormalizer(null, $nameConverter);
+   ```
+
+ * `Symfony\Component\Serializer\Exception\ExceptionInterface` is the new name for the now
+   deprecated `Symfony\Component\Serializer\Exception\Exception` interface.
+
+PropertyAccess
+--------------
+
+ * `UnexpectedTypeException` now expects three constructor arguments: The invalid property value,
+   the `PropertyPathInterface` object and the current index of the property path.
+
+   Before:
+
+   ```php
+        use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+
+        new UnexpectedTypeException($value, $expectedType);
+   ```
+
+   After:
+
+   ```php
+        use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+
+        new UnexpectedTypeException($value, $path, $pathIndex);
+   ```

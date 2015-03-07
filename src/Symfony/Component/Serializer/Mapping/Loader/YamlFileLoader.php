@@ -12,11 +12,12 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Serializer\Exception\MappingException;
-use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Yaml\Parser;
 
 /**
- * YAML File Loader
+ * YAML File Loader.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -34,7 +35,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
     {
         if (null === $this->classes) {
             if (!stream_is_local($this->file)) {
@@ -59,14 +60,22 @@ class YamlFileLoader extends FileLoader
             $this->classes = $classes;
         }
 
-        if (isset($this->classes[$metadata->getClassName()])) {
-            $yaml = $this->classes[$metadata->getClassName()];
+        if (isset($this->classes[$classMetadata->getName()])) {
+            $yaml = $this->classes[$classMetadata->getName()];
 
             if (isset($yaml['attributes']) && is_array($yaml['attributes'])) {
+                $attributesMetadata = $classMetadata->getAttributesMetadata();
                 foreach ($yaml['attributes'] as $attribute => $data) {
+                    if (isset($attributesMetadata[$attribute])) {
+                        $attributeMetadata = $attributesMetadata[$attribute];
+                    } else {
+                        $attributeMetadata = new AttributeMetadata($attribute);
+                        $classMetadata->addAttributeMetadata($attributeMetadata);
+                    }
+
                     if (isset($data['groups'])) {
                         foreach ($data['groups'] as $group) {
-                            $metadata->addAttributeGroup($attribute, $group);
+                            $attributeMetadata->addGroup($group);
                         }
                     }
                 }

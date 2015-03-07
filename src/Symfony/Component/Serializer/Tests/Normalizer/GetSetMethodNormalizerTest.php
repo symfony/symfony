@@ -22,8 +22,6 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 
-require_once __DIR__.'/../../Annotation/Groups.php';
-
 class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -40,6 +38,12 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->serializer = $this->getMock(__NAMESPACE__.'\SerializerNormalizer');
         $this->normalizer = new GetSetMethodNormalizer();
         $this->normalizer->setSerializer($this->serializer);
+    }
+
+    public function testInterface()
+    {
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
     }
 
     public function testNormalize()
@@ -95,13 +99,16 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testDenormalizeOnCamelCaseFormat()
+    public function testLegacyDenormalizeOnCamelCaseFormat()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->normalizer->setCamelizedAttributes(array('camel_case'));
         $obj = $this->normalizer->denormalize(
             array('camel_case' => 'camelCase'),
             __NAMESPACE__.'\GetSetDummy'
         );
+
         $this->assertEquals('camelCase', $obj->getCamelCase());
     }
 
@@ -110,27 +117,50 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, __NAMESPACE__.'\GetSetDummy'));
     }
 
-    /**
-     * @dataProvider attributeProvider
-     */
-    public function testFormatAttribute($attribute, $camelizedAttributes, $result)
+    public function testLegacyCamelizedAttributesNormalize()
     {
-        $r = new \ReflectionObject($this->normalizer);
-        $m = $r->getMethod('formatAttribute');
-        $m->setAccessible(true);
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-        $this->normalizer->setCamelizedAttributes($camelizedAttributes);
-        $this->assertEquals($m->invoke($this->normalizer, $attribute, $camelizedAttributes), $result);
+        $obj = new GetCamelizedDummy('dunglas.fr');
+        $obj->setFooBar('les-tilleuls.coop');
+        $obj->setBar_foo('lostinthesupermarket.fr');
+
+        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
+        $this->assertEquals($this->normalizer->normalize($obj), array(
+            'kevin_dunglas' => 'dunglas.fr',
+            'fooBar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ));
+
+        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
+        $this->assertEquals($this->normalizer->normalize($obj), array(
+            'kevinDunglas' => 'dunglas.fr',
+            'foo_bar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ));
     }
 
-    public function attributeProvider()
+    public function testLegacyCamelizedAttributesDenormalize()
     {
-        return array(
-            array('attribute_test', array('attribute_test'),'AttributeTest'),
-            array('attribute_test', array('any'),'attribute_test'),
-            array('attribute', array('attribute'),'Attribute'),
-            array('attribute', array(), 'attribute'),
-        );
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $obj = new GetCamelizedDummy('dunglas.fr');
+        $obj->setFooBar('les-tilleuls.coop');
+        $obj->setBar_foo('lostinthesupermarket.fr');
+
+        $this->normalizer->setCamelizedAttributes(array('kevin_dunglas'));
+        $this->assertEquals($this->normalizer->denormalize(array(
+            'kevin_dunglas' => 'dunglas.fr',
+            'fooBar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ), __NAMESPACE__.'\GetCamelizedDummy'), $obj);
+
+        $this->normalizer->setCamelizedAttributes(array('foo_bar'));
+        $this->assertEquals($this->normalizer->denormalize(array(
+            'kevinDunglas' => 'dunglas.fr',
+            'foo_bar' => 'les-tilleuls.coop',
+            'bar_foo' => 'lostinthesupermarket.fr',
+        ), __NAMESPACE__.'\GetCamelizedDummy'), $obj);
     }
 
     public function testConstructorDenormalize()
@@ -328,7 +358,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
      * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
@@ -401,6 +431,14 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dummy, $obj);
         $this->assertEquals('foo', $obj->getFoo());
         $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testDenormalizeNonExistingAttribute()
+    {
+        $this->assertEquals(
+            new PropertyDummy(),
+            $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy')
+        );
     }
 }
 
@@ -542,5 +580,42 @@ class GetConstructorOptionalArgsDummy
     public function otherMethod()
     {
         throw new \RuntimeException("Dummy::otherMethod() should not be called");
+    }
+}
+
+class GetCamelizedDummy
+{
+    private $kevinDunglas;
+    private $fooBar;
+    private $bar_foo;
+
+    public function __construct($kevinDunglas = null)
+    {
+        $this->kevinDunglas = $kevinDunglas;
+    }
+
+    public function getKevinDunglas()
+    {
+        return $this->kevinDunglas;
+    }
+
+    public function setFooBar($fooBar)
+    {
+        $this->fooBar = $fooBar;
+    }
+
+    public function getFooBar()
+    {
+        return $this->fooBar;
+    }
+
+    public function setBar_foo($bar_foo)
+    {
+        $this->bar_foo = $bar_foo;
+    }
+
+    public function getBar_foo()
+    {
+        return $this->bar_foo;
     }
 }

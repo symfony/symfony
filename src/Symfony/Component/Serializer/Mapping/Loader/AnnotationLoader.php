@@ -13,7 +13,9 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Exception\MappingException;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**
  * Annotation loader.
@@ -38,18 +40,25 @@ class AnnotationLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadClassMetadata(ClassMetadata $metadata)
+    public function loadClassMetadata(ClassMetadataInterface $classMetadata)
     {
-        $reflClass = $metadata->getReflectionClass();
-        $className = $reflClass->name;
+        $reflectionClass = $classMetadata->getReflectionClass();
+        $className = $reflectionClass->name;
         $loaded = false;
 
-        foreach ($reflClass->getProperties() as $property) {
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
+
+        foreach ($reflectionClass->getProperties() as $property) {
+            if (!isset($attributeMetadata[$property->name])) {
+                $attributesMetadata[$property->name] = new AttributeMetadata($property->name);
+                $classMetadata->addAttributeMetadata($attributesMetadata[$property->name]);
+            }
+
             if ($property->getDeclaringClass()->name == $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $groups) {
                     if ($groups instanceof Groups) {
                         foreach ($groups->getGroups() as $group) {
-                            $metadata->addAttributeGroup($property->name, $group);
+                            $attributesMetadata[$property->name]->addGroup($group);
                         }
                     }
 
@@ -58,16 +67,25 @@ class AnnotationLoader implements LoaderInterface
             }
         }
 
-        foreach ($reflClass->getMethods() as $method) {
+        foreach ($reflectionClass->getMethods() as $method) {
             if ($method->getDeclaringClass()->name == $className) {
                 foreach ($this->reader->getMethodAnnotations($method) as $groups) {
                     if ($groups instanceof Groups) {
                         if (preg_match('/^(get|is)(.+)$/i', $method->name, $matches)) {
+                            $attributeName = lcfirst($matches[2]);
+
+                            if (isset($attributesMetadata[$attributeName])) {
+                                $attributeMetadata = $attributesMetadata[$attributeName];
+                            } else {
+                                $attributesMetadata[$attributeName] = $attributeMetadata = new AttributeMetadata($attributeName);
+                                $classMetadata->addAttributeMetadata($attributeMetadata);
+                            }
+
                             foreach ($groups->getGroups() as $group) {
-                                $metadata->addAttributeGroup(lcfirst($matches[2]), $group);
+                                $attributeMetadata->addGroup($group);
                             }
                         } else {
-                            throw new \BadMethodCallException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get" or "is".', $className, $method->name));
+                            throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get" or "is".', $className, $method->name));
                         }
                     }
 

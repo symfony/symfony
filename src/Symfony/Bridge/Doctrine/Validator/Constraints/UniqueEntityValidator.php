@@ -133,16 +133,17 @@ class UniqueEntityValidator extends ConstraintValidator
         }
 
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
+        $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
         if ($this->context instanceof ExecutionContextInterface) {
             $this->context->buildViolation($constraint->message)
                 ->atPath($errorPath)
-                ->setInvalidValue($criteria[$fields[0]])
+                ->setInvalidValue($invalidValue)
                 ->addViolation();
         } else {
             $this->buildViolation($constraint->message)
                 ->atPath($errorPath)
-                ->setInvalidValue($criteria[$fields[0]])
+                ->setInvalidValue($invalidValue)
                 ->addViolation();
         }
     }

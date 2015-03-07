@@ -504,7 +504,19 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
      */
     public function testResolveFailsIfInvalidType()
     {
-        $this->resolver->setDefault('foo', 42);
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedTypes('foo', 'string');
+
+        $this->resolver->resolve(array('foo' => 42));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value null is expected to be of type "string", but is of type "NULL".
+     */
+    public function testResolveFailsIfInvalidTypeIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
         $this->resolver->setAllowedTypes('foo', 'string');
 
         $this->resolver->resolve();
@@ -675,7 +687,19 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
      */
     public function testResolveFailsIfInvalidValue()
     {
-        $this->resolver->setDefault('foo', 42);
+        $this->resolver->setDefined('foo');
+        $this->resolver->setAllowedValues('foo', 'bar');
+
+        $this->resolver->resolve(array('foo' => 42));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "foo" with value null is invalid. Accepted values are: "bar".
+     */
+    public function testResolveFailsIfInvalidValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->resolver->resolve();
@@ -698,6 +722,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setAllowedValues('foo', 'bar');
 
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfValidValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->setAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
     }
 
     /**
@@ -821,6 +853,14 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->addAllowedValues('foo', 'bar');
 
         $this->assertEquals(array('foo' => 'bar'), $this->resolver->resolve());
+    }
+
+    public function testResolveSucceedsIfValidAddedValueIsNull()
+    {
+        $this->resolver->setDefault('foo', null);
+        $this->resolver->addAllowedValues('foo', null);
+
+        $this->assertEquals(array('foo' => null), $this->resolver->resolve());
     }
 
     /**

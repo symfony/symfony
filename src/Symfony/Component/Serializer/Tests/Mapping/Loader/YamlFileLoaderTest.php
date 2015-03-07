@@ -20,13 +20,24 @@ use Symfony\Component\Serializer\Tests\Mapping\TestClassMetadataFactory;
  */
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var YamlFileLoader
+     */
     private $loader;
+    /**
+     * @var ClassMetadata
+     */
     private $metadata;
 
     public function setUp()
     {
         $this->loader = new YamlFileLoader(__DIR__.'/../../Fixtures/serialization.yml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
+    }
+
+    public function testInterface()
+    {
+        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Loader\LoaderInterface', $this->loader);
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()

@@ -77,9 +77,7 @@ class FormTypeValidatorExtension extends BaseValidatorExtension
             'extra_fields_message' => 'This form should not contain extra fields.',
         ));
 
-        $resolver->setNormalizers(array(
-            'constraints' => $constraintsNormalizer,
-        ));
+        $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 
     /**

@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
 {
@@ -118,6 +119,11 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      */
     public function normalize($data, $format = null, array $context = array())
     {
+        // If a normalizer supports the given data, use it
+        if ($normalizer = $this->getNormalizer($data, $format)) {
+            return $normalizer->normalize($data, $format, $context);
+        }
+
         if (null === $data || is_scalar($data)) {
             return $data;
         }
@@ -172,21 +178,25 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * Returns a matching normalizer.
      *
-     * @param object $data   The object to get the serializer for
+     * @param mixed  $data   Data to get the serializer for
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return NormalizerInterface|null
      */
     private function getNormalizer($data, $format)
     {
-        $class = get_class($data);
-        if (isset($this->normalizerCache[$class][$format])) {
-            return $this->normalizerCache[$class][$format];
+        if ($isObject = is_object($data)) {
+            $class = get_class($data);
+            if (isset($this->normalizerCache[$class][$format])) {
+                return $this->normalizerCache[$class][$format];
+            }
         }
 
         foreach ($this->normalizers as $normalizer) {
             if ($normalizer instanceof NormalizerInterface && $normalizer->supportsNormalization($data, $format)) {
-                $this->normalizerCache[$class][$format] = $normalizer;
+                if ($isObject) {
+                    $this->normalizerCache[$class][$format] = $normalizer;
+                }
 
                 return $normalizer;
             }

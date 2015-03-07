@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -40,6 +41,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      *
+     * @throws LogicException
      * @throws CircularReferenceException
      */
     public function normalize($object, $format = null, array $context = array())
@@ -50,7 +52,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
 
         $reflectionObject = new \ReflectionObject($object);
         $reflectionMethods = $reflectionObject->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $allowedAttributes = $this->getAllowedAttributes($object, $context);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         $attributes = array();
         foreach ($reflectionMethods as $method) {
@@ -66,15 +68,19 @@ class GetSetMethodNormalizer extends AbstractNormalizer
                 }
 
                 $attributeValue = $method->invoke($object);
-                if (array_key_exists($attributeName, $this->callbacks)) {
+                if (isset($this->callbacks[$attributeName])) {
                     $attributeValue = call_user_func($this->callbacks[$attributeName], $attributeValue);
                 }
                 if (null !== $attributeValue && !is_scalar($attributeValue)) {
                     if (!$this->serializer instanceof NormalizerInterface) {
-                        throw new \LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
+                        throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $attributeName));
                     }
 
                     $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                }
+
+                if ($this->nameConverter) {
+                    $attributeName = $this->nameConverter->normalize($attributeName);
                 }
 
                 $attributes[$attributeName] = $attributeValue;
@@ -91,7 +97,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
@@ -102,7 +108,11 @@ class GetSetMethodNormalizer extends AbstractNormalizer
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
-                $setter = 'set'.$this->formatAttribute($attribute);
+                if ($this->nameConverter) {
+                    $attribute = $this->nameConverter->denormalize($attribute);
+                }
+
+                $setter = 'set'.ucfirst($attribute);
 
                 if (method_exists($object, $setter)) {
                     $object->$setter($value);

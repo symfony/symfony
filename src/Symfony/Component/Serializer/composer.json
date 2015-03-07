@@ -19,8 +19,10 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/yaml": "~2.0|~3.0.0",
         "symfony/config": "~2.2|~3.0.0",
+        "symfony/property-access": "~2.3|~3.0.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
@@ -28,7 +30,8 @@
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/yaml": "For using the default YAML mapping loader.",
-        "symfony/config": "For using the XML mapping loader."
+        "symfony/config": "For using the XML mapping loader.",
+        "symfony/property-access": "For using the ObjectNormalizer."
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Serializer\\": "" }

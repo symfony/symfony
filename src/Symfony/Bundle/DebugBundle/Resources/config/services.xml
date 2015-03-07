@@ -14,6 +14,7 @@
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument>%kernel.charset%</argument>
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">

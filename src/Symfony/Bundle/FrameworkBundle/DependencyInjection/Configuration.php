@@ -53,6 +53,65 @@ class Configuration implements ConfigurationInterface
                     return $v;
                 })
             ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return !isset($v['assets']); })
+                ->then(function ($v) {
+                    if (!isset($v['templating'])
+                        || !$v['templating']['assets_version']
+                        && !count($v['templating']['assets_base_urls']['http'])
+                        && !count($v['templating']['assets_base_urls']['ssl'])
+                        && !count($v['templating']['packages'])
+                    ) {
+                        $v['assets'] = array(
+                            'version' => null,
+                            'version_format' => '%%s?%%s',
+                            'base_path' => '',
+                            'base_urls' => array(),
+                            'packages' => array(),
+                        );
+                    }
+
+                    return $v;
+                })
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return isset($v['templating']); })
+                ->then(function ($v) {
+                    if ($v['templating']['assets_version']
+                        || count($v['templating']['assets_base_urls']['http'])
+                        || count($v['templating']['assets_base_urls']['ssl'])
+                        || count($v['templating']['packages'])
+                    ) {
+                        trigger_error('The assets settings under framework.templating are deprecated since version 2.7 and will be removed in 3.0. Use the framework.assets configuration key instead', E_USER_DEPRECATED);
+
+                        // convert the old configuration to the new one
+                        if (isset($v['assets'])) {
+                            throw new \LogicException('You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.');
+                        }
+
+                        $v['assets'] = array(
+                            'version' => $v['templating']['assets_version'],
+                            'version_format' => $v['templating']['assets_version_format'],
+                            'base_path' => '',
+                            'base_urls' => array_values(array_unique(array_merge($v['templating']['assets_base_urls']['http'], $v['templating']['assets_base_urls']['ssl']))),
+                            'packages' => array(),
+                        );
+
+                        foreach ($v['templating']['packages'] as $name => $config) {
+                            $v['assets']['packages'][$name] = array(
+                                'version' => (string) $config['version'],
+                                'version_format' => $config['version_format'],
+                                'base_path' => '',
+                                'base_urls' => array_values(array_unique(array_merge($config['base_urls']['http'], $config['base_urls']['ssl']))),
+                            );
+                        }
+                    }
+
+                    unset($v['templating']['assets_version'], $v['templating']['assets_version_format'], $v['templating']['assets_base_urls'], $v['templating']['packages']);
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -108,6 +167,7 @@ class Configuration implements ConfigurationInterface
         $this->addSessionSection($rootNode);
         $this->addRequestSection($rootNode);
         $this->addTemplatingSection($rootNode);
+        $this->addAssetsSection($rootNode);
         $this->addTranslatorSection($rootNode);
         $this->addValidationSection($rootNode);
         $this->addAnnotationsSection($rootNode);
@@ -328,7 +388,7 @@ class Configuration implements ConfigurationInterface
             );
 
             foreach ($urls as $i => $url) {
-                if (is_integer($i)) {
+                if (is_int($i)) {
                     if (0 === strpos($url, 'https://') || 0 === strpos($url, '//')) {
                         $urls['http'][] = $urls['ssl'][] = $url;
                     } else {
@@ -347,8 +407,8 @@ class Configuration implements ConfigurationInterface
                     ->info('templating configuration')
                     ->canBeUnset()
                     ->children()
-                        ->scalarNode('assets_version')->defaultValue(null)->end()
-                        ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('assets_version')->defaultNull()->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
+                        ->scalarNode('assets_version_format')->defaultValue('%%s?%%s')->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')->end()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()
                         ->arrayNode('form')
                             ->addDefaultsIfNotSet()
@@ -370,6 +430,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('assets_base_url')
                     ->children()
                         ->arrayNode('assets_base_urls')
+                            ->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')
                             ->performNoDeepMerging()
                             ->addDefaultsIfNotSet()
                             ->beforeNormalization()
@@ -417,6 +478,7 @@ class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('package')
                     ->children()
                         ->arrayNode('packages')
+                            ->info('Deprecated since 2.7, will be removed in 3.0. Use the new assets entry instead.')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
                                 ->fixXmlConfig('base_url')
@@ -452,6 +514,54 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addAssetsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('assets')
+                    ->info('assets configuration')
+                    ->canBeUnset()
+                    ->fixXmlConfig('base_url')
+                    ->children()
+                        ->scalarNode('version')->defaultNull()->end()
+                        ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
+                        ->scalarNode('base_path')->defaultValue('')->end()
+                        ->arrayNode('base_urls')
+                            ->requiresAtLeastOneElement()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return !is_array($v); })
+                                ->then(function ($v) { return array($v); })
+                            ->end()
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                    ->fixXmlConfig('package')
+                    ->children()
+                        ->arrayNode('packages')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->fixXmlConfig('base_url')
+                                ->children()
+                                    ->scalarNode('version')->defaultNull()->end()
+                                    ->scalarNode('version_format')->defaultNull()->end()
+                                    ->scalarNode('base_path')->defaultValue('')->end()
+                                    ->arrayNode('base_urls')
+                                        ->requiresAtLeastOneElement()
+                                        ->beforeNormalization()
+                                            ->ifTrue(function ($v) { return !is_array($v); })
+                                            ->then(function ($v) { return array($v); })
+                                        ->end()
+                                        ->prototype('scalar')->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addTranslatorSection(ArrayNodeDefinition $rootNode)
     {
         $rootNode
@@ -459,8 +569,13 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('translator')
                     ->info('translator configuration')
                     ->canBeEnabled()
+                    ->fixXmlConfig('fallback')
                     ->children()
-                        ->scalarNode('fallback')->defaultValue('en')->end()
+                        ->arrayNode('fallbacks')
+                            ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
+                            ->prototype('scalar')->end()
+                            ->defaultValue(array('en'))
+                        ->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
                     ->end()
                 ->end()

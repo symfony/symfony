@@ -123,8 +123,6 @@ abstract class BaseType extends AbstractType
             'auto_initialize' => true,
         ));
 
-        $resolver->setAllowedTypes(array(
-            'attr' => 'array',
-        ));
+        $resolver->setAllowedTypes('attr', 'array');
     }
 }

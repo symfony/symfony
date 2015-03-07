@@ -43,16 +43,14 @@ class NumberType extends AbstractType
             'compound' => false,
         ));
 
-        $resolver->setAllowedValues(array(
-            'rounding_mode' => array(
-                NumberToLocalizedStringTransformer::ROUND_FLOOR,
-                NumberToLocalizedStringTransformer::ROUND_DOWN,
-                NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
-                NumberToLocalizedStringTransformer::ROUND_HALF_EVEN,
-                NumberToLocalizedStringTransformer::ROUND_HALF_UP,
-                NumberToLocalizedStringTransformer::ROUND_UP,
-                NumberToLocalizedStringTransformer::ROUND_CEILING,
-            ),
+        $resolver->setAllowedValues('rounding_mode', array(
+            NumberToLocalizedStringTransformer::ROUND_FLOOR,
+            NumberToLocalizedStringTransformer::ROUND_DOWN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_DOWN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_EVEN,
+            NumberToLocalizedStringTransformer::ROUND_HALF_UP,
+            NumberToLocalizedStringTransformer::ROUND_UP,
+            NumberToLocalizedStringTransformer::ROUND_CEILING,
         ));
     }
 

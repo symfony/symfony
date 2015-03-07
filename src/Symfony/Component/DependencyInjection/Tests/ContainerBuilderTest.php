@@ -260,7 +260,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->setResourceTracking(false);
         $builderCompilerPasses = $builder->getCompiler()->getPassConfig()->getPasses();
         $builder->addCompilerPass($this->getMock('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
-        $this->assertEquals(sizeof($builderCompilerPasses) + 1, sizeof($builder->getCompiler()->getPassConfig()->getPasses()));
+
+        $this->assertCount(count($builder->getCompiler()->getPassConfig()->getPasses()) - 1, $builderCompilerPasses);
     }
 
     /**

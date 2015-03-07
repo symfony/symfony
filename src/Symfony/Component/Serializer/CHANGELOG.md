@@ -14,6 +14,9 @@ CHANGELOG
  * [DEPRECATION] `GetSetMethodNormalizer::setCamelizedAttributes()` and
    `PropertyNormalizer::setCamelizedAttributes()` are replaced by
    `CamelCaseToSnakeCaseNameConverter`
+ * [DEPRECATION] the `Exception` interface has been renamed to `ExceptionInterface`
+ * added `ObjectNormalizer` leveraging the `PropertyAccess` component to normalize
+   objects containing both properties and getters / setters / issers / hassers methods.
 
 2.6.0
 -----

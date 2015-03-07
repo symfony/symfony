@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Mapping;
 
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 /**
@@ -22,21 +23,37 @@ class TestClassMetadataFactory
     {
         $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
 
+        $foo = new AttributeMetadata('foo');
+        $foo->addGroup('a');
+        $expected->addAttributeMetadata($foo);
+
+        $bar = new AttributeMetadata('bar');
+        $bar->addGroup('b');
+        $bar->addGroup('c');
+        $expected->addAttributeMetadata($bar);
+
+        $fooBar = new AttributeMetadata('fooBar');
+        $fooBar->addGroup('a');
+        $fooBar->addGroup('b');
+        $expected->addAttributeMetadata($fooBar);
+
+        $symfony = new AttributeMetadata('symfony');
+        $expected->addAttributeMetadata($symfony);
+
         if ($withParent) {
-            $expected->addAttributeGroup('kevin', 'a');
-            $expected->addAttributeGroup('coopTilleuls', 'a');
-            $expected->addAttributeGroup('coopTilleuls', 'b');
+            $kevin = new AttributeMetadata('kevin');
+            $kevin->addGroup('a');
+            $expected->addAttributeMetadata($kevin);
+
+            $coopTilleuls = new AttributeMetadata('coopTilleuls');
+            $coopTilleuls->addGroup('a');
+            $coopTilleuls->addGroup('b');
+            $expected->addAttributeMetadata($coopTilleuls);
         }
 
         if ($withInterface) {
-            $expected->addAttributeGroup('symfony', 'a');
+            $symfony->addGroup('a');
         }
-
-        $expected->addAttributeGroup('foo', 'a');
-        $expected->addAttributeGroup('bar', 'b');
-        $expected->addAttributeGroup('bar', 'c');
-        $expected->addAttributeGroup('fooBar', 'a');
-        $expected->addAttributeGroup('fooBar', 'b');
 
         // load reflection class so that the comparison passes
         $expected->getReflectionClass();
@@ -47,9 +64,15 @@ class TestClassMetadataFactory
     public static function createXmlCLassMetadata()
     {
         $expected = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');
-        $expected->addAttributeGroup('foo', 'group1');
-        $expected->addAttributeGroup('foo', 'group2');
-        $expected->addAttributeGroup('bar', 'group2');
+
+        $foo = new AttributeMetadata('foo');
+        $foo->addGroup('group1');
+        $foo->addGroup('group2');
+        $expected->addAttributeMetadata($foo);
+
+        $bar = new AttributeMetadata('bar');
+        $bar->addGroup('group2');
+        $expected->addAttributeMetadata($bar);
 
         return $expected;
     }

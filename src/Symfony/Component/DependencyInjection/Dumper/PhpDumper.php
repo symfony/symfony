@@ -1175,7 +1175,7 @@ EOF;
                     $behavior[$id] = $argument->getInvalidBehavior();
                 }
 
-                $calls[$id] += 1;
+                ++$calls[$id];
             }
         }
     }
@@ -1486,12 +1486,12 @@ EOF;
             }
 
             while ($i > 0) {
-                $i -= 1;
+                --$i;
                 $name .= $nonFirstChars[$i%$nonFirstCharsLength];
                 $i = intval($i/$nonFirstCharsLength);
             }
 
-            $this->variableCount += 1;
+            ++$this->variableCount;
 
             // check that the name is not reserved
             if (in_array($name, $this->reservedVariables, true)) {

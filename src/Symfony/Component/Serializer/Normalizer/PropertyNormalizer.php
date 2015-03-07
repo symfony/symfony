@@ -46,7 +46,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
         $reflectionObject = new \ReflectionObject($object);
         $attributes = array();
-        $allowedAttributes = $this->getAllowedAttributes($object, $context);
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
 
         foreach ($reflectionObject->getProperties() as $property) {
             if (in_array($property->name, $this->ignoredAttributes)) {
@@ -64,7 +64,7 @@ class PropertyNormalizer extends AbstractNormalizer
 
             $attributeValue = $property->getValue($object);
 
-            if (array_key_exists($property->name, $this->callbacks)) {
+            if (isset($this->callbacks[$property->name])) {
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
@@ -89,7 +89,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
-        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $data = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);

@@ -103,6 +103,18 @@ UPGRADE FROM 2.x to 3.0
    removed: `ContainerBuilder::synchronize()`, `Definition::isSynchronized()`,
    and `Definition::setSynchronized()`.
 
+### DomCrawler
+
+ * The `Form` class don't extend `Link` anymore. An `UriElementInterface`
+   interface have been introduced since 2.7 and both `Form` and `Link`
+   implement it. The abstract URI parsing logic is in an
+   `AbstractUriElement` class.
+ * The `node` and `method` properties from `AbstractUriElement` are now
+   private. You can access them with `getNode()` and `getMethod()`.
+ * The method `AbstractUriElement::setNode()` have been removed, child
+   classes now have to provide a `findNode` method that returns the node
+   instead of setting the (now private) `node` property.
+
 ### EventDispatcher
 
  * The interface `Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface`

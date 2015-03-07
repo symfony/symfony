@@ -21,7 +21,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
  *
  * @api
  */
-class Form extends Link implements \ArrayAccess
+class Form extends AbstractUriElement implements \ArrayAccess
 {
     /**
      * @var \DOMElement
@@ -58,7 +58,7 @@ class Form extends Link implements \ArrayAccess
      */
     public function getFormNode()
     {
-        return $this->node;
+        return $this->getNode();
     }
 
     /**
@@ -207,7 +207,7 @@ class Form extends Link implements \ArrayAccess
 
     protected function getRawUri()
     {
-        return $this->node->getAttribute('action');
+        return $this->getNode()->getAttribute('action');
     }
 
     /**
@@ -221,11 +221,11 @@ class Form extends Link implements \ArrayAccess
      */
     public function getMethod()
     {
-        if (null !== $this->method) {
-            return $this->method;
+        if (null !== parent::getMethod()) {
+            return parent::getMethod();
         }
 
-        return $this->node->getAttribute('method') ? strtoupper($this->node->getAttribute('method')) : 'GET';
+        return $this->getNode()->getAttribute('method') ? strtoupper($this->getNode()->getAttribute('method')) : 'GET';
     }
 
     /**
@@ -368,9 +368,11 @@ class Form extends Link implements \ArrayAccess
      *
      * @param \DOMElement $node A \DOMElement instance
      *
+     * @return \DOMElement
+     *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node)
+    protected function findNode(\DOMElement $node)
     {
         $this->button = $node;
         if ('button' === $node->nodeName || ('input' === $node->nodeName && in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image')))) {
@@ -381,9 +383,8 @@ class Form extends Link implements \ArrayAccess
                 if (null === $form) {
                     throw new \LogicException(sprintf('The selected node has an invalid form attribute (%s).', $formId));
                 }
-                $this->node = $form;
 
-                return;
+                return $form;
             }
             // we loop until we find a form ancestor
             do {
@@ -395,7 +396,7 @@ class Form extends Link implements \ArrayAccess
             throw new \LogicException(sprintf('Unable to submit on a "%s" tag.', $node->nodeName));
         }
 
-        $this->node = $node;
+        return $node;
     }
 
     /**
@@ -409,7 +410,7 @@ class Form extends Link implements \ArrayAccess
     {
         $this->fields = new FormFieldRegistry();
 
-        $xpath = new \DOMXPath($this->node->ownerDocument);
+        $xpath = new \DOMXPath($this->getNode()->ownerDocument);
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
@@ -433,18 +434,18 @@ class Form extends Link implements \ArrayAccess
         }
 
         // find form elements corresponding to the current form
-        if ($this->node->hasAttribute('id')) {
+        if ($this->getNode()->hasAttribute('id')) {
             // corresponding elements are either descendants or have a matching HTML5 form attribute
-            $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
+            $formId = Crawler::xpathLiteral($this->getNode()->getAttribute('id'));
 
             $fieldNodes = $xpath->query(sprintf('descendant::input[@form=%s] | descendant::button[@form=%s] | descendant::textarea[@form=%s] | descendant::select[@form=%s] | //form[@id=%s]//input[not(@form)] | //form[@id=%s]//button[not(@form)] | //form[@id=%s]//textarea[not(@form)] | //form[@id=%s]//select[not(@form)]', $formId, $formId, $formId, $formId, $formId, $formId, $formId, $formId));
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }
         } else {
-            // do the xpath query with $this->node as the context node, to only find descendant elements
+            // do the xpath query with $this->getNode() as the context node, to only find descendant elements
             // however, descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->node);
+            $fieldNodes = $xpath->query('descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)]', $this->getNode());
             foreach ($fieldNodes as $node) {
                 $this->addField($node);
             }

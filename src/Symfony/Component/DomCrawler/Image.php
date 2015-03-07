@@ -12,23 +12,21 @@
 namespace Symfony\Component\DomCrawler;
 
 /**
- * Link represents an HTML link (an HTML a, area or link tag).
- *
- * @author Fabien Potencier <fabien@symfony.com>
+ * Image represents an HTML image (an HTML img tag).
  *
  * @api
  */
-class Link extends AbstractUriElement
+class Image extends AbstractUriElement
 {
     protected function getRawUri()
     {
-        return $this->getNode()->getAttribute('href');
+        return $this->getNode()->getAttribute('src');
     }
 
     protected function findNode(\DOMElement $node)
     {
-        if ('a' !== $node->nodeName && 'area' !== $node->nodeName && 'link' !== $node->nodeName) {
-            throw new \LogicException(sprintf('Unable to navigate from a "%s" tag.', $node->nodeName));
+        if ('img' !== $node->nodeName) {
+            throw new \LogicException(sprintf('Unable to visualize a "%s" tag.', $node->nodeName));
         }
 
         return $node;

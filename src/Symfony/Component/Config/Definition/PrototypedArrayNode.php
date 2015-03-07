@@ -131,7 +131,7 @@ class PrototypedArrayNode extends ArrayNode
         if (null === $children) {
             $this->defaultChildren = array('defaults');
         } else {
-            $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+            $this->defaultChildren = is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
     }
 

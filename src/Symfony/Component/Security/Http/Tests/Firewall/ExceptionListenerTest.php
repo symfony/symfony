@@ -172,9 +172,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     private function createExceptionListener(TokenStorageInterface $tokenStorage = null, AuthenticationTrustResolverInterface $trustResolver = null, HttpUtils $httpUtils = null, AuthenticationEntryPointInterface $authenticationEntryPoint = null, $errorPage = null, AccessDeniedHandlerInterface $accessDeniedHandler = null)
     {
         return new ExceptionListener(
-            $tokenStorage ? $tokenStorage : $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
-            $trustResolver ? $trustResolver : $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'),
-            $httpUtils ? $httpUtils : $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
+            $tokenStorage ?: $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
+            $trustResolver ?: $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'),
+            $httpUtils ?: $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
             'key',
             $authenticationEntryPoint,
             $errorPage,

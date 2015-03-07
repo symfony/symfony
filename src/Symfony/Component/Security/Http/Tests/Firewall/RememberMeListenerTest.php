@@ -20,7 +20,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
     {
-        list($listener, $tokenStorage, , , ,) = $this->getListener();
+        list($listener, $tokenStorage) = $this->getListener();
 
         $tokenStorage
             ->expects($this->once())
@@ -38,7 +38,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
     {
-        list($listener, $tokenStorage, $service, ,) = $this->getListener();
+        list($listener, $tokenStorage, $service) = $this->getListener();
 
         $tokenStorage
             ->expects($this->once())
@@ -64,7 +64,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
-        list($listener, $tokenStorage, $service, $manager,) = $this->getListener();
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
         $tokenStorage
             ->expects($this->once())
@@ -144,7 +144,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurity()
     {
-        list($listener, $tokenStorage, $service, $manager,) = $this->getListener();
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
         $tokenStorage
             ->expects($this->once())

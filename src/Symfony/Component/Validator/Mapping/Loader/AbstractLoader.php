@@ -58,13 +58,13 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * Creates a new constraint instance for the given constraint name.
      *
-     * @param string $name   The constraint name. Either a constraint relative
-     *                       to the default constraint namespace, or a fully
-     *                       qualified class name. Alternatively, the constraint
-     *                       may be preceded by a namespace alias and a colon.
-     *                       The namespace alias must have been defined using
-     *                       {@link addNamespaceAlias()}.
-     * @param mixed $options The constraint options
+     * @param string $name    The constraint name. Either a constraint relative
+     *                        to the default constraint namespace, or a fully
+     *                        qualified class name. Alternatively, the constraint
+     *                        may be preceded by a namespace alias and a colon.
+     *                        The namespace alias must have been defined using
+     *                        {@link addNamespaceAlias()}.
+     * @param mixed  $options The constraint options
      *
      * @return Constraint
      *

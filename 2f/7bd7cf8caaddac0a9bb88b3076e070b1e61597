@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-05T09:45:37Z
+
+this is indeed equivalent
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-05T09:59:31Z
+
+I wondered if mentioning a non existing version (2.3.26/2.6.5) would make composer fail.
+Looks like not, good to merge then.

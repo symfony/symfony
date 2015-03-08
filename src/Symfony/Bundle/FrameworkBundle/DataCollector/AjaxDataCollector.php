@@ -11,24 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DataCollector;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector as BaseAjaxDataCollector;
 
 /**
  * AjaxDataCollector.
  *
  * @author Bart van den Burg <bart@burgov.nl>
  */
-class AjaxDataCollector extends DataCollector
+class AjaxDataCollector extends BaseAjaxDataCollector
 {
-    public function collect(Request $request, Response $response, \Exception $exception = null)
-    {
-        // all collecting is done client side
-    }
-
-    public function getName()
-    {
-        return 'ajax';
-    }
 }

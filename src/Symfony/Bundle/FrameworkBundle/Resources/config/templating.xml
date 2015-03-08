@@ -14,6 +14,7 @@
         <parameter key="templating.loader.cache.class">Symfony\Component\Templating\Loader\CacheLoader</parameter>
         <parameter key="templating.loader.chain.class">Symfony\Component\Templating\Loader\ChainLoader</parameter>
         <parameter key="templating.finder.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\TemplateFinder</parameter>
+        <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
     </parameters>
 
     <services>
@@ -58,5 +59,14 @@
         </service>
 
         <service id="templating.loader" alias="templating.loader.filesystem" />
+
+        <!--
+            This service will be moved to templating_php.xml in version 3.0, it exists here for BC reasons.
+        -->
+        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
+            <tag name="templating.helper" alias="assets" />
+            <argument /> <!-- default package -->
+            <argument type="collection" /> <!-- named packages -->
+        </service>
     </services>
 </container>

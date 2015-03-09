@@ -179,6 +179,10 @@ class Table
         reset($this->rows);
 
         foreach ($row as $key => $cellValue) {
+            if (is_array($cellValue)) {
+                $cellValue = print_r($cellValue, true);
+            }
+
             if (!strstr($cellValue, "\n")) {
                 continue;
             }

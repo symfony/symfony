@@ -37,6 +37,7 @@ class YamlLintCommand extends Command
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
+            ->addOption('exclude_dir', null, InputOption::VALUE_OPTIONAL, 'Exclude a list of directory', '')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
 the first encountered syntax error.
@@ -49,6 +50,7 @@ Or of a whole directory:
 
   <info>php %command.full_name% dirname</info>
   <info>php %command.full_name% dirname --format=json</info>
+  <info>php %command.full_name% dirname --exclude_dir=dir1,dir2</info>
 
 Or all YAML files in a bundle:
 
@@ -84,14 +86,16 @@ EOF
             throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
         }
 
+        $dirToExclude = explode(',', $input->getOption('exclude_dir'));
+
         $files = array();
         if (is_file($filename)) {
             $files = array($filename);
         } elseif (is_dir($filename)) {
-            $files = Finder::create()->files()->in($filename)->name('*.yml');
+            $files = Finder::create()->files()->in($filename)->exclude($dirToExclude)->name('*.yml');
         } else {
             $dir = $this->getApplication()->getKernel()->locateResource($filename);
-            $files = Finder::create()->files()->in($dir)->name('*.yml');
+            $files = Finder::create()->files()->in($dir)->exclude($dirToExclude)->name('*.yml');
         }
 
         $filesInfo = array();

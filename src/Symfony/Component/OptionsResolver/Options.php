@@ -92,8 +92,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         // Setting is equivalent to overloading while discarding the previous
         // option value
-        unset($this->options[$option]);
-        unset($this->lazy[$option]);
+        unset($this->options[$option], $this->lazy[$option]);
 
         $this->overload($option, $value);
     }
@@ -270,9 +269,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
             throw new OptionDefinitionException('Options cannot be removed anymore once options have been read.');
         }
 
-        unset($this->options[$option]);
-        unset($this->lazy[$option]);
-        unset($this->normalizers[$option]);
+        unset($this->options[$option], $this->lazy[$option], $this->normalizers[$option]);
     }
 
     /**
@@ -470,10 +467,8 @@ class Options implements \ArrayAccess, \Iterator, \Countable
         foreach ($this->lazy[$option] as $closure) {
             $this->options[$option] = $closure($this, $this->options[$option]);
         }
-        unset($this->lock[$option]);
-
         // The option now isn't lazy anymore
-        unset($this->lazy[$option]);
+        unset($this->lock[$option], $this->lazy[$option]);
     }
 
     /**
@@ -509,9 +504,7 @@ class Options implements \ArrayAccess, \Iterator, \Countable
 
         $this->lock[$option] = true;
         $this->options[$option] = $normalizer($this, array_key_exists($option, $this->options) ? $this->options[$option] : null);
-        unset($this->lock[$option]);
-
         // The option is now normalized
-        unset($this->normalizers[$option]);
+        unset($this->lock[$option], $this->normalizers[$option]);
     }
 }

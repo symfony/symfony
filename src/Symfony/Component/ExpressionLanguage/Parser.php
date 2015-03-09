@@ -317,8 +317,9 @@ class Parser
                     $token->type !== Token::NUMBER_TYPE
                     &&
                     // operators line "not" are valid method or property names
-                    ($token->type !== Token::OPERATOR_TYPE && preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
+                    ($token->type !== Token::OPERATOR_TYPE || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
                 ) {
+                    // 
                     throw new SyntaxError('Expected name or number', $token->cursor);
                 }
 

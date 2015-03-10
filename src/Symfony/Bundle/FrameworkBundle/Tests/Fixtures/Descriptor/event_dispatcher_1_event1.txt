@@ -1,7 +1,7 @@
 <info>[event_dispatcher]</info> Registered listeners for event <info>event1</info>
 
 +-------+-------------------+
-| Order | Callable          |
+|[32m Order [39m|[32m Callable          [39m|
 +-------+-------------------+
 | #1    | global_function() |
 | #2    | \Closure()        |

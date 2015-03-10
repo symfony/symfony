@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 /**
  * Twig extension for the Symfony Asset component.
@@ -22,16 +21,10 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 class AssetExtension extends \Twig_Extension
 {
     private $packages;
-    private $foundationExtension;
 
-    /**
-     * Passing an HttpFoundationExtension instance as a second argument must not be relied on
-     * as it's only there to maintain BC with older Symfony version. It will be removed in 3.0.
-     */
-    public function __construct(Packages $packages, HttpFoundationExtension $foundationExtension = null)
+    public function __construct(Packages $packages)
     {
         $this->packages = $packages;
-        $this->foundationExtension = $foundationExtension;
     }
 
     /**
@@ -42,7 +35,6 @@ class AssetExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
             new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
-            new \Twig_SimpleFunction('assets_version', array($this, 'getAssetsVersion')),
         );
     }
 
@@ -57,20 +49,8 @@ class AssetExtension extends \Twig_Extension
      *
      * @return string The public path of the asset
      */
-    public function getAssetUrl($path, $packageName = null, $absolute = false, $version = null)
+    public function getAssetUrl($path, $packageName = null)
     {
-        // BC layer to be removed in 3.0
-        if (2 < $count = func_num_args()) {
-            trigger_error('Generating absolute URLs with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0. Please use absolute_url() instead.', E_USER_DEPRECATED);
-            if (4 === $count) {
-                trigger_error('Forcing a version with the Twig asset() function was deprecated in 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
-            }
-
-            $args = func_get_args();
-
-            return $this->getLegacyAssetUrl($path, $packageName, $args[2], isset($args[3]) ? $args[3] : null);
-        }
-
         return $this->packages->getUrl($path, $packageName);
     }
 
@@ -85,51 +65,6 @@ class AssetExtension extends \Twig_Extension
     public function getAssetVersion($path, $packageName = null)
     {
         return $this->packages->getVersion($path, $packageName);
-    }
-
-    public function getAssetsVersion($packageName = null)
-    {
-        trigger_error('The Twig assets_version() function was deprecated in 2.7 and will be removed in 3.0. Please use asset_version() instead.', E_USER_DEPRECATED);
-
-        return $this->packages->getVersion('/', $packageName);
-    }
-
-    private function getLegacyAssetUrl($path, $packageName = null, $absolute = false, $version = null)
-    {
-        if ($version) {
-            $package = $this->packages->getPackage($packageName);
-
-            $v = new \ReflectionProperty($package, 'versionStrategy');
-            $v->setAccessible(true);
-
-            $currentVersionStrategy = $v->getValue($package);
-
-            $f = new \ReflectionProperty($currentVersionStrategy, 'format');
-            $f->setAccessible(true);
-            $format = $f->getValue($currentVersionStrategy);
-
-            $v->setValue($package, new StaticVersionStrategy($version, $format));
-        }
-
-        try {
-            $url = $this->packages->getUrl($path, $packageName);
-        } catch (\Exception $e) {
-            if ($version) {
-                $v->setValue($package, $currentVersionStrategy);
-            }
-
-            throw $e;
-        }
-
-        if ($version) {
-            $v->setValue($package, $currentVersionStrategy);
-        }
-
-        if ($absolute) {
-            return $this->foundationExtension->generateAbsoluteUrl($url);
-        }
-
-        return $url;
     }
 
     /**

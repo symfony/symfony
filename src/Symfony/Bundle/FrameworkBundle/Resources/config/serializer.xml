@@ -35,6 +35,13 @@
             <argument>null</argument>
         </service>
 
+        <!-- Cache -->
+        <service id="serializer.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
+            <call method="setNamespace">
+                <argument>%serializer.mapping.cache.prefix%</argument>
+            </call>
+        </service>
+
         <!-- Encoders -->
         <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false" >
             <tag name="serializer.encoder" />

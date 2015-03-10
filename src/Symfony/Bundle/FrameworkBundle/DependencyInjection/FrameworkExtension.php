@@ -941,14 +941,8 @@ class FrameworkExtension extends Extension
                 'serializer_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
 
-            if ($config['cache'] === 'apc') {
-                $apcCacheDefinition = $container->register('serializer.mapping.cache.apc', 'Doctrine\Common\Cache\ApcCache');
-                $apcCacheDefinition->addMethodCall('setNamespace', array('%serializer.mapping.cache.prefix%'));
-                $apcCacheDefinition->setPublic(false);
-            }
-
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
-                1, new Reference('serializer.mapping.cache.'.$config['cache'])
+                1, new Reference($config['cache'])
             );
         }
     }

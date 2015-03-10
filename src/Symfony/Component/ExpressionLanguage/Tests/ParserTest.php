@@ -161,4 +161,44 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         return new Node\GetAttrNode($node, new Node\ConstantNode($item), new Node\ArgumentsNode(), $type);
     }
+
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     */
+    public function testParseWithStringAsInvalidName()
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo."#"'), array('foo'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     */
+    public function testParseWithStringAsValidName()
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo."bar"'), array('foo'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     */
+    public function testParseWithOperatorAsInvalidName()
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo.**'), array('foo'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     */
+    public function testParseWithNumberAsInvalidName()
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo.123'), array('foo'));
+    }
 }

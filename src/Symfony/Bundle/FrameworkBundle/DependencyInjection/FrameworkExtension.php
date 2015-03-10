@@ -935,7 +935,7 @@ class FrameworkExtension extends Extension
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
 
-        if (isset($config['cache']) && $config['cache'] !== 'none') {
+        if (isset($config['cache']) && $config['cache']) {
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
                 'serializer_'.hash('sha256', $container->getParameter('kernel.root_dir'))

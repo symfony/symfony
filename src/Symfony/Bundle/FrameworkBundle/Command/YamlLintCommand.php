@@ -37,7 +37,7 @@ class YamlLintCommand extends Command
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
-            ->addOption('exclude_dir', null, InputOption::VALUE_OPTIONAL, 'Exclude a list of directory', '')
+            ->addOption('exclude_dir', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Exclude a  directory')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
 the first encountered syntax error.
@@ -50,7 +50,7 @@ Or of a whole directory:
 
   <info>php %command.full_name% dirname</info>
   <info>php %command.full_name% dirname --format=json</info>
-  <info>php %command.full_name% dirname --exclude_dir=dir1,dir2</info>
+  <info>php %command.full_name% dirname --exclude_dir=dir1 --exclude_dir=dir2</info>
 
 Or all YAML files in a bundle:
 
@@ -86,7 +86,7 @@ EOF
             throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
         }
 
-        $dirToExclude = explode(',', $input->getOption('exclude_dir'));
+        $dirToExclude = $input->getOption('exclude_dir');
 
         $files = array();
         if (is_file($filename)) {

@@ -79,25 +79,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
-    public function testLegacyRouteDefinitionLoading()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));
-        $routeCollection = $loader->load('legacy_validpattern.yml');
-        $route = $routeCollection->get('blog_show_legacy');
-
-        $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
-        $this->assertSame('/blog/{slug}', $route->getPath());
-        $this->assertSame('{locale}.example.com', $route->getHost());
-        $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
-        $this->assertSame('\w+', $route->getRequirement('locale'));
-        $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
-        $this->assertEquals(array('GET', 'POST', 'PUT', 'OPTIONS'), $route->getMethods());
-        $this->assertEquals(array('https'), $route->getSchemes());
-        $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
-    }
-
     public function testLoadWithResource()
     {
         $loader = new YamlFileLoader(new FileLocator(array(__DIR__.'/../Fixtures')));

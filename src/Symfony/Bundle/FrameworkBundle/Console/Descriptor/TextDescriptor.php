@@ -35,8 +35,8 @@ class TextDescriptor extends Descriptor
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
         $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+
+        $table = new Table($this->output);
         $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
         foreach ($routes->all() as $name => $route) {
@@ -70,9 +70,6 @@ class TextDescriptor extends Descriptor
      */
     protected function describeRoute(Route $route, array $options = array())
     {
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-
         // fixme: values were originally written as raw
         $description = array(
             '<comment>Path</comment>         '.$route->getPath(),
@@ -83,7 +80,7 @@ class TextDescriptor extends Descriptor
             '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
             '<comment>Class</comment>        '.get_class($route),
             '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
-            '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
+            '<comment>Requirements</comment> '.($route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'),
             '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
         );
 
@@ -100,8 +97,7 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerParameters(ParameterBag $parameters, array $options = array())
     {
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array('Parameter', 'Value'));
 
         foreach ($this->sortParameters($parameters) as $parameter => $value) {
@@ -201,8 +197,7 @@ class TextDescriptor extends Descriptor
         $tagsCount = count($maxTags);
         $tagsNames = array_keys($maxTags);
 
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
+        $table = new Table($this->output);
         $table->setHeaders(array_merge(array('Service ID'), $tagsNames, array('Class name')));
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -337,11 +332,11 @@ class TextDescriptor extends Descriptor
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
         $registeredListeners = $eventDispatcher->getListeners($event);
+        $table = new Table($this->output);
 
         if (null !== $event) {
             $this->writeText("\n");
-            $table = new Table($this->getOutput());
-            $table->getStyle()->setCellHeaderFormat('%s');
+
             $table->setHeaders(array('Order', 'Callable'));
 
             foreach ($registeredListeners as $order => $listener) {
@@ -354,8 +349,6 @@ class TextDescriptor extends Descriptor
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
 
-                $table = new Table($this->getOutput());
-                $table->getStyle()->setCellHeaderFormat('%s');
                 $table->setHeaders(array('Order', 'Callable'));
 
                 foreach ($eventListeners as $order => $eventListener) {

@@ -63,11 +63,10 @@ abstract class DoctrineType extends AbstractType
         $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
         $propertyAccessor = $this->propertyAccessor;
-        $type = $this;
 
-        $loader = function (Options $options) use ($type) {
+        $loader = function (Options $options) {
             if (null !== $options['query_builder']) {
-                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                return $this->getLoader($options['em'], $options['query_builder'], $options['class']);
             }
         };
 

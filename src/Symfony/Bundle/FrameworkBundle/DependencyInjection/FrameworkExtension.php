@@ -40,6 +40,7 @@ class FrameworkExtension extends Extension
      *
      * @param array            $configs
      * @param ContainerBuilder $container
+     *
      * @throws LogicException
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -682,22 +683,10 @@ class FrameworkExtension extends Extension
         }
 
         // Register translation resources
+        $container->setParameter('translator.resource.directories', $dirs);
         if ($dirs) {
             foreach ($dirs as $dir) {
                 $container->addResource(new DirectoryResource($dir));
-            }
-            $finder = Finder::create()
-                ->files()
-                ->filter(function (\SplFileInfo $file) {
-                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                })
-                ->in($dirs)
-            ;
-
-            foreach ($finder as $file) {
-                // filename is domain.locale.format
-                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-                $translator->addMethodCall('addResource', array($format, (string) $file, $locale, $domain));
             }
         }
     }

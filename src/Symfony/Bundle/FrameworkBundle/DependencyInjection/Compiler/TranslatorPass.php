@@ -40,6 +40,8 @@ class TranslatorPass implements CompilerPassInterface
             }
         }
 
-        $container->findDefinition('translator.default')->replaceArgument(2, $loaders);
+        $translatorDefinition = $container->findDefinition('translator.default');
+        $translatorDefinition->replaceArgument(2, $loaders);
+        $translatorDefinition->replaceArgument(3, $container->getParameter('translator.resource.directories'));
     }
 }

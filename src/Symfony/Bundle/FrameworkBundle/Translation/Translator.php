@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Translator.
@@ -24,6 +25,7 @@ class Translator extends BaseTranslator
 {
     protected $container;
     protected $loaderIds;
+    protected $resourceDirs;
 
     protected $options = array(
         'cache_dir' => null,
@@ -41,14 +43,16 @@ class Translator extends BaseTranslator
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $loaderIds An array of loader Ids
+     * @param array              $resourceDirs An array of resource directories
      * @param array              $options   An array of options
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), $resourceDirs = array(), array $options = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
+        $this->resourceDirs = $resourceDirs;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
@@ -74,6 +78,22 @@ class Translator extends BaseTranslator
         foreach ($this->loaderIds as $id => $aliases) {
             foreach ($aliases as $alias) {
                 $this->addLoader($alias, $this->container->get($id));
+            }
+        }
+
+        if ($this->resourceDirs) {
+            $finder = Finder::create()
+                ->files()
+                ->filter(function (\SplFileInfo $file) {
+                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                })
+                ->in($this->resourceDirs)
+            ;
+
+            foreach ($finder as $file) {
+                // filename is domain.locale.format
+                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
+                $this->addResource($format, (string) $file, $locale, $domain);
             }
         }
     }

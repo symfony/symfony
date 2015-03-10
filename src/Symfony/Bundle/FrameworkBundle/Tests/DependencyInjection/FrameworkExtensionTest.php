@@ -222,31 +222,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
 
-        $resources = array();
-        foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
-            if ('addResource' == $call[0]) {
-                $resources[] = $call[1];
-            }
-        }
+        $dirs = $container->getParameter('translator.resource_directories');
 
-        $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
-            $files,
-            '->registerTranslatorConfiguration() finds Validator translation resources'
+            dirname($ref->getFileName()).'/Resources/translations',
+            $dirs
         );
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
-            $files,
-            '->registerTranslatorConfiguration() finds Form translation resources'
+            dirname($ref->getFileName()).'/Resources/translations',
+            $dirs
         );
-        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
         $this->assertContains(
-            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
-            $files,
-            '->registerTranslatorConfiguration() finds Security translation resources'
+            dirname($ref->getFileName()).'/../Resources/translations',
+            $dirs
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();

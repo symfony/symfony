@@ -95,11 +95,37 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), array(), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
         $translator->setLocale('invalid locale');
 
         $this->setExpectedException('\InvalidArgumentException');
         $translator->trans('foo');
+    }
+
+    public function testLoadRessourcesWithCaching()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+
+        // prime the cache
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), array(__DIR__.'/../Fixtures/Resources/translations'), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('répertoire', $translator->trans('folder'));
+
+        // do it another time as the cache is primed now
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), array(), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('répertoire', $translator->trans('folder'));
+    }
+
+    public function testLoadRessourcesWithoutCaching()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $translator = $this->getTranslator($loader, array(), array(__DIR__.'/../Fixtures/Resources/translations'), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
     protected function getCatalogue($locale, $messages)
@@ -182,23 +208,25 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    public function getTranslator($loader, $options = array(), $resources = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
         $translator = new $translatorClass(
             $this->getContainer($loader),
             new MessageSelector(),
-            array('loader' => array('loader')),
-            array(),
-            $options
+            array($loaderFomat => array($loaderFomat)),
+            $options,
+            $resources
         );
 
-        $translator->addResource('loader', 'foo', 'fr');
-        $translator->addResource('loader', 'foo', 'en');
-        $translator->addResource('loader', 'foo', 'es');
-        $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
-        $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
-        $translator->addResource('loader', 'foo', 'fr.UTF-8');
-        $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+        if ('loader' === $loaderFomat) {
+            $translator->addResource('loader', 'foo', 'fr');
+            $translator->addResource('loader', 'foo', 'en');
+            $translator->addResource('loader', 'foo', 'es');
+            $translator->addResource('loader', 'foo', 'pt-PT'); // European Portuguese
+            $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
+            $translator->addResource('loader', 'foo', 'fr.UTF-8');
+            $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+        }
 
         return $translator;
     }

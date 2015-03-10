@@ -43,12 +43,12 @@ class Translator extends BaseTranslator
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
      * @param array              $loaderIds An array of loader Ids
-     * @param array              $resourceDirs An array of resource directories
      * @param array              $options   An array of options
+     * @param array              $resourceDirs An array of resource directories
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), $resourceDirs = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), $resourceDirs = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;

@@ -683,7 +683,7 @@ class FrameworkExtension extends Extension
         }
 
         // Register translation resources
-        $container->setParameter('translator.resource.directories', $dirs);
+        $container->setParameter('translator.resource_directories', $dirs);
         if ($dirs) {
             foreach ($dirs as $dir) {
                 $container->addResource(new DirectoryResource($dir));

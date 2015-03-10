@@ -40,11 +40,11 @@
             <argument type="service" id="service_container" />
             <argument type="service" id="translator.selector" />
             <argument type="collection" /> <!-- translation loaders -->
-            <argument type="collection" /> <!-- translation resources -->
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <argument type="collection" /> <!-- translation resources -->
         </service>
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">

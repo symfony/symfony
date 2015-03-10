@@ -914,6 +914,23 @@ class FrameworkExtension extends Extension
                 $serializerLoaders[] = $definition;
                 $container->addResource(new FileResource($file));
             }
+
+            if (is_dir($dir = $dirname.'/Resources/config/serialization')) {
+                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+
+                $container->addResource(new DirectoryResource($dir));
+            }
         }
 
         $chainLoader->replaceArgument(0, $serializerLoaders);

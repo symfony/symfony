@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class ConfigDumpReferenceCommandTest extends WebTestCase
+class ConfigDebugCommandTest extends WebTestCase
 {
     private $application;
 
@@ -36,8 +36,7 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
         $ret = $tester->execute(array('name' => 'TestBundle'));
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertContains('test:', $tester->getDisplay());
-        $this->assertContains('    custom:', $tester->getDisplay());
+        $this->assertContains('custom: foo', $tester->getDisplay());
     }
 
     /**
@@ -45,7 +44,7 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
      */
     private function createCommandTester()
     {
-        $command = $this->application->find('config:dump-reference');
+        $command = $this->application->find('debug:config');
 
         return new CommandTester($command);
     }

@@ -15,7 +15,7 @@
 {%- endblock textarea_widget %}
 
 {% block button_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn')|trim}) %}
+    {% set attr = attr|merge({class: (attr.class|default('btn-default') ~ ' btn')|trim}) %}
     {{- parent() -}}
 {%- endblock %}
 

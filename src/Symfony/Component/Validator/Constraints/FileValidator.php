@@ -30,7 +30,7 @@ class FileValidator extends ConstraintValidator
     const KIB_BYTES = 1024;
     const MIB_BYTES = 1048576;
 
-    private static $suffices = array(
+    protected static $suffices = array(
         1 => 'bytes',
         self::KB_BYTES => 'kB',
         self::MB_BYTES => 'MB',

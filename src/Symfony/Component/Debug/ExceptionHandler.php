@@ -131,6 +131,7 @@ class ExceptionHandler
         }
 
         $content = '';
+        $flags = PHP_VERSION_ID >= 50400 ? ENT_QUOTES | ENT_SUBSTITUTE : ENT_QUOTES;
         if ($this->debug) {
             try {
                 $count = count($exception->getAllPrevious());
@@ -138,7 +139,7 @@ class ExceptionHandler
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
                     $class = $this->abbrClass($e['class']);
-                    $message = nl2br($e['message']);
+                    $message = nl2br(htmlspecialchars($e['message'], $flags, $this->charset));
                     $content .= sprintf(<<<EOF
                         <div class="block_exception clear_fix">
                             <h2><span>%d/%d</span> %s: %s</h2>
@@ -169,7 +170,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), htmlspecialchars($e->getMessage(), $flags, $this->charset));
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }

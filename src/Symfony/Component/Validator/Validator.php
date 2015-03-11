@@ -161,7 +161,10 @@ class Validator implements ValidatorInterface
     {
         $context = new ExecutionContext($this->createVisitor($value), $this->translator, $this->translationDomain);
 
-        $constraints = is_array($constraints) ? $constraints : array($constraints);
+        /** no direct array casting (objects casted to properties array) */
+        if ((array) $constraints !== $constraints) {
+            $constraints = array($constraints);
+        }
 
         foreach ($constraints as $constraint) {
             if ($constraint instanceof Valid) {

@@ -16,7 +16,7 @@ namespace Symfony\Component\Intl\Util;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class IcuVersion
+final class IcuVersion
 {
     /**
      * Compares two ICU versions with an operator.

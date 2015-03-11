@@ -60,11 +60,7 @@ class SecurityContext implements SecurityContextInterface
             $this->token = $this->authenticationManager->authenticate($this->token);
         }
 
-        if (!is_array($attributes)) {
-            $attributes = array($attributes);
-        }
-
-        return $this->accessDecisionManager->decide($this->token, $attributes, $object);
+        return $this->accessDecisionManager->decide($this->token, (array) $attributes, $object);
     }
 
     /**

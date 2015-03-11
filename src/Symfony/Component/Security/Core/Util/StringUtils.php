@@ -16,7 +16,7 @@ namespace Symfony\Component\Security\Core\Util;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class StringUtils
+final class StringUtils
 {
     /**
      * This class should not be instantiated.

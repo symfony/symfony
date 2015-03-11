@@ -447,7 +447,11 @@ class Filesystem
     private function toIterator($files)
     {
         if (!$files instanceof \Traversable) {
-            $files = new \ArrayObject(is_array($files) ? $files : array($files));
+            /** no direct array casting (objects casted to properties array) */
+            if ((array) $files !== $files) {
+                $files = array($files);
+            }
+            $files = new \ArrayObject($files);
         }
 
         return $files;

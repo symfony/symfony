@@ -17,7 +17,7 @@ class SimpleProcessTest extends AbstractProcessTest
 {
     private $enabledSigchild = false;
 
-    public function setUp()
+    protected function setUp()
     {
         ob_start();
         phpinfo(INFO_GENERAL);

@@ -47,7 +47,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
@@ -56,7 +56,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->workspace = realpath($this->workspace);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->clean($this->workspace);
         umask($this->umask);

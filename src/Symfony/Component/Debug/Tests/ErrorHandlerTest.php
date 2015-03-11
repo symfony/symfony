@@ -26,13 +26,13 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $errorReporting;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->errorReporting = error_reporting(E_ALL | E_STRICT);
         $this->iniSet('display_errors', '1');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         error_reporting($this->errorReporting);
     }

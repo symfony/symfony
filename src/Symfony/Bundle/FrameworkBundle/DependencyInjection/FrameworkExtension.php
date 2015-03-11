@@ -683,11 +683,30 @@ class FrameworkExtension extends Extension
         }
 
         // Register translation resources
-        $container->setParameter('translator.resource_directories', $dirs);
         if ($dirs) {
             foreach ($dirs as $dir) {
                 $container->addResource(new DirectoryResource($dir));
             }
+
+            $files = array();
+            $finder = Finder::create()
+                ->files()
+                ->filter(function (\SplFileInfo $file) {
+                    return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
+                })
+                ->in($dirs)
+            ;
+
+            foreach ($finder as $file) {
+                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
+                if (!isset($files[$locale])) {
+                    $files[$locale] = array();
+                }
+
+                $files[$locale][] = (string) $file;
+            }
+
+            $translator->replaceArgument(4, $files);
         }
     }
 

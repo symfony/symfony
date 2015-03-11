@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\Finder\Finder;
 
 class TranslatorPass implements CompilerPassInterface
 {
@@ -41,31 +40,6 @@ class TranslatorPass implements CompilerPassInterface
             }
         }
 
-        $translatorDefinition = $container->findDefinition('translator.default');
-        $translatorDefinition->replaceArgument(2, $loaders);
-        if ($container->hasParameter('translator.resource_directories')) {
-            $resourceDirs = $container->getParameter('translator.resource_directories');
-            $files = array();
-            if ($resourceDirs) {
-                $finder = Finder::create()
-                    ->files()
-                    ->filter(function (\SplFileInfo $file) {
-                        return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
-                    })
-                    ->in($resourceDirs)
-                ;
-
-                foreach ($finder as $file) {
-                    list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-                    if (!isset($files[$locale])) {
-                        $files[$locale] = array();
-                    }
-
-                    $files[$locale][] = (string) $file;
-                }
-            }
-
-            $translatorDefinition->replaceArgument(4, $files);
-        }
+        $container->findDefinition('translator.default')->replaceArgument(2, $loaders);
     }
 }

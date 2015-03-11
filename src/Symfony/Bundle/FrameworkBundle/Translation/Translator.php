@@ -84,13 +84,16 @@ class Translator extends BaseTranslator
 
     private function loadResources($locale)
     {
-        if (isset($this->resourceFiles[$locale])) {
-            foreach ($this->resourceFiles[$locale] as $file) {
-                // filename is domain.locale.format
-                list($domain, $locale, $format) = explode('.', basename($file), 3);
-                $this->addResource($format, $file, $locale, $domain);
+        $locales = array_merge(array($locale), $this->computeFallbackLocales($locale));
+        foreach ($locales as $locale) {
+            if (isset($this->resourceFiles[$locale])) {
+                foreach ($this->resourceFiles[$locale] as $file) {
+                    // filename is domain.locale.format
+                    list($domain, $locale, $format) = explode('.', basename($file), 3);
+                    $this->addResource($format, $file, $locale, $domain);
+                }
+                unset($this->resourceFiles[$locale]);
             }
-            unset($this->resourceFiles[$locale]);
         }
     }
 }

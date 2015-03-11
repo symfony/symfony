@@ -26,20 +26,9 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->method('addMethodCall')
             ->with('addLoader', array('xlf', new Reference('xliff')));
 
-        $translatorDefinition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-
-        $expectedResourceFiles = array(
-            'fr' => array(
-                (__DIR__.'/../../Fixtures/Resources/translations/messages.fr.yml'),
-            ),
-        );
-        $translatorDefinition->expects($this->at(1))
-            ->method('replaceArgument')
-            ->with(4, $expectedResourceFiles);
-
         $container = $this->getMock(
             'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'findDefinition', 'hasParameter', 'getParameter')
+            array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'findDefinition')
         );
         $container->expects($this->any())
             ->method('hasDefinition')
@@ -52,16 +41,7 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('xliff' => array(array('alias' => 'xliff', 'legacy-alias' => 'xlf')))));
         $container->expects($this->once())
             ->method('findDefinition')
-            ->will($this->returnValue($translatorDefinition));
-        $container->expects($this->once())
-            ->method('hasParameter')
-            ->with('translator.resource_directories')
-            ->will($this->returnValue(true));
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->with('translator.resource_directories')
-            ->will($this->returnValue(array(__DIR__.'/../../Fixtures/Resources/translations')));
-
+            ->will($this->returnValue($this->getMock('Symfony\Component\DependencyInjection\Definition')));
         $pass = new TranslatorPass();
         $pass->process($container);
     }

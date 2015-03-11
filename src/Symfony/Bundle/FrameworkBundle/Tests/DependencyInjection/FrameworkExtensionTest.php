@@ -218,26 +218,28 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
-
         $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $resources = $container->getDefinition('translator.default')->getArgument(4);
 
-        $dirs = $container->getParameter('translator.resource_directories');
-
+        $files = array_map(function ($resource) { return realpath($resource); }, $resources['en']);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
-            dirname($ref->getFileName()).'/Resources/translations',
-            $dirs
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Validator translation resources'
         );
         $ref = new \ReflectionClass('Symfony\Component\Form\Form');
         $this->assertContains(
-            dirname($ref->getFileName()).'/Resources/translations',
-            $dirs
+            strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Form translation resources'
         );
-        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $ref = new \ReflectionClass('Symfony\Component\Security\Core\Security');
         $this->assertContains(
-            dirname($ref->getFileName()).'/../Resources/translations',
-            $dirs
+            strtr(dirname($ref->getFileName()).'/Resources/translations/security.en.xlf', '/', DIRECTORY_SEPARATOR),
+            $files,
+            '->registerTranslatorConfiguration() finds Security translation resources'
         );
 
         $calls = $container->getDefinition('translator.default')->getMethodCalls();

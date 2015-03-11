@@ -23,7 +23,7 @@ class FilesystemTest extends FilesystemTestCase
      */
     private $filesystem = null;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->filesystem = new Filesystem();

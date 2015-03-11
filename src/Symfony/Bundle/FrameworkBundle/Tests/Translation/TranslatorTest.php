@@ -26,7 +26,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->deleteTmpDir();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->deleteTmpDir();
     }

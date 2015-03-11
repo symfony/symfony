@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RequestContext;
  */
 class LegacyAssetsExtensionTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
     }

@@ -28,7 +28,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $dataCollector;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->dataCollector = $this->getMock('Symfony\Component\Form\Extension\DataCollector\FormDataCollectorInterface');
         $this->extension = new DataCollectorExtension($this->dataCollector);

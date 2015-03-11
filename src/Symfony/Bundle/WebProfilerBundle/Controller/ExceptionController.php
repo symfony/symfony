@@ -62,17 +62,16 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
-        return Response::create(
-            $this->twig->render($template, array(
+        return new Response($this->twig->render(
+            $template,
+            array(
                 'status_code' => $code,
                 'status_text' => Response::$statusTexts[$code],
                 'exception' => $exception,
                 'logger' => null,
                 'currentContent' => '',
-            )),
-            200,
-            array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+            )
+        ), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -98,14 +97,10 @@ class ExceptionController
         if (!$this->templateExists($template)) {
             $handler = new ExceptionHandler();
 
-            $response = new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
-        } else {
-            $response = new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
+            return new Response($handler->getStylesheet($exception), 200, array('Content-Type' => 'text/css'));
         }
 
-        $response->setCharset('UTF-8');
-
-        return $response;
+        return new Response($this->twig->render('@WebProfiler/Collector/exception.css.twig'), 200, array('Content-Type' => 'text/css'));
     }
 
     protected function getTemplate()

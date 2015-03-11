@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class IpUtils
+final class IpUtils
 {
     /**
      * This class should not be instantiated.
@@ -35,13 +35,9 @@ class IpUtils
      */
     public static function checkIp($requestIp, $ips)
     {
-        if (!is_array($ips)) {
-            $ips = array($ips);
-        }
-
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
 
-        foreach ($ips as $ip) {
+        foreach ((array) $ips as $ip) {
             if (self::$method($requestIp, $ip)) {
                 return true;
             }

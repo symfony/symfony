@@ -233,7 +233,8 @@ class Acl implements AuditableAclInterface, NotifyPropertyChanged
             return true;
         }
 
-        if (!is_array($sids)) {
+        /** no direct array casting (objects casted to properties array) */
+        if ((array) $sids !== $sids) {
             $sids = array($sids);
         }
 

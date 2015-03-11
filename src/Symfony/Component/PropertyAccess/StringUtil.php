@@ -16,7 +16,7 @@ namespace Symfony\Component\PropertyAccess;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class StringUtil
+final class StringUtil
 {
     /**
      * Map english plural to singular suffixes.

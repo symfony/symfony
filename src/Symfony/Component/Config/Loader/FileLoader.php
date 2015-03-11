@@ -90,7 +90,7 @@ abstract class FileLoader extends Loader
                 $resource = $locator->locate($resource, $this->currentDir, false);
             }
 
-            $resources = is_array($resource) ? $resource : array($resource);
+            $resources = (array) $resource;
             for ($i = 0; $i < $resourcesCount = count($resources); $i++) {
                 if (isset(self::$loading[$resources[$i]])) {
                     if ($i == $resourcesCount-1) {

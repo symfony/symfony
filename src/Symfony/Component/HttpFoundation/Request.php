@@ -1325,7 +1325,7 @@ class Request
             static::initializeFormats();
         }
 
-        static::$formats[$format] = is_array($mimeTypes) ? $mimeTypes : array($mimeTypes);
+        static::$formats[$format] = (array) $mimeTypes;
     }
 
     /**

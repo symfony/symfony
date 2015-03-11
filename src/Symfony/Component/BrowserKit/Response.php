@@ -123,13 +123,14 @@ class Response
      */
     public function getHeader($header, $first = true)
     {
+        $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {
-            if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header))) {
+            if (str_replace('-', '_', strtolower($key)) === $normalizedHeader) {
                 if ($first) {
                     return is_array($value) ? (count($value) ? $value[0] : '') : $value;
                 }
 
-                return is_array($value) ? $value : array($value);
+                return (array) $value;
             }
         }
 

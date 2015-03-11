@@ -229,7 +229,10 @@ class ExecutionContext implements ExecutionContextInterface
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
-        $constraints = is_array($constraints) ? $constraints : array($constraints);
+        /** no direct array casting (objects casted to properties array) */
+        if ((array) $constraints !== $constraints) {
+            $constraints = array($constraints);
+        }
 
         if (null === $groups && '' === $subPath) {
             $context = clone $this;

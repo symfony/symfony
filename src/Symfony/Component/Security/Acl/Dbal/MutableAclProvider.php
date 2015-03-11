@@ -785,7 +785,6 @@ QUERY;
     {
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        $currentIds = array();
         foreach ($changes[1] as $field => $new) {
             for ($i = 0, $c = count($new); $i<$c; $i++) {
                 $ace = $new[$i];
@@ -813,8 +812,6 @@ QUERY;
                     $aceIdProperty = new \ReflectionProperty('Symfony\Component\Security\Acl\Domain\Entry', 'id');
                     $aceIdProperty->setAccessible(true);
                     $aceIdProperty->setValue($ace, (int) $aceId);
-                } else {
-                    $currentIds[$ace->getId()] = true;
                 }
             }
         }

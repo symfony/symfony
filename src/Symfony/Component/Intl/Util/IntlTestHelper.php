@@ -24,7 +24,7 @@ use Symfony\Component\Intl\Intl;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class IntlTestHelper
+final class IntlTestHelper
 {
     /**
      * Should be called before tests that work fine with the stub implementation.

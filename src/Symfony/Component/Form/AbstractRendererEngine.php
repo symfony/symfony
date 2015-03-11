@@ -61,8 +61,11 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
     {
         $cacheKey = $view->vars[self::CACHE_KEY_VAR];
 
-        // Do not cast, as casting turns objects into arrays of properties
-        $this->themes[$cacheKey] = is_array($themes) ? $themes : array($themes);
+        /** no direct array casting (objects casted to properties array) */
+        if ((array) $themes !== $themes) {
+            $themes = array($themes);
+        }
+        $this->themes[$cacheKey] = $themes;
 
         // Unset instead of resetting to an empty array, in order to allow
         // implementations (like TwigRendererEngine) to check whether $cacheKey

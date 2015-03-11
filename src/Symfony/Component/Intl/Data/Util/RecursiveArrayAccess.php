@@ -18,7 +18,7 @@ use Symfony\Component\Intl\Exception\OutOfBoundsException;
  *
  * @internal
  */
-class RecursiveArrayAccess
+final class RecursiveArrayAccess
 {
     public static function get($array, array $indices)
     {

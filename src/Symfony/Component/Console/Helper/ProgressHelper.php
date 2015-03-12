@@ -259,11 +259,11 @@ class ProgressHelper extends Helper
             $redraw = true;
         }
 
-        $prevPeriod = intval($this->current / $this->redrawFreq);
+        $prevPeriod = (int) ($this->current / $this->redrawFreq);
 
         $this->current = $current;
 
-        $currPeriod = intval($this->current / $this->redrawFreq);
+        $currPeriod = (int) ($this->current / $this->redrawFreq);
         if ($redraw || $prevPeriod !== $currPeriod || $this->max === $this->current) {
             $this->display();
         }

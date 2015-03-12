@@ -154,7 +154,7 @@ class Link
         }
 
         if ('.' === substr($path, -1)) {
-            $path = $path.'/';
+            $path .= '/';
         }
 
         $output = array();

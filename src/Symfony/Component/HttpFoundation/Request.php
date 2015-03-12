@@ -1009,7 +1009,7 @@ class Request
             }
 
             if (false !== $pos) {
-                return intval(substr($host, $pos + 1));
+                return (int) substr($host, $pos + 1);
             }
 
             return 'https' === $this->getScheme() ? 443 : 80;

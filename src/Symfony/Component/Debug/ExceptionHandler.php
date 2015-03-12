@@ -251,7 +251,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), self::utf8Htmlize($e->getMessage()));
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }

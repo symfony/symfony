@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -45,8 +47,20 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
         $exception = null;
         $listener = new DumpListener($cloner, $dumper);
 
+        $response = new Response();
+        $event = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $event
+            ->expects($this->any())
+            ->method('getRequest')
+            ->will($this->returnValue($response))
+        ;
+
         try {
-            $listener->configure();
+            $listener->configure($event);
 
             VarDumper::dump('foo');
             VarDumper::dump('bar');

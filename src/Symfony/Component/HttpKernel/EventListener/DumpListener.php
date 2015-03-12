@@ -12,8 +12,10 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -37,8 +39,16 @@ class DumpListener implements EventSubscriberInterface
         $this->dumper = $dumper;
     }
 
-    public function configure()
+    public function configure(GetResponseEvent $event)
     {
+        // if the request is issued by curl, we do not enable HTML dumper;
+        if (0 === strpos($event->getRequest()->headers->get('user-agent'), 'curl/')) {
+            CliDumper::$defaultColors = true;
+            CliDumper::$defaultOutput = 'php://output';
+
+            return;
+        }
+
         $cloner = $this->cloner;
         $dumper = $this->dumper;
 

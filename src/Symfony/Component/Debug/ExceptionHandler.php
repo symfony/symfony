@@ -177,6 +177,7 @@ class ExceptionHandler
             foreach ($exception->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
+            header('Content-Type: text/html; charset='.$this->charset);
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
@@ -195,7 +196,7 @@ class ExceptionHandler
             $exception = FlattenException::create($exception);
         }
 
-        return new Response($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders());
+        return Response::create($this->decorate($this->getContent($exception), $this->getStylesheet($exception)), $exception->getStatusCode(), $exception->getHeaders())->setCharset($this->charset);
     }
 
     /**
@@ -251,7 +252,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), self::utf8Htmlize($e->getMessage()));
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }

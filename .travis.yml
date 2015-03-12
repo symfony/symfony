@@ -39,6 +39,8 @@ before_install:
 
 install:
     - if [ "$deps" = "no" ]; then composer --prefer-source install; fi;
+    - components=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')
+    - if [ "$deps" != "no" ]; then sh .travis.sh $TRAVIS_BRANCH $components; fi;
 
 script:
     - components=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n')

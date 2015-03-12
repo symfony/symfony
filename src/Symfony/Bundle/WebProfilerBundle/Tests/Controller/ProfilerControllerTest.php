@@ -69,7 +69,6 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
 
         $response = $controller->toolbarAction(Request::create('/_wdt/found'), 'found');
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('UTF-8', $response->getCharset(), 'Request charset is explicitly set to UTF-8');
 
         $response = $controller->toolbarAction(Request::create('/_wdt/notFound'), 'notFound');
         $this->assertEquals(404, $response->getStatusCode());

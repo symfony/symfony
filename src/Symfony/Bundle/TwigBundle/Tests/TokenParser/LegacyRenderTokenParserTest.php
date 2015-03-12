@@ -17,7 +17,7 @@ use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
 class LegacyRenderTokenParserTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
     }

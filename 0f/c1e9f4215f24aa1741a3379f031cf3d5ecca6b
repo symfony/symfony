@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-11T16:39:35Z
+
+Body of the PR have been moved to #13901, only the deprecation remains here. Should be merged on top of #13901

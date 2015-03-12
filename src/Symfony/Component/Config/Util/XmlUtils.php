@@ -19,7 +19,7 @@ namespace Symfony\Component\Config\Util;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Martin Hasoň <martin.hason@gmail.com>
  */
-final class XmlUtils
+class XmlUtils
 {
     /**
      * This class should not be instantiated.

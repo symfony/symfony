@@ -70,7 +70,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * Registers all natively provided mime type guessers.
      */
-    protected function __construct()
+    private function __construct()
     {
         if (FileBinaryMimeTypeGuesser::isSupported()) {
             $this->register(new FileBinaryMimeTypeGuesser());

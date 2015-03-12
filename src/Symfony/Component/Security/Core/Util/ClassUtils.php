@@ -22,7 +22,7 @@ use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Johannes Schmitt <schmittjoh@gmail.com>
  */
-final class ClassUtils
+class ClassUtils
 {
     /**
      * Marker for Proxy class names.

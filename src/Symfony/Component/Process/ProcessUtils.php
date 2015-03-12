@@ -20,7 +20,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  *
  * @author Martin Hasoň <martin.hason@gmail.com>
  */
-final class ProcessUtils
+class ProcessUtils
 {
     /**
      * This class should not be instantiated.

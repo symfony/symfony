@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class IpUtils
+class IpUtils
 {
     /**
      * This class should not be instantiated.

@@ -56,7 +56,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
     /**
      * Registers all natively provided extension guessers.
      */
-    protected function __construct()
+    private function __construct()
     {
         $this->register(new MimeTypeExtensionGuesser());
     }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Util;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class FormUtil
+class FormUtil
 {
     /**
      * This class should not be instantiated.

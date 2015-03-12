@@ -16,7 +16,7 @@ namespace Symfony\Component\Intl\Util;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-final class Version
+class Version
 {
     /**
      * Compares two versions with an operator.

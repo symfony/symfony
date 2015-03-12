@@ -35,9 +35,13 @@ class IpUtils
      */
     public static function checkIp($requestIp, $ips)
     {
+        if (!is_array($ips)) {
+            $ips = array($ips);
+        }
+
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
 
-        foreach ((array) $ips as $ip) {
+        foreach ($ips as $ip) {
             if (self::$method($requestIp, $ip)) {
                 return true;
             }

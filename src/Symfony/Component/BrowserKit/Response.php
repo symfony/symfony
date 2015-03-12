@@ -130,7 +130,7 @@ class Response
                     return is_array($value) ? (count($value) ? $value[0] : '') : $value;
                 }
 
-                return (array) $value;
+                return is_array($value) ? $value : array($value);
             }
         }
 

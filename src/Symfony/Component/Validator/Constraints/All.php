@@ -33,8 +33,7 @@ class All extends Constraint
     {
         parent::__construct($options);
 
-        /** no direct array casting (objects casted to properties array) */
-        if ((array) $this->constraints !== $this->constraints) {
+        if (!is_array($this->constraints)) {
             $this->constraints = array($this->constraints);
         }
 

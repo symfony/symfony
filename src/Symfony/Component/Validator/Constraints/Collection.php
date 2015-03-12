@@ -58,8 +58,7 @@ class Collection extends Constraint
                 $this->fields[$fieldName] = $field = new Required($field);
             }
 
-            /** no direct array casting (objects casted to properties array) */
-            if ((array) $field->constraints !== $field->constraints) {
+            if (!is_array($field->constraints)) {
                 $field->constraints = array($field->constraints);
             }
 

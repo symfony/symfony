@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by unkind at 2015-03-11T22:23:02Z
+
+Adding `final` is a BC break.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-12T09:17:50Z
+
+All places where you changed ``is_array`` checks to casting are changing the behavior of the code
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-03-12T16:02:30Z
+
+I reverted array casting and design patterns related changes, so basically it's left just minor changes.
+Thank you all for your comments and links. That's hard work to support BC and huge thanks for that.
+
+PS: Theoretically, could "finals" be deployed for utility classes in Symfony 3?
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-03-12T16:34:32Z
+
+@unkind : it is, and reverted already. Thank you for feedback!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-12T17:01:58Z
+
+:+1:

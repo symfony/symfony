@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRenderer
 
 class LegacyFragmentRendererPassTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
     }

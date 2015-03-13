@@ -373,6 +373,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo1 ... [fooN]', $definition->getSynopsis(), '->getSynopsis() returns a synopsis of arguments and options');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAsText()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -390,6 +393,9 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixtures.'/definition_astext.txt', $definition->asText(), '->asText() returns a textual representation of the InputDefinition');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAsXml()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -218,6 +218,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyPattern()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -21,7 +21,7 @@ class LegacySecurityContextTest extends \PHPUnit_Framework_TestCase
     private $authorizationChecker;
     private $securityContext;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 

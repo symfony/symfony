@@ -13,6 +13,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
+/**
+ * @group legacy
+ */
 class LegacyUniversalClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

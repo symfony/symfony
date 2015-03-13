@@ -15,6 +15,9 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 
 class SimpleNumericChoiceListTest extends AbstractChoiceListTest
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyGetIndicesForChoicesDealsWithNumericChoices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -24,6 +27,9 @@ class SimpleNumericChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(0, 1), $this->list->getIndicesForChoices($choices));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetIndicesForValuesDealsWithNumericValues()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

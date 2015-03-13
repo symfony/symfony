@@ -14,6 +14,9 @@ namespace Symfony\Component\OptionsResolver\Tests;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
+/**
+ * @group legacy
+ */
 class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /**

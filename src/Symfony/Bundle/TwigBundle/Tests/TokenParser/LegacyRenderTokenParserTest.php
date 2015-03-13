@@ -15,6 +15,9 @@ use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TokenParser\RenderTokenParser;
 use Symfony\Bundle\TwigBundle\Node\RenderNode;
 
+/**
+ * @group legacy
+ */
 class LegacyRenderTokenParserTest extends TestCase
 {
     protected function setUp()

@@ -17,6 +17,9 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @group legacy
+ */
 class LegacyDialogHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

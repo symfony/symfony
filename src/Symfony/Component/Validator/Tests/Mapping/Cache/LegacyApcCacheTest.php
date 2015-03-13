@@ -13,6 +13,9 @@ namespace Symfony\Component\Validator\Tests\Mapping\Cache;
 
 use Symfony\Component\Validator\Mapping\Cache\ApcCache;
 
+/**
+ * @group legacy
+ */
 class LegacyApcCacheTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

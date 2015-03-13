@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class LegacyBindRequestListenerTest extends \PHPUnit_Framework_TestCase
 {

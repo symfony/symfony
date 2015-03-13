@@ -120,6 +120,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4_bad_import.yml');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyLoadServices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -823,6 +823,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
      * Cannot be UnsupportedMetadataException for BC with Symfony < 2.5.
      *
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     * @group legacy
      */
     public function testLegacyValidatePropertyFailsIfPropertiesNotSupported()
     {
@@ -952,6 +953,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
      * Cannot be UnsupportedMetadataException for BC with Symfony < 2.5.
      *
      * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     * @group legacy
      */
     public function testLegacyValidatePropertyValueFailsIfPropertiesNotSupported()
     {

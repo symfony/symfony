@@ -732,6 +732,9 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame($view, $form->createView($parentView));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetErrorsAsString()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

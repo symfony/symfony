@@ -14,6 +14,9 @@ namespace Symfony\Component\DependencyInjection\Tests;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @group legacy
+ */
 class LegacyContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

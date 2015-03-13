@@ -186,6 +186,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacySingleMethodBc()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -201,6 +204,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacySingleMethodBcExplicitName()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -216,6 +222,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacyMultipleMethodsBc()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -233,6 +242,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacyMultipleMethodsBcExplicitName()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -252,6 +264,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacySingleStaticMethodBc()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -269,6 +284,9 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+    /**
+     * @group legacy
+     */
     public function testLegacySingleStaticMethodBcExplicitName()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -307,6 +325,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     * @group legacy
      */
     public function testLegacyExpectEitherCallbackOrMethods()
     {

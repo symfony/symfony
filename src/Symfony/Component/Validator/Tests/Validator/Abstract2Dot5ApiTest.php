@@ -566,6 +566,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnsupportedMetadataException
+     * @group legacy
      */
     public function testLegacyPropertyMetadataMustImplementPropertyMetadataInterface()
     {

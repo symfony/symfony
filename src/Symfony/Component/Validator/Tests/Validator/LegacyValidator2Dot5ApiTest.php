@@ -17,6 +17,9 @@ use Symfony\Component\Validator\Context\LegacyExecutionContextFactory;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\LegacyValidator;
 
+/**
+ * @group legacy
+ */
 class LegacyValidator2Dot5ApiTest extends Abstract2Dot5ApiTest
 {
     protected function createValidator(MetadataFactoryInterface $metadataFactory, array $objectInitializers = array())

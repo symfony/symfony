@@ -637,6 +637,9 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame('0', $view->vars['label']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCanGetErrorsWhenButtonInForm()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

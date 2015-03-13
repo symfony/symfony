@@ -16,8 +16,9 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 /**
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
+ * @group legacy
  */
-class DefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
+class LegacyDefaultCsrfProviderTest extends \PHPUnit_Framework_TestCase
 {
     protected $provider;
 

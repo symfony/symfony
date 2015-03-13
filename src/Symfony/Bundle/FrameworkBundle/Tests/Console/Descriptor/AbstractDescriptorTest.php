@@ -66,7 +66,10 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
     }
 
-    /** @dataProvider provideLegacySynchronizedServiceDefinitionTestData */
+    /**
+     * @dataProvider provideLegacySynchronizedServiceDefinitionTestData
+     * @group legacy
+     */
     public function testLegacyDescribeSynchronizedServiceDefinition(Definition $definition, $expectedDescription)
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

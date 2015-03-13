@@ -191,6 +191,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyLoadServices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

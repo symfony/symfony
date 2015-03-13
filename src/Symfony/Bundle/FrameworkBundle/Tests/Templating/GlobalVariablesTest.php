@@ -26,6 +26,9 @@ class GlobalVariablesTest extends TestCase
         $this->globals = new GlobalVariables($this->container);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetSecurity()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

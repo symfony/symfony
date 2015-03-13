@@ -96,6 +96,9 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyDenormalizeOnCamelCaseFormat()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

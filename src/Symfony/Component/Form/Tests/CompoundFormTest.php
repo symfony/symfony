@@ -803,6 +803,9 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetErrorsAsStringDeep()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -824,6 +827,9 @@ class CompoundFormTest extends AbstractFormTest
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetErrorsAsStringDeepWithIndentation()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -15,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Fragment\ContainerAwareHIncludeFragmentRenderer;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @group legacy
+ */
 class LegacyContainerAwareHIncludeFragmentRendererTest extends TestCase
 {
     public function testRender()

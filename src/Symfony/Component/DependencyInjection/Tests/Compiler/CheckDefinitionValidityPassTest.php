@@ -52,6 +52,7 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @group legacy
      */
     public function testLegacyProcessDetectsBothFactorySyntaxesUsed()
     {

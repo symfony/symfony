@@ -47,6 +47,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAddService()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

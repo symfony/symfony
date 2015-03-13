@@ -40,6 +40,9 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services8.yml', $dumper->dump(), '->dump() dumps parameters');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAddService()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -166,6 +166,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Symfony\Component\DependencyInjection\Definition::setSynchronized
      * @covers Symfony\Component\DependencyInjection\Definition::isSynchronized
+     * @group legacy
      */
     public function testLegacySetIsSynchronized()
     {

@@ -15,6 +15,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\SecurityContext;
 
+/**
+ * @group legacy
+ */
 class LegacySecurityContextTest extends \PHPUnit_Framework_TestCase
 {
     private $tokenStorage;

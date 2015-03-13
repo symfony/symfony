@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-03-07T09:43:24Z
+
+@Tobion, i made a solution which caches only if the query builder is a query builder instance
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-03-09T11:57:18Z
+
+@timglabisch any idea, why the php5.3 test against low deps fails? The output on travis doesn't help
+
+https://travis-ci.org/symfony/symfony/jobs/53549996
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-09T21:11:34Z
+
+@dominikzogg This was just one of the occasionally failing test cases and is not related to your changes.
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-03-09T21:24:05Z
+
+@xabbuh ah ok, thank you
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-03-13T09:47:55Z
+
+@stof is it possible to milestone this for 2.7?
+
+---------------------------------------------------------------------------
+
+by dominikzogg at 2015-03-13T11:50:33Z
+
+@fabpot done

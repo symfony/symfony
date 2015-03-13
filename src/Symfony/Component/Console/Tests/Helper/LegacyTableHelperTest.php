@@ -14,6 +14,9 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @group legacy
+ */
 class LegacyTableHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $stream;

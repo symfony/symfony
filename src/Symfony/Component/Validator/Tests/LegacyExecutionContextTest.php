@@ -20,6 +20,9 @@ use Symfony\Component\Validator\ExecutionContext;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\ValidationVisitor;
 
+/**
+ * @group legacy
+ */
 class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
 {
     const TRANS_DOMAIN = 'trans_domain';

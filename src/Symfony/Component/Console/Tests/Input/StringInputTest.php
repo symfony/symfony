@@ -41,6 +41,9 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $input->getOption('foo'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyInputOptionDefinitionInConstructor()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

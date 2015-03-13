@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by egeloen at 2015-03-08T16:42:16Z
+
+:+1: This is something which have broken one of my bundle too (See egeloen/IvoryCKEditorBundle#157)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-09T07:44:53Z
+
+New comment looks good to me. @WouterJ Can you also update the 3.0 UPGRADE file to mention the availability of this service?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-10T16:10:40Z
+
+@fabpot I've added the removal (and its replacement) to the UPGRADE-3.0 file. I'm not sure if it's correct though (it's very difficult to follow the whole asset things with all its BC layers).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-13T10:53:35Z
+
+Can this please be merged? It's holding up CMF's tests to check if it is future compatible.

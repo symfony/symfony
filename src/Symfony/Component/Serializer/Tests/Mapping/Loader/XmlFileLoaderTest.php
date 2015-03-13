@@ -29,7 +29,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     private $metadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->loader = new XmlFileLoader(__DIR__.'/../../Fixtures/serialization.xml');
         $this->metadata = new ClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

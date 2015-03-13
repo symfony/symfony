@@ -31,7 +31,7 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->dumper = new ProxyDumper();
     }

@@ -25,6 +25,7 @@ class TwigExtensionTest extends TestCase
 {
     /**
      * @dataProvider getFormats
+     * @group legacy
      */
     public function testLegacyFormResourcesConfigurationKey($format)
     {
@@ -44,6 +45,7 @@ class TwigExtensionTest extends TestCase
 
     /**
      * @dataProvider getFormats
+     * @group legacy
      */
     public function testLegacyMergeFormResourcesConfigurationKeyWithFormThemesConfigurationKey($format)
     {

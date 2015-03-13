@@ -89,6 +89,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage You cannot use assets settings under "framework.templating" and "assets" configurations in the same project.
+     * @group legacy
      */
     public function testLegacyInvalidValueAssets()
     {

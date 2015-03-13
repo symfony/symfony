@@ -23,6 +23,9 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = __DIR__.'/../Fixtures/';
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyDump()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

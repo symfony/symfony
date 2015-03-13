@@ -684,6 +684,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($a, $container->get('a'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacySetOnSynchronizedService()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -703,6 +706,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($baz, $container->get('bar')->getBaz());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacySynchronizedServiceWithScopes()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

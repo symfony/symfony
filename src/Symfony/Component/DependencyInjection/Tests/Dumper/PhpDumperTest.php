@@ -124,6 +124,9 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacySynchronizedServices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

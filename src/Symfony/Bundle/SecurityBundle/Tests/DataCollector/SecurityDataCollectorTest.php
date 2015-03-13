@@ -40,6 +40,9 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($collector->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCollectWhenAuthenticationTokenIsNull()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

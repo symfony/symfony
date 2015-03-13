@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
+/**
+ * @group legacy
+ */
 class LegacyCoreAssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $package;

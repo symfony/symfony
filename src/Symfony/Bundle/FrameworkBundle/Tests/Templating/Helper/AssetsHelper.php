@@ -18,6 +18,9 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class AssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyGetUrl()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -29,6 +32,9 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('me.png?version=42', $helper->getUrl('me.png', null, '42'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetVersion()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -46,5 +46,5 @@ install:
 script:
     - if [ "$deps" = "no" ]; then echo "$components" | parallel --gnu --keep-order 'echo -e "\\nRunning {} tests"; phpunit --exclude-group tty,benchmark,intl-data {} || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$deps" = "no" ]; then echo -e "\\nRunning tests requiring tty"; phpunit --group tty || (echo -e "\\e[41mKO\\e[0m tty group" && $(exit 1)); fi;
-    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
+    - if [ "$deps" = "high" ]; then echo "$components" | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source update; phpunit --exclude-group tty,benchmark,intl-data,legacy || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;
     - if [ "$deps" = "low" ]; then echo "$components" | parallel --gnu --keep-order -j25% 'echo -e "\\nRunning {} tests"; cd {}; composer --prefer-source --prefer-lowest --prefer-stable update; phpunit --exclude-group tty,benchmark,intl-data || (echo -e "\\e[41mKO\\e[0m {}" && $(exit 1));'; fi;

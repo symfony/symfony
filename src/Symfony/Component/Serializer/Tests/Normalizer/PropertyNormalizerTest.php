@@ -62,6 +62,9 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyDenormalizeOnCamelCaseFormat()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -74,6 +77,9 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('value', $obj->getCamelCase());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCamelizedAttributesNormalize()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -97,6 +103,9 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCamelizedAttributesDenormalize()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

@@ -51,6 +51,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideLegacyPropertyTests
+     * @group legacy
      */
     public function testLegacySetProperty($property, $changeKey)
     {

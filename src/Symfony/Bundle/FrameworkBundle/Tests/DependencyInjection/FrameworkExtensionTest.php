@@ -203,6 +203,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyTemplatingAssets()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -290,6 +293,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals(array(Validation::API_VERSION_2_5_BC), $calls[6][1]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyFullyConfiguredValidationService()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -452,6 +458,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->getParameter('form.type_extension.csrf.enabled'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyFormCsrfFieldNameCanBeSetUnderCsrfSettings()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -462,6 +471,9 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('_custom', $container->getParameter('form.type_extension.csrf.field_name'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyFormCsrfFieldNameUnderFormSettingsTakesPrecedence()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

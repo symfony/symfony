@@ -18,6 +18,9 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class AssetExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testLegacyGetAssetUrl()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

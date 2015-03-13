@@ -35,6 +35,9 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata = null;
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAddValidSetsMemberToCascaded()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -46,6 +49,9 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->metadata->isCascaded());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyAddOtherConstraintDoesNotSetMemberToCascaded()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -83,6 +89,9 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->metadata, $metadata);
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacySerializeCollectionCascadedDeeply()
     {
         $this->metadata->addConstraint(new Valid(array('traverse' => true)));

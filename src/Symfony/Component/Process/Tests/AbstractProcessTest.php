@@ -234,6 +234,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideLegacyInputValues
+     * @group legacy
      */
     public function testLegacyValidInput($expected, $value)
     {

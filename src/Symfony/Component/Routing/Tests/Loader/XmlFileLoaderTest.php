@@ -45,6 +45,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyRouteDefinitionLoading()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

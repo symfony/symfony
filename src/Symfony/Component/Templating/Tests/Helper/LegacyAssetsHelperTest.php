@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\AssetsHelper;
 
+/**
+ * @group legacy
+ */
 class LegacyAssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

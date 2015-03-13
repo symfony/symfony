@@ -15,7 +15,6 @@
         <parameter key="templating.helper.translator.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper</parameter>
         <parameter key="templating.helper.form.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\FormHelper</parameter>
         <parameter key="templating.helper.stopwatch.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper</parameter>
-        <parameter key="templating.helper.assets.class">Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper</parameter>
         <parameter key="templating.form.engine.class">Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine</parameter>
         <parameter key="templating.form.renderer.class">Symfony\Component\Form\FormRenderer</parameter>
         <parameter key="templating.globals.class">Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables</parameter>
@@ -64,12 +63,6 @@
         <service id="templating.helper.translator" class="%templating.helper.translator.class%">
             <tag name="templating.helper" alias="translator" />
             <argument type="service" id="translator" />
-        </service>
-
-        <service id="templating.helper.assets" class="%templating.helper.assets.class%">
-            <tag name="templating.helper" alias="assets" />
-            <argument /> <!-- default package -->
-            <argument type="collection" /> <!-- named packages -->
         </service>
 
         <service id="templating.helper.form" class="%templating.helper.form.class%">

@@ -232,18 +232,11 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testTranslator()
     {
         $container = $this->createContainerFromFile('full');
-
         $this->assertTrue($container->hasDefinition('translator.default'), '->registerTranslatorConfiguration() loads translation.xml');
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
+        $resources = $container->getDefinition('translator.default')->getArgument(4);
 
-        $resources = array();
-        foreach ($container->getDefinition('translator.default')->getMethodCalls() as $call) {
-            if ('addResource' == $call[0]) {
-                $resources[] = $call[1];
-            }
-        }
-
-        $files = array_map(function ($resource) { return realpath($resource[1]); }, $resources);
+        $files = array_map(function ($resource) { return realpath($resource); }, $resources['en']);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
             strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),

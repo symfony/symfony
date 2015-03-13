@@ -330,6 +330,51 @@ UPGRADE FROM 2.x to 3.0
  * The `request` service was removed. You must inject the `request_stack`
    service instead.
 
+ * The `templating.helper.assets` was moved to `templating_php.xml`. You can
+   use the `assets.package` service instead.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+
+   class DemoService
+   {
+       private $assetsHelper;
+
+       public function __construct(CoreAssetsHelper $assetsHelper)
+       {
+           $this->assetsHelper = $assetsHelper;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetsHelper->getUrl('thumbnail.png', null, $this->assetsHelper->getVersion());
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Asset\Packages;
+
+   class DemoService
+   {
+       private $assetPackages;
+
+       public function __construct(Packages $assetPackages)
+       {
+           $this->assetPackages = $assetPackages;
+       }
+
+       public function testMethod()
+       {
+           return $this->assetPackages->getUrl('thumbnail.png').$this->assetPackages->getVersion();
+       }
+   }
+   ```
+
  * The `enctype` method of the `form` helper was removed. You should use the
    new method `start` instead.
 

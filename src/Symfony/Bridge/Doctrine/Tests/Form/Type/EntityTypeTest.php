@@ -11,7 +11,11 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
+use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\GroupableEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
@@ -22,6 +26,7 @@ use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityTypeTest extends TypeTestCase
 {
@@ -656,7 +661,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function ($repository) {
                 return $repository->createQueryBuilder('e')
-                        ->where('e.id IN (1, 2)');
+                    ->where('e.id IN (1, 2)');
             },
             'property' => 'name',
         ));
@@ -680,7 +685,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::COMPOSITE_IDENT_CLASS,
             'query_builder' => function ($repository) {
                 return $repository->createQueryBuilder('e')
-                        ->where('e.id1 IN (10, 50)');
+                    ->where('e.id1 IN (10, 50)');
             },
             'property' => 'name',
         ));
@@ -766,13 +771,75 @@ class EntityTypeTest extends TypeTestCase
         ));
     }
 
+    public function testLoaderCaching()
+    {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+        $entity3 = new SingleIntIdEntity(3, 'Baz');
+
+        $this->persist(array($entity1, $entity2, $entity3));
+
+        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
+        $qb = $repository->createQueryBuilder('e')->where('e.id IN (1, 2)');
+
+        $entityType = new EntityType(
+            $this->emRegistry,
+            PropertyAccess::createPropertyAccessor()
+        );
+
+        $entityTypeGuesser = new DoctrineOrmTypeGuesser($this->emRegistry);
+
+        $factory = Forms::createFormFactoryBuilder()
+            ->addType($entityType)
+            ->addTypeGuesser($entityTypeGuesser)
+            ->getFormFactory();
+
+        $formBuilder = $factory->createNamedBuilder('form', 'form');
+
+        $formBuilder->add('property1', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $qb,
+        ));
+
+        $formBuilder->add('property2', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $qb,
+        ));
+
+        $formBuilder->add('property3', 'entity', array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => $qb,
+        ));
+
+        $form = $formBuilder->getForm();
+
+        $form->submit(array(
+            'property1' => 1,
+            'property2' => 1,
+            'property3' => 2,
+        ));
+
+        $reflectionClass = new \ReflectionObject($entityType);
+        $reflectionProperty = $reflectionClass->getProperty('loaderCache');
+        $reflectionProperty->setAccessible(true);
+
+        $loaders = $reflectionProperty->getValue($entityType);
+
+        $reflectionProperty->setAccessible(false);
+
+        $this->assertCount(1, $loaders);
+    }
+
     protected function createRegistryMock($name, $em)
     {
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())
-                 ->method('getManager')
-                 ->with($this->equalTo($name))
-                 ->will($this->returnValue($em));
+            ->method('getManager')
+            ->with($this->equalTo($name))
+            ->will($this->returnValue($em));
 
         return $registry;
     }

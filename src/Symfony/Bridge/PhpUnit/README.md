@@ -39,6 +39,9 @@ Add this bridge to the `require-dev` section of your composer.json file
 (not in `require`) with e.g.
 `composer require --dev "symfony/phpunit-bridge"`.
 
+Make sure that the `bootstrap.php` file is loaded. You can use the `PhpUnitBridge::getBootstrapFilePath()`
+method to obtain the actual file path depending on your environment.
+
 When running `phpunit`, you will see a summary of deprecation notices at the end
 of the test suite.
 

@@ -83,20 +83,15 @@ class ExceptionListener implements EventSubscriberInterface
      *
      * @param \Exception $exception The \Exception instance
      * @param string     $message   The error message to log
-     * @param bool       $original  False when the handling of the exception thrown another exception
      */
-    protected function logException(\Exception $exception, $message, $original = true)
+    protected function logException(\Exception $exception, $message)
     {
-        $isCritical = !$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500;
-        $context = array('exception' => $exception);
         if (null !== $this->logger) {
-            if ($isCritical) {
-                $this->logger->critical($message, $context);
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+                $this->logger->critical($message, array('exception' => $exception));
             } else {
-                $this->logger->error($message, $context);
+                $this->logger->error($message, array('exception' => $exception));
             }
-        } elseif (!$original || $isCritical) {
-            error_log($message);
         }
     }
 

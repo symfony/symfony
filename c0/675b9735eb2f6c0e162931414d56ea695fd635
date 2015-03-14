@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-07T16:35:26Z
+
+As said in #13854, if it's okay that people would now have to explicitly depend on the package (I second that), this seems like the best solution to me.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-07T21:57:18Z
+
+:+1:
+
+@fabpot there seem to be issues with @fabbot (a wrong link is used in the GitHub communication, as the fabbot reports are generated)

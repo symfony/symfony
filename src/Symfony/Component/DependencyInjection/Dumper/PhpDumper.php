@@ -1332,7 +1332,9 @@ EOF;
                 if (null !== $value->getFactoryClass()) {
                     return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                 } elseif (null !== $value->getFactoryService()) {
-                    return sprintf("%s->%s(%s)", $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
+                    $service = $this->dumpValue($definition->getFactoryService());
+
+                    return sprintf("%s->%s(%s)", 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {
                     throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }

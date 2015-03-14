@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-11T07:46:03Z
+
+@fabpot @stof What is the plan with this? It would be nice to get this fix into 2.6.5 to make bundles forward-compatible.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-11T08:34:13Z
+
+I've removed some code, should be ready now. ping @symfony/deciders

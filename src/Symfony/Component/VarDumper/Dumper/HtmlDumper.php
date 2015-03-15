@@ -243,6 +243,7 @@ return function (root) {
             } else {
                 a.innerHTML += ' ';
             }
+            a.title = 'hold ALT and click to expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
             if ('sf-dump' != elt.parentNode.className) {

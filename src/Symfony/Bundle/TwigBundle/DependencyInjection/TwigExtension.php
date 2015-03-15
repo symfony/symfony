@@ -65,10 +65,9 @@ class TwigExtension extends Extension
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
             } else {
                 // register the "override" path
-                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array(
-                    $container->getParameter('kernel.root_dir').'/Resources/'.$namespace.'/views',
-                    $namespace
-                ));
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$namespace.'/views')) {
+                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $namespace));
+                }
 
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }

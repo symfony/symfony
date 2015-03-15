@@ -62,9 +62,13 @@ class TemplateLocator implements FileLocatorInterface
      *
      * @throws \InvalidArgumentException When the template is not an instance of TemplateReferenceInterface
      * @throws \InvalidArgumentException When the template file can not be found
+     *
+     * @deprecated since version 2.8, to be removed in 3.0.
      */
     public function locate($template, $currentPath = null, $first = true)
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (!$template instanceof TemplateReferenceInterface) {
             throw new \InvalidArgumentException('The template must be an instance of TemplateReferenceInterface.');
         }

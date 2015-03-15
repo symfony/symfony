@@ -78,7 +78,7 @@ class FilesystemLoader extends \Twig_Loader_Filesystem
         } catch (\Twig_Error_Loader $e) {
             $previous = $e;
 
-            // for BC
+            // deprecated - supports the bundle:directory:filename.format.engine format
             try {
                 $template = $this->parser->parse($template);
                 $file = $this->locator->locate($template);

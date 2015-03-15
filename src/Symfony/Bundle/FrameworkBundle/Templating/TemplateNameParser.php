@@ -20,6 +20,7 @@ use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
  * "bundle:section:template.format.engine" to TemplateReferenceInterface
  * instances.
  *
+ * @deprecated since version 2.8, to be removed in 3.0
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class TemplateNameParser extends BaseTemplateNameParser
@@ -47,6 +48,8 @@ class TemplateNameParser extends BaseTemplateNameParser
         } elseif (isset($this->cache[$name])) {
             return $this->cache[$name];
         }
+
+        trigger_error('The "bundle:section:template.format.engine" syntax is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
 
         // normalize name
         $name = str_replace(':/', ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));

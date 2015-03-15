@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
+use Symfony\Component\HttpKernel\Exception\DependencyMismatchException;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
+use Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -613,10 +615,10 @@ EOF;
         $child = $this->getBundle(null, 'ParentABundle', 'ChildABundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(array('registeredDependencies'));
         $kernel
             ->expects($this->once())
-            ->method('registerBundles')
+            ->method('registeredDependencies')
             ->will($this->returnValue(array($parent, $child)))
         ;
         $kernel->boot();
@@ -632,10 +634,10 @@ EOF;
         $child = $this->getBundle(null, 'ParentBBundle', 'ChildBBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(array('registeredDependencies'));
         $kernel
             ->expects($this->once())
-            ->method('registerBundles')
+            ->method('registeredDependencies')
             ->will($this->returnValue(array($grandparent, $parent, $child)))
         ;
         $kernel->boot();
@@ -664,10 +666,10 @@ EOF;
         $child = $this->getBundle(null, 'ParentCBundle', 'ChildCBundle');
 
         // use test kernel so we can access getBundleMap()
-        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel = $this->getKernelForTest(array('registeredDependencies'));
         $kernel
             ->expects($this->once())
-            ->method('registerBundles')
+            ->method('registeredDependencies')
             ->will($this->returnValue(array($parent, $grandparent, $child)))
         ;
         $kernel->boot();
@@ -715,6 +717,133 @@ EOF;
 
         $kernel = $this->getKernel(array(), array($circularRef));
         $kernel->boot();
+    }
+
+    public function getRegisteredDependenciesData()
+    {
+        $aNon = new BundleDependencies\BundleADependenciesNon();
+        $bA = new BundleDependencies\BundleBDependenciesA();
+        $cBA = new BundleDependencies\BundleCDependenciesBA();
+        $g = new BundleDependencies\BundleGDependenciesMissingOptional();
+
+        return array(
+            array(
+                array($bA, $aNon),
+                array($aNon, $bA),
+            ),
+            array(
+                array($cBA, $bA, $aNon),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($cBA, $aNon, $bA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($bA, $aNon, $cBA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($bA, $cBA, $aNon),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($aNon, $bA, $cBA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($aNon, $cBA, $bA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($cBA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($aNon, $cBA),
+                array($aNon, $bA, $cBA),
+            ),
+            array(
+                array($bA, $cBA),
+                array($aNon, $bA, $cBA),
+            ),
+            // optional
+            array(
+                array($g),
+                array($g),
+            ),
+            // params
+            array(
+                array($cBA),
+                array($cBA),
+                'prod_test',
+            ),
+            array(
+                array($cBA),
+                array($aNon, $cBA),
+                'test',
+                true,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getRegisteredDependenciesData
+     */
+    public function testRegisteredDependencies(array $dependencies, array $expected, $environment = 'test', $debug = false)
+    {
+        // use test kernel so we can test registeredDependencies() directly
+        $kernel = $this->getKernelForTest(array('registerBundles'), $environment, $debug);
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue($dependencies))
+        ;
+
+        $bundles = array_values($kernel->registeredDependencies());
+        $this->assertEquals($expected, $bundles);
+    }
+
+    public function getRegisteredDependenciesExceptionData()
+    {
+        $dE = new BundleDependencies\BundleDDependenciesE();
+        $eD = new BundleDependencies\BundleEDependenciesD();
+        $f = new BundleDependencies\BundleFDependenciesMissing();
+
+        return array(
+            array(
+                array($dE),
+                'Recursive dependency for "'.get_class($dE),
+            ),
+            array(
+                array($eD),
+                'Recursive dependency for "'.get_class($eD),
+            ),
+            array(
+                array($f),
+                'Could not find "',
+            ),
+        );
+    }
+    /**
+     * @dataProvider getRegisteredDependenciesExceptionData
+     */
+    public function testRegisteredDependenciesException(array $dependencies, $prefix)
+    {
+        // use test kernel so we can test registeredDependencies() directly
+        $kernel = $this->getKernelForTest(array('registerBundles'));
+        $kernel
+            ->expects($this->once())
+            ->method('registerBundles')
+            ->will($this->returnValue($dependencies))
+        ;
+
+        try {
+            $kernel->registeredDependencies();
+            $this->fail('Expected DependencyMismatchException');
+        } catch (DependencyMismatchException $e) {
+            $this->assertStringStartsWith($prefix, $e->getMessage());
+        }
     }
 
     public function testTerminateReturnsSilentlyIfKernelIsNotBooted()
@@ -765,9 +894,9 @@ EOF;
     }
 
     /**
-     * Returns a mock for the BundleInterface
+     * Returns a mock for the BundleInterface.
      *
-     * @return BundleInterface
+     * @return \Symfony\Component\HttpKernel\Bundle\BundleInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getBundle($dir = null, $parent = null, $className = null, $bundleName = null)
     {
@@ -810,11 +939,11 @@ EOF;
      * @param array $methods Additional methods to mock (besides the abstract ones)
      * @param array $bundles Bundles to register
      *
-     * @return Kernel
+     * @return Kernel|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getKernel(array $methods = array(), array $bundles = array())
     {
-        $methods[] = 'registerBundles';
+        $methods[] = 'registeredDependencies';
 
         $kernel = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Kernel')
@@ -823,7 +952,7 @@ EOF;
             ->getMockForAbstractClass()
         ;
         $kernel->expects($this->any())
-            ->method('registerBundles')
+            ->method('registeredDependencies')
             ->will($this->returnValue($bundles))
         ;
         $p = new \ReflectionProperty($kernel, 'rootDir');
@@ -833,10 +962,19 @@ EOF;
         return $kernel;
     }
 
-    protected function getKernelForTest(array $methods = array())
+    /**
+     * Returns a mock for the abstract kernel.
+     *
+     * @param array  $methods     Additional methods to mock (besides the abstract ones)
+     * @param string $environment The current environment
+     * @param bool   $debug       Whether to debugging is enabled or not
+     *
+     * @return KernelForTest|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getKernelForTest(array $methods = array(), $environment = 'test', $debug = false)
     {
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
-            ->setConstructorArgs(array('test', false))
+            ->setConstructorArgs(array($environment, $debug))
             ->setMethods($methods)
             ->getMock();
         $p = new \ReflectionProperty($kernel, 'rootDir');

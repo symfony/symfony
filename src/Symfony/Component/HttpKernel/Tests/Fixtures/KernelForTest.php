@@ -34,4 +34,9 @@ class KernelForTest extends Kernel
     {
         return $this->booted;
     }
+
+    public function registeredDependencies()
+    {
+        return parent::registeredDependencies();
+    }
 }

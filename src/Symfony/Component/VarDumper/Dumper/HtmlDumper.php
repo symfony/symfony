@@ -119,7 +119,40 @@ var refStyle = doc.createElement('style'),
 
 doc.documentElement.firstChild.appendChild(refStyle);
 
-function toggle(a) {
+function expandAll(a) {
+    toggle(a, true);
+    var samp = a.nextSibling;
+    for (var i = 0; i < samp.children.length; i++) {
+        var child = samp.children[i];
+        if (child.tagName !== 'A') {
+            continue;
+        }
+        if (! /\bsf-dump-compact\b/.test(child.nextSibling.className)) {
+            continue
+        }
+        expandAll(child);
+    }
+}
+
+var altKeyPressed = false;
+function keysPressed(e) {
+    if (e.keyCode === 18) {
+        altKeyPressed = true;
+    }
+}
+function keysReleased(e) {
+    if (e.keyCode === 18) {
+        altKeyPressed = false;
+    }
+}
+window.addEventListener('keydown', keysPressed, false);
+window.addEventListener('keyup', keysReleased, false);
+
+function toggle(a, ignoreAltKey) {
+    if (! ignoreAltKey && altKeyPressed) {
+        expandAll(a);
+        return true;
+    }
     var s = a.nextSibling || {};
 
     if ('sf-dump-compact' == s.className) {
@@ -210,6 +243,7 @@ return function (root) {
             } else {
                 a.innerHTML += ' ';
             }
+            a.title = 'hold ALT and click to expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
             if ('sf-dump' != elt.parentNode.className) {

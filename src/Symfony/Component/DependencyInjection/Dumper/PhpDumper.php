@@ -1223,7 +1223,7 @@ EOF;
                 if (null !== $value->getFactoryClass()) {
                     return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                 } elseif (null !== $value->getFactoryService()) {
-                    $service = $this->dumpValue($definition->getFactoryService());
+                    $service = $this->dumpValue($value->getFactoryService());
 
                     return sprintf("%s->%s(%s)", 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {

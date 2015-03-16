@@ -25,12 +25,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new XmlDumper($container = new ContainerBuilder());
+        $dumper = new XmlDumper(new ContainerBuilder());
 
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
-
-        $container = new ContainerBuilder();
-        $dumper = new XmlDumper($container);
     }
 
     public function testExportParameters()

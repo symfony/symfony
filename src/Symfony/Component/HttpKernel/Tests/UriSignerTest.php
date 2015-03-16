@@ -36,4 +36,15 @@ class UriSignerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($signer->sign('http://example.com/foo?foo=bar&bar=foo') === $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
     }
+
+    public function testCheckWithDifferentArgSeparator()
+    {
+        $this->iniSet('arg_separator.output', '&amp;');
+        $signer = new UriSigner('foobar');
+
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo')));
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+
+        $this->assertTrue($signer->sign('http://example.com/foo?foo=bar&bar=foo') === $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
+    }
 }

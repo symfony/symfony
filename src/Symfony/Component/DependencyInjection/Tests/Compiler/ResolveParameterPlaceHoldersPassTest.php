@@ -33,12 +33,7 @@ class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Foo', $this->fooDefinition->getClass());
     }
 
-    public function testFactoryClassParametersShouldBeResolved()
-    {
-        $this->assertSame('FooFactory', $this->fooDefinition->getFactoryClass());
-    }
-
-    public function testClassOfFactoryParametersShouldBeResolved()
+    public function testFactoryParametersShouldBeResolved()
     {
         $this->assertSame(array('FooFactory', 'getFoo'), $this->fooDefinition->getFactory());
     }
@@ -83,7 +78,6 @@ class ResolveParameterPlaceHoldersPassTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->setParameter('alias.id', 'bar');
 
         $fooDefinition = $containerBuilder->register('foo', '%foo.class%');
-        $fooDefinition->setFactoryClass('%foo.factory.class%');
         $fooDefinition->setFactory(array('%foo.factory.class%', 'getFoo'));
         $fooDefinition->setArguments(array('%foo.arg1%', '%foo.arg2%'));
         $fooDefinition->addMethodCall('%foo.method%', array('%foo.arg1%', '%foo.arg2%'));

@@ -45,7 +45,6 @@
         "symfony/locale": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
-        "symfony/phpunit-bridge": "self.version",
         "symfony/process": "2.99.99",
         "symfony/property-access": "self.version",
         "symfony/proxy-manager-bridge": "self.version",
@@ -68,6 +67,7 @@
         "symfony/yaml": "2.99.99"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "self.version",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3",
@@ -78,15 +78,20 @@
         "egulias/email-validator": "~1.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\": "src/" },
+        "psr-0": {
+            "Symfony\\Bridge\\Doctrine\\": "src/",
+            "Symfony\\Bridge\\Monolog\\": "src/",
+            "Symfony\\Bridge\\ProxyManager\\": "src/",
+            "Symfony\\Bridge\\Swiftmailer\\": "src/",
+            "Symfony\\Bridge\\Twig\\": "src/",
+            "Symfony\\Bundle\\": "src/",
+            "Symfony\\Component\\": "src/"
+        },
         "classmap": [
             "src/Symfony/Component/HttpFoundation/Resources/stubs",
             "src/Symfony/Component/Intl/Resources/stubs"
         ],
         "files": [ "src/Symfony/Component/Intl/Resources/stubs/functions.php" ]
-    },
-    "autoload-dev": {
-        "files": [ "src/Symfony/Bridge/PhpUnit/bootstrap.php" ]
     },
     "minimum-stability": "dev",
     "extra": {

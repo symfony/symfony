@@ -78,7 +78,7 @@ To set permissions at the class scope, use the <info>--class-scope</info> option
 EOF
             )
             ->addArgument('arguments', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of permissions and object identities (class name and ID separated by a column)')
-            ->addOption('user', null, InputOption::VALUE_REQUIRED, 'A list of security identities')
+            ->addOption('user', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A list of security identities')
             ->addOption('role', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A list of roles')
             ->addOption('class-scope', null, InputOption::VALUE_NONE, 'Use class-scope entries')
         ;

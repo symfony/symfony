@@ -139,7 +139,7 @@ EOF
         $table = new Table($output);
 
         // Display header line
-        $headers = array('State(s)', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = array('State(s)', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
@@ -172,7 +172,7 @@ EOF
                     }
                 }
 
-                $row = array($this->formatStates($states), $this->formatId($messageId), $this->sanitizeString($value));
+                $row = array($this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value));
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
@@ -59,6 +60,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class Application
 {
+    /**
+     * @var CommandConfiguration[]
+     */
     private $commands = array();
     private $wantHelps = false;
     private $runningCommand;
@@ -405,6 +409,32 @@ class Application
     }
 
     /**
+     * Adds a command object.
+     *
+     * If a command with the same name already exists, it will be overridden.
+     *
+     * @param CommandConfiguration $commandConfiguration A command configuration
+     *
+     * @return CommandConfiguration The command configuration
+     *
+     * @api
+     */
+    public function addCommandConfiguration(CommandConfiguration $commandConfiguration)
+    {
+        if (!$commandConfiguration->isEnabled()) {
+            return $commandConfiguration;
+        }
+
+        $this->commands[$commandConfiguration->getName()] = $commandConfiguration;
+
+        foreach ($commandConfiguration->getAliases() as $alias) {
+            $this->commands[$alias] = $commandConfiguration;
+        }
+
+        return $commandConfiguration;
+    }
+
+    /**
      * Returns a registered command by name or alias.
      *
      * @param string $name The command name or alias
@@ -422,12 +452,13 @@ class Application
         }
 
         $command = $this->commands[$name];
+        $command = $command->getCommand();
 
         if ($this->wantHelps) {
             $this->wantHelps = false;
 
             $helpCommand = $this->get('help');
-            $helpCommand->setCommand($command);
+            $helpCommand->setTargetCommand($command);
 
             return $helpCommand;
         }
@@ -583,13 +614,15 @@ class Application
     public function all($namespace = null)
     {
         if (null === $namespace) {
-            return $this->commands;
+            return array_map(function (CommandConfiguration $commandConfiguration) {
+                return $commandConfiguration->getCommand();
+            }, $this->commands);
         }
 
         $commands = array();
-        foreach ($this->commands as $name => $command) {
+        foreach ($this->commands as $name => $commandConfiguration) {
             if ($namespace === $this->extractNamespace($name, substr_count($namespace, ':') + 1)) {
-                $commands[$name] = $command;
+                $commands[$name] = $commandConfiguration->getCommand();
             }
         }
 

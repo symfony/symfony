@@ -137,6 +137,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
             $length = $this->readLong($stream, $isBigEndian);
             $offset = $this->readLong($stream, $isBigEndian);
 
+            if ($length < 1) {
+                continue;
+            }
+
             fseek($stream, $offset);
             $translated = fread($stream, $length);
 

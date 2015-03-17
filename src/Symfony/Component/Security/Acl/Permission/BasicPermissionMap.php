@@ -28,6 +28,9 @@ class BasicPermissionMap implements PermissionMapInterface
     const PERMISSION_MASTER = 'MASTER';
     const PERMISSION_OWNER = 'OWNER';
 
+    /**
+     * @var array
+     */
     protected $map;
 
     public function __construct()
@@ -104,5 +107,13 @@ class BasicPermissionMap implements PermissionMapInterface
     public function contains($permission)
     {
         return isset($this->map[$permission]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaskBuilder()
+    {
+        return new MaskBuilder();
     }
 }

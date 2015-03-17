@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-12T20:46:30Z
+
+fixed tests (failures are not related to this pull request)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-16T10:18:57Z
+
+I've been hit by the bug, patch fixes the issue :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-16T10:25:07Z
+
+I would have preferred to actually inline the service instead of keeping it as a separate method.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-16T10:32:57Z
+
+hmmm, as this breaks the XML dump, we need a test for the XML dumper, to ensure we don't reintroduce the bug later on.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-16T11:35:14Z
+
+@fabpot What kind of behaviour would you expect in the `XmlDumper` when it gets passed an "inlined" service factory? Should it throw an exception?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-16T11:51:25Z
+
+XML-dumping a definition using a private factory fails without your patch, and works with. This could be tested.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-16T13:56:51Z
+
+I suggest adding a test taking each of our container fixture in the testsuite, compiling the container, and then dumping it as XML. this way, we would detect cases whichcannot be dumped
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-16T14:01:50Z
+
+@nicolas-grekas The issue with your suggestion is that this is no related to the `XmlDumper` itself, but is related to how the instance looks like that is passed to it (i.e. the container as it has been modified by all compiler passes). So I added a test for the `InlineServiceDefinitionPass` which ensures that factories are not inlined.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-16T14:27:53Z
+
+@stof Doing so reveals that the `XmlDumper` also isn't capable of dumping inlined configurators (I suggested a way to dump them in #13557). Should I remove this possibility here too (given that adding such an option might be considered a new feature)?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-16T14:32:30Z
+
+By the way, most of the container fixtures were not usable because of undefined parameters. I added tests for the others though as you suggested.

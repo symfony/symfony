@@ -46,6 +46,7 @@ class ProjectServiceContainer extends Container
             'foo_bar' => 'getFooBarService',
             'foo_with_inline' => 'getFooWithInlineService',
             'method_call1' => 'getMethodCall1Service',
+            'new_factory' => 'getNewFactoryService',
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
@@ -264,10 +265,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getNewFactoryServiceService()
     {
-        $a = new \FactoryClass();
-        $a->foo = 'bar';
-
-        $this->services['new_factory_service'] = $instance = $a->getInstance();
+        $this->services['new_factory_service'] = $instance = $this->get('new_factory')->getInstance();
 
         $instance->foo = 'bar';
 
@@ -298,6 +296,27 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
+    }
+
+    /**
+     * Gets the 'new_factory' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return \FactoryClass A FactoryClass instance.
+     */
+    protected function getNewFactoryService()
+    {
+        $this->services['new_factory'] = $instance = new \FactoryClass();
+
+        $instance->foo = 'bar';
+
+        return $instance;
     }
 
     /**

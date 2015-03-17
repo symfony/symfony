@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
@@ -28,25 +30,37 @@ class DumpListener implements EventSubscriberInterface
 {
     private $cloner;
     private $dumper;
+    private $expressionLanguage;
+    private $expression;
 
     /**
-     * @param ClonerInterface     $cloner Cloner service.
-     * @param DataDumperInterface $dumper Dumper service.
+     * @param ClonerInterface         $cloner             Cloner service.
+     * @param DataDumperInterface     $dumper             Dumper service.
+     * @param ExpressionLanguage|null $expressionLanguage Expression Language service.
+     * @param string|null             $expression         The expression.
      */
-    public function __construct(ClonerInterface $cloner, DataDumperInterface $dumper)
+    public function __construct(ClonerInterface $cloner, DataDumperInterface $dumper, ExpressionLanguage $expressionLanguage = null, $expression = null)
     {
+        if (null !== $expression && null === $expressionLanguage) {
+            throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+        }
+
         $this->cloner = $cloner;
         $this->dumper = $dumper;
+        $this->expressionLanguage = $expressionLanguage;
+        $this->expression = $expression;
     }
 
     public function configure(GetResponseEvent $event)
     {
-        // if the request is issued by curl, we do not enable HTML dumper;
-        if (0 === strpos($event->getRequest()->headers->get('user-agent'), 'curl/')) {
-            CliDumper::$defaultColors = true;
-            CliDumper::$defaultOutput = 'php://output';
+        if ($this->expression) {
+            $result = $this->expressionLanguage->evaluate($this->expression, array('request' => $event->getRequest()));
+            if ($result) {
+                CliDumper::$defaultColors = true;
+                CliDumper::$defaultOutput = 'php://output';
 
-            return;
+                return;
+            }
         }
 
         $cloner = $this->cloner;

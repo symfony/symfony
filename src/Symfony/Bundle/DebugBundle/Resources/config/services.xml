@@ -21,6 +21,8 @@
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="var_dumper.cloner" />
             <argument type="service" id="data_collector.dump" />
+            <argument>null</argument><!-- Expression language -->
+            <argument>null</argument><!-- Expression -->
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />

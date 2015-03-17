@@ -13,6 +13,7 @@ namespace Symfony\Bundle\DebugBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -37,6 +38,13 @@ class DebugExtension extends Extension
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems',  array($config['max_items']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
+
+        if ($config['disable_html_for']) {
+            $container->getDefinition('debug.dump_listener')
+                ->replaceArgument(2, new Definition('Symfony\Bundle\DebugBundle\ExpressionLanguage'))
+                ->replaceArgument(3, $config['disable_html_for'])
+            ;
+        }
     }
 
     /**

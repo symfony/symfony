@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 /**
@@ -68,6 +69,10 @@ class PropertyNormalizer extends AbstractNormalizer
                 $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
             }
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                if (!$this->serializer instanceof NormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot normalize attribute "%s" because injected serializer is not a normalizer', $property->name));
+                }
+
                 $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 

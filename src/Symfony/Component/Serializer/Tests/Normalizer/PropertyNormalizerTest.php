@@ -350,6 +350,22 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy')
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
+     * @expectedExceptionMessage Cannot normalize attribute "bar" because injected serializer is not a normalizer
+     */
+    public function testUnableToNormalizeObjectAttribute()
+    {
+        $serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
+        $this->normalizer->setSerializer($serializer);
+
+        $obj = new PropertyDummy();
+        $object = new \stdClass();
+        $obj->setBar($object);
+
+        $this->normalizer->normalize($obj, 'any');
+    }
 }
 
 class PropertyDummy

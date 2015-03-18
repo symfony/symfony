@@ -113,9 +113,12 @@ class TextDescriptor extends Descriptor
      */
     protected function describeCommand(Command $command, array $options = array())
     {
+        $messages = array('<comment>Description:</comment>', ' '.$command->getDescription(), '');
+
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
-        $messages = array('<comment>Usage:</comment>', ' '.$command->getSynopsis(), '');
+        $messages[] = '<comment>Usage:</comment>';
+        $messages[] = ' '.str_replace("\n", "\n ", $command->getSynopsis())."\n";
 
         if ($command->getAliases()) {
             $messages[] = '<comment>Aliases:</comment> <info>'.implode(', ', $command->getAliases()).'</info>';

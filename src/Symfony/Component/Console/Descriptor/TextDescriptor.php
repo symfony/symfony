@@ -118,6 +118,12 @@ class TextDescriptor extends Descriptor
         $command->getSynopsis();
         $command->mergeApplicationDefinition(false);
 
+        $this->writeText('<comment>Description:</comment>', $options);
+        $this->writeText("\n");
+        $this->writeText(' '.$command->getDescription(), $options);
+        $this->writeText("\n");
+
+        $this->writeText("\n");
         $this->writeText('<comment>Usage:</comment>', $options);
         $this->writeText("\n");
         $this->writeText(' '.$command->getSynopsis(), $options);

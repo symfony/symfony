@@ -660,6 +660,10 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                    ->children()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('cache')->end()
+                    ->end()
                 ->end()
             ->end()
         ;

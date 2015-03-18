@@ -34,9 +34,20 @@ class FileLoaderLoadException extends \Exception
 
         // Is the resource located inside a bundle?
         if ('@' === $resource[0]) {
-            $parts = explode(DIRECTORY_SEPARATOR, $resource);
-            $bundle = substr($parts[0], 1);
-            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            $bundleController = substr($resource, 1);
+            $bundle = strstr($bundleController, '/', true);
+
+            // Get the controller full path
+            $currentPath = dirname(__FILE__);
+            $srcPath = strstr($currentPath, 'vendor/', true);
+            $controllerPath = $srcPath.'src/'.$bundleController;
+
+            // If the controller folder exist ?
+            if (file_exists($controllerPath)) {
+                $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            } else {
+                $message .= ' '.sprintf('Make sure the "%s" folder exist.', $controllerPath);
+            }
         } elseif ($previous) {
             // include the previous exception, to help the user see what might be the underlying cause
             $message .= ' '.sprintf('(%s)', $previous->getMessage());

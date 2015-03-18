@@ -8,10 +8,11 @@
         <parameter key="serializer.class">Symfony\Component\Serializer\Serializer</parameter>
         <parameter key="serializer.encoder.xml.class">Symfony\Component\Serializer\Encoder\XmlEncoder</parameter>
         <parameter key="serializer.encoder.json.class">Symfony\Component\Serializer\Encoder\JsonEncoder</parameter>
+        <parameter key="serializer.mapping.cache.prefix" />
     </parameters>
 
     <services>
-        <service id="serializer" class="%serializer.class%" >
+        <service id="serializer" class="%serializer.class%">
             <argument type="collection" />
             <argument type="collection" />
         </service>
@@ -43,10 +44,11 @@
         </service>
 
         <!-- Encoders -->
-        <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false" >
+        <service id="serializer.encoder.xml" class="%serializer.encoder.xml.class%" public="false">
             <tag name="serializer.encoder" />
         </service>
-        <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false" >
+
+        <service id="serializer.encoder.json" class="%serializer.encoder.json.class%" public="false">
             <tag name="serializer.encoder" />
         </service>
     </services>

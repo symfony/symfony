@@ -68,7 +68,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
-        $classMetadata = new ClassMetadata($class);
+        $classMetadata = $this->createMetadataClass($class);
         $this->loader->loadClassMetadata($classMetadata);
 
         $reflectionClass = $classMetadata->getReflectionClass();
@@ -114,5 +114,10 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         }
 
         return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+    }
+
+    protected function createMetadataClass($class)
+    {
+        return new ClassMetadata($class);
     }
 }

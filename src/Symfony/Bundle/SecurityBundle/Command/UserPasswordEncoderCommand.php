@@ -60,7 +60,7 @@ The command allows you to provide your own <comment>salt</comment>. If you don't
 the command will take care about that for you.
 
 You can also use the non interactive way by typing the following command:
-    <info>php %command.full_name% [password] [salt] [user-class]</info>
+    <info>php %command.full_name% [password] [user-class] [salt]</info>
 
 EOF
             )

@@ -23,7 +23,7 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/browser-kit": "~2.4|~3.0.0",
-        "symfony/console": "~2.3|~3.0.0",
+        "symfony/console": "~2.5|~3.0.0",
         "symfony/css-selector": "~2.0,>=2.0.5|~3.0.0",
         "symfony/dependency-injection": "~2.3|~3.0.0",
         "symfony/dom-crawler": "~2.0,>=2.0.5|~3.0.0",
@@ -37,7 +37,8 @@
         "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
         "symfony/expression-language": "~2.6|~3.0.0",
         "doctrine/doctrine-bundle": "~1.2",
-        "twig/twig": "~1.12"
+        "twig/twig": "~1.12",
+        "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

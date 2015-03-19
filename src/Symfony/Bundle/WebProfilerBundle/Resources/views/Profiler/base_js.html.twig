@@ -4,6 +4,17 @@
 
         var noop = function() {},
 
+            collectionToArray = function (collection) {
+                var length = collection.length || 0,
+                    results = new Array(length);
+
+                while (length--) {
+                    results[length] = collection[length];
+                }
+
+                return results;
+            },
+
             profilerStorageKey = 'sf2/profiler/',
 
             request = function(url, onSuccess, onError, payload, options) {
@@ -131,13 +142,13 @@
                                 }
                             } else if (request.loading) {
                                 requestState = 'loading';
-                                state = 'loading'
+                                state = 'loading';
                             }
                             row.className = 'sf-ajax-request sf-ajax-request-' + requestState;
                         }
 
                         var infoSpan = document.querySelectorAll(".sf-toolbar-ajax-info")[0];
-                        var children = Array.prototype.slice.call(tbody.children);
+                        var children = collectionToArray(tbody.children);
                         for (var i = 0; i < children.length; i++) {
                             tbody.removeChild(children[i]);
                         }
@@ -185,7 +196,7 @@
         }
 
         {% if excluded_ajax_paths is defined %}
-            if (window.XMLHttpRequest) {
+            if (window.XMLHttpRequest && XMLHttpRequest.addEventListener) {
                 var proxied = XMLHttpRequest.prototype.open;
 
                 XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
@@ -262,9 +273,7 @@
             },
 
             toggle: function(selector, elOn, elOff) {
-                var i,
-                    style,
-                    tmp = elOn.style.display,
+                var tmp = elOn.style.display,
                     el = document.getElementById(selector);
 
                 elOn.style.display = elOff.style.display;

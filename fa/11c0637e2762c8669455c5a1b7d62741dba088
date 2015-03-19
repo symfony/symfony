@@ -1,0 +1,168 @@
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-17T00:03:48Z
+
+Ping @javiereguiluz : Is that what you expected?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-12-17T08:04:47Z
+
+@saro0h sorry for the late response. This is indeed what I expected, but I think we can simplify the user experience of the command. I find it confusing having to read so many text and it's also confusing to me the order of the questions.
+
+The ida of this command is to provide a very simple and lightweight utility to encode plain text passwords using the appropriate encoding. The way passwords are encoded makes it almost "impossible" to encode the password by hand. This is necessary when you want to encode passwords for the "in_memory" provider and when you want to do checks of encoded passwords in the database.
+
+This is how I imagined this command could work:
+
+```
+ Symfony Password Encoder Utility
+ ================================
+
+ > Select the encoder for which you want to encode the password:
+   o Symfony\Component\Security\Core\User\User
+   o ...
+
+ > Type in your password (it won't be shown):
+   ***********
+
+ > (Optional) Type in the random salt (<Enter>):
+   <Enter>
+
+ [OK] The encoded password is:
+ 238ae5152rd77b787f78a7e7c723909fcd09090ea09908122332f23c32d23e43456a
+```
+
+In addition, if you only define one encoder, the command shouldn't ask you to pick one.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-21T14:08:23Z
+
+@javiereguiluz Unfortunatly, I can't access the ``security.encoders`` parameter in the container… The user has to type the user class.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-21T15:12:28Z
+
+ping @fabpot : to close this issue #11206
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-12-23T12:52:46Z
+
+I like the idea, but why should we do a totaly "Symfony-coupled" implementation instead of console application ? This can be useful for a lot of PHP projects (and developpers).
+
+Maybe can you check the minimal dependencies to provide this kind of stuff ? I you don't, I will :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2014-12-25T12:46:54Z
+
+@saro0h : I provided a similar [command](https://github.com/ogizanagi/encodpwd-command-bundle) (but much less worked) in a separate bundle, and I faced the same issue about the `security.encoders`, which I cannot access from the container.
+I didn't go further, as my own needs where limited, but can't you simply use the `Yaml Parser` in order to retrieve them from the `security.yml` ? (And provide an option to specify the location of the yaml file where they are described, if not the default location)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2014-12-25T13:55:44Z
+
+@mickaelandrieu which PHP Open-Source projects? Maybe Silex eventually. I don't think decoupling this command really worths it for now. It mostly serves Symfony users first. Maybe if there is a real need to get it extracted somewhere else, we will be able to do it.
+
+@ogizanagi instead of parsing the YAML files, the easiest way is to rely on a global configuration parameter in the container. Remember the console is executed at "runtime" whereas configuration files like `security.yml` are processed and validated at "compile" (very first request) time. So, you're doing the same thing twice without validating the file if you do it in your command. Also, relying on the container allows to rely on an environment. Console commands are "environment aware" thanks to the global `--env` option.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2014-12-25T15:27:37Z
+
+@hhamon : Indeed, I completely ignored the environments in my suggestion. This was a bad idea...
+
+> instead of parsing the YAML files, the easiest way is to rely on a global configuration parameter in the container.
+
+Should the `SecurityExtension` expose the `$config['encoders']` as a global parameter in the container, then ? (Or should the `EncoderFactory` provide access to the currently private `$encoders` property through a dedicated method ?)
+
+---------------------------------------------------------------------------
+
+by saro0h at 2014-12-25T15:49:42Z
+
+Nope it doesn't and I think it's a bad idea to expose it just for this command.
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-01T19:09:57Z
+
+@hhamon Laravel also, the biggest PHP US framework for now :) But I understand your point: the way the command is used require a class who implements UserInterface. I did a cli who only need to set the encoder method and arguments (like ``cost`` for instance) and return the correct encoded password.
+
+I don't understand why we need an User class to encode a password but it's ok for Symfony (framework) projects.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-01-01T22:00:25Z
+
+Do Laravel users use the Security component?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-01-01T23:54:55Z
+
+@hhamon yes : https://github.com/laravel/framework/blob/master/composer.json#L36
+
+But I don't know well Laravel, I can't say if they use Symfony encoders to deal with passwords. For bcrypt, they have their own package called [Hashing](http://laravel.com/docs/4.2/security).
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-02-08T22:53:54Z
+
+Changes have been made.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2015-02-09T07:06:32Z
+
+Is it possible to use `null` as salt? I think that was recommended previously for bcrypt.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-02-09T07:20:47Z
+
+BTW, passing the salt as an option should be allowed for non-interactive usage too, shouldn't it ?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-02-09T09:23:00Z
+
+@ogizanagi :+1:
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-02-09T12:56:19Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-03-15T08:20:32Z
+
+Ping @fabpot
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-03-16T17:13:13Z
+
+:+1: for the feature.
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-03-16T17:28:39Z
+
+ping @fabpot Done
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-03-17T16:50:57Z
+
+@fabpot Now I remember why I added the package ``ircmaxell/password-compat`` =>  https://travis-ci.org/symfony/symfony/jobs/54716343#L3250
+
+---------------------------------------------------------------------------
+
+by saro0h at 2015-03-18T05:22:23Z
+
+Ping @fabpot modification done.

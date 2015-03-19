@@ -49,10 +49,11 @@ abstract class AbstractOperation implements OperationInterface
     /**
      * @param MessageCatalogueInterface $source
      * @param MessageCatalogueInterface $target
+     * @param CatalogueFactoryInterface $catalogueFactory
      *
      * @throws \LogicException
      */
-    public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
+    public function __construct(MessageCatalogueInterface $source, MessageCatalogueInterface $target, CatalogueFactoryInterface $catalogueFactory = null)
     {
         if ($source->getLocale() !== $target->getLocale()) {
             throw new \LogicException('Operated catalogues must belong to the same locale.');
@@ -60,7 +61,9 @@ abstract class AbstractOperation implements OperationInterface
 
         $this->source = $source;
         $this->target = $target;
-        $this->result = new MessageCatalogue($source->getLocale());
+
+        $catalogueFactory = $catalogueFactory ?: new CatalogueFactory();
+        $this->result = $catalogueFactory->create($source->getLocale());
         $this->domains = null;
         $this->messages = array();
     }

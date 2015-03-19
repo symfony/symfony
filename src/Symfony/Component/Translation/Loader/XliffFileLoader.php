@@ -12,7 +12,6 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
@@ -24,7 +23,7 @@ use Symfony\Component\Config\Resource\FileResource;
  *
  * @api
  */
-class XliffFileLoader implements LoaderInterface
+class XliffFileLoader extends AbstractLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
@@ -44,7 +43,7 @@ class XliffFileLoader implements LoaderInterface
         list($xml, $encoding) = $this->parseFile($resource);
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:1.2');
 
-        $catalogue = new MessageCatalogue($locale);
+        $catalogue = $this->catalogueFactory->create($locale);
         foreach ($xml->xpath('//xliff:trans-unit') as $translation) {
             $attributes = $translation->attributes();
 

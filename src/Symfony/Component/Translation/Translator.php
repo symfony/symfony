@@ -14,6 +14,8 @@ namespace Symfony\Component\Translation;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Translation\Catalogue\CatalogueFactoryInterface;
+use Symfony\Component\Translation\Catalogue\CatalogueFactory;
 
 /**
  * Translator.
@@ -65,23 +67,28 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $debug;
 
     /**
-     * Constructor.
-     *
-     * @param string               $locale   The locale
-     * @param MessageSelector|null $selector The message selector for pluralization
-     * @param string|null          $cacheDir The directory to use for the cache
-     * @param bool                 $debug    Use cache in debug mode ?
+     * @var CatalogueFactoryInterface
+     */
+    private $catalogueFactory;
+
+    /**
+     * @param string                    $locale           The locale
+     * @param MessageSelector|null      $selector         The message selector for pluralization
+     * @param string|null               $cacheDir         The directory to use for the cache
+     * @param bool                      $debug            Use cache in debug mode ?
+     * @param CatalogueFactoryInterface $catalogueFactory The catalogue factory
      *
      * @throws \InvalidArgumentException If a locale contains invalid characters
      *
      * @api
      */
-    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false)
+    public function __construct($locale, MessageSelector $selector = null, $cacheDir = null, $debug = false, CatalogueFactoryInterface $catalogueFactory = null)
     {
         $this->setLocale($locale);
         $this->selector = $selector ?: new MessageSelector();
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
+        $this->catalogueFactory = $catalogueFactory ?: new CatalogueFactory();
     }
 
     /**
@@ -346,7 +353,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param string $locale
-     * @param bool $forceRefresh
+     * @param bool   $forceRefresh
      */
     private function initializeCacheCatalogue($locale, $forceRefresh = false)
     {
@@ -408,7 +415,7 @@ EOF
 
         $catalogue = include $cache;
 
-        /**
+        /*
          * Old cache returns only the catalogue, without resourcesHash
          */
         $resourcesHash = null;
@@ -434,7 +441,7 @@ EOF
 
     private function doLoadCatalogue($locale)
     {
-        $this->catalogues[$locale] = new MessageCatalogue($locale);
+        $this->catalogues[$locale] = $this->catalogueFactory->create($locale);
 
         if (isset($this->resources[$locale])) {
             foreach ($this->resources[$locale] as $resource) {

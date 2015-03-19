@@ -45,6 +45,7 @@
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
             <argument type="collection" /> <!-- translation resources -->
+            <argument type="service" id="translation.catalogue.factory" />
         </service>
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">
@@ -60,46 +61,57 @@
         <service id="translator.selector" class="%translator.selector.class%" public="false" />
 
         <service id="translation.loader.php" class="%translation.loader.php.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="php" />
         </service>
 
         <service id="translation.loader.yml" class="%translation.loader.yml.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="yml" />
         </service>
 
         <service id="translation.loader.xliff" class="%translation.loader.xliff.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="xlf" legacy-alias="xliff" />
         </service>
 
         <service id="translation.loader.po" class="%translation.loader.po.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="po" />
         </service>
 
         <service id="translation.loader.mo" class="%translation.loader.mo.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="mo" />
         </service>
 
         <service id="translation.loader.qt" class="%translation.loader.qt.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="ts" />
         </service>
 
         <service id="translation.loader.csv" class="%translation.loader.csv.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="csv" />
         </service>
 
         <service id="translation.loader.res" class="%translation.loader.res.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="res" />
         </service>
 
         <service id="translation.loader.dat" class="%translation.loader.dat.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="dat" />
         </service>
 
         <service id="translation.loader.ini" class="%translation.loader.ini.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="ini" />
         </service>
 
         <service id="translation.loader.json" class="%translation.loader.json.class%">
+            <argument type="service" id="translation.catalogue.factory" />
             <tag name="translation.loader" alias="json" />
         </service>
 
@@ -150,6 +162,8 @@
         <service id="translation.loader" class="%translation.loader.class%"/>
 
         <service id="translation.extractor" class="%translation.extractor.class%"/>
+
+        <service id="translation.catalogue.factory" class="Symfony\Component\Translation\Catalogue\CatalogueFactory"/>
 
         <service id="translation.writer" class="%translation.writer.class%"/>
     </services>

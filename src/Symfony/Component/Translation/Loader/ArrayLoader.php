@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
-
 /**
  * ArrayLoader loads translations from a PHP array.
  *
@@ -20,7 +18,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  *
  * @api
  */
-class ArrayLoader implements LoaderInterface
+class ArrayLoader extends AbstractLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
@@ -30,7 +28,7 @@ class ArrayLoader implements LoaderInterface
     public function load($resource, $locale, $domain = 'messages')
     {
         $this->flatten($resource);
-        $catalogue = new MessageCatalogue($locale);
+        $catalogue = $this->catalogueFactory->create($locale);
         $catalogue->add($resource, $domain);
 
         return $catalogue;

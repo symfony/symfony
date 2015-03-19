@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Catalogue\CatalogueFactoryInterface;
 
 /**
  * Translator.
@@ -47,7 +48,7 @@ class Translator extends BaseTranslator
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), $resourceFiles = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), $resourceFiles = array(), CatalogueFactoryInterface $catalogueFactory = null)
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -60,7 +61,7 @@ class Translator extends BaseTranslator
 
         $this->options = array_merge($this->options, $options);
 
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug'], $catalogueFactory);
     }
 
     /**

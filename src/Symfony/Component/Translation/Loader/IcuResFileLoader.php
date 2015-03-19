@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -21,7 +20,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
  *
  * @author stealth35
  */
-class IcuResFileLoader implements LoaderInterface
+class IcuResFileLoader extends AbstractLoader implements LoaderInterface
 {
     /**
      * {@inheritdoc}
@@ -50,7 +49,7 @@ class IcuResFileLoader implements LoaderInterface
         }
 
         $messages = $this->flatten($rb);
-        $catalogue = new MessageCatalogue($locale);
+        $catalogue = $this->catalogueFactory->create($locale);
         $catalogue->add($messages, $domain);
         $catalogue->addResource(new DirectoryResource($resource));
 

@@ -45,8 +45,8 @@ class StringUtils
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLen = strlen($knownString);
-        $userLen = strlen($userInput);
+        $knownLen = self::safeStrlen($knownString);
+        $userLen = self::safeStrlen($userInput);
 
         // Extend the known string to avoid uninitialized string offsets
         $knownString .= $userInput;
@@ -62,5 +62,19 @@ class StringUtils
 
         // They are only identical strings if $result is exactly 0...
         return 0 === $result;
+    }
+    
+    /**
+     * Return the number of bytes in a string
+     * 
+     * @param string $string The string whose length we wish to obtain
+     * @return int
+     */
+    public static function safeStrlen($string)
+    {
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($string, '8bit');
+        }
+        return strlen($string);
     }
 }

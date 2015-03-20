@@ -29,7 +29,7 @@
         "symfony/security-csrf": "~2.6|~3.0.0",
         "symfony/stopwatch": "~2.3|~3.0.0",
         "symfony/templating": "~2.1|~3.0.0",
-        "symfony/translation": "~2.6|~3.0.0",
+        "symfony/translation": "~2.7|~3.0.0",
         "doctrine/annotations": "~1.0"
     },
     "require-dev": {

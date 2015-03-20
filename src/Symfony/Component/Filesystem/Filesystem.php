@@ -42,7 +42,7 @@ class Filesystem
         $this->mkdir(dirname($targetFile));
 
         $doCopy = true;
-        if (! $override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
+        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         }
 
@@ -273,7 +273,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if ($copyOnWindows && ! function_exists('symlink')) {
+        if ($copyOnWindows && !function_exists('symlink')) {
             $this->mirror($originDir, $targetDir);
 
             return;
@@ -290,7 +290,7 @@ class Filesystem
             }
         }
 
-        if (! $ok && true !== @symlink($originDir, $targetDir)) {
+        if (!$ok && true !== @symlink($originDir, $targetDir)) {
             $report = error_get_last();
             if (is_array($report)) {
                 if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {

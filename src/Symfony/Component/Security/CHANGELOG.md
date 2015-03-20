@@ -6,6 +6,8 @@ CHANGELOG
 
  * added LogoutUrlGenerator
  * added the triggering of the `Symfony\Component\Security\Http\SecurityEvents::INTERACTIVE_LOGIN` in `Symfony\Component\Security\Http\Firewall\SimplePreAuthenticationListener`
+ * The MaskBuilder logic has been abstracted in the `Symfony\Component\Security\Acl\Permission\AbstractMaskBuilder`
+   and described in the `Symfony\Component\Security\Acl\Permission\MaskBuilderInterface`
 
 2.6.0
 -----

@@ -105,4 +105,14 @@ class BasicPermissionMap implements PermissionMapInterface
     {
         return isset($this->map[$permission]);
     }
+
+    /**
+     * Returns a new instance of the MaskBuilder used in the permissionMap
+     *
+     * @return MaskBuilderInterface
+     */
+    public function getMaskBuilder()
+    {
+        return new MaskBuilder();
+    }
 }

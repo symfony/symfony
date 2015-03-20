@@ -41,10 +41,9 @@ class Filesystem
 
         $this->mkdir(dirname($targetFile));
 
-        if (!$override && is_file($targetFile) && null === parse_url($originFile, PHP_URL_HOST)) {
+        $doCopy = true;
+        if (! $override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
-        } else {
-            $doCopy = true;
         }
 
         if ($doCopy) {
@@ -274,7 +273,7 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if (!function_exists('symlink') && $copyOnWindows) {
+        if ($copyOnWindows && ! function_exists('symlink')) {
             $this->mirror($originDir, $targetDir);
 
             return;
@@ -291,16 +290,14 @@ class Filesystem
             }
         }
 
-        if (!$ok) {
-            if (true !== @symlink($originDir, $targetDir)) {
-                $report = error_get_last();
-                if (is_array($report)) {
-                    if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
-                        throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
-                    }
+        if (! $ok && true !== @symlink($originDir, $targetDir)) {
+            $report = error_get_last();
+            if (is_array($report)) {
+                if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
+                    throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                 }
-                throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
             }
+            throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
         }
     }
 
@@ -339,9 +336,9 @@ class Filesystem
         $endPathRemainder = implode('/', array_slice($endPathArr, $index));
 
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
-        $relativePath = $traverser.(strlen($endPathRemainder) > 0 ? $endPathRemainder.'/' : '');
+        $relativePath = $traverser.($endPathRemainder !== '' ? $endPathRemainder.'/' : '');
 
-        return (strlen($relativePath) === 0) ? './' : $relativePath;
+        return $relativePath === '' ? './' : $relativePath;
     }
 
     /**

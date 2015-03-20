@@ -18,7 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  */
-class MoFileLoader extends ArrayLoader implements LoaderInterface
+class MoFileLoader extends ArrayLoader
 {
     /**
      * Magic used for validating the format of a MO file as well as

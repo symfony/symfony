@@ -1549,7 +1549,7 @@ class Request
         foreach (array_keys($languages) as $lang) {
             if (strstr($lang, '-')) {
                 $codes = explode('-', $lang);
-                if ($codes[0] == 'i') {
+                if ($codes[0] === 'i') {
                     // Language not listed in ISO 639 that are not variants
                     // of any listed language, which can be registered with the
                     // i-prefix, such as i-cherokee
@@ -1558,7 +1558,7 @@ class Request
                     }
                 } else {
                     for ($i = 0, $max = count($codes); $i < $max; $i++) {
-                        if ($i == 0) {
+                        if ($i === 0) {
                             $lang = strtolower($codes[0]);
                         } else {
                             $lang .= '_'.strtoupper($codes[$i]);

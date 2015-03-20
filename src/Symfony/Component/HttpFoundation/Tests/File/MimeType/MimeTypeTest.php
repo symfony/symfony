@@ -75,7 +75,7 @@ class MimeTypeTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Can not verify chmod operations on Windows');
         }
 
-        if (in_array(get_current_user(), array('root'))) {
+        if (get_current_user() === 'root') {
             $this->markTestSkipped('This test will fail if run under superuser');
         }
 

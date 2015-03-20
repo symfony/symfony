@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Translation;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\Extractor\AbstractFileExtractor;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
@@ -21,7 +22,7 @@ use Symfony\Component\Translation\MessageCatalogue;
  * @author Michel Salib <michelsalib@hotmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TwigExtractor implements ExtractorInterface
+class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
 {
     /**
      * Default domain for found messages.
@@ -52,11 +53,9 @@ class TwigExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function extract($directory, MessageCatalogue $catalogue)
+    public function extract($resource, MessageCatalogue $catalogue)
     {
-        // load any existing translation files
-        $finder = new Finder();
-        $files = $finder->files()->name('*.twig')->sortByName()->in($directory);
+        $files = $this->extractFiles($resource);
         foreach ($files as $file) {
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
@@ -88,5 +87,27 @@ class TwigExtractor implements ExtractorInterface
         }
 
         $visitor->disable();
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return bool
+     */
+    protected function canBeExtracted($file)
+    {
+        return $this->isFile($file) && 'twig' === pathinfo($file, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @param string|array $directory
+     *
+     * @return array
+     */
+    protected function extractFromDirectory($directory)
+    {
+        $finder = new Finder();
+
+        return $finder->files()->name('*.twig')->in($directory);
     }
 }

@@ -278,6 +278,38 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>{{ compared_value_type }}としての{{ compared_value }}と等しくてはいけません。</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>画像のアスペクト比が大きすぎます({{ ratio }})。{{ max_ratio }}までにしてください。</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>画像のアスペクト比が小さすぎます({{ ratio }})。{{ min_ratio }}以上にしてください。</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>画像が正方形になっています({{ width }}x{{ height }}ピクセル)。正方形の画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>画像が横向きになっています({{ width }}x{{ height }}ピクセル)。横向きの画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>画像が縦向きになっています({{ width }}x{{ height }}ピクセル)。縦向きの画像は許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>空のファイルは許可されていません。</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>ホストを解決できませんでした。</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>この値は予期される文字コード（{{ charset }}）と異なります。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

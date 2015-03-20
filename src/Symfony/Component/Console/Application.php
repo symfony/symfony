@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Command\CommandConfiguration;
+use Symfony\Component\Console\Command\Resolver\CommandResolverInterface;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
@@ -60,6 +62,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Application
 {
     private $commands = array();
+    private $commandResolver;
     private $wantHelps = false;
     private $runningCommand;
     private $name;
@@ -93,9 +96,20 @@ class Application
         }
     }
 
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param CommandResolverInterface $commandResolver
+     */
+    public function setCommandResolver(CommandResolverInterface $commandResolver)
+    {
+        $this->commandResolver = $commandResolver;
     }
 
     /**
@@ -402,6 +416,21 @@ class Application
         }
 
         return $command;
+    }
+
+    /**
+     * Adds command configuration.
+     *
+     * @param CommandConfiguration $configuration
+     * @return Command
+     */
+    public function addCommandConfiguration(CommandConfiguration $configuration)
+    {
+        if (null === $this->commandResolver) {
+            throw new \RuntimeException('You have to specify command resolver in order to register separate command configuration');
+        }
+
+        return $this->add(Command::registerLazyLoaded($configuration, $this->commandResolver));
     }
 
     /**

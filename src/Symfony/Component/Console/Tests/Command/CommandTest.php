@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -45,7 +46,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testCommandNameCannotBeEmpty()
     {
-        new Command();
+        $command = new Command();
+        $command->getName();
     }
 
     public function testSetApplication()
@@ -94,25 +96,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $ret = $command->setName('foobar:bar');
         $this->assertEquals($command, $ret, '->setName() implements a fluent interface');
         $this->assertEquals('foobar:bar', $command->getName(), '->setName() sets the command name');
-    }
-
-    /**
-     * @dataProvider provideInvalidCommandNames
-     */
-    public function testInvalidCommandNames($name)
-    {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Command name "%s" is invalid.', $name));
-
-        $command = new \TestCommand();
-        $command->setName($name);
-    }
-
-    public function provideInvalidCommandNames()
-    {
-        return array(
-            array(''),
-            array('foo:'),
-        );
     }
 
     public function testGetSetDescription()
@@ -344,5 +327,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester = new CommandTester($command);
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testInconsistentDefinition()
+    {
+        new Command('foo', new CommandConfiguration('bar'));
     }
 }

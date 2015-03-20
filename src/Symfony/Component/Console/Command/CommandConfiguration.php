@@ -32,14 +32,23 @@ final class CommandConfiguration
     private $synopsis;
 
     /**
-     * @param $name
+     * @param string $name
+     * @return CommandConfiguration
+     */
+    public static function create($name)
+    {
+        return new self($name);
+    }
+
+    /**
+     * @param string $name
      * @param InputDefinition $definition
      * @param string[] $aliases
-     * @param $enabled
-     * @param $processTitle
-     * @param $help
-     * @param $description
-     * @param $synopsis
+     * @param bool $enabled
+     * @param string $processTitle
+     * @param string $help
+     * @param string $description
+     * @param string $synopsis
      */
     public function __construct(
         $name = null,
@@ -50,8 +59,7 @@ final class CommandConfiguration
         $help = null,
         $description = null,
         $synopsis = null
-    )
-    {
+    ) {
         if ($name !== null) {
             $this->validateName($name);
         }

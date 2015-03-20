@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Command\Resolver\CommandResolverInterface;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -40,30 +41,34 @@ class Command
     private $helperSet;
 
     /**
-     * Registers command in a lazy load manner.
-     * Factory requires $name as an only argument.
+     * Registers command in a lazy load manner and returns proxy command.
      *
      * @param CommandConfiguration $configuration
-     * @param callable $factory
+     * @param CommandResolverInterface $resolver
      * @return Command
      */
-    final public static function registerLazyLoaded(CommandConfiguration $configuration, $factory)
+    final public static function registerLazyLoaded(CommandConfiguration $configuration, CommandResolverInterface $resolver)
     {
-        if (!is_callable($factory)) {
-            throw new \InvalidArgumentException(sprintf('Factory of the command "%s" must be callable', $configuration->getName()));
-        }
+        $proxyCommand = new self(null, $configuration);
+        $proxyCommand->setCode(function ($input, $output) use ($configuration, $resolver, $proxyCommand) {
+            $command = $resolver->resolve($configuration->getName());
 
-        $lazyLoaded = new self(null, $configuration);
-        $lazyLoaded->setCode(function ($input, $output) use ($configuration, $factory, $lazyLoaded) {
-            /** @var Command $command */
-            $command = $factory($configuration->getName());
-            $command->application = $lazyLoaded->application;
-            $command->configuration = $lazyLoaded->configuration;
+            if ($command instanceof Command) {
+                $command->application = $proxyCommand->application;
+                $command->configuration = $proxyCommand->configuration;
+                $command->helperSet = $proxyCommand->helperSet;
 
-            return $command->doRun($input, $output);
+                return $command->doRun($input, $output);
+            }
+
+            if (is_callable($command)) {
+                return (int) $command($input, $output);
+            }
+
+            throw new \RuntimeException(sprintf('Command or callable was expected, %s given', gettype($command)));
         });
 
-        return $lazyLoaded;
+        return $proxyCommand;
     }
 
     /**
@@ -85,10 +90,6 @@ class Command
         $this->configuration = $configuration ?: new CommandConfiguration($name);
 
         $this->configure();
-
-        if (!$this->configuration->getName()) {
-            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
-        }
     }
 
     /**
@@ -463,6 +464,10 @@ class Command
      */
     public function getName()
     {
+        if (!$this->configuration->getName()) {
+            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
+        }
+
         return $this->configuration->getName();
     }
 

@@ -55,7 +55,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
 
             $queryBuilder = $queryBuilder($manager->getRepository($class));
 
-            if (!$queryBuilder instanceof QueryBuilder) {
+            if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                 throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
             }
         }
@@ -68,6 +68,11 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      */
     public function getEntities()
     {
+        if (null === $this->queryBuilder) {
+            
+            return array();
+        }
+        
         return $this->queryBuilder->getQuery()->execute();
     }
 
@@ -76,6 +81,11 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      */
     public function getEntitiesByIds($identifier, array $values)
     {
+        if (null === $this->queryBuilder) {
+            
+            return array();
+        }
+        
         $qb = clone ($this->queryBuilder);
         $alias = current($qb->getRootAliases());
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;

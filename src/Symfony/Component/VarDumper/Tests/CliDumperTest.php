@@ -211,7 +211,7 @@ EOTXT
         $dumper->setColors(false);
         $cloner = new VarCloner();
 
-        $data = $cloner->cloneVar($var)->getLimitedClone(3, -1);
+        $data = $cloner->cloneVar($var)->withMaxDepth(3);
         $out = '';
         $dumper->dump($data, function ($line, $depth) use (&$out) {
             if ($depth >= 0) {

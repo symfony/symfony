@@ -373,7 +373,7 @@
                         throw "Tab target " + targetId + " does not exist";
                     }
 
-                    clickHandler(buttons[i], select);
+                    clickHandler(tabs[i], select);
 
                     Sfjs.addClass(target, 'hidden');
                 }
@@ -398,7 +398,7 @@
                     e = window.event;
                 }
 
-                callback(e.target || e.srcElement);
+                callback(this);
 
                 if (e.preventDefault) {
                     e.preventDefault();

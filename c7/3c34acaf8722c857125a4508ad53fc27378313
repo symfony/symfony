@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-20T18:28:17Z
+
+:+1: Thanks!
+
+Seems it was forgotten when doing https://github.com/issei-m/symfony/commit/07d14e5ff2647ab197ad711760ddb95e69278edd As this applies to all current maintained Symfony versions, it should be merged into the 2.3 branch. However, the mergers have a tool that can easily do this for them. You don't have to open a new PR.

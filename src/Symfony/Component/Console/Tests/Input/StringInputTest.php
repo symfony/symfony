@@ -70,8 +70,8 @@ class StringInputTest extends \PHPUnit_Framework_TestCase
             array('--long-option="foo bar"', array('--long-option=foo bar'), '->tokenize() parses long options with a value'),
             array('--long-option="foo bar""another"', array('--long-option=foo baranother'), '->tokenize() parses long options with a value'),
             array('--long-option=\'foo bar\'', array('--long-option=foo bar'), '->tokenize() parses long options with a value'),
-            array("--long-option='foo bar''another'", array("--long-option=foo baranother"), '->tokenize() parses long options with a value'),
-            array("--long-option='foo bar'\"another\"", array("--long-option=foo baranother"), '->tokenize() parses long options with a value'),
+            array("--long-option='foo bar''another'", array('--long-option=foo baranother'), '->tokenize() parses long options with a value'),
+            array("--long-option='foo bar'\"another\"", array('--long-option=foo baranother'), '->tokenize() parses long options with a value'),
             array('foo -a -ffoo --long bar', array('foo', '-a', '-ffoo', '--long', 'bar'), '->tokenize() parses when several arguments and options'),
         );
     }

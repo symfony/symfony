@@ -41,7 +41,7 @@ class ExampleConfiguration implements ConfigurationInterface
                             ->info(
                                 "this is a long\n".
                                 "multi-line info text\n".
-                                "which should be indented"
+                                'which should be indented'
                             )
                             ->example('example setting')
                         ->end()

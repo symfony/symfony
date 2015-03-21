@@ -151,18 +151,18 @@ class ApacheMatcherDumper extends MatcherDumper
             }
 
             if ($compiledRoute->getHostRegex()) {
-                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+                $rule[] = sprintf('RewriteCond %%{ENV:__ROUTING_host_%s} =1', $hostRegexUnique);
             }
 
             $rule[] = "RewriteCond %{REQUEST_URI} $regex";
-            $rule[] = sprintf("RewriteCond %%{REQUEST_METHOD} !^(%s)$ [NC]", implode('|', $methods));
+            $rule[] = sprintf('RewriteCond %%{REQUEST_METHOD} !^(%s)$ [NC]', implode('|', $methods));
             $rule[] = sprintf('RewriteRule .* - [S=%d,%s]', $hasTrailingSlash ? 2 : 1, implode(',', $allow));
         }
 
         // redirect with trailing slash appended
         if ($hasTrailingSlash) {
             if ($compiledRoute->getHostRegex()) {
-                $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+                $rule[] = sprintf('RewriteCond %%{ENV:__ROUTING_host_%s} =1', $hostRegexUnique);
             }
 
             $rule[] = 'RewriteCond %{REQUEST_URI} '.substr($regex, 0, -2).'$';
@@ -172,7 +172,7 @@ class ApacheMatcherDumper extends MatcherDumper
         // the main rule
 
         if ($compiledRoute->getHostRegex()) {
-            $rule[] = sprintf("RewriteCond %%{ENV:__ROUTING_host_%s} =1", $hostRegexUnique);
+            $rule[] = sprintf('RewriteCond %%{ENV:__ROUTING_host_%s} =1', $hostRegexUnique);
         }
 
         $rule[] = "RewriteCond %{REQUEST_URI} $regex";

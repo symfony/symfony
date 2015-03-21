@@ -75,7 +75,7 @@ class DumperPrefixCollection extends DumperCollection
         }
 
         // Reached only if the root has a non empty prefix
-        throw new \LogicException("The collection root must not have a prefix");
+        throw new \LogicException('The collection root must not have a prefix');
     }
 
     /**

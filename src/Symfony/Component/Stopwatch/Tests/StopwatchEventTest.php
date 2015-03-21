@@ -138,6 +138,6 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidOriginThrowsAnException()
     {
-        new StopwatchEvent("abc");
+        new StopwatchEvent('abc');
     }
 }

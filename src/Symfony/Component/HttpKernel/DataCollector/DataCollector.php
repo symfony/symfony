@@ -51,7 +51,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("Array(%s)", implode(', ', $a));
+            return sprintf('Array(%s)', implode(', ', $a));
         }
 
         if (is_resource($var)) {

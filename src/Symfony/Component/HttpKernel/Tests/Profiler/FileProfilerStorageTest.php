@@ -94,7 +94,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         fwrite($h, "line1\n\n\nline2\n");
         fseek($h, 0, SEEK_END);
 
-        $this->assertEquals("line2", $r->invoke(self::$storage, $h));
-        $this->assertEquals("line1", $r->invoke(self::$storage, $h));
+        $this->assertEquals('line2', $r->invoke(self::$storage, $h));
+        $this->assertEquals('line1', $r->invoke(self::$storage, $h));
     }
 }

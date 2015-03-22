@@ -56,7 +56,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
 
         // get some random test object identities from the database
         $oids = array();
-        $stmt = $this->con->executeQuery("SELECT object_identifier, class_type FROM acl_object_identities o INNER JOIN acl_classes c ON c.id = o.class_id ORDER BY RAND() LIMIT 25");
+        $stmt = $this->con->executeQuery('SELECT object_identifier, class_type FROM acl_object_identities o INNER JOIN acl_classes c ON c.id = o.class_id ORDER BY RAND() LIMIT 25');
         foreach ($stmt->fetchAll() as $oid) {
             $oids[] = new ObjectIdentity($oid['object_identifier'], $oid['class_type']);
         }
@@ -66,7 +66,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $start = microtime(true);
         $provider->findAcls($oids);
         $time = microtime(true) - $start;
-        echo "Total Time: ".$time."s\n";
+        echo 'Total Time: '.$time."s\n";
     }
 
     /**
@@ -77,7 +77,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     {
         $sm = $this->con->getSchemaManager();
         $sm->dropAndCreateDatabase('testdb');
-        $this->con->exec("USE testdb");
+        $this->con->exec('USE testdb');
 
         // import the schema
         $schema = new Schema($options = $this->getOptions());

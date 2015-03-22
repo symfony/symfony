@@ -29,8 +29,8 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response();
         $response = explode("\r\n", $response);
-        $this->assertEquals("HTTP/1.0 200 OK", $response[0]);
-        $this->assertEquals("Cache-Control: no-cache", $response[1]);
+        $this->assertEquals('HTTP/1.0 200 OK', $response[0]);
+        $this->assertEquals('Cache-Control: no-cache', $response[1]);
     }
 
     public function testClone()
@@ -497,7 +497,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         //array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public')
         try {
-            $response->setCache(array("wrong option" => "value"));
+            $response->setCache(array('wrong option' => 'value'));
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');

@@ -277,7 +277,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                 } else {
                     $data['item'][] = $value;
                 }
-            } elseif (array_key_exists($key, $data) || $key == "entry") {
+            } elseif (array_key_exists($key, $data) || $key == 'entry') {
                 if ((false === is_array($data[$key]))  || (false === isset($data[$key][0]))) {
                     $data[$key] = array($data[$key]);
                 }
@@ -308,7 +308,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         if (is_array($data) || $data instanceof \Traversable) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
-                if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
+                if (0 === strpos($key, '@') && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ($key === '#') {
                     $append = $this->selectNodeType($parentNode, $data);
@@ -327,7 +327,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                         $append = $this->appendNode($parentNode, $data, $key);
                     }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
-                    $append = $this->appendNode($parentNode, $data, "item", $key);
+                    $append = $this->appendNode($parentNode, $data, 'item', $key);
                 } else {
                     $append = $this->appendNode($parentNode, $data, $key);
                 }

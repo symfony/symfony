@@ -77,6 +77,6 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkHost($host)
     {
-        return $this->checkMX($host) || (checkdnsrr($host, "A") || checkdnsrr($host, "AAAA"));
+        return $this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA'));
     }
 }

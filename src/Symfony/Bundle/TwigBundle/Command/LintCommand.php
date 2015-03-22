@@ -63,7 +63,7 @@ EOF
 
         if (!$filename) {
             if (0 !== ftell(STDIN)) {
-                throw new \RuntimeException("Please provide a filename or pipe template content to stdin.");
+                throw new \RuntimeException('Please provide a filename or pipe template content to stdin.');
             }
 
             while (!feof(STDIN)) {
@@ -114,14 +114,14 @@ EOF
         $lines = $this->getContext($template, $line);
 
         if ($file) {
-            $output->writeln(sprintf("<error>KO</error> in %s (line %s)", $file, $line));
+            $output->writeln(sprintf('<error>KO</error> in %s (line %s)', $file, $line));
         } else {
-            $output->writeln(sprintf("<error>KO</error> (line %s)", $line));
+            $output->writeln(sprintf('<error>KO</error> (line %s)', $line));
         }
 
         foreach ($lines as $no => $code) {
             $output->writeln(sprintf(
-                "%s %-6s %s",
+                '%s %-6s %s',
                 $no == $line ? '<error>>></error>' : '  ',
                 $no,
                 $code

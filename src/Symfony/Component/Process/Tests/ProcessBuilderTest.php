@@ -117,7 +117,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->getProcess();
 
-        $this->assertContains("second", $proc->getCommandLine());
+        $this->assertContains('second', $proc->getCommandLine());
     }
 
     public function testPrefixIsPrependedToAllGeneratedProcess()

@@ -298,9 +298,9 @@ EOF;
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
+                $formattedValue = sprintf('<em>object</em>(%s)', $this->abbrClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], $flags, $this->charset));
             } elseif ('null' === $item[0]) {

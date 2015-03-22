@@ -31,9 +31,9 @@ class PluralizationRules
      */
     public static function get($number, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' == $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {
@@ -197,9 +197,9 @@ class PluralizationRules
      */
     public static function set($rule, $locale)
     {
-        if ("pt_BR" == $locale) {
+        if ('pt_BR' == $locale) {
             // temporary set a locale for brazilian
-            $locale = "xbr";
+            $locale = 'xbr';
         }
 
         if (strlen($locale) > 3) {

@@ -40,7 +40,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
         $keys = $bag->keys();
-        $this->assertEquals("foo", $keys[0]);
+        $this->assertEquals('foo', $keys[0]);
     }
 
     public function testGetDate()

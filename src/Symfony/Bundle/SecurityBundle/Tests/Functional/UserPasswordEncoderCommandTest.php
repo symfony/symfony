@@ -29,8 +29,8 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Symfony\Component\Security\Core\User\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
+            '--user-class' => 'Symfony\Component\Security\Core\User\User',
+            '--salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
         ));
         $expected = file_get_contents(__DIR__.'/app/PasswordEncode/plaintext.txt');
 
@@ -42,12 +42,13 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Custom\Class\Bcrypt\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
+            '--user-class' => 'Custom\Class\Bcrypt\User',
+            '--salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
         ));
-        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/bcrypt.txt');
 
-        $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains('$2y$13$', $this->passwordEncoderCommandTester->getDisplay());
+
     }
 
     public function testEncodePasswordPbkdf2()
@@ -55,8 +56,8 @@ class UserPasswordEncoderCommandTest extends WebTestCase
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Custom\Class\Pbkdf2\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
+            '--user-class' => 'Custom\Class\Pbkdf2\User',
+            '--salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
         ));
 
         $expected = file_get_contents(__DIR__.'/app/PasswordEncode/pbkdf2.txt');
@@ -66,14 +67,29 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     public function testEncodePasswordNoConfigForGivenUserClass()
     {
-        $this->setExpectedException('\RuntimeException', 'No encoder has been configured for account "Wrong/User/Class".');
+        $this->setExpectedException('\RuntimeException', 'No encoder has been configured for account "Foo\Bar\User".');
 
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Wrong/User/Class',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
+            '--user-class' => 'Foo\Bar\User',
+            '--salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
         ));
+    }
+
+    public function testEncodePasswordWithNoSaltNoInteraction()
+    {
+        $this->passwordEncoderCommandTester->execute(
+            array(
+                'command' => 'security:encode-password',
+                'password' => 'password',
+                '--user-class' => 'Symfony\Component\Security\Core\User\User',
+            ),
+            array('interactive' => false)
+        );
+
+        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains('password{', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     protected function setUp()

@@ -32,8 +32,18 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0.
+     * @see IpRetriever
+     */
     const HEADER_FORWARDED = 'forwarded';
+
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0.
+     * @see IpRetriever
+     */
     const HEADER_CLIENT_IP = 'client_ip';
+
     const HEADER_CLIENT_HOST = 'client_host';
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT = 'client_port';
@@ -77,6 +87,8 @@ class Request
      *
      * The other headers are non-standard, but widely used
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     *
+     * @see IpRetriever
      */
     protected static $trustedHeaders = array(
         self::HEADER_FORWARDED => 'FORWARDED',
@@ -834,6 +846,9 @@ class Request
         if (null === $this->ipRetriever) {
             $this->getDefaultIpRetriever();
         }
+
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
         $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
         return $this->ipRetriever->getClientIps($this);
     }
@@ -849,6 +864,8 @@ class Request
         if (null === $this->ipRetriever) {
             $this->getDefaultIpRetriever();
         }
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
         $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
         return $this->ipRetriever->getClientIp($this);
     }

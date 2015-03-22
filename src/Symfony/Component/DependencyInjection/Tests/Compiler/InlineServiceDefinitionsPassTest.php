@@ -254,6 +254,23 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $factory[0]);
     }
 
+    public function testProcessDoesNotInlineConfigurators()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo.configurator')
+            ->setPublic(false)
+        ;
+        $container
+            ->register('foo')
+            ->setConfigurator(array(new Reference('foo.configurator'), 'getFoo'))
+        ;
+        $this->process($container);
+
+        $configurator = $container->getDefinition('foo')->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $configurator[0]);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new RepeatedPass(array(new AnalyzeServiceReferencesPass(), new InlineServiceDefinitionsPass()));

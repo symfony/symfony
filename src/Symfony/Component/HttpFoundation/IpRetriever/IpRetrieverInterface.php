@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 interface IpRetrieverInterface
 {
+    const HEADER_FORWARDED = 'forwarded';
+    const HEADER_CLIENT_IP = 'client_ip';
+    const HEADER_REAL_IP = 'real_ip';
 
     /**
      * Sets a list of trusted proxies.
@@ -34,6 +37,29 @@ interface IpRetrieverInterface
      * @return array An array of trusted proxies.
      */
     public function getTrustedProxies();
+
+    /**
+     * Sets the name for trusted headers.
+     *
+     * Setting an empty value allows to disable the trusted header for the given key.
+     *
+     * @param string $key   The header key
+     * @param string $value The header name
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setTrustedHeaderName($key, $value);
+
+    /**
+     * Gets the trusted proxy header name.
+     *
+     * @param string $key The header key
+     *
+     * @return string The header name
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getTrustedHeaderName($key);
 
     /**
      * Returns the client IP addresses.

@@ -46,6 +46,21 @@ class IpRetrieverTest extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
+    private function getRequestInstanceForClientIpsRealIpTests($remoteAddr, $httpRealIp)
+    {
+        $request = new Request();
+
+        $server = array('REMOTE_ADDR' => $remoteAddr);
+
+        if (null !== $httpRealIp) {
+            $server['HTTP_X_REAL_IP'] = $httpRealIp;
+        }
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        return $request;
+    }
+
     /**
      * @dataProvider testGetClientIpsProvider
      */
@@ -74,7 +89,7 @@ class IpRetrieverTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $ipRetriever->getClientIps($request));
 
-        Request::setTrustedProxies(array());
+        $ipRetriever->setTrustedProxies(array());
     }
 
     /**
@@ -91,7 +106,35 @@ class IpRetrieverTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $ipRetriever->getClientIps($request));
 
-        Request::setTrustedProxies(array());
+        $ipRetriever->setTrustedProxies(array());
+    }
+
+    /**
+     * @dataProvider testGetClientIpsRealIpProvider
+     */
+    public function testGetClientIpsRealIp($expected, $remoteAddr, $httpRealIp, $trustedProxies)
+    {
+        $ipRetriever = new IpRetriever();
+        $request = $this->getRequestInstanceForClientIpsRealIpTests($remoteAddr, $httpRealIp);
+
+        if ($trustedProxies) {
+            $ipRetriever->setTrustedProxies($trustedProxies);
+        }
+
+        $this->assertEquals($expected, $ipRetriever->getClientIps($request));
+
+        $ipRetriever->setTrustedProxies(array());
+    }
+
+    public function testGetClientIpsRealIpProvider()
+    {
+        //              $expected                                  $remoteAddr  $httpRealIp                                  $trustedProxies
+        return array(
+            array(array('88.88.88.88'),                            '127.0.0.1', '88.88.88.88',                               array('127.0.0.1')),
+            array(array('192.0.2.60'),                             '::1',       '192.0.2.60',          array('::1')),
+            array(array('2620:0:1cfe:face:b00c::3', '192.0.2.43'), '::1',       '192.0.2.43,2620:0:1cfe:face:b00c::3',       array('::1')),
+            array(array('2001:db8:cafe::17'),                      '::1',       '2001:db8:cafe::17',                         array('::1')),
+        );
     }
 
     public function testGetClientIpsForwardedProvider()

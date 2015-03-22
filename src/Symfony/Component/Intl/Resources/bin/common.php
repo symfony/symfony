@@ -79,11 +79,11 @@ set_exception_handler(function (\Exception $exception) {
             echo "Caused by\n";
         }
 
-        echo get_class($cause).": ".$cause->getMessage()."\n";
+        echo get_class($cause).': '.$cause->getMessage()."\n";
         echo "\n";
-        echo $cause->getFile().":".$cause->getLine()."\n";
+        echo $cause->getFile().':'.$cause->getLine()."\n";
         foreach ($cause->getTrace() as $trace) {
-            echo $trace['file'].":".$trace['line']."\n";
+            echo $trace['file'].':'.$trace['line']."\n";
         }
         echo "\n";
 

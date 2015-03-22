@@ -49,8 +49,8 @@ class ProcessFailedExceptionTest extends \PHPUnit_Framework_TestCase
         $cmd = 'php';
         $exitCode = 1;
         $exitText = 'General error';
-        $output = "Command output";
-        $errorOutput = "FATAL: Unexpected error";
+        $output = 'Command output';
+        $errorOutput = 'FATAL: Unexpected error';
 
         $process = $this->getMock(
             'Symfony\Component\Process\Process',

@@ -98,9 +98,9 @@ class HtmlExtension extends AbstractExtension
     public function translateDisabled(XPathExpr $xpath)
     {
         return $xpath->addCondition(
-            "("
-                ."@disabled and"
-                ."("
+            '('
+                .'@disabled and'
+                .'('
                     ."(name(.) = 'input' and @type != 'hidden')"
                     ." or name(.) = 'button'"
                     ." or name(.) = 'select'"
@@ -109,14 +109,14 @@ class HtmlExtension extends AbstractExtension
                     ." or name(.) = 'fieldset'"
                     ." or name(.) = 'optgroup'"
                     ." or name(.) = 'option'"
-                .")"
-            .") or ("
+                .')'
+            .') or ('
                 ."(name(.) = 'input' and @type != 'hidden')"
                 ." or name(.) = 'button'"
                 ." or name(.) = 'select'"
                 ." or name(.) = 'textarea'"
-            .")"
-            ." and ancestor::fieldset[@disabled]"
+            .')'
+            .' and ancestor::fieldset[@disabled]'
         );
         // todo: in the second half, add "and is not a descendant of that fieldset element's first legend element child, if any."
     }
@@ -150,10 +150,10 @@ class HtmlExtension extends AbstractExtension
                     ." or name(.) = 'textarea'"
                     ." or name(.) = 'keygen'"
                 .')'
-                ." and not (@disabled or ancestor::fieldset[@disabled])"
+                .' and not (@disabled or ancestor::fieldset[@disabled])'
             .') or ('
                 ."name(.) = 'option' and not("
-                    ."@disabled or ancestor::optgroup[@disabled]"
+                    .'@disabled or ancestor::optgroup[@disabled]'
                 .')'
             .')'
         );

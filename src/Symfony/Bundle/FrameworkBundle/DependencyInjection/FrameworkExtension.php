@@ -763,8 +763,9 @@ class FrameworkExtension extends Extension
 
         // You can use this parameter to check the API version in your own
         // bundle extension classes
+        // This is set to 2.5-bc for compatibility with Symfony 2.5 and 2.6.
         // @deprecated since version 2.7, to be removed in 3.0
-        $container->setParameter('validator.api', $config['api']);
+        $container->setParameter('validator.api', '2.5-bc');
     }
 
     private function getValidatorMappingFiles(ContainerBuilder $container)

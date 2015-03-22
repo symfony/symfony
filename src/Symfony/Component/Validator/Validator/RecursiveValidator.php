@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
+use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 
 /**
  * Recursive implementation of {@link ValidatorInterface}.
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class RecursiveValidator implements ValidatorInterface
+class RecursiveValidator implements ValidatorInterface, LegacyValidatorInterface
 {
     /**
      * @var ExecutionContextFactoryInterface
@@ -113,22 +114,19 @@ class RecursiveValidator implements ValidatorInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value, $constraints = null, $groups = null)
+    public function validate($value, $groups = null, $traverse = false, $deep = false)
     {
-        // The following code must be removed in 3.0
         $numArgs = func_num_args();
-        if ($numArgs > 3) {
-            trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
-            $traverse = func_get_arg(3);
-            $deep = func_get_arg(4);
-            $constraints = new Valid(array('traverse' => $traverse, 'deep' => $deep));
 
-            if (self::testConstraints($groups)) {
-                if ((!$traverse && !$deep) || self::testGroups($traverse)) {
-                    $constraints = $groups;
-                    $groups = $traverse;
-                }
-            }
+        // Use new signature if constraints are given in the second argument
+        if (self::testConstraints($groups) && ($numArgs < 3 || 3 === $numArgs && self::testGroups($traverse))) {
+            // Rename to avoid total confusion ;)
+            $constraints = $groups;
+            $groups = $traverse;
+        } else {
+            trigger_error('The Symfony\Component\Validator\ValidatorInterface::validate method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+
+            $constraints = new Valid(array('traverse' => $traverse, 'deep' => $deep));
         }
 
         return $this->startContext($value)
@@ -158,18 +156,30 @@ class RecursiveValidator implements ValidatorInterface
     }
 
     /**
-     * @internal
-     * @deprecated since version 2.5, to be removed in 3.0.
+     * {@inheritdoc}
      */
+    public function validateValue($value, $constraints, $groups = null)
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+
+        return $this->validate($value, $constraints, $groups);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadataFactory()
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+
+        return $this->metadataFactory;
+    }
+
     private static function testConstraints($constraints)
     {
         return null === $constraints || $constraints instanceof Constraint || (is_array($constraints) && current($constraints) instanceof Constraint);
     }
 
-    /**
-     * @internal
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
     private static function testGroups($groups)
     {
         return null === $groups || is_string($groups) || $groups instanceof GroupSequence || (is_array($groups) && (is_string(current($groups)) || current($groups) instanceof GroupSequence));

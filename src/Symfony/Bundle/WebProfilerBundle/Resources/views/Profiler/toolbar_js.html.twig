@@ -33,10 +33,10 @@
                 Sfjs.renderAjaxRequests();
 
                 /* Handle toolbar-info position */
-                var toolbarBlocks = document.getElementsByClassName('sf-toolbar-block');
+                var toolbarBlocks = document.querySelectorAll('.sf-toolbar-block');
                 for (var i = 0; i < toolbarBlocks.length; i += 1) {
                     toolbarBlocks[i].onmouseover = function () {
-                        var toolbarInfo = this.getElementsByClassName('sf-toolbar-info')[0];
+                        var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
                         var pageWidth = document.body.clientWidth;
                         var elementWidth = toolbarInfo.offsetWidth;
                         var leftValue = (elementWidth + this.offsetLeft) - pageWidth;

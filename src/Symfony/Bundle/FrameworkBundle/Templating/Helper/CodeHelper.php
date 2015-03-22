@@ -62,7 +62,7 @@ class CodeHelper extends Helper
     {
         if (false !== strpos($method, '::')) {
             list($class, $method) = explode('::', $method, 2);
-            $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
+            $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
             $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);
         } else {
@@ -88,7 +88,7 @@ class CodeHelper extends Helper
                 $short = array_pop($parts);
                 $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->getCharset()));
             } elseif ('null' === $item[0]) {

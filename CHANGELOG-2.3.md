@@ -7,6 +7,31 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.26 (2015-03-17)
+
+ * bug #13927 Fixing wrong variable name from #13519 (weaverryan)
+ * bug #13519 [DependencyInjection] fixed service resolution for factories (fabpot)
+ * bug #13901 [Bundle] Fix charset config (nicolas-grekas, bamarni)
+ * bug #13911 [HttpFoundation] MongoDbSessionHandler::read() now checks for valid session age (bzikarsky)
+ * bug #13890 Fix XSS in Debug exception handler (fabpot)
+ * bug #13744 minor #13377 [Console] Change greater by greater or equal for isFresh in FileResource (bijibox)
+ * bug #13708  [HttpFoundation] fixed param order for Nginx's x-accel-mapping (phansys)
+ * bug #13767 [HttpKernel] Throw double-bounce exceptions (nicolas-grekas)
+ * bug #13769 [Form] NativeRequestHandler file handling fix (mpajunen)
+ * bug #13779 [FrameworkBundle] silence E_USER_DEPRECATED in insulated clients (nicolas-grekas)
+ * bug #13715 Enforce UTF-8 charset for core controllers (WouterJ)
+ * bug #13683 [PROCESS] make sure /dev/tty is readable (staabm)
+ * bug #13733 [Process] Fixed PhpProcess::getCommandLine() result (francisbesset)
+ * bug #13618 [PropertyAccess] Fixed invalid feedback -> foodback singularization (WouterJ)
+ * bug #13630 [Console] fixed ArrayInput, if array contains 0 key. (arima-ryunosuke)
+ * bug #13647 [FrameworkBundle] Fix title and placeholder rendering in php form templates (jakzal)
+ * bug #13607 [Console] Fixed output bug, if escaped string in a formatted string. (tronsha)
+ * bug #13466 [Security] Remove ContextListener's onKernelResponse listener as it is used (davedevelopment)
+ * bug #12864 [Console][Table] Fix cell padding with multi-byte (ttsuruoka)
+ * bug #13375 [YAML] Fix one-liners to work with multiple new lines (Alex Pott)
+ * bug #13545 fixxed order of usage (OskarStark)
+ * bug #13567 [Routing] make host matching case-insensitive (Tobion)
+
 * 2.3.25 (2015-01-30)
 
  * bug #13528 [Validator] reject ill-formed strings (nicolas-grekas)

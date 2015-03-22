@@ -963,7 +963,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $req = new Request();
         $retval = $req->getContent(true);
         $this->assertInternalType('resource', $retval);
-        $this->assertEquals("", fread($retval, 1));
+        $this->assertEquals('', fread($retval, 1));
         $this->assertTrue(feof($retval));
     }
 

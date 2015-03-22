@@ -400,9 +400,9 @@ EOF;
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf("<em>object</em>(%s)", $this->formatClass($item[1]));
+                $formattedValue = sprintf('<em>object</em>(%s)', $this->formatClass($item[1]));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", $this->escapeHtml($item[1]));
             } elseif ('null' === $item[0]) {

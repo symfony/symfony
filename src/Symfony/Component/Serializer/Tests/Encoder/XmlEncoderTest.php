@@ -32,7 +32,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeScalar()
     {
         $obj = new ScalarDummy();
-        $obj->xmlFoo = "foo";
+        $obj->xmlFoo = 'foo';
 
         $expected = '<?xml version="1.0"?>'."\n".
             '<response>foo</response>'."\n";
@@ -43,7 +43,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testSetRootNodeName()
     {
         $obj = new ScalarDummy();
-        $obj->xmlFoo = "foo";
+        $obj->xmlFoo = 'foo';
 
         $this->encoder->setRootNodeName('test');
         $expected = '<?xml version="1.0"?>'."\n".
@@ -70,11 +70,11 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
                 '@name' => 'Bar',
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $expected = '<?xml version="1.0"?>'."\n".
@@ -376,28 +376,28 @@ XML;
         $obj = new ScalarDummy();
         $obj->xmlFoo = array(
             'foo-bar' => array(
-                '@key' => "value",
-                'item' => array("@key" => 'key', "key-val" => 'val'),
+                '@key' => 'value',
+                'item' => array('@key' => 'key', 'key-val' => 'val'),
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $expected = array(
             'foo-bar' => array(
-                '@key' => "value",
-                'key' => array('@key' => 'key', "key-val" => 'val'),
+                '@key' => 'value',
+                'key' => array('@key' => 'key', 'key-val' => 'val'),
             ),
             'Foo' => array(
-                'Bar' => "Test",
+                'Bar' => 'Test',
                 '@Type' => 'test',
             ),
             'föo_bär' => 'a',
-            "Bar" => array(1,2,3),
+            'Bar' => array(1,2,3),
             'a' => 'b',
         );
         $xml = $this->encoder->encode($obj, 'xml');
@@ -503,7 +503,7 @@ XML;
         $obj->foo = 'foo';
         $obj->bar = array('a', 'b');
         $obj->baz = array('key' => 'val', 'key2' => 'val', 'A B' => 'bar', 'item' => array(array('title' => 'title1'), array('title' => 'title2')), 'Barry' => array('FooBar' => array('Baz' => 'Ed', '@id' => 1)));
-        $obj->qux = "1";
+        $obj->qux = '1';
 
         return $obj;
     }

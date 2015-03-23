@@ -38,25 +38,29 @@ class StringUtils
      */
     public static function equals($knownString, $userInput)
     {
-        $knownString = (string) $knownString;
-        $userInput = (string) $userInput;
-
         if (function_exists('hash_equals')) {
             return hash_equals($knownString, $userInput);
+        }
+
+        // Avoid making unnecessary duplications of secret data
+        if (!is_string($knownString)) {
+            $knownString = (string) $knownString;
+        }
+
+        if (!is_string($userInput)) {
+            $userInput = (string) $userInput;
         }
 
         $knownLen = self::safeStrlen($knownString);
         $userLen = self::safeStrlen($userInput);
 
-        // Extend the known string to avoid uninitialized string offsets
-        $knownString .= $userInput;
-
         // Set the result to the difference between the lengths
         $result = $knownLen - $userLen;
 
-        // Note that we ALWAYS iterate over the user-supplied length
-        // This is to mitigate leaking length information
-        for ($i = 0; $i < $userLen; $i++) {
+        // Always iterate over the minimum length possible.
+        $iterationLen = min($knownLen, $userLen);
+
+        for ($i = 0; $i < $iterationLen; $i++) {
             $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
         }
 

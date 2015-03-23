@@ -63,10 +63,10 @@ class StringUtils
         // They are only identical strings if $result is exactly 0...
         return 0 === $result;
     }
-    
+
     /**
      * Return the number of bytes in a string
-     * 
+     *
      * @param string $string The string whose length we wish to obtain
      * @return int
      */
@@ -75,6 +75,7 @@ class StringUtils
         if (function_exists('mb_strlen')) {
             return mb_strlen($string, '8bit');
         }
+
         return strlen($string);
     }
 }

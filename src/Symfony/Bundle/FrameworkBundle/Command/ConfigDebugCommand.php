@@ -66,11 +66,7 @@ EOF
         }
 
         $extension = $this->findExtension($name);
-
-        $kernel = $this->getContainer()->get('kernel');
-        $method = new \ReflectionMethod($kernel, 'buildContainer');
-        $method->setAccessible(true);
-        $container = $method->invoke($kernel);
+        $container = $this->compileContainer();
 
         $configs = $container->getExtensionConfig($extension->getAlias());
         $configuration = $extension->getConfiguration($configs, $container);
@@ -89,5 +85,18 @@ EOF
         }
 
         $output->writeln(Yaml::dump(array($extension->getAlias() => $config), 3));
+    }
+
+    private function compileContainer()
+    {
+        $kernel = clone $this->getContainer()->get('kernel');
+        $kernel->boot();
+
+        $method = new \ReflectionMethod($kernel, 'buildContainer');
+        $method->setAccessible(true);
+        $container = $method->invoke($kernel);
+        $container->getCompiler()->compile($container);
+
+        return $container;
     }
 }

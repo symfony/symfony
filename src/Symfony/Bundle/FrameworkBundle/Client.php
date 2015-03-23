@@ -86,6 +86,8 @@ class Client extends BaseClient
     }
 
     /**
+     * Disables kernel reboot between requests.
+     *
      * By default, the Client reboots the Kernel for each request. This method
      * allows to keep the same kernel across requests.
      */
@@ -95,10 +97,7 @@ class Client extends BaseClient
     }
 
     /**
-     * Enable the kernel reboot behaviour.
-     *
-     * If the kernel reboot was previously disabled, you can re-enable it with
-     * this method.
+     * Enables kernel reboot between requests.
      */
     public function enableReboot()
     {

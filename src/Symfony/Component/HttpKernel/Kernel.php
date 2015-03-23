@@ -51,6 +51,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $bundles = array();
 
     protected $bundleMap;
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
     protected $rootDir;
     protected $environment;
@@ -189,6 +192,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (false === $this->booted) {
             $this->boot();
         }
+
+        $request->setIpRetriever($this->container->get('ip_retriever'));
 
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }

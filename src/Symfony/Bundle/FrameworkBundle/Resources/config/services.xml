@@ -62,5 +62,17 @@
         <service id="uri_signer" class="%uri_signer.class%">
             <argument>%kernel.secret%</argument>
         </service>
+
+        <service id="ip_retriever.default" class="Symfony\Component\HttpKernel\IpRetriever\IpRetriever">
+            <call method="setTrustedProxies">
+                <argument type="string">%kernel.trusted_proxies%</argument>
+            </call>
+        </service>
+
+        <service id="ip_retriever.akamai" class="Symfony\Component\HttpKernel\IpRetriever\AkamaiIpRetriever">
+            <call method="setTrustedProxies">
+                <argument type="string">%kernel.trusted_proxies%</argument>
+            </call>
+        </service>
     </services>
 </container>

@@ -106,9 +106,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            'fr' => array(
-                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
+            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
         );
 
         // prime the cache
@@ -134,9 +132,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            'fr' => array(
-                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
+            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
         );
 
         $translator = $this->getTranslator($loader, array(), $resourceFiles, 'yml');

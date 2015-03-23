@@ -62,9 +62,6 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             $definition->setProperties(
                 $this->inlineArguments($container, $definition->getProperties())
             );
-
-            $configurator = $this->inlineArguments($container, array($definition->getConfigurator()));
-            $definition->setConfigurator($configurator[0]);
         }
     }
 

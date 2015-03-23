@@ -105,7 +105,7 @@ class AmqpCaster
         $a += array(
             $prefix.'name' => $c->getName(),
             $prefix.'flags' => self::extractFlags($c->getFlags()),
-            $prefix.'type' => new ConstStub(self::$exchangeTypes[$c->getType()], $c->getType()),
+            $prefix.'type' => isset(self::$exchangeTypes[$c->getType()]) ? new ConstStub(self::$exchangeTypes[$c->getType()], $c->getType()) : $c->getType(),
             $prefix.'arguments' => $c->getArguments(),
             $prefix.'channel' => $c->getChannel(),
             $prefix.'connection' => $c->getConnection(),

@@ -127,16 +127,20 @@ class Data
                     break;
 
                 case Stub::TYPE_ARRAY:
-                    $dumper->enterHash($cursor, $item->class, $item->value, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->class);
-                    $dumper->leaveHash($cursor, $item->class, $item->value, (bool) $children, $cut);
-                    break;
-
+                    $item = clone $item;
+                    $item->type = $item->class;
+                    $item->class = $item->value;
+                    // No break;
                 case Stub::TYPE_OBJECT:
                 case Stub::TYPE_RESOURCE:
-                    $dumper->enterHash($cursor, $item->type, $item->class, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
-                    $dumper->leaveHash($cursor, $item->type, $item->class, (bool) $children, $cut);
+                    $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
+                    $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
+                    if ($withChildren) {
+                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
+                    } elseif ($children && 0 <= $cut) {
+                        $cut += count($children);
+                    }
+                    $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
 
                 default:
@@ -166,26 +170,20 @@ class Data
      */
     private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType)
     {
-        if ($children) {
-            if ($parentCursor->depth !== $this->maxDepth && $this->maxItemsPerDepth) {
-                $cursor = clone $parentCursor;
-                ++$cursor->depth;
-                $cursor->hashType = $hashType;
-                $cursor->hashIndex = 0;
-                $cursor->hashLength = count($children);
-                $cursor->hashCut = $hashCut;
-                foreach ($children as $key => $child) {
-                    $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-                    $cursor->hashKey = $key;
-                    $this->dumpItem($dumper, $cursor, $refs, $child);
-                    if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
-                        $parentCursor->stop = true;
+        $cursor = clone $parentCursor;
+        ++$cursor->depth;
+        $cursor->hashType = $hashType;
+        $cursor->hashIndex = 0;
+        $cursor->hashLength = count($children);
+        $cursor->hashCut = $hashCut;
+        foreach ($children as $key => $child) {
+            $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
+            $cursor->hashKey = $key;
+            $this->dumpItem($dumper, $cursor, $refs, $child);
+            if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
+                $parentCursor->stop = true;
 
-                        return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
-                    }
-                }
-            } elseif ($hashCut >= 0) {
-                $hashCut += count($children);
+                return $hashCut >= 0 ? $hashCut + $cursor->hashLength - $cursor->hashIndex : $hashCut;
             }
         }
 

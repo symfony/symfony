@@ -1962,7 +1962,7 @@ class Request
         return new static($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
-    public function setIpRetriever(IPRetriever\IpRetrieverInterface $ipRetriever)
+    public function setIpRetriever(IpRetrieverInterface $ipRetriever)
     {
         $this->ipRetriever = $ipRetriever;
     }

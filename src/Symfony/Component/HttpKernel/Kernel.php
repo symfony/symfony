@@ -193,8 +193,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $this->boot();
         }
 
-        $request->setIpRetriever($this->container->get('ip_retriever'));
-
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
 

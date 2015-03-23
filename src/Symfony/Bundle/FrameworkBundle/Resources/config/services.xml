@@ -63,16 +63,21 @@
             <argument>%kernel.secret%</argument>
         </service>
 
-        <service id="ip_retriever.default" class="Symfony\Component\HttpKernel\IpRetriever\IpRetriever">
+        <service id="ip_retriever.default" class="Symfony\Component\HttpFoundation\IpRetriever\IpRetriever">
             <call method="setTrustedProxies">
                 <argument type="string">%kernel.trusted_proxies%</argument>
             </call>
         </service>
 
-        <service id="ip_retriever.akamai" class="Symfony\Component\HttpKernel\IpRetriever\AkamaiIpRetriever">
+        <service id="ip_retriever.akamai" class="Symfony\Component\HttpFoundation\IpRetriever\AkamaiIpRetriever">
             <call method="setTrustedProxies">
                 <argument type="string">%kernel.trusted_proxies%</argument>
             </call>
+        </service>
+
+        <service id="ip_retriever.listener" class="Symfony\Bundle\FrameworkBundle\EventListener\IpRetrieverListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="ip_retriever" />
         </service>
     </services>
 </container>

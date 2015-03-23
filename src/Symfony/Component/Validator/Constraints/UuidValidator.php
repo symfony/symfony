@@ -60,17 +60,17 @@ class UuidValidator extends ConstraintValidator
     /**
      * @deprecated since version 2.6, to be removed in 3.0
      */
-    const STRICT_PATTERN = Deprecated::STRICT_PATTERN;
+    const STRICT_PATTERN = '/^[a-f0-9]{8}-[a-f0-9]{4}-[%s][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i';
 
     /**
      * @deprecated since version 2.6, to be removed in 3.0
      */
-    const LOOSE_PATTERN = Deprecated::LOOSE_PATTERN;
+    const LOOSE_PATTERN = '/^[a-f0-9]{4}(?:-?[a-f0-9]{4}){7}$/i';
 
     /**
      * @deprecated since version 2.6, to be removed in 3.0
      */
-    const STRICT_UUID_LENGTH = Deprecated::STRICT_UUID_LENGTH;
+    const STRICT_UUID_LENGTH = 36;
 
     /**
      * {@inheritdoc}

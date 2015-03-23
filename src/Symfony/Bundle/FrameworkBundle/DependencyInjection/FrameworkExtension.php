@@ -71,7 +71,7 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
-        if (isset($config['ip_retriever']) && null !== $config['ip_retriever']) {
+        if (null !== $config['ip_retriever']) {
             if ($container->has($config['ip_retriever']) === false) {
                 throw new LogicException('Service ' . $config['ip_retriever'] . ' not defined');
             }

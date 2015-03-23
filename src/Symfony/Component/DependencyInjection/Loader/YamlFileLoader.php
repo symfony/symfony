@@ -237,8 +237,15 @@ class YamlFileLoader extends FileLoader
             }
 
             foreach ($service['calls'] as $call) {
-                $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
-                $definition->addMethodCall($call[0], $args);
+                if (isset($call['method'])) {
+                    $method = $call['method'];
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                } else {
+                    $method = $call[0];
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                }
+
+                $definition->addMethodCall($method, $args);
             }
         }
 

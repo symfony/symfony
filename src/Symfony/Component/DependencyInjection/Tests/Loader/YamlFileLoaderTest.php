@@ -270,4 +270,16 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertStringStartsWith('A "tags" attribute must be of a scalar-type for service "foo_service", tag "foo", attribute "bar"', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag-attribute is not a scalar');
         }
     }
+
+    public function testLoadYamlOnlyWithKeys()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services21.yml');
+
+        $definition = $container->getDefinition('manager');
+        $this->assertEquals(array(array('setLogger', array(new Reference('logger'))), array('setClass', array('User'))), $definition->getMethodCalls());
+        $this->assertEquals(array(true), $definition->getArguments());
+        $this->assertEquals(array('manager' => array(array('alias' => 'user'))), $definition->getTags());
+    }
 }

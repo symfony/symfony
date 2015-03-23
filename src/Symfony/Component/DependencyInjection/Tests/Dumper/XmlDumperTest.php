@@ -175,4 +175,12 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
             array('container14'),
         );
     }
+
+    public function testDumpInlinedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container21.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/xml/services21.xml'), $dumper->dump());
+    }
 }

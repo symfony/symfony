@@ -69,7 +69,6 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     public function getEntities()
     {
         if (null === $this->queryBuilder) {
-            
             return array();
         }
         
@@ -82,7 +81,6 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
     public function getEntitiesByIds($identifier, array $values)
     {
         if (null === $this->queryBuilder) {
-            
             return array();
         }
         

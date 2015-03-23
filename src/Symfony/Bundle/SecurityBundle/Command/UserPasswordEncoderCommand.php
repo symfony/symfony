@@ -153,7 +153,7 @@ EOF
         $container = $this->getContainer();
         $saltQuestion->setValidator(function ($value) use ($output, $container) {
             if ('' === trim($value)) {
-                $value = hash('sha512', $container->get('security.secure_random')->nextBytes(30));
+                $value = base64_encode($container->get('security.secure_random')->nextBytes(30));
 
                 $output->writeln("\n<comment>The salt has been generated: </comment>".$value);
                 $output->writeln(sprintf("<comment>Make sure that your salt storage field fits this salt length: %s chars.</comment>\n", strlen($value)));

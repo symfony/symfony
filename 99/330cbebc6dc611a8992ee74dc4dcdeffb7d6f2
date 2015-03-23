@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-22T14:18:35Z
+
+:+1:
+
+For Symfony 2.7, we should make it possible to dump the inline ones in the XML though (not being able to perform such optimization just because of the XML dumping is a shame)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-22T21:42:09Z
+
+@stof see #13557

@@ -66,6 +66,18 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
+    protected function loadCatalogue($locale)
+    {
+        if (null !== $this->options['cache_dir'] && $this->options['debug']) {
+            $this->loadResources($locale);
+        }
+
+        parent::loadCatalogue($locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function initializeCatalogue($locale)
     {
         $this->initialize();

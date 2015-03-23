@@ -122,6 +122,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
+
+        // refresh cache when resources is changed in debug mode.
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true), array(), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('folder', $translator->trans('folder'));
     }
 
     public function testLoadRessourcesWithoutCaching()

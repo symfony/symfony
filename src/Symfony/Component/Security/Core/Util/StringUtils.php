@@ -72,7 +72,14 @@ class StringUtils
      */
     public static function safeStrlen($string)
     {
-        if (function_exists('mb_strlen')) {
+        // Premature optimization
+        // Since this cannot be changed at runtime, we can cache it
+        static $func_exists = null;
+        if ($func_exists === null) {
+            $func_exists = function_exists('mb_strlen');
+        }
+        
+        if ($func_exists) {
             return mb_strlen($string, '8bit');
         }
 

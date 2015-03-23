@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Context;
 
+trigger_error('The '.__NAMESPACE__.'\LegacyExecutionContextFactory class is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

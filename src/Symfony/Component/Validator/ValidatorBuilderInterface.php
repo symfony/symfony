@@ -180,6 +180,8 @@ interface ValidatorBuilderInterface
      *
      * @see Validation::API_VERSION_2_5
      * @see Validation::API_VERSION_2_5_BC
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function setApiVersion($apiVersion);
 

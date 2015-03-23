@@ -84,6 +84,7 @@ abstract class AbstractCloner implements ClonerInterface
         ':process' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castProcess',
         ':stream' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStream',
         ':stream-context' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStreamContext',
+        ':xml' => 'Symfony\Component\VarDumper\Caster\XmlResourceCaster::castXml',
     );
 
     protected $maxItems = 2500;

@@ -82,7 +82,7 @@ class StringUtils
         if ($func_exists === null) {
             $func_exists = function_exists('mb_strlen');
         }
-        
+
         if ($func_exists) {
             return mb_strlen($string, '8bit');
         }

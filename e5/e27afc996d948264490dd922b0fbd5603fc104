@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-22T21:21:44Z
+
+Looks good to me. :+1:
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-03-22T22:45:59Z
+
+Instead passing the array by reference, this array could be replaced by a `SplObjectStorage` or an `ArrayObject`.

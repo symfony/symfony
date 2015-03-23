@@ -1151,7 +1151,7 @@ EOF;
      *
      * @return bool
      */
-    private function hasReference($id, array $arguments, $deep = false, $visited = array())
+    private function hasReference($id, array $arguments, $deep = false, &$visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {

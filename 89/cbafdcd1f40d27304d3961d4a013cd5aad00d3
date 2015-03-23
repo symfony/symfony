@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-18T09:40:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-18T09:41:29Z
+
+This implementatio currently supports mixing numeric keys and name keys for the method and the arguments, which can be confusing
+
+---------------------------------------------------------------------------
+
+by hason at 2015-03-18T11:12:40Z
+
+@stof Fixed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-19T16:09:07Z
+
+Looks good to me :+1:

@@ -178,7 +178,11 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getFactory()) {
             $factory = $this->document->createElement('factory');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $factory);
+                $factory->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $factory->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $factory->setAttribute('method', $callable[1]);
             } else {
@@ -189,7 +193,11 @@ class XmlDumper extends Dumper
 
         if ($callable = $definition->getConfigurator()) {
             $configurator = $this->document->createElement('configurator');
-            if (is_array($callable)) {
+
+            if (is_array($callable) && $callable[0] instanceof Definition) {
+                $this->addService($callable[0], null, $configurator);
+                $configurator->setAttribute('method', $callable[1]);
+            } elseif (is_array($callable)) {
                 $configurator->setAttribute($callable[0] instanceof Reference ? 'service' : 'class', $callable[0]);
                 $configurator->setAttribute('method', $callable[1]);
             } else {

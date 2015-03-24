@@ -9,6 +9,7 @@
         <parameter key="form.registry.class">Symfony\Component\Form\FormRegistry</parameter>
         <parameter key="form.factory.class">Symfony\Component\Form\FormFactory</parameter>
         <parameter key="form.extension.class">Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension</parameter>
+        <parameter key="form.type_guesser.core.class">Symfony\Component\Form\Extension\Core\CoreTypeGuesser</parameter>
         <parameter key="form.type_guesser.validator.class">Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser</parameter>
         <parameter key="form.type_extension.form.request_handler.class">Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler</parameter>
     </parameters>
@@ -46,6 +47,11 @@
             <argument type="collection" />
             <!-- All services with tag "form.type_guesser" are inserted here by FormPass -->
             <argument type="collection" />
+        </service>
+
+        <!-- CoreTypeGuesser -->
+        <service id="form.type_guesser.core" class="%form.type_guesser.core.class%">
+            <tag name="form.type_guesser" />
         </service>
 
         <!-- ValidatorTypeGuesser -->

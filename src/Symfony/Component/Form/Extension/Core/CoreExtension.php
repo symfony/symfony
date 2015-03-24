@@ -56,4 +56,9 @@ class CoreExtension extends AbstractExtension
             new Type\CurrencyType(),
         );
     }
+
+    public function loadTypeGuesser()
+    {
+        return new CoreTypeGuesser();
+    }
 }

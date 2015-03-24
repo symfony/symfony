@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
 /**
  * Encode a user's password.
@@ -87,8 +88,9 @@ EOF
         $this->writeIntroduction($output);
 
         $password = $input->getArgument('password');
-        $emptySalt = $input->getOption('empty-salt');
         $userClass = $input->getArgument('user-class');
+        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($userClass);
+        $emptySalt = $input->getOption('empty-salt') || $encoder instanceof BCryptPasswordEncoder;
 
         $helper = $this->getHelper('question');
 
@@ -112,7 +114,6 @@ EOF
             $salt = $this->generateSalt();
         }
 
-        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($userClass);
         $encodedPassword = $encoder->encodePassword($password, $salt);
 
         $this->writeResult($output);

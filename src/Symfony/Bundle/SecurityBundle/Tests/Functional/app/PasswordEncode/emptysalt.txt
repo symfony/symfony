@@ -8,8 +8,6 @@ This command encodes any password you want according to the configuration you
 made in your configuration file containing the security.encoders key.
 
 
- Encoders are configured by user type in the security.yml file.
-
                                  
   ✔ Password encoding succeeded  
                                  
@@ -18,5 +16,5 @@ made in your configuration file containing the security.encoders key.
 | Key              | Value                                                            |
 +------------------+------------------------------------------------------------------+
 | Encoder used     | Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder |
-| Encoded password | password{AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk}         |
+| Encoded password | password                                                         |
 +------------------+------------------------------------------------------------------+

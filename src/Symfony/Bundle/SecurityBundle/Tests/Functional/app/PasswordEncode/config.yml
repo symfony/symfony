@@ -1,0 +1,21 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        Custom\Class\Bcrypt\User: bcrypt
+        Custom\Class\Pbkdf2\User: pbkdf2
+        Custom\Class\Test\User: test
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
+                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+
+    firewalls:
+        test:
+            pattern:  ^/
+            security: false

@@ -63,12 +63,20 @@ abstract class AbstractCloner implements ClonerInterface
         'PDO' => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdo',
         'PDOStatement' => 'Symfony\Component\VarDumper\Caster\PdoCaster::castPdoStatement',
 
+        'AMQPConnection' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castConnection',
+        'AMQPChannel' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castChannel',
+        'AMQPQueue' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castQueue',
+        'AMQPExchange' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castExchange',
+        'AMQPEnvelope' => 'Symfony\Component\VarDumper\Caster\AmqpCaster::castEnvelope',
+
         'ArrayObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
         'SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
         'SplFixedArray' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFixedArray',
         'SplHeap' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
         'SplObjectStorage' => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',
         'SplPriorityQueue' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
+
+        'MongoCursorInterface' => 'Symfony\Component\VarDumper\Caster\MongoCaster::castCursor',
 
         ':curl' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl',
         ':dba' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
@@ -78,6 +86,7 @@ abstract class AbstractCloner implements ClonerInterface
         ':process' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castProcess',
         ':stream' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStream',
         ':stream-context' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castStreamContext',
+        ':xml' => 'Symfony\Component\VarDumper\Caster\XmlResourceCaster::castXml',
     );
 
     protected $maxItems = 2500;
@@ -204,7 +213,7 @@ abstract class AbstractCloner implements ClonerInterface
                 $class,
                 method_exists($class, '__debugInfo'),
                 new \ReflectionClass($class),
-                array_reverse(array($class => $class) + class_parents($class) + class_implements($class)),
+                array_reverse(array('*' => '*', $class => $class) + class_parents($class) + class_implements($class)),
             );
 
             $this->classInfo[$class] = $classInfo;

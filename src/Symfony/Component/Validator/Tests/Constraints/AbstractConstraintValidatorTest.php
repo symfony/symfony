@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Context\LegacyExecutionContext;
 use Symfony\Component\Validator\ExecutionContextInterface as LegacyExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
-use Symfony\Component\Validator\Tests\Fixtures\StubGlobalExecutionContext;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -303,7 +302,10 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
         return new ConstraintViolationAssertion($this->context, $message, $this->constraint);
     }
 
-    abstract protected function getApiVersion();
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
 
     abstract protected function createValidator();
 }

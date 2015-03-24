@@ -107,8 +107,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->exactly(2))
               ->method('vote')
               ->will($this->returnValueMap(array(
-                  array($token, null, array("ROLE_FOO"), $vote1),
-                  array($token, null, array("ROLE_BAR"), $vote2),
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
               )))
         ;
 

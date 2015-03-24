@@ -166,6 +166,10 @@ EOF
      */
     protected function getContainerBuilder()
     {
+        if ($this->containerBuilder) {
+            return $this->containerBuilder;
+        }
+
         if (!$this->getApplication()->getKernel()->isDebug()) {
             throw new \LogicException(sprintf('Debug information about the container is only available in debug mode.'));
         }
@@ -179,7 +183,7 @@ EOF
         $loader = new XmlFileLoader($container, new FileLocator());
         $loader->load($cachedFile);
 
-        return $container;
+        return $this->containerBuilder = $container;
     }
 
     private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)

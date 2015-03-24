@@ -274,31 +274,31 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testConvertDomElementToArray()
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo>bar</foo>');
         $this->assertEquals('bar', XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo foo="bar" />');
         $this->assertEquals(array('foo' => 'bar'), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo>bar</foo></foo>');
         $this->assertEquals(array('foo' => 'bar'), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo>bar<foo>bar</foo></foo></foo>');
         $this->assertEquals(array('foo' => array('value' => 'bar', 'foo' => 'bar')), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo></foo></foo>');
         $this->assertEquals(array('foo' => null), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo><!-- foo --></foo></foo>');
         $this->assertEquals(array('foo' => null), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
 
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadXML('<foo><foo foo="bar"/><foo foo="bar"/></foo>');
         $this->assertEquals(array('foo' => array(array('foo' => 'bar'), array('foo' => 'bar'))), XmlFileLoader::convertDomElementToArray($doc->documentElement), '::convertDomElementToArray() converts a \DomElement to an array');
     }
@@ -466,5 +466,34 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services14.xml');
 
         $this->assertEquals(array('index_0' => 'app'), $container->findDefinition('logger')->getArguments());
+    }
+
+    public function testLoadInlinedServices()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services21.xml');
+
+        $foo = $container->getDefinition('foo');
+
+        $fooFactory = $foo->getFactory();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactory[0]);
+        $this->assertSame('FooFactory', $fooFactory[0]->getClass());
+        $this->assertSame('createFoo', $fooFactory[1]);
+
+        $fooFactoryFactory = $fooFactory[0]->getFactory();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooFactoryFactory[0]);
+        $this->assertSame('Foobar', $fooFactoryFactory[0]->getClass());
+        $this->assertSame('createFooFactory', $fooFactoryFactory[1]);
+
+        $fooConfigurator = $foo->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $fooConfigurator[0]);
+        $this->assertSame('Bar', $fooConfigurator[0]->getClass());
+        $this->assertSame('configureFoo', $fooConfigurator[1]);
+
+        $barConfigurator = $fooConfigurator[0]->getConfigurator();
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $barConfigurator[0]);
+        $this->assertSame('Baz', $barConfigurator[0]->getClass());
+        $this->assertSame('configureBar', $barConfigurator[1]);
     }
 }

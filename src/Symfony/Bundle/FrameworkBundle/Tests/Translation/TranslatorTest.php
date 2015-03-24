@@ -106,9 +106,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            'fr' => array(
-                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
+            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
         );
 
         // prime the cache
@@ -122,15 +120,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
+
+        // refresh cache when resources is changed in debug mode.
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true), array(), 'yml');
+        $translator->setLocale('fr');
+
+        $this->assertEquals('folder', $translator->trans('folder'));
     }
 
     public function testLoadRessourcesWithoutCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            'fr' => array(
-                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
-            ),
+            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
         );
 
         $translator = $this->getTranslator($loader, array(), $resourceFiles, 'yml');

@@ -148,7 +148,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
-                'api' => '2.5-bc',
             ),
             'annotations' => array(
                 'cache' => 'file',
@@ -157,6 +156,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'serializer' => array(
                 'enabled' => false,
+                'enable_annotations' => false,
             ),
             'property_access' => array(
                 'magic_call' => false,

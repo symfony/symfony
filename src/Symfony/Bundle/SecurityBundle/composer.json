@@ -37,7 +37,8 @@
         "symfony/yaml": "~2.7|~3.0",
         "symfony/expression-language": "~2.7|~3.0",
         "doctrine/doctrine-bundle": "~1.2",
-        "twig/twig": "~1.12"
+        "twig/twig": "~1.12",
+        "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }

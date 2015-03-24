@@ -218,7 +218,7 @@ class RouteCompiler implements RouteCompilerInterface
                     $nbTokens = count($tokens);
                     if ($nbTokens - 1 == $index) {
                         // Close the optional subpatterns
-                        $regexp .= str_repeat(")?", $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
+                        $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
                     }
                 }
 

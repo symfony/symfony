@@ -471,6 +471,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
                         ->enumNode('api')
+                            ->info('Deprecated since version 2.7, to be removed in 3.0')
                             ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
                             ->beforeNormalization()
                                 // XML/YAML parse as numbers, not as strings
@@ -480,19 +481,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return !isset($v['validation']['api']) || 'auto' === $v['validation']['api']; })
-                ->then(function ($v) {
-                    // This condition is duplicated in ValidatorBuilder. This
-                    // duplication is necessary in order to know the desired
-                    // API version already during container configuration
-                    // (to adjust service classes etc.)
-                    // See https://github.com/symfony/symfony/issues/11580
-                    $v['validation']['api'] = '2.5-bc';
-
-                    return $v;
-                })
             ->end()
         ;
     }
@@ -521,6 +509,10 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
                     ->canBeEnabled()
+                    ->children()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
+                        ->scalarNode('cache')->end()
+                    ->end()
                 ->end()
             ->end()
         ;

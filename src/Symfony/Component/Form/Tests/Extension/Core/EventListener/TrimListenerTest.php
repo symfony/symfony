@@ -18,7 +18,7 @@ class TrimListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testTrim()
     {
-        $data = " Foo! ";
+        $data = ' Foo! ';
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $event = new FormEvent($form, $data);
 

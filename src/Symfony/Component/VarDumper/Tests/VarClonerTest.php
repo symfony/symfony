@@ -134,4 +134,54 @@ Symfony\Component\VarDumper\Cloner\Data Object
 EOTXT;
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
+
+    public function testCaster()
+    {
+        $cloner = new VarCloner(array(
+            '*' => function ($obj, $array) {
+                $array['foo'] = 123;
+
+                return $array;
+            },
+            __CLASS__ => function ($obj, $array) {
+                return array();
+            },
+        ));
+        $clone = $cloner->cloneVar($this);
+
+        $expected = <<<EOTXT
+Symfony\Component\VarDumper\Cloner\Data Object
+(
+    [data:Symfony\Component\VarDumper\Cloner\Data:private] => Array
+        (
+            [0] => Array
+                (
+                    [0] => Symfony\Component\VarDumper\Cloner\Stub Object
+                        (
+                            [type] => object
+                            [class] => %s
+                            [value] => 
+                            [cut] => 0
+                            [handle] => %d
+                            [refCount] => 0
+                            [position] => 1
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [foo] => 123
+                )
+
+        )
+
+    [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
+    [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+    [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
+)
+
+EOTXT;
+        $this->assertStringMatchesFormat($expected, print_r($clone, true));
+    }
 }

@@ -46,6 +46,7 @@ framework:
         cache:   file
         debug:   true
         file_cache_dir: %kernel.cache_dir%/annotations
+    serializer: { enabled: true }
     ide: file%%link%%format
     request:
         formats:

@@ -108,6 +108,40 @@ EOTXT
         );
     }
 
+    public function testXmlResource()
+    {
+        if (!extension_loaded('xml')) {
+            $this->markTestSkipped('xml extension is required');
+        }
+
+        $var = xml_parser_create();
+        $ref = (int) $var;
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $data = $cloner->cloneVar($var);
+        $out = fopen('php://memory', 'r+b');
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertSame(
+            <<<EOTXT
+:xml {@{$ref}
+  current_byte_index: 0
+  current_column_number: 1
+  current_line_number: 1
+  error_code: XML_ERROR_NONE
+}
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -211,7 +245,7 @@ EOTXT
         $dumper->setColors(false);
         $cloner = new VarCloner();
 
-        $data = $cloner->cloneVar($var)->getLimitedClone(3, -1);
+        $data = $cloner->cloneVar($var)->withMaxDepth(3);
         $out = '';
         $dumper->dump($data, function ($line, $depth) use (&$out) {
             if ($depth >= 0) {
@@ -224,9 +258,7 @@ EOTXT
 array:1 [
   0 => array:1 [
     0 => array:1 [
-      0 => array:1 [
-         …1
-      ]
+      0 => array:1 [ …1]
     ]
   ]
 ]

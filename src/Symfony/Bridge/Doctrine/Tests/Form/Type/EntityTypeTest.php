@@ -196,6 +196,19 @@ class EntityTypeTest extends TypeTestCase
 
         $field->submit('2');
     }
+    
+    public function testConfigureQueryBuilderWithClosureReturningNull()
+    {
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'query_builder' => function () {
+                return null;
+            },
+        ));
+
+        $this->assertEquals(array(), $field->createView()->vars['choices']);
+    }
 
     public function testSetDataSingleNull()
     {

@@ -76,6 +76,8 @@ abstract class AbstractCloner implements ClonerInterface
         'SplObjectStorage' => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',
         'SplPriorityQueue' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
 
+        'MongoCursorInterface' => 'Symfony\Component\VarDumper\Caster\MongoCaster::castCursor',
+
         ':curl' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl',
         ':dba' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
         ':dba persistent' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',

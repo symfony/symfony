@@ -38,19 +38,20 @@ class TranslationDebugCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('debug:translation')
-            ->setAliases(array(
-                'translation:debug',
-            ))
-            ->setDefinition(array(
-                new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
-                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
-                new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
-                new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
-            ))
-            ->setDescription('Displays translation messages informations')
-            ->setHelp(<<<EOF
+                ->setName('debug:translation')
+                ->setAliases(array(
+                    'translation:debug',
+                ))
+                ->setDefinition(array(
+                    new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
+                    new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
+                    new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
+                    new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
+                    new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
+                    new InputOption('explicit-state', null, InputOption::VALUE_NONE, 'Displays state as string'),
+                ))
+                ->setDescription('Displays translation messages informations')
+                ->setHelp(<<<EOF
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
 templates and translation files of a given bundle.
@@ -207,10 +208,31 @@ EOF
         return $state;
     }
 
-    private function formatStates(array $states)
+    private function formatStateAsText($state)
+    {
+        if (self::MESSAGE_MISSING === $state) {
+            return '<fg=red>missing</>';
+        }
+
+        if (self::MESSAGE_UNUSED === $state) {
+            return '<fg=yellow>unused</>';
+        }
+
+        if (self::MESSAGE_EQUALS_FALLBACK === $state) {
+            return '<fg=green>fallback</>';
+        }
+
+        return $state;
+    }
+
+    private function formatStates(array $states, $explicitState = false)
     {
         $result = array();
         foreach ($states as $state) {
+            if ($explicitState) {
+                $result[] = $this->formatStateAsText($state);
+                continue;
+            }
             $result[] = $this->formatState($state);
         }
 

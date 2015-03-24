@@ -200,4 +200,74 @@ class IpRetrieverTest extends \PHPUnit_Framework_TestCase
             array(array('88.88.88.88'), '127.0.0.1', '88.88.88.88:12345, 127.0.0.1', array('127.0.0.1')),
         );
     }
+
+    public function legacyTestTrustedProxies()
+    {
+        $ipRetriever = new IpRetriever();
+
+        $request = Request::create('http://example.com/');
+        $request->server->set('REMOTE_ADDR', '3.3.3.3');
+        $request->headers->set('X_FORWARDED_FOR', '1.1.1.1, 2.2.2.2');
+        $request->headers->set('X_FORWARDED_HOST', 'foo.example.com, real.example.com:8080');
+        $request->headers->set('X_FORWARDED_PROTO', 'https');
+        $request->headers->set('X_FORWARDED_PORT', 443);
+        $request->headers->set('X_MY_FOR', '3.3.3.3, 4.4.4.4');
+        $request->headers->set('X_MY_HOST', 'my.example.com');
+        $request->headers->set('X_MY_PROTO', 'http');
+        $request->headers->set('X_MY_PORT', 81);
+
+        // no trusted proxies
+        $this->assertEquals('3.3.3.3', $ipRetriever->getClientIp($request));
+        $this->assertEquals('example.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertFalse($request->isSecure());
+
+        // disabling proxy trusting
+        $ipRetriever->setTrustedProxies(array());
+        $this->assertEquals('3.3.3.3', $ipRetriever->getClientIp($request));
+        $this->assertEquals('example.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertFalse($request->isSecure());
+
+        // trusted proxy via setTrustedProxies()
+        $ipRetriever->setTrustedProxies(array('3.3.3.3', '2.2.2.2'));
+        $this->assertEquals('1.1.1.1', $ipRetriever->getClientIp($request));
+        $this->assertEquals('real.example.com', $request->getHost());
+        $this->assertEquals(443, $request->getPort());
+        $this->assertTrue($request->isSecure());
+
+        // check various X_FORWARDED_PROTO header values
+        $request->headers->set('X_FORWARDED_PROTO', 'ssl');
+        $this->assertTrue($request->isSecure());
+
+        $request->headers->set('X_FORWARDED_PROTO', 'https, http');
+        $this->assertTrue($request->isSecure());
+
+        // custom header names
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_IP, 'X_MY_FOR');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_HOST, 'X_MY_HOST');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PORT, 'X_MY_PORT');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PROTO, 'X_MY_PROTO');
+        $this->assertEquals('4.4.4.4', $ipRetriever->getClientIp($request));
+        $this->assertEquals('my.example.com', $request->getHost());
+        $this->assertEquals(81, $request->getPort());
+        $this->assertFalse($request->isSecure());
+
+        // disabling via empty header names
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_IP, null);
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_HOST, null);
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PORT, null);
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PROTO, null);
+        $this->assertEquals('3.3.3.3', $ipRetriever->getClientIp($request));
+        $this->assertEquals('example.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertFalse($request->isSecure());
+
+        // reset
+        $ipRetriever->setTrustedProxies(array());
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_IP, 'X_FORWARDED_FOR');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_HOST, 'X_FORWARDED_HOST');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PORT, 'X_FORWARDED_PORT');
+        $ipRetriever->setTrustedHeaderName($ipRetriever::HEADER_CLIENT_PROTO, 'X_FORWARDED_PROTO');
+    }
 }

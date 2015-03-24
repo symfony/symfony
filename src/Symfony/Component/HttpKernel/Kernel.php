@@ -51,9 +51,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $bundles = array();
 
     protected $bundleMap;
-    /**
-     * @var ContainerInterface
-     */
     protected $container;
     protected $rootDir;
     protected $environment;

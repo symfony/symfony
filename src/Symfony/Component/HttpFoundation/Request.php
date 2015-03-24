@@ -843,6 +843,7 @@ class Request
      */
     public function getClientIps()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
         if (null === $this->ipRetriever) {
             $this->getDefaultIpRetriever();
         }
@@ -861,6 +862,7 @@ class Request
      */
     public function getClientIp()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
         if (null === $this->ipRetriever) {
             $this->getDefaultIpRetriever();
         }
@@ -1968,6 +1970,7 @@ class Request
      */
     public function setIpRetriever(IpRetrieverInterface $ipRetriever)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
         $this->ipRetriever = $ipRetriever;
     }
 
@@ -1977,6 +1980,7 @@ class Request
      */
     private function getDefaultIpRetriever()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
         if (null === $this->ipRetriever) {
             $this->ipRetriever = new IpRetriever();
         }

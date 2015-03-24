@@ -856,7 +856,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      * Kept to check backward compatibility
      * @group legacy
      */
-    public function testGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function legacyTestGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
@@ -870,7 +870,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      * Kept to check backward compatibility
      * @group legacy
      */
-    public function testGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
+    public function legacyTestGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies);
 
@@ -884,7 +884,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      * Kept to check backward compatibility
      * @group legacy
      */
-    public function testGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
+    public function legacyTestGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
     {
         $request = $this->getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies);
 
@@ -1533,7 +1533,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         return $request;
     }
 
-    public function testTrustedProxies()
+    public function legacyTestTrustedProxies()
     {
         $request = Request::create('http://example.com/');
         $request->server->set('REMOTE_ADDR', '3.3.3.3');

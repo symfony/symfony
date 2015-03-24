@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T11:13:26Z
+
+related to https://github.com/liip/LiipTranslationBundle/pull/36
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-23T11:19:06Z
+
+does this allow to preserve the performance improvement or no ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T11:22:11Z
+
+yes, as we don't load them in prod env.

@@ -21,7 +21,7 @@ trigger_error('The '.__NAMESPACE__.'\AssetsExtension class is deprecated since v
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @deprecated since 2.7, to be removed in 3.0. Use Symfony\Component\Twig\Extension\AssetExtension instead.
+ * @deprecated since 2.7, to be removed in 3.0. Use Symfony\Bridge\Twig\Extension\AssetExtension instead.
  */
 class AssetsExtension extends \Twig_Extension
 {

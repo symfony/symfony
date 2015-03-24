@@ -1,4 +1,5 @@
 <?php
+
 namespace Symfony\Component\Security\Http\RememberMe;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

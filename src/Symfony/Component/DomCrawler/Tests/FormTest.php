@@ -594,6 +594,12 @@ class FormTest extends \PHPUnit_Framework_TestCase
                 '/foo?bar=bar&foo=foo',
             ),
             array(
+                'replaces query values with the form values',
+                '<form action="/foo?bar=bar"><input type="text" name="bar" value="foo" /><input type="submit" /></form>',
+                array(),
+                '/foo?bar=foo',
+            ),
+            array(
                 'returns an empty URI if the action is empty',
                 '<form><input type="submit" /></form>',
                 array(),

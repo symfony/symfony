@@ -1235,7 +1235,7 @@ EOF;
      *
      * @return bool
      */
-    private function hasReference($id, array $arguments, $deep = false, array $visited = array())
+    private function hasReference($id, array $arguments, $deep = false, array &$visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {

@@ -225,7 +225,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('translator.default', (string) $container->getAlias('translator'), '->registerTranslatorConfiguration() redefines translator service from identity to real translator');
         $resources = $container->getDefinition('translator.default')->getArgument(4);
 
-        $files = array_map(function ($resource) { return realpath($resource); }, $resources['en']);
+        $files = array_map(function ($resource) { return realpath($resource); }, $resources);
         $ref = new \ReflectionClass('Symfony\Component\Validator\Validation');
         $this->assertContains(
             strtr(dirname($ref->getFileName()).'/Resources/translations/validators.en.xlf', '/', DIRECTORY_SEPARATOR),

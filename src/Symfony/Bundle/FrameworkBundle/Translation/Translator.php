@@ -59,20 +59,11 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
-
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadCatalogue($locale)
-    {
         if (null !== $this->options['cache_dir'] && $this->options['debug']) {
-            $this->loadResources($locale);
+            $this->loadResources();
         }
 
-        parent::loadCatalogue($locale);
+        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**
@@ -81,12 +72,12 @@ class Translator extends BaseTranslator
     protected function initializeCatalogue($locale)
     {
         $this->initialize();
-        $this->loadResources($locale);
         parent::initializeCatalogue($locale);
     }
 
     protected function initialize()
     {
+        $this->loadResources();
         foreach ($this->loaderIds as $id => $aliases) {
             foreach ($aliases as $alias) {
                 $this->addLoader($alias, $this->container->get($id));
@@ -94,18 +85,13 @@ class Translator extends BaseTranslator
         }
     }
 
-    private function loadResources($locale)
+    private function loadResources()
     {
-        $locales = array_merge(array($locale), $this->computeFallbackLocales($locale));
-        foreach ($locales as $locale) {
-            if (isset($this->resourceFiles[$locale])) {
-                foreach ($this->resourceFiles[$locale] as $file) {
-                    // filename is domain.locale.format
-                    list($domain, $locale, $format) = explode('.', basename($file), 3);
-                    $this->addResource($format, $file, $locale, $domain);
-                }
-                unset($this->resourceFiles[$locale]);
-            }
+        foreach ($this->resourceFiles as $key => $file) {
+            // filename is domain.locale.format
+            list($domain, $locale, $format) = explode('.', basename($file), 3);
+            $this->addResource($format, $file, $locale, $domain);
+            unset($this->resourceFiles[$key]);
         }
     }
 }

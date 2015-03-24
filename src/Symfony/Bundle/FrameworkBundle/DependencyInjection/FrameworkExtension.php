@@ -700,11 +700,7 @@ class FrameworkExtension extends Extension
 
             foreach ($finder as $file) {
                 list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
-                if (!isset($files[$locale])) {
-                    $files[$locale] = array();
-                }
-
-                $files[$locale][] = (string) $file;
+                $files[] = (string) $file;
             }
 
             $translator->replaceArgument(4, $files);

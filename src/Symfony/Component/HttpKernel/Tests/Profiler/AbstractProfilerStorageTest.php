@@ -43,7 +43,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         // Load them from storage
         $parentProfile = $this->getStorage()->read('token_parent');
-        $childProfile  = $this->getStorage()->read('token_child');
+        $childProfile = $this->getStorage()->read('token_child');
 
         // Check child has link to parent
         $this->assertNotNull($childProfile->getParent());
@@ -244,6 +244,22 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $this->getStorage()->write($profile);
         }
         $this->assertCount(3, $this->getStorage()->find('127.0.0.1', 'http://example.net/', 3, 'GET'), '->find() method returns incorrect number of entries');
+    }
+
+    public function testStatusCode()
+    {
+        $profile = new Profile('token1');
+        $profile->setStatusCode(200);
+        $this->getStorage()->write($profile);
+
+        $profile = new Profile('token2');
+        $profile->setStatusCode(404);
+        $this->getStorage()->write($profile);
+
+        $tokens = $this->getStorage()->find('', '', 10, '');
+        $this->assertCount(2, $tokens);
+        $this->assertContains($tokens[0]['status_code'], array(200, 404));
+        $this->assertContains($tokens[1]['status_code'], array(200, 404));
     }
 
     /**

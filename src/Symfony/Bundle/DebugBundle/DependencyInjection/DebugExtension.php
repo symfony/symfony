@@ -34,13 +34,24 @@ class DebugExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
-        $container->setParameter(
-            'var_dumper.cloner.class',
-            'Symfony\Component\VarDumper\Cloner\\'.(function_exists('symfony_zval_info') ? 'Ext' : 'Php').'Cloner'
-        );
-
         $container->getDefinition('var_dumper.cloner')
             ->addMethodCall('setMaxItems',  array($config['max_items']))
             ->addMethodCall('setMaxString', array($config['max_string_length']));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getXsdValidationBasePath()
+    {
+        return __DIR__.'/../Resources/config/schema';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamespace()
+    {
+        return 'http://symfony.com/schema/dic/debug';
     }
 }

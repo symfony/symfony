@@ -41,7 +41,7 @@ interface ConfigurableRequirementsInterface
      * Enables or disables the exception on incorrect parameters.
      * Passing null will deactivate the requirements check completely.
      *
-     * @param bool|null    $enabled
+     * @param bool|null $enabled
      */
     public function setStrictRequirements($enabled);
 

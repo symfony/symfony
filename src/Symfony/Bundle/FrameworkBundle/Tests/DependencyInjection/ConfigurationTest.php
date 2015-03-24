@@ -35,7 +35,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, array(array(
-            'secret'          => 's3cr3t',
+            'secret' => 's3cr3t',
             'trusted_proxies' => $trustedProxies,
         )));
 
@@ -86,59 +86,76 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testAssetsCanBeEnabled()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+        $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
+
+        $defaultConfig = array(
+            'version' => null,
+            'version_format' => '%%s?%%s',
+            'base_path' => '',
+            'base_urls' => array(),
+            'packages' => array(),
+        );
+
+        $this->assertEquals($defaultConfig, $config['assets']);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(
             'http_method_override' => true,
-            'trusted_proxies'     => array(),
-            'ide'                 => null,
-            'default_locale'      => 'en',
-            'form'                => array(
+            'trusted_proxies' => array(),
+            'ide' => null,
+            'default_locale' => 'en',
+            'form' => array(
                 'enabled' => false,
                 'csrf_protection' => array(
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => null,
                 ),
             ),
-            'csrf_protection'     => array(
-                'enabled'    => false,
+            'csrf_protection' => array(
+                'enabled' => false,
                 'field_name' => '_token',
             ),
-            'esi'                 => array('enabled' => false),
-            'ssi'                 => array('enabled' => false),
-            'fragments'           => array(
+            'esi' => array('enabled' => false),
+            'ssi' => array('enabled' => false),
+            'fragments' => array(
                 'enabled' => false,
-                'path'    => '/_fragment',
+                'path' => '/_fragment',
             ),
-            'profiler'            => array(
-                'enabled'              => false,
-                'only_exceptions'      => false,
+            'profiler' => array(
+                'enabled' => false,
+                'only_exceptions' => false,
                 'only_master_requests' => false,
-                'dsn'                  => 'file:%kernel.cache_dir%/profiler',
-                'username'             => '',
-                'password'             => '',
-                'lifetime'             => 86400,
-                'collect'              => true,
+                'dsn' => 'file:%kernel.cache_dir%/profiler',
+                'username' => '',
+                'password' => '',
+                'lifetime' => 86400,
+                'collect' => true,
             ),
-            'translator'          => array(
-                'enabled'  => false,
-                'fallback' => 'en',
-                'logging'  => true,
+            'translator' => array(
+                'enabled' => false,
+                'fallbacks' => array('en'),
+                'logging' => true,
             ),
-            'validation'          => array(
-                'enabled'            => false,
+            'validation' => array(
+                'enabled' => false,
                 'enable_annotations' => false,
-                'static_method'      => array('loadValidatorMetadata'),
+                'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
-                'strict_email'       => false,
-                'api'                => version_compare(PHP_VERSION, '5.3.9', '<') ? '2.4' : '2.5-bc',
+                'strict_email' => false,
+                'api' => '2.5-bc',
             ),
-            'annotations'         => array(
-                'cache'          => 'file',
+            'annotations' => array(
+                'cache' => 'file',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
-                'debug'          => '%kernel.debug%',
+                'debug' => '%kernel.debug%',
             ),
-            'serializer'          => array(
+            'serializer' => array(
                 'enabled' => false,
             ),
             'property_access' => array(

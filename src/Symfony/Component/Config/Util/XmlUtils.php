@@ -22,7 +22,7 @@ namespace Symfony\Component\Config\Util;
 class XmlUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -191,14 +191,14 @@ class XmlUtils
                 return;
             case ctype_digit($value):
                 $raw = $value;
-                $cast = intval($value);
+                $cast = (int) $value;
 
-                return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                return '0' == $value[0] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
                 $raw = $value;
                 $cast = intval($value);
 
-                return '0' == $value[1] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                return '0' == $value[1] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:
@@ -206,9 +206,9 @@ class XmlUtils
             case isset($value[1]) && '0b' == $value[0].$value[1]:
                 return bindec($value);
             case is_numeric($value):
-                return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
+                return '0x' === $value[0].$value[1] ? hexdec($value) : (float) $value;
             case preg_match('/^(-|\+)?[0-9]+(\.[0-9]+)?$/', $value):
-                return floatval($value);
+                return (float) $value;
             default:
                 return $value;
         }
@@ -222,7 +222,7 @@ class XmlUtils
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),
-                $error->file ? $error->file : 'n/a',
+                $error->file ?: 'n/a',
                 $error->line,
                 $error->column
             );

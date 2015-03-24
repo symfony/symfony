@@ -28,14 +28,14 @@ interface ResourceInterface
     /**
      * Returns true if the resource has not been updated since the given timestamp.
      *
-     * @param int     $timestamp The last time the resource was loaded
+     * @param int $timestamp The last time the resource was loaded
      *
-     * @return bool    true if the resource has not been updated, false otherwise
+     * @return bool True if the resource has not been updated, false otherwise
      */
     public function isFresh($timestamp);
 
     /**
-     * Returns the resource tied to this Resource.
+     * Returns the tied resource.
      *
      * @return mixed The resource
      */

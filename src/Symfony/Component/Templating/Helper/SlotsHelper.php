@@ -83,8 +83,8 @@ class SlotsHelper extends Helper
     /**
      * Gets the slot value.
      *
-     * @param string         $name    The slot name
-     * @param bool|string    $default The default slot content
+     * @param string      $name    The slot name
+     * @param bool|string $default The default slot content
      *
      * @return string The slot content
      *
@@ -111,10 +111,10 @@ class SlotsHelper extends Helper
     /**
      * Outputs a slot.
      *
-     * @param string         $name    The slot name
-     * @param bool|string    $default The default slot content
+     * @param string      $name    The slot name
+     * @param bool|string $default The default slot content
      *
-     * @return bool    true if the slot is defined or if a default content has been provided, false otherwise
+     * @return bool true if the slot is defined or if a default content has been provided, false otherwise
      *
      * @api
      */

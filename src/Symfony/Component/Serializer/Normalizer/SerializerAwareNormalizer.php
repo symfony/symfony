@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 
 /**
- * SerializerAware Normalizer implementation
+ * SerializerAware Normalizer implementation.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */

@@ -21,7 +21,7 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -58,16 +58,15 @@ abstract class DoctrineType extends AbstractType
         }
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choiceListCache = & $this->choiceListCache;
         $registry = $this->registry;
         $propertyAccessor = $this->propertyAccessor;
-        $type = $this;
 
-        $loader = function (Options $options) use ($type) {
+        $loader = function (Options $options) {
             if (null !== $options['query_builder']) {
-                return $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                return $this->getLoader($options['em'], $options['query_builder'], $options['class']);
             }
         };
 
@@ -143,6 +142,10 @@ abstract class DoctrineType extends AbstractType
         $emNormalizer = function (Options $options, $em) use ($registry) {
             /* @var ManagerRegistry $registry */
             if (null !== $em) {
+                if ($em instanceof ObjectManager) {
+                    return $em;
+                }
+
                 return $registry->getManager($em);
             }
 
@@ -160,24 +163,21 @@ abstract class DoctrineType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'em'                => null,
-            'property'          => null,
-            'query_builder'     => null,
-            'loader'            => $loader,
-            'choices'           => null,
-            'choice_list'       => $choiceList,
-            'group_by'          => null,
+            'em' => null,
+            'property' => null,
+            'query_builder' => null,
+            'loader' => $loader,
+            'choices' => null,
+            'choice_list' => $choiceList,
+            'group_by' => null,
         ));
 
         $resolver->setRequired(array('class'));
 
-        $resolver->setNormalizers(array(
-            'em' => $emNormalizer,
-        ));
+        $resolver->setNormalizer('em', $emNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'loader' => array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'),
-        ));
+        $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
+        $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
     }
 
     /**

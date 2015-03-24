@@ -4,6 +4,7 @@ framework:
         enabled: true
     router:        { resource: "%kernel.root_dir%/%kernel.test_case%/routing.yml" }
     validation:    { enabled: true, enable_annotations: true }
+    assets: ~
     form: ~
     test: ~
     default_locale: en
@@ -12,4 +13,4 @@ framework:
     profiler: { only_exceptions: false }
 
 services:
-    logger: { class: Symfony\Component\HttpKernel\Log\NullLogger }
+    logger: { class: Psr\Log\NullLogger }

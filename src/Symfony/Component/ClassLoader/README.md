@@ -4,56 +4,72 @@ ClassLoader Component
 ClassLoader loads your project classes automatically if they follow some
 standard PHP conventions.
 
-The Universal ClassLoader is able to autoload classes that implement the PSR-0
+The ClassLoader object is able to autoload classes that implement the PSR-0
 standard or the PEAR naming convention.
 
 First, register the autoloader:
 
-    require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+```php
+require_once __DIR__.'/src/Symfony/Component/ClassLoader/ClassLoader.php';
 
-    use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Symfony\Component\ClassLoader\ClassLoader;
 
-    $loader = new UniversalClassLoader();
-    $loader->register();
+$loader = new ClassLoader();
+$loader->register();
+```
 
-Then, register some namespaces with the `registerNamespace()` method:
+Then, register some namespaces with the `addPrefix()` method:
 
-    $loader->registerNamespace('Symfony', __DIR__.'/src');
-    $loader->registerNamespace('Monolog', __DIR__.'/vendor/monolog/src');
+```php
+$loader->addPrefix('Symfony', __DIR__.'/src');
+$loader->addPrefix('Monolog', __DIR__.'/vendor/monolog/src');
+```
 
-The `registerNamespace()` method takes a namespace prefix and a path where to
-look for the classes as arguments.
+The `addPrefix()` method takes a namespace prefix and a path where to look for
+the classes as arguments.
 
 You can also register a sub-namespaces:
 
-    $loader->registerNamespace('Doctrine\\Common', __DIR__.'/vendor/doctrine-common/lib');
+```php
+$loader->addPrefix('Doctrine\\Common', __DIR__.'/vendor/doctrine-common/lib');
+```
 
 The order of registration is significant and the first registered namespace
 takes precedence over later registered one.
 
 You can also register more than one path for a given namespace:
 
-    $loader->registerNamespace('Symfony', array(__DIR__.'/src', __DIR__.'/symfony/src'));
+```php
+$loader->addPrefix('Symfony', array(__DIR__.'/src', __DIR__.'/symfony/src'));
+```
 
-Alternatively, you can use the `registerNamespaces()` method to register more
+Alternatively, you can use the `addPrefixes()` method to register more
 than one namespace at once:
 
-    $loader->registerNamespaces(array(
-        'Symfony'          => array(__DIR__.'/src', __DIR__.'/symfony/src'),
-        'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
-        'Doctrine'         => __DIR__.'/vendor/doctrine/lib',
-        'Monolog'          => __DIR__.'/vendor/monolog/src',
-    ));
+```php
+$loader->addPrefixes(array(
+    'Symfony' => array(__DIR__.'/src', __DIR__.'/symfony/src'),
+    'Doctrine\\Common' => __DIR__.'/vendor/doctrine-common/lib',
+    'Doctrine' => __DIR__.'/vendor/doctrine/lib',
+    'Monolog' => __DIR__.'/vendor/monolog/src',
+));
+```
 
-For better performance, you can use the APC based version of the universal
-class loader:
+For better performance, you can use the APC class loader:
 
-    require_once __DIR__.'/src/Symfony/Component/ClassLoader/UniversalClassLoader.php';
-    require_once __DIR__.'/src/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php';
+```php
+require_once __DIR__.'/src/Symfony/Component/ClassLoader/ClassLoader.php';
+require_once __DIR__.'/src/Symfony/Component/ClassLoader/ApcClassLoader.php';
 
-    use Symfony\Component\ClassLoader\ApcUniversalClassLoader;
+use Symfony\Component\ClassLoader\ClassLoader;
+use Symfony\Component\ClassLoader\ApcClassLoader;
 
-    $loader = new ApcUniversalClassLoader('apc.prefix.');
+$loader = new ClassLoader();
+$loader->addPrefix('Symfony', __DIR__.'/src');
+
+$loader = new ApcClassLoader('apc.prefix.', $loader);
+$loader->register();
+```
 
 Furthermore, the component provides tools to aggregate classes into a single
 file, which is especially useful to improve performance on servers that do not
@@ -65,5 +81,5 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/ClassLoader/
-    $ composer.phar install
+    $ composer install
     $ phpunit

@@ -30,16 +30,16 @@ class Response
      * The headers array is a set of key/value pairs. If a header is present multiple times
      * then the value is an array of all the values.
      *
-     * @param string  $content The content of the response
-     * @param int     $status  The response status code
-     * @param array   $headers An array of headers
+     * @param string $content The content of the response
+     * @param int    $status  The response status code
+     * @param array  $headers An array of headers
      *
      * @api
      */
     public function __construct($content = '', $status = 200, array $headers = array())
     {
         $this->content = $content;
-        $this->status  = $status;
+        $this->status = $status;
         $this->headers = $headers;
     }
 
@@ -92,7 +92,7 @@ class Response
     /**
      * Gets the response status code.
      *
-     * @return int     The response status code
+     * @return int The response status code
      *
      * @api
      */
@@ -116,15 +116,16 @@ class Response
     /**
      * Gets a response header.
      *
-     * @param string  $header The header name
-     * @param bool    $first  Whether to return the first value or all header values
+     * @param string $header The header name
+     * @param bool   $first  Whether to return the first value or all header values
      *
      * @return string|array The first header value if $first is true, an array of values otherwise
      */
     public function getHeader($header, $first = true)
     {
+        $normalizedHeader = str_replace('-', '_', strtolower($header));
         foreach ($this->headers as $key => $value) {
-            if (str_replace('-', '_', strtolower($key)) == str_replace('-', '_', strtolower($header))) {
+            if (str_replace('-', '_', strtolower($key)) === $normalizedHeader) {
                 if ($first) {
                     return is_array($value) ? (count($value) ? $value[0] : '') : $value;
                 }

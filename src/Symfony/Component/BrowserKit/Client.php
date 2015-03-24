@@ -65,7 +65,7 @@ abstract class Client
     /**
      * Sets whether to automatically follow redirects or not.
      *
-     * @param bool    $followRedirect Whether to follow redirects
+     * @param bool $followRedirect Whether to follow redirects
      *
      * @api
      */
@@ -77,7 +77,7 @@ abstract class Client
     /**
      * Sets the maximum number of requests that crawler can follow.
      *
-     * @param int     $maxRedirects
+     * @param int $maxRedirects
      */
     public function setMaxRedirects($maxRedirects)
     {
@@ -88,7 +88,7 @@ abstract class Client
     /**
      * Sets the insulated flag.
      *
-     * @param bool    $insulated Whether to insulate the requests or not
+     * @param bool $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
      *
@@ -113,7 +113,7 @@ abstract class Client
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_HOST'       => 'localhost',
+            'HTTP_HOST' => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
@@ -198,7 +198,7 @@ abstract class Client
      *
      * @return object|null A response instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */
@@ -227,7 +227,7 @@ abstract class Client
      *
      * @return object|null A Request instance
      *
-     * @see doRequest
+     * @see doRequest()
      *
      * @api
      */
@@ -274,13 +274,13 @@ abstract class Client
     /**
      * Calls a URI.
      *
-     * @param string  $method        The request method
-     * @param string  $uri           The URI to fetch
-     * @param array   $parameters    The Request parameters
-     * @param array   $files         The files
-     * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
-     * @param string  $content       The raw body data
-     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param string $method        The request method
+     * @param string $uri           The URI to fetch
+     * @param array  $parameters    The Request parameters
+     * @param array  $files         The files
+     * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $content       The raw body data
+     * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      *

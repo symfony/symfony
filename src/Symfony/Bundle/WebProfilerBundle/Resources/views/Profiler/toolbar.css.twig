@@ -30,7 +30,6 @@
     background-color: #f7f7f7;
     left: 0;
     right: 0;
-    height: 38px;
     margin: 0;
     padding: 0 40px 0 0;
     z-index: 6000000;
@@ -51,14 +50,25 @@
     cursor: help;
 }
 .sf-toolbarreset span,
-.sf-toolbarreset div {
+.sf-toolbarreset div,
+.sf-toolbarreset td,
+.sf-toolbarreset th {
     font-size: 11px;
 }
 .sf-toolbarreset img {
     width: auto;
     display: inline;
 }
-
+.sf-toolbarreset table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    table-layout: auto;
+}
 .sf-toolbarreset .hide-button {
     display: block;
     position: absolute;
@@ -77,6 +87,7 @@
     color: #2f2f2f;
     display: block;
     min-height: 28px;
+    border-bottom: 1px solid #e4e4e4;
     border-right: 1px solid #e4e4e4;
     padding: 0;
     float: left;
@@ -137,10 +148,6 @@
     border-bottom-width: 0;
     border-bottom: 1px solid #bbb;
     border-radius: 4px 4px 0 0;
-}
-
-.sf-toolbarreset > div:last-of-type .sf-toolbar-info {
-    right: -1px;
 }
 
 .sf-toolbar-block .sf-toolbar-info:empty {
@@ -207,12 +214,12 @@
     content: "";
 }
 
-.sf-toolbar-block .sf-toolbar-icon img {
+.sf-toolbar-block .sf-toolbar-icon img, .sf-toolbar-block .sf-toolbar-icon svg {
     border-width: 0;
     vertical-align: middle;
 }
 
-.sf-toolbar-block .sf-toolbar-icon img + span {
+.sf-toolbar-block .sf-toolbar-icon img + span, .sf-toolbar-block .sf-toolbar-icon svg + span {
     margin-left: 5px;
     margin-top: 2px;
 }
@@ -281,14 +288,19 @@
     box-sizing: border-box;
     padding: 9px;
     line-height: 19px;
+
+    max-width: 480px;
+    max-height: 480px;
+    word-wrap: break-word;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
-table.sf-toolbar-ajax-requests {
-    border-collapse: collapse;
-}
 .sf-toolbar-ajax-requests th, .sf-toolbar-ajax-requests td {
     border-bottom: 1px solid #ddd;
     padding: 0 4px;
+    color: #2f2f2f;
+    background-color: #fff;
 }
 .sf-toolbar-ajax-requests th {
     background-color: #eee;
@@ -303,7 +315,7 @@ table.sf-toolbar-ajax-requests {
     text-align: right;
 }
 .sf-ajax-request-error {
-    color: #a33;
+    color: #a33 !important;
 }
 .sf-ajax-request-loading {
     -webkit-animation: sf-blink .5s ease-in-out infinite;

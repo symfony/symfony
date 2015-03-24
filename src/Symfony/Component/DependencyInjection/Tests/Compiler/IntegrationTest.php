@@ -16,16 +16,18 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * This class tests the integration of the different compiler passes
+ * This class tests the integration of the different compiler passes.
  */
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * This tests that the following dependencies are correctly processed:
+     * This tests that dependencies are correctly processed.
      *
-     * A is public, B/C are private
-     * A -> C
-     * B -> C
+     * We're checking that:
+     *
+     *   * A is public, B/C are private
+     *   * A -> C
+     *   * B -> C
      */
     public function testProcessRemovesAndInlinesRecursively()
     {

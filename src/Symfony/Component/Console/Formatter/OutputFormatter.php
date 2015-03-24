@@ -39,7 +39,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Initializes console output formatter.
      *
-     * @param bool             $decorated Whether this formatter should actually decorate strings
+     * @param bool                            $decorated Whether this formatter should actually decorate strings
      * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
      *
      * @api
@@ -63,7 +63,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param bool    $decorated Whether to decorate the messages or not
+     * @param bool $decorated Whether to decorate the messages or not
      *
      * @api
      */
@@ -75,7 +75,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Gets the decorated flag.
      *
-     * @return bool    true if the output will decorate messages, false otherwise
+     * @return bool true if the output will decorate messages, false otherwise
      *
      * @api
      */
@@ -150,6 +150,10 @@ class OutputFormatter implements OutputFormatterInterface
             $pos = $match[1];
             $text = $match[0];
 
+            if (0 != $pos && '\\' == $message[$pos - 1]) {
+                continue;
+            }
+
             // add the text up to the next tag
             $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
             $offset = $pos + strlen($text);
@@ -164,9 +168,6 @@ class OutputFormatter implements OutputFormatterInterface
             if (!$open && !$tag) {
                 // </>
                 $this->styleStack->pop();
-            } elseif ($pos && '\\' == $message[$pos - 1]) {
-                // escaped tag
-                $output .= $this->applyCurrentStyle($text);
             } elseif (false === $style = $this->createStyleFromString(strtolower($tag))) {
                 $output .= $this->applyCurrentStyle($text);
             } elseif ($open) {
@@ -194,7 +195,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|bool    false if string is not format string
+     * @return OutputFormatterStyle|bool false if string is not format string
      */
     private function createStyleFromString($string)
     {

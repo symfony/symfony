@@ -26,12 +26,13 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToBooleanArrayTr
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToBooleanArrayTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceType extends AbstractType
 {
     /**
      * Caches created choice lists.
+     *
      * @var array
      */
     private $choiceListCache = array();
@@ -61,7 +62,6 @@ class ChoiceType extends AbstractType
                 $placeholderView = new ChoiceView(null, '', $options['placeholder']);
 
                 // "placeholder" is a reserved index
-                // see also ChoiceListInterface::getIndicesForChoices()
                 $this->addSubForms($builder, array('placeholder' => $placeholderView), $options);
             }
 
@@ -96,12 +96,12 @@ class ChoiceType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, array(
-            'multiple'          => $options['multiple'],
-            'expanded'          => $options['expanded'],
+            'multiple' => $options['multiple'],
+            'expanded' => $options['expanded'],
             'preferred_choices' => $options['choice_list']->getPreferredViews(),
-            'choices'           => $options['choice_list']->getRemainingViews(),
-            'separator'         => '-------------------',
-            'placeholder'       => null,
+            'choices' => $options['choice_list']->getRemainingViews(),
+            'separator' => '-------------------',
+            'placeholder' => null,
         ));
 
         // The decision, whether a choice is selected, is potentially done
@@ -110,7 +110,7 @@ class ChoiceType extends AbstractType
         // avoid making the type check inside the closure.
         if ($options['multiple']) {
             $view->vars['is_selected'] = function ($choice, array $values) {
-                return false !== array_search($choice, $values, true);
+                return in_array($choice, $values, true);
             };
         } else {
             $view->vars['is_selected'] = function ($choice, $value) {
@@ -134,7 +134,7 @@ class ChoiceType extends AbstractType
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->vars['full_name'] = $view->vars['full_name'].'[]';
+            $view->vars['full_name'] .= '[]';
         }
     }
 
@@ -161,7 +161,7 @@ class ChoiceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choiceListCache = & $this->choiceListCache;
 
@@ -217,30 +217,26 @@ class ChoiceType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'multiple'          => false,
-            'expanded'          => false,
-            'choice_list'       => $choiceList,
-            'choices'           => array(),
+            'multiple' => false,
+            'expanded' => false,
+            'choice_list' => $choiceList,
+            'choices' => array(),
             'preferred_choices' => array(),
-            'empty_data'        => $emptyData,
-            'empty_value'       => $emptyValue, // deprecated
-            'placeholder'       => $placeholder,
-            'error_bubbling'    => false,
-            'compound'          => $compound,
+            'empty_data' => $emptyData,
+            'empty_value' => $emptyValue, // deprecated
+            'placeholder' => $placeholder,
+            'error_bubbling' => false,
+            'compound' => $compound,
             // The view data is always a string, even if the "data" option
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
-            'data_class'        => null,
+            'data_class' => null,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
-        ));
+        $resolver->setNormalizer('empty_value', $placeholderNormalizer);
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
 
-        $resolver->setAllowedTypes(array(
-            'choice_list' => array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'),
-        ));
+        $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
     }
 
     /**

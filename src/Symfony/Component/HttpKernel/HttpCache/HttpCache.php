@@ -87,13 +87,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         register_shutdown_function(array($this->store, 'cleanup'));
 
         $this->options = array_merge(array(
-            'debug'                  => false,
-            'default_ttl'            => 0,
-            'private_headers'        => array('Authorization', 'Cookie'),
-            'allow_reload'           => false,
-            'allow_revalidate'       => false,
+            'debug' => false,
+            'default_ttl' => 0,
+            'private_headers' => array('Authorization', 'Cookie'),
+            'allow_reload' => false,
+            'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
-            'stale_if_error'         => 60,
+            'stale_if_error' => 60,
         ), $options);
     }
 
@@ -143,7 +143,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Kernel instance
+     * Gets the Kernel instance.
      *
      * @return HttpKernelInterface An HttpKernelInterface instance
      */
@@ -153,7 +153,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Surrogate instance
+     * Gets the Surrogate instance.
      *
      * @throws \LogicException
      * @return SurrogateInterface A Surrogate instance
@@ -164,15 +164,18 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     }
 
     /**
-     * Gets the Esi instance
+     * Gets the Esi instance.
      *
      * @throws \LogicException
+     *
      * @return Esi An Esi instance
      *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
+     * @deprecated since version 2.6, to be removed in 3.0. Use getSurrogate() instead
      */
     public function getEsi()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getSurrogate() method instead.', E_USER_DEPRECATED);
+
         if (!$this->surrogate instanceof Esi) {
             throw new \LogicException('This instance of HttpCache was not set up to use ESI as surrogate handler. You must overwrite and use createSurrogate');
         }
@@ -519,7 +522,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return bool    true if the cache entry if fresh enough, false otherwise
+     * @return bool true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry)
     {
@@ -540,7 +543,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return bool    true if the cache entry can be returned even if it is staled, false otherwise
+     * @return bool true if the cache entry can be returned even if it is staled, false otherwise
      */
     protected function lock(Request $request, Response $entry)
     {
@@ -672,7 +675,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request A Request instance
      *
-     * @return bool    true if the Request is private, false otherwise
+     * @return bool true if the Request is private, false otherwise
      */
     private function isPrivateRequest(Request $request)
     {

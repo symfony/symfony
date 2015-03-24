@@ -34,6 +34,7 @@ class Stub
     public $class = '';
     public $value;
     public $cut = 0;
-    public $ref = 0;
+    public $handle = 0;
+    public $refCount = 0;
     public $position = 0;
 }

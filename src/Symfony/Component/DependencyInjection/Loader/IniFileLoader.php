@@ -22,22 +22,17 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class IniFileLoader extends FileLoader
 {
     /**
-     * Loads a resource.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
-     *
-     * @throws InvalidArgumentException When ini file is not valid
+     * {@inheritdoc}
      */
-    public function load($file, $type = null)
+    public function load($resource, $type = null)
     {
-        $path = $this->locator->locate($file);
+        $path = $this->locator->locate($resource);
 
         $this->container->addResource(new FileResource($path));
 
         $result = parse_ini_file($path, true);
         if (false === $result || array() === $result) {
-            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $file));
+            throw new InvalidArgumentException(sprintf('The "%s" file is not valid.', $resource));
         }
 
         if (isset($result['parameters']) && is_array($result['parameters'])) {
@@ -48,12 +43,7 @@ class IniFileLoader extends FileLoader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return bool    true if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

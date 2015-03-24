@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RepeatedType extends AbstractType
 {
@@ -24,7 +24,7 @@ class RepeatedType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Overwrite required option for child fields
-        $options['first_options']['required']  = $options['required'];
+        $options['first_options']['required'] = $options['required'];
         $options['second_options']['required'] = $options['required'];
 
         if (!isset($options['options']['error_bubbling'])) {
@@ -44,17 +44,21 @@ class RepeatedType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'type'           => 'text',
-            'options'        => array(),
-            'first_options'  => array(),
+            'type' => 'text',
+            'options' => array(),
+            'first_options' => array(),
             'second_options' => array(),
-            'first_name'     => 'first',
-            'second_name'    => 'second',
+            'first_name' => 'first',
+            'second_name' => 'second',
             'error_bubbling' => false,
         ));
+
+        $resolver->setAllowedTypes('options', 'array');
+        $resolver->setAllowedTypes('first_options', 'array');
+        $resolver->setAllowedTypes('second_options', 'array');
     }
 
     /**

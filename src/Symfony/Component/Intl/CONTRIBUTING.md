@@ -10,7 +10,7 @@ Preparation
 To prepare, you need to install the development dependencies of the component.
 
     $ cd /path/to/Symfony/Component/Intl
-    $ composer.phar install --dev
+    $ composer install
 
 Determining your ICU version
 ---------------------------
@@ -88,4 +88,4 @@ Once it is, the following steps have to be followed to build the .dat-file:
 
    $ rm -rf build packagelist.txt
 
-3. You can now move region.dat to replace the version bundled with Symfony2.
+3. You can now move region.dat to replace the version bundled with Symfony.

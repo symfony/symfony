@@ -33,12 +33,13 @@ Its behavior is about the same as:
                     'object_class' => get_class($array[$key]),
                     'object_refcount' => /* internal object refcount of $array[$key] */,
                     'object_hash' => spl_object_hash($array[$key]),
+                    'object_handle' => /* internal object handle $array[$key] */,
                 );
                 break;
 
             case 'resource':
                 $info += array(
-                    'resource_id' => (int) substr((string) $array[$key], 13),
+                    'resource_handle' => (int) $array[$key],
                     'resource_type' => get_resource_type($array[$key]),
                     'resource_refcount' => /* internal resource refcount of $array[$key] */,
                 );

@@ -39,6 +39,40 @@ class FormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
+    public function testFormLogout($config)
+    {
+        $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));
+        $client->insulate();
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/profile');
+
+        $crawler = $client->followRedirect();
+        $text = $crawler->text();
+
+        $this->assertContains('Hello johannes!', $text);
+        $this->assertContains('You\'re browsing to path "/profile".', $text);
+
+        $logoutLinks = $crawler->selectLink('Log out')->links();
+        $this->assertCount(6, $logoutLinks);
+        $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[1]->getUri());
+        $this->assertSame($logoutLinks[2]->getUri(), $logoutLinks[3]->getUri());
+        $this->assertSame($logoutLinks[4]->getUri(), $logoutLinks[5]->getUri());
+
+        $this->assertNotSame($logoutLinks[0]->getUri(), $logoutLinks[2]->getUri());
+        $this->assertNotSame($logoutLinks[1]->getUri(), $logoutLinks[3]->getUri());
+
+        $this->assertSame($logoutLinks[0]->getUri(), $logoutLinks[4]->getUri());
+        $this->assertSame($logoutLinks[1]->getUri(), $logoutLinks[5]->getUri());
+    }
+
+    /**
+     * @dataProvider getConfigs
+     */
     public function testFormLoginWithCustomTargetPath($config)
     {
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => $config));

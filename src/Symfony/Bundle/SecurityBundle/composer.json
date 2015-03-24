@@ -16,20 +16,28 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/security": "~2.6",
-        "symfony/http-kernel": "~2.2"
+        "php": ">=5.5.9",
+        "symfony/security": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0"
     },
     "require-dev": {
-        "symfony/browser-kit": "~2.3",
-        "symfony/form": "~2.3",
-        "symfony/framework-bundle": "~2.2",
-        "symfony/twig-bundle": "~2.2",
-        "symfony/process": "~2.0",
-        "symfony/validator": "~2.2",
-        "symfony/yaml": "~2.0",
-        "symfony/expression-language": "~2.4",
-        "doctrine/doctrine-bundle": "~1.2"
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/browser-kit": "~2.7|~3.0",
+        "symfony/console": "~2.7|~3.0",
+        "symfony/css-selector": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "symfony/dom-crawler": "~2.7|~3.0",
+        "symfony/form": "~2.7|~3.0",
+        "symfony/framework-bundle": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0",
+        "symfony/twig-bundle": "~2.7|~3.0",
+        "symfony/twig-bridge": "~2.7|~3.0",
+        "symfony/process": "~2.7|~3.0",
+        "symfony/validator": "~2.7|~3.0",
+        "symfony/yaml": "~2.7|~3.0",
+        "symfony/expression-language": "~2.7|~3.0",
+        "doctrine/doctrine-bundle": "~1.2",
+        "twig/twig": "~1.12"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }
@@ -38,7 +46,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

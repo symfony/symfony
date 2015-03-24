@@ -13,13 +13,14 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
+use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
 {
     public function testOnlyClearOwnOutputBuffers()
     {
-        $flatten = $this->getMock('Symfony\Component\HttpKernel\Exception\FlattenException');
+        $flatten = $this->getMock('Symfony\Component\Debug\Exception\FlattenException');
         $flatten
             ->expects($this->once())
             ->method('getStatusCode')
@@ -40,5 +41,44 @@ class ExceptionControllerTest extends TestCase
 
         $controller = new ExceptionController($twig, false);
         $controller->showAction($request, $flatten);
+    }
+
+    public function testShowActionCanBeForcedToShowErrorPage()
+    {
+        $twig = new \Twig_Environment(
+            new \Twig_Loader_Array(array(
+                'TwigBundle:Exception:error404.html.twig' => 'ok',
+            ))
+        );
+
+        $request = Request::create('whatever', 'GET');
+        $request->headers->set('X-Php-Ob-Level', 1);
+        $request->attributes->set('showException', false);
+        $exception = FlattenException::create(new \Exception(), 404);
+        $controller = new ExceptionController($twig, /* "showException" defaults to --> */ true);
+
+        $response = $controller->showAction($request, $exception, null);
+
+        $this->assertEquals(200, $response->getStatusCode()); // successful request
+        $this->assertEquals('ok', $response->getContent());  // content of the error404.html template
+    }
+
+    public function testFallbackToHtmlIfNoTemplateForRequestedFormat()
+    {
+        $twig = new \Twig_Environment(
+            new \Twig_Loader_Array(array(
+                'TwigBundle:Exception:error.html.twig' => 'html',
+            ))
+        );
+
+        $request = Request::create('whatever');
+        $request->headers->set('X-Php-Ob-Level', 1);
+        $request->setRequestFormat('txt');
+        $exception = FlattenException::create(new \Exception());
+        $controller = new ExceptionController($twig, false);
+
+        $response = $controller->showAction($request, $exception);
+
+        $this->assertEquals('html', $request->getRequestFormat());
     }
 }

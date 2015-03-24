@@ -302,6 +302,14 @@
                 <source>An empty file is not allowed.</source>
                 <target>Plik nie może być pusty.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Nazwa hosta nie została rozpoznana.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Ta wartość nie pasuje do oczekiwanego zestawu znaków {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

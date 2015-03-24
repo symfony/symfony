@@ -17,7 +17,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator pseudo-class extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -30,14 +30,14 @@ class PseudoClassExtension extends AbstractExtension
     public function getPseudoClassTranslators()
     {
         return array(
-            'root'          => array($this, 'translateRoot'),
-            'first-child'   => array($this, 'translateFirstChild'),
-            'last-child'    => array($this, 'translateLastChild'),
+            'root' => array($this, 'translateRoot'),
+            'first-child' => array($this, 'translateFirstChild'),
+            'last-child' => array($this, 'translateLastChild'),
             'first-of-type' => array($this, 'translateFirstOfType'),
-            'last-of-type'  => array($this, 'translateLastOfType'),
-            'only-child'    => array($this, 'translateOnlyChild'),
-            'only-of-type'  => array($this, 'translateOnlyOfType'),
-            'empty'         => array($this, 'translateEmpty'),
+            'last-of-type' => array($this, 'translateLastOfType'),
+            'only-child' => array($this, 'translateOnlyChild'),
+            'only-of-type' => array($this, 'translateOnlyOfType'),
+            'empty' => array($this, 'translateEmpty'),
         );
     }
 

@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\ValueGuess;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 use Symfony\Component\Form\Tests\Fixtures\FooSubType;
 use Symfony\Component\Form\Tests\Fixtures\FooSubTypeWithParentInstance;
@@ -499,6 +498,41 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
         $this->builder = $factory->createBuilderForProperty(
             'Application\Author',
             'firstName'
+        );
+
+        $this->assertEquals('builderInstance', $this->builder);
+    }
+
+    public function testCreateBuilderUsesMaxLengthAndPattern()
+    {
+        $this->guesser1->expects($this->once())
+            ->method('guessMaxLength')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new ValueGuess(
+                20,
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $this->guesser2->expects($this->once())
+            ->method('guessPattern')
+            ->with('Application\Author', 'firstName')
+            ->will($this->returnValue(new ValueGuess(
+                '.{5,}',
+                Guess::HIGH_CONFIDENCE
+            )));
+
+        $factory = $this->getMockFactory(array('createNamedBuilder'));
+
+        $factory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with('firstName', 'text', null, array('attr' => array('maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce')))
+            ->will($this->returnValue('builderInstance'));
+
+        $this->builder = $factory->createBuilderForProperty(
+            'Application\Author',
+            'firstName',
+            null,
+            array('attr' => array('class' => 'tinymce'))
         );
 
         $this->assertEquals('builderInstance', $this->builder);

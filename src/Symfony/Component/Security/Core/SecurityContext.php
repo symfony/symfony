@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core;
 
+trigger_error('The '.__NAMESPACE__.'\SecurityContext class is deprecated since version 2.6 and will be removed in 3.0. Use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage or Symfony\Component\Security\Core\Authorization\AuthorizationChecker instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -26,7 +28,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- * @deprecated Deprecated since version 2.6, to be removed in 3.0.
+ * @deprecated since version 2.6, to be removed in 3.0.
  */
 class SecurityContext implements SecurityContextInterface
 {
@@ -41,7 +43,7 @@ class SecurityContext implements SecurityContextInterface
     private $authorizationChecker;
 
     /**
-     * For backwords compatibility, the signature of sf <2.6 still works
+     * For backwards compatibility, the signature of sf <2.6 still works
      *
      * @param TokenStorageInterface|AuthenticationManagerInterface         $tokenStorage
      * @param AuthorizationCheckerInterface|AccessDecisionManagerInterface $authorizationChecker
@@ -58,7 +60,7 @@ class SecurityContext implements SecurityContextInterface
         }
 
         if ($oldSignature) {
-            // renamed for clearity
+            // renamed for clarity
             $authenticationManager = $tokenStorage;
             $accessDecisionManager = $authorizationChecker;
             $tokenStorage = new TokenStorage();
@@ -70,7 +72,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::getToken() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::getToken() instead.
      *
      * {@inheritdoc}
      */
@@ -80,7 +82,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::setToken() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use TokenStorageInterface::setToken() instead.
      *
      * {@inheritdoc}
      */
@@ -90,7 +92,7 @@ class SecurityContext implements SecurityContextInterface
     }
 
     /**
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use AuthorizationCheckerInterface::isGranted() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use AuthorizationCheckerInterface::isGranted() instead.
      *
      * {@inheritdoc}
      */

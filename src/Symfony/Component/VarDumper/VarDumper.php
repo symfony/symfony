@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\VarDumper;
 
-use Symfony\Component\VarDumper\Cloner\ExtCloner;
-use Symfony\Component\VarDumper\Cloner\PhpCloner;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+
+// Load the global dump() function
+require_once __DIR__.'/Resources/functions/dump.php';
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -26,7 +28,7 @@ class VarDumper
     public static function dump($var)
     {
         if (null === self::$handler) {
-            $cloner = extension_loaded('symfony_debug') ? new ExtCloner() : new PhpCloner();
+            $cloner = new VarCloner();
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new HtmlDumper();
             self::$handler = function ($var) use ($cloner, $dumper) {
                 $dumper->dump($cloner->cloneVar($var));

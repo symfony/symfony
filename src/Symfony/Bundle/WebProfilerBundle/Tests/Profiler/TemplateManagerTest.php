@@ -41,7 +41,7 @@ class TemplateManagerTest extends TestCase
      */
     protected $templateManager;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ class TemplateManagerTest extends TestCase
     }
 
     /**
-     * if template exists in both profile and profiler then its name should be returned
+     * if template exists in both profile and profiler then its name should be returned.
      */
     public function testGetNameValidTemplate()
     {
@@ -85,7 +85,7 @@ class TemplateManagerTest extends TestCase
 
     /**
      * template should be loaded for 'foo' because other collectors are
-     * missing in profile or in profiler
+     * missing in profile or in profiler.
      */
     public function testGetTemplates()
     {
@@ -100,9 +100,9 @@ class TemplateManagerTest extends TestCase
             ->will($this->returnCallback(array($this, 'profileHasCollectorCallback')));
 
         $result = $this->templateManager->getTemplates($profile);
-        $this->assertArrayHasKey('foo',$result);
-        $this->assertArrayNotHasKey('bar',$result);
-        $this->assertArrayNotHasKey('baz',$result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertArrayNotHasKey('bar', $result);
+        $this->assertArrayNotHasKey('baz', $result);
     }
 
     public function profilerHasCallback($panel)

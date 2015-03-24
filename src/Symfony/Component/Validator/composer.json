@@ -16,19 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/translation": "~2.0"
+        "php": ">=5.5.9",
+        "symfony/translation": "~2.7|~3.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "~2.1",
-        "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.0",
-        "symfony/config": "~2.2",
-        "symfony/property-access": "~2.2",
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0",
+        "symfony/intl": "~2.7|~3.0",
+        "symfony/yaml": "~2.7|~3.0",
+        "symfony/config": "~2.7|~3.0",
+        "symfony/property-access": "~2.7|~3.0",
+        "symfony/expression-language": "~2.7|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "~1.0",
-        "symfony/expression-language": "~2.4"
+        "egulias/email-validator": "~1.2,>=1.2.1"
     },
     "suggest": {
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
@@ -48,7 +49,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

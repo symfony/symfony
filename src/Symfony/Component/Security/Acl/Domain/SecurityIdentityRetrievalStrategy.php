@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
@@ -20,7 +19,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 
 /**
- * Strategy for retrieving security identities
+ * Strategy for retrieving security identities.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -30,7 +29,7 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
     private $authenticationTrustResolver;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param RoleHierarchyInterface      $roleHierarchy
      * @param AuthenticationTrustResolver $authenticationTrustResolver

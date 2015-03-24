@@ -17,8 +17,9 @@ namespace Symfony\Component\VarDumper\Cloner;
 class Data
 {
     private $data;
-    private $maxDepth = -1;
+    private $maxDepth = 20;
     private $maxItemsPerDepth = -1;
+    private $useRefHandles = -1;
 
     /**
      * @param array $data A array as returned by ClonerInterface::cloneVar().
@@ -39,16 +40,18 @@ class Data
     /**
      * Returns a depth limited clone of $this.
      *
-     * @param int $maxDepth         The max dumped depth level.
-     * @param int $maxItemsPerDepth The max number of items dumped per depth level.
+     * @param int  $maxDepth         The max dumped depth level.
+     * @param int  $maxItemsPerDepth The max number of items dumped per depth level.
+     * @param bool $useRefHandles    False to hide ref. handles.
      *
      * @return self A depth limited clone of $this.
      */
-    public function getLimitedClone($maxDepth, $maxItemsPerDepth)
+    public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
     {
         $data = clone $this;
         $data->maxDepth = (int) $maxDepth;
         $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
+        $data->useRefHandles = $useRefHandles ? -1 : 0;
 
         return $data;
     }
@@ -59,7 +62,7 @@ class Data
     public function dump(DumperInterface $dumper)
     {
         $refs = array(0);
-        $this->dumpItem($dumper, new Cursor, $refs, $this->data[0][0]);
+        $this->dumpItem($dumper, new Cursor(), $refs, $this->data[0][0]);
     }
 
     /**
@@ -72,40 +75,41 @@ class Data
      */
     private function dumpItem($dumper, $cursor, &$refs, $item)
     {
-        $cursor->refIndex = $cursor->softRefTo = $cursor->hardRefTo = false;
+        $cursor->refIndex = 0;
+        $cursor->softRefTo = $cursor->softRefHandle = $cursor->softRefCount = 0;
+        $cursor->hardRefTo = $cursor->hardRefHandle = $cursor->hardRefCount = 0;
+        $firstSeen = true;
 
         if (!$item instanceof Stub) {
             $type = gettype($item);
         } elseif (Stub::TYPE_REF === $item->type) {
-            if ($item->ref) {
-                if (isset($refs[$r = $item->ref])) {
-                    $cursor->hardRefTo = $refs[$r];
+            if ($item->handle) {
+                if (!isset($refs[$r = $item->handle - (PHP_INT_MAX >> 1)])) {
+                    $cursor->refIndex = $refs[$r] = $cursor->refIndex ?: ++$refs[0];
                 } else {
-                    $cursor->refIndex = $refs[$r] = ++$refs[0];
+                    $firstSeen = false;
                 }
+                $cursor->hardRefTo = $refs[$r];
+                $cursor->hardRefHandle = $this->useRefHandles & $item->handle;
+                $cursor->hardRefCount = $item->refCount;
             }
             $type = $item->class ?: gettype($item->value);
             $item = $item->value;
         }
         if ($item instanceof Stub) {
-            if ($item->ref) {
-                if (isset($refs[$r = $item->ref])) {
-                    if (Stub::TYPE_ARRAY === $item->type) {
-                        if (false === $cursor->hardRefTo) {
-                            $cursor->hardRefTo = $refs[$r];
-                        }
-                    } elseif (false === $cursor->softRefTo) {
-                        $cursor->softRefTo = $refs[$r];
-                    }
-                } elseif (false !== $cursor->refIndex) {
-                    $refs[$r] = $cursor->refIndex;
+            if ($item->refCount) {
+                if (!isset($refs[$r = $item->handle])) {
+                    $cursor->refIndex = $refs[$r] = $cursor->refIndex ?: ++$refs[0];
                 } else {
-                    $cursor->refIndex = $refs[$r] = ++$refs[0];
+                    $firstSeen = false;
                 }
+                $cursor->softRefTo = $refs[$r];
             }
+            $cursor->softRefHandle = $this->useRefHandles & $item->handle;
+            $cursor->softRefCount = $item->refCount;
             $cut = $item->cut;
 
-            if ($item->position && false === $cursor->softRefTo && false === $cursor->hardRefTo) {
+            if ($item->position && $firstSeen) {
                 $children = $this->data[$item->position];
 
                 if ($cursor->stop) {
@@ -123,29 +127,26 @@ class Data
                     break;
 
                 case Stub::TYPE_ARRAY:
-                    $dumper->enterArray($cursor, $item->value, Stub::ARRAY_INDEXED === $item->class, (bool) $children);
+                    $dumper->enterHash($cursor, $item->class, $item->value, (bool) $children);
                     $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->class);
-                    $dumper->leaveArray($cursor, $item->value, Stub::ARRAY_INDEXED === $item->class, (bool) $children, $cut);
+                    $dumper->leaveHash($cursor, $item->class, $item->value, (bool) $children, $cut);
                     break;
 
                 case Stub::TYPE_OBJECT:
-                    $dumper->enterObject($cursor, $item->class, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, Cursor::HASH_OBJECT);
-                    $dumper->leaveObject($cursor, $item->class, (bool) $children, $cut);
-                    break;
-
                 case Stub::TYPE_RESOURCE:
-                    $dumper->enterResource($cursor, $item->class, (bool) $children);
-                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, Cursor::HASH_RESOURCE);
-                    $dumper->leaveResource($cursor, $item->class, (bool) $children, $cut);
+                    $dumper->enterHash($cursor, $item->type, $item->class, (bool) $children);
+                    $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
+                    $dumper->leaveHash($cursor, $item->type, $item->class, (bool) $children, $cut);
                     break;
 
                 default:
                     throw new \RuntimeException(sprintf('Unexpected Stub type: %s', $item->type));
             }
         } elseif ('array' === $type) {
-            $dumper->enterArray($cursor, 0, true, 0, 0);
-            $dumper->leaveArray($cursor, 0, true, 0, 0);
+            $dumper->enterHash($cursor, Cursor::HASH_INDEXED, 0, false);
+            $dumper->leaveHash($cursor, Cursor::HASH_INDEXED, 0, false, 0);
+        } elseif ('string' === $type) {
+            $dumper->dumpString($cursor, $item, false, 0);
         } else {
             $dumper->dumpScalar($cursor, $type, $item);
         }
@@ -173,7 +174,9 @@ class Data
                 $cursor->hashIndex = 0;
                 $cursor->hashLength = count($children);
                 $cursor->hashCut = $hashCut;
-                foreach ($children as $cursor->hashKey => $child) {
+                foreach ($children as $key => $child) {
+                    $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
+                    $cursor->hashKey = $key;
                     $this->dumpItem($dumper, $cursor, $refs, $child);
                     if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
                         $parentCursor->stop = true;
@@ -187,34 +190,5 @@ class Data
         }
 
         return $hashCut;
-    }
-
-    /**
-     * Portable variant of utf8_encode()
-     *
-     * @param string $s
-     *
-     * @return string
-     *
-     * @internal
-     */
-    public static function utf8Encode($s)
-    {
-        if (function_exists('iconv')) {
-            return iconv('CP1252', 'UTF-8', $s);
-        }
-
-        $s .= $s;
-        $len = strlen($s);
-
-        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
-            switch (true) {
-                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-                default: $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
-            }
-        }
-
-        return substr($s, 0, $j);
     }
 }

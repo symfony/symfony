@@ -126,7 +126,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Creates a Kernel expecting a request equals to $request
-     * Allows delta in comparison in case REQUEST_TIME changed by 1 second
+     * Allows delta in comparison in case REQUEST_TIME changed by 1 second.
      */
     private function getKernelExpectingRequest(Request $request)
     {

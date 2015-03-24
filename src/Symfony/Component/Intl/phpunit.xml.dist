@@ -6,11 +6,21 @@
          colors="true"
          bootstrap="vendor/autoload.php"
 >
+    <php>
+        <ini name="error_reporting" value="-1" />
+    </php>
+
     <testsuites>
         <testsuite name="Symfony Intl Component Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>
+
+    <groups>
+        <exclude>
+            <group>intl-data</group>
+        </exclude>
+    </groups>
 
     <filter>
         <whitelist>

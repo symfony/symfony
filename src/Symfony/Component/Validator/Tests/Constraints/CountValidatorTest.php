@@ -124,6 +124,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Count::TOO_MANY_ERROR)
             ->assertRaised();
     }
 
@@ -144,6 +145,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Count::TOO_FEW_ERROR)
             ->assertRaised();
     }
 
@@ -165,6 +167,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Count::TOO_MANY_ERROR)
             ->assertRaised();
     }
 
@@ -186,6 +189,7 @@ abstract class CountValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Count::TOO_FEW_ERROR)
             ->assertRaised();
     }
 

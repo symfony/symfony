@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  * A console command for retrieving information about services.
@@ -63,7 +64,7 @@ To get specific information about a service, specify its name:
   <info>php %command.full_name% validator</info>
 
 By default, private services are hidden. You can display all services by
-using the --show-private flag:
+using the <info>--show-private</info> flag:
 
   <info>php %command.full_name% --show-private</info>
 
@@ -71,15 +72,15 @@ Use the --tags option to display tagged <comment>public</comment> services group
 
   <info>php %command.full_name% --tags</info>
 
-Find all services with a specific tag by specifying the tag name with the --tag option:
+Find all services with a specific tag by specifying the tag name with the <info>--tag</info> option:
 
   <info>php %command.full_name% --tag=form.type</info>
 
-Use the --parameters option to display all parameters:
+Use the <info>--parameters</info> option to display all parameters:
 
   <info>php %command.full_name% --parameters</info>
 
-Display a specific parameter by specifying his name with the --parameter option:
+Display a specific parameter by specifying his name with the <info>--parameter</info> option:
 
   <info>php %command.full_name% --parameter=kernel.debug</info>
 
@@ -93,6 +94,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "container:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:container" instead.</comment>');
+        }
+
         $this->validateInput($input);
 
         if ($input->getOption('parameters')) {
@@ -109,6 +114,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $object = $this->getContainerBuilder();
+            $name = $this->findProperServiceName($input, $output, $object, $name);
             $options = array('id' => $name);
         } else {
             $object = $this->getContainerBuilder();
@@ -119,6 +125,10 @@ EOF
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
         $helper->describe($output, $object, $options);
+
+        if (!$input->getArgument('name') && $input->isInteractive()) {
+            $output->writeln('To search for a service, re-run this command with a search term. <comment>debug:container log</comment>');
+        }
     }
 
     /**
@@ -170,5 +180,37 @@ EOF
         $loader->load($cachedFile);
 
         return $container;
+    }
+
+    private function findProperServiceName(InputInterface $input, OutputInterface $output, ContainerBuilder $builder, $name)
+    {
+        if ($builder->has($name) || !$input->isInteractive()) {
+            return $name;
+        }
+
+        $matchingServices = $this->findServiceIdsContaining($builder, $name);
+        if (empty($matchingServices)) {
+            throw new \InvalidArgumentException(sprintf('No services found that match "%s".', $name));
+        }
+
+        $question = new ChoiceQuestion('Choose a number for more information on the service', $matchingServices);
+        $question->setErrorMessage('Service %s is invalid.');
+
+        return $this->getHelper('question')->ask($input, $output, $question);
+    }
+
+    private function findServiceIdsContaining(ContainerBuilder $builder, $name)
+    {
+        $serviceIds = $builder->getServiceIds();
+        $foundServiceIds = array();
+        $name = strtolower($name);
+        foreach ($serviceIds as $serviceId) {
+            if (false === strpos($serviceId, $name)) {
+                continue;
+            }
+            $foundServiceIds[] = $serviceId;
+        }
+
+        return $foundServiceIds;
     }
 }

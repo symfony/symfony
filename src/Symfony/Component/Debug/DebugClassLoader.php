@@ -30,20 +30,21 @@ class DebugClassLoader
     private $isFinder;
     private $wasFinder;
     private static $caseCheck;
+    private static $deprecated = array();
 
     /**
      * Constructor.
      *
-     * @param callable|object $classLoader
+     * @param callable|object $classLoader Passing an object is @deprecated since version 2.5 and support for it will be removed in 3.0
      *
      * @api
-     * @deprecated since 2.5, passing an object is deprecated and support for it will be removed in 3.0
      */
     public function __construct($classLoader)
     {
         $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
 
         if ($this->wasFinder) {
+            trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
             $this->classLoader = array($classLoader, 'loadClass');
             $this->isFinder = true;
         } else {
@@ -59,17 +60,11 @@ class DebugClassLoader
     /**
      * Gets the wrapped class loader.
      *
-     * @return callable|object a class loader
-     *
-     * @deprecated since 2.5, returning an object is deprecated and support for it will be removed in 3.0
+     * @return callable|object A class loader. Since version 2.5, returning an object is @deprecated and support for it will be removed in 3.0
      */
     public function getClassLoader()
     {
-        if ($this->wasFinder) {
-            return $this->classLoader[0];
-        } else {
-            return $this->classLoader;
-        }
+        return $this->wasFinder ? $this->classLoader[0] : $this->classLoader;
     }
 
     /**
@@ -127,10 +122,12 @@ class DebugClassLoader
      *
      * @return string|null
      *
-     * @deprecated Deprecated since 2.5, to be removed in 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function findFile($class)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($this->wasFinder) {
             return $this->classLoader[0]->findFile($class);
         }
@@ -141,7 +138,7 @@ class DebugClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return bool|null    True, if loaded
+     * @return bool|null True, if loaded
      *
      * @throws \RuntimeException
      */
@@ -166,7 +163,7 @@ class DebugClassLoader
 
         ErrorHandler::unstackErrors();
 
-        $exists = class_exists($class, false) || interface_exists($class, false) || (function_exists('trait_exists') && trait_exists($class, false));
+        $exists = class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 
         if ('\\' === $class[0]) {
             $class = substr($class, 1);
@@ -178,6 +175,37 @@ class DebugClassLoader
 
             if ($name !== $class && 0 === strcasecmp($name, $class)) {
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
+            }
+
+            if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
+            } else {
+                if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
+                    $len = 0;
+                    $ns = '';
+                } else {
+                    switch ($ns = substr($name, 0, $len)) {
+                        case 'Symfony\Bridge\\':
+                        case 'Symfony\Bundle\\':
+                        case 'Symfony\Component\\':
+                            $ns = 'Symfony\\';
+                            $len = strlen($ns);
+                            break;
+                    }
+                }
+                $parent = $refl->getParentClass();
+
+                if (!$parent || strncmp($ns, $parent, $len)) {
+                    if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
+                        trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
+                    }
+
+                    foreach ($refl->getInterfaceNames() as $interface) {
+                        if (isset(self::$deprecated[$interface]) && strncmp($ns, $interface, $len) && !($parent && $parent->implementsInterface($interface))) {
+                            trigger_error(sprintf('The %s %s %s that is deprecated %s', $name, $refl->isInterface() ? 'interface extends' : 'class implements', $interface, self::$deprecated[$interface]), E_USER_DEPRECATED);
+                        }
+                    }
+                }
             }
         }
 
@@ -214,7 +242,7 @@ class DebugClassLoader
                     chdir($cwd);
                 }
 
-                if ( 0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
+                if (0 === substr_compare($real, $tail, -strlen($tail), strlen($tail), true)
                   && 0 !== substr_compare($real, $tail, -strlen($tail), strlen($tail), false)
                 ) {
                     throw new \RuntimeException(sprintf('Case mismatch between class and source file names: %s vs %s', $class, $real));

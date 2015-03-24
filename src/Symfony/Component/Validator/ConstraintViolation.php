@@ -64,6 +64,11 @@ class ConstraintViolation implements ConstraintViolationInterface
     private $code;
 
     /**
+     * @var mixed
+     */
+    private $cause;
+
+    /**
      * Creates a new constraint violation.
      *
      * @param string          $message         The violation message
@@ -79,10 +84,11 @@ class ConstraintViolation implements ConstraintViolationInterface
      * @param int|null        $plural          The number for determining the plural
      *                                         form when translating the message
      * @param mixed           $code            The error code of the violation
-     * @param Constraint|null $constraint      The constraint that caused the
-     *                                         violation
+     * @param Constraint|null $constraint      The constraint whose validation
+     *                                         caused the violation
+     * @param mixed           $cause           The cause of the violation
      */
-    public function __construct($message, $messageTemplate, array $parameters, $root, $propertyPath, $invalidValue, $plural = null, $code = null, Constraint $constraint = null)
+    public function __construct($message, $messageTemplate, array $parameters, $root, $propertyPath, $invalidValue, $plural = null, $code = null, Constraint $constraint = null, $cause = null)
     {
         $this->message = $message;
         $this->messageTemplate = $messageTemplate;
@@ -93,6 +99,7 @@ class ConstraintViolation implements ConstraintViolationInterface
         $this->invalidValue = $invalidValue;
         $this->constraint = $constraint;
         $this->code = $code;
+        $this->cause = $cause;
     }
 
     /**
@@ -134,9 +141,14 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
+     *             Use getParameters() instead
      */
     public function getMessageParameters()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getParameters() method instead.', E_USER_DEPRECATED);
+
         return $this->parameters;
     }
 
@@ -150,9 +162,14 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
+     *             Use getPlural() instead
      */
     public function getMessagePluralization()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7, to be removed in 3.0. Use the ConstraintViolation::getPlural() method instead.', E_USER_DEPRECATED);
+
         return $this->plural;
     }
 
@@ -197,13 +214,23 @@ class ConstraintViolation implements ConstraintViolationInterface
     }
 
     /**
-     * Returns the constraint that caused the violation.
+     * Returns the constraint whose validation caused the violation.
      *
      * @return Constraint|null The constraint or null if it is not known
      */
     public function getConstraint()
     {
         return $this->constraint;
+    }
+
+    /**
+     * Returns the cause of the violation.
+     *
+     * @return mixed
+     */
+    public function getCause()
+    {
+        return $this->cause;
     }
 
     /**

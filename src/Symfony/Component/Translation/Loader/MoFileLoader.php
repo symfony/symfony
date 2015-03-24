@@ -39,7 +39,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * The size of the header of a MO file in bytes.
      *
-     * @var int     Number of bytes.
+     * @var int Number of bytes.
      */
     const MO_HEADER_SIZE = 28;
 
@@ -78,6 +78,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      * @param resource $resource
      *
      * @return array
+     *
      * @throws InvalidResourceException If stream content has an invalid format.
      */
     private function parse($resource)
@@ -168,8 +169,9 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
     /**
      * Reads an unsigned long from stream respecting endianess.
      *
-     * @param  resource $stream
-     * @param  bool     $isBigEndian
+     * @param resource $stream
+     * @param bool     $isBigEndian
+     *
      * @return int
      */
     private function readLong($stream, $isBigEndian)

@@ -24,18 +24,15 @@ use Symfony\Component\Config\Resource\FileResource;
 class PhpFileLoader extends FileLoader
 {
     /**
-     * Loads a PHP file.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
+     * {@inheritdoc}
      */
-    public function load($file, $type = null)
+    public function load($resource, $type = null)
     {
         // the container and loader variables are exposed to the included file below
         $container = $this->container;
         $loader = $this;
 
-        $path = $this->locator->locate($file);
+        $path = $this->locator->locate($resource);
         $this->setCurrentDir(dirname($path));
         $this->container->addResource(new FileResource($path));
 
@@ -43,12 +40,7 @@ class PhpFileLoader extends FileLoader
     }
 
     /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return bool    true if this class supports the given resource, false otherwise
+     * {@inheritdoc}
      */
     public function supports($resource, $type = null)
     {

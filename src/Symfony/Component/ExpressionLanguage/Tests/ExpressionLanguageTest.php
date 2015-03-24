@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
 class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,6 +53,13 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 
         $expressionLanguage = new ExpressionLanguage();
         $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+    }
+
+    public function testProviders()
+    {
+        $expressionLanguage = new ExpressionLanguage(null, array(new TestProvider()));
+        $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
+        $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
     }
 
     /**

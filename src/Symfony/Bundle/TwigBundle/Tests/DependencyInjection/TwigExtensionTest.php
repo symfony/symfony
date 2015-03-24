@@ -35,10 +35,10 @@ class TwigExtensionTest extends TestCase
         $this->assertContains('form_div_layout.html.twig', $container->getParameter('twig.form.resources'), '->load() includes default template for form resources');
 
         // Twig options
-        $options = $container->getParameter('twig.options');
-        $this->assertEquals(__DIR__.'/twig', $options['cache'], '->load() sets default value for cache option');
-        $this->assertEquals('UTF-8', $options['charset'], '->load() sets default value for charset option');
-        $this->assertFalse($options['debug'], '->load() sets default value for debug option');
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals('%kernel.cache_dir%/twig', $options['cache'], '->load() sets default value for cache option');
+        $this->assertEquals('%kernel.charset%', $options['charset'], '->load() sets default value for charset option');
+        $this->assertEquals('%kernel.debug%', $options['debug'], '->load() sets default value for debug option');
     }
 
     /**
@@ -57,13 +57,11 @@ class TwigExtensionTest extends TestCase
         $resources = $container->getParameter('twig.form.resources');
         $this->assertContains('form_div_layout.html.twig', $resources, '->load() includes default template for form resources');
         $this->assertContains('MyBundle::form.html.twig', $resources, '->load() merges new templates into form resources');
-        // @deprecated since 2.6, to be removed in 3.0
-        $this->assertContains('MyBundle::formDeprecated.html.twig', $resources, '->load() merges new templates into form resources');
 
         // Globals
         $calls = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('templating.globals'), $calls[0][1][1]);
+        $this->assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
         $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
         $this->assertEquals('baz', $calls[2][1][0], '->load() registers variables as Twig globals');
@@ -78,7 +76,7 @@ class TwigExtensionTest extends TestCase
         }
 
         // Twig options
-        $options = $container->getParameter('twig.options');
+        $options = $container->getDefinition('twig')->getArgument(1);
         $this->assertTrue($options['auto_reload'], '->load() sets the auto_reload option');
         $this->assertTrue($options['autoescape'], '->load() sets the autoescape option');
         $this->assertEquals('stdClass', $options['base_template_class'], '->load() sets the base_template_class option');
@@ -98,7 +96,8 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'customTemplateEscapingGuesser', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'my_project.some_bundle.template_escaping_guesser', 'guess');
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals(array(new Reference('my_project.some_bundle.template_escaping_guesser'), 'guess'), $options['autoescape']);
     }
 
     /**
@@ -111,20 +110,21 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'empty', $format);
         $this->compileContainer($container);
 
-        $this->assertTemplateEscapingGuesserDefinition($container, 'templating.engine.twig', 'guessDefaultEscapingStrategy');
+        $options = $container->getDefinition('twig')->getArgument(1);
+        $this->assertEquals('filename', $options['autoescape']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()
     {
         $globals = array(
-            'array'   => array(),
-            'false'   => false,
-            'float'   => 2.0,
+            'array' => array(),
+            'false' => false,
+            'float' => 2.0,
             'integer' => 3,
-            'null'    => null,
-            'object'  => new \stdClass(),
-            'string'  => 'foo',
-            'true'    => true,
+            'null' => null,
+            'object' => new \stdClass(),
+            'string' => 'foo',
+            'true' => true,
         );
 
         $container = $this->createContainer();
@@ -217,10 +217,10 @@ class TwigExtensionTest extends TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.cache_dir' => __DIR__,
-            'kernel.root_dir'  => __DIR__.'/Fixtures',
-            'kernel.charset'   => 'UTF-8',
-            'kernel.debug'     => false,
-            'kernel.bundles'   => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
+            'kernel.root_dir' => __DIR__.'/Fixtures',
+            'kernel.charset' => 'UTF-8',
+            'kernel.debug' => false,
+            'kernel.bundles' => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
         )));
 
         return $container;
@@ -252,19 +252,5 @@ class TwigExtensionTest extends TestCase
         }
 
         $loader->load($file.'.'.$format);
-    }
-
-    private function assertTemplateEscapingGuesserDefinition(ContainerBuilder $container, $serviceId, $serviceMethod)
-    {
-        $def = $container->getDefinition('templating.engine.twig');
-
-        $this->assertCount(1, $def->getMethodCalls());
-
-        foreach ($def->getMethodCalls() as $call) {
-            if ('setDefaultEscapingStrategy' === $call[0]) {
-                $this->assertSame($serviceId, (string) $call[1][0][0]);
-                $this->assertSame($serviceMethod, $call[1][0][1]);
-            }
-        }
     }
 }

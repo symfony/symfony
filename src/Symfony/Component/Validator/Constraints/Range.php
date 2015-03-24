@@ -24,6 +24,16 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class Range extends Constraint
 {
+    const INVALID_VALUE_ERROR = 1;
+    const BEYOND_RANGE_ERROR = 2;
+    const BELOW_RANGE_ERROR = 3;
+
+    protected static $errorNames = array(
+        self::INVALID_VALUE_ERROR => 'INVALID_VALUE_ERROR',
+        self::BEYOND_RANGE_ERROR => 'BEYOND_RANGE_ERROR',
+        self::BELOW_RANGE_ERROR => 'BELOW_RANGE_ERROR',
+    );
+
     public $minMessage = 'This value should be {{ limit }} or more.';
     public $maxMessage = 'This value should be {{ limit }} or less.';
     public $invalidMessage = 'This value should be a valid number.';

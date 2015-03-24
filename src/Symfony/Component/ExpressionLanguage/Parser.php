@@ -38,42 +38,52 @@ class Parser
 
         $this->unaryOperators = array(
             'not' => array('precedence' => 50),
-            '!'   => array('precedence' => 50),
-            '-'   => array('precedence' => 500),
-            '+'   => array('precedence' => 500),
+            '!' => array('precedence' => 50),
+            '-' => array('precedence' => 500),
+            '+' => array('precedence' => 500),
         );
         $this->binaryOperators = array(
-            'or'      => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
-            '||'      => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
-            'and'     => array('precedence' => 15,  'associativity' => Parser::OPERATOR_LEFT),
-            '&&'      => array('precedence' => 15,  'associativity' => Parser::OPERATOR_LEFT),
-            '|'       => array('precedence' => 16,  'associativity' => Parser::OPERATOR_LEFT),
-            '^'       => array('precedence' => 17,  'associativity' => Parser::OPERATOR_LEFT),
-            '&'       => array('precedence' => 18,  'associativity' => Parser::OPERATOR_LEFT),
-            '=='      => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '==='     => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '!='      => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '!=='     => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '<'       => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '>'       => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '>='      => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '<='      => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            'not in'  => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            'in'      => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            'or' => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
+            '||' => array('precedence' => 10,  'associativity' => Parser::OPERATOR_LEFT),
+            'and' => array('precedence' => 15,  'associativity' => Parser::OPERATOR_LEFT),
+            '&&' => array('precedence' => 15,  'associativity' => Parser::OPERATOR_LEFT),
+            '|' => array('precedence' => 16,  'associativity' => Parser::OPERATOR_LEFT),
+            '^' => array('precedence' => 17,  'associativity' => Parser::OPERATOR_LEFT),
+            '&' => array('precedence' => 18,  'associativity' => Parser::OPERATOR_LEFT),
+            '==' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '===' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '!=' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '!==' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '<' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '>' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '>=' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            '<=' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            'not in' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
+            'in' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
             'matches' => array('precedence' => 20,  'associativity' => Parser::OPERATOR_LEFT),
-            '..'      => array('precedence' => 25,  'associativity' => Parser::OPERATOR_LEFT),
-            '+'       => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
-            '-'       => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
-            '~'       => array('precedence' => 40,  'associativity' => Parser::OPERATOR_LEFT),
-            '*'       => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
-            '/'       => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
-            '%'       => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
-            '**'      => array('precedence' => 200, 'associativity' => Parser::OPERATOR_RIGHT),
+            '..' => array('precedence' => 25,  'associativity' => Parser::OPERATOR_LEFT),
+            '+' => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
+            '-' => array('precedence' => 30,  'associativity' => Parser::OPERATOR_LEFT),
+            '~' => array('precedence' => 40,  'associativity' => Parser::OPERATOR_LEFT),
+            '*' => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
+            '/' => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
+            '%' => array('precedence' => 60,  'associativity' => Parser::OPERATOR_LEFT),
+            '**' => array('precedence' => 200, 'associativity' => Parser::OPERATOR_RIGHT),
         );
     }
 
     /**
      * Converts a token stream to a node tree.
+     *
+     * The valid names is an array where the values
+     * are the names that the user can use in an expression.
+     *
+     * If the variable name in the compiled PHP code must be
+     * different, define it as the key.
+     *
+     * For instance, ['this' => 'container'] means that the
+     * variable 'container' can be used in the expression
+     * but the compiled code will use 'this'.
      *
      * @param TokenStream $stream A token stream instance
      * @param array       $names  An array of valid names
@@ -194,7 +204,13 @@ class Parser
                                 throw new SyntaxError(sprintf('Variable "%s" is not valid', $token->value), $token->cursor);
                             }
 
-                            $node = new Node\NameNode($token->value);
+                            // is the name used in the compiled code different
+                            // from the name used in the expression?
+                            if (is_int($name = array_search($token->value, $this->names))) {
+                                $name = $token->value;
+                            }
+
+                            $node = new Node\NameNode($name);
                         }
                 }
                 break;
@@ -298,12 +314,20 @@ class Parser
                 if (
                     $token->type !== Token::NAME_TYPE
                     &&
-                    $token->type !== Token::NUMBER_TYPE
-                    &&
-                    // operators line "not" are valid method or property names
-                    ($token->type !== Token::OPERATOR_TYPE && preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
+                    // Operators like "not" and "matches" are valid method or property names,
+                    //
+                    // In other words, besides NAME_TYPE, OPERATOR_TYPE could also be parsed as a property or method.
+                    // This is because operators are processed by the lexer prior to names. So "not" in "foo.not()" or "matches" in "foo.matches" will be recognized as an operator first.
+                    // But in fact, "not" and "matches" in such expressions shall be parsed as method or property names.
+                    //
+                    // And this ONLY works if the operator consists of valid characters for a property or method name.
+                    //
+                    // Other types, such as STRING_TYPE and NUMBER_TYPE, can't be parsed as property nor method names.
+                    //
+                    // As a result, if $token is NOT an operator OR $token->value is NOT a valid property or method name, an exception shall be thrown.
+                    ($token->type !== Token::OPERATOR_TYPE || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
                 ) {
-                    throw new SyntaxError('Expected name or number', $token->cursor);
+                    throw new SyntaxError('Expected name', $token->cursor);
                 }
 
                 $arg = new Node\ConstantNode($token->value);
@@ -320,10 +344,6 @@ class Parser
 
                 $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
             } elseif ('[' === $token->value) {
-                if ($node instanceof Node\GetAttrNode && Node\GetAttrNode::METHOD_CALL === $node->attributes['type'] && version_compare(PHP_VERSION, '5.4.0', '<')) {
-                    throw new SyntaxError('Array calls on a method call is only supported on PHP 5.4+', $token->cursor);
-                }
-
                 $this->stream->next();
                 $arg = $this->parseExpression();
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ']');

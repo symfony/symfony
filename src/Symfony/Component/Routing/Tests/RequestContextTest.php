@@ -98,4 +98,62 @@ class RequestContextTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar', $requestContext->getParameter('foo'));
     }
+
+    public function testMethod()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setMethod('post');
+
+        $this->assertSame('POST', $requestContext->getMethod());
+    }
+
+    public function testScheme()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setScheme('HTTPS');
+
+        $this->assertSame('https', $requestContext->getScheme());
+    }
+
+    public function testHost()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setHost('eXampLe.com');
+
+        $this->assertSame('example.com', $requestContext->getHost());
+    }
+
+    public function testQueryString()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setQueryString(null);
+
+        $this->assertSame('', $requestContext->getQueryString());
+    }
+
+    public function testPort()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->setHttpPort('123');
+        $requestContext->setHttpsPort('456');
+
+        $this->assertSame(123, $requestContext->getHttpPort());
+        $this->assertSame(456, $requestContext->getHttpsPort());
+    }
+
+    public function testFluentInterface()
+    {
+        $requestContext = new RequestContext();
+
+        $this->assertSame($requestContext, $requestContext->setBaseUrl('/app.php'));
+        $this->assertSame($requestContext, $requestContext->setPathInfo('/index'));
+        $this->assertSame($requestContext, $requestContext->setMethod('POST'));
+        $this->assertSame($requestContext, $requestContext->setScheme('https'));
+        $this->assertSame($requestContext, $requestContext->setHost('example.com'));
+        $this->assertSame($requestContext, $requestContext->setQueryString('foo=bar'));
+        $this->assertSame($requestContext, $requestContext->setHttpPort(80));
+        $this->assertSame($requestContext, $requestContext->setHttpsPort(443));
+        $this->assertSame($requestContext, $requestContext->setParameters(array()));
+        $this->assertSame($requestContext, $requestContext->setParameter('foo', 'bar'));
+    }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandle
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class NativeSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,14 +27,7 @@ class NativeSessionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new NativeSessionHandler();
 
-        // note for PHPUnit optimisers - the use of assertTrue/False
-        // here is deliberate since the tests do not require the classes to exist - drak
-        if (version_compare(phpversion(), '5.4.0', '<')) {
-            $this->assertFalse($handler instanceof \SessionHandler);
-            $this->assertTrue($handler instanceof NativeSessionHandler);
-        } else {
-            $this->assertTrue($handler instanceof \SessionHandler);
-            $this->assertTrue($handler instanceof NativeSessionHandler);
-        }
+        $this->assertTrue($handler instanceof \SessionHandler);
+        $this->assertTrue($handler instanceof NativeSessionHandler);
     }
 }

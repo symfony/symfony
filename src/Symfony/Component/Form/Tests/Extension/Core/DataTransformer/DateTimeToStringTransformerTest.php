@@ -30,6 +30,7 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
             array('H:i:00', '16:05:00', '1970-01-01 16:05:00 UTC'),
             array('H:i', '16:05', '1970-01-01 16:05:00 UTC'),
             array('H', '16', '1970-01-01 16:00:00 UTC'),
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
 
             // different day representations
             array('Y-m-j', '2010-02-3', '2010-02-03 00:00:00 UTC'),
@@ -57,12 +58,9 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
 
             // seconds since Unix
             array('U', '1265213106', '2010-02-03 16:05:06 UTC'),
-        );
 
-        // This test will fail < 5.3.9 - see https://bugs.php.net/51994
-        if (version_compare(phpversion(), '5.3.9', '>=')) {
-            $data[] = array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC');
-        }
+            array('Y-z', '2010-33', '2010-02-03 00:00:00 UTC'),
+        );
 
         return $data;
     }
@@ -111,10 +109,6 @@ class DateTimeToStringTransformerTest extends DateTimeTestCase
      */
     public function testReverseTransformUsingPipe($format, $input, $output)
     {
-        if (version_compare(phpversion(), '5.3.7', '<')) {
-            $this->markTestSkipped('Pipe usage requires PHP 5.3.7 or newer.');
-        }
-
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format, true);
 
         $output = new \DateTime($output);

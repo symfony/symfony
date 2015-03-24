@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 
 /**
- * Tests for {@see \Symfony\Component\DependencyInjection\PhpDumper\NullDumper}
+ * Tests for {@see \Symfony\Component\DependencyInjection\PhpDumper\NullDumper}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  *
@@ -25,7 +25,7 @@ class NullDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testNullDumper()
     {
-        $dumper     = new NullDumper();
+        $dumper = new NullDumper();
         $definition = new Definition('stdClass');
 
         $this->assertFalse($dumper->isProxyCandidate($definition));

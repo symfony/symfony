@@ -9,8 +9,6 @@
 
     <xsd:complexType name="config">
         <xsd:sequence>
-            <!-- @deprecated since 2.6, to be removed in 3.0 -->
-            <xsd:element name="form" type="form" minOccurs="0" maxOccurs="1" />
             <xsd:element name="form-theme" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="global" type="global" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="path" type="path" minOccurs="0" maxOccurs="unbounded" />
@@ -26,12 +24,6 @@
         <xsd:attribute name="debug" type="xsd:string" />
         <xsd:attribute name="strict-variables" type="xsd:string" />
         <xsd:attribute name="exception-controller" type="xsd:string" />
-    </xsd:complexType>
-
-    <xsd:complexType name="form">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="resource" type="xsd:string" />
-        </xsd:choice>
     </xsd:complexType>
 
     <xsd:complexType name="path" mixed="true">

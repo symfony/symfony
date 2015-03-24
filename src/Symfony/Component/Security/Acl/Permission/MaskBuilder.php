@@ -44,35 +44,35 @@ namespace Symfony\Component\Security\Acl\Permission;
  */
 class MaskBuilder
 {
-    const MASK_VIEW         = 1;          // 1 << 0
-    const MASK_CREATE       = 2;          // 1 << 1
-    const MASK_EDIT         = 4;          // 1 << 2
-    const MASK_DELETE       = 8;          // 1 << 3
-    const MASK_UNDELETE     = 16;         // 1 << 4
-    const MASK_OPERATOR     = 32;         // 1 << 5
-    const MASK_MASTER       = 64;         // 1 << 6
-    const MASK_OWNER        = 128;        // 1 << 7
-    const MASK_IDDQD        = 1073741823; // 1 << 0 | 1 << 1 | ... | 1 << 30
+    const MASK_VIEW = 1;           // 1 << 0
+    const MASK_CREATE = 2;         // 1 << 1
+    const MASK_EDIT = 4;           // 1 << 2
+    const MASK_DELETE = 8;         // 1 << 3
+    const MASK_UNDELETE = 16;      // 1 << 4
+    const MASK_OPERATOR = 32;      // 1 << 5
+    const MASK_MASTER = 64;        // 1 << 6
+    const MASK_OWNER = 128;        // 1 << 7
+    const MASK_IDDQD = 1073741823; // 1 << 0 | 1 << 1 | ... | 1 << 30
 
-    const CODE_VIEW         = 'V';
-    const CODE_CREATE       = 'C';
-    const CODE_EDIT         = 'E';
-    const CODE_DELETE       = 'D';
-    const CODE_UNDELETE     = 'U';
-    const CODE_OPERATOR     = 'O';
-    const CODE_MASTER       = 'M';
-    const CODE_OWNER        = 'N';
+    const CODE_VIEW = 'V';
+    const CODE_CREATE = 'C';
+    const CODE_EDIT = 'E';
+    const CODE_DELETE = 'D';
+    const CODE_UNDELETE = 'U';
+    const CODE_OPERATOR = 'O';
+    const CODE_MASTER = 'M';
+    const CODE_OWNER = 'N';
 
-    const ALL_OFF           = '................................';
-    const OFF               = '.';
-    const ON                = '*';
+    const ALL_OFF = '................................';
+    const OFF = '.';
+    const ON = '*';
 
     private $mask;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param int     $mask optional; defaults to 0
+     * @param int $mask optional; defaults to 0
      *
      * @throws \InvalidArgumentException
      */
@@ -86,7 +86,7 @@ class MaskBuilder
     }
 
     /**
-     * Adds a mask to the permission
+     * Adds a mask to the permission.
      *
      * @param mixed $mask
      *
@@ -102,7 +102,7 @@ class MaskBuilder
     }
 
     /**
-     * Returns the mask of this permission
+     * Returns the mask of this permission.
      *
      * @return int
      */
@@ -112,7 +112,7 @@ class MaskBuilder
     }
 
     /**
-     * Returns a human-readable representation of the permission
+     * Returns a human-readable representation of the permission.
      *
      * @return string
      */
@@ -136,7 +136,7 @@ class MaskBuilder
     }
 
     /**
-     * Removes a mask from the permission
+     * Removes a mask from the permission.
      *
      * @param mixed $mask
      *
@@ -152,7 +152,7 @@ class MaskBuilder
     }
 
     /**
-     * Resets the PermissionBuilder
+     * Resets the PermissionBuilder.
      *
      * @return MaskBuilder
      */
@@ -164,11 +164,13 @@ class MaskBuilder
     }
 
     /**
-     * Returns the code for the passed mask
+     * Returns the code for the passed mask.
      *
-     * @param int     $mask
+     * @param int $mask
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     *
      * @return string
      */
     public static function getCode($mask)

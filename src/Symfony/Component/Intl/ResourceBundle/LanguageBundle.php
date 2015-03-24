@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
+use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
+use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
+use Symfony\Component\Intl\Exception\MissingResourceException;
+
 /**
  * Default implementation of {@link LanguageBundleInterface}.
  *
@@ -18,100 +24,99 @@ namespace Symfony\Component\Intl\ResourceBundle;
  *
  * @internal
  */
-class LanguageBundle extends AbstractBundle implements LanguageBundleInterface
+class LanguageBundle extends LanguageDataProvider implements LanguageBundleInterface
 {
     /**
+     * @var LocaleDataProvider
+     */
+    private $localeProvider;
+
+    /**
+     * @var ScriptDataProvider
+     */
+    private $scriptProvider;
+
+    /**
+     * Creates a new language bundle.
+     *
+     * @param string                     $path
+     * @param BundleEntryReaderInterface $reader
+     * @param LocaleDataProvider         $localeProvider
+     */
+    public function __construct($path, BundleEntryReaderInterface $reader, LocaleDataProvider $localeProvider, ScriptDataProvider $scriptProvider)
+    {
+        parent::__construct($path, $reader);
+
+        $this->localeProvider = $localeProvider;
+        $this->scriptProvider = $scriptProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getLanguageName($lang, $region = null, $locale = null)
+    public function getLanguageName($language, $region = null, $displayLocale = null)
     {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
-
-        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
-            return;
-        }
-
         // Some languages are translated together with their region,
         // i.e. "en_GB" is translated as "British English"
-        if (null !== $region && isset($languages[$lang.'_'.$region])) {
-            return $languages[$lang.'_'.$region];
-        }
-
-        return $languages[$lang];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLanguageNames($locale = null)
-    {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
-
-        if (null === ($languages = $this->readEntry($locale, array('Languages'), true))) {
-            return array();
-        }
-
-        if ($languages instanceof \Traversable) {
-            $languages = iterator_to_array($languages);
-        }
-
-        return $languages;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getScriptName($script, $lang = null, $locale = null)
-    {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
-
-        $data = $this->read($locale);
-
-        // Some languages are translated together with their script,
-        // e.g. "zh_Hans" is translated as "Simplified Chinese"
-        if (null !== $lang && isset($data['Languages'][$lang.'_'.$script])) {
-            $langName = $data['Languages'][$lang.'_'.$script];
-
-            // If the script is appended in braces, extract it, e.g. "zh_Hans"
-            // is translated as "Chinesisch (vereinfacht)" in locale "de"
-            if (strpos($langName, '(') !== false) {
-                list($langName, $scriptName) = preg_split('/[\s()]/', $langName, null, PREG_SPLIT_NO_EMPTY);
-
-                return $scriptName;
+        if (null !== $region) {
+            try {
+                return $this->getName($language.'_'.$region, $displayLocale);
+            } catch (MissingResourceException $e) {
             }
         }
 
-        // "af" (Afrikaans) has no "Scripts" block
-        if (!isset($data['Scripts'][$script])) {
+        try {
+            return $this->getName($language, $displayLocale);
+        } catch (MissingResourceException $e) {
             return;
         }
-
-        return $data['Scripts'][$script];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getScriptNames($locale = null)
+    public function getLanguageNames($displayLocale = null)
     {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
+        try {
+            return $this->getNames($displayLocale);
+        } catch (MissingResourceException $e) {
+            return;
         }
+    }
 
-        if (null === ($scripts = $this->readEntry($locale, array('Scripts'), true))) {
-            return array();
+    /**
+     * {@inheritdoc}
+     */
+    public function getScriptName($script, $language = null, $displayLocale = null)
+    {
+        try {
+            return $this->scriptProvider->getName($script, $displayLocale);
+        } catch (MissingResourceException $e) {
+            return;
         }
+    }
 
-        if ($scripts instanceof \Traversable) {
-            $scripts = iterator_to_array($scripts);
+    /**
+     * {@inheritdoc}
+     */
+    public function getScriptNames($displayLocale = null)
+    {
+        try {
+            return $this->scriptProvider->getNames($displayLocale);
+        } catch (MissingResourceException $e) {
+            return;
         }
+    }
 
-        return $scripts;
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocales()
+    {
+        try {
+            return $this->localeProvider->getLocales();
+        } catch (MissingResourceException $e) {
+            return;
+        }
     }
 }

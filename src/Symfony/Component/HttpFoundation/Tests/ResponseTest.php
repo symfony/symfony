@@ -141,9 +141,9 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsNotModifiedLastModified()
     {
-        $before   = 'Sun, 25 Aug 2013 18:32:31 GMT';
+        $before = 'Sun, 25 Aug 2013 18:32:31 GMT';
         $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
-        $after    = 'Sun, 25 Aug 2013 19:33:31 GMT';
+        $after = 'Sun, 25 Aug 2013 19:33:31 GMT';
 
         $request = new Request();
         $request->headers->set('If-Modified-Since', $modified);
@@ -185,10 +185,10 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsNotModifiedLastModifiedAndEtag()
     {
-        $before   = 'Sun, 25 Aug 2013 18:32:31 GMT';
+        $before = 'Sun, 25 Aug 2013 18:32:31 GMT';
         $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
-        $after    = 'Sun, 25 Aug 2013 19:33:31 GMT';
-        $etag     = 'randomly_generated_etag';
+        $after = 'Sun, 25 Aug 2013 19:33:31 GMT';
+        $etag = 'randomly_generated_etag';
 
         $request = new Request();
         $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
@@ -212,7 +212,7 @@ class ResponseTest extends ResponseTestCase
     public function testIsNotModifiedIfModifiedSinceAndEtagWithoutLastModified()
     {
         $modified = 'Sun, 25 Aug 2013 18:33:31 GMT';
-        $etag     = 'randomly_generated_etag';
+        $etag = 'randomly_generated_etag';
 
         $request = new Request();
         $request->headers->set('if_none_match', sprintf('%s, %s', $etag, 'etagThree'));
@@ -825,18 +825,18 @@ class ResponseTest extends ResponseTestCase
     public function validContentProvider()
     {
         return array(
-            'obj'    => array(new StringableObject()),
+            'obj' => array(new StringableObject()),
             'string' => array('Foo'),
-            'int'    => array(2),
+            'int' => array(2),
         );
     }
 
     public function invalidContentProvider()
     {
         return array(
-            'obj'   => array(new \stdClass()),
+            'obj' => array(new \stdClass()),
             'array' => array(array()),
-            'bool'   => array(true, '1'),
+            'bool' => array(true, '1'),
         );
     }
 

@@ -19,23 +19,13 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 /**
  * A validator that supports both the API of Symfony < 2.5 and Symfony 2.5+.
  *
- * This class is incompatible with PHP versions < 5.3.9, because it implements
- * two different interfaces specifying the same method validate():
- *
- *   - {@link \Symfony\Component\Validator\ValidatorInterface}
- *   - {@link \Symfony\Component\Validator\Validator\ValidatorInterface}
- *
- * In PHP versions prior to 5.3.9, either use {@link RecursiveValidator} or the
- * deprecated class {@link \Symfony\Component\Validator\Validator} instead.
- *
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Validator\ValidatorInterface
  * @see \Symfony\Component\Validator\Validator\ValidatorInterface
  *
- * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
- *             To be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class LegacyValidator extends RecursiveValidator implements LegacyValidatorInterface
 {
@@ -52,6 +42,8 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
             return parent::validate($value, $constraints, $groups);
         }
 
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+
         $constraint = new Valid(array('traverse' => $traverse, 'deep' => $deep));
 
         return parent::validate($value, $constraint, $groups);
@@ -59,11 +51,15 @@ class LegacyValidator extends RecursiveValidator implements LegacyValidatorInter
 
     public function validateValue($value, $constraints, $groups = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::validate method instead.', E_USER_DEPRECATED);
+
         return parent::validate($value, $constraints, $groups);
     }
 
     public function getMetadataFactory()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated in version 2.5 and will be removed in version 3.0. Use the Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+
         return $this->metadataFactory;
     }
 

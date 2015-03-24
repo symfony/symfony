@@ -69,7 +69,7 @@ class RepeatedPass implements CompilerPassInterface
     }
 
     /**
-     * Sets if the pass should repeat
+     * Sets if the pass should repeat.
      */
     public function setRepeat()
     {
@@ -77,7 +77,7 @@ class RepeatedPass implements CompilerPassInterface
     }
 
     /**
-     * Returns the passes
+     * Returns the passes.
      *
      * @return RepeatablePassInterface[] An array of RepeatablePassInterface objects
      */

@@ -22,15 +22,15 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  */
 interface OutputInterface
 {
-    const VERBOSITY_QUIET        = 0;
-    const VERBOSITY_NORMAL       = 1;
-    const VERBOSITY_VERBOSE      = 2;
+    const VERBOSITY_QUIET = 0;
+    const VERBOSITY_NORMAL = 1;
+    const VERBOSITY_VERBOSE = 2;
     const VERBOSITY_VERY_VERBOSE = 3;
-    const VERBOSITY_DEBUG        = 4;
+    const VERBOSITY_DEBUG = 4;
 
     const OUTPUT_NORMAL = 0;
-    const OUTPUT_RAW    = 1;
-    const OUTPUT_PLAIN  = 2;
+    const OUTPUT_RAW = 1;
+    const OUTPUT_PLAIN = 2;
 
     /**
      * Writes a message to the output.
@@ -60,7 +60,7 @@ interface OutputInterface
     /**
      * Sets the verbosity of the output.
      *
-     * @param int     $level The level of verbosity (one of the VERBOSITY constants)
+     * @param int $level The level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
@@ -69,16 +69,44 @@ interface OutputInterface
     /**
      * Gets the current verbosity of the output.
      *
-     * @return int     The current level of verbosity (one of the VERBOSITY constants)
+     * @return int The current level of verbosity (one of the VERBOSITY constants)
      *
      * @api
      */
     public function getVerbosity();
 
     /**
+     * Returns whether verbosity is quiet (-q)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
+     */
+    public function isQuiet();
+
+    /**
+     * Returns whether verbosity is verbose (-v)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
+     */
+    public function isVerbose();
+
+    /**
+     * Returns whether verbosity is very verbose (-vv)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
+     */
+    public function isVeryVerbose();
+
+    /**
+     * Returns whether verbosity is debug (-vvv)
+     *
+     * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
+     */
+    public function isDebug();
+
+    /**
      * Sets the decorated flag.
      *
-     * @param bool    $decorated Whether to decorate the messages
+     * @param bool $decorated Whether to decorate the messages
      *
      * @api
      */
@@ -87,7 +115,7 @@ interface OutputInterface
     /**
      * Gets the decorated flag.
      *
-     * @return bool    true if the output will decorate messages, false otherwise
+     * @return bool true if the output will decorate messages, false otherwise
      *
      * @api
      */
@@ -105,7 +133,7 @@ interface OutputInterface
     /**
      * Returns current output formatter instance.
      *
-     * @return  OutputFormatterInterface
+     * @return OutputFormatterInterface
      *
      * @api
      */

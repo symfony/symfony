@@ -40,7 +40,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($yaml, Inline::dump($value), sprintf('::dump() converts a PHP structure to an inline YAML (%s)', $yaml));
 
-        $this->assertEquals($value, Inline::parse(Inline::dump($value)), 'check consistency');
+        $this->assertSame($value, Inline::parse(Inline::dump($value)), 'check consistency');
     }
 
     public function testDumpNumericValueWithLocale()
@@ -194,6 +194,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array("'#cfcfcf'", '#cfcfcf'),
             array('::form_base.html.twig', '::form_base.html.twig'),
 
+            // Pre-YAML-1.2 booleans
+            array("'y'", 'y'),
+            array("'n'", 'n'),
+            array("'yes'", 'yes'),
+            array("'no'", 'no'),
+            array("'on'", 'on'),
+            array("'off'", 'off'),
+
             array('2007-10-30', mktime(0, 0, 0, 10, 30, 2007)),
             array('2007-10-30T02:59:43Z', gmmktime(2, 59, 43, 10, 30, 2007)),
             array('2007-10-30 02:59:43 Z', gmmktime(2, 59, 43, 10, 30, 2007)),
@@ -323,7 +331,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('true', true),
             array('12', 12),
             array("'quoted string'", 'quoted string'),
-            array('12.30e+02', 12.30e+02),
+            array('!!float 1230', 12.30e+02),
             array('1234', 0x4D2),
             array('1243', 02333),
             array('.Inf', -log(0)),
@@ -338,6 +346,14 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
             array("'-dash'", '-dash'),
             array("'-'", '-'),
+
+            // Pre-YAML-1.2 booleans
+            array("'y'", 'y'),
+            array("'n'", 'n'),
+            array("'yes'", 'yes'),
+            array("'no'", 'no'),
+            array("'on'", 'on'),
+            array("'off'", 'off'),
 
             // sequences
             array('[foo, bar, false, null, 12]', array('foo', 'bar', false, null, 12)),

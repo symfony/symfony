@@ -23,7 +23,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class ProcessUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -42,7 +42,7 @@ class ProcessUtils
         //Fix for PHP bug #49446 escapeshellarg doesn't work on Windows
         //@see https://bugs.php.net/bug.php?id=43784
         //@see https://bugs.php.net/bug.php?id=49446
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             if ('' === $argument) {
                 return escapeshellarg($argument);
             }
@@ -75,7 +75,7 @@ class ProcessUtils
     }
 
     /**
-     * Validates and normalizes a Process input
+     * Validates and normalizes a Process input.
      *
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
@@ -83,6 +83,8 @@ class ProcessUtils
      * @return string The validated input
      *
      * @throws InvalidArgumentException In case the input is not valid
+     *
+     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public static function validateInput($caller, $input)
     {
@@ -95,6 +97,8 @@ class ProcessUtils
             }
             // deprecated as of Symfony 2.5, to be removed in 3.0
             if (is_object($input) && method_exists($input, '__toString')) {
+                trigger_error('Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
                 return (string) $input;
             }
 

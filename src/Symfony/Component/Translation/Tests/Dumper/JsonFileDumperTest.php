@@ -18,10 +18,6 @@ class JsonFileDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
-        if (version_compare(PHP_VERSION, '5.4.0', '<')) {
-            $this->markTestIncomplete('PHP below 5.4 doesn\'t support JSON pretty printing');
-        }
-
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(array('foo' => 'bar'));
 

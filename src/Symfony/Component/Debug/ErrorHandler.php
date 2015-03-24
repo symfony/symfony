@@ -46,44 +46,44 @@ use Symfony\Component\Debug\FatalErrorHandler\FatalErrorHandlerInterface;
 class ErrorHandler
 {
     /**
-     * @deprecated since 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     const TYPE_DEPRECATION = -100;
 
     private $levels = array(
-        E_DEPRECATED        => 'Deprecated',
-        E_USER_DEPRECATED   => 'User Deprecated',
-        E_NOTICE            => 'Notice',
-        E_USER_NOTICE       => 'User Notice',
-        E_STRICT            => 'Runtime Notice',
-        E_WARNING           => 'Warning',
-        E_USER_WARNING      => 'User Warning',
-        E_COMPILE_WARNING   => 'Compile Warning',
-        E_CORE_WARNING      => 'Core Warning',
-        E_USER_ERROR        => 'User Error',
+        E_DEPRECATED => 'Deprecated',
+        E_USER_DEPRECATED => 'User Deprecated',
+        E_NOTICE => 'Notice',
+        E_USER_NOTICE => 'User Notice',
+        E_STRICT => 'Runtime Notice',
+        E_WARNING => 'Warning',
+        E_USER_WARNING => 'User Warning',
+        E_COMPILE_WARNING => 'Compile Warning',
+        E_CORE_WARNING => 'Core Warning',
+        E_USER_ERROR => 'User Error',
         E_RECOVERABLE_ERROR => 'Catchable Fatal Error',
-        E_COMPILE_ERROR     => 'Compile Error',
-        E_PARSE             => 'Parse Error',
-        E_ERROR             => 'Error',
-        E_CORE_ERROR        => 'Core Error',
+        E_COMPILE_ERROR => 'Compile Error',
+        E_PARSE => 'Parse Error',
+        E_ERROR => 'Error',
+        E_CORE_ERROR => 'Core Error',
     );
 
     private $loggers = array(
-        E_DEPRECATED        => array(null, LogLevel::INFO),
-        E_USER_DEPRECATED   => array(null, LogLevel::INFO),
-        E_NOTICE            => array(null, LogLevel::NOTICE),
-        E_USER_NOTICE       => array(null, LogLevel::NOTICE),
-        E_STRICT            => array(null, LogLevel::NOTICE),
-        E_WARNING           => array(null, LogLevel::WARNING),
-        E_USER_WARNING      => array(null, LogLevel::WARNING),
-        E_COMPILE_WARNING   => array(null, LogLevel::WARNING),
-        E_CORE_WARNING      => array(null, LogLevel::WARNING),
-        E_USER_ERROR        => array(null, LogLevel::ERROR),
+        E_DEPRECATED => array(null, LogLevel::INFO),
+        E_USER_DEPRECATED => array(null, LogLevel::INFO),
+        E_NOTICE => array(null, LogLevel::NOTICE),
+        E_USER_NOTICE => array(null, LogLevel::NOTICE),
+        E_STRICT => array(null, LogLevel::NOTICE),
+        E_WARNING => array(null, LogLevel::WARNING),
+        E_USER_WARNING => array(null, LogLevel::WARNING),
+        E_COMPILE_WARNING => array(null, LogLevel::WARNING),
+        E_CORE_WARNING => array(null, LogLevel::WARNING),
+        E_USER_ERROR => array(null, LogLevel::ERROR),
         E_RECOVERABLE_ERROR => array(null, LogLevel::ERROR),
-        E_COMPILE_ERROR     => array(null, LogLevel::EMERGENCY),
-        E_PARSE             => array(null, LogLevel::EMERGENCY),
-        E_ERROR             => array(null, LogLevel::EMERGENCY),
-        E_CORE_ERROR        => array(null, LogLevel::EMERGENCY),
+        E_COMPILE_ERROR => array(null, LogLevel::EMERGENCY),
+        E_PARSE => array(null, LogLevel::EMERGENCY),
+        E_ERROR => array(null, LogLevel::EMERGENCY),
+        E_CORE_ERROR => array(null, LogLevel::EMERGENCY),
     );
 
     private $thrownErrors = 0x1FFF; // E_ALL - E_DEPRECATED - E_USER_DEPRECATED
@@ -103,30 +103,49 @@ class ErrorHandler
     /**
      * Same init value as thrownErrors
      *
-     * @deprecated since 2.6, to be removed in 3.0.
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     private $displayErrors = 0x1FFF;
 
     /**
      * Registers the error handler.
      *
-     * @param int  $levels Levels to register to for throwing, 0 for none
-     * @param bool $throw  @deprecated argument, same as setting $levels to 0
+     * @param self|null|int $handler The handler to register, or @deprecated (since version 2.6, to be removed in 3.0) bit field of thrown levels
+     * @param bool          $replace Whether to replace or not any existing handler
      *
-     * @return ErrorHandler The registered error handler
+     * @return self The registered error handler
      */
-    public static function register($levels = -1, $throw = true)
+    public static function register($handler = null, $replace = true)
     {
         if (null === self::$reservedMemory) {
             self::$reservedMemory = str_repeat('x', 10240);
             register_shutdown_function(__CLASS__.'::handleFatalError');
         }
 
-        $handler = new static();
-        $levels &= $handler->thrownErrors;
-        set_error_handler(array($handler, 'handleError'), $levels);
-        $handler->throwAt($throw ? $levels : 0, true);
-        $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
+        $levels = -1;
+
+        if ($handlerIsNew = !$handler instanceof self) {
+            // @deprecated polymorphism, to be removed in 3.0
+            if (null !== $handler) {
+                $levels = $replace ? $handler : 0;
+                $replace = true;
+            }
+            $handler = new static();
+        }
+
+        $prev = set_error_handler(array($handler, 'handleError'), $handler->thrownErrors | $handler->loggedErrors);
+
+        if ($handlerIsNew && is_array($prev) && $prev[0] instanceof self) {
+            $handler = $prev[0];
+            $replace = false;
+        }
+        if ($replace || !$prev) {
+            $handler->setExceptionHandler(set_exception_handler(array($handler, 'handleException')));
+        } else {
+            restore_error_handler();
+        }
+
+        $handler->throwAt($levels & $handler->thrownErrors, true);
 
         return $handler;
     }
@@ -237,7 +256,7 @@ class ErrorHandler
         }
         $this->reRegister($prev | $this->loggedErrors);
 
-        // $this->displayErrors is @deprecated since 2.6
+        // $this->displayErrors is @deprecated since version 2.6
         $this->displayErrors = $this->thrownErrors;
 
         return $prev;
@@ -319,7 +338,7 @@ class ErrorHandler
     /**
      * Handles errors by filtering then logging them according to the configured bit fields.
      *
-     * @param int    $type One of the E_* constants
+     * @param int    $type    One of the E_* constants
      * @param string $file
      * @param int    $line
      * @param array  $context
@@ -338,26 +357,12 @@ class ErrorHandler
         $type &= $level | $this->screamedErrors;
 
         if ($type && ($log || $throw)) {
-            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
-                $e = $context;                  // Whatever the signature of the method,
-                unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
-                $context = $e;
-            }
-
             if ($throw) {
                 if (($this->scopedErrors & $type) && class_exists('Symfony\Component\Debug\Exception\ContextErrorException')) {
                     // Checking for class existence is a work around for https://bugs.php.net/42098
                     $throw = new ContextErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line, $context);
                 } else {
                     $throw = new \ErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line);
-                }
-
-                if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
-                    // Exceptions thrown from error handlers are sometimes not caught by the exception
-                    // handler and shutdown handlers are bypassed before 5.4.8/5.3.18.
-                    // We temporarily re-enable display_errors to prevent any blank page related to this bug.
-
-                    $throw->errorHandlerCanary = new ErrorHandlerCanary();
                 }
 
                 throw $throw;
@@ -382,7 +387,7 @@ class ErrorHandler
                         $e['stack'] = debug_backtrace(true); // Provide object
                     }
                 } elseif ($trace) {
-                    $e['stack'] = debug_backtrace(PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_IGNORE_ARGS : false);
+                    $e['stack'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                 }
             }
 
@@ -468,7 +473,6 @@ class ErrorHandler
     public static function handleFatalError(array $error = null)
     {
         self::$reservedMemory = '';
-        gc_collect_cycles();
         $handler = set_error_handler('var_dump', 0);
         $handler = is_array($handler) ? $handler[0] : null;
         restore_error_handler();
@@ -566,12 +570,14 @@ class ErrorHandler
     /**
      * Sets the level at which the conversion to Exception is done.
      *
-     * @param int|null     $level The level (null to use the error_reporting() value and 0 to disable)
+     * @param int|null $level The level (null to use the error_reporting() value and 0 to disable)
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use throwAt() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use throwAt() instead.
      */
     public function setLevel($level)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the throwAt() method instead.', E_USER_DEPRECATED);
+
         $level = null === $level ? error_reporting() : $level;
         $this->throwAt($level, true);
     }
@@ -579,12 +585,14 @@ class ErrorHandler
     /**
      * Sets the display_errors flag value.
      *
-     * @param int     $displayErrors The display_errors flag value
+     * @param int $displayErrors The display_errors flag value
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use throwAt() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use throwAt() instead.
      */
     public function setDisplayErrors($displayErrors)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the throwAt() method instead.', E_USER_DEPRECATED);
+
         if ($displayErrors) {
             $this->throwAt($this->displayErrors, true);
         } else {
@@ -600,10 +608,12 @@ class ErrorHandler
      * @param LoggerInterface $logger  A logger interface
      * @param string          $channel The channel associated with the logger (deprecation, emergency or scream)
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use setLoggers() or setDefaultLogger() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use setLoggers() or setDefaultLogger() instead.
      */
     public static function setLogger(LoggerInterface $logger, $channel = 'deprecation')
     {
+        trigger_error('The '.__METHOD__.' static method is deprecated since version 2.6 and will be removed in 3.0. Use the setLoggers() or setDefaultLogger() methods instead.', E_USER_DEPRECATED);
+
         $handler = set_error_handler('var_dump', 0);
         $handler = is_array($handler) ? $handler[0] : null;
         restore_error_handler();
@@ -623,47 +633,24 @@ class ErrorHandler
     }
 
     /**
-     * @deprecated since 2.6, to be removed in 3.0. Use handleError() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use handleError() instead.
      */
     public function handle($level, $message, $file = 'unknown', $line = 0, $context = array())
     {
+        $this->handleError(E_USER_DEPRECATED, 'The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the handleError() method instead.', __FILE__, __LINE__, array());
+
         return $this->handleError($level, $message, $file, $line, (array) $context);
     }
 
     /**
      * Handles PHP fatal errors.
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use handleFatalError() instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use handleFatalError() instead.
      */
     public function handleFatal()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the handleFatalError() method instead.', E_USER_DEPRECATED);
+
         static::handleFatalError();
-    }
-}
-
-/**
- * Private class used to work around https://bugs.php.net/54275
- *
- * @author Nicolas Grekas <p@tchwork.com>
- *
- * @internal
- */
-class ErrorHandlerCanary
-{
-    private static $displayErrors = null;
-
-    public function __construct()
-    {
-        if (null === self::$displayErrors) {
-            self::$displayErrors = ini_set('display_errors', 1);
-        }
-    }
-
-    public function __destruct()
-    {
-        if (null !== self::$displayErrors) {
-            ini_set('display_errors', self::$displayErrors);
-            self::$displayErrors = null;
-        }
     }
 }

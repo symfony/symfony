@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated `DefaultTranslator` in favor of `Symfony\Component\Translation\IdentityTranslator`
+
 2.6.0
 -----
 
@@ -14,6 +19,7 @@ CHANGELOG
  * deprecated `ClassMetadata::addMemberMetadata()`
  * [BC BREAK] added `Mapping\MetadataInterface::getConstraints()`
  * added generic "payload" option to all constraints for attaching domain-specific data
+ * [BC BREAK] added `ConstraintViolationBuilderInterface::setCause()`
 
 2.5.0
 -----
@@ -73,7 +79,7 @@ CHANGELOG
  * added `Util\PropertyPath`
  * made the PropertyAccess component an optional dependency
  * deprecated `ValidatorBuilder::setPropertyAccessor()`
-
+ * deprecated `validate` and `validateValue` on `Validator\Context\ExecutionContext` use `getValidator()` together with `inContext()` instead
 
 2.4.0
 -----

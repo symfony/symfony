@@ -23,8 +23,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class AccessDecisionManager implements AccessDecisionManagerInterface
 {
     const STRATEGY_AFFIRMATIVE = 'affirmative';
-    const STRATEGY_CONSENSUS   = 'consensus';
-    const STRATEGY_UNANIMOUS   = 'unanimous';
+    const STRATEGY_CONSENSUS = 'consensus';
+    const STRATEGY_UNANIMOUS = 'unanimous';
 
     private $voters;
     private $strategy;

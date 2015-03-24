@@ -16,11 +16,12 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/process": "~2.1",
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/event-dispatcher": "~2.7|~3.0",
+        "symfony/process": "~2.7|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
@@ -35,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

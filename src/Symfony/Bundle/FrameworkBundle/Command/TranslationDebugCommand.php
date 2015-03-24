@@ -57,19 +57,19 @@ templates and translation files of a given bundle.
 
 You can display information about bundle translations in a specific locale:
 
-<info>php %command.full_name% en AcmeDemoBundle</info>
+  <info>php %command.full_name% en AcmeDemoBundle</info>
 
 You can also specify a translation domain for the search:
 
-<info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+  <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
 
 You can only display missing messages:
 
-<info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
+  <info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
 
 You can only display unused messages:
 
-<info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
+  <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
 EOF
             )
@@ -81,6 +81,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.</comment>');
+        }
+
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
         $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));
@@ -135,7 +139,7 @@ EOF
         $table = new Table($output);
 
         // Display header line
-        $headers = array('State(s)', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = array('State(s)', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
@@ -168,7 +172,7 @@ EOF
                     }
                 }
 
-                $row = array($this->formatStates($states), $this->formatId($messageId), $this->sanitizeString($value));
+                $row = array($this->formatStates($states), $domain, $this->formatId($messageId), $this->sanitizeString($value));
                 foreach ($fallbackCatalogues as $fallbackCatalogue) {
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }

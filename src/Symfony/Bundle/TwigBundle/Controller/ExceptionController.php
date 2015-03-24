@@ -16,15 +16,22 @@ use Symfony\Component\HttpKernel\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
- * ExceptionController.
+ * ExceptionController renders error or exception pages for a given
+ * FlattenException.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Matthias Pigulla <mp@webfactory.de>
  */
 class ExceptionController
 {
     protected $twig;
+
+    /**
+     * @var bool Show error (false) or exception (true) pages by default.
+     */
     protected $debug;
 
     public function __construct(\Twig_Environment $twig, $debug)
@@ -35,6 +42,10 @@ class ExceptionController
 
     /**
      * Converts an Exception to a Response.
+     *
+     * A "showException" request parameter can be used to force display of an error page (when set to false) or
+     * the exception page (when true). If it is not present, the "debug" value passed into the constructor will
+     * be used.
      *
      * @param Request              $request   The request
      * @param FlattenException     $exception A FlattenException instance
@@ -47,23 +58,24 @@ class ExceptionController
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
+        $showException = $request->attributes->get('showException', $this->debug); // As opposed to an additional parameter, this maintains BC
 
         $code = $exception->getStatusCode();
 
         return new Response($this->twig->render(
-            $this->findTemplate($request, $request->getRequestFormat(), $code, $this->debug),
+            $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
             array(
-                'status_code'    => $code,
-                'status_text'    => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception'      => $exception,
-                'logger'         => $logger,
+                'status_code' => $code,
+                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                'exception' => $exception,
+                'logger' => $logger,
                 'currentContent' => $currentContent,
             )
         ));
     }
 
     /**
-     * @param int     $startObLevel
+     * @param int $startObLevel
      *
      * @return string
      */
@@ -81,20 +93,20 @@ class ExceptionController
     /**
      * @param Request $request
      * @param string  $format
-     * @param int     $code       An HTTP response status code
-     * @param bool    $debug
+     * @param int     $code          An HTTP response status code
+     * @param bool    $showException
      *
-     * @return TemplateReference
+     * @return TemplateReferenceInterface
      */
-    protected function findTemplate(Request $request, $format, $code, $debug)
+    protected function findTemplate(Request $request, $format, $code, $showException)
     {
-        $name = $debug ? 'exception' : 'error';
-        if ($debug && 'html' == $format) {
+        $name = $showException ? 'exception' : 'error';
+        if ($showException && 'html' == $format) {
             $name = 'exception_full';
         }
 
-        // when not in debug, try to find a template for the specific HTTP status code and format
-        if (!$debug) {
+        // For error pages, try to find a template for the specific HTTP status code and format
+        if (!$showException) {
             $template = new TemplateReference('TwigBundle', 'Exception', $name.$code, $format, 'twig');
             if ($this->templateExists($template)) {
                 return $template;
@@ -110,7 +122,7 @@ class ExceptionController
         // default to a generic HTML exception
         $request->setRequestFormat('html');
 
-        return new TemplateReference('TwigBundle', 'Exception', $name, 'html', 'twig');
+        return new TemplateReference('TwigBundle', 'Exception', $showException ? 'exception_full' : $name, 'html', 'twig');
     }
 
     // to be removed when the minimum required version of Twig is >= 2.0

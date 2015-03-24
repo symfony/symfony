@@ -16,11 +16,11 @@ namespace Symfony\Component\Finder\Shell;
  */
 class Shell
 {
-    const TYPE_UNIX    = 1;
-    const TYPE_DARWIN  = 2;
-    const TYPE_CYGWIN  = 3;
+    const TYPE_UNIX = 1;
+    const TYPE_DARWIN = 2;
+    const TYPE_CYGWIN = 3;
     const TYPE_WINDOWS = 4;
-    const TYPE_BSD     = 5;
+    const TYPE_BSD = 5;
 
     /**
      * @var string|null

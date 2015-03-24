@@ -27,17 +27,13 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
     /**
      * Constructor.
      *
-     * @param int     $cost The algorithmic cost that should be used
+     * @param int $cost The algorithmic cost that should be used
      *
-     * @throws \RuntimeException When no BCrypt encoder is available
+     * @throws \RuntimeException         When no BCrypt encoder is available
      * @throws \InvalidArgumentException if cost is out of range
      */
     public function __construct($cost)
     {
-        if (!function_exists('password_hash')) {
-            throw new \RuntimeException('To use the BCrypt encoder, you need to upgrade to PHP 5.5 or install the "ircmaxell/password-compat" via Composer.');
-        }
-
         $cost = (int) $cost;
         if ($cost < 4 || $cost > 31) {
             throw new \InvalidArgumentException('Cost must be in the range of 4-31.');
@@ -52,6 +48,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
      * It doesn't work with PHP versions lower than 5.3.7, since
      * the password compat library uses CRYPT_BLOWFISH hash type with
      * the "$2y$" salt prefix (which is not available in the early PHP versions).
+     *
      * @see https://github.com/ircmaxell/password_compat/issues/10#issuecomment-11203833
      *
      * It is almost best to **not** pass a salt and let PHP generate one for you.

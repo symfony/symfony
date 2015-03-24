@@ -21,41 +21,41 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
     /**
      * Returns the symbol used for a currency.
      *
-     * @param string $currency A currency code (e.g. "EUR").
-     * @param string $locale   Optional. The locale to return the result in.
-     *                         Defaults to {@link \Locale::getDefault()}.
+     * @param string $currency      A currency code (e.g. "EUR").
+     * @param string $displayLocale Optional. The locale to return the result in.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The currency symbol or NULL if not found.
      */
-    public function getCurrencySymbol($currency, $locale = null);
+    public function getCurrencySymbol($currency, $displayLocale = null);
 
     /**
      * Returns the name of a currency.
      *
-     * @param string $currency A currency code (e.g. "EUR").
-     * @param string $locale   Optional. The locale to return the name in.
-     *                         Defaults to {@link \Locale::getDefault()}.
+     * @param string $currency      A currency code (e.g. "EUR").
+     * @param string $displayLocale Optional. The locale to return the name in.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string|null The name of the currency or NULL if not found.
      */
-    public function getCurrencyName($currency, $locale = null);
+    public function getCurrencyName($currency, $displayLocale = null);
 
     /**
      * Returns the names of all known currencies.
      *
-     * @param string $locale Optional. The locale to return the names in.
-     *                       Defaults to {@link \Locale::getDefault()}.
+     * @param string $displayLocale Optional. The locale to return the names in.
+     *                              Defaults to {@link \Locale::getDefault()}.
      *
      * @return string[] A list of currency names indexed by currency codes.
      */
-    public function getCurrencyNames($locale = null);
+    public function getCurrencyNames($displayLocale = null);
 
     /**
      * Returns the number of digits after the comma of a currency.
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return int|null     The number of digits after the comma or NULL if not found.
+     * @return int|null The number of digits after the comma or NULL if not found.
      */
     public function getFractionDigits($currency);
 
@@ -68,7 +68,7 @@ interface CurrencyBundleInterface extends ResourceBundleInterface
      *
      * @param string $currency A currency code (e.g. "EUR").
      *
-     * @return float|int|null     The rounding increment or NULL if not found.
+     * @return float|int|null The rounding increment or NULL if not found.
      */
     public function getRoundingIncrement($currency);
 }

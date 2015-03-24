@@ -21,6 +21,8 @@ use Symfony\Component\Console\Input\InputOption;
  * Text descriptor.
  *
  * @author Jean-François Simon <contact@jfsimon.fr>
+ *
+ * @internal
  */
 class TextDescriptor extends Descriptor
 {
@@ -162,7 +164,7 @@ class TextDescriptor extends Descriptor
             }
 
             $this->writeText("<comment>Usage:</comment>\n", $options);
-            $this->writeText(" [options] command [arguments]\n\n", $options);
+            $this->writeText(" command [options] [arguments]\n\n", $options);
             $this->writeText('<comment>Options:</comment>', $options);
 
             $inputOptions = $application->getDefinition()->getOptions();
@@ -229,10 +231,6 @@ class TextDescriptor extends Descriptor
      */
     private function formatDefaultValue($default)
     {
-        if (version_compare(PHP_VERSION, '5.4', '<')) {
-            return str_replace('\/', '/', json_encode($default));
-        }
-
         return json_encode($default, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 

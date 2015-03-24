@@ -31,9 +31,9 @@ class JsonResponse extends Response
     /**
      * Constructor.
      *
-     * @param mixed   $data    The response data
-     * @param int     $status  The response status code
-     * @param array   $headers An array of response headers
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
      */
     public function __construct($data = null, $status = 200, $headers = array())
     {
@@ -120,7 +120,7 @@ class JsonResponse extends Response
         }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \InvalidArgumentException($this->transformJsonError());
+            throw new \InvalidArgumentException(json_last_error_msg());
         }
 
         return $this->update();
@@ -139,7 +139,7 @@ class JsonResponse extends Response
     /**
      * Sets options used while encoding data to JSON.
      *
-     * @param int     $encodingOptions
+     * @param int $encodingOptions
      *
      * @return JsonResponse
      */
@@ -171,32 +171,5 @@ class JsonResponse extends Response
         }
 
         return $this->setContent($this->data);
-    }
-
-    private function transformJsonError()
-    {
-        if (function_exists('json_last_error_msg')) {
-            return json_last_error_msg();
-        }
-
-        switch (json_last_error()) {
-            case JSON_ERROR_DEPTH:
-                return 'Maximum stack depth exceeded.';
-
-            case JSON_ERROR_STATE_MISMATCH:
-                return 'Underflow or the modes mismatch.';
-
-            case JSON_ERROR_CTRL_CHAR:
-                return 'Unexpected control character found.';
-
-            case JSON_ERROR_SYNTAX:
-                return 'Syntax error, malformed JSON.';
-
-            case JSON_ERROR_UTF8:
-                return 'Malformed UTF-8 characters, possibly incorrectly encoded.';
-
-            default:
-                return 'Unknown error.';
-        }
     }
 }

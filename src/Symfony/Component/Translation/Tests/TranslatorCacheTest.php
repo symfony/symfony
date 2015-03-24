@@ -25,7 +25,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->deleteTmpDir();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->deleteTmpDir();
     }
@@ -101,6 +101,41 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
+    public function testRefreshCacheWhenResourcesChange()
+    {
+        // prime the cache
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr', array(
+                'foo' => 'foo A',
+            ))))
+        ;
+
+        $translator = new Translator('fr', new MessageSelector(), $this->tmpDir, true);
+        $translator->setLocale('fr');
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', 'foo', 'fr');
+
+        $this->assertEquals('foo A', $translator->trans('foo'));
+
+        // add a new resource to refresh the cache
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr', array(
+                'foo' => 'foo B',
+            ))))
+        ;
+
+        $translator = new Translator('fr', new MessageSelector(), $this->tmpDir, true);
+        $translator->setLocale('fr');
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', 'bar', 'fr');
+
+        $this->assertEquals('foo B', $translator->trans('foo'));
+    }
+
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
@@ -153,8 +188,8 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('load')
             ->will($this->returnValue($this->getCatalogue('en', array(
-                'foo'    => 'foo (EN)',
-                'bar'    => 'bar (EN)',
+                'foo' => 'foo (EN)',
+                'bar' => 'bar (EN)',
                 'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)',
             ))))
         ;

@@ -39,7 +39,7 @@ class YamlExtension extends \Twig_Extension
             $dumper = new YamlDumper();
         }
 
-        return $dumper->dump($input, $inline, false, $dumpObjects);
+        return $dumper->dump($input, $inline, 0, false, $dumpObjects);
     }
 
     public function dump($value, $inline = 0, $dumpObjects = false)

@@ -7,8 +7,10 @@
                         http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
 
     <framework:config secret="s3cr3t" ide="file%%link%%format" default-locale="fr" trusted-proxies="127.0.0.1, 10.0.0.1" http-method-override="false">
-        <framework:csrf-protection enabled="true" field-name="_csrf" />
-        <framework:form />
+        <framework:csrf-protection enabled="true" />
+        <framework:form>
+            <framework:csrf-protection field-name="_csrf"/>
+        </framework:form>
         <framework:esi enabled="true" />
         <framework:profiler only-exceptions="true" enabled="false" />
         <framework:router resource="%kernel.root_dir%/config/routing.xml" type="xml" />
@@ -22,27 +24,17 @@
                 <framework:mime-type>application/pdf</framework:mime-type>
             </framework:format>
         </framework:request>
-        <framework:templating assets-version="SomeVersionScheme" cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
+        <framework:templating cache="/path/to/cache" hinclude-default-template="global_hinclude_template">
             <framework:loader>loader.foo</framework:loader>
             <framework:loader>loader.bar</framework:loader>
             <framework:engine>php</framework:engine>
             <framework:engine>twig</framework:engine>
-            <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
-            <framework:package name="images" version="1.0.0">
-                <framework:base-url>http://images1.example.com</framework:base-url>
-                <framework:base-url>http://images2.example.com</framework:base-url>
-            </framework:package>
-            <framework:package name="foo" version="1.0.0" />
-            <framework:package name="bar">
-                <framework:base-url>http://bar1.example.com</framework:base-url>
-                <framework:base-url>http://bar2.example.com</framework:base-url>
-            </framework:package>
             <framework:form>
                  <framework:resource>theme1</framework:resource>
                  <framework:resource>theme2</framework:resource>
             </framework:form>
         </framework:templating>
-        <framework:translator enabled="true" fallback="fr" />
+        <framework:translator enabled="true" fallback="fr" logging="true" />
         <framework:validation enabled="true" cache="apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
     </framework:config>

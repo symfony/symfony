@@ -20,7 +20,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     public function testGetControllerWithoutControllerParameter()
     {
         $logger = $this->getMock('Psr\Log\LoggerInterface');
-        $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing');
+        $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 
         $request = Request::create('/');
@@ -181,15 +181,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('foobar', 'foobar');
         $controller = array(new self(), 'controllerMethod3');
 
-        if (version_compare(PHP_VERSION, '5.3.16', '==')) {
-            $this->markTestSkipped('PHP 5.3.16 has a major bug in the Reflection sub-system');
-        } else {
-            try {
-                $resolver->getArguments($request, $controller);
-                $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
-            }
+        try {
+            $resolver->getArguments($request, $controller);
+            $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         }
 
         $request = Request::create('/');

@@ -148,11 +148,50 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'foo.bar().foo().baz[3]',
                 array('foo'),
             ),
+
+            array(
+                new Node\NameNode('foo'),
+                'bar',
+                array('foo' => 'bar'),
+            ),
         );
     }
 
     private function createGetAttrNode($node, $item, $type)
     {
         return new Node\GetAttrNode($node, new Node\ConstantNode($item), new Node\ArgumentsNode(), $type);
+    }
+
+    /**
+     * @dataProvider getInvalidPostfixData
+     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
+     */
+    public function testParseWithInvalidPostfixData($expr, $names = array())
+    {
+        $lexer = new Lexer();
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize($expr), $names);
+    }
+
+    public function getInvalidPostfixData()
+    {
+        return array(
+            array(
+                'foo."#"',
+                array('foo'),
+            ),
+            array(
+                'foo."bar"',
+                array('foo'),
+            ),
+            array(
+                'foo.**',
+                array('foo'),
+            ),
+            array(
+                'foo.123',
+                array('foo'),
+            ),
+        );
     }
 }

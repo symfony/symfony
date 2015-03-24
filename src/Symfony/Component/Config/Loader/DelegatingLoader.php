@@ -34,14 +34,7 @@ class DelegatingLoader extends Loader
     }
 
     /**
-     * Loads a resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return mixed
-     *
-     * @throws FileLoaderLoadException if no loader is found.
+     * {@inheritdoc}
      */
     public function load($resource, $type = null)
     {

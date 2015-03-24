@@ -31,10 +31,17 @@ class ExpressionLanguage
 
     protected $functions = array();
 
-    public function __construct(ParserCacheInterface $cache = null)
+    /**
+     * @param ParserCacheInterface                  $cache
+     * @param ExpressionFunctionProviderInterface[] $providers
+     */
+    public function __construct(ParserCacheInterface $cache = null, array $providers = array())
     {
         $this->cache = $cache ?: new ArrayParserCache();
         $this->registerFunctions();
+        foreach ($providers as $provider) {
+            $this->registerProvider($provider);
+        }
     }
 
     /**
@@ -92,25 +99,27 @@ class ExpressionLanguage
     /**
      * Registers a function.
      *
-     * A function is defined by two PHP callables. The callables are used
-     * by the language to compile and/or evaluate the function.
-     *
-     * The first function is used at compilation time and must return a
-     * PHP representation of the function call (it receives the function
-     * arguments as arguments).
-     *
-     * The second function is used for expression evaluation and must return
-     * the value of the function call based on the values defined for the
-     * expression (it receives the values as a first argument and the function
-     * arguments as remaining arguments).
-     *
      * @param string   $name      The function name
      * @param callable $compiler  A callable able to compile the function
      * @param callable $evaluator A callable able to evaluate the function
+     *
+     * @see ExpressionFunction
      */
     public function register($name, $compiler, $evaluator)
     {
         $this->functions[$name] = array('compiler' => $compiler, 'evaluator' => $evaluator);
+    }
+
+    public function addFunction(ExpressionFunction $function)
+    {
+        $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
+    }
+
+    public function registerProvider(ExpressionFunctionProviderInterface $provider)
+    {
+        foreach ($provider->getFunctions() as $function) {
+            $this->addFunction($function);
+        }
     }
 
     protected function registerFunctions()

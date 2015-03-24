@@ -19,6 +19,8 @@ use Symfony\Component\Console\Helper\DescriptorHelper as BaseDescriptorHelper;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class DescriptorHelper extends BaseDescriptorHelper
 {

@@ -59,7 +59,7 @@ class XmlReferenceDumper
             });
 
             if (count($remapping)) {
-                list($singular, $plural) = current($remapping);
+                list($singular) = current($remapping);
                 $rootName = $singular;
             }
         }
@@ -129,7 +129,7 @@ class XmlReferenceDumper
                     // get attributes
 
                     // metadata
-                    $name  = str_replace('_', '-', $child->getName());
+                    $name = str_replace('_', '-', $child->getName());
                     $value = '%%%%not_defined%%%%'; // use a string which isn't used in the normal world
 
                     // comments

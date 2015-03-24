@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -34,9 +35,17 @@ class RangeValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value) && !$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
-            $this->buildViolation($constraint->invalidMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->invalidMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setCode(Range::INVALID_VALUE_ERROR)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->invalidMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setCode(Range::INVALID_VALUE_ERROR)
+                    ->addViolation();
+            }
 
             return;
         }
@@ -59,19 +68,37 @@ class RangeValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->max && $value > $max) {
-            $this->buildViolation($constraint->maxMessage)
-                ->setParameter('{{ value }}', $value)
-                ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->maxMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
+                    ->setCode(Range::BEYOND_RANGE_ERROR)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->maxMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
+                    ->setCode(Range::BEYOND_RANGE_ERROR)
+                    ->addViolation();
+            }
 
             return;
         }
 
         if (null !== $constraint->min && $value < $min) {
-            $this->buildViolation($constraint->minMessage)
-                ->setParameter('{{ value }}', $value)
-                ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
-                ->addViolation();
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($constraint->minMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
+                    ->setCode(Range::BELOW_RANGE_ERROR)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($constraint->minMessage)
+                    ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
+                    ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
+                    ->setCode(Range::BELOW_RANGE_ERROR)
+                    ->addViolation();
+            }
         }
     }
 }

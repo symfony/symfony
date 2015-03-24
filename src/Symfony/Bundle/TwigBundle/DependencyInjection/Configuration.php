@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Generates the configuration tree builder.
      *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * @return TreeBuilder The tree builder
      */
     public function getConfigTreeBuilder()
     {
@@ -38,48 +38,11 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addFormSection($rootNode);
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
         $this->addTwigOptions($rootNode);
 
         return $treeBuilder;
-    }
-
-    private function addFormSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->validate()
-                ->ifTrue(function ($v) {
-                    return count($v['form']['resources']) > 0;
-                })
-                ->then(function ($v) {
-                    $v['form_themes'] = array_unique(array_merge($v['form']['resources'], $v['form_themes']));
-
-                    return $v;
-                })
-            ->end()
-            ->children()
-                ->arrayNode('form')
-                    ->info('Deprecated since 2.6, to be removed in 3.0. Use twig.form_themes instead')
-                    ->addDefaultsIfNotSet()
-                    ->fixXmlConfig('resource')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                            ->example(array('MyBundle::form.html.twig'))
-                            ->validate()
-                                ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
-                                ->then(function ($v) {
-                                    return array_merge(array('form_div_layout.html.twig'), $v);
-                                })
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addFormThemesSection(ArrayNodeDefinition $rootNode)
@@ -156,7 +119,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->scalarNode('autoescape')->end()
+                ->variableNode('autoescape')->defaultValue('filename')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->end()

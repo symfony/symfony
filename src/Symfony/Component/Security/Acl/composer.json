@@ -16,10 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/security-core": "~2.4"
+        "php": ">=5.5.9",
+        "symfony/security-core": "~2.7|~3.0"
     },
     "require-dev": {
+        "symfony/phpunit-bridge": "~2.7|~3.0",
         "doctrine/common": "~2.2",
         "doctrine/dbal": "~2.2",
         "psr/log": "~1.0"
@@ -36,7 +37,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

@@ -43,7 +43,7 @@ class FileLoaderLoadException extends \Exception
             if (null === $sourceResource) {
                 $message .= sprintf('(which is loaded in resource "%s")', $this->varToString($resource));
             } else {
-                $message .= sprintf('(which is being imported from "%s")',$this->varToString($sourceResource));
+                $message .= sprintf('(which is being imported from "%s")', $this->varToString($sourceResource));
             }
             $message .= '.';
 
@@ -51,14 +51,14 @@ class FileLoaderLoadException extends \Exception
         } elseif (null === $sourceResource) {
             $message .= sprintf('Cannot load resource "%s".', $this->varToString($resource));
         } else {
-            $message .= sprintf('Cannot import resource "%s" from "%s".',$this->varToString($resource),$this->varToString($sourceResource));
+            $message .= sprintf('Cannot import resource "%s" from "%s".', $this->varToString($resource), $this->varToString($sourceResource));
         }
 
         // Is the resource located inside a bundle?
         if ('@' === $resource[0]) {
             $parts = explode(DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
-            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.',$bundle);
+            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
         }
 
         parent::__construct($message, $code, $previous);

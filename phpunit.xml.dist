@@ -4,12 +4,13 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="autoload.php.dist"
+         bootstrap="vendor/autoload.php"
 >
     <php>
-        <ini name="intl.default_locale" value="en"/>
-        <ini name="intl.error_level" value="0"/>
-        <ini name="memory_limit" value="-1"/>
+        <ini name="error_reporting" value="-1" />
+        <ini name="intl.default_locale" value="en" />
+        <ini name="intl.error_level" value="0" />
+        <ini name="memory_limit" value="-1" />
     </php>
 
     <testsuites>
@@ -24,6 +25,7 @@
     <groups>
         <exclude>
             <group>benchmark</group>
+            <group>intl-data</group>
         </exclude>
     </groups>
 

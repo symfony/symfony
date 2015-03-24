@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
- * A choice list that is loaded lazily
+ * A choice list that is loaded lazily.
  *
  * This list loads itself as soon as any of the getters is accessed for the
  * first time. You should implement loadChoiceList() in your child classes,
@@ -25,7 +25,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
 abstract class LazyChoiceList implements ChoiceListInterface
 {
     /**
-     * The loaded choice list
+     * The loaded choice list.
      *
      * @var ChoiceListInterface
      */
@@ -106,10 +106,12 @@ abstract class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (!$this->choiceList) {
             $this->load();
         }
@@ -120,10 +122,12 @@ abstract class LazyChoiceList implements ChoiceListInterface
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.4 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if (!$this->choiceList) {
             $this->load();
         }
@@ -132,7 +136,7 @@ abstract class LazyChoiceList implements ChoiceListInterface
     }
 
     /**
-     * Loads the choice list
+     * Loads the choice list.
      *
      * Should be implemented by child classes.
      *

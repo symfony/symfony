@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
  * Adds all services with the tags "form.type" and "form.type_guesser" as
- * arguments of the "form.extension" service
+ * arguments of the "form.extension" service.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

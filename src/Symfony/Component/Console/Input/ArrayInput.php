@@ -65,7 +65,7 @@ class ArrayInput extends Input
      *
      * @param string|array $values The values to look for in the raw parameters (can be an array)
      *
-     * @return bool    true if the value is contained in the raw parameters
+     * @return bool true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values)
     {
@@ -100,8 +100,10 @@ class ArrayInput extends Input
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
-            if (is_int($k) && in_array($v, $values)) {
-                return true;
+            if (is_int($k)) {
+                if (in_array($v, $values)) {
+                    return true;
+                }
             } elseif (in_array($k, $values)) {
                 return $v;
             }
@@ -111,7 +113,7 @@ class ArrayInput extends Input
     }
 
     /**
-     * Returns a stringified representation of the args passed to the command
+     * Returns a stringified representation of the args passed to the command.
      *
      * @return string
      */

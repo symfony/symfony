@@ -16,9 +16,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Form type for use with the Security component's form-based authentication
@@ -29,18 +29,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class UserLoginFormType extends AbstractType
 {
-    private $request;
+    private $requestStack;
 
-    /**
-     * @param Request $request A request instance
-     */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * @see Symfony\Component\Form\AbstractType::buildForm()
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -50,7 +47,7 @@ class UserLoginFormType extends AbstractType
             ->add('_target_path', 'hidden')
         ;
 
-        $request = $this->request;
+        $request = $this->requestStack->getCurrentRequest();
 
         /* Note: since the Security component's form login listener intercepts
          * the POST request, this form will never really be bound to the
@@ -58,10 +55,10 @@ class UserLoginFormType extends AbstractType
          * session for an authentication error and last username.
          */
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
-            if ($request->attributes->has(SecurityContextInterface::AUTHENTICATION_ERROR)) {
-                $error = $request->attributes->get(SecurityContextInterface::AUTHENTICATION_ERROR);
+            if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+                $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
             } else {
-                $error = $request->getSession()->get(SecurityContextInterface::AUTHENTICATION_ERROR);
+                $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
             }
 
             if ($error) {
@@ -69,15 +66,15 @@ class UserLoginFormType extends AbstractType
             }
 
             $event->setData(array_replace((array) $event->getData(), array(
-                'username' => $request->getSession()->get(SecurityContextInterface::LAST_USERNAME),
+                'username' => $request->getSession()->get(Security::LAST_USERNAME),
             )));
         });
     }
 
     /**
-     * @see Symfony\Component\Form\AbstractType::setDefaultOptions()
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         /* Note: the form's intention must correspond to that for the form login
          * listener in order for the CSRF token to validate successfully.
@@ -89,7 +86,7 @@ class UserLoginFormType extends AbstractType
     }
 
     /**
-     * @see Symfony\Component\Form\FormTypeInterface::getName()
+     * {@inheritdoc}
      */
     public function getName()
     {

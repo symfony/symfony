@@ -16,15 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/security-core": "~2.4",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/http-foundation": "~2.4",
-        "symfony/http-kernel": "~2.4"
+        "php": ">=5.5.9",
+        "symfony/security-core": "~2.7|~3.0",
+        "symfony/event-dispatcher": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0"
     },
     "require-dev": {
-        "symfony/routing": "~2.2",
-        "symfony/security-csrf": "~2.4",
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/routing": "~2.7|~3.0",
+        "symfony/security-csrf": "~2.7|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
@@ -38,7 +39,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

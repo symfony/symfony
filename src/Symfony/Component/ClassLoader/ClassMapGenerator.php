@@ -11,19 +11,15 @@
 
 namespace Symfony\Component\ClassLoader;
 
-if (!defined('T_TRAIT')) {
-    define('T_TRAIT', 0);
-}
-
 /**
- * ClassMapGenerator
+ * ClassMapGenerator.
  *
  * @author Gyula Sallai <salla016@gmail.com>
  */
 class ClassMapGenerator
 {
     /**
-     * Generate a class map file
+     * Generate a class map file.
      *
      * @param array|string $dirs Directories or a single path to search in
      * @param string       $file The name of the class map file
@@ -41,7 +37,7 @@ class ClassMapGenerator
     }
 
     /**
-     * Iterate over all files in the given directory searching for classes
+     * Iterate over all files in the given directory searching for classes.
      *
      * @param \Iterator|string $dir The directory to search in or an iterator
      *
@@ -77,7 +73,7 @@ class ClassMapGenerator
     }
 
     /**
-     * Extract the classes in the given file
+     * Extract the classes in the given file.
      *
      * @param string $path The file to check
      *
@@ -86,7 +82,7 @@ class ClassMapGenerator
     private static function findClasses($path)
     {
         $contents = file_get_contents($path);
-        $tokens   = token_get_all($contents);
+        $tokens = token_get_all($contents);
 
         $classes = array();
 

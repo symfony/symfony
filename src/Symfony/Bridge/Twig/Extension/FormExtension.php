@@ -61,7 +61,6 @@ class FormExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('form_enctype', null, array('node_class' => 'Symfony\Bridge\Twig\Node\FormEnctypeNode', 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_widget', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_errors', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
             new \Twig_SimpleFunction('form_label', null, array('node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => array('html'))),
@@ -137,14 +136,14 @@ class FormExtension extends \Twig_Extension
      * @param ChoiceView   $choice        The choice to check.
      * @param string|array $selectedValue The selected value to compare.
      *
-     * @return bool    Whether the choice is selected.
+     * @return bool Whether the choice is selected.
      *
      * @see ChoiceView::isSelected()
      */
     public function isSelectedChoice(ChoiceView $choice, $selectedValue)
     {
         if (is_array($selectedValue)) {
-            return false !== array_search($choice->value, $selectedValue, true);
+            return in_array($choice->value, $selectedValue, true);
         }
 
         return $choice->value === $selectedValue;

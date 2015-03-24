@@ -1,5 +1,7 @@
 <comment>Path</comment>         /hello/{name}
+<comment>Path Regex</comment>   #^/hello(?:/(?P<name>[a-z]+))?$#s
 <comment>Host</comment>         localhost
+<comment>Host Regex</comment>   #^localhost$#si
 <comment>Scheme</comment>       http|https
 <comment>Method</comment>       GET|HEAD
 <comment>Class</comment>        Symfony\Component\Routing\Route
@@ -8,5 +10,3 @@
 <comment>Options</comment>      compiler_class: Symfony\Component\Routing\RouteCompiler
              opt1: val1
              opt2: val2
-<comment>Path-Regex</comment>   #^/hello(?:/(?P<name>[a-z]+))?$#s
-<comment>Host-Regex</comment>   #^localhost$#s

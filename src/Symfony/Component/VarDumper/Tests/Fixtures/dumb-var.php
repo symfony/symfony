@@ -19,7 +19,7 @@ fclose($h);
 $var = array(
     'number' => 1, null,
     'const' => 1.1, true, false, NAN, INF, -INF, PHP_INT_MAX,
-    'str' => "déjà", "\xE9",
+    'str' => "déjà", "\xE9\x00",
     '[]' => array(),
     'res' => $g,
     $h,

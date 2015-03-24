@@ -83,6 +83,11 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
      */
     private $code;
 
+    /**
+     * @var mixed
+     */
+    private $cause;
+
     public function __construct(ConstraintViolationList $violations, Constraint $constraint, $message, array $parameters, $root, $propertyPath, $invalidValue, TranslatorInterface $translator, $translationDomain = null)
     {
         $this->violations = $violations;
@@ -169,6 +174,16 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setCause($cause)
+    {
+        $this->cause = $cause;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addViolation()
     {
         if (null === $this->plural) {
@@ -203,7 +218,8 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
             $this->invalidValue,
             $this->plural,
             $this->code,
-            $this->constraint
+            $this->constraint,
+            $this->cause
         ));
     }
 }

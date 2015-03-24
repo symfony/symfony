@@ -24,10 +24,11 @@ class Translator extends BaseTranslator
 {
     protected $container;
     protected $loaderIds;
+    protected $resourceFiles;
 
     protected $options = array(
         'cache_dir' => null,
-        'debug'     => false,
+        'debug' => false,
     );
 
     /**
@@ -38,17 +39,19 @@ class Translator extends BaseTranslator
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
+     * @param ContainerInterface $container     A ContainerInterface instance
+     * @param MessageSelector    $selector      The message selector for pluralization
+     * @param array              $loaderIds     An array of loader Ids
+     * @param array              $options       An array of options
+     * @param array              $resourceFiles An array of resource directories
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), $resourceFiles = array())
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
+        $this->resourceFiles = $resourceFiles;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
@@ -63,26 +66,10 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function getLocale()
-    {
-        if (null === $this->locale && $request = $this->container->get('request_stack')->getCurrentRequest()) {
-            $this->locale = $request->getLocale();
-            try {
-                $this->setLocale($request->getLocale());
-            } catch (\InvalidArgumentException $e) {
-                $this->setLocale($request->getDefaultLocale());
-            }
-        }
-
-        return $this->locale;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function initializeCatalogue($locale)
     {
         $this->initialize();
+        $this->loadResources($locale);
         parent::initializeCatalogue($locale);
     }
 
@@ -91,6 +78,21 @@ class Translator extends BaseTranslator
         foreach ($this->loaderIds as $id => $aliases) {
             foreach ($aliases as $alias) {
                 $this->addLoader($alias, $this->container->get($id));
+            }
+        }
+    }
+
+    private function loadResources($locale)
+    {
+        $locales = array_merge(array($locale), $this->computeFallbackLocales($locale));
+        foreach ($locales as $locale) {
+            if (isset($this->resourceFiles[$locale])) {
+                foreach ($this->resourceFiles[$locale] as $file) {
+                    // filename is domain.locale.format
+                    list($domain, $locale, $format) = explode('.', basename($file), 3);
+                    $this->addResource($format, $file, $locale, $domain);
+                }
+                unset($this->resourceFiles[$locale]);
             }
         }
     }

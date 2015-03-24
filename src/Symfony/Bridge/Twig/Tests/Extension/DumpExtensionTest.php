@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\DumpExtension;
 use Symfony\Component\VarDumper\VarDumper;
-use Symfony\Component\VarDumper\Cloner\PhpCloner;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DumpExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDumpTag($template, $debug, $expectedOutput, $expectedDumped)
     {
-        $extension = new DumpExtension(new PhpCloner());
+        $extension = new DumpExtension(new VarCloner());
         $twig = new \Twig_Environment(new \Twig_Loader_String(), array(
             'debug' => $debug,
             'cache' => false,
@@ -62,7 +62,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
-        $extension = new DumpExtension(new PhpCloner());
+        $extension = new DumpExtension(new VarCloner());
         $twig = new \Twig_Environment(new \Twig_Loader_String(), array(
             'debug' => $debug,
             'cache' => false,
@@ -77,6 +77,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
         if ($debug) {
             $this->assertStringStartsWith('<script>', $dump);
             $dump = preg_replace('/^.*?<pre/', '<pre', $dump);
+            $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
         }
         $this->assertEquals($expectedOutput, $dump);
     }
@@ -85,20 +86,20 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array(), array(), '', false),
-            array(array(), array(), "<pre id=sf-dump><span class=sf-dump-0>[]\n</span></pre><script>Sfjs.dump.instrument()</script>\n"),
+            array(array(), array(), "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \">[]\n</pre><script>Sfdump(\"sf-dump\")</script>\n"),
             array(
                 array(),
                 array(123, 456),
-                "<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-num>123</span>\n</span></pre><script>Sfjs.dump.instrument()</script>\n"
-                ."<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-num>456</span>\n</span></pre><script>Sfjs.dump.instrument()</script>\n",
+                "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-num>123</span>\n</pre><script>Sfdump(\"sf-dump\")</script>\n"
+                ."<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-num>456</span>\n</pre><script>Sfdump(\"sf-dump\")</script>\n",
             ),
             array(
                 array('foo' => 'bar'),
                 array(),
-                "<pre id=sf-dump><span class=sf-dump-0><span class=sf-dump-note>array:1</span> [<span name=sf-dump-child>\n"
-                ."  <span class=sf-dump-1>\"<span class=sf-dump-meta>foo</span>\" => \"<span class=sf-dump-str>bar</span>\"\n"
-                ."</span></span>]\n"
-                ."</span></pre><script>Sfjs.dump.instrument()</script>\n",
+                "<pre class=sf-dump id=sf-dump data-indent-pad=\"  \"><span class=sf-dump-note>array:1</span> [<samp>\n"
+                ."  \"<span class=sf-dump-key>foo</span>\" => \"<span class=sf-dump-str title=\"3 characters\">bar</span>\"\n"
+                ."</samp>]\n"
+                ."</pre><script>Sfdump(\"sf-dump\")</script>\n",
             ),
         );
     }

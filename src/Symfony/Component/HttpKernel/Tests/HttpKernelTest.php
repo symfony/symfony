@@ -23,14 +23,17 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHandleWhenControllerThrowsAnExceptionAndRawIsTrue()
     {
-        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
+        $exception = new \RuntimeException();
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () use ($exception) { throw $exception; }));
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $this->fail('LogicException expected');
+        } catch (\LogicException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+        }
     }
 
     /**
@@ -132,7 +135,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(false));
 
-        $kernel->handle(new Request());
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
     }
 
     /**

@@ -58,6 +58,7 @@ class ChainDecoder implements DecoderInterface
      * @param string $format
      *
      * @return DecoderInterface
+     *
      * @throws RuntimeException if no decoder is found
      */
     private function getDecoder($format)

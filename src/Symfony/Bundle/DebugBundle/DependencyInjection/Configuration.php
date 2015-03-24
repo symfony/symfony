@@ -34,14 +34,15 @@ class Configuration implements ConfigurationInterface
                 ->integerNode('max_items')
                     ->info('Max number of displayed items past the first level, -1 means no limit')
                     ->min(-1)
-                    ->defaultValue(250)
+                    ->defaultValue(2500)
                 ->end()
                 ->integerNode('max_string_length')
                     ->info('Max length of displayed strings, -1 means no limit')
                     ->min(-1)
                     ->defaultValue(-1)
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $treeBuilder;
     }

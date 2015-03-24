@@ -25,12 +25,9 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new XmlDumper($container = new ContainerBuilder());
+        $dumper = new XmlDumper(new ContainerBuilder());
 
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
-
-        $container = new ContainerBuilder();
-        $dumper = new XmlDumper($container);
     }
 
     public function testExportParameters()
@@ -47,10 +44,34 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/xml/services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyAddService()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $container = include self::$fixturesPath.'/containers/legacy-container9.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/legacy-services9.xml')), $dumper->dump(), '->dump() dumps services');
+
+        $dumper = new XmlDumper($container = new ContainerBuilder());
+        $container->register('foo', 'FooClass')->addArgument(new \stdClass());
+        try {
+            $dumper->dump();
+            $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+        }
+    }
+
     public function testAddService()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new XmlDumper($container);
+
         $this->assertEquals(str_replace('%path%', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
 
         $dumper = new XmlDumper($container = new ContainerBuilder());
@@ -129,6 +150,28 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
   </services>
 </container>
 ", include $fixturesPath.'/containers/container16.php'),
+        );
+    }
+
+    /**
+     * @dataProvider provideCompiledContainerData
+     */
+    public function testCompiledContainerCanBeDumped($containerFile)
+    {
+        $fixturesPath = __DIR__.'/../Fixtures';
+        $container = require $fixturesPath.'/containers/'.$containerFile.'.php';
+        $container->compile();
+        $dumper = new XmlDumper($container);
+        $dumper->dump();
+    }
+
+    public function provideCompiledContainerData()
+    {
+        return array(
+            array('container8'),
+            array('container11'),
+            array('container12'),
+            array('container14'),
         );
     }
 }

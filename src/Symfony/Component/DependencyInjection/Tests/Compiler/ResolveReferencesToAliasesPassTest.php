@@ -48,6 +48,17 @@ class ResolveReferencesToAliasesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $arguments[0]);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
+    public function testAliasCircularReference()
+    {
+        $container = new ContainerBuilder();
+        $container->setAlias('bar', 'foo');
+        $container->setAlias('foo', 'bar');
+        $this->process($container);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new ResolveReferencesToAliasesPass();

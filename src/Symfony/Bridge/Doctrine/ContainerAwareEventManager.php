@@ -24,6 +24,7 @@ class ContainerAwareEventManager extends EventManager
 {
     /**
      * Map of registered listeners.
+     *
      * <event> => <listeners>
      *
      * @var array
@@ -40,10 +41,11 @@ class ContainerAwareEventManager extends EventManager
     /**
      * Dispatches an event to all registered listeners.
      *
-     * @param string $eventName The name of the event to dispatch. The name of the event is
-     *                          the name of the method that is invoked on listeners.
+     * @param string    $eventName The name of the event to dispatch. The name of the event is
+     *                             the name of the method that is invoked on listeners.
      * @param EventArgs $eventArgs The event arguments to pass to the event handlers/listeners.
      *                             If not supplied, the single empty EventArgs instance is used.
+     *
      * @return bool
      */
     public function dispatchEvent($eventName, EventArgs $eventArgs = null)
@@ -81,7 +83,7 @@ class ContainerAwareEventManager extends EventManager
      *
      * @param string $event
      *
-     * @return bool    TRUE if the specified event has any listeners, FALSE otherwise.
+     * @return bool TRUE if the specified event has any listeners, FALSE otherwise.
      */
     public function hasListeners($event)
     {

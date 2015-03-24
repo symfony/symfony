@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Intl\ResourceBundle;
 
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
+use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
+use Symfony\Component\Intl\Exception\MissingResourceException;
+
 /**
  * Default implementation of {@link RegionBundleInterface}.
  *
@@ -18,37 +23,60 @@ namespace Symfony\Component\Intl\ResourceBundle;
  *
  * @internal
  */
-class RegionBundle extends AbstractBundle implements RegionBundleInterface
+class RegionBundle extends RegionDataProvider implements RegionBundleInterface
 {
     /**
-     * {@inheritdoc}
+     * @var LocaleDataProvider
      */
-    public function getCountryName($country, $locale = null)
-    {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
-        }
+    private $localeProvider;
 
-        return $this->readEntry($locale, array('Countries', $country), true);
+    /**
+     * Creates a new region bundle.
+     *
+     * @param string                     $path
+     * @param BundleEntryReaderInterface $reader
+     * @param LocaleDataProvider         $localeProvider
+     */
+    public function __construct($path, BundleEntryReaderInterface $reader, LocaleDataProvider $localeProvider)
+    {
+        parent::__construct($path, $reader);
+
+        $this->localeProvider = $localeProvider;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCountryNames($locale = null)
+    public function getCountryName($country, $displayLocale = null)
     {
-        if (null === $locale) {
-            $locale = \Locale::getDefault();
+        try {
+            return $this->getName($country, $displayLocale);
+        } catch (MissingResourceException $e) {
+            return;
         }
+    }
 
-        if (null === ($countries = $this->readEntry($locale, array('Countries'), true))) {
-            return array();
+    /**
+     * {@inheritdoc}
+     */
+    public function getCountryNames($displayLocale = null)
+    {
+        try {
+            return $this->getNames($displayLocale);
+        } catch (MissingResourceException $e) {
+            return;
         }
+    }
 
-        if ($countries instanceof \Traversable) {
-            $countries = iterator_to_array($countries);
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocales()
+    {
+        try {
+            return $this->localeProvider->getLocales();
+        } catch (MissingResourceException $e) {
+            return;
         }
-
-        return $countries;
     }
 }

@@ -37,7 +37,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response('foo', 200, array(
             'Content-Type' => 'text/html',
-            'Set-Cookie'   => array('foo=bar', 'bar=foo'),
+            'Set-Cookie' => array('foo=bar', 'bar=foo'),
         ));
 
         $this->assertEquals('text/html', $response->getHeader('Content-Type'), '->getHeader() returns a header of the response');
@@ -61,7 +61,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $headers = array(
             'content-type' => 'text/html; charset=utf-8',
-            'set-cookie'   => array('foo=bar', 'bar=foo'),
+            'set-cookie' => array('foo=bar', 'bar=foo'),
         );
 
         $expected = 'content-type: text/html; charset=utf-8'."\n";

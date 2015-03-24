@@ -22,8 +22,8 @@ class Alias
     /**
      * Constructor.
      *
-     * @param string  $id     Alias identifier
-     * @param bool    $public If this alias is public
+     * @param string $id     Alias identifier
+     * @param bool   $public If this alias is public
      *
      * @api
      */
@@ -48,7 +48,7 @@ class Alias
     /**
      * Sets if this Alias is public.
      *
-     * @param bool    $boolean If this Alias should be public
+     * @param bool $boolean If this Alias should be public
      *
      * @api
      */

@@ -6,7 +6,7 @@ if (is_file($file)) {
 }
 
 $phar = new Phar($file, 0, 'ProjectWithXsdExtensionInPhar.phar');
-$phar->addFromString('ProjectWithXsdExtensionInPhar.php',<<<EOT
+$phar->addFromString('ProjectWithXsdExtensionInPhar.php', <<<EOT
 <?php
 
 class ProjectWithXsdExtensionInPhar extends ProjectExtension

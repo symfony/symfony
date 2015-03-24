@@ -19,7 +19,7 @@ class FragmentHandlerTest extends \PHPUnit_Framework_TestCase
 {
     private $requestStack;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->requestStack = $this->getMockBuilder('Symfony\\Component\\HttpFoundation\\RequestStack')
             ->disableOriginalConstructor()

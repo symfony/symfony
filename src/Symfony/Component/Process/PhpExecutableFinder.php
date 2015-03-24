@@ -60,7 +60,7 @@ class PhpExecutableFinder
         }
 
         $dirs = array(PHP_BINDIR);
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $dirs[] = 'C:\xampp\php\\';
         }
 

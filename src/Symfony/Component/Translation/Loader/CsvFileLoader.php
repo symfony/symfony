@@ -26,7 +26,7 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
 {
     private $delimiter = ';';
     private $enclosure = '"';
-    private $escape    = '\\';
+    private $escape = '\\';
 
     /**
      * {@inheritdoc}
@@ -87,6 +87,6 @@ class CsvFileLoader extends ArrayLoader implements LoaderInterface
     {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
-        $this->escape    = $escape;
+        $this->escape = $escape;
     }
 }

@@ -4,25 +4,26 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="data_collector.dump.class">Symfony\Component\HttpKernel\DataCollector\DumpDataCollector</parameter>
-        <parameter key="debug.dump_listener.class">Symfony\Component\HttpKernel\EventListener\DumpListener</parameter>
-    </parameters>
-
     <services>
-        <service id="data_collector.dump" class="%data_collector.dump.class%">
+        <service id="twig.extension.dump" class="Symfony\Bridge\Twig\Extension\DumpExtension" public="false">
+            <tag name="twig.extension" />
+            <argument type="service" id="var_dumper.cloner" />
+        </service>
+
+        <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
-            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument>%kernel.charset%</argument>
         </service>
 
-        <service id="debug.dump_listener" class="%debug.dump_listener.class%">
+        <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
             <tag name="kernel.event_subscriber" />
-            <argument type="service" id="service_container" />
-            <argument>data_collector.dump</argument>
+            <argument type="service" id="var_dumper.cloner" />
+            <argument type="service" id="data_collector.dump" />
         </service>
 
-        <service id="var_dumper.cloner" class="%var_dumper.cloner.class%" />
+        <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />
     </services>
 
 </container>

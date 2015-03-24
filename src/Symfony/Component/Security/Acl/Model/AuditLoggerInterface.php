@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Model;
 
 /**
- * Interface for audit loggers
+ * Interface for audit loggers.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

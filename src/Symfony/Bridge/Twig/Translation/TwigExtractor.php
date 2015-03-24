@@ -58,7 +58,13 @@ class TwigExtractor implements ExtractorInterface
         $finder = new Finder();
         $files = $finder->files()->name('*.twig')->sortByName()->in($directory);
         foreach ($files as $file) {
-            $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
+            try {
+                $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
+            } catch (\Twig_Error $e) {
+                $e->setTemplateFile($file->getRelativePathname());
+
+                throw $e;
+            }
         }
     }
 
@@ -78,7 +84,7 @@ class TwigExtractor implements ExtractorInterface
         $this->twig->parse($this->twig->tokenize($template));
 
         foreach ($visitor->getMessages() as $message) {
-            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ? $message[1] : $this->defaultDomain);
+            $catalogue->set(trim($message[0]), $this->prefix.trim($message[0]), $message[1] ?: $this->defaultDomain);
         }
 
         $visitor->disable();

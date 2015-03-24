@@ -9,13 +9,16 @@
  * file that was distributed with this source code.
  */
 
+use Symfony\Component\Intl\Collator\Collator as IntlCollator;
+use Symfony\Component\Intl\Collator\StubCollator;
+
 /**
- * Stub implementation for the Collator class of the intl extension
+ * Stub implementation for the Collator class of the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see \Symfony\Component\Intl\Collator\StubCollator
+ * @see StubCollator
  */
-class Collator extends \Symfony\Component\Intl\Collator\Collator
+class Collator extends IntlCollator
 {
 }

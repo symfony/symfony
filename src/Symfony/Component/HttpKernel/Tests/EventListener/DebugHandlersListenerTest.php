@@ -12,9 +12,17 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Event\ConsoleEvent;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\EventListener\DebugHandlersListener;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * DebugHandlersListenerTest
@@ -52,5 +60,47 @@ class DebugHandlersListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayHasKey(E_DEPRECATED, $loggers);
         $this->assertSame(array($logger, LogLevel::INFO), $loggers[E_DEPRECATED]);
+    }
+
+    public function testConsoleEvent()
+    {
+        $dispatcher = new EventDispatcher();
+        $listener = new DebugHandlersListener(null);
+        $app = $this->getMock('Symfony\Component\Console\Application');
+        $app->expects($this->once())->method('getHelperSet')->will($this->returnValue(new HelperSet()));
+        $command = new Command(__FUNCTION__);
+        $command->setApplication($app);
+        $event = new ConsoleEvent($command, new ArgvInput(), new ConsoleOutput());
+
+        $dispatcher->addSubscriber($listener);
+
+        $xListeners = array(
+            KernelEvents::REQUEST => array(array($listener, 'configure')),
+            ConsoleEvents::COMMAND => array(array($listener, 'configure')),
+        );
+        $this->assertSame($xListeners, $dispatcher->getListeners());
+
+        $exception = null;
+        $eHandler = new ErrorHandler();
+        set_error_handler(array($eHandler, 'handleError'));
+        set_exception_handler(array($eHandler, 'handleException'));
+        try {
+            $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
+        } catch (\Exception $exception) {
+        }
+        restore_exception_handler();
+        restore_error_handler();
+
+        if (null !== $exception) {
+            throw $exception;
+        }
+
+        $xHandler = $eHandler->setExceptionHandler('var_dump');
+        $this->assertInstanceOf('Closure', $xHandler);
+
+        $app->expects($this->once())
+            ->method('renderException');
+
+        $xHandler(new \Exception());
     }
 }

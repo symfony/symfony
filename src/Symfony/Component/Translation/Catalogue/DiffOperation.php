@@ -24,8 +24,8 @@ class DiffOperation extends AbstractOperation
     protected function processDomain($domain)
     {
         $this->messages[$domain] = array(
-            'all'      => array(),
-            'new'      => array(),
+            'all' => array(),
+            'new' => array(),
             'obsolete' => array(),
         );
 

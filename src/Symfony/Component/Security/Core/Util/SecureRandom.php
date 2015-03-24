@@ -43,9 +43,7 @@ final class SecureRandom implements SecureRandomInterface
         $this->logger = $logger;
 
         // determine whether to use OpenSSL
-        if (defined('PHP_WINDOWS_VERSION_BUILD') && version_compare(PHP_VERSION, '5.3.4', '<')) {
-            $this->useOpenSsl = false;
-        } elseif (!function_exists('openssl_random_pseudo_bytes')) {
+        if (!function_exists('openssl_random_pseudo_bytes')) {
             if (null !== $this->logger) {
                 $this->logger->notice('It is recommended that you enable the "openssl" extension for random number generation.');
             }

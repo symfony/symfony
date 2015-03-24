@@ -77,7 +77,7 @@ class Psr4ClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param bool    $prepend
+     * @param bool $prepend
      */
     public function register($prepend = false)
     {

@@ -22,7 +22,9 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class DumpExtension extends \Twig_Extension
 {
-    public function __construct(ClonerInterface $cloner = null)
+    private $cloner;
+
+    public function __construct(ClonerInterface $cloner)
     {
         $this->cloner = $cloner;
     }
@@ -46,7 +48,7 @@ class DumpExtension extends \Twig_Extension
 
     public function dump(\Twig_Environment $env, $context)
     {
-        if (!$env->isDebug() || !$this->cloner) {
+        if (!$env->isDebug()) {
             return;
         }
 
@@ -64,17 +66,14 @@ class DumpExtension extends \Twig_Extension
             unset($vars[0], $vars[1]);
         }
 
-        $html = '';
-        $dumper = new HtmlDumper(function ($line, $depth) use (&$html) {
-            if (-1 !== $depth) {
-                $html .= str_repeat('  ', $depth).$line."\n";
-            }
-        });
+        $dump = fopen('php://memory', 'r+b');
+        $dumper = new HtmlDumper($dump);
 
         foreach ($vars as $value) {
             $dumper->dump($this->cloner->cloneVar($value));
         }
+        rewind($dump);
 
-        return $html;
+        return stream_get_contents($dump);
     }
 }

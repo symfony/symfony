@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
+use Symfony\Component\Templating\TemplateReference as BaseTemplateReference;
 
 class TemplateNameParserTest extends TestCase
 {
@@ -63,25 +64,17 @@ class TemplateNameParserTest extends TestCase
             array(':Post:index.html.php', new TemplateReference('', 'Post', 'index', 'html', 'php')),
             array('::index.html.php', new TemplateReference('', '', 'index', 'html', 'php')),
             array('FooBundle:Post:foo.bar.index.html.php', new TemplateReference('FooBundle', 'Post', 'foo.bar.index', 'html', 'php')),
+            array('/path/to/section/name.php', new BaseTemplateReference('/path/to/section/name.php', 'php')),
+            array('name.twig', new BaseTemplateReference('name.twig', 'twig')),
+            array('name', new BaseTemplateReference('name')),
         );
     }
 
     /**
-     * @dataProvider      getInvalidLogicalNameProvider
      * @expectedException \InvalidArgumentException
      */
-    public function testParseInvalidName($name)
+    public function testParseValidNameWithNotFoundBundle()
     {
-        $this->parser->parse($name);
-    }
-
-    public function getInvalidLogicalNameProvider()
-    {
-        return array(
-            array('BarBundle:Post:index.html.php'),
-            array('FooBundle:Post:index'),
-            array('FooBundle:Post'),
-            array('FooBundle:Post:foo:bar'),
-        );
+        $this->parser->parse('BarBundle:Post:index.html.php');
     }
 }

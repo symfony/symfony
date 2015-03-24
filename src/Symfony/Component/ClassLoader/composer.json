@@ -17,10 +17,11 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/finder": "~2.0"
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/finder": "~2.7|~3.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }
@@ -28,7 +29,7 @@
     "target-dir": "Symfony/Component/ClassLoader",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

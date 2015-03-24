@@ -14,7 +14,7 @@ namespace Symfony\Component\Serializer\Encoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
- * Defines the interface of decoders
+ * Defines the interface of decoders.
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
@@ -23,9 +23,9 @@ interface DecoderInterface
     /**
      * Decodes a string into PHP data.
      *
-     * @param scalar $data      Data to decode
-     * @param string $format    Format name
-     * @param array  $context   options that decoders have access to.
+     * @param string $data    Data to decode
+     * @param string $format  Format name
+     * @param array  $context options that decoders have access to.
      *
      * The format parameter specifies which format the data is in; valid values
      * depend on the specific implementation. Authors implementing this interface

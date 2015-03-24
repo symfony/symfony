@@ -19,14 +19,14 @@ namespace Symfony\Component\HttpFoundation\Session;
 interface SessionBagInterface
 {
     /**
-     * Gets this bag's name
+     * Gets this bag's name.
      *
      * @return string
      */
     public function getName();
 
     /**
-     * Initializes the Bag
+     * Initializes the Bag.
      *
      * @param array $array
      */

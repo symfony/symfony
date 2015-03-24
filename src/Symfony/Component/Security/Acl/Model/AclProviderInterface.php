@@ -21,7 +21,7 @@ use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 interface AclProviderInterface
 {
     /**
-     * Retrieves all child object identities from the database
+     * Retrieves all child object identities from the database.
      *
      * @param ObjectIdentityInterface $parentOid
      * @param bool                    $directChildrenOnly
@@ -31,7 +31,7 @@ interface AclProviderInterface
     public function findChildren(ObjectIdentityInterface $parentOid, $directChildrenOnly = false);
 
     /**
-     * Returns the ACL that belongs to the given object identity
+     * Returns the ACL that belongs to the given object identity.
      *
      * @param ObjectIdentityInterface     $oid
      * @param SecurityIdentityInterface[] $sids
@@ -43,7 +43,7 @@ interface AclProviderInterface
     public function findAcl(ObjectIdentityInterface $oid, array $sids = array());
 
     /**
-     * Returns the ACLs that belong to the given object identities
+     * Returns the ACLs that belong to the given object identities.
      *
      * @param ObjectIdentityInterface[]   $oids an array of ObjectIdentityInterface implementations
      * @param SecurityIdentityInterface[] $sids an array of SecurityIdentityInterface implementations

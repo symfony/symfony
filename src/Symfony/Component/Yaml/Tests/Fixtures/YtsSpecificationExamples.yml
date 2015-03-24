@@ -463,9 +463,9 @@ yaml: |
      0.278 Batting Average
 php: |
   array(
-    'name'           => 'Mark McGwire',
+    'name' => 'Mark McGwire',
     'accomplishment' => "Mark set a major league home run record in 1998.\n",
-    'stats'          => "65 Home Runs\n0.278 Batting Average\n"
+    'stats' => "65 Home Runs\n0.278 Batting Average\n"
   )
 ---
 test: Quoted scalars
@@ -529,6 +529,7 @@ yaml: |
   fixed: 1,230.15
   negative infinity: -.inf
   not a number: .NaN
+  float as whole number: !!float 1
 php: |
   array(
     'canonical' => 1230.15,
@@ -536,6 +537,7 @@ php: |
     'fixed' => 1230.15,
     'negative infinity' => log(0),
     'not a number' => -log(0),
+    'float as whole number' => (float) 1
   )
 ---
 test: Miscellaneous

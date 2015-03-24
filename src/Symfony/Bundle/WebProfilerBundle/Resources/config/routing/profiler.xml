@@ -4,47 +4,47 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="_profiler_home" pattern="/">
+    <route id="_profiler_home" path="/">
         <default key="_controller">web_profiler.controller.profiler:homeAction</default>
     </route>
 
-    <route id="_profiler_search" pattern="/search">
+    <route id="_profiler_search" path="/search">
         <default key="_controller">web_profiler.controller.profiler:searchAction</default>
     </route>
 
-    <route id="_profiler_search_bar" pattern="/search_bar">
+    <route id="_profiler_search_bar" path="/search_bar">
         <default key="_controller">web_profiler.controller.profiler:searchBarAction</default>
     </route>
 
-    <route id="_profiler_purge" pattern="/purge">
+    <route id="_profiler_purge" path="/purge">
         <default key="_controller">web_profiler.controller.profiler:purgeAction</default>
     </route>
 
-    <route id="_profiler_info" pattern="/info/{about}">
+    <route id="_profiler_info" path="/info/{about}">
         <default key="_controller">web_profiler.controller.profiler:infoAction</default>
     </route>
 
-    <route id="_profiler_phpinfo" pattern="/phpinfo">
+    <route id="_profiler_phpinfo" path="/phpinfo">
         <default key="_controller">web_profiler.controller.profiler:phpinfoAction</default>
     </route>
 
-    <route id="_profiler_search_results" pattern="/{token}/search/results">
+    <route id="_profiler_search_results" path="/{token}/search/results">
         <default key="_controller">web_profiler.controller.profiler:searchResultsAction</default>
     </route>
 
-    <route id="_profiler" pattern="/{token}">
+    <route id="_profiler" path="/{token}">
         <default key="_controller">web_profiler.controller.profiler:panelAction</default>
     </route>
 
-    <route id="_profiler_router" pattern="/{token}/router">
+    <route id="_profiler_router" path="/{token}/router">
         <default key="_controller">web_profiler.controller.router:panelAction</default>
     </route>
 
-    <route id="_profiler_exception" pattern="/{token}/exception">
+    <route id="_profiler_exception" path="/{token}/exception">
         <default key="_controller">web_profiler.controller.exception:showAction</default>
     </route>
 
-    <route id="_profiler_exception_css" pattern="/{token}/exception.css">
+    <route id="_profiler_exception_css" path="/{token}/exception.css">
         <default key="_controller">web_profiler.controller.exception:cssAction</default>
     </route>
 

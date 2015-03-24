@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Profiler;
 
 /**
- * Memcache Profiler Storage
+ * Memcache Profiler Storage.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  */
@@ -24,7 +24,7 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     private $memcache;
 
     /**
-     * Internal convenience method that returns the instance of the Memcache
+     * Internal convenience method that returns the instance of the Memcache.
      *
      * @return \Memcache
      *
@@ -50,7 +50,7 @@ class MemcacheProfilerStorage extends BaseMemcacheProfilerStorage
     }
 
     /**
-     * Set instance of the Memcache
+     * Set instance of the Memcache.
      *
      * @param \Memcache $memcache
      */

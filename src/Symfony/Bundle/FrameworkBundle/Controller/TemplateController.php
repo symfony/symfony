@@ -24,10 +24,10 @@ class TemplateController extends ContainerAware
     /**
      * Renders a template.
      *
-     * @param string       $template  The template name
-     * @param int|null     $maxAge    Max age for client caching
-     * @param int|null     $sharedAge Max age for shared (proxy) caching
-     * @param bool|null    $private   Whether or not caching should apply for client caches only
+     * @param string    $template  The template name
+     * @param int|null  $maxAge    Max age for client caching
+     * @param int|null  $sharedAge Max age for shared (proxy) caching
+     * @param bool|null $private   Whether or not caching should apply for client caches only
      *
      * @return Response A Response instance
      */

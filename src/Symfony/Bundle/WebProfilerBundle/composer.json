@@ -16,16 +16,17 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/http-kernel": "~2.3",
-        "symfony/routing": "~2.2",
-        "symfony/twig-bridge": "~2.2"
+        "php": ">=5.5.9",
+        "symfony/http-kernel": "~2.7|~3.0",
+        "symfony/routing": "~2.7|~3.0",
+        "symfony/twig-bridge": "~2.7|~3.0"
     },
     "require-dev": {
-        "symfony/config": "~2.2",
-        "symfony/console": "~2.3",
-        "symfony/dependency-injection": "~2.0",
-        "symfony/stopwatch": "~2.2"
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/config": "~2.7|~3.0",
+        "symfony/console": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "symfony/stopwatch": "~2.7|~3.0"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }
@@ -34,7 +35,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

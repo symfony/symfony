@@ -11,10 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
@@ -96,7 +92,7 @@ class CodeExtension extends \Twig_Extension
                 $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
-            } elseif ('string'  === $item[0]) {
+            } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
@@ -156,9 +152,9 @@ class CodeExtension extends \Twig_Extension
     /**
      * Formats a file path.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
-     * @param string  $text Use this text for the link rather than the file path
+     * @param string $file An absolute file path
+     * @param int    $line The line number
+     * @param string $text Use this text for the link rather than the file path
      *
      * @return string
      */
@@ -178,7 +174,9 @@ class CodeExtension extends \Twig_Extension
         $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), $text);
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
         }
 
         return $text;
@@ -187,8 +185,8 @@ class CodeExtension extends \Twig_Extension
     /**
      * Returns the link for a given file/line pair.
      *
-     * @param string  $file An absolute file path
-     * @param int     $line The line number
+     * @param string $file An absolute file path
+     * @param int    $line The line number
      *
      * @return string A link of false
      */
@@ -203,10 +201,8 @@ class CodeExtension extends \Twig_Extension
 
     public function formatFileFromText($text)
     {
-        $that = $this;
-
-        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) use ($that) {
-            return 'in '.$that->formatFile($match[2], $match[3]);
+        return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
+            return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
     }
 

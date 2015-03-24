@@ -23,13 +23,13 @@ class ControllerNameParserTest extends TestCase
     {
         $this->loader = new ClassLoader();
         $this->loader->addPrefixes(array(
-            'TestBundle'      => __DIR__.'/../Fixtures',
+            'TestBundle' => __DIR__.'/../Fixtures',
             'TestApplication' => __DIR__.'/../Fixtures',
         ));
         $this->loader->register();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         spl_autoload_unregister(array($this->loader, 'loadClass'));
 

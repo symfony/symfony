@@ -104,7 +104,7 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
-        for ($i = 0,$c = count($oids); $i<$c; $i++) {
+        for ($i = 0, $c = count($oids); $i<$c; $i++) {
             $oid = $oids[$i];
             $oidLookupKey = $oid->getIdentifier().$oid->getType();
             $oidLookup[$oidLookupKey] = $oid;
@@ -173,7 +173,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // Is it time to load the current batch?
-            if ((self::MAX_BATCH_SIZE === count($currentBatch) || ($i + 1) === $c) && count($currentBatch) > 0) {
+            $currentBatchesCount = count($currentBatch);
+            if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $c)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $aclNotFoundException) {
@@ -224,6 +225,7 @@ class AclProvider implements AclProviderInterface
      * ACEs, and security identities.
      *
      * @param array $ancestorIds
+     *
      * @return string
      */
     protected function getLookupSql(array $ancestorIds)
@@ -330,6 +332,7 @@ SELECTCLAUSE;
      *
      * @param ObjectIdentityInterface $oid
      * @param bool                    $directChildrenOnly
+     *
      * @return string
      */
     protected function getFindChildrenSql(ObjectIdentityInterface $oid, $directChildrenOnly)
@@ -361,6 +364,7 @@ FINDCHILDREN;
      * identity.
      *
      * @param ObjectIdentityInterface $oid
+     *
      * @return string
      */
     protected function getSelectObjectIdentityIdSql(ObjectIdentityInterface $oid)
@@ -385,6 +389,7 @@ QUERY;
      * Returns the primary key of the passed object identity.
      *
      * @param ObjectIdentityInterface $oid
+     *
      * @return int
      */
     final protected function retrieveObjectIdentityPrimaryKey(ObjectIdentityInterface $oid)
@@ -493,8 +498,10 @@ QUERY;
      * @param Statement $stmt
      * @param array     $oidLookup
      * @param array     $sids
-     * @throws \RuntimeException
+     *
      * @return \SplObjectStorage
+     *
+     * @throws \RuntimeException
      */
     private function hydrateObjectIdentities(Statement $stmt, array $oidLookup, array $sids)
     {
@@ -553,10 +560,11 @@ QUERY;
                 // attach ACL to the result set; even though we do not enforce that every
                 // object identity has only one instance, we must make sure to maintain
                 // referential equality with the oids passed to findAcls()
-                if (!isset($oidCache[$objectIdentifier.$classType])) {
-                    $oidCache[$objectIdentifier.$classType] = $acl->getObjectIdentity();
+                $oidCacheKey = $objectIdentifier.$classType;
+                if (!isset($oidCache[$oidCacheKey])) {
+                    $oidCache[$oidCacheKey] = $acl->getObjectIdentity();
                 }
-                $result->attach($oidCache[$objectIdentifier.$classType], $acl);
+                $result->attach($oidCache[$oidCacheKey], $acl);
             // so, this hasn't been hydrated yet
             } else {
                 // create object identity if we haven't done so yet
@@ -664,7 +672,7 @@ QUERY;
             // let's see if we have already hydrated this
             if (isset($acls[$parentId])) {
                 $aclParentAclProperty->setValue($acl, $acls[$parentId]);
-                $processed += 1;
+                ++$processed;
 
                 continue;
             }

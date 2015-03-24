@@ -16,17 +16,20 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "doctrine/common": "~2.2"
+        "php": ">=5.5.9",
+        "doctrine/common": "~2.3"
     },
     "require-dev": {
-        "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0",
-        "symfony/form": "~2.2",
-        "symfony/http-kernel": "~2.2",
-        "symfony/security": "~2.2",
-        "symfony/expression-language": "~2.2",
-        "symfony/validator": "~2.3.0",
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/stopwatch": "~2.7|~3.0",
+        "symfony/dependency-injection": "~2.7|~3.0",
+        "symfony/form": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0",
+        "symfony/property-access": "~2.7|~3.0",
+        "symfony/security": "~2.7|~3.0",
+        "symfony/expression-language": "~2.7|~3.0",
+        "symfony/validator": "~2.7|~3.0",
+        "symfony/translation": "~2.7|~3.0",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
         "doctrine/orm": "~2.2,>=2.2.3"
@@ -45,7 +48,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

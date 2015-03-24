@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds tagged routing.loader services to routing.resolver service
+ * Adds tagged routing.loader services to routing.resolver service.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

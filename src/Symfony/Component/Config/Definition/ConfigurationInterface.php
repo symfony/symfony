@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config\Definition;
 
 /**
- * Configuration interface
+ * Configuration interface.
  *
  * @author Victor Berchet <victor@suumit.com>
  */

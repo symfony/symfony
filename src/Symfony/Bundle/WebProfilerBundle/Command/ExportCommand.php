@@ -56,7 +56,7 @@ class ExportCommand extends Command
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command exports a profile to the standard output:
 
-<info>php %command.full_name% profile_token</info>
+  <info>php %command.full_name% profile_token</info>
 EOF
             )
         ;

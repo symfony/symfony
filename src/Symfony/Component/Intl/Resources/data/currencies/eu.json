@@ -1,0 +1,642 @@
+{
+    "Version": "2.1.8.9",
+    "Names": {
+        "AED": [
+            "AED",
+            "Arabiar Emirerri Batuetako dirhama"
+        ],
+        "AFN": [
+            "AFN",
+            "Afganistango afghania"
+        ],
+        "ALL": [
+            "ALL",
+            "Albaniako leka"
+        ],
+        "AMD": [
+            "AMD",
+            "Armeniako drama"
+        ],
+        "ANG": [
+            "ANG",
+            "Holandarren Antilletako guilderra"
+        ],
+        "AOA": [
+            "AOA",
+            "Angolako kwanza"
+        ],
+        "ARS": [
+            "ARS",
+            "Argentinako pesoa"
+        ],
+        "AUD": [
+            "A$",
+            "Australiako dolarra"
+        ],
+        "AWG": [
+            "AWG",
+            "Arubeko florina"
+        ],
+        "AZN": [
+            "AZN",
+            "Azerbaijango manata"
+        ],
+        "BAM": [
+            "BAM",
+            "Bosnia-Herzegovinako marko trukakorra"
+        ],
+        "BBD": [
+            "BBD",
+            "Barbadosetako dolarra"
+        ],
+        "BDT": [
+            "BDT",
+            "Bangladesheko taka"
+        ],
+        "BGN": [
+            "BGN",
+            "Bulgariako leva"
+        ],
+        "BHD": [
+            "BHD",
+            "Bahraingo dinarra"
+        ],
+        "BIF": [
+            "BIF",
+            "Burundiko frankoa"
+        ],
+        "BMD": [
+            "BMD",
+            "Bermudetako dolarra"
+        ],
+        "BND": [
+            "BND",
+            "Bruneiko dolarra"
+        ],
+        "BOB": [
+            "BOB",
+            "Boliviako bolivianoa"
+        ],
+        "BRL": [
+            "R$",
+            "Brasilgo erreala"
+        ],
+        "BSD": [
+            "BSD",
+            "Bahametako dolarra"
+        ],
+        "BTN": [
+            "BTN",
+            "Bhutango ngultruma"
+        ],
+        "BWP": [
+            "BWP",
+            "Bosniako pula"
+        ],
+        "BYR": [
+            "BYR",
+            "Bielorrusiako errubloa"
+        ],
+        "BZD": [
+            "BZD",
+            "Belizeko dolarra"
+        ],
+        "CAD": [
+            "CA$",
+            "Kanadako dolarra"
+        ],
+        "CDF": [
+            "CDF",
+            "Kongoko frankoa"
+        ],
+        "CHF": [
+            "CHF",
+            "Suitzako frankoa"
+        ],
+        "CLP": [
+            "CLP",
+            "Txileko pesoa"
+        ],
+        "CNY": [
+            "CN¥",
+            "Txinako yuana"
+        ],
+        "COP": [
+            "COP",
+            "Kolonbiako pesoa"
+        ],
+        "CRC": [
+            "CRC",
+            "Costa Ricako colona"
+        ],
+        "CUC": [
+            "CUC",
+            "Kubako peso trukakorra"
+        ],
+        "CUP": [
+            "CUP",
+            "Kubako pesoa"
+        ],
+        "CVE": [
+            "CVE",
+            "Cabo Verdeko ezkutua"
+        ],
+        "CZK": [
+            "CZK",
+            "Txekiar Errepublikako koroa"
+        ],
+        "DJF": [
+            "DJF",
+            "Djibouteko frankoa"
+        ],
+        "DKK": [
+            "DKK",
+            "Danimarkako koroa"
+        ],
+        "DOP": [
+            "DOP",
+            "Dominikar Errepublikako pesoa"
+        ],
+        "DZD": [
+            "DZD",
+            "Algeriako dinarra"
+        ],
+        "EGP": [
+            "EGP",
+            "Egiptoko libera"
+        ],
+        "ERN": [
+            "ERN",
+            "Eritreako nakfa"
+        ],
+        "ESP": [
+            "₧",
+            "ESP",
+            {}
+        ],
+        "ETB": [
+            "ETB",
+            "Etiopiako birra"
+        ],
+        "EUR": [
+            "€",
+            "Euroa"
+        ],
+        "FJD": [
+            "FJD",
+            "Fijiko dolarra"
+        ],
+        "FKP": [
+            "FKP",
+            "Falkland uharteetako libera"
+        ],
+        "GBP": [
+            "£",
+            "Libera esterlina"
+        ],
+        "GEL": [
+            "GEL",
+            "Georgiako laria"
+        ],
+        "GHS": [
+            "GHS",
+            "Ghanako cedia"
+        ],
+        "GIP": [
+            "GIP",
+            "Gibraltarreko libera"
+        ],
+        "GMD": [
+            "GMD",
+            "Ganbiako dalasia"
+        ],
+        "GNF": [
+            "GNF",
+            "Gineako frankoa"
+        ],
+        "GTQ": [
+            "GTQ",
+            "Guatemalako quetzala"
+        ],
+        "GYD": [
+            "GYD",
+            "Guyanako dolarra"
+        ],
+        "HKD": [
+            "HK$",
+            "Hong Kongeko dolarra"
+        ],
+        "HNL": [
+            "HNL",
+            "Hondurasko lempira"
+        ],
+        "HRK": [
+            "HRK",
+            "Kroaziako kuna"
+        ],
+        "HTG": [
+            "HTG",
+            "Haitiko gourdea"
+        ],
+        "HUF": [
+            "HUF",
+            "Hungariako florina"
+        ],
+        "IDR": [
+            "IDR",
+            "Indonesiako errupia"
+        ],
+        "ILS": [
+            "₪",
+            "Israeleko sheqel berria"
+        ],
+        "INR": [
+            "₹",
+            "Indiako errupia"
+        ],
+        "IQD": [
+            "IQD",
+            "Irakeko dinarra"
+        ],
+        "IRR": [
+            "IRR",
+            "Irango riala"
+        ],
+        "ISK": [
+            "ISK",
+            "Islandiako koroa"
+        ],
+        "JMD": [
+            "JMD",
+            "Jamaikako dolarra"
+        ],
+        "JOD": [
+            "JOD",
+            "Jordaniako dinarra"
+        ],
+        "JPY": [
+            "JP¥",
+            "Japoniako yena"
+        ],
+        "KES": [
+            "KES",
+            "Kenyako txelina"
+        ],
+        "KGS": [
+            "KGS",
+            "Kirgizistango soma"
+        ],
+        "KHR": [
+            "KHR",
+            "Kanbodiako riela"
+        ],
+        "KMF": [
+            "KMF",
+            "Komoreetako frankoa"
+        ],
+        "KPW": [
+            "KPW",
+            "Ipar Koreako wona"
+        ],
+        "KRW": [
+            "₩",
+            "Hego Koreako wona"
+        ],
+        "KWD": [
+            "KWD",
+            "Kuwaiteko dinarra"
+        ],
+        "KYD": [
+            "KYD",
+            "Kaiman uharteetako dolarra"
+        ],
+        "KZT": [
+            "KZT",
+            "Kazakhstango tengea"
+        ],
+        "LAK": [
+            "LAK",
+            "Laoseko kipa"
+        ],
+        "LBP": [
+            "LBP",
+            "Libanoko libera"
+        ],
+        "LKR": [
+            "LKR",
+            "Sri Lankako errupia"
+        ],
+        "LRD": [
+            "LRD",
+            "Liberiako dolarra"
+        ],
+        "LSL": [
+            "LSL",
+            "Lesothoko lotia"
+        ],
+        "LTL": [
+            "LTL",
+            "Lituaniako litasa"
+        ],
+        "LVL": [
+            "LVL",
+            "Letoniako latsa"
+        ],
+        "LYD": [
+            "LYD",
+            "Libiako dinarra"
+        ],
+        "MAD": [
+            "MAD",
+            "Marokoko dirhama"
+        ],
+        "MDL": [
+            "MDL",
+            "Moldaviako leua"
+        ],
+        "MGA": [
+            "MGA",
+            "Madagaskarreko ariarya"
+        ],
+        "MKD": [
+            "MKD",
+            "Mazedoniako denara"
+        ],
+        "MMK": [
+            "MMK",
+            "Myanmarreko kyata"
+        ],
+        "MNT": [
+            "MNT",
+            "Mongoliako tugrika"
+        ],
+        "MOP": [
+            "MOP",
+            "Macanako pataca"
+        ],
+        "MRO": [
+            "MRO",
+            "Mauritaniako ouguiya"
+        ],
+        "MUR": [
+            "MUR",
+            "Maurizio uharteetako errupia"
+        ],
+        "MVR": [
+            "MVR",
+            "Maldivetako rufiyaa"
+        ],
+        "MWK": [
+            "MWK",
+            "Malawiko kwacha"
+        ],
+        "MXN": [
+            "MX$",
+            "Mexikoko pesoa"
+        ],
+        "MYR": [
+            "MYR",
+            "Malaysiako ringgita"
+        ],
+        "MZN": [
+            "MZN",
+            "Mozambikeko metikala"
+        ],
+        "NAD": [
+            "NAD",
+            "Namibiako dolarra"
+        ],
+        "NGN": [
+            "NGN",
+            "Nigeriako naira"
+        ],
+        "NIO": [
+            "NIO",
+            "Nikaraguako cordoba"
+        ],
+        "NOK": [
+            "NOK",
+            "Norvegiako koroa"
+        ],
+        "NPR": [
+            "NPR",
+            "Nepalgo errupia"
+        ],
+        "NZD": [
+            "NZ$",
+            "Zeelanda Berriko dolarra"
+        ],
+        "OMR": [
+            "OMR",
+            "Omango riala"
+        ],
+        "PAB": [
+            "PAB",
+            "Panamako balboa"
+        ],
+        "PEN": [
+            "PEN",
+            "Peruko sol berria"
+        ],
+        "PGK": [
+            "PGK",
+            "Papua Ginea Berriko kina"
+        ],
+        "PHP": [
+            "PHP",
+            "Filipinetako pesoa"
+        ],
+        "PKR": [
+            "PKR",
+            "Pakistango errupia"
+        ],
+        "PLN": [
+            "PLN",
+            "Poloniako zlotya"
+        ],
+        "PYG": [
+            "PYG",
+            "Paraguaiko guarania"
+        ],
+        "QAR": [
+            "QAR",
+            "Qatarreko riala"
+        ],
+        "RON": [
+            "RON",
+            "Errumaniako leua"
+        ],
+        "RSD": [
+            "RSD",
+            "Serbiako dinarra"
+        ],
+        "RUB": [
+            "RUB",
+            "Errusiako errubloa"
+        ],
+        "RWF": [
+            "RWF",
+            "Ruandako frankoa"
+        ],
+        "SAR": [
+            "SAR",
+            "Saudiko riala"
+        ],
+        "SBD": [
+            "SBD",
+            "Salomon uharteetako dolarra"
+        ],
+        "SCR": [
+            "SCR",
+            "Seychelleetako errupia"
+        ],
+        "SDG": [
+            "SDG",
+            "Sudango libera"
+        ],
+        "SEK": [
+            "SEK",
+            "Suediako koroa"
+        ],
+        "SGD": [
+            "SGD",
+            "Singapurreko dolarra"
+        ],
+        "SHP": [
+            "SHP",
+            "Santa Helenako libera"
+        ],
+        "SLL": [
+            "SLL",
+            "Sierra Leonako leona"
+        ],
+        "SOS": [
+            "SOS",
+            "Somaliako txelina"
+        ],
+        "SRD": [
+            "SRD",
+            "Surinameko dolarra"
+        ],
+        "SSP": [
+            "SSP",
+            "Hego Sudango libera"
+        ],
+        "STD": [
+            "STD",
+            "Sao Tomeko eta Principeko dobra"
+        ],
+        "SYP": [
+            "SYP",
+            "Siriako libera"
+        ],
+        "SZL": [
+            "SZL",
+            "Swaziko lilangenia"
+        ],
+        "THB": [
+            "฿",
+            "Thailandiako bahta"
+        ],
+        "TJS": [
+            "TJS",
+            "Tajikistango somonia"
+        ],
+        "TMT": [
+            "TMT",
+            "Turkmenistango manata"
+        ],
+        "TND": [
+            "TND",
+            "Tunisiako dinarra"
+        ],
+        "TOP": [
+            "TOP",
+            "Tongako Paʻanga"
+        ],
+        "TRY": [
+            "TRY",
+            "Turkiako lira"
+        ],
+        "TTD": [
+            "TTD",
+            "Trinidadeko eta Tobagoko dolarra"
+        ],
+        "TWD": [
+            "NT$",
+            "Taiwango dolar berria"
+        ],
+        "TZS": [
+            "TZS",
+            "Tanzaniako txelina"
+        ],
+        "UAH": [
+            "UAH",
+            "Ukrainako hryvnia"
+        ],
+        "UGX": [
+            "UGX",
+            "Ugandako txelina"
+        ],
+        "USD": [
+            "US$",
+            "AEBetako dolarra"
+        ],
+        "UYU": [
+            "UYU",
+            "Uruguaiko pesoa"
+        ],
+        "UZS": [
+            "UZS",
+            "Uzbekistango soma"
+        ],
+        "VEF": [
+            "VEF",
+            "Venezuelako bolivarra"
+        ],
+        "VND": [
+            "₫",
+            "Vietnameko donga"
+        ],
+        "VUV": [
+            "VUV",
+            "Vanuatuko vatua"
+        ],
+        "WST": [
+            "WST",
+            "Samoko tala"
+        ],
+        "XAF": [
+            "FCFA",
+            "Afrika erdialdeko frankoa BEAC"
+        ],
+        "XCD": [
+            "EC$",
+            "Karibe ekialdeko dolarra"
+        ],
+        "XOF": [
+            "CFA",
+            "Afrika ekialdeko frankoa BCEAO"
+        ],
+        "XPF": [
+            "CFPF",
+            "CFP frankoa"
+        ],
+        "YER": [
+            "YER",
+            "Yemengo riala"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Hegoafrikako randa"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Zambiako kwacha (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Zambiako kwacha"
+        ]
+    }
+}

@@ -5,7 +5,12 @@
             "scope": "container",
             "public": false,
             "synthetic": true,
-            "file": "\/path\/to\/file"
+            "lazy": false,
+            "synchronized": false,
+            "abstract": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get"
         }
     ],
     "tag2": [
@@ -14,7 +19,12 @@
             "scope": "container",
             "public": false,
             "synthetic": true,
-            "file": "\/path\/to\/file"
+            "lazy": false,
+            "synchronized": false,
+            "abstract": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get"
         }
     ]
 }

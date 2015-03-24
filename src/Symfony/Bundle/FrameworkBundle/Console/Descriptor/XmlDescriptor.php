@@ -15,12 +15,15 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class XmlDescriptor extends Descriptor
 {
@@ -193,11 +196,9 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $requirements = $route->getRequirements();
-        unset($requirements['_scheme'], $requirements['_method']);
-        if (count($requirements)) {
+        if (count($route->getRequirements())) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
-            foreach ($requirements as $attribute => $pattern) {
+            foreach ($route->getRequirements() as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
@@ -328,23 +329,44 @@ class XmlDescriptor extends Descriptor
 
         $serviceXML->setAttribute('class', $definition->getClass());
 
-        if ($definition->getFactoryClass()) {
-            $serviceXML->setAttribute('factory-class', $definition->getFactoryClass());
+        if (method_exists($definition, 'getFactoryMethod')) {
+            if ($definition->getFactoryClass(false)) {
+                $serviceXML->setAttribute('factory-class', $definition->getFactoryClass(false));
+            }
+
+            if ($definition->getFactoryService(false)) {
+                $serviceXML->setAttribute('factory-service', $definition->getFactoryService(false));
+            }
+
+            if ($definition->getFactoryMethod(false)) {
+                $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod(false));
+            }
         }
 
-        if ($definition->getFactoryService()) {
-            $serviceXML->setAttribute('factory-service', $definition->getFactoryService());
-        }
+        if ($factory = $definition->getFactory()) {
+            $serviceXML->appendChild($factoryXML = $dom->createElement('factory'));
 
-        if ($definition->getFactoryMethod()) {
-            $serviceXML->setAttribute('factory-method', $definition->getFactoryMethod());
+            if (is_array($factory)) {
+                if ($factory[0] instanceof Reference) {
+                    $factoryXML->setAttribute('service', (string) $factory[0]);
+                } elseif ($factory[0] instanceof Definition) {
+                    throw new \InvalidArgumentException('Factory is not describable.');
+                } else {
+                    $factoryXML->setAttribute('class', $factory[0]);
+                }
+                $factoryXML->setAttribute('method', $factory[1]);
+            } else {
+                $factoryXML->setAttribute('function', $factory);
+            }
         }
 
         $serviceXML->setAttribute('scope', $definition->getScope());
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
-        $serviceXML->setAttribute('synchronized', $definition->isSynchronized() ? 'true' : 'false');
+        if (method_exists($definition, 'isSynchronized')) {
+            $serviceXML->setAttribute('synchronized', $definition->isSynchronized(false) ? 'true' : 'false');
+        }
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
@@ -412,8 +434,8 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param string|null               $event
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param string|null              $event
      *
      * @return \DOMDocument
      */

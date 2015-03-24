@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2.7.0
+------
+
+ * `UnexpectedTypeException` now expects three constructor arguments: The invalid property value,
+   the `PropertyPathInterface` object and the current index of the property path.
+
 2.5.0
 ------
 

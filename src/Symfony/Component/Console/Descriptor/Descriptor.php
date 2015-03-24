@@ -20,13 +20,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 abstract class Descriptor implements DescriptorInterface
 {
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * {@inheritdoc}
@@ -59,8 +61,8 @@ abstract class Descriptor implements DescriptorInterface
     /**
      * Writes content to output.
      *
-     * @param string  $content
-     * @param bool    $decorated
+     * @param string $content
+     * @param bool   $decorated
      */
     protected function write($content, $decorated = false)
     {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 
 /**
- * Parser and formatter for time zone format
+ * Parser and formatter for time zone format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
@@ -23,7 +23,7 @@ class TimeZoneTransformer extends Transformer
     /**
      * {@inheritdoc}
      *
-     * @throws NotImplementedException  When time zone is different than UTC or GMT (Etc/GMT)
+     * @throws NotImplementedException When time zone is different than UTC or GMT (Etc/GMT)
      */
     public function format(\DateTime $dateTime, $length)
     {
@@ -58,7 +58,7 @@ class TimeZoneTransformer extends Transformer
     }
 
     /**
-     * Get an Etc/GMT timezone identifier for the specified timezone
+     * Get an Etc/GMT timezone identifier for the specified timezone.
      *
      * The PHP documentation for timezones states to not use the 'Other' time zones because them exists
      * "for backwards compatibility". However all Etc/GMT time zones are in the tz database 'etcetera' file,
@@ -69,20 +69,20 @@ class TimeZoneTransformer extends Transformer
      *
      * @param string $formattedTimeZone A GMT timezone string (GMT-03:00, e.g.)
      *
-     * @return string                     A timezone identifier
+     * @return string A timezone identifier
      *
      * @see    http://php.net/manual/en/timezones.others.php
      * @see    http://www.twinsun.com/tz/tz-link.htm
      *
      * @throws NotImplementedException   When the GMT time zone have minutes offset different than zero
-     * @throws \InvalidArgumentException  When the value can not be matched with pattern
+     * @throws \InvalidArgumentException When the value can not be matched with pattern
      */
     public static function getEtcTimeZoneId($formattedTimeZone)
     {
         if (preg_match('/GMT(?P<signal>[+-])(?P<hours>\d{2}):?(?P<minutes>\d{2})/', $formattedTimeZone, $matches)) {
-            $hours   = (int) $matches['hours'];
+            $hours = (int) $matches['hours'];
             $minutes = (int) $matches['minutes'];
-            $signal  = $matches['signal'] == '-' ? '+' : '-';
+            $signal = $matches['signal'] == '-' ? '+' : '-';
 
             if (0 < $minutes) {
                 throw new NotImplementedException(sprintf(

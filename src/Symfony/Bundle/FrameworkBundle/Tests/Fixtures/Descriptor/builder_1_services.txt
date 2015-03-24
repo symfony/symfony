@@ -1,8 +1,10 @@
 <info>[container]</info> <comment>Public</comment> and <comment>private</comment> services
- Service ID        Class name                                             
- alias_1           alias for "service_1"                                  
- alias_2           alias for "service_2"                                  
- definition_1      Full\Qualified\Class1                                  
- definition_2      Full\Qualified\Class2                                  
- service_container Symfony\Component\DependencyInjection\ContainerBuilder 
-                                                                                        
++-------------------+--------------------------------------------------------+
+|[32m Service ID        [39m|[32m Class name                                             [39m|
++-------------------+--------------------------------------------------------+
+| alias_1           | alias for "service_1"                                  |
+| alias_2           | alias for "service_2"                                  |
+| definition_1      | Full\Qualified\Class1                                  |
+| definition_2      | Full\Qualified\Class2                                  |
+| service_container | Symfony\Component\DependencyInjection\ContainerBuilder |
++-------------------+--------------------------------------------------------+

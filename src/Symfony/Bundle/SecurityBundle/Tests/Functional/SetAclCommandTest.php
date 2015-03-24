@@ -151,6 +151,20 @@ class SetAclCommandTest extends WebTestCase
         $this->assertTrue($acl2->isGranted($permissionMap->getMasks($grantedPermission, null), array($roleSecurityIdentity)));
     }
 
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->deleteTmpDir('Acl');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('Acl');
+    }
+
     private function getApplication()
     {
         $kernel = $this->createKernel(array('test_case' => 'Acl'));

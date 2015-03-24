@@ -19,24 +19,26 @@ class TestClass
 
     private $publicAccessor;
     private $publicMethodAccessor;
-    private $publicMethodMutator;
+    private $publicGetSetter;
     private $publicAccessorWithDefaultValue;
     private $publicAccessorWithRequiredAndDefaultValue;
     private $publicAccessorWithMoreRequiredParameters;
     private $publicIsAccessor;
     private $publicHasAccessor;
+    private $publicGetter;
 
     public function __construct($value)
     {
         $this->publicProperty = $value;
         $this->publicAccessor = $value;
         $this->publicMethodAccessor = $value;
-        $this->publicMethodMutator = $value;
+        $this->publicGetSetter = $value;
         $this->publicAccessorWithDefaultValue = $value;
         $this->publicAccessorWithRequiredAndDefaultValue = $value;
         $this->publicAccessorWithMoreRequiredParameters = $value;
         $this->publicIsAccessor = $value;
         $this->publicHasAccessor = $value;
+        $this->publicGetter = $value;
     }
 
     public function setPublicAccessor($value)
@@ -99,19 +101,18 @@ class TestClass
         return $this->publicHasAccessor;
     }
 
-    public function publicMethodAccessor()
+    public function publicGetSetter($value = null)
     {
-        return $this->publicMethodAccessor;
-    }
+        if (null !== $value) {
+            $this->publicGetSetter = $value;
+        }
 
-    public function publicMethodMutator($value)
-    {
-        $this->publicMethodMutator = $value;
+        return $this->publicGetSetter;
     }
 
     public function getPublicMethodMutator()
     {
-        return $this->publicMethodMutator;
+        return $this->publicGetSetter;
     }
 
     protected function setProtectedAccessor($value)
@@ -166,5 +167,10 @@ class TestClass
     private function hasPrivateHasAccessor()
     {
         return 'foobar';
+    }
+
+    public function getPublicGetter()
+    {
+        return $this->publicGetter;
     }
 }

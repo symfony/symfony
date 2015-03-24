@@ -20,8 +20,8 @@ class XliffFileDumperTest extends \PHPUnit_Framework_TestCase
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add(array(
-            'foo'            => 'bar',
-            'key'            => '',
+            'foo' => 'bar',
+            'key' => '',
             'key.with.cdata' => '<source> & <target>',
         ));
         $catalogue->setMetadata('foo', array('notes' => array(array('priority' => 1, 'from' => 'bar', 'content' => 'baz'))));

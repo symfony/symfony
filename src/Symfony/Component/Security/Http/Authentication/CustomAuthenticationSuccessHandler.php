@@ -24,7 +24,7 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
     /**
      * Constructor.
      *
-     * @param AuthenticationSuccessHandlerInterface $handler     An AuthenticationFailureHandlerInterface instance
+     * @param AuthenticationSuccessHandlerInterface $handler     An AuthenticationSuccessHandlerInterface instance
      * @param array                                 $options     Options for processing a successful authentication attempt
      * @param string                                $providerKey The provider key
      */

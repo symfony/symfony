@@ -99,8 +99,8 @@ class NamespacedAttributeBag extends AttributeBag
      *
      * This method allows structured namespacing of session attributes.
      *
-     * @param string  $name         Key name
-     * @param bool    $writeContext Write context, default false
+     * @param string $name         Key name
+     * @param bool   $writeContext Write context, default false
      *
      * @return array
      */

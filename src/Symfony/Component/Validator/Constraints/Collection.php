@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
@@ -24,6 +23,14 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  */
 class Collection extends Composite
 {
+    const MISSING_FIELD_ERROR = 1;
+    const NO_SUCH_FIELD_ERROR = 2;
+
+    protected static $errorNames = array(
+        self::MISSING_FIELD_ERROR => 'MISSING_FIELD_ERROR',
+        self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
+    );
+
     public $fields = array();
     public $allowExtraFields = false;
     public $allowMissingFields = false;

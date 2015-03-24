@@ -28,12 +28,12 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string  $originFile The original filename
-     * @param string  $targetFile The target filename
-     * @param bool    $override   Whether to override an existing file or not
+     * @param string $originFile The original filename
+     * @param string $targetFile The target filename
+     * @param bool   $override   Whether to override an existing file or not
      *
-     * @throws FileNotFoundException    When originFile doesn't exist
-     * @throws IOException              When copy fails
+     * @throws FileNotFoundException When originFile doesn't exist
+     * @throws IOException           When copy fails
      */
     public function copy($originFile, $targetFile, $override = false)
     {
@@ -69,8 +69,11 @@ class Filesystem
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
             }
 
-            if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {
-                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s %g bytes copied".', $originFile, $targetFile, $bytesCopied), 0, null, $originFile);
+            // Like `cp`, preserve executable permission bits
+            @chmod($targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+
+            if (stream_is_local($originFile) && $bytesCopied !== ($bytesOrigin = filesize($originFile))) {
+                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
             }
         }
     }
@@ -108,7 +111,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return bool    true if the file exists, false otherwise
+     * @return bool true if the file exists, false otherwise
      */
     public function exists($files)
     {
@@ -164,7 +167,7 @@ class Filesystem
                 }
             } else {
                 // https://bugs.php.net/bug.php?id=52176
-                if (defined('PHP_WINDOWS_VERSION_MAJOR') && is_dir($file)) {
+                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
                     if (true !== @rmdir($file)) {
                         throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
                     }
@@ -200,7 +203,7 @@ class Filesystem
     }
 
     /**
-     * Change the owner of an array of files or directories
+     * Change the owner of an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
@@ -227,7 +230,7 @@ class Filesystem
     }
 
     /**
-     * Change the group of an array of files or directories
+     * Change the group of an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
@@ -256,9 +259,9 @@ class Filesystem
     /**
      * Renames a file or a directory.
      *
-     * @param string  $origin    The origin filename or directory
-     * @param string  $target    The new filename or directory
-     * @param bool    $overwrite Whether to overwrite the target if it already exists
+     * @param string $origin    The origin filename or directory
+     * @param string $target    The new filename or directory
+     * @param bool   $overwrite Whether to overwrite the target if it already exists
      *
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
@@ -278,18 +281,17 @@ class Filesystem
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @param string  $originDir     The origin directory path
-     * @param string  $targetDir     The symbolic link name
-     * @param bool    $copyOnWindows Whether to copy files if on Windows
+     * @param string $originDir     The origin directory path
+     * @param string $targetDir     The symbolic link name
+     * @param bool   $copyOnWindows Whether to copy files if on Windows
      *
      * @throws IOException When symlink fails
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        $onWindows = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN';
-
-        if ($onWindows && $copyOnWindows) {
+        if ('\\' === DIRECTORY_SEPARATOR && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
+
             return;
         }
 
@@ -308,21 +310,17 @@ class Filesystem
             if (true !== @symlink($originDir, $targetDir)) {
                 $report = error_get_last();
                 if (is_array($report)) {
-                    if (defined('PHP_WINDOWS_VERSION_MAJOR') && false !== strpos($report['message'], 'error code(1314)')) {
+                    if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
                         throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
                 throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
             }
-
-            if (!file_exists($targetDir)) {
-                throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $targetDir), 0, null, $targetDir);
-            }
         }
     }
 
     /**
-     * Given an existing path, convert it to a path relative to a given starting path
+     * Given an existing path, convert it to a path relative to a given starting path.
      *
      * @param string $endPath   Absolute path of target
      * @param string $startPath Absolute path where traversal begins
@@ -332,7 +330,7 @@ class Filesystem
     public function makePathRelative($endPath, $startPath)
     {
         // Normalize separators on Windows
-        if (defined('PHP_WINDOWS_VERSION_MAJOR')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $endPath = strtr($endPath, '\\', '/');
             $startPath = strtr($startPath, '\\', '/');
         }
@@ -368,10 +366,10 @@ class Filesystem
      * @param string       $targetDir The target directory
      * @param \Traversable $iterator  A Traversable instance
      * @param array        $options   An array of boolean options
-     *                               Valid options are:
-     *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
-     *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
-     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
+     *                                Valid options are:
+     *                                - $options['override'] Whether to override an existing file on copy or not (see copy())
+     *                                - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
@@ -405,6 +403,10 @@ class Filesystem
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
+        if ($this->exists($originDir)) {
+            $this->mkdir($targetDir);
+        }
+
         foreach ($iterator as $file) {
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
@@ -418,7 +420,7 @@ class Filesystem
                 }
             } else {
                 if (is_link($file)) {
-                    $this->symlink($file->getLinkTarget(), $target);
+                    $this->symlink($file->getRealPath(), $target);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
                 } elseif (is_file($file)) {
@@ -455,11 +457,12 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param  string       $filename The file to be written to.
-     * @param  string       $content  The data to write into the file.
-     * @param  null|int     $mode     The file mode (octal). If null, file permissions are not modified
-     *                                Deprecated since version 2.3.12, to be removed in 3.0.
-     * @throws IOException            If the file cannot be written to.
+     * @param string   $filename The file to be written to.
+     * @param string   $content  The data to write into the file.
+     * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
+     *                           Deprecated since version 2.3.12, to be removed in 3.0.
+     *
+     * @throws IOException If the file cannot be written to.
      */
     public function dumpFile($filename, $content, $mode = 0666)
     {

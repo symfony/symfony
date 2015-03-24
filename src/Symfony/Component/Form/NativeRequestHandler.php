@@ -63,7 +63,9 @@ class NativeRequestHandler implements RequestHandlerInterface
             return;
         }
 
-        if ('GET' === $method) {
+        // For request methods that must not have a request body we fetch data
+        // from the query string. Otherwise we look for data in the request body.
+        if ('GET' === $method || 'HEAD' === $method || 'TRACE' === $method) {
             if ('' === $name) {
                 $data = $_GET;
             } else {
@@ -96,8 +98,8 @@ class NativeRequestHandler implements RequestHandlerInterface
             }
 
             $fixedFiles = array();
-            foreach ($_FILES as $name => $file) {
-                $fixedFiles[$name] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
+            foreach ($_FILES as $fileKey => $file) {
+                $fixedFiles[$fileKey] = self::stripEmptyFiles(self::fixPhpFilesArray($file));
             }
 
             if ('' === $name) {
@@ -184,11 +186,11 @@ class NativeRequestHandler implements RequestHandlerInterface
 
         foreach (array_keys($data['name']) as $key) {
             $files[$key] = self::fixPhpFilesArray(array(
-                'error'    => $data['error'][$key],
-                'name'     => $data['name'][$key],
-                'type'     => $data['type'][$key],
+                'error' => $data['error'][$key],
+                'name' => $data['name'][$key],
+                'type' => $data['type'][$key],
                 'tmp_name' => $data['tmp_name'][$key],
-                'size'     => $data['size'][$key],
+                'size' => $data['size'][$key],
             ));
         }
 

@@ -20,7 +20,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 {
     private $path;
 
-    public function tearDown()
+    protected function tearDown()
     {
         if ($this->path) {
             // Restore path if it was changed.
@@ -94,7 +94,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Requires the PHP_BINARY constant');
         }
 
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
         }
 
@@ -102,7 +102,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Cannot test when open_basedir is set');
         }
 
-        ini_set('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
+        $this->iniSet('open_basedir', dirname(PHP_BINARY).PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName());
@@ -120,10 +120,12 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Requires the PHP_BINARY constant');
         }
 
-        $execPath = __DIR__.'/SignalListener.php';
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Cannot run test on windows');
+        }
 
         $this->setPath('');
-        ini_set('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
+        $this->iniSet('open_basedir', PHP_BINARY.PATH_SEPARATOR.'/');
 
         $finder = new ExecutableFinder();
         $result = $finder->find($this->getPhpBinaryName(), false);
@@ -133,7 +135,7 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
     private function assertSamePath($expected, $tested)
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->assertEquals(strtolower($expected), strtolower($tested));
         } else {
             $this->assertEquals($expected, $tested);
@@ -142,6 +144,6 @@ class ExecutableFinderTest extends \PHPUnit_Framework_TestCase
 
     private function getPhpBinaryName()
     {
-        return basename(PHP_BINARY, defined('PHP_WINDOWS_VERSION_BUILD') ? '.exe' : '');
+        return basename(PHP_BINARY, '\\' === DIRECTORY_SEPARATOR ? '.exe' : '');
     }
 }

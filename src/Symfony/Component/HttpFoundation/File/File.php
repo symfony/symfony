@@ -28,8 +28,8 @@ class File extends \SplFileInfo
     /**
      * Constructs a new file from the given path.
      *
-     * @param string  $path      The path to the file
-     * @param bool    $checkPath Whether to check the path or not
+     * @param string $path      The path to the file
+     * @param bool   $checkPath Whether to check the path or not
      *
      * @throws FileNotFoundException If the given path is not a file
      *
@@ -130,7 +130,7 @@ class File extends \SplFileInfo
     protected function getTargetFile($directory, $name = null)
     {
         if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0777, true)) {
+            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
                 throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
             }
         } elseif (!is_writable($directory)) {

@@ -64,7 +64,7 @@ class DOMCaster
     public static function castException(\DOMException $e, array $a, Stub $stub, $isNested)
     {
         if (isset($a["\0*\0code"], self::$errorCodes[$a["\0*\0code"]])) {
-            $a["\0*\0code"] = new CasterStub(self::$errorCodes[$a["\0*\0code"]], 'const');
+            $a["\0*\0code"] = new ConstStub(self::$errorCodes[$a["\0*\0code"]], $a["\0*\0code"]);
         }
 
         return $a;
@@ -93,21 +93,21 @@ class DOMCaster
     {
         $a += array(
             'nodeName' => $dom->nodeName,
-            'nodeValue' => new CasterStub($dom->nodeValue),
-            'nodeType' => new CasterStub(self::$nodeTypes[$dom->nodeType], 'const'),
-            'parentNode' => new CasterStub($dom->parentNode),
+            'nodeValue' => new CutStub($dom->nodeValue),
+            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
+            'parentNode' => new CutStub($dom->parentNode),
             'childNodes' => $dom->childNodes,
-            'firstChild' => new CasterStub($dom->firstChild),
-            'lastChild' => new CasterStub($dom->lastChild),
-            'previousSibling' => new CasterStub($dom->previousSibling),
-            'nextSibling' => new CasterStub($dom->nextSibling),
+            'firstChild' => new CutStub($dom->firstChild),
+            'lastChild' => new CutStub($dom->lastChild),
+            'previousSibling' => new CutStub($dom->previousSibling),
+            'nextSibling' => new CutStub($dom->nextSibling),
             'attributes' => $dom->attributes,
-            'ownerDocument' => new CasterStub($dom->ownerDocument),
+            'ownerDocument' => new CutStub($dom->ownerDocument),
             'namespaceURI' => $dom->namespaceURI,
             'prefix' => $dom->prefix,
             'localName' => $dom->localName,
             'baseURI' => $dom->baseURI,
-            'textContent' => new CasterStub($dom->textContent),
+            'textContent' => new CutStub($dom->textContent),
         );
 
         return $a;
@@ -115,17 +115,15 @@ class DOMCaster
 
     public static function castNameSpaceNode(\DOMNameSpaceNode $dom, array $a, Stub $stub, $isNested)
     {
-        // Commented lines denote properties that exist but are better not dumped for clarity.
-
         $a += array(
             'nodeName' => $dom->nodeName,
-            'nodeValue' => new CasterStub($dom->nodeValue),
-            'nodeType' => new CasterStub(self::$nodeTypes[$dom->nodeType], 'const'),
+            'nodeValue' => new CutStub($dom->nodeValue),
+            'nodeType' => new ConstStub(self::$nodeTypes[$dom->nodeType], $dom->nodeType),
             'prefix' => $dom->prefix,
             'localName' => $dom->localName,
             'namespaceURI' => $dom->namespaceURI,
-            'ownerDocument' => new CasterStub($dom->ownerDocument),
-            'parentNode' => new CasterStub($dom->parentNode),
+            'ownerDocument' => new CutStub($dom->ownerDocument),
+            'parentNode' => new CutStub($dom->parentNode),
         );
 
         return $a;
@@ -139,7 +137,7 @@ class DOMCaster
         $a += array(
             'doctype' => $dom->doctype,
             'implementation' => $dom->implementation,
-            'documentElement' => new CasterStub($dom->documentElement),
+            'documentElement' => new CutStub($dom->documentElement),
             'actualEncoding' => $dom->actualEncoding,
             'encoding' => $dom->encoding,
             'xmlEncoding' => $dom->xmlEncoding,

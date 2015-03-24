@@ -49,13 +49,15 @@ class VariableNode extends BaseNode implements PrototypeNodeInterface
      */
     public function getDefaultValue()
     {
-        return $this->defaultValue instanceof \Closure ? call_user_func($this->defaultValue) : $this->defaultValue;
+        $v = $this->defaultValue;
+
+        return $v instanceof \Closure ? $v() : $v;
     }
 
     /**
      * Sets if this node is allowed to have an empty value.
      *
-     * @param bool    $boolean True if this entity will accept empty values.
+     * @param bool $boolean True if this entity will accept empty values.
      */
     public function setAllowEmptyValue($boolean)
     {

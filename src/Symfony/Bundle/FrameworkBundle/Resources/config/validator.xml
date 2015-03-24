@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="validator.class">Symfony\Component\Validator\ValidatorInterface</parameter>
+        <parameter key="validator.class">Symfony\Component\Validator\Validator\ValidatorInterface</parameter>
         <parameter key="validator.builder.class">Symfony\Component\Validator\ValidatorBuilderInterface</parameter>
         <parameter key="validator.builder.factory.class">Symfony\Component\Validator\Validation</parameter>
         <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
@@ -16,9 +16,12 @@
     </parameters>
 
     <services>
-        <service id="validator" class="%validator.class%" factory-service="validator.builder" factory-method="getValidator" />
+        <service id="validator" class="%validator.class%">
+            <factory service="validator.builder" method="getValidator" />
+        </service>
 
-        <service id="validator.builder" class="%validator.builder.class%" factory-class="%validator.builder.factory.class%" factory-method="createValidatorBuilder">
+        <service id="validator.builder" class="%validator.builder.class%">
+            <factory class="%validator.builder.factory.class%" method="createValidatorBuilder" />
             <call method="setConstraintValidatorFactory">
                 <argument type="service" id="validator.validator_factory" />
             </call>

@@ -1,12 +1,12 @@
 <comment>Path</comment>         /name/add
+<comment>Path Regex</comment>   #^/name/add$#s
 <comment>Host</comment>         localhost
+<comment>Host Regex</comment>   #^localhost$#si
 <comment>Scheme</comment>       http|https
 <comment>Method</comment>       PUT|POST
 <comment>Class</comment>        Symfony\Component\Routing\Route
-<comment>Defaults</comment>     
-<comment>Requirements</comment> 
+<comment>Defaults</comment>     NONE
+<comment>Requirements</comment> NO CUSTOM
 <comment>Options</comment>      compiler_class: Symfony\Component\Routing\RouteCompiler
              opt1: val1
              opt2: val2
-<comment>Path-Regex</comment>   #^/name/add$#s
-<comment>Host-Regex</comment>   #^localhost$#s

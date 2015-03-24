@@ -16,15 +16,15 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 class BinaryNode extends Node
 {
     private static $operators = array(
-        '~'   => '.',
+        '~' => '.',
         'and' => '&&',
-        'or'  => '||',
+        'or' => '||',
     );
 
     private static $functions = array(
-        '**'     => 'pow',
-        '..'     => 'range',
-        'in'     => 'in_array',
+        '**' => 'pow',
+        '..' => 'range',
+        'in' => 'in_array',
         'not in' => '!in_array',
     );
 
@@ -87,11 +87,12 @@ class BinaryNode extends Node
         if (isset(self::$functions[$operator])) {
             $right = $this->nodes['right']->evaluate($functions, $values);
 
-            if ('not in' == $operator) {
-                return !call_user_func('in_array', $left, $right);
+            if ('not in' === $operator) {
+                return !in_array($left, $right);
             }
+            $f = self::$functions[$operator];
 
-            return call_user_func(self::$functions[$operator], $left, $right);
+            return $f($left, $right);
         }
 
         switch ($operator) {

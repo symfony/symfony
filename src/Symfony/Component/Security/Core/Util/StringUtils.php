@@ -19,7 +19,7 @@ namespace Symfony\Component\Security\Core\Util;
 class StringUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -34,7 +34,7 @@ class StringUtils
      * @param string $knownString The string of known length to compare against
      * @param string $userInput   The string that the user can control
      *
-     * @return bool    true if the two strings are the same, false otherwise
+     * @return bool true if the two strings are the same, false otherwise
      */
     public static function equals($knownString, $userInput)
     {

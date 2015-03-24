@@ -50,9 +50,9 @@ class DoctrineCaster
     {
         $prefix = "\0Doctrine\\ORM\\PersistentCollection\0";
 
-        $a[$prefix.'snapshot'] = new CasterStub($a[$prefix.'snapshot']);
-        $a[$prefix.'association'] = new CasterStub($a[$prefix.'association']);
-        $a[$prefix.'typeClass'] = new CasterStub($a[$prefix.'typeClass']);
+        $a[$prefix.'snapshot'] = new CutStub($a[$prefix.'snapshot']);
+        $a[$prefix.'association'] = new CutStub($a[$prefix.'association']);
+        $a[$prefix.'typeClass'] = new CutStub($a[$prefix.'typeClass']);
 
         return $a;
     }

@@ -6,13 +6,10 @@
 
     <parameters>
         <parameter key="security.context.class">Symfony\Component\Security\Core\SecurityContext</parameter>
-        <parameter key="security.authorization_checker.class">Symfony\Component\Security\Core\Authorization\AuthorizationChecker</parameter>
-        <parameter key="security.token_storage.class">Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage</parameter>
 
         <parameter key="security.user_checker.class">Symfony\Component\Security\Core\User\UserChecker</parameter>
 
         <parameter key="security.encoder_factory.generic.class">Symfony\Component\Security\Core\Encoder\EncoderFactory</parameter>
-        <parameter key="security.user_password_encoder.generic.class">Symfony\Component\Security\Core\Encoder\UserPasswordEncoder</parameter>
         <parameter key="security.encoder.digest.class">Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder</parameter>
         <parameter key="security.encoder.plain.class">Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder</parameter>
         <parameter key="security.encoder.pbkdf2.class">Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder</parameter>
@@ -50,8 +47,6 @@
         <parameter key="security.validator.user_password.class">Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator</parameter>
 
         <parameter key="security.expression_language.class">Symfony\Component\Security\Core\Authorization\ExpressionLanguage</parameter>
-
-        <parameter key="security.authentication_utils.class">Symfony\Component\Security\Http\Authentication\AuthenticationUtils</parameter>
     </parameters>
 
     <services>
@@ -60,14 +55,14 @@
             <argument type="service" id="security.authorization_checker" />
         </service>
 
-        <service id="security.authorization_checker" class="%security.authorization_checker.class%">
+        <service id="security.authorization_checker" class="Symfony\Component\Security\Core\Authorization\AuthorizationChecker">
             <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.authentication.manager" />
             <argument type="service" id="security.access.decision_manager" />
             <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
 
-        <service id="security.token_storage" class="%security.token_storage.class%" />
+        <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
 
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="%security.authentication.manager.class%" public="false">
@@ -93,7 +88,7 @@
 
         <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
 
-        <service id="security.user_password_encoder.generic" class="%security.user_password_encoder.generic.class%" public="false">
+        <service id="security.user_password_encoder.generic" class="Symfony\Component\Security\Core\Encoder\UserPasswordEncoder" public="false">
             <argument type="service" id="security.encoder_factory"></argument>
         </service>
 
@@ -103,7 +98,7 @@
 
         <service id="security.expression_language" class="%security.expression_language.class%" public="false" />
 
-        <service id="security.authentication_utils" class="%security.authentication_utils.class%">
+        <service id="security.authentication_utils" class="Symfony\Component\Security\Http\Authentication\AuthenticationUtils">
             <argument type="service" id="request_stack" />
         </service>
 
@@ -157,6 +152,12 @@
             <argument type="service" id="security.exception_listener" />
         </service>
 
+        <service id="security.logout_url_generator" class="Symfony\Component\Security\Http\Logout\LogoutUrlGenerator" public="false">
+            <argument type="service" id="request_stack" on-invalid="null" />
+            <argument type="service" id="router" on-invalid="null" />
+            <argument type="service" id="security.token_storage" on-invalid="null" />
+        </service>
+
         <!-- Provisioning -->
         <service id="security.user.provider.in_memory" class="%security.user.provider.in_memory.class%" abstract="true" public="false" />
         <service id="security.user.provider.in_memory.user" class="%security.user.provider.in_memory.user.class%" abstract="true" public="false" />
@@ -171,7 +172,7 @@
         <!-- Validator -->
         <service id="security.validator.user_password" class="%security.validator.user_password.class%">
             <tag name="validator.constraint_validator" alias="security.validator.user_password" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
             <argument type="service" id="security.encoder_factory" />
         </service>
     </services>

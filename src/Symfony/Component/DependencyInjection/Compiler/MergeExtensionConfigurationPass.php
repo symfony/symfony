@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 /**
- * Merges extension configs into the container builder
+ * Merges extension configs into the container builder.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -29,6 +29,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $parameters = $container->getParameterBag()->all();
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
+        $exprLangProviders = $container->getExpressionLanguageProviders();
 
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof PrependExtensionInterface) {
@@ -46,6 +47,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $tmpContainer = new ContainerBuilder($container->getParameterBag());
             $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
+
+            foreach ($exprLangProviders as $provider) {
+                $tmpContainer->addExpressionLanguageProvider($provider);
+            }
 
             $extension->load($config, $tmpContainer);
 

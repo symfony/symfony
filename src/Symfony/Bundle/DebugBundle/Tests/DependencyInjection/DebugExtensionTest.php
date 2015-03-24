@@ -38,10 +38,10 @@ class DebugExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder(new ParameterBag(array(
             'kernel.cache_dir' => __DIR__,
-            'kernel.root_dir'  => __DIR__.'/Fixtures',
-            'kernel.charset'   => 'UTF-8',
-            'kernel.debug'     => true,
-            'kernel.bundles'   => array('DebugBundle' => 'Symfony\\Bundle\\DebugBundle\\DebugBundle'),
+            'kernel.root_dir' => __DIR__.'/Fixtures',
+            'kernel.charset' => 'UTF-8',
+            'kernel.debug' => true,
+            'kernel.bundles' => array('DebugBundle' => 'Symfony\\Bundle\\DebugBundle\\DebugBundle'),
         )));
 
         return $container;

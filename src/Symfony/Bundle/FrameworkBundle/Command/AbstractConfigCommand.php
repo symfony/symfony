@@ -13,7 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * A console command for dumping available configuration reference.
@@ -70,10 +72,12 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
             }
         }
 
+        $this->initializeExtensions($bundles);
+
         return $extension;
     }
 
-    public function validateConfiguration(Extension $extension, $configuration)
+    public function validateConfiguration(ExtensionInterface $extension, $configuration)
     {
         if (!$configuration) {
             throw new \LogicException(sprintf('The extension with alias "%s" does not have its getConfiguration() method setup', $extension->getAlias()));
@@ -81,6 +85,24 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 
         if (!$configuration instanceof ConfigurationInterface) {
             throw new \LogicException(sprintf('Configuration class "%s" should implement ConfigurationInterface in order to be dumpable', get_class($configuration)));
+        }
+    }
+
+    private function initializeExtensions($bundles)
+    {
+        // Re-build bundle manually to initialize DI extensions that can be extended by other bundles in their build() method
+        // as this method is not called when the container is loaded from the cache.
+        $parameters = $this->getContainer()->getParameterBag()->all();
+        $container = new ContainerBuilder(new ParameterBag($parameters));
+        foreach ($bundles as $bundle) {
+            if ($extension = $bundle->getContainerExtension()) {
+                $container->registerExtension($extension);
+            }
+        }
+
+        foreach ($bundles as $bundle) {
+            $bundle = clone $bundle;
+            $bundle->build($container);
         }
     }
 }

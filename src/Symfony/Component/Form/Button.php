@@ -206,8 +206,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getData()
     {
@@ -215,8 +213,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getNormData()
     {
@@ -224,8 +220,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getViewData()
     {
@@ -273,8 +267,6 @@ class Button implements \IteratorAggregate, FormInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getPropertyPath()
     {
@@ -342,6 +334,15 @@ class Button implements \IteratorAggregate, FormInterface
     public function isSynchronized()
     {
         return true;
+    }
+
+    /**
+     * Unsupported method.
+     *
+     * @return null Always returns null
+     */
+    public function getTransformationFailure()
+    {
     }
 
     /**

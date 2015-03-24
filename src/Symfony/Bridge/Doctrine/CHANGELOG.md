@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.4.0
+-----
+
+ * deprecated DoctrineOrmTestCase class
+
 2.2.0
 -----
 

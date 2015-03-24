@@ -6,7 +6,6 @@
 
     <parameters>
         <parameter key="translator.class">Symfony\Bundle\FrameworkBundle\Translation\Translator</parameter>
-        <parameter key="translator.logging.class">Symfony\Component\Translation\LoggingTranslator</parameter>
         <parameter key="translator.identity.class">Symfony\Component\Translation\IdentityTranslator</parameter>
         <parameter key="translator.selector.class">Symfony\Component\Translation\MessageSelector</parameter>
         <parameter key="translation.loader.php.class">Symfony\Component\Translation\Loader\PhpFileLoader</parameter>
@@ -45,9 +44,10 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
+            <argument type="collection" /> <!-- translation resources -->
         </service>
 
-        <service id="translator.logging" class="%translator.logging.class%" public="false">
+        <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">
             <argument type="service" id="translator.logging.inner" />
             <argument type="service" id="logger" />
             <tag name="monolog.logger" channel="translation" />

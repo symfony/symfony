@@ -14,7 +14,7 @@ namespace Symfony\Component\CssSelector\Node;
 /**
  * Represents a node specificity.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @see http://www.w3.org/TR/selectors/#specificity
@@ -81,6 +81,7 @@ class Specificity
      * 0 if they are equal, and 1 if the argument is lower
      *
      * @param Specificity $specificity
+     *
      * @return int
      */
     public function compareTo(Specificity $specificity)

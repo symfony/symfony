@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+trigger_error('The '.__NAMESPACE__.'\Validator class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Validator\RecursiveValidator class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ValidatorException;
@@ -21,7 +23,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  *             Use {@link Validator\RecursiveValidator} instead.
  */
 class Validator implements ValidatorInterface, Mapping\Factory\MetadataFactoryInterface

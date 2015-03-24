@@ -127,8 +127,8 @@ class ViolationMapper implements ViolationMapperInterface
             $scope->addError(new FormError(
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
-                $violation->getMessageParameters(),
-                $violation->getMessagePluralization(),
+                $violation->getParameters(),
+                $violation->getPlural(),
                 $violation
             ));
         }
@@ -229,8 +229,8 @@ class ViolationMapper implements ViolationMapperInterface
     /**
      * Reconstructs a property path from a violation path and a form tree.
      *
-     * @param  ViolationPath $violationPath The violation path.
-     * @param  FormInterface $origin        The root form of the tree.
+     * @param ViolationPath $violationPath The violation path.
+     * @param FormInterface $origin        The root form of the tree.
      *
      * @return RelativePath The reconstructed path.
      */

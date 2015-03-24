@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator HTML extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -45,14 +45,14 @@ class HtmlExtension extends AbstractExtension
     public function getPseudoClassTranslators()
     {
         return array(
-            'checked'  => array($this, 'translateChecked'),
-            'link'     => array($this, 'translateLink'),
+            'checked' => array($this, 'translateChecked'),
+            'link' => array($this, 'translateLink'),
             'disabled' => array($this, 'translateDisabled'),
-            'enabled'  => array($this, 'translateEnabled'),
+            'enabled' => array($this, 'translateEnabled'),
             'selected' => array($this, 'translateSelected'),
-            'invalid'  => array($this, 'translateInvalid'),
-            'hover'    => array($this, 'translateHover'),
-            'visited'  => array($this, 'translateVisited'),
+            'invalid' => array($this, 'translateInvalid'),
+            'hover' => array($this, 'translateHover'),
+            'visited' => array($this, 'translateVisited'),
         );
     }
 

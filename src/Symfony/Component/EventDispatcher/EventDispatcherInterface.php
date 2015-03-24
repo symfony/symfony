@@ -28,7 +28,7 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
-     * @param Event $event The event to pass to the event handlers/listeners.
+     * @param Event  $event     The event to pass to the event handlers/listeners.
      *                          If not supplied, an empty Event instance is created.
      *
      * @return Event
@@ -64,8 +64,8 @@ interface EventDispatcherInterface
     /**
      * Removes an event listener from the specified events.
      *
-     * @param string|array $eventName The event(s) to remove a listener from
-     * @param callable     $listener  The listener to remove
+     * @param string   $eventName The event to remove a listener from
+     * @param callable $listener  The listener to remove
      */
     public function removeListener($eventName, $listener);
 
@@ -90,7 +90,7 @@ interface EventDispatcherInterface
      *
      * @param string $eventName The name of the event
      *
-     * @return bool    true if the specified event has any listeners, false otherwise
+     * @return bool true if the specified event has any listeners, false otherwise
      */
     public function hasListeners($eventName = null);
 }

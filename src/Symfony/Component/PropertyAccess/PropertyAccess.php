@@ -39,19 +39,6 @@ final class PropertyAccess
     }
 
     /**
-     * Alias of {@link getPropertyAccessor}.
-     *
-     * @return PropertyAccessor The new property accessor
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link createPropertyAccessor()} instead.
-     */
-    public static function getPropertyAccessor()
-    {
-        return self::createPropertyAccessor();
-    }
-
-    /**
      * This class cannot be instantiated.
      */
     private function __construct()

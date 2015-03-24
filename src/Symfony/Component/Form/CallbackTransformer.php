@@ -17,13 +17,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class CallbackTransformer implements DataTransformerInterface
 {
     /**
-     * The callback used for forward transform
+     * The callback used for forward transform.
+     *
      * @var callable
      */
     private $transform;
 
     /**
-     * The callback used for reverse transform
+     * The callback used for reverse transform.
+     *
      * @var callable
      */
     private $reverseTransform;

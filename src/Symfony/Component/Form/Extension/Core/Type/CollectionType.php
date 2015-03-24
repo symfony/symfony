@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CollectionType extends AbstractType
 {
@@ -50,7 +50,7 @@ class CollectionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, array(
-            'allow_add'    => $options['allow_add'],
+            'allow_add' => $options['allow_add'],
             'allow_delete' => $options['allow_delete'],
         ));
 
@@ -72,7 +72,7 @@ class CollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $optionsNormalizer = function (Options $options, $value) {
             $value['block_name'] = 'entry';
@@ -81,18 +81,16 @@ class CollectionType extends AbstractType
         };
 
         $resolver->setDefaults(array(
-            'allow_add'      => false,
-            'allow_delete'   => false,
-            'prototype'      => true,
+            'allow_add' => false,
+            'allow_delete' => false,
+            'prototype' => true,
             'prototype_name' => '__name__',
-            'type'           => 'text',
-            'options'        => array(),
-            'delete_empty'   => false,
+            'type' => 'text',
+            'options' => array(),
+            'delete_empty' => false,
         ));
 
-        $resolver->setNormalizers(array(
-            'options' => $optionsNormalizer,
-        ));
+        $resolver->setNormalizer('options', $optionsNormalizer);
     }
 
     /**

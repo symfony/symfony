@@ -21,9 +21,46 @@ namespace Symfony\Component\Intl;
 final class Locale extends \Locale
 {
     /**
-     * Returns the fallback locale for a given locale, if any
+     * @var string
+     */
+    private static $defaultFallback = 'en';
+
+    /**
+     * Sets the default fallback locale.
      *
-     * @param string $locale The ICU locale code to find the fallback for.
+     * The default fallback locale is used as fallback for locales that have no
+     * fallback otherwise.
+     *
+     * @param string $locale The default fallback locale
+     *
+     * @see getFallback()
+     */
+    public static function setDefaultFallback($locale)
+    {
+        self::$defaultFallback = $locale;
+    }
+
+    /**
+     * Returns the default fallback locale.
+     *
+     * @return string The default fallback locale
+     *
+     * @see setDefaultFallback()
+     * @see getFallback()
+     */
+    public static function getDefaultFallback()
+    {
+        return self::$defaultFallback;
+    }
+
+    /**
+     * Returns the fallback locale for a given locale.
+     *
+     * For example, the fallback of "fr_FR" is "fr". The fallback of "fr" is
+     * the default fallback locale configured with {@link setDefaultFallback()}.
+     * The default fallback locale has no fallback.
+     *
+     * @param string $locale The ICU locale code to find the fallback for
      *
      * @return string|null The ICU locale code of the fallback locale, or null
      *                     if no fallback exists
@@ -31,11 +68,17 @@ final class Locale extends \Locale
     public static function getFallback($locale)
     {
         if (false === $pos = strrpos($locale, '_')) {
-            if ('root' === $locale) {
-                return;
+            if (self::$defaultFallback === $locale) {
+                return 'root';
             }
 
-            return 'root';
+            // Don't return default fallback for "root", "meta" or others
+            // Normal locales have two or three letters
+            if (strlen($locale) < 4) {
+                return self::$defaultFallback;
+            }
+
+            return;
         }
 
         return substr($locale, 0, $pos);

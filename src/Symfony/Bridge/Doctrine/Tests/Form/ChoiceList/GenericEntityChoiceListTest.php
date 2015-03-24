@@ -36,22 +36,6 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\Form\Form')) {
-            $this->markTestSkipped('The "Form" component is not available');
-        }
-
-        if (!class_exists('Doctrine\DBAL\Platforms\MySqlPlatform')) {
-            $this->markTestSkipped('Doctrine DBAL is not available.');
-        }
-
-        if (!class_exists('Doctrine\Common\Version')) {
-            $this->markTestSkipped('Doctrine Common is not available.');
-        }
-
-        if (!class_exists('Doctrine\ORM\EntityManager')) {
-            $this->markTestSkipped('Doctrine ORM is not available.');
-        }
-
         $this->em = DoctrineTestHelper::createTestEntityManager();
 
         $schemaTool = new SchemaTool($this->em);
@@ -281,6 +265,26 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyInitShorthandEntityName()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $item1 = new SingleIntIdEntity(1, 'Foo');
+        $item2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->em->persist($item1);
+        $this->em->persist($item2);
+
+        $choiceList = new EntityChoiceList(
+            $this->em,
+            'SymfonyTestsDoctrine:SingleIntIdEntity'
+        );
+
         $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
     }
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpFoundation\File\Exception;
 
 /**
- * Thrown when a file was not found
+ * Thrown when a file was not found.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

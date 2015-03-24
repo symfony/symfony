@@ -77,6 +77,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':d')) {
+            $output->writeln('<comment>The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.</comment>');
+        }
+
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
 
@@ -87,9 +91,9 @@ EOF
             }
             $this->convertController($route);
             $helper->describe($output, $route, array(
-                'format'   => $input->getOption('format'),
+                'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
-                'name'     => $name,
+                'name' => $name,
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
@@ -99,8 +103,8 @@ EOF
             }
 
             $helper->describe($output, $routes, array(
-                'format'           => $input->getOption('format'),
-                'raw_text'         => $input->getOption('raw'),
+                'format' => $input->getOption('format'),
+                'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
             ));
         }

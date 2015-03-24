@@ -19,6 +19,9 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
+/**
+ * @group tty
+ */
 class QuestionHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testAskChoice()
@@ -125,12 +128,9 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('FooBundle', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
-    /**
-     * @group tty
-     */
     public function testAskHiddenResponse()
     {
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
         }
 
@@ -143,27 +143,39 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('8AM', $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
-    public function testAskConfirmation()
+    /**
+     * @dataProvider getAskConfirmationData
+     */
+    public function testAskConfirmation($question, $expected, $default = true)
     {
         $dialog = new QuestionHelper();
 
-        $dialog->setInputStream($this->getInputStream("\n\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?');
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $dialog->setInputStream($this->getInputStream($question."\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', $default);
+        $this->assertEquals($expected, $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question), 'confirmation question should '.($expected ? 'pass' : 'cancel'));
+    }
 
-        $dialog->setInputStream($this->getInputStream("y\nyes\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', false);
-        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    public function getAskConfirmationData()
+    {
+        return array(
+            array('', true),
+            array('', false, false),
+            array('y', true),
+            array('yes', true),
+            array('n', false),
+            array('no', false),
+        );
+    }
 
-        $dialog->setInputStream($this->getInputStream("n\nno\n"));
-        $question = new ConfirmationQuestion('Do you like French fries?', true);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
-        $question = new ConfirmationQuestion('Do you like French fries?', true);
-        $this->assertFalse($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    public function testAskConfirmationWithCustomTrueAnswer()
+    {
+        $dialog = new QuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream("j\ny\n"));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $question = new ConfirmationQuestion('Do you like French fries?', false, '/^(j|y)/i');
+        $this->assertTrue($dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
     public function testAskAndValidate()
@@ -198,6 +210,60 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @dataProvider answerProvider
+     */
+    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    {
+        $possibleChoices = array(
+            'env_1' => 'My environment 1',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream($providedAnswer."\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+
+        $this->assertSame($expectedValue, $answer);
+    }
+
+    public function testAmbiguousChoiceFromChoicelist()
+    {
+        $possibleChoices = array(
+            'env_1' => 'My environment 1',
+            'env_2' => 'My environment',
+            'env_3' => 'My environment',
+        );
+
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream("My environment\n"));
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $dialog->setHelperSet($helperSet);
+
+        $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+
+        try {
+            $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('The provided answer is ambiguous. Value should be one of env_2 or env_3.', $e->getMessage());
+        }
+    }
+
+    public function answerProvider()
+    {
+        return array(
+            array('env_1', 'env_1'),
+            array('env_2', 'env_2'),
+            array('env_3', 'env_3'),
+            array('My environment 1', 'env_1'),
+        );
+    }
+
     public function testNoInteraction()
     {
         $dialog = new QuestionHelper();
@@ -208,7 +274,7 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
+        fwrite($stream, $input);
         rewind($stream);
 
         return $stream;

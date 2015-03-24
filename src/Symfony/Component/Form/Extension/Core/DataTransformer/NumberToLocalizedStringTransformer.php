@@ -75,23 +75,23 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Alias for {@link self::ROUND_HALF_EVEN}.
      *
-     * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
-    const ROUND_HALFEVEN = self::ROUND_HALF_EVEN;
+    const ROUND_HALFEVEN = \NumberFormatter::ROUND_HALFEVEN;
 
     /**
      * Alias for {@link self::ROUND_HALF_UP}.
      *
-     * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
-    const ROUND_HALFUP = self::ROUND_HALF_UP;
+    const ROUND_HALFUP = \NumberFormatter::ROUND_HALFUP;
 
     /**
      * Alias for {@link self::ROUND_HALF_DOWN}.
      *
-     * @deprecated Deprecated as of Symfony 2.4, to be removed in Symfony 3.0.
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
-    const ROUND_HALFDOWN = self::ROUND_HALF_DOWN;
+    const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
 
     protected $precision;
 
@@ -148,7 +148,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a localized number into an integer or float
+     * Transforms a localized number into an integer or float.
      *
      * @param string $value The localized value
      *
@@ -221,7 +221,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Returns a preconfigured \NumberFormatter instance
+     * Returns a preconfigured \NumberFormatter instance.
      *
      * @return \NumberFormatter
      */
@@ -242,9 +242,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Rounds a number according to the configured precision and rounding mode.
      *
-     * @param int|float     $number A number.
+     * @param int|float $number A number.
      *
-     * @return int|float     The rounded number.
+     * @return int|float The rounded number.
      */
     private function round($number)
     {

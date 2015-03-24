@@ -59,24 +59,26 @@ class SetAclCommand extends ContainerAwareCommand
 The <info>%command.name%</info> command sets ACL.
 The ACL system must have been initialized with the <info>init:acl</info> command.
 
-To set <comment>VIEW</comment> and <comment>EDIT</comment> permissions for the user <comment>kevin</comment> on the instance of <comment>Acme\MyClass</comment> having the identifier <comment>42</comment>:
+To set <comment>VIEW</comment> and <comment>EDIT</comment> permissions for the user <comment>kevin</comment> on the instance of
+<comment>Acme\MyClass</comment> having the identifier <comment>42</comment>:
 
-<info>php %command.full_name% --user=Symfony/Component/Security/Core/User/User:kevin VIEW EDIT Acme/MyClass:42</info>
+  <info>php %command.full_name% --user=Symfony/Component/Security/Core/User/User:kevin VIEW EDIT Acme/MyClass:42</info>
 
 Note that you can use <comment>/</comment> instead of <comment>\\ </comment>for the namespace delimiter to avoid any
 problem.
 
 To set permissions for a role, use the <info>--role</info> option:
 
-<info>php %command.full_name% --role=ROLE_USER VIEW Acme/MyClass:1936</info>
+  <info>php %command.full_name% --role=ROLE_USER VIEW Acme/MyClass:1936</info>
 
 To set permissions at the class scope, use the <info>--class-scope</info> option:
 
-<info>php %command.full_name% --class-scope --user=Symfony/Component/Security/Core/User/User:anne OWNER Acme/MyClass:42</info>
+  <info>php %command.full_name% --class-scope --user=Symfony/Component/Security/Core/User/User:anne OWNER Acme/MyClass:42</info>
+  
 EOF
             )
             ->addArgument('arguments', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'A list of permissions and object identities (class name and ID separated by a column)')
-            ->addOption('user', null, InputOption::VALUE_REQUIRED, 'A list of security identities')
+            ->addOption('user', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A list of security identities')
             ->addOption('role', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'A list of roles')
             ->addOption('class-scope', null, InputOption::VALUE_NONE, 'Use class-scope entries')
         ;

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Acl\Model;
 
 /**
- * Interface for entries which are restricted to specific fields
+ * Interface for entries which are restricted to specific fields.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */

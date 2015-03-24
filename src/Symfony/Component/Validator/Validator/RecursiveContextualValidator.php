@@ -313,17 +313,17 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * traversal, the object will be iterated and each nested object will be
      * validated instead.
      *
-     * @param object    $object            The object to cascade
-     * @param string    $propertyPath      The current property path
-     * @param string[]  $groups            The validated groups
-     * @param int       $traversalStrategy The strategy for traversing the
-     *                                     cascaded object
-     * @param ExecutionContextInterface $context The current execution context
+     * @param object                    $object            The object to cascade
+     * @param string                    $propertyPath      The current property path
+     * @param string[]                  $groups            The validated groups
+     * @param int                       $traversalStrategy The strategy for traversing the
+     *                                                     cascaded object
+     * @param ExecutionContextInterface $context           The current execution context
      *
-     * @throws NoSuchMetadataException If the object has no associated metadata
-     *                                 and does not implement {@link \Traversable}
-     *                                 or if traversal is disabled via the
-     *                                 $traversalStrategy argument
+     * @throws NoSuchMetadataException      If the object has no associated metadata
+     *                                      and does not implement {@link \Traversable}
+     *                                      or if traversal is disabled via the
+     *                                      $traversalStrategy argument
      * @throws UnsupportedMetadataException If the metadata returned by the
      *                                      metadata factory does not implement
      *                                      {@link ClassMetadataInterface}
@@ -384,11 +384,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      * @param array|\Traversable        $collection    The collection
      * @param string                    $propertyPath  The current property path
      * @param string[]                  $groups        The validated groups
-     * @param bool    $stopRecursion                   Whether to disable
+     * @param bool                      $stopRecursion Whether to disable
      *                                                 recursive iteration. For
      *                                                 backwards compatibility
      *                                                 with Symfony < 2.5.
-     * @param ExecutionContextInterface $context      The current execution context
+     * @param ExecutionContextInterface $context       The current execution context
      *
      * @see ClassNode
      * @see CollectionNode
@@ -832,12 +832,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     /**
      * Validates a node's value against all constraints in the given group.
      *
-     * @param mixed                     $value      The validated value
-     * @param string                    $cacheKey   The key for caching the
-     *                                              validated value
-     * @param MetadataInterface         $metadata   The metadata of the value
-     * @param string                    $group      The group to validate
-     * @param ExecutionContextInterface $context    The execution context
+     * @param mixed                     $value    The validated value
+     * @param string                    $cacheKey The key for caching the
+     *                                            validated value
+     * @param MetadataInterface         $metadata The metadata of the value
+     * @param string                    $group    The group to validate
+     * @param ExecutionContextInterface $context  The execution context
      */
     private function validateInGroup($value, $cacheKey, MetadataInterface $metadata, $group, ExecutionContextInterface $context)
     {

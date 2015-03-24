@@ -1,0 +1,229 @@
+{
+    "Version": "2.1.6.69",
+    "Names": {
+        "AED": [
+            "AED",
+            "arabu mara kafoli Diram"
+        ],
+        "AOA": [
+            "AOA",
+            "angola Kwanza"
+        ],
+        "AUD": [
+            "A$",
+            "ositirali Dolar"
+        ],
+        "BHD": [
+            "BHD",
+            "bareyini Dinar"
+        ],
+        "BIF": [
+            "BIF",
+            "burundi Fraŋ"
+        ],
+        "BWP": [
+            "BWP",
+            "bɔtisiwana Pula"
+        ],
+        "CAD": [
+            "CA$",
+            "kanada Dolar"
+        ],
+        "CDF": [
+            "CDF",
+            "kongole Fraŋ"
+        ],
+        "CHF": [
+            "CHF",
+            "suwisi Fraŋ"
+        ],
+        "CNY": [
+            "CN¥",
+            "siniwa Yuwan"
+        ],
+        "CVE": [
+            "CVE",
+            "capivɛrdi Esekudo"
+        ],
+        "DJF": [
+            "DJF",
+            "jibuti Fraŋ"
+        ],
+        "DZD": [
+            "DZD",
+            "alizeri Dinar"
+        ],
+        "EGP": [
+            "EGP",
+            "eziputi Livri"
+        ],
+        "ERN": [
+            "ERN",
+            "eritere Nafika"
+        ],
+        "ETB": [
+            "ETB",
+            "etiopi Bir"
+        ],
+        "EUR": [
+            "€",
+            "ero"
+        ],
+        "GBP": [
+            "£",
+            "angilɛ Livri Siterlingi"
+        ],
+        "GHC": [
+            "GHC",
+            "gana Sedi"
+        ],
+        "GMD": [
+            "GMD",
+            "gambi Dalasi"
+        ],
+        "GNS": [
+            "GNS",
+            "gine Fraŋ"
+        ],
+        "INR": [
+            "₹",
+            "Ɛndu Rupi"
+        ],
+        "JPY": [
+            "JP¥",
+            "zapɔne Yɛn"
+        ],
+        "KES": [
+            "KES",
+            "keniya Siling"
+        ],
+        "KMF": [
+            "KMF",
+            "komɔri Fraŋ"
+        ],
+        "LRD": [
+            "LRD",
+            "liberiya Dolar"
+        ],
+        "LSL": [
+            "LSL",
+            "lesoto Loti"
+        ],
+        "LYD": [
+            "LYD",
+            "libi Dinar"
+        ],
+        "MAD": [
+            "MAD",
+            "marɔku Diram"
+        ],
+        "MGA": [
+            "MGA",
+            "madagasikari Fraŋ"
+        ],
+        "MRO": [
+            "MRO",
+            "mɔritani Uguwiya"
+        ],
+        "MUR": [
+            "MUR",
+            "morisi Rupi"
+        ],
+        "MWK": [
+            "MWK",
+            "malawi Kwaca"
+        ],
+        "MZM": [
+            "MZM",
+            "mozanbiki Metikali"
+        ],
+        "NAD": [
+            "NAD",
+            "namibi Dolar"
+        ],
+        "NGN": [
+            "NGN",
+            "nizeriya Nɛra"
+        ],
+        "RWF": [
+            "RWF",
+            "ruwanda Fraŋ"
+        ],
+        "SAR": [
+            "SAR",
+            "sawudiya Riyal"
+        ],
+        "SCR": [
+            "SCR",
+            "sesɛli Rupi"
+        ],
+        "SDG": [
+            "SDG",
+            "sudani Dinar"
+        ],
+        "SDP": [
+            "SDP",
+            "sudani Livri"
+        ],
+        "SHP": [
+            "SHP",
+            "Ɛlɛni-Senu Livri"
+        ],
+        "SLL": [
+            "SLL",
+            "siyeralewɔni Lewɔni"
+        ],
+        "SOS": [
+            "SOS",
+            "somali Siling"
+        ],
+        "STD": [
+            "STD",
+            "sawotome Dobra"
+        ],
+        "SZL": [
+            "SZL",
+            "swazilandi Lilangeni"
+        ],
+        "TND": [
+            "TND",
+            "tunizi Dinar"
+        ],
+        "TZS": [
+            "TZS",
+            "tanzani Siling"
+        ],
+        "UGX": [
+            "UGX",
+            "uganda Siling"
+        ],
+        "USD": [
+            "US$",
+            "ameriki Dolar"
+        ],
+        "XAF": [
+            "FCFA",
+            "sefa Fraŋ (BEAC)"
+        ],
+        "XOF": [
+            "CFA",
+            "sefa Fraŋ (BCEAO)"
+        ],
+        "ZAR": [
+            "ZAR",
+            "sudafriki Randi"
+        ],
+        "ZMK": [
+            "ZMK",
+            "zambi Kwaca (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "zambi Kwaca"
+        ],
+        "ZWD": [
+            "ZWD",
+            "zimbabuwe Dolar"
+        ]
+    }
+}

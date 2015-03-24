@@ -22,8 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * @since  2.5
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
- *             To be removed in Symfony 3.0.
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class LegacyExecutionContext extends ExecutionContext
 {
@@ -58,6 +57,8 @@ class LegacyExecutionContext extends ExecutionContext
     public function addViolation($message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         if (func_num_args() > 2) {
+            trigger_error('The parameters $invalidValue, $plural and $code in method '.__METHOD__.' are deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+
             $this
                 ->buildViolation($message, $parameters)
                 ->setInvalidValue($invalidValue)
@@ -77,6 +78,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::buildViolation method instead.', E_USER_DEPRECATED);
+
         if (func_num_args() > 2) {
             $this
                 ->buildViolation($message, $parameters)
@@ -138,6 +141,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Use the '.__CLASS__.'::validate method instead.', E_USER_DEPRECATED);
+
         return $this
             ->getValidator()
             ->inContext($this)
@@ -151,6 +156,8 @@ class LegacyExecutionContext extends ExecutionContext
      */
     public function getMetadataFactory()
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0. Use the new Symfony\Component\Validator\Context\ExecutionContext::getValidator method in combination with Symfony\Component\Validator\Validator\ValidatorInterface::getMetadataFor or Symfony\Component\Validator\Validator\ValidatorInterface::hasMetadataFor method instead.', E_USER_DEPRECATED);
+
         return $this->metadataFactory;
     }
 }

@@ -17,7 +17,7 @@ namespace Symfony\Component\Finder\Expression;
 class Expression implements ValueInterface
 {
     const TYPE_REGEX = 1;
-    const TYPE_GLOB  = 2;
+    const TYPE_GLOB = 2;
 
     /**
      * @var ValueInterface

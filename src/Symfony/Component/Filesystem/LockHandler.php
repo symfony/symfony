@@ -49,9 +49,7 @@ class LockHandler
             throw new IOException(sprintf('The directory "%s" is not writable.', $lockPath), 0, null, $lockPath);
         }
 
-        $name = sprintf('%s-%s', preg_replace('/[^a-z0-9\._-]+/i', '-', $name), hash('sha256', $name));
-
-        $this->file = sprintf('%s/%s', $lockPath, $name);
+        $this->file = sprintf('%s/sf.%s.%s.lock', $lockPath, preg_replace('/[^a-z0-9\._-]+/i', '-', $name), hash('sha256', $name));
     }
 
     /**
@@ -67,14 +65,24 @@ class LockHandler
             return true;
         }
 
-        // Set an error handler to not trigger the registered error handler if
-        // the file can not be opened.
+        // Silence both userland and native PHP error handlers
+        $errorLevel = error_reporting(0);
         set_error_handler('var_dump', 0);
-        $this->handle = @fopen($this->file, 'c');
+
+        if (!$this->handle = fopen($this->file, 'r')) {
+            if ($this->handle = fopen($this->file, 'x')) {
+                chmod($this->file, 0444);
+            } elseif (!$this->handle = fopen($this->file, 'r')) {
+                usleep(100); // Give some time for chmod() to complete
+                $this->handle = fopen($this->file, 'r');
+            }
+        }
         restore_error_handler();
+        error_reporting($errorLevel);
 
         if (!$this->handle) {
-            throw new IOException(sprintf('Unable to fopen "%s".', $this->file), 0, null, $this->file);
+            $error = error_get_last();
+            throw new IOException($error['message'], 0, null, $this->file);
         }
 
         // On Windows, even if PHP doc says the contrary, LOCK_NB works, see

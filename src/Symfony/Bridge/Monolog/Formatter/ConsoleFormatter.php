@@ -26,20 +26,28 @@ class ConsoleFormatter extends LineFormatter
     /**
      * {@inheritdoc}
      */
+    public function __construct($format = null, $dateFormat = null, $allowInlineLineBreaks = false, $ignoreEmptyContextAndExtra = true)
+    {
+        parent::__construct($format, $dateFormat, $allowInlineLineBreaks, $ignoreEmptyContextAndExtra);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function format(array $record)
     {
         if ($record['level'] >= Logger::ERROR) {
             $record['start_tag'] = '<error>';
-            $record['end_tag']   = '</error>';
+            $record['end_tag'] = '</error>';
         } elseif ($record['level'] >= Logger::NOTICE) {
             $record['start_tag'] = '<comment>';
-            $record['end_tag']   = '</comment>';
+            $record['end_tag'] = '</comment>';
         } elseif ($record['level'] >= Logger::INFO) {
             $record['start_tag'] = '<info>';
-            $record['end_tag']   = '</info>';
+            $record['end_tag'] = '</info>';
         } else {
             $record['start_tag'] = '';
-            $record['end_tag']   = '';
+            $record['end_tag'] = '';
         }
 
         return parent::format($record);

@@ -18,8 +18,8 @@ Resources
 You can run the unit tests with the following command:
 
     $ cd path/to/Symfony/Component/Intl/
-    $ composer.phar install --dev
+    $ composer install
     $ phpunit
 
 [0]: http://www.php.net/manual/en/intl.setup.php
-[1]: http://symfony.com/doc/2.6/components/intl.html
+[1]: http://symfony.com/doc/3.0/components/intl.html

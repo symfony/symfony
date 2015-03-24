@@ -17,7 +17,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator attribute extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -31,13 +31,13 @@ class AttributeMatchingExtension extends AbstractExtension
     {
         return array(
             'exists' => array($this, 'translateExists'),
-            '='      => array($this, 'translateEquals'),
-            '~='     => array($this, 'translateIncludes'),
-            '|='     => array($this, 'translateDashMatch'),
-            '^='     => array($this, 'translatePrefixMatch'),
-            '$='     => array($this, 'translateSuffixMatch'),
-            '*='     => array($this, 'translateSubstringMatch'),
-            '!='     => array($this, 'translateDifferent'),
+            '=' => array($this, 'translateEquals'),
+            '~=' => array($this, 'translateIncludes'),
+            '|=' => array($this, 'translateDashMatch'),
+            '^=' => array($this, 'translatePrefixMatch'),
+            '$=' => array($this, 'translateSuffixMatch'),
+            '*=' => array($this, 'translateSubstringMatch'),
+            '!=' => array($this, 'translateDifferent'),
         );
     }
 

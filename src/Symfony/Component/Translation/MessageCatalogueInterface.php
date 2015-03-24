@@ -70,7 +70,7 @@ interface MessageCatalogueInterface
      * @param string $id     The message id
      * @param string $domain The domain name
      *
-     * @return bool    true if the message has a translation, false otherwise
+     * @return bool true if the message has a translation, false otherwise
      *
      * @api
      */
@@ -82,7 +82,7 @@ interface MessageCatalogueInterface
      * @param string $id     The message id
      * @param string $domain The domain name
      *
-     * @return bool    true if the message has a translation, false otherwise
+     * @return bool true if the message has a translation, false otherwise
      *
      * @api
      */

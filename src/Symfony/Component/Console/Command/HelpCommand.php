@@ -58,7 +58,7 @@ EOF
     }
 
     /**
-     * Sets the command
+     * Sets the command.
      *
      * @param Command $command The command to set
      */
@@ -83,7 +83,7 @@ EOF
         $helper = new DescriptorHelper();
         $helper->describe($output, $this->command, array(
             'format' => $input->getOption('format'),
-            'raw'    => $input->getOption('raw'),
+            'raw_text' => $input->getOption('raw'),
         ));
 
         $this->command = null;

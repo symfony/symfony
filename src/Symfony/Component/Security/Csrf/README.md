@@ -9,7 +9,7 @@ Resources
 
 Documentation:
 
-http://symfony.com/doc/2.6/book/security.html
+http://symfony.com/doc/3.0/book/security.html
 
 Tests
 -----

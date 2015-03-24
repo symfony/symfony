@@ -77,8 +77,10 @@ class Router extends BaseRouter implements WarmableInterface
      * Replaces placeholders with service container parameter values in:
      * - the route defaults,
      * - the route requirements,
-     * - the route pattern.
-     * - the route host.
+     * - the route path,
+     * - the route host,
+     * - the route schemes,
+     * - the route methods.
      *
      * @param RouteCollection $collection
      */
@@ -95,6 +97,19 @@ class Router extends BaseRouter implements WarmableInterface
 
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
+
+            $schemes = array();
+            foreach ($route->getSchemes() as $scheme) {
+                $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
+            }
+            $route->setSchemes($schemes);
+
+            $methods = array();
+            foreach ($route->getMethods() as $method) {
+                $methods = array_merge($methods, explode('|', $this->resolve($method)));
+            }
+            $route->setMethods($methods);
+            $route->setCondition($this->resolve($route->getCondition()));
         }
     }
 

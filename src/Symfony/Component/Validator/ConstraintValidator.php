@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use Symfony\Component\Validator\Violation\LegacyConstraintViolationBuilder;
 
 /**
- * Base class for constraint validators
+ * Base class for constraint validators.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
@@ -61,10 +61,12 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      *
-     * @deprecated This method will be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     protected function buildViolation($message, array $parameters = array())
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($this->context instanceof ExecutionContextInterface2Dot5) {
             return $this->context->buildViolation($message, $parameters);
         }
@@ -77,15 +79,17 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * supports the 2.4 context API.
      *
      * @param ExecutionContextInterface $context    The context to use
-     * @param string                          $message    The violation message
-     * @param array                           $parameters The message parameters
+     * @param string                    $message    The violation message
+     * @param array                     $parameters The message parameters
      *
      * @return ConstraintViolationBuilderInterface The violation builder
      *
-     * @deprecated This method will be removed in Symfony 3.0.
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
     {
+        trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($context instanceof ExecutionContextInterface2Dot5) {
             return $context->buildViolation($message, $parameters);
         }
@@ -126,9 +130,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param mixed   $value  The value to format as string
-     * @param int     $format A bitwise combination of the format
-     *                        constants in this class
+     * @param mixed $value  The value to format as string
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the passed value
      */
@@ -197,9 +201,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array   $values A list of values
-     * @param int     $format A bitwise combination of the format
-     *                        constants in this class
+     * @param array $values A list of values
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the value list
      *

@@ -19,9 +19,9 @@ class ValueExporter
     /**
      * Converts a PHP value to a string.
      *
-     * @param mixed   $value The PHP value
-     * @param int     $depth only for internal usage
-     * @param bool    $deep  only for internal usage
+     * @param mixed $value The PHP value
+     * @param int   $depth only for internal usage
+     * @param bool  $deep  only for internal usage
      *
      * @return string The string representation of the given value
      */

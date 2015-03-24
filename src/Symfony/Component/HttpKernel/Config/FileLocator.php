@@ -47,7 +47,7 @@ class FileLocator extends BaseFileLocator
      */
     public function locate($file, $currentPath = null, $first = true)
     {
-        if ('@' === $file[0]) {
+        if (isset($file[0]) && '@' === $file[0]) {
             return $this->kernel->locateResource($file, $this->path, $first);
         }
 

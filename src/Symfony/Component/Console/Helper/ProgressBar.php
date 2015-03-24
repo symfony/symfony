@@ -22,12 +22,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ProgressBar
 {
     // options
-    private $barWidth     = 28;
+    private $barWidth = 28;
     private $barChar;
     private $emptyBarChar = '-';
     private $progressChar = '>';
-    private $format       = null;
-    private $redrawFreq   = 1;
+    private $format = null;
+    private $redrawFreq = 1;
 
     /**
      * @var OutputInterface
@@ -151,7 +151,7 @@ class ProgressBar
     /**
      * Gets the progress bar start time.
      *
-     * @return int     The progress bar start time
+     * @return int The progress bar start time
      */
     public function getStartTime()
     {
@@ -161,7 +161,7 @@ class ProgressBar
     /**
      * Gets the progress bar maximal steps.
      *
-     * @return int     The progress bar max steps
+     * @return int The progress bar max steps
      */
     public function getMaxSteps()
     {
@@ -171,12 +171,14 @@ class ProgressBar
     /**
      * Gets the progress bar step.
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link getProgress()} instead.
      *
-     * @return int     The progress bar step
+     * @return int The progress bar step
      */
     public function getStep()
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the getProgress() method instead.', E_USER_DEPRECATED);
+
         return $this->getProgress();
     }
 
@@ -193,11 +195,9 @@ class ProgressBar
     /**
      * Gets the progress bar step width.
      *
-     * @internal This method is public for PHP 5.3 compatibility, it should not be used.
-     *
      * @return int     The progress bar step width
      */
-    public function getStepWidth()
+    private function getStepWidth()
     {
         return $this->stepWidth;
     }
@@ -215,7 +215,7 @@ class ProgressBar
     /**
      * Sets the progress bar width.
      *
-     * @param int     $size The progress bar size
+     * @param int $size The progress bar size
      */
     public function setBarWidth($size)
     {
@@ -225,7 +225,7 @@ class ProgressBar
     /**
      * Gets the progress bar width.
      *
-     * @return int     The progress bar size
+     * @return int The progress bar size
      */
     public function getBarWidth()
     {
@@ -318,7 +318,7 @@ class ProgressBar
     /**
      * Sets the redraw frequency.
      *
-     * @param int     $freq The frequency in steps
+     * @param int $freq The frequency in steps
      */
     public function setRedrawFrequency($freq)
     {
@@ -346,7 +346,7 @@ class ProgressBar
     /**
      * Advances the progress output X steps.
      *
-     * @param int     $step Number of steps to advance
+     * @param int $step Number of steps to advance
      *
      * @throws \LogicException
      */
@@ -358,14 +358,16 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @deprecated since 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
+     * @deprecated since version 2.6, to be removed in 3.0. Use {@link setProgress()} instead.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
      * @throws \LogicException
      */
     public function setCurrent($step)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the setProgress() method instead.', E_USER_DEPRECATED);
+
         $this->setProgress($step);
     }
 
@@ -382,7 +384,7 @@ class ProgressBar
     /**
      * Sets the current progress.
      *
-     * @param int     $step The current progress
+     * @param int $step The current progress
      *
      * @throws \LogicException
      */
@@ -432,15 +434,11 @@ class ProgressBar
             return;
         }
 
-        // these 3 variables can be removed in favor of using $this in the closure when support for PHP 5.3 will be dropped.
-        $self = $this;
-        $output = $this->output;
-        $messages = $this->messages;
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) use ($self, $output, $messages) {
-            if ($formatter = $self::getPlaceholderFormatterDefinition($matches[1])) {
-                $text = call_user_func($formatter, $self, $output);
-            } elseif (isset($messages[$matches[1]])) {
-                $text = $messages[$matches[1]];
+        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $this, $this->output);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
             } else {
                 return $matches[0];
             }
@@ -595,17 +593,17 @@ class ProgressBar
     private static function initFormats()
     {
         return array(
-            'normal'             => ' %current%/%max% [%bar%] %percent:3s%%',
-            'normal_nomax'       => ' %current% [%bar%]',
+            'normal' => ' %current%/%max% [%bar%] %percent:3s%%',
+            'normal_nomax' => ' %current% [%bar%]',
 
-            'verbose'            => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
-            'verbose_nomax'      => ' %current% [%bar%] %elapsed:6s%',
+            'verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
+            'verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
 
-            'very_verbose'       => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
+            'very_verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
             'very_verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
 
-            'debug'              => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
-            'debug_nomax'        => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
+            'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
+            'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
     }
 }

@@ -37,12 +37,8 @@ class RouteCompiler implements RouteCompilerInterface
      */
     public static function compile(Route $route)
     {
-        $staticPrefix = null;
         $hostVariables = array();
-        $pathVariables = array();
         $variables = array();
-        $tokens = array();
-        $regex = null;
         $hostRegex = null;
         $hostTokens = array();
 
@@ -50,7 +46,7 @@ class RouteCompiler implements RouteCompilerInterface
             $result = self::compilePattern($route, $host, true);
 
             $hostVariables = $result['variables'];
-            $variables = array_merge($variables, $hostVariables);
+            $variables = $hostVariables;
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];
@@ -167,7 +163,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         return array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s',
+            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
@@ -195,9 +191,9 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * Computes the regexp used to match a specific token. It can be static text or a subpattern.
      *
-     * @param array   $tokens        The route tokens
-     * @param int     $index         The index of the current token
-     * @param int     $firstOptional The index of the first optional token
+     * @param array $tokens        The route tokens
+     * @param int   $index         The index of the current token
+     * @param int   $firstOptional The index of the first optional token
      *
      * @return string The regexp pattern for a single token
      */

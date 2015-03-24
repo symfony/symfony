@@ -211,13 +211,13 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as URL with a path');
 
         $this->assertFalse($bag->filter('dec', '', false, FILTER_VALIDATE_INT, array(
-            'flags'   => FILTER_FLAG_ALLOW_HEX,
-            'options' => array('min_range' => 1, 'max_range' => 0xff),)
+            'flags' => FILTER_FLAG_ALLOW_HEX,
+            'options' => array('min_range' => 1, 'max_range' => 0xff))
                 ), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertFalse($bag->filter('hex', '', false, FILTER_VALIDATE_INT, array(
-            'flags'   => FILTER_FLAG_ALLOW_HEX,
-            'options' => array('min_range' => 1, 'max_range' => 0xff),)
+            'flags' => FILTER_FLAG_ALLOW_HEX,
+            'options' => array('min_range' => 1, 'max_range' => 0xff))
                 ), '->filter() gets a value of parameter as integer between boundaries');
 
         $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');

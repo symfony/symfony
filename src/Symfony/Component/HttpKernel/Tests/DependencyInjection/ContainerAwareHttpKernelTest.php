@@ -102,8 +102,8 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             $this->fail('->handle() suppresses the controller exception');
         } catch (\PHPUnit_Framework_Exception $exception) {
             throw $exception;
-        } catch (\Exception $actual) {
-            $this->assertSame($expected, $actual, '->handle() throws the controller exception');
+        } catch (\LogicException $actual) {
+            $this->assertSame($expected, $actual->getPrevious(), '->handle() throws the controller exception, wrapped when no listener');
         }
     }
 

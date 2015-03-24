@@ -29,10 +29,10 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     protected $providerKey;
     protected $defaultOptions = array(
         'always_use_default_target_path' => false,
-        'default_target_path'            => '/',
-        'login_path'                     => '/login',
-        'target_path_parameter'          => '_target_path',
-        'use_referer'                    => false,
+        'default_target_path' => '/',
+        'login_path' => '/login',
+        'target_path_parameter' => '_target_path',
+        'use_referer' => false,
     );
 
     /**

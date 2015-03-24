@@ -51,7 +51,7 @@ class FilePathsIterator extends \ArrayIterator
      */
     public function __construct(array $paths, $baseDir)
     {
-        $this->baseDir       = $baseDir;
+        $this->baseDir = $baseDir;
         $this->baseDirLength = strlen($baseDir);
 
         parent::__construct($paths);

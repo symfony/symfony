@@ -115,18 +115,39 @@ class FormDataExtractor implements FormDataExtractorInterface
                 'origin' => is_object($error->getOrigin())
                     ? spl_object_hash($error->getOrigin())
                     : null,
+                'trace' => array(),
             );
 
             $cause = $error->getCause();
 
-            if ($cause instanceof ConstraintViolationInterface) {
-                $errorData['cause'] = array(
-                    'root' => $this->valueExporter->exportValue($cause->getRoot()),
-                    'path' => $this->valueExporter->exportValue($cause->getPropertyPath()),
-                    'value' => $this->valueExporter->exportValue($cause->getInvalidValue()),
-                );
-            } else {
-                $errorData['cause'] = null !== $cause ? $this->valueExporter->exportValue($cause) : null;
+            while (null !== $cause) {
+                if ($cause instanceof ConstraintViolationInterface) {
+                    $errorData['trace'][] = array(
+                        'class' => $this->valueExporter->exportValue(get_class($cause)),
+                        'root' => $this->valueExporter->exportValue($cause->getRoot()),
+                        'path' => $this->valueExporter->exportValue($cause->getPropertyPath()),
+                        'value' => $this->valueExporter->exportValue($cause->getInvalidValue()),
+                    );
+
+                    $cause = method_exists($cause, 'getCause') ? $cause->getCause() : null;
+
+                    continue;
+                }
+
+                if ($cause instanceof \Exception) {
+                    $errorData['trace'][] = array(
+                        'class' => $this->valueExporter->exportValue(get_class($cause)),
+                        'message' => $this->valueExporter->exportValue($cause->getMessage()),
+                    );
+
+                    $cause = $cause->getPrevious();
+
+                    continue;
+                }
+
+                $errorData['trace'][] = $cause;
+
+                break;
             }
 
             $data['errors'][] = $errorData;

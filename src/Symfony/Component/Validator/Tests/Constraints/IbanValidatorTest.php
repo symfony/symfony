@@ -156,7 +156,7 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidIbans
      */
-    public function testInvalidIbans($iban)
+    public function testInvalidIbans($iban, $code)
     {
         $constraint = new Iban(array(
             'message' => 'myMessage',
@@ -166,27 +166,28 @@ class IbanValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$iban.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 
     public function getInvalidIbans()
     {
         return array(
-            array('CH93 0076 2011 6238 5295'),
-            array('CH930076201162385295'),
-            array('GB29 RBOS 6016 1331 9268 19'),
-            array('CH930072011623852957'),
-            array('NL39 RASO 0300 0652 64'),
-            array('NO93 8601117 947'),
-            array('CY170020 128 0000 0012 0052 7600'),
-            array('foo'),
-            array('123'),
-            array('0750447346'),
-            array('CH930076201162385295]'),
+            array('CH93 0076 2011 6238 5295', Iban::CHECKSUM_FAILED_ERROR),
+            array('CH930076201162385295', Iban::CHECKSUM_FAILED_ERROR),
+            array('GB29 RBOS 6016 1331 9268 19', Iban::CHECKSUM_FAILED_ERROR),
+            array('CH930072011623852957', Iban::CHECKSUM_FAILED_ERROR),
+            array('NL39 RASO 0300 0652 64', Iban::CHECKSUM_FAILED_ERROR),
+            array('NO93 8601117 947', Iban::CHECKSUM_FAILED_ERROR),
+            array('CY170020 128 0000 0012 0052 7600', Iban::CHECKSUM_FAILED_ERROR),
+            array('foo', Iban::TOO_SHORT_ERROR),
+            array('123', Iban::TOO_SHORT_ERROR),
+            array('0750447346', Iban::INVALID_COUNTRY_CODE_ERROR),
+            array('CH930076201162385295]', Iban::INVALID_CHARACTERS_ERROR),
 
             //Ibans with lower case values are invalid
-            array('Ae260211000000230064016'),
-            array('ae260211000000230064016'),
+            array('Ae260211000000230064016', Iban::INVALID_CASE_ERROR),
+            array('ae260211000000230064016', Iban::INVALID_CASE_ERROR),
         );
     }
 }

@@ -18,15 +18,15 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator node extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
 class NodeExtension extends AbstractExtension
 {
-    const ELEMENT_NAME_IN_LOWER_CASE    = 1;
-    const ATTRIBUTE_NAME_IN_LOWER_CASE  = 2;
+    const ELEMENT_NAME_IN_LOWER_CASE = 1;
+    const ATTRIBUTE_NAME_IN_LOWER_CASE = 2;
     const ATTRIBUTE_VALUE_IN_LOWER_CASE = 4;
 
     /**
@@ -45,8 +45,8 @@ class NodeExtension extends AbstractExtension
     }
 
     /**
-     * @param int     $flag
-     * @param bool    $on
+     * @param int  $flag
+     * @param bool $on
      *
      * @return NodeExtension
      */
@@ -79,15 +79,15 @@ class NodeExtension extends AbstractExtension
     public function getNodeTranslators()
     {
         return array(
-            'Selector'         => array($this, 'translateSelector'),
+            'Selector' => array($this, 'translateSelector'),
             'CombinedSelector' => array($this, 'translateCombinedSelector'),
-            'Negation'         => array($this, 'translateNegation'),
-            'Function'         => array($this, 'translateFunction'),
-            'Pseudo'           => array($this, 'translatePseudo'),
-            'Attribute'        => array($this, 'translateAttribute'),
-            'Class'            => array($this, 'translateClass'),
-            'Hash'             => array($this, 'translateHash'),
-            'Element'          => array($this, 'translateElement'),
+            'Negation' => array($this, 'translateNegation'),
+            'Function' => array($this, 'translateFunction'),
+            'Pseudo' => array($this, 'translatePseudo'),
+            'Attribute' => array($this, 'translateAttribute'),
+            'Class' => array($this, 'translateClass'),
+            'Hash' => array($this, 'translateHash'),
+            'Element' => array($this, 'translateElement'),
         );
     }
 

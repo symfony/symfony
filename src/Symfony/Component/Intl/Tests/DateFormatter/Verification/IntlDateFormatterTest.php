@@ -36,6 +36,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
      * time zone, this test would use it too if not running in a separated process.
      *
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testFormatWithTimezoneFromEnvironmentVariable()
     {

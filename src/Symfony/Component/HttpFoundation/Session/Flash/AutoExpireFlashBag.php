@@ -28,7 +28,7 @@ class AutoExpireFlashBag implements FlashBagInterface
     private $flashes = array('display' => array(), 'new' => array());
 
     /**
-     * The storage key for flashes in the session
+     * The storage key for flashes in the session.
      *
      * @var string
      */

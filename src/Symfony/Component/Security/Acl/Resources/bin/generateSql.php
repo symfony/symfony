@@ -17,20 +17,20 @@ use Symfony\Component\Security\Acl\Dbal\Schema;
 
 $loader = new ClassLoader();
 $loader->addPrefixes(array(
-    'Symfony'                    => __DIR__.'/../../../../../..',
-    'Doctrine\\Common'           => __DIR__.'/../../../../../../../vendor/doctrine-common/lib',
+    'Symfony' => __DIR__.'/../../../../../..',
+    'Doctrine\\Common' => __DIR__.'/../../../../../../../vendor/doctrine-common/lib',
     'Doctrine\\DBAL\\Migrations' => __DIR__.'/../../../../../../../vendor/doctrine-migrations/lib',
-    'Doctrine\\DBAL'             => __DIR__.'/../../../../../../../vendor/doctrine-dbal/lib',
-    'Doctrine'                   => __DIR__.'/../../../../../../../vendor/doctrine/lib',
+    'Doctrine\\DBAL' => __DIR__.'/../../../../../../../vendor/doctrine/dbal/lib',
+    'Doctrine' => __DIR__.'/../../../../../../../vendor/doctrine/lib',
 ));
 $loader->register();
 
 $schema = new Schema(array(
-    'class_table_name'         => 'acl_classes',
-    'entry_table_name'         => 'acl_entries',
-    'oid_table_name'           => 'acl_object_identities',
+    'class_table_name' => 'acl_classes',
+    'entry_table_name' => 'acl_entries',
+    'oid_table_name' => 'acl_object_identities',
     'oid_ancestors_table_name' => 'acl_object_identity_ancestors',
-    'sid_table_name'           => 'acl_security_identities',
+    'sid_table_name' => 'acl_security_identities',
 ));
 
 $reflection = new ReflectionClass('Doctrine\\DBAL\\Platforms\\AbstractPlatform');
@@ -46,6 +46,6 @@ foreach ($finder as $file) {
     }
 
     $platform = $reflection->newInstance();
-    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->name);
+    $targetFile = sprintf(__DIR__.'/../schema/%s.sql', $platform->getName());
     file_put_contents($targetFile, implode("\n\n", $schema->toSql($platform)));
 }

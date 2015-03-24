@@ -16,12 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.0",
-        "symfony/config": "~2.2",
-        "symfony/expression-language": "~2.4"
+        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/yaml": "~2.7|~3.0",
+        "symfony/config": "~2.7|~3.0",
+        "symfony/expression-language": "~2.7|~3.0"
     },
     "suggest": {
         "symfony/yaml": "",
@@ -35,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.6-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

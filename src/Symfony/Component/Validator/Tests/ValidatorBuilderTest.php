@@ -110,21 +110,15 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 
-    public function testDefaultApiVersion()
+    /**
+     * @group legacy
+     */
+    public function testLegacyDefaultApiVersion()
     {
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
-            // Old implementation on PHP < 5.3.9
-            $this->assertInstanceOf('Symfony\Component\Validator\Validator', $this->builder->getValidator());
-        } else {
-            // Legacy compatible implementation on PHP >= 5.3.9
-            $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
-        }
-    }
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
-    public function testSetApiVersion24()
-    {
-        $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_4));
-        $this->assertInstanceOf('Symfony\Component\Validator\Validator', $this->builder->getValidator());
+        // Legacy compatible implementation
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());
     }
 
     public function testSetApiVersion25()
@@ -133,11 +127,12 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }
 
-    public function testSetApiVersion24And25()
+    /**
+     * @group legacy
+     */
+    public function testLegacySetApiVersion24And25()
     {
-        if (version_compare(PHP_VERSION, '5.3.9', '<')) {
-            $this->markTestSkipped('Not supported prior to PHP 5.3.9');
-        }
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
 
         $this->assertSame($this->builder, $this->builder->setApiVersion(Validation::API_VERSION_2_5_BC));
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\LegacyValidator', $this->builder->getValidator());

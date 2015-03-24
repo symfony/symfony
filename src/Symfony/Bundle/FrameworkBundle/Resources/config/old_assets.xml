@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="templating.asset.path_package.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PathPackage</parameter>
+        <parameter key="templating.asset.url_package.class">Symfony\Component\Templating\Asset\UrlPackage</parameter>
+        <parameter key="templating.asset.package_factory.class">Symfony\Bundle\FrameworkBundle\Templating\Asset\PackageFactory</parameter>
+    </parameters>
+
+    <services>
+        <service id="templating.asset.path_package" class="%templating.asset.path_package.class%" abstract="true">
+            <argument type="expression">service('request_stack').getMasterRequest()</argument>
+            <argument /> <!-- version -->
+            <argument /> <!-- version format -->
+        </service>
+
+        <service id="templating.asset.url_package" class="%templating.asset.url_package.class%" abstract="true">
+            <argument /> <!-- base urls -->
+            <argument /> <!-- version -->
+            <argument /> <!-- version format -->
+        </service>
+
+        <service id="templating.asset.request_aware_package" class="Symfony\Component\Templating\Asset\PackageInterface" abstract="true">
+            <factory service="templating.asset.package_factory" method="getPackage" />
+            <argument type="expression">service('request_stack').getMasterRequest()</argument>
+            <argument /> <!-- HTTP id -->
+            <argument /> <!-- SSL id -->
+        </service>
+
+        <service id="templating.asset.package_factory" class="%templating.asset.package_factory.class%">
+            <argument type="service" id="service_container" />
+        </service>
+    </services>
+</container>

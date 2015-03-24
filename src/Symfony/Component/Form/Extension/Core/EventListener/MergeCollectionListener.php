@@ -22,13 +22,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class MergeCollectionListener implements EventSubscriberInterface
 {
     /**
-     * Whether elements may be added to the collection
+     * Whether elements may be added to the collection.
+     *
      * @var bool
      */
     private $allowAdd;
 
     /**
-     * Whether elements may be removed from the collection
+     * Whether elements may be removed from the collection.
+     *
      * @var bool
      */
     private $allowDelete;
@@ -127,11 +129,13 @@ class MergeCollectionListener implements EventSubscriberInterface
     /**
      * Alias of {@link onSubmit()}.
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link onSubmit()} instead.
+     * @deprecated since version 2.3, to be removed in 3.0.
+     *             Use {@link onSubmit()} instead.
      */
     public function onBind(FormEvent $event)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
+
         $this->onSubmit($event);
     }
 }

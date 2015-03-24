@@ -66,6 +66,24 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getContainerBuilderDescriptionTestData(ObjectsProvider::getContainerBuilders());
     }
 
+    /**
+     * @dataProvider provideLegacySynchronizedServiceDefinitionTestData
+     * @group legacy
+     */
+    public function testLegacyDescribeSynchronizedServiceDefinition(Definition $definition, $expectedDescription)
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $this->assertDescription($expectedDescription, $definition);
+    }
+
+    public function provideLegacySynchronizedServiceDefinitionTestData()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        return $this->getDescriptionTestData(ObjectsProvider::getLegacyContainerDefinitions());
+    }
+
     /** @dataProvider getDescribeContainerDefinitionTestData */
     public function testDescribeContainerDefinition(Definition $definition, $expectedDescription)
     {
@@ -137,7 +155,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         if ('json' === $this->getFormat()) {
             $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals($expectedDescription, $output->fetch());
         }
     }
 
@@ -156,9 +174,9 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     {
         $variations = array(
             'services' => array('show_private' => true),
-            'public'   => array('show_private' => false),
-            'tag1'     => array('show_private' => true, 'tag' => 'tag1'),
-            'tags'     => array('group_by' => 'tags', 'show_private' => true),
+            'public' => array('show_private' => false),
+            'tag1' => array('show_private' => true, 'tag' => 'tag1'),
+            'tags' => array('group_by' => 'tags', 'show_private' => true),
         );
 
         $data = array();
@@ -175,8 +193,8 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     private function getEventDispatcherDescriptionTestData(array $objects)
     {
         $variations = array(
-            'events'    => array(),
-            'event1'    => array('event' => 'event1'),
+            'events' => array(),
+            'event1' => array('event' => 'event1'),
         );
 
         $data = array();

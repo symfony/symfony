@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -46,20 +47,30 @@ class IsbnValidator extends ConstraintValidator
         $value = (string) $value;
         $canonical = str_replace('-', '', $value);
 
-        if (null == $constraint->type) {
+        if (null === $constraint->type) {
             if ($constraint->isbn10 && !$constraint->isbn13) {
+                trigger_error('The "isbn10" option of the Isbn constraint is deprecated since version 2.5 and will be removed in 3.0. Use the "type" option instead.', E_USER_DEPRECATED);
                 $constraint->type = 'isbn10';
             } elseif ($constraint->isbn13 && !$constraint->isbn10) {
+                trigger_error('The "isbn13" option of the Isbn constraint is deprecated since version 2.5 and will be removed in 3.0. Use the "type" option instead.', E_USER_DEPRECATED);
                 $constraint->type = 'isbn13';
             }
         }
 
         // Explicitly validate against ISBN-10
         if ('isbn10' === $constraint->type) {
-            if (!$this->validateIsbn10($canonical)) {
-                $this->buildViolation($this->getMessage($constraint, $constraint->type))
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
+            if (true !== ($code = $this->validateIsbn10($canonical))) {
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode($code)
+                        ->addViolation();
+                } else {
+                    $this->buildViolation($this->getMessage($constraint, $constraint->type))
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode($code)
+                        ->addViolation();
+                }
             }
 
             return;
@@ -67,30 +78,74 @@ class IsbnValidator extends ConstraintValidator
 
         // Explicitly validate against ISBN-13
         if ('isbn13' === $constraint->type) {
-            if (!$this->validateIsbn13($canonical)) {
-                $this->buildViolation($this->getMessage($constraint, $constraint->type))
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
+            if (true !== ($code = $this->validateIsbn13($canonical))) {
+                if ($this->context instanceof ExecutionContextInterface) {
+                    $this->context->buildViolation($this->getMessage($constraint, $constraint->type))
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode($code)
+                        ->addViolation();
+                } else {
+                    $this->buildViolation($this->getMessage($constraint, $constraint->type))
+                        ->setParameter('{{ value }}', $this->formatValue($value))
+                        ->setCode($code)
+                        ->addViolation();
+                }
             }
 
             return;
         }
 
         // Try both ISBNs
-        if (!$this->validateIsbn10($canonical) && !$this->validateIsbn13($canonical)) {
-            $this->buildViolation($this->getMessage($constraint))
-                ->setParameter('{{ value }}', $this->formatValue($value))
-                ->addViolation();
+
+        // First, try ISBN-10
+        $code = $this->validateIsbn10($canonical);
+
+        // The ISBN can only be an ISBN-13 if the value was too long for ISBN-10
+        if (Isbn::TOO_LONG_ERROR === $code) {
+            // Try ISBN-13 now
+            $code = $this->validateIsbn13($canonical);
+
+            // If too short, this means we have 11 or 12 digits
+            if (Isbn::TOO_SHORT_ERROR === $code) {
+                $code = Isbn::TYPE_NOT_RECOGNIZED_ERROR;
+            }
+        }
+
+        if (true !== $code) {
+            if ($this->context instanceof ExecutionContextInterface) {
+                $this->context->buildViolation($this->getMessage($constraint))
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode($code)
+                    ->addViolation();
+            } else {
+                $this->buildViolation($this->getMessage($constraint))
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode($code)
+                    ->addViolation();
+            }
         }
     }
 
     protected function validateIsbn10($isbn)
     {
+        // Choose an algorithm so that ERROR_INVALID_CHARACTERS is preferred
+        // over ERROR_TOO_SHORT/ERROR_TOO_LONG
+        // Otherwise "0-45122-5244" passes, but "0-45122_5244" reports
+        // "too long"
+
+        // Error priority:
+        // 1. ERROR_INVALID_CHARACTERS
+        // 2. ERROR_TOO_SHORT/ERROR_TOO_LONG
+        // 3. ERROR_CHECKSUM_FAILED
+
         $checkSum = 0;
 
         for ($i = 0; $i < 10; ++$i) {
+            // If we test the length before the loop, we get an ERROR_TOO_SHORT
+            // when actually an ERROR_INVALID_CHARACTERS is wanted, e.g. for
+            // "0-45122_5244" (typo)
             if (!isset($isbn{$i})) {
-                return false;
+                return Isbn::TOO_SHORT_ERROR;
             }
 
             if ('X' === $isbn{$i}) {
@@ -98,33 +153,38 @@ class IsbnValidator extends ConstraintValidator
             } elseif (ctype_digit($isbn{$i})) {
                 $digit = $isbn{$i};
             } else {
-                return false;
+                return Isbn::INVALID_CHARACTERS_ERROR;
             }
 
-            $checkSum += $digit * intval(10 - $i);
+            $checkSum += $digit * (10 - $i);
         }
 
         if (isset($isbn{$i})) {
-            return false;
+            return Isbn::TOO_LONG_ERROR;
         }
 
-        return 0 === $checkSum % 11;
+        return 0 === $checkSum % 11 ? true : Isbn::CHECKSUM_FAILED_ERROR;
     }
 
     protected function validateIsbn13($isbn)
     {
+        // Error priority:
+        // 1. ERROR_INVALID_CHARACTERS
+        // 2. ERROR_TOO_SHORT/ERROR_TOO_LONG
+        // 3. ERROR_CHECKSUM_FAILED
+
         if (!ctype_digit($isbn)) {
-            return false;
+            return Isbn::INVALID_CHARACTERS_ERROR;
         }
 
         $length = strlen($isbn);
 
         if ($length < 13) {
-            return false;
+            return Isbn::TOO_SHORT_ERROR;
         }
 
         if ($length > 13) {
-            return false;
+            return Isbn::TOO_LONG_ERROR;
         }
 
         $checkSum = 0;
@@ -138,7 +198,7 @@ class IsbnValidator extends ConstraintValidator
             * 3;
         }
 
-        return 0 === $checkSum % 10;
+        return 0 === $checkSum % 10 ? true : Isbn::CHECKSUM_FAILED_ERROR;
     }
 
     protected function getMessage($constraint, $type = null)

@@ -31,8 +31,8 @@ class RouterDataCollector extends DataCollector
 
         $this->data = array(
             'redirect' => false,
-            'url'      => null,
-            'route'    => null,
+            'url' => null,
+            'route' => null,
         );
     }
 
@@ -69,7 +69,7 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * @return bool    Whether this request will result in a redirect
+     * @return bool Whether this request will result in a redirect
      */
     public function getRedirect()
     {

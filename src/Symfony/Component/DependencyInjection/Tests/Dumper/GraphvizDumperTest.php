@@ -23,6 +23,18 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = __DIR__.'/../Fixtures/';
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyDump()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $container = include self::$fixturesPath.'/containers/legacy-container9.php';
+        $dumper = new GraphvizDumper($container);
+        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/legacy-services9.dot')), $dumper->dump(), '->dump() dumps services');
+    }
+
     public function testDump()
     {
         $dumper = new GraphvizDumper($container = new ContainerBuilder());
@@ -41,8 +53,8 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new GraphvizDumper($container);
         $this->assertEquals($dumper->dump(array(
             'graph' => array('ratio' => 'normal'),
-            'node'  => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
-            'edge'  => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
+            'node' => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
+            'edge' => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
             'node.instance' => array('fillcolor' => 'green', 'style' => 'empty'),
             'node.definition' => array('fillcolor' => 'grey'),
             'node.missing' => array('fillcolor' => 'red', 'style' => 'empty'),

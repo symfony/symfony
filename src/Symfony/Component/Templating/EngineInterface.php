@@ -51,7 +51,7 @@ interface EngineInterface
      *
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return bool    true if the template exists, false otherwise
+     * @return bool true if the template exists, false otherwise
      *
      * @throws \RuntimeException if the engine cannot handle the template name
      *
@@ -64,7 +64,7 @@ interface EngineInterface
      *
      * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return bool    true if this class supports the given template, false otherwise
+     * @return bool true if this class supports the given template, false otherwise
      *
      * @api
      */

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Http\Tests;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\HttpUtils;
 
 class HttpUtilsTest extends \PHPUnit_Framework_TestCase
@@ -126,9 +126,9 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
     public function provideSecurityContextAttributes()
     {
         return array(
-            array(SecurityContextInterface::AUTHENTICATION_ERROR),
-            array(SecurityContextInterface::ACCESS_DENIED_ERROR),
-            array(SecurityContextInterface::LAST_USERNAME),
+            array(Security::AUTHENTICATION_ERROR),
+            array(Security::ACCESS_DENIED_ERROR),
+            array(Security::LAST_USERNAME),
         );
     }
 

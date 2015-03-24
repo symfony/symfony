@@ -19,40 +19,40 @@ namespace Symfony\Component\Security\Acl\Model;
 interface AuditableAclInterface extends MutableAclInterface
 {
     /**
-     * Updates auditing for class-based ACE
+     * Updates auditing for class-based ACE.
      *
-     * @param int     $index
-     * @param bool    $auditSuccess
-     * @param bool    $auditFailure
+     * @param int  $index
+     * @param bool $auditSuccess
+     * @param bool $auditFailure
      */
     public function updateClassAuditing($index, $auditSuccess, $auditFailure);
 
     /**
-     * Updates auditing for class-field-based ACE
+     * Updates auditing for class-field-based ACE.
      *
-     * @param int     $index
-     * @param string  $field
-     * @param bool    $auditSuccess
-     * @param bool    $auditFailure
+     * @param int    $index
+     * @param string $field
+     * @param bool   $auditSuccess
+     * @param bool   $auditFailure
      */
     public function updateClassFieldAuditing($index, $field, $auditSuccess, $auditFailure);
 
     /**
-     * Updates auditing for object-based ACE
+     * Updates auditing for object-based ACE.
      *
-     * @param int     $index
-     * @param bool    $auditSuccess
-     * @param bool    $auditFailure
+     * @param int  $index
+     * @param bool $auditSuccess
+     * @param bool $auditFailure
      */
     public function updateObjectAuditing($index, $auditSuccess, $auditFailure);
 
     /**
-     * Updates auditing for object-field-based ACE
+     * Updates auditing for object-field-based ACE.
      *
-     * @param int     $index
-     * @param string  $field
-     * @param bool    $auditSuccess
-     * @param bool    $auditFailure
+     * @param int    $index
+     * @param string $field
+     * @param bool   $auditSuccess
+     * @param bool   $auditFailure
      */
     public function updateObjectFieldAuditing($index, $field, $auditSuccess, $auditFailure);
 }

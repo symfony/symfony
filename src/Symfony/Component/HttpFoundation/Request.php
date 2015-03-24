@@ -1962,11 +1962,19 @@ class Request
         return new static($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
+    /**
+     * @param IpRetrieverInterface $ipRetriever
+     * @deprecated since version 2.7, to be removed in 3.0.
+     */
     public function setIpRetriever(IpRetrieverInterface $ipRetriever)
     {
         $this->ipRetriever = $ipRetriever;
     }
 
+    /**
+     * @return IpRetrieverInterface
+     * @deprecated since version 2.7, to be removed in 3.0.
+     */
     private function getDefaultIpRetriever()
     {
         if (null === $this->ipRetriever) {

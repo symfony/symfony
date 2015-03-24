@@ -146,7 +146,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('ip_retriever')
                     ->info('Define your custom service to retrieve IP')
-                    ->defaultNull()
+                    ->defaultValue('ip_retriever.default')
                 ->end()
                 ->scalarNode('ide')->defaultNull()->end()
                 ->booleanNode('test')->end()

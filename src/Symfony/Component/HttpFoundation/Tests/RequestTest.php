@@ -854,7 +854,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testGetClientIpsProvider
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     public function testGetClientIp($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
@@ -868,7 +868,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testGetClientIpsProvider
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     public function testGetClientIps($expected, $remoteAddr, $httpForwardedFor, $trustedProxies)
     {
@@ -882,7 +882,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testGetClientIpsForwardedProvider
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     public function testGetClientIpsForwarded($expected, $remoteAddr, $httpForwarded, $trustedProxies)
     {
@@ -895,7 +895,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     public function testGetClientIpsForwardedProvider()
     {
@@ -912,7 +912,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     public function testGetClientIpsProvider()
     {
@@ -1490,7 +1490,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     private function getRequestInstanceForClientIpTests($remoteAddr, $httpForwardedFor, $trustedProxies)
     {
@@ -1512,7 +1512,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Kept to check backward compatibility
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @group legacy
      */
     private function getRequestInstanceForClientIpsForwardedTests($remoteAddr, $httpForwarded, $trustedProxies)
     {

@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class IpRetrieverListener implements EventSubscriberInterface
 {
-    private $ipRetriever = null;
+    private $ipRetriever;
 
     public function __construct(IpRetrieverInterface $ipRetriever)
     {

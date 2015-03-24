@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-03T08:37:08Z
+
+@WouterJ Can you fix the CS and have a look at the broken tests? It looks like there is something wrong. Thanks.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-22T15:01:17Z
+
+Fixed the tests and CS
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-24T10:35:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-24T10:58:15Z
+
+@fabpot done (although I strongly believe they make code a lot easier to understand)

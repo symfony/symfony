@@ -228,22 +228,6 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $resolving[$key] = true;
-            if (preg_match_all("/(.*?)\[(.+?)\]/", $key, $matches)) {
-                $rootKey = empty($matches[1][0]) ? $matches[0][0] : $matches[1][0];
-
-                $stringValue = $this->get($rootKey);
-
-                foreach ($matches[2] as $keyValue) {
-                    if (!is_array($stringValue)) {
-                        continue;
-                    }
-                    $stringValue = $stringValue[$keyValue];
-                }
-
-                $stringValue = (string)$stringValue;
-                $this->parameters[$key] = $stringValue;
-                return $stringValue;
-            }
 
             return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
         }

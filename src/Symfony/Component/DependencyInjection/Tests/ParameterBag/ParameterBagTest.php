@@ -196,37 +196,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $bag = new ParameterBag(array('host' => 'foo.bar', 'port' => 1337));
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
-
-        $bag = new ParameterBag(
-            array(
-                'connection' => array(
-                    'blog' => array(
-                        'host' => 'blog-host'
-                    ),
-                    'store' => array(
-                        'host' => 'store-host'
-                    )
-                )
-            )
-        );
-        $this->assertEquals('blog-host', $bag->resolveValue('%connection[blog][host]%'));
-        $this->assertEquals('store-host', $bag->resolveValue('%connection[store][host]%'));
-
-
-        $bag = new ParameterBag(array('[]' => 'bar'));
-        $this->assertEquals('bar', $bag->resolveValue('%[]%'));
-
-        $bag = new ParameterBag(array('[foo' => 'bar'));
-        $this->assertEquals('bar', $bag->resolveValue('%[foo%'));
-
-        $bag = new ParameterBag(array('foo]' => 'bar'));
-        $this->assertEquals('bar', $bag->resolveValue('%foo]%'));
-
-        $bag = new ParameterBag(array('[foo]' => 'bar'));
-        $this->assertEquals('bar', $bag->resolveValue('%[foo]%'));
-
-        $bag = new ParameterBag(array('foo[]' => 'bar'));
-        $this->assertEquals('bar', $bag->resolveValue('%foo[]%'));
     }
 
     /**

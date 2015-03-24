@@ -206,9 +206,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
             $this->innerType->setDefaultOptions($this->optionsResolver);
 
             $reflector = new \ReflectionMethod($this->innerType, 'setDefaultOptions');
-            $isOverwritten = ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType');
+            $isOldOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType';
 
-            if (true === $isOverwritten) {
+            $reflector = new \ReflectionMethod($this->innerType, 'configureOptions');
+            $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractType';
+
+            if ($isOldOverwritten && !$isNewOverwritten) {
                 trigger_error('The FormTypeInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeInterface with Symfony 3.0.', E_USER_DEPRECATED);
             }
 
@@ -216,9 +219,12 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 $extension->setDefaultOptions($this->optionsResolver);
 
                 $reflector = new \ReflectionMethod($extension, 'setDefaultOptions');
-                $isOverwritten = ($reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension');
+                $isOldOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension';
 
-                if (true === $isOverwritten) {
+                $reflector = new \ReflectionMethod($extension, 'configureOptions');
+                $isNewOverwritten = $reflector->getDeclaringClass()->getName() !== 'Symfony\Component\Form\AbstractTypeExtension';
+
+                if ($isOldOverwritten && !$isNewOverwritten) {
                     trigger_error('The FormTypeExtensionInterface::setDefaultOptions() method is deprecated since version 2.7 and will be removed in 3.0. Use configureOptions() instead. This method will be added to the FormTypeExtensionInterface with Symfony 3.0.', E_USER_DEPRECATED);
                 }
             }

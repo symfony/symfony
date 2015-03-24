@@ -54,7 +54,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * {$options['class']}
+ * {$options['class']}.
  *
  * This class has been auto-generated
  * by the Symfony Routing Component.

@@ -116,7 +116,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     /**
      * Creates a metadata class
      *
-     * @param string|object $class
+     * @param string $class
      *
      * @return ClassMetadataInterface
      */

@@ -38,29 +38,60 @@ class StringUtils
      */
     public static function equals($knownString, $userInput)
     {
-        $knownString = (string) $knownString;
-        $userInput = (string) $userInput;
+        // Avoid making unnecessary duplications of secret data
+        if (!is_string($knownString)) {
+            $knownString = self::castAsString($knownString);
+        }
+
+        if (!is_string($userInput)) {
+            $userInput = self::castAsString($userInput);
+        }
 
         if (function_exists('hash_equals')) {
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLen = strlen($knownString);
-        $userLen = strlen($userInput);
+        if (function_exists('mb_strlen')) {
+            $knownLen = mb_strlen($knownString, '8bit');
+            $userLen = mb_strlen($userInput, '8bit');
+        } else {
+            $knownLen = strlen($knownString);
+            $userLen = strlen($userInput);
+        }
 
-        // Extend the known string to avoid uninitialized string offsets
-        $knownString .= $userInput;
+        // Leaking the length of $knownString is unavoidable.
+        // Instead of trying to be smarter than the original,
+        // this fallback implementation of hash_equals is as close
+        // as possible to its C version.
+        // See http://lxr.php.net/xref/PHP_TRUNK/ext/hash/hash.c
 
-        // Set the result to the difference between the lengths
-        $result = $knownLen - $userLen;
+        if ($userLen !== $knownLen) {
+            return false;
+        }
 
-        // Note that we ALWAYS iterate over the user-supplied length
-        // This is to mitigate leaking length information
-        for ($i = 0; $i < $userLen; $i++) {
+        $result = 0;
+
+        for ($i = 0; $i < $knownLen; $i++) {
             $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
         }
 
         // They are only identical strings if $result is exactly 0...
         return 0 === $result;
+    }
+
+    /**
+     * Preserves copy-on-write references while casting to string
+     *
+     * @param mixed $value The value to cast as string
+     *
+     * @return string The value casted as string
+     */
+    private static function castAsString($value)
+    {
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return $value->__toString();
+        }
+
+        return (string) $value;
     }
 }

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\SessionExpiredException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;

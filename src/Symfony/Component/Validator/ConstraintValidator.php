@@ -24,14 +24,14 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Whether to format {@link \DateTime} objects as RFC-3339 dates
      * ("Y-m-d H:i:s").
      *
-     * @var integer
+     * @var int
      */
     const PRETTY_DATE = 1;
 
     /**
      * Whether to cast objects with a "__toString()" method to strings.
      *
-     * @var integer
+     * @var int
      */
     const OBJECT_TO_STRING = 2;
 
@@ -81,9 +81,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param mixed   $value  The value to format as string
-     * @param integer $format A bitwise combination of the format
-     *                        constants in this class
+     * @param mixed $value  The value to format as string
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the passed value
      */
@@ -141,9 +141,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array   $values A list of values
-     * @param integer $format A bitwise combination of the format
-     *                        constants in this class
+     * @param array $values A list of values
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the value list
      *

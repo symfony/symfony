@@ -12,7 +12,6 @@
 namespace Symfony\Component\Intl\Tests\NumberFormatter;
 
 use Symfony\Component\Intl\Globals\IntlGlobals;
-use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\NumberFormatter\NumberFormatter;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 

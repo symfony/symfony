@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Collator\Verification;
 
-use Symfony\Component\Intl\Locale;
 use Symfony\Component\Intl\Tests\Collator\AbstractCollatorTest;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 

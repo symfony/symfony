@@ -186,6 +186,35 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
         // should not throw an exception
         XmlUtils::loadFile(__DIR__.'/../Fixtures/Util/valid.xml', __DIR__.'/../Fixtures/Util/schema.xsd');
     }
+
+    /**
+     * @dataProvider getDataForCreateSequenceIfNotExists
+     */
+    public function testCreateSequenceIfNotExists($expected, $xml, $root = false, $checkPrefix = true)
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
+
+        $this->assertSame($expected, XmlUtils::convertDomElementToArray($dom->documentElement, $checkPrefix));
+    }
+
+    public function getDataForCreateSequenceIfNotExists()
+    {
+        return array(
+            array(array('parameter' => array('name' => 'name001','value' => 'value001')),
+                  '<parameter><name>name001</name><value>value001</value></parameter>', ),
+            array(array('parameter' => array(array('name' => 'name001','value' => 'value001'))),
+                  '<parameter create-sequence-if-not-exists="true"><name>name001</name><value>value001</value></parameter>', ),
+            array(array('parameter' => array(array('name' => 'name001','value' => 'value001'),array('name' => 'name002','value' => 'value002'))),
+                  '<parameter create-sequence-if-not-exists="true"><name>name001</name><value>value001</value></parameter><parameter create-sequence-if-not-exists="true"><name>name002</name><value>value002</value></parameter>', ),
+            array(array('parameter' => array(array('name' => 'name001','value' => 'value001'),array('name' => 'name002','value' => 'value002'))),
+                  '<parameter><name>name001</name><value>value001</value></parameter><parameter create-sequence-if-not-exists="true"><name>name002</name><value>value002</value></parameter>', ),
+            array(array('parameter' => array(array('name' => 'name001','value' => 'value001'),array('name' => 'name002','value' => 'value002'))),
+                  '<parameter create-sequence-if-not-exists="true"><name>name001</name><value>value001</value></parameter><parameter><name>name002</name><value>value002</value></parameter>', ),
+            array(array('parameter' => array(array('name' => 'name001','value' => 'value001'),array('name' => 'name002','value' => 'value002'))),
+                  '<parameter><name>name001</name><value>value001</value></parameter><parameter><name>name002</name><value>value002</value></parameter>', ),
+        );
+    }
 }
 
 interface Validator

@@ -21,6 +21,8 @@ namespace Symfony\Component\Config\Util;
  */
 class XmlUtils
 {
+    const DIRECTIVE_SEQUENCE = 'create-sequence-if-not-exists';
+
     /**
      * This class should not be instantiated.
      */
@@ -118,6 +120,140 @@ class XmlUtils
      *
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
+     *  * A special tag attribute "create-sequence-if-not-exists" is introduced, which is an equivalent of the sequence directive "-" in YAML file, so the following files are equivalent.
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter create-sequence-if-not-exists="true">
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    YAML:
+     *    -------------------------------------------------------
+     *    parameter:
+     *        - name: name001
+     *          value: value001
+     *
+     *    Both files are converted to the php object as follows:
+     *
+     *    array(
+     *       'parameter'=> array(
+     *          array(
+     *             'name'=>'name001',
+     *             'value'=>'value001'
+     *          )
+     *       )
+     *    )
+     *
+     *    NOTE: the 'create-sequence-if-not-exists' attribute is removed from the php object to avoid introducting extra key.
+     *
+     *    So if the 'create-sequence-if-not-exists' attribute is used on a tag, its child nodes will be enclosed by a wrapper array.
+     *    This is useful when the tag is a 'prototype node' in a configuration tree, BUT ONLY ONE of its concrete record is defined in the XML file.
+     *    In which case, no wrapper array is created by default, which will cause subsequent processing error:
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter>
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    The php object is as follows:
+     *
+     *    array(
+     *       'parameter'=> array(
+     *           'name'=>'name001',
+     *           'value'=>'value001'
+     *       )
+     *    )
+     *
+     *    NOTE: Assume the 'parameter' node is a prototype node in configuration tree, so each of its child nodes should be a warpper array, which contains real configuration data.
+     *    So processing the php object as a prototype node will result in errors.
+     *
+     *    If more than ONE records are defined in the XML file, the 'create-sequence-if-not-exists' attribute can be omitted, because in which case, the wrapper array will be created anyways.
+     *    Using this attribute when multiple records are defined will neither cause any error nor have any effect. So the following files are equivalent:
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter create-sequence-if-not-exists="true">
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *        <parameter>
+     *            <name>name002</name>
+     *            <value>value002</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter>
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *        <parameter create-sequence-if-not-exists="true">
+     *            <name>name002</name>
+     *            <value>value002</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter create-sequence-if-not-exists="true">
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *        <parameter create-sequence-if-not-exists="true">
+     *            <name>name002</name>
+     *            <value>value002</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    XML:
+     *    -------------------------------------------------------
+     *    <root>
+     *        <parameter>
+     *            <name>name001</name>
+     *            <value>value001</value>
+     *        </parameter>
+     *        <parameter>
+     *            <name>name002</name>
+     *            <value>value002</value>
+     *        </parameter>
+     *    </root>
+     *
+     *    YAML:
+     *    -------------------------------------------------------
+     *    parameter:
+     *        - name: name001
+     *          value: value001
+     *        - name: name002
+     *          value: value002
+     *
+     *    These files are equivalent and will be converted to the following php object:
+     *
+     *    array(
+     *       'parameter'=> array(
+     *          array(
+     *             'name'=>'name001',
+     *             'value'=>'value001'
+     *          ),
+     *          array(
+     *             'name'=>'name002',
+     *             'value'=>'value002'
+     *          )
+     *       )
+     *    )
+     *
+     *
      * @param \DomElement $element     A \DomElement instance
      * @param bool        $checkPrefix Check prefix in an element or an attribute name
      *
@@ -147,6 +283,13 @@ class XmlUtils
                 continue;
             } elseif (!$node instanceof \DOMComment) {
                 $value = static::convertDomElementToArray($node, $checkPrefix);
+                // Check if 'create-sequence-if-not-exists' attribute is used on current child node
+                // E.g, <foo create-sequence-if-not-exists="true">...</foo>
+                $createSequenceIfNotExists = isset($value[static::DIRECTIVE_SEQUENCE]);
+                if ($createSequenceIfNotExists) {
+                    // The 'create-sequence-if-not-exists' attribute is useless now, so remove it to avoid extra key
+                    unset($value[static::DIRECTIVE_SEQUENCE]);
+                }
 
                 $key = $node->localName;
                 if (isset($config[$key])) {
@@ -155,7 +298,10 @@ class XmlUtils
                     }
                     $config[$key][] = $value;
                 } else {
-                    $config[$key] = $value;
+                    // It's the first time to process the child node of <$key> tag under the $element node.
+                    // If the 'create-sequence-if-not-exists' attribute is used on $element node, create the wrapper array.
+                    // Otherwise, directly append the child node's value to $config[$key].
+                    $config[$key] = $createSequenceIfNotExists ? array($value) : $value;
                 }
 
                 $empty = false;

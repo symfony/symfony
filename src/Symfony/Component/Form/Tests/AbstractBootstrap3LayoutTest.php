@@ -1813,6 +1813,6 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         $html = $this->renderWidget($form->createView());
 
         // foo="foo"
-        $this->assertSame('<button type="button" id="button" name="button" foo="foo" class="btn">[trans]Button[/trans]</button>', $html);
+        $this->assertSame('<button type="button" id="button" name="button" foo="foo" class="btn-default btn">[trans]Button[/trans]</button>', $html);
     }
 }

@@ -30,7 +30,7 @@
             <argument type="service" id="security.user_checker" />
         </service>
 
-        <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false"></service>
+        <service id="security.rememberme.token.provider.in_memory" class="%security.rememberme.token.provider.in_memory.class%" public="false" />
 
         <service id="security.authentication.rememberme.services.abstract" abstract="true" public="false">
             <tag name="monolog.logger" channel="security" />
@@ -51,8 +51,7 @@
         <service id="security.authentication.rememberme.services.simplehash"
                  class="%security.authentication.rememberme.services.simplehash.class%"
                  parent="security.authentication.rememberme.services.abstract"
-                 abstract="true">
-        </service>
+                 abstract="true" />
 
         <service id="security.rememberme.response_listener" class="%security.rememberme.response_listener.class%">
             <tag name="kernel.event_subscriber" />

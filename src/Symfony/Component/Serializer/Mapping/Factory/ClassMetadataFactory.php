@@ -14,6 +14,7 @@ namespace Symfony\Component\Serializer\Mapping\Factory;
 use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
 /**
@@ -64,10 +65,6 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
 
-        if (!class_exists($class) && !interface_exists($class)) {
-            throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
-        }
-
         $classMetadata = $this->createMetadataClass($class);
         $this->loader->loadClassMetadata($classMetadata);
 
@@ -116,8 +113,19 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         return ltrim(is_object($value) ? get_class($value) : $value, '\\');
     }
 
+    /**
+     * Creates a metadata class
+     *
+     * @param string|object $class
+     *
+     * @return ClassMetadataInterface
+     */
     protected function createMetadataClass($class)
     {
+        if (!class_exists($class) && !interface_exists($class)) {
+            throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
+        }
+
         return new ClassMetadata($class);
     }
 }

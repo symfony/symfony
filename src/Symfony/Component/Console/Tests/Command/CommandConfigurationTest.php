@@ -24,7 +24,7 @@ class CommandConfigurationTest  extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($configuration, $newConfiguration, '->withName() does not mutate original configuration');
 
         $configuration = $newConfiguration;
-        $newConfiguration = $configuration->withAliases(['bar:foo']);
+        $newConfiguration = $configuration->withAliases(array('bar:foo'));
         $this->assertNotSame($configuration, $newConfiguration, '->withAliases() does not mutate original configuration');
 
         $configuration = $newConfiguration;
@@ -51,8 +51,8 @@ class CommandConfigurationTest  extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo:bar', $configuration->getName(), '->getName() returns correct command name');
         $this->assertSame('bar:foo', $configuration->withName('bar:foo')->getName(), '->withName() returns configuration with new name');
 
-        $this->assertSame([], $configuration->getAliases());
-        $this->assertSame(['bar:baz'], $configuration->withAliases(['bar:baz'])->getAliases(), '->withAliases() returns configuration with new aliases');
+        $this->assertSame(array(), $configuration->getAliases());
+        $this->assertSame(array('bar:baz'), $configuration->withAliases(array('bar:baz'))->getAliases(), '->withAliases() returns configuration with new aliases');
 
         $this->assertNull($configuration->getProcessTitle());
         $this->assertSame('title', $configuration->withProcessTitle('title')->getProcessTitle(), '->getProcessTitle() returns configuration with new title');

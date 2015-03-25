@@ -32,6 +32,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
+        require_once self::$fixturesPath.'/TestCommandWithSeparateConfiguration.php';
     }
 
     public function testConstructor()
@@ -335,5 +336,97 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testInconsistentDefinition()
     {
         new Command('foo', new CommandConfiguration('bar'));
+    }
+
+    public function testThatCommandIsNotLoaded()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->never())
+            ->method('resolve')
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $this->assertSame('foo:bar', $command->getName());
+    }
+
+    public function testCommandWithSeparateConfiguration()
+    {
+        $configuration =
+            CommandConfiguration::create('foo:baz')
+                ->withDescription('foo description')
+                ->withDefinition(
+                    new InputDefinition(array(
+                        new InputArgument('name'),
+                    ))
+                );
+
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('foo:baz')
+            ->will($this->returnCallback(function () {
+                return new \TestCommandWithSeparateConfiguration();
+            }))
+        ;
+
+        $command = Command::registerLazyLoaded($configuration, $resolver);
+        $command->setApplication(new Application());
+
+        $tester = new CommandTester($command);
+        $tester->execute(array('name' => 'Alice'));
+
+        $this->assertSame(
+            'interact called'.PHP_EOL.'Hello, Alice'.PHP_EOL.'Command name: foo:baz'.PHP_EOL.'Description foo description'.PHP_EOL,
+            $tester->getDisplay()
+        );
+    }
+
+    public function testThatResolverIsAllowedToReturnCallable()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->will($this->returnValue(function (InputInterface $input, OutputInterface $output) {
+                $output->writeln('Hello, world');
+
+                return 42;
+            }))
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $tester = new CommandTester($command);
+        $tester->execute(array(), array());
+
+        $this->assertSame('Hello, world'.PHP_EOL, $tester->getDisplay());
+        $this->assertSame(42, $tester->getStatusCode());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Command or callable was expected, string given
+     */
+    public function testInvalidResolver()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('foo:bar')
+            ->will($this->returnValue('foo'))
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $tester = new CommandTester($command);
+        $tester->execute(array());
     }
 }

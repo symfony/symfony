@@ -29,7 +29,9 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
 
     protected function createChoiceList()
     {
-        return new ArrayChoiceList($this->getChoices(), $this->getValues());
+        $i = 0;
+
+        return new ArrayChoiceList($this->getChoices());
     }
 
     protected function getChoices()
@@ -48,5 +50,46 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
     public function testFailIfKeyMismatch()
     {
         new ArrayChoiceList(array(0 => 'a', 1 => 'b'), array(1 => 'a', 2 => 'b'));
+    }
+
+    public function testCreateChoiceListWithValueCallback()
+    {
+        $callback = function ($choice, $key) {
+            return $key.':'.$choice;
+        };
+
+        $choiceList = new ArrayChoiceList(array(2 => 'foo', 7 => 'bar', 10 => 'baz'), $callback);
+
+        $this->assertSame(array(2 => '2:foo', 7 => '7:bar', 10 => '10:baz'), $choiceList->getValues());
+        $this->assertSame(array(1 => 'foo', 2 => 'baz'), $choiceList->getChoicesForValues(array(1 => '2:foo', 2 => '10:baz')));
+        $this->assertSame(array(1 => '2:foo', 2 => '10:baz'), $choiceList->getValuesForChoices(array(1 => 'foo', 2 => 'baz')));
+    }
+
+    public function testCompareChoicesByIdentityByDefault()
+    {
+        $callback = function ($choice) {
+            return $choice->value;
+        };
+
+        $obj1 = (object) array('value' => 'value1');
+        $obj2 = (object) array('value' => 'value2');
+
+        $choiceList = new ArrayChoiceList(array($obj1, $obj2), $callback);
+        $this->assertSame(array(2 => 'value2'), $choiceList->getValuesForChoices(array(2 => $obj2)));
+        $this->assertSame(array(), $choiceList->getValuesForChoices(array(2 => (object) array('value' => 'value2'))));
+    }
+
+    public function testCompareChoicesWithValueCallbackIfCompareByValue()
+    {
+        $callback = function ($choice) {
+            return $choice->value;
+        };
+
+        $obj1 = (object) array('value' => 'value1');
+        $obj2 = (object) array('value' => 'value2');
+
+        $choiceList = new ArrayChoiceList(array($obj1, $obj2), $callback, true);
+        $this->assertSame(array(2 => 'value2'), $choiceList->getValuesForChoices(array(2 => $obj2)));
+        $this->assertSame(array(2 => 'value2'), $choiceList->getValuesForChoices(array(2 => (object) array('value' => 'value2'))));
     }
 }

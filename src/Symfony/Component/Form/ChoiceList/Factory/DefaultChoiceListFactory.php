@@ -89,10 +89,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
         }
 
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -102,29 +98,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // in the view only.
         self::flatten($choices, $flatChoices);
 
-        // If no values are given, use incrementing integers as values
-        // We can not use the choices themselves, because we don't know whether
-        // choices can be converted to (duplicate-free) strings
-        if (null === $value) {
-            $values = $flatChoices;
-            $i = 0;
-
-            foreach ($values as $key => $value) {
-                $values[$key] = (string) $i++;
-            }
-
-            return new ArrayChoiceList($flatChoices, $values);
-        }
-
-        // Can't use array_map(), because array_map() doesn't pass the key
-        // Can't use array_walk(), which ignores the return value of the
-        // closure
-        $values = array();
-        foreach ($flatChoices as $key => $choice) {
-            $values[$key] = call_user_func($value, $choice, $key);
-        }
-
-        return new ArrayChoiceList($flatChoices, $values);
+        return new ArrayChoiceList($flatChoices, $value);
     }
 
     /**
@@ -137,10 +111,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     {
         if (!is_array($choices) && !$choices instanceof \Traversable) {
             throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
         }
 
         if ($choices instanceof \Traversable) {
@@ -157,20 +127,12 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         // strings or integers, we are guaranteed to be able to convert them
         // to strings
         if (null === $value) {
-            $values = array_map('strval', $flatChoices);
-
-            return new ArrayKeyChoiceList($flatChoices, $values);
+            $value = function ($choice) {
+                return (string) $choice;
+            };
         }
 
-        // Can't use array_map(), because array_map() doesn't pass the key
-        // Can't use array_walk(), which ignores the return value of the
-        // closure
-        $values = array();
-        foreach ($flatChoices as $key => $choice) {
-            $values[$key] = call_user_func($value, $choice, $key);
-        }
-
-        return new ArrayKeyChoiceList($flatChoices, $values);
+        return new ArrayKeyChoiceList($flatChoices, $value);
     }
 
     /**

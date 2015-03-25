@@ -43,21 +43,14 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * @deprecated Added for backwards compatibility in Symfony 2.7, to be removed
  *             in Symfony 3.0.
  */
-class ArrayKeyChoiceList implements ChoiceListInterface
+class ArrayKeyChoiceList extends ArrayChoiceList
 {
     /**
-     * The selectable choices.
+     * Whether the choices are used as values.
      *
-     * @var array
+     * @var bool
      */
-    private $choices = array();
-
-    /**
-     * The values of the choices.
-     *
-     * @var string[]
-     */
-    private $values = array();
+    private $useChoicesAsValues = false;
 
     /**
      * Casts the given choice to an array key.
@@ -100,51 +93,26 @@ class ArrayKeyChoiceList implements ChoiceListInterface
      * values.
      *
      * @param array    $choices The selectable choices
-     * @param string[] $values  Optional. The string values of the choices
+     * @param callable $value   The callable for creating the value for a
+     *                          choice. If `null` is passed, the choices are
+     *                          cast to strings and used as values
      *
      * @throws InvalidArgumentException If the keys of the choices don't match
      *                                  the keys of the values or if any of the
      *                                  choices is not scalar
      */
-    public function __construct(array $choices, array $values = array())
+    public function __construct(array $choices, $value = null)
     {
-        if (empty($values)) {
-            // The cast to strings happens later
-            $values = $choices;
-        } else {
-            $choiceKeys = array_keys($choices);
-            $valueKeys = array_keys($values);
+        $choices = array_map(array(__CLASS__, 'toArrayKey'), $choices);
 
-            if ($choiceKeys !== $valueKeys) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'The keys of the choices and the values must match. The choice '.
-                        'keys are: "%s". The value keys are: "%s".',
-                        implode('", "', $choiceKeys),
-                        implode('", "', $valueKeys)
-                    )
-                );
-            }
+        if (null === $value) {
+            $value = function ($choice) {
+                return (string) $choice;
+            };
+            $this->useChoicesAsValues = true;
         }
 
-        $this->choices = array_map(array(__CLASS__, 'toArrayKey'), $choices);
-        $this->values = array_map('strval', $values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChoices()
-    {
-        return $this->choices;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getValues()
-    {
-        return $this->values;
+        parent::__construct($choices, $value);
     }
 
     /**
@@ -152,11 +120,15 @@ class ArrayKeyChoiceList implements ChoiceListInterface
      */
     public function getChoicesForValues(array $values)
     {
-        $values = array_map('strval', $values);
+        if ($this->useChoicesAsValues) {
+            $values = array_map('strval', $values);
 
-        // The values are identical to the choices, so we can just return them
-        // to improve performance a little bit
-        return array_map(array(__CLASS__, 'toArrayKey'), array_intersect($values, $this->values));
+            // If the values are identical to the choices, so we can just return
+            // them to improve performance a little bit
+            return array_map(array(__CLASS__, 'toArrayKey'), array_intersect($values, $this->values));
+        }
+
+        return parent::getChoicesForValues($values);
     }
 
     /**
@@ -166,8 +138,12 @@ class ArrayKeyChoiceList implements ChoiceListInterface
     {
         $choices = array_map(array(__CLASS__, 'toArrayKey'), $choices);
 
-        // The choices are identical to the values, so we can just return them
-        // to improve performance a little bit
-        return array_map('strval', array_intersect($choices, $this->choices));
+        if ($this->useChoicesAsValues) {
+            // If the choices are identical to the values, we can just return
+            // them to improve performance a little bit
+            return array_map('strval', array_intersect($choices, $this->choices));
+        }
+
+        return parent::getValuesForChoices($choices);
     }
 }

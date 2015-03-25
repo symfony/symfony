@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * A list of choices with arbitrary data types.
@@ -40,32 +40,45 @@ class ArrayChoiceList implements ChoiceListInterface
     protected $values = array();
 
     /**
+     * The callback for creating the value for a choice.
+     *
+     * @var callable
+     */
+    protected $valueCallback;
+
+    /**
      * Creates a list with the given choices and values.
      *
      * The given choice array must have the same array keys as the value array.
      *
-     * @param array    $choices The selectable choices
-     * @param string[] $values  The string values of the choices
-     *
-     * @throws InvalidArgumentException If the keys of the choices don't match
-     *                                  the keys of the values
+     * @param array    $choices        The selectable choices
+     * @param callable $value          The callable for creating the value for a
+     *                                 choice. If `null` is passed, incrementing
+     *                                 integers are used as values
+     * @param bool     $compareByValue Whether to use the value callback to
+     *                                 compare choices. If `null`, choices are
+     *                                 compared by identity
      */
-    public function __construct(array $choices, array $values)
+    public function __construct(array $choices, $value = null, $compareByValue = false)
     {
-        $choiceKeys = array_keys($choices);
-        $valueKeys = array_keys($values);
-
-        if ($choiceKeys !== $valueKeys) {
-            throw new InvalidArgumentException(sprintf(
-                'The keys of the choices and the values must match. The choice '.
-                'keys are: "%s". The value keys are: "%s".',
-                implode('", "', $choiceKeys),
-                implode('", "', $valueKeys)
-            ));
+        if (null !== $value && !is_callable($value)) {
+            throw new UnexpectedTypeException($value, 'null or callable');
         }
 
         $this->choices = $choices;
-        $this->values = array_map('strval', $values);
+        $this->values = array();
+        $this->valueCallback = $compareByValue ? $value : null;
+
+        if (null === $value) {
+            $i = 0;
+            foreach ($this->choices as $key => $choice) {
+                $this->values[$key] = (string) $i++;
+            }
+        } else {
+            foreach ($choices as $key => $choice) {
+                $this->values[$key] = (string) call_user_func($value, $choice, $key);
+            }
+        }
     }
 
     /**
@@ -116,6 +129,17 @@ class ArrayChoiceList implements ChoiceListInterface
     {
         $values = array();
 
+        // Use the value callback to compare choices by their values, if present
+        if ($this->valueCallback) {
+            $givenValues = array();
+            foreach ($choices as $key => $choice) {
+                $givenValues[$key] = (string) call_user_func($this->valueCallback, $choice, $key);
+            }
+
+            return array_intersect($givenValues, $this->values);
+        }
+
+        // Otherwise compare choices by identity
         foreach ($choices as $i => $givenChoice) {
             foreach ($this->choices as $j => $choice) {
                 if ($choice !== $givenChoice) {

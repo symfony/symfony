@@ -29,7 +29,7 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
 
     protected function createChoiceList()
     {
-        return new ArrayKeyChoiceList($this->getChoices(), $this->getValues());
+        return new ArrayKeyChoiceList($this->getChoices());
     }
 
     protected function getChoices()
@@ -40,14 +40,6 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
     protected function getValues()
     {
         return array('0', '1', 'a', 'b', '');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
-    public function testFailIfKeyMismatch()
-    {
-        new ArrayKeyChoiceList(array(0 => 'a', 1 => 'b'), array(1 => 'a', 2 => 'b'));
     }
 
     public function testUseChoicesAsValuesByDefault()
@@ -102,7 +94,7 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
      */
     public function testConvertChoicesIfNecessary(array $choices, array $converted)
     {
-        $list = new ArrayKeyChoiceList($choices, range(0, count($choices) - 1));
+        $list = new ArrayKeyChoiceList($choices);
 
         $this->assertSame($converted, $list->getChoices());
     }
@@ -134,7 +126,7 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
      */
     public function testFailIfInvalidChoices(array $choices)
     {
-        new ArrayKeyChoiceList($choices, range(0, count($choices) - 1));
+        new ArrayKeyChoiceList($choices);
     }
 
     /**
@@ -157,31 +149,48 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
     /**
      * @dataProvider provideConvertibleValues
      */
-    public function testConvertValuesToStrings(array $values, array $converted)
+    public function testConvertValuesToStrings($value, $converted)
     {
-        $list = new ArrayKeyChoiceList(range(0, count($values) - 1), $values);
+        $callback = function () use ($value) {
+            return $value;
+        };
 
-        $this->assertSame($converted, $list->getValues());
+        $list = new ArrayKeyChoiceList(array('choice'), $callback);
+
+        $this->assertSame(array($converted), $list->getValues());
     }
 
     public function provideConvertibleValues()
     {
         return array(
-            array(array(0), array('0')),
-            array(array(1), array('1')),
-            array(array('0'), array('0')),
-            array(array('1'), array('1')),
-            array(array('1.23'), array('1.23')),
-            array(array('foobar'), array('foobar')),
+            array(0, '0'),
+            array(1, '1'),
+            array('0', '0'),
+            array('1', '1'),
+            array('1.23', '1.23'),
+            array('foobar', 'foobar'),
             // The default value of choice fields is NULL. It should be treated
             // like the empty value for this choice list type
-            array(array(null), array('')),
-            array(array(1.23), array('1.23')),
+            array(null, ''),
+            array(1.23, '1.23'),
             // Always cast booleans to 0 and 1, because:
             // array(true => 'Yes', false => 'No') === array(1 => 'Yes', 0 => 'No')
             // see ChoiceTypeTest::testSetDataSingleNonExpandedAcceptsBoolean
-            array(array(true), array('1')),
-            array(array(false), array('')),
+            array(true, '1'),
+            array(false, ''),
         );
+    }
+
+    public function testCreateChoiceListWithValueCallback()
+    {
+        $callback = function ($choice, $key) {
+            return $key.':'.$choice;
+        };
+
+        $choiceList = new ArrayKeyChoiceList(array(2 => 'foo', 7 => 'bar', 10 => 'baz'), $callback);
+
+        $this->assertSame(array(2 => '2:foo', 7 => '7:bar', 10 => '10:baz'), $choiceList->getValues());
+        $this->assertSame(array(1 => 'foo', 2 => 'baz'), $choiceList->getChoicesForValues(array(1 => '2:foo', 2 => '10:baz')));
+        $this->assertSame(array(1 => '2:foo', 2 => '10:baz'), $choiceList->getValuesForChoices(array(1 => 'foo', 2 => 'baz')));
     }
 }

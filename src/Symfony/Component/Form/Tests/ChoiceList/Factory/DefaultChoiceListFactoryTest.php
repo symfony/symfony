@@ -83,8 +83,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->obj3 = (object) array('label' => 'C', 'index' => 'y', 'value' => 1, 'preferred' => true, 'group' => 'Group 2', 'attr' => array('attr2' => 'value2'));
         $this->obj4 = (object) array('label' => 'D', 'index' => 'z', 'value' => 2, 'preferred' => false, 'group' => 'Group 2', 'attr' => array());
         $this->list = new ArrayChoiceList(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4),
-            array('A' => '0', 'B' => '1', 'C' => '2', 'D' => '3')
+            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4)
         );
         $this->factory = new DefaultChoiceListFactory();
     }

@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
@@ -28,6 +29,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityTypeTest extends TypeTestCase
@@ -172,7 +174,7 @@ class EntityTypeTest extends TypeTestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
@@ -786,8 +788,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
-        $qb = $repository->createQueryBuilder('e')->where('e.id IN (1, 2)');
+        $repo = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
         $entityType = new EntityType(
             $this->emRegistry,
@@ -806,19 +807,23 @@ class EntityTypeTest extends TypeTestCase
         $formBuilder->add('property1', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => $qb,
+            'query_builder' => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
         ));
 
         $formBuilder->add('property2', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => $qb,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id IN (1, 2)');
+            },
         ));
 
         $formBuilder->add('property3', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => $qb,
+            'query_builder' => function (EntityRepository $repo) {
+                return $repo->createQueryBuilder('e')->where('e.id IN (1, 2)');
+            },
         ));
 
         $form = $formBuilder->getForm();
@@ -829,15 +834,13 @@ class EntityTypeTest extends TypeTestCase
             'property3' => 2,
         ));
 
-        $reflectionClass = new \ReflectionObject($entityType);
-        $reflectionProperty = $reflectionClass->getProperty('loaderCache');
-        $reflectionProperty->setAccessible(true);
+        $choiceList1 = $form->get('property1')->getConfig()->getOption('choice_list');
+        $choiceList2 = $form->get('property2')->getConfig()->getOption('choice_list');
+        $choiceList3 = $form->get('property3')->getConfig()->getOption('choice_list');
 
-        $loaders = $reflectionProperty->getValue($entityType);
-
-        $reflectionProperty->setAccessible(false);
-
-        $this->assertCount(1, $loaders);
+        $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $choiceList1);
+        $this->assertSame($choiceList1, $choiceList2);
+        $this->assertSame($choiceList1, $choiceList3);
     }
 
     public function testCacheChoiceLists()

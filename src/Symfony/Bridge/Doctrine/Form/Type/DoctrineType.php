@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Exception\RuntimeException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -71,20 +73,24 @@ abstract class DoctrineType extends AbstractType
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-                // Don't cache if the query builder is constructed dynamically
-                if ($options['query_builder'] instanceof \Closure) {
-                    $hash = null;
-                } else {
-                    $hash = CachingFactoryDecorator::generateHash(array(
-                        $options['em'],
-                        $options['class'],
-                        $options['query_builder'],
-                        $options['loader'],
-                    ));
+                // We consider two query builders with an equal SQL string and
+                // equal parameters to be equal
+                $qbParts = $options['query_builder']
+                    ? array(
+                        $options['query_builder']->getQuery()->getSQL(),
+                        $options['query_builder']->getParameters()->toArray(),
+                    )
+                    : null;
 
-                    if (isset($choiceLoaders[$hash])) {
-                        return $choiceLoaders[$hash];
-                    }
+                $hash = CachingFactoryDecorator::generateHash(array(
+                    $options['em'],
+                    $options['class'],
+                    $qbParts,
+                    $options['loader'],
+                ));
+
+                if (isset($choiceLoaders[$hash])) {
+                    return $choiceLoaders[$hash];
                 }
 
                 if ($options['loader']) {
@@ -96,18 +102,14 @@ abstract class DoctrineType extends AbstractType
                     $entityLoader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
                 }
 
-               $choiceLoader = new DoctrineChoiceLoader(
+                $choiceLoaders[$hash] = new DoctrineChoiceLoader(
                     $choiceListFactory,
                     $options['em'],
                     $options['class'],
                     $entityLoader
                 );
 
-                if (null !== $hash) {
-                    $choiceLoaders[$hash] = $choiceLoader;
-                }
-
-                return $choiceLoader;
+                return $choiceLoaders[$hash];
             }
         };
 
@@ -199,6 +201,20 @@ abstract class DoctrineType extends AbstractType
             return $entitiesById;
         };
 
+        // Invoke the query builder closure so that we can cache choice lists
+        // for equal query builders
+        $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
+            if (is_callable($queryBuilder)) {
+                $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+
+                if (!$queryBuilder instanceof QueryBuilder) {
+                    throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
+                }
+            }
+
+            return $queryBuilder;
+        };
+
         $resolver->setDefaults(array(
             'em' => null,
             'property' => null, // deprecated, use "choice_label"
@@ -216,9 +232,11 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setNormalizer('em', $emNormalizer);
         $resolver->setNormalizer('choices', $choicesNormalizer);
+        $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
         $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
+        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
 
     /**

@@ -51,6 +51,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         }
 
+        // This block is not executed anymore since Symfony 2.7. The query
+        // builder closure is already invoked in DoctrineType
         if ($queryBuilder instanceof \Closure) {
             if (!$manager instanceof EntityManager) {
                 throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManager');

@@ -40,21 +40,32 @@ class StringUtils
     {
         // Avoid making unnecessary duplications of secret data
         if (!is_string($knownString)) {
-            $knownString = (string) $knownString;
+            $knownString = self::castAsString($knownString);
         }
 
         if (!is_string($userInput)) {
-            $userInput = (string) $userInput;
+            $userInput = self::castAsString($userInput);
         }
 
         if (function_exists('hash_equals')) {
             return hash_equals($knownString, $userInput);
         }
 
-        $knownLen = self::safeStrlen($knownString);
-        $userLen = self::safeStrlen($userInput);
+        if (function_exists('mb_strlen')) {
+            $knownLen = mb_strlen($knownString, '8bit');
+            $userLen = mb_strlen($userInput, '8bit');
+        } else {
+            $knownLen = strlen($knownString);
+            $userLen = strlen($userInput);
+        }
 
-		if ($userLen != $knownLen) {
+        // Leaking the length of $knownString is unavoidable.
+        // Instead of trying to be smarter than the original,
+        // this fallback implementation of hash_equals is as close
+        // as possible to its C version.
+        // See http://lxr.php.net/xref/PHP_TRUNK/ext/hash/hash.c
+
+        if ($userLen !== $knownLen) {
             return false;
         }
 
@@ -69,24 +80,18 @@ class StringUtils
     }
 
     /**
-     * Return the number of bytes in a string
+     * Preserves copy-on-write references while casting to string
      *
-     * @param string $string The string whose length we wish to obtain
-     * @return int
+     * @param mixed $value The value to cast as string
+     *
+     * @return string The value casted as string
      */
-    public static function safeStrlen($string)
+    private static function castAsString($value)
     {
-        // Premature optimization
-        // Since this cannot be changed at runtime, we can cache it
-        static $func_exists = null;
-        if ($func_exists === null) {
-            $func_exists = function_exists('mb_strlen');
+        if (is_object($value) && method_exists($value, '__toString')) {
+            return $value->__toString();
         }
 
-        if ($func_exists) {
-            return mb_strlen($string, '8bit');
-        }
-
-        return strlen($string);
+        return (string) $value;
     }
 }

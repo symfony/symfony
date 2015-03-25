@@ -24,7 +24,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
- *             Use {@link EntityChoiceLoader} instead.
+ *             Use {@link DoctrineChoiceLoader} instead.
  */
 class EntityChoiceList extends ObjectChoiceList
 {

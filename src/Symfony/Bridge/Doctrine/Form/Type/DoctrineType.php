@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceLoader;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
@@ -41,7 +41,7 @@ abstract class DoctrineType extends AbstractType
     private $choiceListFactory;
 
     /**
-     * @var EntityChoiceLoader[]
+     * @var DoctrineChoiceLoader[]
      */
     private $choiceLoaders = array();
 
@@ -71,32 +71,43 @@ abstract class DoctrineType extends AbstractType
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-                $hash = CachingFactoryDecorator::generateHash(array(
-                    $options['em'],
-                    $options['class'],
-                    $options['query_builder'],
-                    $options['loader'],
-                ));
-
-                if (!isset($choiceLoaders[$hash])) {
-                    if ($options['loader']) {
-                        $loader = $options['loader'];
-                    } elseif (null !== $options['query_builder']) {
-                        $loader = $type->getLoader($options['em'], $options['query_builder'], $options['class']);
-                    } else {
-                        $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
-                        $loader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
-                    }
-
-                    $choiceLoaders[$hash] = new EntityChoiceLoader(
-                        $choiceListFactory,
+                // Don't cache if the query builder is constructed dynamically
+                if ($options['query_builder'] instanceof \Closure) {
+                    $hash = null;
+                } else {
+                    $hash = CachingFactoryDecorator::generateHash(array(
                         $options['em'],
                         $options['class'],
-                        $loader
-                    );
+                        $options['query_builder'],
+                        $options['loader'],
+                    ));
+
+                    if (isset($choiceLoaders[$hash])) {
+                        return $choiceLoaders[$hash];
+                    }
                 }
 
-                return $choiceLoaders[$hash];
+                if ($options['loader']) {
+                    $entityLoader = $options['loader'];
+                } elseif (null !== $options['query_builder']) {
+                    $entityLoader = $type->getLoader($options['em'], $options['query_builder'], $options['class']);
+                } else {
+                    $queryBuilder = $options['em']->getRepository($options['class'])->createQueryBuilder('e');
+                    $entityLoader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
+                }
+
+               $choiceLoader = new DoctrineChoiceLoader(
+                    $choiceListFactory,
+                    $options['em'],
+                    $options['class'],
+                    $entityLoader
+                );
+
+                if (null !== $hash) {
+                    $choiceLoaders[$hash] = $choiceLoader;
+                }
+
+                return $choiceLoader;
             }
         };
 
@@ -131,7 +142,7 @@ abstract class DoctrineType extends AbstractType
         };
 
         // The choices are always indexed by ID (see "choices" normalizer
-        // and EntityChoiceLoader), unless the ID is composite. Then they
+        // and DoctrineChoiceLoader), unless the ID is composite. Then they
         // are indexed by an incrementing integer.
         // Use the ID/incrementing integer as choice value.
         $choiceValue = function ($entity, $key) {
@@ -181,7 +192,7 @@ abstract class DoctrineType extends AbstractType
             $entitiesById = array();
 
             foreach ($entities as $entity) {
-                $id = EntityChoiceLoader::getIdValue($om, $classMetadata, $entity);
+                $id = DoctrineChoiceLoader::getIdValue($om, $classMetadata, $entity);
                 $entitiesById[$id] = $entity;
             }
 

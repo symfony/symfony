@@ -54,7 +54,7 @@ class StringUtils
         $knownLen = self::safeStrlen($knownString);
         $userLen = self::safeStrlen($userInput);
 
-		if ($userLen != $knownLen) {
+        if ($userLen !== $knownLen) {
             return false;
         }
 
@@ -69,21 +69,22 @@ class StringUtils
     }
 
     /**
-     * Return the number of bytes in a string
+     * Returns the number of bytes in a string.
      *
      * @param string $string The string whose length we wish to obtain
+     *
      * @return int
      */
     public static function safeStrlen($string)
     {
         // Premature optimization
         // Since this cannot be changed at runtime, we can cache it
-        static $func_exists = null;
-        if ($func_exists === null) {
-            $func_exists = function_exists('mb_strlen');
+        static $funcExists = null;
+        if (null === $funcExists) {
+            $funcExists = function_exists('mb_strlen');
         }
 
-        if ($func_exists) {
+        if ($funcExists) {
             return mb_strlen($string, '8bit');
         }
 

@@ -95,7 +95,7 @@ class SymfonyQuestionHelper extends QuestionHelper
     protected function writeError(OutputInterface $output, \Exception $error)
     {
         if ($output instanceof SymfonyStyle) {
-            $output->ln();
+            $output->newLine();
             $output->error($error->getMessage());
 
             return;

@@ -22,7 +22,7 @@
         <service id="session" class="%session.class%">
             <argument type="service" id="session.storage" />
             <argument type="service" id="session.attribute_bag" />
-            <argument type="service" id="session.flash_bag" />
+            <argument type="service" id="session.default_flash_bag" />
         </service>
 
         <service id="session.storage.metadata_bag" class="%session.storage.metadata_bag.class%" public="false">
@@ -41,7 +41,9 @@
             <argument type="service" id="session.storage.metadata_bag" />
         </service>
 
-        <service id="session.flash_bag" class="%session.flashbag.class%" public="false" />
+        <service id="session.flash_bag" class="Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface" factory-class="session" factory-method="getFlashBag" />
+        
+        <service id="session.default_flash_bag" class="%session.flashbag.class%" public="false" />
 
         <service id="session.attribute_bag" class="%session.attribute_bag.class%" public="false" />
 

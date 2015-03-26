@@ -21,12 +21,12 @@ trait VarDumperTestTrait
 {
     public function assertDumpEquals($dump, $data, $message = '')
     {
-        $this->assertSame($dump, $this->getVarDumperDump($data), $message);
+        $this->assertSame(rtrim($dump), $this->getVarDumperDump($data), $message);
     }
 
     public function assertDumpMatchesFormat($dump, $data, $message = '')
     {
-        $this->assertStringMatchesFormat($dump, $this->getVarDumperDump($data), $message);
+        $this->assertStringMatchesFormat(rtrim($dump), $this->getVarDumperDump($data), $message);
     }
 
     private function getVarDumperDump($data)
@@ -40,6 +40,6 @@ trait VarDumperTestTrait
         $data = stream_get_contents($h);
         fclose($h);
 
-        return $data;
+        return rtrim($data);
     }
 }

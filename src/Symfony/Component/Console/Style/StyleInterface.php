@@ -132,17 +132,6 @@ interface StyleInterface
     public function choice($question, array $choices, $default = null);
 
     /**
-     * Asks a multiple choice question.
-     *
-     * @param string $question
-     * @param array  $choices
-     * @param array  $default
-     *
-     * @return string
-     */
-    public function multipleChoice($question, array $choices, array $default = array());
-
-    /**
      * Add newline(s)
      *
      * @param int $count The number of newlines

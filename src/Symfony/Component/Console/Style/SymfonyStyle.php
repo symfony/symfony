@@ -238,17 +238,6 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function multipleChoice($question, array $choices, array $default = array())
-    {
-        $question = new ChoiceQuestion($question, $choices, $default);
-        $question->setMultiselect(true);
-
-        return $this->askQuestion($question);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function progressStart($max = 0)
     {
         $this->progressBar = $this->createProgressBar($max);

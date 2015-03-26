@@ -267,7 +267,7 @@ abstract class AbstractCloner implements ClonerInterface
                 $a = $cast;
             }
         } catch (\Exception $e) {
-            $a["\0~\0⚠"] = new ThrowingCasterException($callback, $e);
+            $a[(Stub::TYPE_OBJECT === $stub->type ? "\0~\0" : '').'⚠'] = new ThrowingCasterException($callback, $e);
         }
 
         return $a;

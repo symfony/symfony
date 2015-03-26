@@ -16,21 +16,12 @@ namespace Symfony\Component\VarDumper\Exception;
  */
 class ThrowingCasterException extends \Exception
 {
-    private $caster;
-
     /**
      * @param callable   $caster The failing caster
      * @param \Exception $prev   The exception thrown from the caster
      */
     public function __construct($caster, \Exception $prev)
     {
-        if (is_array($caster)) {
-            if (isset($caster[0]) && is_object($caster[0])) {
-                $caster[0] = get_class($caster[0]);
-            }
-            $caster = implode('::', $caster);
-        }
-        $this->caster = $caster;
-        parent::__construct(null, 0, $prev);
+        parent::__construct('Unexpected exception thrown from a caster: '.get_class($prev), 0, $prev);
     }
 }

@@ -71,27 +71,17 @@ class ExceptionCaster
     {
         $b = (array) $a["\0Exception\0previous"];
 
-        array_splice($b["\0Exception\0trace"], count($a["\0Exception\0trace"]));
-
-        $t = static::$traceArgs;
-        static::$traceArgs = false;
-        $b = static::castException($a["\0Exception\0previous"], $b, $stub, $isNested);
-        static::$traceArgs = $t;
-
-        if (empty($a["\0*\0message"])) {
-            $a["\0*\0message"] = "Unexpected exception thrown from a caster: ".get_class($a["\0Exception\0previous"]);
-        }
-
         if (isset($b["\0*\0message"])) {
             $a["\0~\0message"] = $b["\0*\0message"];
         }
-        if (isset($b["\0*\0file"])) {
-            $a["\0~\0file"] = $b["\0*\0file"];
-        }
-        if (isset($b["\0*\0line"])) {
-            $a["\0~\0line"] = $b["\0*\0line"];
-        }
-        if (isset($b["\0Exception\0trace"])) {
+
+        if (isset($a["\0Exception\0trace"])) {
+            $b["\0Exception\0trace"][0] += array(
+                'file' => $b["\0*\0file"],
+                'line' => $b["\0*\0line"],
+            );
+            array_splice($b["\0Exception\0trace"], -1 - count($a["\0Exception\0trace"]));
+            static::filterTrace($b["\0Exception\0trace"], false);
             $a["\0~\0trace"] = $b["\0Exception\0trace"];
         }
 

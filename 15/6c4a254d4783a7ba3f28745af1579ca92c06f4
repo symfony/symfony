@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T12:29:47Z
+
+Here is the script I used:
+
+```php
+<?php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Finder\Finder;
+
+$finder = (new Finder())->name('*.xml')->in(__DIR__.'/src');
+$values = array();
+foreach ($finder as $file) {
+    $contents = file_get_contents($file);
+
+    $new = preg_replace_callback("{^ +<parameter key=\"([^\"]+)\.class\">([^<]+)</parameter>\n}m", function ($match) use (&$values) {
+        $values['%'.$match[1].'.class%'] = $match[2];
+    }, $contents);
+
+    $new = preg_replace("{^ +<parameters>\s+</parameters>\n\n}sm", '', $new);
+    $new = preg_replace("{</parameter>\s+</parameters>}s", "</parameter>\n    </parameters>", $new);
+    $new = preg_replace("{<parameters>\s+    <parameter}s", "<parameters>\n        <parameter", $new);
+
+    if ($new != $contents) {
+        file_put_contents($file, $new);
+    }
+}
+
+$finder = (new Finder())->in(__DIR__.'/src');
+foreach ($finder as $file) {
+    $contents = file_get_contents($file);
+
+    $new = preg_replace_callback('{%[a-zA-Z0-9\._]+\.class%}', function ($match) use ($values) {
+        return isset($values[$match[0]]) ? $values[$match[0]] : $match[0];
+    }, $contents);
+
+    if ($new != $contents) {
+        file_put_contents($file, $new);
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2015-03-26T12:42:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-26T13:22:28Z
+
+Apart from the two small things looks ok to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-26T15:49:33Z
+
+:+1:

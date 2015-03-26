@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Style;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,6 +33,7 @@ class SymfonyStyle extends OutputStyle
 
     private $input;
     private $questionHelper;
+    private $progressBar;
 
     /**
      * @param InputInterface  $input
@@ -247,9 +249,36 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
-    public function progress($max = 0)
+    public function progressStart($max = 0)
     {
-        $progress = parent::progress($max);
+        $this->progressBar = $this->createProgressBar($max);
+        $this->progressBar->start();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function progressAdvance($step = 1)
+    {
+        $this->getProgressBar()->advance($step);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function progressFinish()
+    {
+        $this->getProgressBar()->finish();
+        $this->newLine(2);
+        $this->progressBar = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createProgressBar($max = 0)
+    {
+        $progress = parent::createProgressBar($max);
         $progress->setEmptyBarCharacter('░'); // light shade character \u2591
         $progress->setProgressCharacter('');
         $progress->setBarCharacter('▓'); // dark shade character \u2593
@@ -273,5 +302,17 @@ class SymfonyStyle extends OutputStyle
         $this->newLine();
 
         return $answer;
+    }
+
+    /**
+     * @return ProgressBar
+     */
+    private function getProgressBar()
+    {
+        if (!$this->progressBar) {
+            throw new \RuntimeException('The ProgressBar is not started.');
+        }
+
+        return $this->progressBar;
     }
 }

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Console\Style;
 
-use Symfony\Component\Console\Helper\ProgressBar;
-
 /**
  * Output style helpers
  *
@@ -152,9 +150,21 @@ interface StyleInterface
     public function newLine($count = 1);
 
     /**
-     * @param int $max Maximum steps (0 if unknown)
+     * Starts the progress output.
      *
-     * @return ProgressBar
+     * @param int $max Maximum steps (0 if unknown)
      */
-    public function progress($max = 0);
+    public function progressStart($max = 0);
+
+    /**
+     * Advances the progress output X steps.
+     *
+     * @param int $step Number of steps to advance
+     */
+    public function progressAdvance($step = 1);
+
+    /**
+     * Finishes the progress output.
+     */
+    public function progressFinish();
 }

@@ -180,7 +180,13 @@ class QuestionHelper extends Helper
      */
     protected function writeError(OutputInterface $output, \Exception $error)
     {
-        $output->writeln($this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error'));
+        if (null !== $this->getHelperSet() && $this->getHelperSet()->has('formatter')) {
+            $message = $this->getHelperSet()->get('formatter')->formatBlock($error->getMessage(), 'error');
+        } else {
+            $message = '<error>'.$error->getMessage().'</error>';
+        }
+
+        $output->writeln($message);
     }
 
     /**

@@ -115,54 +115,50 @@ Sfdump = window.Sfdump || (function (doc) {
 
 var refStyle = doc.createElement('style'),
     rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
-    idRx = /\bsf-dump-\d+-ref[012]\w+\b/;
+    idRx = /\bsf-dump-\d+-ref[012]\w+\b/,
+    addEventListener = function (e, n, cb) {
+        e.addEventListener(n, cb, false);
+    };
 
 doc.documentElement.firstChild.appendChild(refStyle);
 
-function expandAll(a) {
-    toggle(a, true);
-    var samp = a.nextSibling;
-    for (var i = 0; i < samp.children.length; i++) {
-        var child = samp.children[i];
-        if (child.tagName !== 'A') {
-            continue;
-        }
-        if (! /\bsf-dump-compact\b/.test(child.nextSibling.className)) {
-            continue
-        }
-        expandAll(child);
-    }
+if (!doc.addEventListener) {
+    addEventListener = function (element, eventName, callback) {
+        element.attachEvent('on' + eventName, function (e) {
+            e.preventDefault = function () {e.returnValue = false;};
+            e.target = e.srcElement;
+            callback(e);
+        });
+    };
 }
 
-var altKeyPressed = false;
-function keysPressed(e) {
-    if (e.keyCode === 18) {
-        altKeyPressed = true;
-    }
-}
-function keysReleased(e) {
-    if (e.keyCode === 18) {
-        altKeyPressed = false;
-    }
-}
-window.addEventListener('keydown', keysPressed, false);
-window.addEventListener('keyup', keysReleased, false);
+function toggle(a, recursive) {
+    var s = a.nextSibling || {}, oldClass = s.className, arrow, newClass;
 
-function toggle(a, ignoreAltKey) {
-    if (! ignoreAltKey && altKeyPressed) {
-        expandAll(a);
-        return true;
-    }
-    var s = a.nextSibling || {};
-
-    if ('sf-dump-compact' == s.className) {
-        a.lastChild.innerHTML = '▼';
-        s.className = 'sf-dump-expanded';
-    } else if ('sf-dump-expanded' == s.className) {
-        a.lastChild.innerHTML = '▶';
-        s.className = 'sf-dump-compact';
+    if ('sf-dump-compact' == oldClass) {
+        arrow = '▼';
+        newClass = 'sf-dump-expanded';
+    } else if ('sf-dump-expanded' == oldClass) {
+        arrow = '▶';
+        newClass = 'sf-dump-compact';
     } else {
         return false;
+    }
+
+    a.lastChild.innerHTML = arrow;
+    s.className = newClass;
+
+    if (recursive) {
+        try {
+            a = s.querySelectorAll('.'+oldClass);
+            for (s = 0; s < a.length; ++s) {
+                if (a[s].className !== newClass) {
+                    a[s].className = newClass;
+                    a[s].previousSibling.lastChild.innerHTML = arrow;
+                }
+            }
+        } catch (e) {
+        }
     }
 
     return true;
@@ -172,7 +168,7 @@ return function (root) {
     root = doc.getElementById(root);
 
     function a(e, f) {
-        root.addEventListener(e, function (e) {
+        addEventListener(root, e, function (e) {
             if ('A' == e.target.tagName) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
@@ -180,20 +176,23 @@ return function (root) {
             }
         });
     };
-    root.addEventListener('mouseover', function (e) {
+    addEventListener(root, 'mouseover', function (e) {
         if ('' != refStyle.innerHTML) {
             refStyle.innerHTML = '';
         }
     });
     a('mouseover', function (a) {
         if (a = idRx.exec(a.className)) {
-            refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: #B729D9; color: #FFF !important; border-radius: 2px}';
+            try {
+                refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: #B729D9; color: #FFF !important; border-radius: 2px}';
+            } catch (e) {
+            }
         }
     });
     a('click', function (a, e) {
         if (/\bsf-dump-toggle\b/.test(a.className)) {
             e.preventDefault();
-            if (!toggle(a)) {
+            if (!toggle(a, e.ctrlKey)) {
                 var r = doc.getElementById(a.getAttribute('href').substr(1)),
                     s = r.previousSibling,
                     f = r.parentNode,
@@ -207,8 +206,18 @@ return function (root) {
                     r.innerHTML = r.innerHTML.replace(new RegExp('^'+f[0].replace(rxEsc, '\\$1'), 'mg'), t[0]);
                 }
                 if ('sf-dump-compact' == r.className) {
-                    toggle(s);
+                    toggle(s, e.ctrlKey);
                 }
+            }
+
+            if (doc.getSelection) {
+                try {
+                    doc.getSelection().removeAllRanges();
+                } catch (e) {
+                    doc.getSelection().empty();
+                }
+            } else {
+                doc.selection.empty();
             }
         }
     });
@@ -243,7 +252,7 @@ return function (root) {
             } else {
                 a.innerHTML += ' ';
             }
-            a.title = 'hold ALT and click to expand all children';
+            a.title = (a.title ? a.title+'\n' : '')+'[Ctrl+click] Expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
             if ('sf-dump' != elt.parentNode.className) {

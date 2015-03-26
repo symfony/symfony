@@ -91,7 +91,15 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         if ($value instanceof PropertyPath) {
             $accessor = $this->propertyAccessor;
             $value = function ($choice) use ($accessor, $value) {
-                return $accessor->getValue($choice, $value);
+                // The callable may be invoked with a non-object/array value
+                // when such values are passed to
+                // ChoiceListInterface::getValuesForChoices(). Handle this case
+                // so that the call to getValue() doesn't break.
+                if (is_object($choice) || is_array($choice)) {
+                    return $accessor->getValue($choice, $value);
+                }
+
+                return null;
             };
         }
 

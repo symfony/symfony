@@ -11,12 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
-use Symfony\Component\Form\Exception\RuntimeException;
 
 /**
  * Loads choices using a Doctrine object manager.
@@ -41,9 +39,9 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     private $class;
 
     /**
-     * @var ClassMetadata
+     * @var IdReader
      */
-    private $classMetadata;
+    private $idReader;
 
     /**
      * @var null|EntityLoaderInterface
@@ -51,56 +49,9 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     private $objectLoader;
 
     /**
-     * The identifier field, unless the identifier is composite
-     *
-     * @var null|string
-     */
-    private $idField = null;
-
-    /**
-     * Whether to use the identifier for value generation
-     *
-     * @var bool
-     */
-    private $compositeId = true;
-
-    /**
      * @var ChoiceListInterface
      */
     private $choiceList;
-
-    /**
-     * Returns the value of the identifier field of an object.
-     *
-     * Doctrine must know about this object, that is, the object must already
-     * be persisted or added to the identity map before. Otherwise an
-     * exception is thrown.
-     *
-     * This method assumes that the object has a single-column identifier and
-     * will return a single value instead of an array.
-     *
-     * @param object $object The object for which to get the identifier
-     *
-     * @return int|string The identifier value
-     *
-     * @throws RuntimeException If the object does not exist in Doctrine's identity map
-     *
-     * @internal Should not be accessed by user-land code. This method is public
-     *           only to be usable as callback.
-     */
-    public static function getIdValue(ObjectManager $om, ClassMetadata $classMetadata, $object)
-    {
-        if (!$om->contains($object)) {
-            throw new RuntimeException(
-                'Entities passed to the choice field must be managed. Maybe '.
-                'persist them in the entity manager?'
-            );
-        }
-
-        $om->initializeObject($object);
-
-        return current($classMetadata->getIdentifierValues($object));
-    }
 
     /**
      * Creates a new choice loader.
@@ -114,22 +65,17 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      * @param ObjectManager              $manager      The object manager
      * @param string                     $class        The class name of the
      *                                                 loaded objects
+     * @param IdReader                   $idReader     The reader for the object
+     *                                                 IDs.
      * @param null|EntityLoaderInterface $objectLoader The objects loader
      */
-    public function __construct(ChoiceListFactoryInterface $factory, ObjectManager $manager, $class, EntityLoaderInterface $objectLoader = null)
+    public function __construct(ChoiceListFactoryInterface $factory, ObjectManager $manager, $class, IdReader $idReader, EntityLoaderInterface $objectLoader = null)
     {
         $this->factory = $factory;
         $this->manager = $manager;
-        $this->classMetadata = $manager->getClassMetadata($class);
-        $this->class = $this->classMetadata->getName();
+        $this->class = $manager->getClassMetadata($class)->getName();
+        $this->idReader = $idReader;
         $this->objectLoader = $objectLoader;
-
-        $identifier = $this->classMetadata->getIdentifierFieldNames();
-
-        if (1 === count($identifier)) {
-            $this->idField = $identifier[0];
-            $this->compositeId = false;
-        }
     }
 
     /**
@@ -145,23 +91,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             ? $this->objectLoader->getEntities()
             : $this->manager->getRepository($this->class)->findAll();
 
-        // If the class has a multi-column identifier, we cannot index the
-        // objects by their IDs
-        if ($this->compositeId) {
-            $this->choiceList = $this->factory->createListFromChoices($objects, $value);
-
-            return $this->choiceList;
-        }
-
-        // Index the objects by ID
-        $objectsById = array();
-
-        foreach ($objects as $object) {
-            $id = self::getIdValue($this->manager, $this->classMetadata, $object);
-            $objectsById[$id] = $object;
-        }
-
-        $this->choiceList = $this->factory->createListFromChoices($objectsById, $value);
+        $this->choiceList = $this->factory->createListFromChoices($objects, $value);
 
         return $this->choiceList;
     }
@@ -193,14 +123,14 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
         // know that the IDs are used as values
 
         // Attention: This optimization does not check choices for existence
-        if (!$this->choiceList && !$this->compositeId) {
+        if (!$this->choiceList && $this->idReader->isSingleId()) {
             $values = array();
 
             // Maintain order and indices of the given objects
             foreach ($objects as $i => $object) {
                 if ($object instanceof $this->class) {
                     // Make sure to convert to the right format
-                    $values[$i] = (string) self::getIdValue($this->manager, $this->classMetadata, $object);
+                    $values[$i] = (string) $this->idReader->getIdValue($object);
                 }
             }
 
@@ -240,8 +170,8 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance in case we have an object loader and
         // a single-field identifier
-        if (!$this->choiceList && !$this->compositeId && $this->objectLoader) {
-            $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idField, $values);
+        if (!$this->choiceList && $this->objectLoader && $this->idReader->isSingleId()) {
+            $unorderedObjects = $this->objectLoader->getEntitiesByIds($this->idReader->getIdField(), $values);
             $objectsById = array();
             $objects = array();
 
@@ -250,8 +180,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
             foreach ($unorderedObjects as $object) {
-                $id = self::getIdValue($this->manager, $this->classMetadata, $object);
-                $objectsById[$id] = $object;
+                $objectsById[$this->idReader->getIdValue($object)] = $object;
             }
 
             foreach ($values as $i => $id) {

@@ -150,23 +150,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertObjectListWithCustomValues($list);
     }
 
-    public function testCreateFromChoicesFlatValuesClosureReceivesKey()
-    {
-        $list = $this->factory->createListFromChoices(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4),
-            function ($object, $key) {
-                switch ($key) {
-                    case 'A': return 'a';
-                    case 'B': return 'b';
-                    case 'C': return '1';
-                    case 'D': return '2';
-                }
-            }
-        );
-
-        $this->assertObjectListWithCustomValues($list);
-    }
-
     public function testCreateFromChoicesGrouped()
     {
         $list = $this->factory->createListFromChoices(
@@ -212,26 +195,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                 'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
             ),
             function ($object) { return $object->value; }
-        );
-
-        $this->assertObjectListWithCustomValues($list);
-    }
-
-    public function testCreateFromChoicesGroupedValuesAsClosureReceivesKey()
-    {
-        $list = $this->factory->createListFromChoices(
-            array(
-                'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
-                'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
-            ),
-            function ($object, $key) {
-                switch ($key) {
-                    case 'A': return 'a';
-                    case 'B': return 'b';
-                    case 'C': return '1';
-                    case 'D': return '2';
-                }
-            }
         );
 
         $this->assertObjectListWithCustomValues($list);
@@ -306,23 +269,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertScalarListWithCustomValues($list);
     }
 
-    public function testCreateFromFlippedChoicesFlatValuesClosureReceivesKey()
-    {
-        $list = $this->factory->createListFromFlippedChoices(
-            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D'),
-            function ($choice, $key) {
-                switch ($key) {
-                    case 'A': return 'a';
-                    case 'B': return 'b';
-                    case 'C': return '1';
-                    case 'D': return '2';
-                }
-            }
-        );
-
-        $this->assertScalarListWithCustomValues($list);
-    }
-
     public function testCreateFromFlippedChoicesGrouped()
     {
         $list = $this->factory->createListFromFlippedChoices(
@@ -373,26 +319,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case 'b': return 'b';
                     case 'c': return '1';
                     case 'd': return '2';
-                }
-            }
-        );
-
-        $this->assertScalarListWithCustomValues($list);
-    }
-
-    public function testCreateFromFlippedChoicesGroupedValuesAsClosureReceivesKey()
-    {
-        $list = $this->factory->createListFromFlippedChoices(
-            array(
-                'Group 1' => array('a' => 'A', 'b' => 'B'),
-                'Group 2' => array('c' => 'C', 'd' => 'D'),
-            ),
-            function ($choice, $key) {
-                switch ($key) {
-                    case 'A': return 'a';
-                    case 'B': return 'b';
-                    case 'C': return '1';
-                    case 'D': return '2';
                 }
             }
         );
@@ -537,13 +463,22 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateViewFlatPreferredChoicesClosureReceivesKey()
     {
-        $obj2 = $this->obj2;
-        $obj3 = $this->obj3;
-
         $view = $this->factory->createView(
             $this->list,
-            function ($object, $key) use ($obj2, $obj3) {
+            function ($object, $key) {
                 return 'B' === $key || 'C' === $key;
+            }
+        );
+
+        $this->assertFlatView($view);
+    }
+
+    public function testCreateViewFlatPreferredChoicesClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            function ($object, $key, $value) {
+                return '1' === $value || '2' === $value;
             }
         );
 
@@ -581,6 +516,24 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array($this->obj2, $this->obj3),
             function ($object, $key) {
                 return $key;
+            }
+        );
+
+        $this->assertFlatView($view);
+    }
+
+    public function testCreateViewFlatLabelClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            function ($object, $key, $value) {
+                switch ($value) {
+                    case '0': return 'A';
+                    case '1': return 'B';
+                    case '2': return 'C';
+                    case '3': return 'D';
+                }
             }
         );
 
@@ -625,6 +578,25 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case 'B': return 'x';
                     case 'C': return 'y';
                     case 'D': return 'z';
+                }
+            }
+        );
+
+        $this->assertFlatViewWithCustomIndices($view);
+    }
+
+    public function testCreateViewFlatIndexClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            function ($object, $key, $value) {
+                switch ($value) {
+                    case '0': return 'w';
+                    case '1': return 'x';
+                    case '2': return 'y';
+                    case '3': return 'z';
                 }
             }
         );
@@ -724,6 +696,21 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertGroupedView($view);
     }
 
+    public function testCreateViewFlatGroupByClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            function ($object, $key, $value) {
+                return '0' === $value || '1' === $value ? 'Group 1' : 'Group 2';
+            }
+        );
+
+        $this->assertGroupedView($view);
+    }
+
     public function testCreateViewFlatAttrAsArray()
     {
         $view = $this->factory->createView(
@@ -797,6 +784,26 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                 switch ($key) {
                     case 'B': return array('attr1' => 'value1');
                     case 'C': return array('attr2' => 'value2');
+                    default: return array();
+                }
+            }
+        );
+
+        $this->assertFlatViewWithAttr($view);
+    }
+
+    public function testCreateViewFlatAttrClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            function ($object, $key, $value) {
+                switch ($value) {
+                    case '1': return array('attr1' => 'value1');
+                    case '2': return array('attr2' => 'value2');
                     default: return array();
                 }
             }

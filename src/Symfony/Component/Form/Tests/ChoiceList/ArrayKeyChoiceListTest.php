@@ -183,14 +183,14 @@ class ArrayKeyChoiceListTest extends AbstractChoiceListTest
 
     public function testCreateChoiceListWithValueCallback()
     {
-        $callback = function ($choice, $key) {
-            return $key.':'.$choice;
+        $callback = function ($choice) {
+            return ':'.$choice;
         };
 
         $choiceList = new ArrayKeyChoiceList(array(2 => 'foo', 7 => 'bar', 10 => 'baz'), $callback);
 
-        $this->assertSame(array(2 => '2:foo', 7 => '7:bar', 10 => '10:baz'), $choiceList->getValues());
-        $this->assertSame(array(1 => 'foo', 2 => 'baz'), $choiceList->getChoicesForValues(array(1 => '2:foo', 2 => '10:baz')));
-        $this->assertSame(array(1 => '2:foo', 2 => '10:baz'), $choiceList->getValuesForChoices(array(1 => 'foo', 2 => 'baz')));
+        $this->assertSame(array(2 => ':foo', 7 => ':bar', 10 => ':baz'), $choiceList->getValues());
+        $this->assertSame(array(1 => 'foo', 2 => 'baz'), $choiceList->getChoicesForValues(array(1 => ':foo', 2 => ':baz')));
+        $this->assertSame(array(1 => ':foo', 2 => ':baz'), $choiceList->getValuesForChoices(array(1 => 'foo', 2 => 'baz')));
     }
 }

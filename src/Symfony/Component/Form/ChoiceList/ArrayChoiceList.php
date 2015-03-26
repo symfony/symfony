@@ -51,15 +51,12 @@ class ArrayChoiceList implements ChoiceListInterface
      *
      * The given choice array must have the same array keys as the value array.
      *
-     * @param array    $choices        The selectable choices
-     * @param callable $value          The callable for creating the value for a
-     *                                 choice. If `null` is passed, incrementing
-     *                                 integers are used as values
-     * @param bool     $compareByValue Whether to use the value callback to
-     *                                 compare choices. If `null`, choices are
-     *                                 compared by identity
+     * @param array    $choices The selectable choices
+     * @param callable $value   The callable for creating the value for a
+     *                          choice. If `null` is passed, incrementing
+     *                          integers are used as values
      */
-    public function __construct(array $choices, $value = null, $compareByValue = false)
+    public function __construct(array $choices, $value = null)
     {
         if (null !== $value && !is_callable($value)) {
             throw new UnexpectedTypeException($value, 'null or callable');
@@ -67,7 +64,7 @@ class ArrayChoiceList implements ChoiceListInterface
 
         $this->choices = $choices;
         $this->values = array();
-        $this->valueCallback = $compareByValue ? $value : null;
+        $this->valueCallback = $value;
 
         if (null === $value) {
             $i = 0;
@@ -76,7 +73,7 @@ class ArrayChoiceList implements ChoiceListInterface
             }
         } else {
             foreach ($choices as $key => $choice) {
-                $this->values[$key] = (string) call_user_func($value, $choice, $key);
+                $this->values[$key] = (string) call_user_func($value, $choice);
             }
         }
     }
@@ -132,8 +129,9 @@ class ArrayChoiceList implements ChoiceListInterface
         // Use the value callback to compare choices by their values, if present
         if ($this->valueCallback) {
             $givenValues = array();
-            foreach ($choices as $key => $choice) {
-                $givenValues[$key] = (string) call_user_func($this->valueCallback, $choice, $key);
+
+            foreach ($choices as $i => $givenChoice) {
+                $givenValues[$i] = (string) call_user_func($this->valueCallback, $givenChoice);
             }
 
             return array_intersect($givenValues, $this->values);

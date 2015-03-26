@@ -16,6 +16,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
@@ -43,9 +44,53 @@ abstract class DoctrineType extends AbstractType
     private $choiceListFactory;
 
     /**
+     * @var IdReader[]
+     */
+    private $idReaders = array();
+
+    /**
      * @var DoctrineChoiceLoader[]
      */
     private $choiceLoaders = array();
+
+    /**
+     * Creates the label for a choice.
+     *
+     * For backwards compatibility, objects are cast to strings by default.
+     *
+     * @param object $choice The object.
+     *
+     * @return string The string representation of the object.
+     *
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public static function createChoiceLabel($choice)
+    {
+        return (string) $choice;
+    }
+
+    /**
+     * Creates the field name for a choice.
+     *
+     * This method is used to generate field names if the underlying object has
+     * a single-column integer ID. In that case, the value of the field is
+     * the ID of the object. That ID is also used as field name.
+     *
+     * @param object     $choice The object.
+     * @param int|string $key    The choice key.
+     * @param string     $value  The choice value. Corresponds to the object's
+     *                           ID here.
+     *
+     * @return string The field name.
+     *
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public static function createChoiceName($choice, $key, $value)
+    {
+        return (string) $value;
+    }
 
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
@@ -67,8 +112,29 @@ abstract class DoctrineType extends AbstractType
     {
         $registry = $this->registry;
         $choiceListFactory = $this->choiceListFactory;
+        $idReaders = &$this->idReaders;
         $choiceLoaders = &$this->choiceLoaders;
         $type = $this;
+
+        $idReader = function (Options $options) use (&$idReaders) {
+            $hash = CachingFactoryDecorator::generateHash(array(
+                $options['em'],
+                $options['class'],
+            ));
+
+            // The ID reader is a utility that is needed to read the object IDs
+            // when generating the field values. The callback generating the
+            // field values has no access to the object manager or the class
+            // of the field, so we store that information in the reader.
+            // The reader is cached so that two choice lists for the same class
+            // (and hence with the same reader) can successfully be cached.
+            if (!isset($idReaders[$hash])) {
+                $classMetadata = $options['em']->getClassMetadata($options['class']);
+                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
+            }
+
+            return $idReaders[$hash];
+        };
 
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
             // Unless the choices are given explicitly, load them on demand
@@ -106,6 +172,7 @@ abstract class DoctrineType extends AbstractType
                     $choiceListFactory,
                     $options['em'],
                     $options['class'],
+                    $options['id_reader'],
                     $entityLoader
                 );
 
@@ -120,24 +187,18 @@ abstract class DoctrineType extends AbstractType
             }
 
             // BC: use __toString() by default
-            return function ($entity) {
-                return (string) $entity;
-            };
+            return array(__CLASS__, 'createChoiceLabel');
         };
 
         $choiceName = function (Options $options) {
-            /** @var ObjectManager $om */
-            $om = $options['em'];
-            $classMetadata = $om->getClassMetadata($options['class']);
-            $ids = $classMetadata->getIdentifierFieldNames();
-            $idType = $classMetadata->getTypeOfField(current($ids));
+            /** @var IdReader $idReader */
+            $idReader = $options['id_reader'];
 
-            // If the entity has a single-column, numeric ID, use that ID as
-            // field name
-            if (1 === count($ids) && in_array($idType, array('integer', 'smallint', 'bigint'))) {
-                return function ($entity, $id) {
-                    return $id;
-                };
+            // If the object has a single-column, numeric ID, use that ID as
+            // field name. We can only use numeric IDs as names, as we cannot
+            // guarantee that a non-numeric ID contains a valid form name
+            if ($idReader->isIntId()) {
+                return array(__CLASS__, 'createChoiceName');
             }
 
             // Otherwise, an incrementing integer is used as name automatically
@@ -147,8 +208,16 @@ abstract class DoctrineType extends AbstractType
         // and DoctrineChoiceLoader), unless the ID is composite. Then they
         // are indexed by an incrementing integer.
         // Use the ID/incrementing integer as choice value.
-        $choiceValue = function ($entity, $key) {
-            return $key;
+        $choiceValue = function (Options $options) {
+            /** @var IdReader $idReader */
+            $idReader = $options['id_reader'];
+
+            // If the entity has a single-column ID, use that ID as value
+            if ($idReader->isSingleId()) {
+                return array($idReader, 'getIdValue');
+            }
+
+            // Otherwise, an incrementing integer is used as value automatically
         };
 
         $emNormalizer = function (Options $options, $em) use ($registry) {
@@ -172,33 +241,6 @@ abstract class DoctrineType extends AbstractType
             }
 
             return $em;
-        };
-
-        $choicesNormalizer = function (Options $options, $entities) {
-            if (null === $entities || 0 === count($entities)) {
-                return $entities;
-            }
-
-            // Make sure that the entities are indexed by their ID
-            /** @var ObjectManager $om */
-            $om = $options['em'];
-            $classMetadata = $om->getClassMetadata($options['class']);
-            $ids = $classMetadata->getIdentifierFieldNames();
-
-            // We cannot use composite IDs as indices. In that case, keep the
-            // given indices
-            if (count($ids) > 1) {
-                return $entities;
-            }
-
-            $entitiesById = array();
-
-            foreach ($entities as $entity) {
-                $id = DoctrineChoiceLoader::getIdValue($om, $classMetadata, $entity);
-                $entitiesById[$id] = $entity;
-            }
-
-            return $entitiesById;
         };
 
         // Invoke the query builder closure so that we can cache choice lists
@@ -226,12 +268,12 @@ abstract class DoctrineType extends AbstractType
             'choice_label' => $choiceLabel,
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
+            'id_reader' => $idReader,
         ));
 
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('em', $emNormalizer);
-        $resolver->setNormalizer('choices', $choicesNormalizer);
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));

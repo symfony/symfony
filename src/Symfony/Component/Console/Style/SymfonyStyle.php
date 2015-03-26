@@ -83,7 +83,7 @@ class SymfonyStyle extends OutputStyle
             $line .= str_repeat(' ', self::MAX_LINE_LENGTH - Helper::strlen($line));
 
             if ($style) {
-                $line = sprintf('<%s>%s</%s>', $style, $line, $style);
+                $line = sprintf('<%s>%s</>', $style, $line);
             }
         }
 

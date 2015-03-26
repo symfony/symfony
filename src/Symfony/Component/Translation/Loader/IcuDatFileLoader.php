@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\Resource\FileResource;
@@ -50,7 +49,7 @@ class IcuDatFileLoader extends IcuResFileLoader
         }
 
         $messages = $this->flatten($rb);
-        $catalogue = new MessageCatalogue($locale);
+        $catalogue = $this->catalogueFactory->create($locale);
         $catalogue->add($messages, $domain);
         $catalogue->addResource(new FileResource($resource.'.dat'));
 

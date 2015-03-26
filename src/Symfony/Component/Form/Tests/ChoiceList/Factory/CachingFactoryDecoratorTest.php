@@ -34,14 +34,6 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->factory = new CachingFactoryDecorator($this->decoratedFactory);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromChoicesFailsIfChoicesNotArrayOrTraversable()
-    {
-        $this->factory->createListFromChoices('foobar');
-    }
-
     public function testCreateFromChoicesEmpty()
     {
         $list = new \stdClass();
@@ -161,14 +153,6 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($list1, $this->factory->createListFromChoices($choices, $closure1));
         $this->assertSame($list2, $this->factory->createListFromChoices($choices, $closure2));
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromFlippedChoicesFailsIfChoicesNotArrayOrTraversable()
-    {
-        $this->factory->createListFromFlippedChoices('foobar');
     }
 
     public function testCreateFromFlippedChoicesEmpty()

@@ -85,10 +85,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromChoices($choices, $value = null)
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
-            throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -109,10 +105,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromFlippedChoices($choices, $value = null)
     {
-        if (!is_array($choices) && !$choices instanceof \Traversable) {
-            throw new UnexpectedTypeException($choices, 'array or \Traversable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }
@@ -140,10 +132,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
-        }
-
         return new LazyChoiceList($loader, $value);
     }
 
@@ -152,26 +140,6 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
-        if (null !== $preferredChoices && !is_array($preferredChoices) && !is_callable($preferredChoices)) {
-            throw new UnexpectedTypeException($preferredChoices, 'null, array or callable');
-        }
-
-        if (null !== $label && !is_callable($label)) {
-            throw new UnexpectedTypeException($label, 'null or callable');
-        }
-
-        if (null !== $index && !is_callable($index)) {
-            throw new UnexpectedTypeException($index, 'null or callable');
-        }
-
-        if (null !== $groupBy && !is_array($groupBy) && !$groupBy instanceof \Traversable && !is_callable($groupBy)) {
-            throw new UnexpectedTypeException($groupBy, 'null, array, \Traversable or callable');
-        }
-
-        if (null !== $attr && !is_array($attr) && !is_callable($attr)) {
-            throw new UnexpectedTypeException($attr, 'null, array or callable');
-        }
-
         // Backwards compatibility
         if ($list instanceof LegacyChoiceListInterface && null === $preferredChoices
             && null === $label && null === $index && null === $groupBy && null === $attr) {
@@ -247,7 +215,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             );
         }
 
-        // Remove any empty group views that may have been created by
+        // Remove any empty group view that may have been created by
         // addChoiceViewGroupedBy()
         foreach ($preferredViews as $key => $view) {
             if ($view instanceof ChoiceGroupView && 0 === count($view->choices)) {

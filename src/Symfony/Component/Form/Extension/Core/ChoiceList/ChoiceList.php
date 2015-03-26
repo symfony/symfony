@@ -35,7 +35,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
- *             Use {@link \Symfony\Component\Form\ArrayChoiceList\ArrayChoiceList} instead.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList} instead.
  */
 class ChoiceList implements ChoiceListInterface
 {
@@ -92,6 +92,8 @@ class ChoiceList implements ChoiceListInterface
         }
 
         $this->initialize($choices, $labels, $preferredChoices);
+
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
     }
 
     /**

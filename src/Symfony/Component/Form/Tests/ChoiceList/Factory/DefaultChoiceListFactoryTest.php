@@ -88,22 +88,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory = new DefaultChoiceListFactory();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromChoicesFailsIfChoicesNotArrayOrTraversable()
-    {
-        $this->factory->createListFromChoices('foobar');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromChoicesFailsIfValuesNotCallableOrString()
-    {
-        $this->factory->createListFromChoices(array(), new \stdClass());
-    }
-
     public function testCreateFromChoicesEmpty()
     {
         $list = $this->factory->createListFromChoices(array());
@@ -198,22 +182,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertObjectListWithCustomValues($list);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromFlippedChoicesFailsIfChoicesNotArrayOrTraversable()
-    {
-        $this->factory->createListFromFlippedChoices('foobar');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromFlippedChoicesFailsIfValuesNotCallableOrString()
-    {
-        $this->factory->createListFromFlippedChoices(array(), new \stdClass());
     }
 
     public function testCreateFromFlippedChoicesEmpty()
@@ -343,56 +311,6 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $list = $this->factory->createListFromLoader($loader, $value);
 
         $this->assertEquals(new LazyChoiceList($loader, $value), $list);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateFromLoaderFailsIfValuesNotCallableOrString()
-    {
-        $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
-
-        $this->factory->createListFromLoader($loader, new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateViewFailsIfPreferredChoicesInvalid()
-    {
-        $this->factory->createView($this->list, new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateViewFailsIfLabelInvalid()
-    {
-        $this->factory->createView($this->list, null, new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateViewFailsIfIndexInvalid()
-    {
-        $this->factory->createView($this->list, null, null, new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateViewFailsIfGroupByInvalid()
-    {
-        $this->factory->createView($this->list, null, null, null, new \stdClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
-    public function testCreateViewFailsIfAttrInvalid()
-    {
-        $this->factory->createView($this->list, null, null, null, null, new \stdClass());
     }
 
     public function testCreateViewFlat()

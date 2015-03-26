@@ -116,27 +116,10 @@ abstract class DoctrineType extends AbstractType
         $choiceLoaders = &$this->choiceLoaders;
         $type = $this;
 
-        $idReader = function (Options $options) use (&$idReaders) {
-            $hash = CachingFactoryDecorator::generateHash(array(
-                $options['em'],
-                $options['class'],
-            ));
-
-            // The ID reader is a utility that is needed to read the object IDs
-            // when generating the field values. The callback generating the
-            // field values has no access to the object manager or the class
-            // of the field, so we store that information in the reader.
-            // The reader is cached so that two choice lists for the same class
-            // (and hence with the same reader) can successfully be cached.
-            if (!isset($idReaders[$hash])) {
-                $classMetadata = $options['em']->getClassMetadata($options['class']);
-                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
-            }
-
-            return $idReaders[$hash];
-        };
-
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
+            // This closure and the "query_builder" options should be pushed to
+            // EntityType in Symfony 3.0 as they are specific to the ORM
+
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
                 // We consider two query builders with an equal SQL string and
@@ -243,6 +226,13 @@ abstract class DoctrineType extends AbstractType
             return $em;
         };
 
+        // deprecation note
+        $propertyNormalizer = function (Options $options, $propertyName) {
+            trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
+
+            return $propertyName;
+        };
+
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
@@ -257,6 +247,35 @@ abstract class DoctrineType extends AbstractType
             return $queryBuilder;
         };
 
+        // deprecation note
+        $loaderNormalizer = function (Options $options, $loader) {
+            trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
+
+            return $loader;
+        };
+
+        // Set the "id_reader" option via the normalizer. This option is not
+        // supposed to be set by the user.
+        $idReaderNormalizer = function (Options $options) use (&$idReaders) {
+            $hash = CachingFactoryDecorator::generateHash(array(
+                $options['em'],
+                $options['class'],
+            ));
+
+            // The ID reader is a utility that is needed to read the object IDs
+            // when generating the field values. The callback generating the
+            // field values has no access to the object manager or the class
+            // of the field, so we store that information in the reader.
+            // The reader is cached so that two choice lists for the same class
+            // (and hence with the same reader) can successfully be cached.
+            if (!isset($idReaders[$hash])) {
+                $classMetadata = $options['em']->getClassMetadata($options['class']);
+                $idReaders[$hash] = new IdReader($options['em'], $classMetadata);
+            }
+
+            return $idReaders[$hash];
+        };
+
         $resolver->setDefaults(array(
             'em' => null,
             'property' => null, // deprecated, use "choice_label"
@@ -268,17 +287,19 @@ abstract class DoctrineType extends AbstractType
             'choice_label' => $choiceLabel,
             'choice_name' => $choiceName,
             'choice_value' => $choiceValue,
-            'id_reader' => $idReader,
+            'id_reader' => null, // internal
         ));
 
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('em', $emNormalizer);
+        $resolver->setNormalizer('property', $propertyNormalizer);
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
+        $resolver->setNormalizer('loader', $loaderNormalizer);
+        $resolver->setNormalizer('id_reader', $idReaderNormalizer);
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
         $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
-        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
 
     /**

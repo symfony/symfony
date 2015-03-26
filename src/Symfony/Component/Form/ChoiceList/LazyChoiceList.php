@@ -51,7 +51,7 @@ class LazyChoiceList implements ChoiceListInterface
     private $compareByValue;
 
     /**
-     * @var ChoiceListInterface
+     * @var ChoiceListInterface|null
      */
     private $loadedList;
 

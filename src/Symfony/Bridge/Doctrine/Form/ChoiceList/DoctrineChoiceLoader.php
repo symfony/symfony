@@ -97,25 +97,12 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
     }
 
     /**
-     * Loads the values corresponding to the given objects.
-     *
-     * The values are returned with the same keys and in the same order as the
-     * corresponding objects in the given array.
-     *
-     * Optionally, a callable can be passed for generating the choice values.
-     * The callable receives the object as first and the array key as the second
-     * argument.
-     *
-     * @param array $objects       An array of objects. Non-existing objects in
-     *                             this array are ignored
-     * @param null|callable $value The callable generating the choice values
-     *
-     * @return string[] An array of choice values
+     * {@inheritdoc}
      */
-    public function loadValuesForChoices(array $objects, $value = null)
+    public function loadValuesForChoices(array $choices, $value = null)
     {
         // Performance optimization
-        if (empty($objects)) {
+        if (empty($choices)) {
             return array();
         }
 
@@ -127,7 +114,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             $values = array();
 
             // Maintain order and indices of the given objects
-            foreach ($objects as $i => $object) {
+            foreach ($choices as $i => $object) {
                 if ($object instanceof $this->class) {
                     // Make sure to convert to the right format
                     $values[$i] = (string) $this->idReader->getIdValue($object);
@@ -137,24 +124,11 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             return $values;
         }
 
-        return $this->loadChoiceList($value)->getValuesForChoices($objects);
+        return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 
     /**
-     * Loads the objects corresponding to the given values.
-     *
-     * The objects are returned with the same keys and in the same order as the
-     * corresponding values in the given array.
-     *
-     * Optionally, a callable can be passed for generating the choice values.
-     * The callable receives the object as first and the array key as the second
-     * argument.
-     *
-     * @param string[] $values     An array of choice values. Non-existing
-     *                             values in this array are ignored
-     * @param null|callable $value The callable generating the choice values
-     *
-     * @return array An array of objects
+     * {@inheritdoc}
      */
     public function loadChoicesForValues(array $values, $value = null)
     {

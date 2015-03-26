@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInterface;
+
 /**
  * Contains choices that can be selected in a form field.
  *
@@ -27,10 +29,9 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
- *             Use {@link \Symfony\Component\Form\ArrayChoiceList\ChoiceListInterface}
- *             instead.
+ *             Use {@link BaseChoiceListInterface} instead.
  */
-interface ChoiceListInterface extends \Symfony\Component\Form\ChoiceList\ChoiceListInterface
+interface ChoiceListInterface extends BaseChoiceListInterface
 {
     /**
      * Returns the choice views of the preferred choices as nested array with

@@ -129,6 +129,8 @@ class EntityChoiceList extends ObjectChoiceList
         }
 
         parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, null, $propertyAccessor);
+
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
     }
 
     /**

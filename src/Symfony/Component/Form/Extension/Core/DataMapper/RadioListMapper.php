@@ -58,8 +58,6 @@ class RadioListMapper implements DataMapperInterface
         foreach ($radios as $radio) {
             if ($radio->getData()) {
                 if ('placeholder' === $radio->getName()) {
-                    $choice = null;
-
                     return;
                 }
 

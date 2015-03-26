@@ -22,6 +22,10 @@ use Symfony\Component\Form\FormEvents;
  * indexed array.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link \Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper}
+ *             instead.
  */
 class FixCheckboxInputListener implements EventSubscriberInterface
 {
@@ -35,6 +39,8 @@ class FixCheckboxInputListener implements EventSubscriberInterface
     public function __construct(ChoiceListInterface $choiceList)
     {
         $this->choiceList = $choiceList;
+
+        trigger_error('The class '.__CLASS__.' is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\Extension\Core\DataMapper\CheckboxListMapper instead.', E_USER_DEPRECATED);
     }
 
     public function preSubmit(FormEvent $event)

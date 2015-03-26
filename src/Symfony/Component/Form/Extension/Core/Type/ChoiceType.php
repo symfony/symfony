@@ -233,15 +233,8 @@ class ChoiceType extends AbstractType
     {
         $choiceListFactory = $this->choiceListFactory;
 
-        $choiceList = function (Options $options) use ($choiceListFactory) {
+        $choiceList = function (Options $options, $choiceList) use ($choiceListFactory) {
             if (null !== $options['choice_loader']) {
-                // Due to a bug in OptionsResolver, the choices haven't been
-                // validated yet at this point. Remove the if statement once that
-                // bug is resolved
-                if (!$options['choice_loader'] instanceof ChoiceLoaderInterface) {
-                    return;
-                }
-
                 return $choiceListFactory->createListFromLoader(
                     $options['choice_loader'],
                     $options['choice_value']
@@ -250,13 +243,6 @@ class ChoiceType extends AbstractType
 
             // Harden against NULL values (like in EntityType and ModelType)
             $choices = null !== $options['choices'] ? $options['choices'] : array();
-
-            // Due to a bug in OptionsResolver, the choices haven't been
-            // validated yet at this point. Remove the if statement once that
-            // bug is resolved
-            if (!is_array($choices) && !$choices instanceof \Traversable) {
-                return;
-            }
 
             // BC when choices are in the keys, not in the values
             if (!$options['choices_as_values']) {
@@ -281,6 +267,13 @@ class ChoiceType extends AbstractType
         // for BC with the "empty_value" option
         $placeholder = function (Options $options) {
             return $options['empty_value'];
+        };
+
+        // deprecation note
+        $choiceListNormalizer = function (Options $options, $choiceList) {
+            trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+
+            return $choiceList;
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
@@ -327,6 +320,7 @@ class ChoiceType extends AbstractType
             'data_class' => null,
         ));
 
+        $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
 

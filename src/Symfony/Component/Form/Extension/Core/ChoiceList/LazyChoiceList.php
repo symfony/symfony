@@ -23,7 +23,7 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
- *             Use {@link \Symfony\Component\Form\ArrayChoiceList\LazyChoiceList}
+ *             Use {@link \Symfony\Component\Form\ChoiceList\LazyChoiceList}
  *             instead.
  */
 abstract class LazyChoiceList implements ChoiceListInterface
@@ -34,6 +34,11 @@ abstract class LazyChoiceList implements ChoiceListInterface
      * @var ChoiceListInterface
      */
     private $choiceList;
+
+    public function __construct()
+    {
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\LazyChoiceList instead.', E_USER_DEPRECATED);
+    }
 
     /**
      * {@inheritdoc}

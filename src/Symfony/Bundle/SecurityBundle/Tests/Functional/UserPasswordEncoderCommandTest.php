@@ -54,7 +54,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Custom\Class\Bcrypt\User',
-        ));
+        ), array('interactive' => false));
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
         $this->assertContains('Password encoding succeeded', $output);
@@ -71,7 +71,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Custom\Class\Pbkdf2\User',
-        ));
+        ), array('interactive' => false));
 
         $output = $this->passwordEncoderCommandTester->getDisplay();
         $this->assertContains('Password encoding succeeded', $output);
@@ -90,7 +90,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             array(
                 'command' => 'security:encode-password',
                 'password' => 'p@ssw0rd',
-            )
+            ), array('interactive' => false)
         );
 
         $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
@@ -121,7 +121,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Foo\Bar\User',
-        ));
+        ), array('interactive' => false));
     }
 
     protected function setUp()

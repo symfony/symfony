@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -99,7 +100,17 @@ EOF
             $password = $helper->ask($input, $output, $passwordQuestion);
         }
 
-        $salt = $emptySalt ? null : base64_encode($this->getContainer()->get('security.secure_random')->nextBytes(30));
+        $salt = null;
+
+        if ($input->isInteractive() && !$emptySalt) {
+            $emptySalt = true;
+            if ($helper->ask($input, $output, $this->createSaltQuestion($output))) {
+                $salt = $this->generateSalt();
+                $emptySalt = false;
+            }
+        } elseif (!$emptySalt) {
+            $salt = $this->generateSalt();
+        }
 
         $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($userClass);
         $encodedPassword = $encoder->encodePassword($password, $salt);
@@ -146,6 +157,25 @@ EOF
         return $passwordQuestion;
     }
 
+    /**
+     * Create the question that asks for the salt generation confirmation.
+     *
+     * @param OutputInterface $output
+     *
+     * @return ConfirmationQuestion
+     */
+    private function createSaltQuestion(OutputInterface $output)
+    {
+        $output->writeln(array(
+            '<fg=yellow>! [NOTE] The command will take care of generating a salt for you.',
+            '! Be aware that some encoders advise to let them generate their own salt.',
+            '! If you\'re using the bcrypt encoder, please answer \'no\' to the question below.',
+            '! Provide the \'empty-salt\' option in order to let the encoder handle the generation itself.</>'.PHP_EOL,
+        ));
+
+        return new ConfirmationQuestion('Confirm salt generation ? <info> (yes/no)</info> [<comment>yes</comment>]:', true);
+    }
+
     private function writeIntroduction(OutputInterface $output)
     {
         $output->writeln(array(
@@ -177,5 +207,10 @@ EOF
             ),
             '',
         ));
+    }
+
+    private function generateSalt()
+    {
+        return base64_encode($this->getContainer()->get('security.secure_random')->nextBytes(30));
     }
 }

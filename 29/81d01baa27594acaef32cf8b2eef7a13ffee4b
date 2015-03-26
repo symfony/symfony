@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-04T11:25:02Z
+
+@mvar can you work on finishing this ?
+
+---------------------------------------------------------------------------
+
+by mvar at 2015-01-04T12:46:33Z
+
+@stof, yes I can. I will finish this PR on Monday or Tuesday.
+
+I will remove previously mentioned `&nbsp;`. I think all spacing should be done using CSS.
+
+---------------------------------------------------------------------------
+
+by mvar at 2015-01-04T13:40:23Z
+
+Space issue on label attributes is already fixed: 90b3f3b0402deaa8709832d6f7cd3f53d31fb64b
+
+So this PR will only remove whitespace (including `&nbsp;`) and add tests.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-11T12:34:05Z
+
+@mvar Is it ready to be merged?
+
+---------------------------------------------------------------------------
+
+by mvar at 2015-02-11T12:53:40Z
+
+@fabpot Yes, it is ready from my side. Should be reviewed first.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-24T16:58:56Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-03-24T17:17:41Z
+
+I will review it ASAP. In the meantime @mvar could you rebase please ?
+
+---------------------------------------------------------------------------
+
+by mvar at 2015-03-24T17:45:40Z
+
+@lyrixx, rebased.
+
+One more time I want to remember, that this PR removes hardcoded spaces (e.g., after checkbox before label text). Because such spaces cannot be easily controlled with CSS. This requires user to write some lines of CSS for custom spacing. I'm not sure all users will be happy about that.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-03-25T09:47:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-25T10:07:39Z
+
+@mvar Apparently, tests are broken.
+
+---------------------------------------------------------------------------
+
+by mvar at 2015-03-25T10:21:06Z
+
+@fabpot, fixed.

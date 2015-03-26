@@ -29,17 +29,20 @@
         "symfony/security": "~2.2",
         "symfony/expression-language": "~2.2",
         "symfony/validator": "~2.5,>=2.5.5",
-        "symfony/translation": "~2.0,>=2.0.5",
+        "symfony/translation": "~2.7",
+        "symfony/config": "~2.3,>=2.3.12",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.2",
-        "doctrine/orm": "~2.2,>=2.2.3"
+        "doctrine/orm": "~2.2,>=2.2.3",
+        "doctrine/cache": "~1.0"
     },
     "suggest": {
         "symfony/form": "",
         "symfony/validator": "",
         "doctrine/data-fixtures": "",
         "doctrine/dbal": "",
-        "doctrine/orm": ""
+        "doctrine/orm": "",
+        "doctrine/cache": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" }

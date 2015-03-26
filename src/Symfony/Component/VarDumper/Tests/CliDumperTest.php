@@ -39,11 +39,19 @@ class CliDumperTest extends VarDumperTestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
         $res2 = (int) $var[8];
+        $closure54 = '';
+
+        if (PHP_VERSION_ID >= 50400) {
+            $closure54 = <<<EOTXT
+
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
+EOTXT;
+        }
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -76,17 +84,16 @@ array:25 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {#%d
-    reflection: """
-      Closure [ <user> {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
-        @@ {$var['file']} {$var['line']} - {$var['line']}
-
-        - Parameters [2] {
-          Parameter #0 [ <required> \$a ]
-          Parameter #1 [ <optional> PDO or NULL &\$b = NULL ]
-        }
-      }
-      """
+  "closure" => Closure {#%d{$closure54}
+    parameters: array:2 [
+      "\$a" => []
+      "&\$b" => array:2 [
+        "typeHint" => "PDO"
+        "default" => null
+      ]
+    ]
+    file: "{$var['file']}"
+    line: "{$var['line']} to {$var['line']}"
   }
   "line" => {$var['line']}
   "nobj" => array:1 [

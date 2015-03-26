@@ -29,10 +29,16 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     private $logger;
 
     /**
+     * @var array|null
+     */
+    private $excludedDomains;
+
+    /**
      * @param Translator      $translator
      * @param LoggerInterface $logger
+     * @param array           $excludedDomains
      */
-    public function __construct($translator, LoggerInterface $logger)
+    public function __construct($translator, LoggerInterface $logger, array $excludedDomains = array())
     {
         if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {
             throw new \InvalidArgumentException(sprintf('The Translator "%s" must implements TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
@@ -40,6 +46,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 
         $this->translator = $translator;
         $this->logger = $logger;
+        $this->excludedDomains = !empty($excludedDomains) ? $excludedDomains : null;
     }
 
     /**
@@ -109,6 +116,10 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      */
     private function log($id, $domain, $locale)
     {
+        if ($this->excludedDomains && in_array($domain, $this->excludedDomains)) {
+            return;
+        }
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }

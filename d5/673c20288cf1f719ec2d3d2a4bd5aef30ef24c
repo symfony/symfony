@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-25T08:53:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-25T13:00:41Z
+
+I tried to find a way to "cancel" the build but it looks like it's not possible, so we must `exit 1` which puts the build in "errored" mode.

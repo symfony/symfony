@@ -245,6 +245,19 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function progress($max = 0)
+    {
+        $progress = parent::progress($max);
+        $progress->setEmptyBarCharacter('░'); // light shade character \u2591
+        $progress->setProgressCharacter('');
+        $progress->setBarCharacter('▓'); // dark shade character \u2593
+
+        return $progress;
+    }
+
+    /**
      * @param Question $question
      *
      * @return string

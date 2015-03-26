@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Style;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -37,6 +38,14 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     public function newLine($count = 1)
     {
         $this->output->write(str_repeat(PHP_EOL, $count));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function progress($max = 0)
+    {
+        return new ProgressBar($this->output, $max);
     }
 
     /**

@@ -4,18 +4,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="web_profiler.command.import.class">Symfony\Bundle\WebProfilerBundle\Command\ImportCommand</parameter>
-        <parameter key="web_profiler.command.export.class">Symfony\Bundle\WebProfilerBundle\Command\ExportCommand</parameter>
-    </parameters>
-
     <services>
-        <service id="web_profiler.command.import" class="%web_profiler.command.import.class%">
+        <service id="web_profiler.command.import" class="Symfony\Bundle\WebProfilerBundle\Command\ImportCommand">
             <argument type="service" id="profiler" on-invalid="null" />
             <tag name="console.command" />
         </service>
 
-        <service id="web_profiler.command.export" class="%web_profiler.command.export.class%">
+        <service id="web_profiler.command.export" class="Symfony\Bundle\WebProfilerBundle\Command\ExportCommand">
             <argument type="service" id="profiler" on-invalid="null" />
             <tag name="console.command" />
         </service>

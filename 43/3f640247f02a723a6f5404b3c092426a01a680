@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-12T23:06:54Z
+
+It should not be an exception but a notice of some kind. See symfony/symfony-docs#4265
+
+---------------------------------------------------------------------------
+
+by stof at 2014-10-13T09:49:50Z
+
+I agree that it should not be an exception. Not having any listener registered does not mean it is a failure
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2014-10-13T20:52:42Z
+
+Thanks, I didn't know there was an initiative for console style, this is great. I should wait for https://github.com/symfony/symfony/pull/12035
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-05T15:11:58Z
+
+@matthieuauger Any news on this PR?
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2015-02-05T16:07:34Z
+
+I was waiting for https://github.com/symfony/symfony-docs/issues/4265 but it seems to be dead.
+I'll quickly update this PR to display a standard notice instead.
+
+---------------------------------------------------------------------------
+
+by matthieuauger at 2015-02-17T17:07:25Z
+
+I updated the PR to display a message instead of an exception. I followed the Console Style Guide for the formatting. Any feedbacks welcome
+
+![screen shot 2015-02-17 at 18 05 46](https://cloud.githubusercontent.com/assets/1172099/6232928/a9423fb8-b6cf-11e4-91cb-5e766aeeee8f.png)
+
+The PR is currently headed to master, but I think it should be merged in 2.6. Tell me if you want me to create another PR

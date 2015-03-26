@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-21T21:10:34Z
+
+This PR is now ready to be reviewed.
+
+---------------------------------------------------------------------------
+
+by jeremy-derusse at 2015-01-23T23:17:41Z
+
+Tests missed a case with a separator inside a rowspan
+
+```
++------------------+-----------------+
+| ISBN             | Author          |
++------------------+-----------------+
+| 9971-5-0210-0    | Dante Alighieri |
+|                  +-----------------+
+|                  | Charles Dickens |
++------------------+-----------------+
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-01-24T13:54:49Z
+
+@jeremy-derusse done :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-24T15:10:43Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T12:51:20Z
+
+@aitboudad Can you start working on the documentation?
+ping @symfony/deciders
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T14:50:48Z
+
+I'll work on doc next week, so I opened an issue https://github.com/symfony/symfony-docs/issues/5119.

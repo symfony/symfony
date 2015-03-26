@@ -147,5 +147,5 @@ interface StyleInterface
      *
      * @param int $count The number of newlines
      */
-    public function ln($count = 1);
+    public function newLine($count = 1);
 }

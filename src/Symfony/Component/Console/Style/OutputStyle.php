@@ -34,7 +34,7 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     /**
      * {@inheritdoc}
      */
-    public function ln($count = 1)
+    public function newLine($count = 1)
     {
         $this->output->write(str_repeat(PHP_EOL, $count));
     }

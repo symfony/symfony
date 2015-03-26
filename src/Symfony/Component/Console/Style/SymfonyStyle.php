@@ -187,7 +187,7 @@ class SymfonyStyle extends OutputStyle
         $table->setStyle('symfony-style-guide');
 
         $table->render();
-        $this->ln();
+        $this->newLine();
     }
 
     /**
@@ -257,7 +257,7 @@ class SymfonyStyle extends OutputStyle
 
         $answer = $this->questionHelper->ask($this->input, $this, $question);
 
-        $this->ln();
+        $this->newLine();
 
         return $answer;
     }

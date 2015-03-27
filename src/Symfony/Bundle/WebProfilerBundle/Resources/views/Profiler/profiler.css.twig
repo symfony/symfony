@@ -139,7 +139,7 @@ pre, code {
     overflow: hidden;
 }
 #menu-profiler li a span.icon {
-    display: block;
+    display: block !important;
     position: absolute;
     left: 0;
     top: 12px;
@@ -400,8 +400,8 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
-    display: none !important;
+.collapsed-menu .label span, .collapsed-menu .label strong {
+    display: none;
 }
 .collapsed-menu span.icon img {
     display: inline !important;

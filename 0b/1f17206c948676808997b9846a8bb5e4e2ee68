@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by pyrech at 2015-03-10T16:42:29Z
+
+ping @fabpot, @romainneutron or @xabbuh
+Any opinion on this fix?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-10T18:39:07Z
+
+@pyrech I think this makes sense (though I don't have vote permissions).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-10T18:40:06Z
+
+However, we need to keep in mind that people might rely on this behaviour (for example, if you had a prefix containing a space, this won't now work anymore if you didn't do the escaping yourself).
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2015-03-16T10:31:40Z
+
+Hello,
+
+This is an error in the docblock. When I introduced it in https://github.com/symfony/symfony/pull/7584, the purpose was to reuse the ProcessBuilder
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-27T15:05:32Z
+
+@pyrech Can you fix the docblock instead?
+
+---------------------------------------------------------------------------
+
+by pyrech at 2015-03-27T15:17:21Z
+
+Done :)

@@ -108,6 +108,58 @@ EOTXT
         );
     }
 
+    public function testThrowingCaster()
+    {
+        $out = fopen('php://memory', 'r+b');
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+        $cloner->addCasters(array(
+            ':stream' => function () {
+                throw new \Exception('Foobar');
+            },
+        ));
+        $line = __LINE__ - 3;
+        $file = __FILE__;
+        $ref = (int) $out;
+
+        $data = $cloner->cloneVar($out);
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertStringMatchesFormat(
+            <<<EOTXT
+:stream {@{$ref}
+  wrapper_type: "PHP"
+  stream_type: "MEMORY"
+  mode: "w+b"
+  unread_bytes: 0
+  seekable: true
+  uri: "php://memory"
+  timed_out: false
+  blocked: true
+  eof: false
+  options: []
+  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
+    #message: "Unexpected exception thrown from a caster: Exception"
+    message: "Foobar"
+    trace: array:1 [
+      0 => array:2 [
+        "call" => "%s{closure}()"
+        "file" => "{$file}:{$line}"
+      ]
+    ]
+  }
+}
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled

@@ -3,7 +3,7 @@
         $required = false;
     endif; ?>
     <?php echo $view['form']->block($form, 'widget_attributes', array(
-        'required' => $required
+        'required' => $required,
     )) ?>
     <?php if ($multiple): ?> multiple="multiple"<?php endif ?>
 >

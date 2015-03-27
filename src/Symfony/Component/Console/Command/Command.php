@@ -50,13 +50,14 @@ class Command
     final public static function registerLazyLoaded(CommandConfiguration $configuration, CommandResolverInterface $resolver)
     {
         $proxyCommand = new self(null, $configuration);
+
         $proxyCommand->setCode(function ($input, $output) use ($configuration, $resolver, $proxyCommand) {
             $command = $resolver->resolve($configuration->getName());
 
             if ($command instanceof Command) {
-                $command->application = $proxyCommand->application;
-                $command->configuration = $proxyCommand->configuration;
-                $command->helperSet = $proxyCommand->helperSet;
+                $command->setApplication($proxyCommand->getApplication());
+                $command->setConfiguration($proxyCommand->getConfiguration());
+                $command->setHelperSet($proxyCommand->getHelperSet());
 
                 return $command->doRun($input, $output);
             }
@@ -120,6 +121,16 @@ class Command
     }
 
     /**
+     * Sets command configuration.
+     *
+     * @param CommandConfiguration $configuration
+     */
+    public function setConfiguration(CommandConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
      * Sets the helper set.
      *
      * @param HelperSet $helperSet A HelperSet instance
@@ -149,6 +160,16 @@ class Command
     public function getApplication()
     {
         return $this->application;
+    }
+
+    /**
+     * Gets command configuration.
+     *
+     * @return CommandConfiguration
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
     }
 
     /**
@@ -653,11 +674,12 @@ class Command
     }
 
     /**
+     * @internal
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
      */
-    private function doRun(InputInterface $input, OutputInterface $output)
+    public function doRun(InputInterface $input, OutputInterface $output)
     {
         if ($input->isInteractive()) {
             $this->interact($input, $output);

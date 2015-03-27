@@ -267,12 +267,15 @@ class SymfonyStyle extends OutputStyle
      */
     public function createProgressBar($max = 0)
     {
-        $progress = parent::createProgressBar($max);
-        $progress->setEmptyBarCharacter('░'); // light shade character \u2591
-        $progress->setProgressCharacter('');
-        $progress->setBarCharacter('▓'); // dark shade character \u2593
+        $progressBar = parent::createProgressBar($max);
 
-        return $progress;
+        if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $progressBar->setEmptyBarCharacter('░'); // light shade character \u2591
+            $progressBar->setProgressCharacter('');
+            $progressBar->setBarCharacter('▓'); // dark shade character \u2593
+        }
+
+        return $progressBar;
     }
 
     /**

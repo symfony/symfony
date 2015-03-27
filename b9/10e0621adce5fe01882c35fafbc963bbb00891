@@ -1,0 +1,101 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T09:30:00Z
+
+@marcosdsanchez what do you think about adding a new class that give ability to extract from one file (FileTwigExtractor for example) ? /cc @fabpot
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-23T17:15:03Z
+
+@aitboudad , what about something like 1b419cb ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T17:22:59Z
+
+@marcosdsanchez It's exactly what I want :D
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T18:07:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-23T20:12:22Z
+
+@aitboudad  Because of the new class the code is not backwards compatible anymore. See https://travis-ci.org/symfony/symfony/builds/55525434 . What should I do? Get back to the version I had before or point the PR to another branch?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T20:16:57Z
+
+just update [composer.json](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bridge/Twig/composer.json#L31) to 2.7
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-23T20:58:57Z
+
+@marcosdsanchez You will have to bump the version in the FrameworkBundle too.
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-24T02:28:14Z
+
+@aitboudad @xabbuh updated Twig Bridge and Framework Bundle. Travis is still failing with high dependencies in php 5.6 https://travis-ci.org/symfony/symfony/builds/55551337 . What am I missing?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-24T06:42:24Z
+
+@marcosdsanchez This seems to be related to how that specific build works (you change is not available in the components repos as it was not merged). So that's nothing to worry about.
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-24T13:13:55Z
+
+Thanks @xabbuh . I think this is ready then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-26T08:44:18Z
+
+Can you please add an entry to the changelog?
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-26T16:37:16Z
+
+@xabbuh sure. For which version 2.3.27 (unreleased) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T16:57:28Z
+
+@marcosdsanchez You need to add an entry in the CHANGELOG of the component, not the CHANGLOG file from the root directory (those are automatically generated.)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-26T17:10:05Z
+
+@marcosdsanchez As @fabpot said, and the version should be 2.7.0.
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-26T17:18:15Z
+
+Thanks @fabpot and @xabbuh . Done in 5258f01.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T17:30:02Z
+
+:+1: when my 2 comments are fixed
+
+---------------------------------------------------------------------------
+
+by marcosdsanchez at 2015-03-26T17:40:33Z
+
+@fabpot comments addressed.

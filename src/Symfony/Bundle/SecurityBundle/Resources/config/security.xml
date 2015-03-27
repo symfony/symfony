@@ -83,10 +83,10 @@
         </service>
 
         <service id="security.encoder_factory.generic" class="%security.encoder_factory.generic.class%" public="false">
-            <argument type="collection"></argument>
+            <argument type="collection" />
         </service>
 
-        <service id="security.encoder_factory" alias="security.encoder_factory.generic"></service>
+        <service id="security.encoder_factory" alias="security.encoder_factory.generic" />
 
         <service id="security.user_password_encoder.generic" class="Symfony\Component\Security\Core\Encoder\UserPasswordEncoder" public="false">
             <argument type="service" id="security.encoder_factory"></argument>
@@ -104,7 +104,7 @@
 
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="%security.access.decision_manager.class%" public="false">
-            <argument type="collection"></argument>
+            <argument type="collection" />
         </service>
 
         <service id="security.role_hierarchy" class="%security.role_hierarchy.class%" public="false">

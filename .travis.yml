@@ -26,6 +26,8 @@ env:
         - SYMFONY_DEPRECATIONS_HELPER=weak
 
 before_install:
+    - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then git fetch origin "refs/pull/$TRAVIS_PULL_REQUEST/merge"; else git fetch origin "$TRAVIS_BRANCH"; fi;
+    - if [[ "$TRAVIS_COMMIT" != `git rev-parse FETCH_HEAD` ]]; then echo "Pull request or branch commit hash has changed, aborting!"; exit 1; fi;
     - travis_retry sudo apt-get install parallel
     - composer self-update
     - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then phpenv config-rm xdebug.ini; fi;

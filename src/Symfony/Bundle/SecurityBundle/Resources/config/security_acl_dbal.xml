@@ -48,7 +48,5 @@
         </service>
 
         <service id="security.acl.cache.doctrine.cache_impl" alias="doctrine.orm.default_result_cache" public="false" />
-
-        <service id="security.acl.permission.map" class="%security.acl.permission.map.class%" public="false"></service>
     </services>
 </container>

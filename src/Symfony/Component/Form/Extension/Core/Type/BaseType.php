@@ -57,7 +57,7 @@ abstract class BaseType extends AbstractType
                 $uniqueBlockPrefix = '_'.$blockName;
             }
 
-            if (!$translationDomain) {
+            if (null === $translationDomain) {
                 $translationDomain = $view->parent->vars['translation_domain'];
             }
 
@@ -80,10 +80,6 @@ abstract class BaseType extends AbstractType
             array_unshift($blockPrefixes, $type->getName());
         }
         $blockPrefixes[] = $uniqueBlockPrefix;
-
-        if (!$translationDomain) {
-            $translationDomain = 'messages';
-        }
 
         $view->vars = array_replace($view->vars, array(
             'form' => $view,

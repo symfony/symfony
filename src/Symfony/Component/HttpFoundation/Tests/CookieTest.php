@@ -119,14 +119,14 @@ class CookieTest extends \PHPUnit_Framework_TestCase
 
     public function testCookieIsNotCleared()
     {
-        $cookie = new Cookie('foo', 'bar', time()+3600*24);
+        $cookie = new Cookie('foo', 'bar', time() + 3600 * 24);
 
         $this->assertFalse($cookie->isCleared(), '->isCleared() returns false if the cookie did not expire yet');
     }
 
     public function testCookieIsCleared()
     {
-        $cookie = new Cookie('foo', 'bar', time()-20);
+        $cookie = new Cookie('foo', 'bar', time() - 20);
 
         $this->assertTrue($cookie->isCleared(), '->isCleared() returns true if the cookie has expired');
     }
@@ -137,7 +137,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly', $cookie->__toString(), '->__toString() returns string representation of the cookie');
 
         $cookie = new Cookie('foo', null, 1, '/admin/', '.myfoodomain.com');
-        $this->assertEquals('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time()-31536001).'; path=/admin/; domain=.myfoodomain.com; httponly', $cookie->__toString(), '->__toString() returns string representation of a cleared cookie if value is NULL');
+        $this->assertEquals('foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/admin/; domain=.myfoodomain.com; httponly', $cookie->__toString(), '->__toString() returns string representation of a cleared cookie if value is NULL');
 
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
         $this->assertEquals('foo=bar; path=/; httponly', $cookie->__toString());

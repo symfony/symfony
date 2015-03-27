@@ -165,7 +165,7 @@ class PoFileLoader extends ArrayLoader
                 end($plurals);
                 $count = key($plurals);
                 // Fill missing spots with '-'.
-                $empties = array_fill(0, $count+1, '-');
+                $empties = array_fill(0, $count + 1, '-');
                 $plurals += $empties;
                 ksort($plurals);
                 $messages[stripcslashes($item['ids']['plural'])] = stripcslashes(implode('|', $plurals));

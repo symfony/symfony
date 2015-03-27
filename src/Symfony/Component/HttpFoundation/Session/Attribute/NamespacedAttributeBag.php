@@ -125,7 +125,7 @@ class NamespacedAttributeBag extends AttributeBag
             return $array;
         }
 
-        unset($parts[count($parts)-1]);
+        unset($parts[count($parts) - 1]);
 
         foreach ($parts as $part) {
             if (null !== $array && !array_key_exists($part, $array)) {
@@ -150,7 +150,7 @@ class NamespacedAttributeBag extends AttributeBag
     protected function resolveKey($name)
     {
         if (strpos($name, $this->namespaceCharacter) !== false) {
-            $name = substr($name, strrpos($name, $this->namespaceCharacter)+1, strlen($name));
+            $name = substr($name, strrpos($name, $this->namespaceCharacter) + 1, strlen($name));
         }
 
         return $name;

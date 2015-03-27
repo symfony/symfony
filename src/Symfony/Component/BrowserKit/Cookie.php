@@ -204,7 +204,7 @@ class Cookie
     private static function parseDate($dateValue)
     {
         // trim single quotes around date if present
-        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length-1]) {
+        if (($length = strlen($dateValue)) > 1 && "'" === $dateValue[0] && "'" === $dateValue[$length - 1]) {
             $dateValue = substr($dateValue, 1, -1);
         }
 

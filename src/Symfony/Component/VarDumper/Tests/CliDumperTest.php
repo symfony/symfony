@@ -13,11 +13,12 @@ namespace Symfony\Component\VarDumper\Tests;
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
+use Symfony\Component\VarDumper\Test\VarDumperTestCase;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CliDumperTest extends \PHPUnit_Framework_TestCase
+class CliDumperTest extends VarDumperTestCase
 {
     public function testGet()
     {
@@ -115,21 +116,10 @@ EOTXT
         }
 
         $var = xml_parser_create();
-        $ref = (int) $var;
 
-        $dumper = new CliDumper();
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $out = fopen('php://memory', 'r+b');
-        $dumper->dump($data, $out);
-        rewind($out);
-        $out = stream_get_contents($out);
-
-        $this->assertSame(
+        $this->assertDumpEquals(
             <<<EOTXT
-:xml {@{$ref}
+:xml {
   current_byte_index: 0
   current_column_number: 1
   current_line_number: 1
@@ -138,7 +128,7 @@ EOTXT
 
 EOTXT
             ,
-            $out
+            $var
         );
     }
 
@@ -190,7 +180,7 @@ EOTXT
 
 EOTXT
             ,
-            $out
+            $var
         );
     }
 
@@ -206,17 +196,7 @@ EOTXT
 
         $var = $this->getSpecialVars();
 
-        $dumper = new CliDumper();
-        $dumper->setColors(false);
-        $cloner = new VarCloner();
-
-        $data = $cloner->cloneVar($var);
-        $out = fopen('php://memory', 'r+b');
-        $dumper->dump($data, $out);
-        rewind($out);
-        $out = stream_get_contents($out);
-
-        $this->assertSame(
+        $this->assertDumpEquals(
             <<<EOTXT
 array:3 [
   0 => array:1 [

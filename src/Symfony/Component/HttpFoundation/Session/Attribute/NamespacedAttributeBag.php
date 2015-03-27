@@ -73,7 +73,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function set($name, $value)
     {
-        $attributes = & $this->resolveAttributePath($name, true);
+        $attributes = &$this->resolveAttributePath($name, true);
         $name = $this->resolveKey($name);
         $attributes[$name] = $value;
     }
@@ -84,7 +84,7 @@ class NamespacedAttributeBag extends AttributeBag
     public function remove($name)
     {
         $retval = null;
-        $attributes = & $this->resolveAttributePath($name);
+        $attributes = &$this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
         if (null !== $attributes && array_key_exists($name, $attributes)) {
             $retval = $attributes[$name];
@@ -106,7 +106,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     protected function &resolveAttributePath($name, $writeContext = false)
     {
-        $array = & $this->attributes;
+        $array = &$this->attributes;
         $name = (strpos($name, $this->namespaceCharacter) === 0) ? substr($name, 1) : $name;
 
         // Check if there is anything to do, else return
@@ -132,7 +132,7 @@ class NamespacedAttributeBag extends AttributeBag
                 $array[$part] = $writeContext ? array() : null;
             }
 
-            $array = & $array[$part];
+            $array = &$array[$part];
         }
 
         return $array;

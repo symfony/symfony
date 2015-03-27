@@ -69,7 +69,7 @@ class FlattenException extends LegacyFlattenException
     private $trace;
     private $class;
     private $statusCode;
-    private $headers;
+    private $headers = array();
     private $file;
     private $line;
     private $extras = array();

@@ -34,6 +34,11 @@
         <service id="exception_flattener" class="Symfony\Component\Debug\ExceptionFlattener">
             <argument type="collection" />
         </service>
+
+        <service id="debug.exception_processor.http" class="Symfony\Component\HttpKernel\Debug\HttpFlattenExceptionProcessor" public="false">
+            <tag name="exception.processor" />
+        </service>
+
     </services>
 
 </container>

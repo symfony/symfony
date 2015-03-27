@@ -64,7 +64,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         if ($this->cache && ($this->loadedClasses[$class] = $this->cache->fetch($class))) {
             return $this->loadedClasses[$class];
         }
-        
+
         if (!class_exists($class) && !interface_exists($class)) {
             throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
@@ -102,6 +102,18 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     }
 
     /**
+     * Creates a metadata class
+     *
+     * @param string $class
+     *
+     * @return ClassMetadataInterface
+     */
+    protected function createMetadataClass($class)
+    {
+        return new ClassMetadata($class);
+    }
+
+    /**
      * Gets a class name for a given class or instance.
      *
      * @param mixed $value
@@ -115,17 +127,5 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         }
 
         return ltrim(is_object($value) ? get_class($value) : $value, '\\');
-    }
-
-    /**
-     * Creates a metadata class
-     *
-     * @param string $class
-     *
-     * @return ClassMetadataInterface
-     */
-    protected function createMetadataClass($class)
-    {
-        return new ClassMetadata($class);
     }
 }

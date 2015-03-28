@@ -18,8 +18,8 @@ class BundleCDependenciesBA implements BundleDependenciesInterface
     public function getBundleDependencies()
     {
         return array(
-            'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleBDependenciesA',
-            'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleADependenciesNon',
+            'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleBDependenciesA' => self::DEP_REQUIRED,
+            'Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleADependenciesNon' => self::DEP_OPTIONAL,
         );
     }
 }

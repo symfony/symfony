@@ -517,13 +517,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function registeredDependencies()
     {
         $bundles = $this->registerBundles();
-        $topMostBundles = $topMostBundlesMap = array();
+        $children = $rootBundles = array();
         $hasDependencies = false;
 
         // Build up bundles as a hash with FQN for basis to rebuild again in correct order given dependencies
         foreach ($bundles as $bundle) {
-            $topMostBundles[] = $bundleFQN = get_class($bundle);
-            $topMostBundlesMap[$bundleFQN] = $bundle;
+            $bundleFQN = get_class($bundle);
+            $children[$bundleFQN] = BundleDependenciesInterface::DEP_REQUIRED;
+            $rootBundles[$bundleFQN] = $bundle;
 
             if ($bundle instanceof BundleDependenciesInterface) {
                 $hasDependencies = true;
@@ -538,9 +539,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $bundles = array();
         $stack = array(get_class($this) => true);
         $this->appendDependenciesRecursively(
-            $topMostBundles,
+            $children,
             $bundles,
-            $topMostBundlesMap,
+            $rootBundles,
             $stack
        );
 
@@ -554,28 +555,32 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * this string must be in exactly same format as returned by get_class() and PHP 5.5's CLASS constant.
      * Example of FQN string: "Symfony\Component\HttpKernel\Bundle\BundleInterface"
      *
-     * @param string[] $directChildren Dependencies to apply
+     * @link BundleDependenciesInterface For further details on dependencies and DEP_* constants.
+     *
+     * @param mixed[string] $children Dependencies to apply, key FQN, value {@see BundleDependenciesInterface} constants
      * @param BundleInterface[string] $bundles Ordered bundles to append dependencies to
-     * @param BundleInterface[string] $topMostBundlesMap Loaded Bundles from registerRootBundles()
+     * @param BundleInterface[string] $rootBundles Loaded Bundles from registerRootBundles()
      * @param bool[string] $stack For recursion protection, and for debug use on exceptions
      *
      * @throws \Symfony\Component\HttpKernel\Exception\DependencyMismatchException On missing dependencies
      */
-    protected function appendDependenciesRecursively(array $directChildren, array &$bundles, array $topMostBundlesMap, array $stack)
+    protected function appendDependenciesRecursively(array $children, array &$bundles, array $rootBundles, array $stack)
     {
-        while (!empty($directChildren)) {
-            $dependencyFQN = array_shift($directChildren);
+        foreach ($children as $dependencyFQN => $requiredFlag) {
             if (isset($bundles[$dependencyFQN])) {
                 continue;
-            } else if (isset($stack[$dependencyFQN]))  {
+            } elseif (isset($stack[$dependencyFQN])) {
                 throw new DependencyMismatchException("Recursive dependency for '{$dependencyFQN}'", array_keys($stack));
             }
 
             // If already loaded root bundle, use that to not re instantiate
-            if (isset($topMostBundlesMap[$dependencyFQN])) {
-                $dependency = $topMostBundlesMap[$dependencyFQN];
+            if (isset($rootBundles[$dependencyFQN])) {
+                $dependency = $rootBundles[$dependencyFQN];
             } else {
                 if (!class_exists($dependencyFQN)) {
+                    if ($requiredFlag === BundleDependenciesInterface::DEP_OPTIONAL) {
+                        continue;
+                    }
                     throw new DependencyMismatchException("Could not find '{$dependencyFQN}'", array_keys($stack));
                 }
                 $dependency = new $dependencyFQN();
@@ -587,7 +592,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $this->appendDependenciesRecursively(
                     $dependency->getBundleDependencies(),
                     $bundles,
-                    $topMostBundlesMap,
+                    $rootBundles,
                     $stack
                );
             }

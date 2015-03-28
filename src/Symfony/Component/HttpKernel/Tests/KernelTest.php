@@ -726,6 +726,7 @@ EOF;
         $aNon = new BundleDependencies\BundleADependenciesNon();
         $bA = new BundleDependencies\BundleBDependenciesA();
         $cBA = new BundleDependencies\BundleCDependenciesBA();
+        $g = new BundleDependencies\BundleGDependenciesMissingOptional();
 
         return array(
             array(
@@ -768,6 +769,11 @@ EOF;
                 array($bA, $cBA),
                 array($aNon, $bA, $cBA),
             ),
+            // optional
+            array(
+                array($g),
+                array($g),
+            ),
         );
     }
 
@@ -797,11 +803,11 @@ EOF;
         return array(
             array(
                 array($dE),
-                "Recursive dependency for '" . get_class($dE),
+                "Recursive dependency for '".get_class($dE),
             ),
             array(
                 array($eD),
-                "Recursive dependency for '" . get_class($eD),
+                "Recursive dependency for '".get_class($eD),
             ),
             array(
                 array($f),

@@ -13,10 +13,10 @@ namespace Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies;
 
 use Symfony\Component\HttpKernel\Bundle\BundleDependenciesInterface;
 
-class BundleDDependenciesE implements BundleDependenciesInterface
+class BundleGDependenciesMissingOptional implements BundleDependenciesInterface
 {
     public function getBundleDependencies()
     {
-        return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleEDependenciesD' => self::DEP_REQUIRED);
+        return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleMissing' => self::DEP_OPTIONAL);
     }
 }

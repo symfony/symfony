@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Ez a mező nem számítottak.</target>
+                <target>Nem várt mező.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>

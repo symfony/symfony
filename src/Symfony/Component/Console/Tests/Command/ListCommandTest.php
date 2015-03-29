@@ -69,28 +69,9 @@ EOF;
         $application->add(new \Foo6Command());
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(array('command' => $command->getName()));
-        $output = <<<EOF
-Console Tool
 
-Usage:
- [options] command [arguments]
+        $regex = '/Available commands:\s*help\s*.*\s*list.*\s*<fg=blue>foo\s*<fg=blue>foo:bar<\/fg=blue>/';
 
-Options:
- --help (-h)           Display this help message.
- --quiet (-q)          Do not output any message.
- --verbose (-v|vv|vvv) Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug.
- --version (-V)        Display this application version.
- --ansi                Force ANSI output.
- --no-ansi             Disable ANSI output.
- --no-interaction (-n) Do not ask any interactive question.
-
-Available commands:
- help                         Displays help for a command
- list                         Lists commands
-<fg=blue>foo
- <fg=blue>foo:bar</fg=blue>
-EOF;
-
-        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+        $this->assertRegExp($regex, $commandTester->getDisplay(true));
     }
 }

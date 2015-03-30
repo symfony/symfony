@@ -180,7 +180,7 @@ EOTXT
 
 EOTXT
             ,
-            $var
+            $out
         );
     }
 

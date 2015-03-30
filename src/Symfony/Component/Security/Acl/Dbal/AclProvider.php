@@ -507,8 +507,8 @@ QUERY;
         $acls = $aces = $emptyArray = array();
         $oidCache = $oidLookup;
         $result = new \SplObjectStorage();
-        $loadedAces = & $this->loadedAces;
-        $loadedAcls = & $this->loadedAcls;
+        $loadedAces = &$this->loadedAces;
+        $loadedAcls = &$this->loadedAcls;
         $permissionGrantingStrategy = $this->permissionGrantingStrategy;
 
         // we need these to set protected properties on hydrated objects

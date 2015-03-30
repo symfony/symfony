@@ -71,10 +71,10 @@ class NumberComparatorTest extends \PHPUnit_Framework_TestCase
             array('==1KI', array('1024'), array('1023', '1025')),
 
             array('==1m', array('1000000'), array('999999', '1000001')),
-            array('==1mi', array(1024*1024), array(1024*1024-1, 1024*1024+1)),
+            array('==1mi', array(1024 * 1024), array(1024 * 1024 - 1, 1024 * 1024 + 1)),
 
             array('==1g', array('1000000000'), array('999999999', '1000000001')),
-            array('==1gi', array(1024*1024*1024), array(1024*1024*1024-1, 1024*1024*1024+1)),
+            array('==1gi', array(1024 * 1024 * 1024), array(1024 * 1024 * 1024 - 1, 1024 * 1024 * 1024 + 1)),
 
             array('!= 1000', array('500', '999'), array('1000')),
         );

@@ -162,7 +162,7 @@ class IssnValidator extends ConstraintValidator
 
         for ($i = 0; $i < 7; ++$i) {
             // Multiply the first digit by 8, the second by 7, etc.
-            $checkSum += (8-$i) * $canonical{$i};
+            $checkSum += (8 - $i) * $canonical{$i};
         }
 
         if (0 !== $checkSum % 11) {

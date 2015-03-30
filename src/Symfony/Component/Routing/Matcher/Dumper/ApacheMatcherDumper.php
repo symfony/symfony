@@ -78,7 +78,7 @@ class ApacheMatcherDumper extends MatcherDumper
                 $variables[] = sprintf('E=__ROUTING_host_%s:1', $hostRegexUnique);
 
                 foreach ($compiledRoute->getHostVariables() as $i => $variable) {
-                    $variables[] = sprintf('E=__ROUTING_host_%s_%s:%%%d', $hostRegexUnique, $variable, $i+1);
+                    $variables[] = sprintf('E=__ROUTING_host_%s_%s:%%%d', $hostRegexUnique, $variable, $i + 1);
                 }
 
                 $variables = implode(',', $variables);

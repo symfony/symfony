@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Ez a mező nem számítottak.</target>
+                <target>Nem várt mező.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
@@ -305,6 +305,10 @@
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
                 <target>Az állomásnevet nem lehet feloldani.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Ez az érték nem az elvárt {{ charset }} karakterkódolást használja.</target>
             </trans-unit>
         </body>
     </file>

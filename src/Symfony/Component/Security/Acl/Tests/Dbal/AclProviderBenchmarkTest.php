@@ -92,7 +92,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $this->insertEntryStmt = $this->con->prepare('INSERT INTO acl_entries (id, class_id, object_identity_id, field_name, ace_order, security_identity_id, mask, granting, granting_strategy, audit_success, audit_failure) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $this->insertOidAncestorStmt = $this->con->prepare('INSERT INTO acl_object_identity_ancestors (object_identity_id, ancestor_id) VALUES (?, ?)');
 
-        for ($i = 0; $i<40000; $i++) {
+        for ($i = 0; $i < 40000; $i++) {
             $this->generateAclHierarchy();
         }
     }
@@ -107,7 +107,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
     protected function generateAclLevel($depth, $parentId, $ancestors)
     {
         $level = count($ancestors);
-        for ($i = 0, $t = rand(1, 10); $i<$t; $i++) {
+        for ($i = 0, $t = rand(1, 10); $i < $t; $i++) {
             $id = $this->generateAcl($this->chooseClassId(), $parentId, $ancestors);
 
             if ($level < $depth) {
@@ -124,9 +124,9 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             $this->insertClassStmt->execute(array($id, $this->getRandomString(rand(20, 100), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\_')));
             ++$id;
 
-            return $id-1;
+            return $id - 1;
         } else {
-            return rand(1000, $id-1);
+            return rand(1000, $id - 1);
         }
     }
 
@@ -150,7 +150,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $this->generateAces($classId, $id);
         ++$id;
 
-        return $id-1;
+        return $id - 1;
     }
 
     protected function chooseSid()
@@ -165,9 +165,9 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             ));
             ++$id;
 
-            return $id-1;
+            return $id - 1;
         } else {
-            return rand(1000, $id-1);
+            return rand(1000, $id - 1);
         }
     }
 
@@ -185,7 +185,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
                 $sid = $this->chooseSid();
             } while (array_key_exists($sid, $sids) && in_array($fieldName, $sids[$sid], true));
 
-            $fieldOrder[$fieldName] = array_key_exists($fieldName, $fieldOrder) ? $fieldOrder[$fieldName]+1 : 0;
+            $fieldOrder[$fieldName] = array_key_exists($fieldName, $fieldOrder) ? $fieldOrder[$fieldName] + 1 : 0;
             if (!isset($sids[$sid])) {
                 $sids[$sid] = array();
             }
@@ -238,7 +238,7 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
         $cLength = strlen($chars);
 
         while (strlen($s) < $length) {
-            $s .= $chars[mt_rand(0, $cLength-1)];
+            $s .= $chars[mt_rand(0, $cLength - 1)];
         }
 
         return $s;

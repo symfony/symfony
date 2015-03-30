@@ -52,23 +52,6 @@ class RememberMeTokenTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error
-     * @dataProvider getUserArguments
-     */
-    public function testConstructorUserCannotBeNull($user)
-    {
-        new RememberMeToken($user, 'foo', 'foo');
-    }
-
-    public function getUserArguments()
-    {
-        return array(
-            array(null),
-            array('foo'),
-        );
-    }
-
     protected function getUser($roles = array('ROLE_FOO'))
     {
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');

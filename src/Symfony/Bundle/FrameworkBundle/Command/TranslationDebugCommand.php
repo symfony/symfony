@@ -39,9 +39,6 @@ class TranslationDebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('debug:translation')
-            ->setAliases(array(
-                'translation:debug',
-            ))
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
@@ -81,10 +78,6 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.</comment>');
-        }
-
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
         $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));

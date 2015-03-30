@@ -160,6 +160,34 @@ EOTXT
         );
     }
 
+    public function testRefsInProperties()
+    {
+        $var = (object) array('foo' => 'foo');
+        $var->bar =& $var->foo;
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $out = fopen('php://memory', 'r+b');
+        $data = $cloner->cloneVar($var);
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertStringMatchesFormat(
+            <<<EOTXT
+{#%d
+  +"foo": &1 "foo"
+  +"bar": &1 "foo"
+}
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled

@@ -466,7 +466,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $i = 0;
 
         foreach ($directory as $dir) {
-            $i++;
+            ++$i;
         }
 
         $this->assertCount($i, $directory);
@@ -478,7 +478,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $i = 0;
 
         foreach ($files as $file) {
-            $i++;
+            ++$i;
         }
 
         $this->assertCount($i, $files);

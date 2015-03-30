@@ -95,7 +95,7 @@ class ClassMapGenerator
         $classes = array();
 
         $namespace = '';
-        for ($i = 0, $max = count($tokens); $i < $max; $i++) {
+        for ($i = 0, $max = count($tokens); $i < $max; ++$i) {
             $token = $tokens[$i];
 
             if (is_string($token)) {

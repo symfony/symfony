@@ -141,7 +141,7 @@ class CodeExtension extends \Twig_Extension
             $content = preg_split('#<br />#', $code);
 
             $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; $i++) {
+            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; ++$i) {
                 $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 

@@ -84,7 +84,7 @@ class FunctionExtension extends AbstractExtension
 
         if ($last) {
             $expr = 'last() - '.$expr;
-            $b--;
+            --$b;
         }
 
         if (0 !== $b) {

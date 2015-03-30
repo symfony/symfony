@@ -148,24 +148,6 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Sets the fallback locale(s).
-     *
-     * @param string|array $locales The fallback locale(s)
-     *
-     * @throws \InvalidArgumentException If a locale contains invalid characters
-     *
-     * @deprecated since version 2.3, to be removed in 3.0. Use setFallbackLocales() instead.
-     *
-     * @api
-     */
-    public function setFallbackLocale($locales)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0. Use the setFallbackLocales() method instead.', E_USER_DEPRECATED);
-
-        $this->setFallbackLocales(is_array($locales) ? $locales : array($locales));
-    }
-
-    /**
      * Sets the fallback locales.
      *
      * @param array $locales The fallback locales

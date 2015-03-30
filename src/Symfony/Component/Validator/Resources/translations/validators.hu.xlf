@@ -302,6 +302,10 @@
                 <source>An empty file is not allowed.</source>
                 <target>Üres fájl nem megengedett.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Az állomásnevet nem lehet feloldani.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

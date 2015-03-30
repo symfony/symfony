@@ -400,9 +400,9 @@ td.main, td.menu {
 .collapsed-menu {
     width: 60px !important;
 }
-.collapsed-menu span :not(.icon) {
+.collapsed-menu span.label > :not(.icon) {
     display: none !important;
 }
-.collapsed-menu span.icon img {
-    display: inline !important;
+.collapsed-menu #minimizePanelIcon {
+    transform: rotate(180deg);
 }

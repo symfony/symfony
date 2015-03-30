@@ -346,7 +346,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param string $locale
-     * @param bool $forceRefresh
+     * @param bool   $forceRefresh
      */
     private function initializeCacheCatalogue($locale, $forceRefresh = false)
     {
@@ -358,29 +358,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
         if ($forceRefresh || !$cache->isFresh()) {
             $this->initializeCatalogue($locale);
-
-            $fallbackContent = '';
-            $current = '';
-            $replacementPattern = '/[^a-z0-9_]/i';
-            foreach ($this->computeFallbackLocales($locale) as $fallback) {
-                $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
-                $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
-
-                $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
-
-
-EOF
-                    ,
-                    $fallbackSuffix,
-                    $fallback,
-                    var_export($this->catalogues[$fallback]->all(), true),
-                    $currentSuffix,
-                    $fallbackSuffix
-                );
-                $current = $fallback;
-            }
+            $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
 
             $content = sprintf(<<<EOF
 <?php
@@ -408,7 +386,7 @@ EOF
 
         $catalogue = include $cache;
 
-        /**
+        /*
          * Old cache returns only the catalogue, without resourcesHash
          */
         $resourcesHash = null;
@@ -421,6 +399,51 @@ EOF
         }
 
         $this->catalogues[$locale] = $catalogue;
+    }
+
+    private function getFallbackContent(MessageCatalogue $catalogue)
+    {
+        if (!$this->debug) {
+            // merge all fallback catalogues messages into $catalogue
+            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
+            $messages = $catalogue->all();
+            while ($fallbackCatalogue) {
+                $messages = array_replace_recursive($fallbackCatalogue->all(), $messages);
+                $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
+            }
+            foreach ($messages as $domain => $domainMessages) {
+                $catalogue->add($domainMessages, $domain);
+            }
+
+            return '';
+        }
+
+        $fallbackContent = '';
+        $current = '';
+        $replacementPattern = '/[^a-z0-9_]/i';
+        $fallbackCatalogue = $catalogue->getFallbackCatalogue();
+        while ($fallbackCatalogue) {
+            $fallback = $fallbackCatalogue->getLocale();
+            $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
+            $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
+
+            $fallbackContent .= sprintf(<<<EOF
+\$catalogue%s = new MessageCatalogue('%s', %s);
+\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+
+EOF
+                ,
+                $fallbackSuffix,
+                $fallback,
+                var_export($fallbackCatalogue->all(), true),
+                $currentSuffix,
+                $fallbackSuffix
+            );
+            $current = $fallbackCatalogue->getLocale();
+            $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
+        }
+
+        return $fallbackContent;
     }
 
     private function getResourcesHash($locale)

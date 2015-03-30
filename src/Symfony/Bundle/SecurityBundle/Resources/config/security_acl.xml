@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="security.acl.object_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy" public="false"></service>
+        <service id="security.acl.object_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\ObjectIdentityRetrievalStrategy" public="false" />
 
         <service id="security.acl.security_identity_retrieval_strategy" class="Symfony\Component\Security\Acl\Domain\SecurityIdentityRetrievalStrategy" public="false">
             <argument type="service" id="security.role_hierarchy" />
@@ -18,7 +18,7 @@
             </call>
         </service>
 
-        <service id="security.acl.permission.map" class="Symfony\Component\Security\Acl\Permission\BasicPermissionMap" public="false"></service>
+        <service id="security.acl.permission.map" class="Symfony\Component\Security\Acl\Permission\BasicPermissionMap" public="false" />
 
         <service id="security.acl.voter.basic_permissions" class="Symfony\Component\Security\Acl\Voter\AclVoter" public="false">
             <tag name="monolog.logger" channel="security" />

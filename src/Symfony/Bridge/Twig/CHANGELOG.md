@@ -7,6 +7,7 @@ CHANGELOG
  * added LogoutUrlExtension (provides `logout_url` and `logout_path`)
  * added an HttpFoundation extension (provides the `absolute_url` and the `relative_path` functions)
  * added AssetExtension (provides the `asset` and `asset_version` functions)
+ * Added possibility to extract translation messages from a file or files besides extracting from a directory
 
 2.5.0
 -----

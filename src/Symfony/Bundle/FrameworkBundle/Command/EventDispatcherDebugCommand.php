@@ -58,13 +58,27 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $dispatcher = $this->getEventDispatcher();
+
         if ($event = $input->getArgument('event')) {
+            if (!$dispatcher->hasListeners($event)) {
+                $formatter = $this->getHelperSet()->get('formatter');
+
+                $formattedBlock = $formatter->formatBlock(
+                    sprintf('[NOTE] The event "%s" does not have any registered listeners.', $event),
+                    'fg=yellow',
+                    true
+                );
+
+                $output->writeln($formattedBlock);
+
+                return;
+            }
+
             $options = array('event' => $event);
         } else {
             $options = array();
         }
-
-        $dispatcher = $this->getEventDispatcher();
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');

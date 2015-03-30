@@ -19,7 +19,7 @@
             <argument type="service" id="security.user_checker" />
         </service>
 
-        <service id="security.rememberme.token.provider.in_memory" class="Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider" public="false"/>
+        <service id="security.rememberme.token.provider.in_memory" class="Symfony\Component\Security\Core\Authentication\RememberMe\InMemoryTokenProvider" public="false" />
 
         <service id="security.authentication.rememberme.services.abstract" abstract="true" public="false">
             <tag name="monolog.logger" channel="security" />
@@ -40,8 +40,7 @@
         <service id="security.authentication.rememberme.services.simplehash"
                  class="Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices"
                  parent="security.authentication.rememberme.services.abstract"
-                 abstract="true">
-        </service>
+                 abstract="true" />
 
         <service id="security.rememberme.response_listener" class="Symfony\Component\Security\Http\RememberMe\ResponseListener">
             <tag name="kernel.event_subscriber" />

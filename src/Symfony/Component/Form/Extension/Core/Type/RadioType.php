@@ -25,7 +25,8 @@ class RadioType extends AbstractType
             'invalid_message' => 'Selected value is invalid.',
         ));
     }
-        /**
+
+    /**
      * {@inheritdoc}
      */
     public function getParent()

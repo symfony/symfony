@@ -1,0 +1,149 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T17:57:18Z
+
+Nice work :)
+
+---------------------------------------------------------------------------
+
+by aequasi at 2015-03-25T18:02:59Z
+
+Hopefully not too much work to get it in to 2.7 :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T20:32:19Z
+
+@kbond thanks a lot for this pull request. You did an amazing job!
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-25T20:44:40Z
+
+Thanks! Is the plan to adjust the style guide to conform to the styles implemented in this PR? I recall there were some things in the style guide that were difficult to implement (like the table style). Also, you will notice the blue used for the title text looks pretty dark in my console (I'm using Ubuntu but I think it looks fine on OSX).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T20:57:39Z
+
+I don't know if I'm right ... but I think in the future we'll be able to tweak the output of this helper methods without considering that a BC break. We just need to put these helpers inside Symfony and we'll fix everything else afterwards.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-25T21:04:08Z
+
+Ah, ok that works. So I think the only thing that is in the style guide but not in this PR is the progress bar. How do you think we should handle that?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T21:07:46Z
+
+In most of the Symfony Installer commands we use a progress bar and we decided to be on the safe side and do something simple (see https://github.com/symfony/symfony-installer/blob/master/src/Symfony/Installer/NewCommand.php#L252-256):
+
+```php
+$progressBar->setEmptyBarCharacter('░'); // light shade character \u2591
+$progressBar->setProgressCharacter('');
+$progressBar->setBarCharacter('▓'); // dark shade character \u2593
+```
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-25T21:16:35Z
+
+Yeah, that looks pretty decent. Should I add a `StyleInterface::progress()` method that returns a configured `ProgressBar` or just leave it to the user to configure?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T06:10:28Z
+
+Regarding BC, I think that we won't be able to tweak the output except things that do not change the output without colors. People might rely on the output in their tests or integration with other tools. Or am I too strict here?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-26T06:28:26Z
+
+I think you are beein too strict here. If you depend on the output of a command, you should rely at least on `--format=json` or `--format=xml`. Relying on the regular text output looks hackish to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T06:31:34Z
+
+@javiereguiluz I agree with you, forget my comment.
+
+So, @kbond whenever you feel that this one is ready, I will merge it and we will still have 2 months of stabilization to improve it if needed.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T13:49:12Z
+
+Couple remaining questions:
+
+1. `OutputStyle::ln()`? Should I rename?
+2. Should I add `StyleInterface::progress()` that returns a properly formatted `ProgressBar`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T13:50:18Z
+
+1. yes, I would rename it to something else.
+2. that would be cool.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T14:35:37Z
+
+1. ok, renamed to `newLine()`
+2. Added.
+
+I have updated this PR description with the latest code/output/screenshots
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T14:40:22Z
+
+Regarding the progress bar, do you think it would be useful to have three methods in the decorator: `progressStart`, `progressAdvance`, `progressFinish` and fully abstract the ProgressBar usage?
+
+The code in the example command above could be simplified to:
+
+```php
+$output->progressStart(100);
+
+for ($i = 0; $i < 100; $i++) {
+    usleep(10000);
+    $output->progressAdvance();
+}
+
+$output->progressFinish();
+```
+
+Perhaps there could be a `createProgressBar` method as well if you needed to do something more complex.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-26T15:01:26Z
+
+:+1: I like your proposal about creating these three helper methods to easily control the progress bar.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T15:21:37Z
+
+Ok, I have done that and updated the code example above.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T15:50:26Z
+
+@javiereguiluz we talked in #12035 about removing `StyleInterface::multipleChoice` as it was not a common "real world" requirement. It looks like I never did (you removed it from the style guide). Should I still do that? As it stands right now, it is broken...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-26T16:03:52Z
+
+Personally I've never seen the multiplceChoice question used in a Symfony application, but I don't really know if that's the general case. However, since these methods are primarily for us (the built-in Symfony commands) I don't see a problem not adding this method because we're not going to use it.
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-03-26T16:39:17Z
+
+Assuming no one has any problems with this PR I think it is good to go.

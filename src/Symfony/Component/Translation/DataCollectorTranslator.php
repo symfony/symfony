@@ -11,35 +11,35 @@
 
 namespace Symfony\Component\Translation;
 
-use Psr\Log\LoggerInterface;
-
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
+class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface
 {
+    const MESSAGE_DEFINED = 0;
+    const MESSAGE_MISSING = 1;
+    const MESSAGE_EQUALS_FALLBACK = 2;
+
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var LoggerInterface
+     * @var array
      */
-    private $logger;
+    private $messages = array();
 
     /**
-     * @param Translator      $translator
-     * @param LoggerInterface $logger
+     * @param Translator $translator
      */
-    public function __construct($translator, LoggerInterface $logger)
+    public function __construct(TranslatorInterface $translator)
     {
         if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {
             throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
-        $this->logger = $logger;
     }
 
     /**
@@ -48,7 +48,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
         $trans = $this->translator->trans($id, $parameters, $domain, $locale);
-        $this->log($id, $domain, $locale);
+        $this->collectMessage($locale, $domain, $id, $trans);
 
         return $trans;
     }
@@ -59,7 +59,7 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         $trans = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-        $this->log($id, $domain, $locale);
+        $this->collectMessage($locale, $domain, $id, $trans);
 
         return $trans;
     }
@@ -101,13 +101,20 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
-     * Logs for missing translations.
-     *
-     * @param string      $id
-     * @param string|null $domain
-     * @param string|null $locale
+     * @return array
      */
-    private function log($id, $domain, $locale)
+    public function getCollectedMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param string|null $locale
+     * @param string|null $domain
+     * @param string      $id
+     * @param string      $trans
+     */
+    private function collectMessage($locale, $domain, $id, $translation)
     {
         if (null === $locale) {
             $locale = $this->getLocale();
@@ -120,13 +127,27 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
         if ($catalogue->defines($id, $domain)) {
-            return;
+            $state = self::MESSAGE_DEFINED;
+        } elseif ($catalogue->has($id, $domain)) {
+            $state = self::MESSAGE_EQUALS_FALLBACK;
+
+            $fallbackCatalogue = $catalogue->getFallBackCatalogue();
+            while ($fallbackCatalogue) {
+                if ($fallbackCatalogue->defines($id, $domain)) {
+                    $locale = $fallbackCatalogue->getLocale();
+                    break;
+                }
+            }
+        } else {
+            $state = self::MESSAGE_MISSING;
         }
 
-        if ($catalogue->has($id, $domain)) {
-            $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
-        } else {
-            $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
-        }
+        $this->messages[] = array(
+            'locale' => $locale,
+            'domain' => $domain,
+            'id' => $id,
+            'translation' => $translation,
+            'state' => $state,
+        );
     }
 }

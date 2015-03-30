@@ -113,7 +113,7 @@ class MoFileLoader extends ArrayLoader
 
         $messages = array();
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $singularId = $pluralId = null;
             $translated = null;
 

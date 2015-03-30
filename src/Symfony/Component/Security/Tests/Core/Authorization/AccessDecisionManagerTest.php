@@ -145,13 +145,13 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     protected function getVoters($grants, $denies, $abstains)
     {
         $voters = array();
-        for ($i = 0; $i < $grants; $i++) {
+        for ($i = 0; $i < $grants; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_GRANTED);
         }
-        for ($i = 0; $i < $denies; $i++) {
+        for ($i = 0; $i < $denies; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_DENIED);
         }
-        for ($i = 0; $i < $abstains; $i++) {
+        for ($i = 0; $i < $abstains; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_ABSTAIN);
         }
 

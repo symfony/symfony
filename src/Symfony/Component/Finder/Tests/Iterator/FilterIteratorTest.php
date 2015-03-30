@@ -31,7 +31,7 @@ class FilterIteratorTest extends RealIteratorTestCase
 
         $c = 0;
         foreach ($i as $item) {
-            $c++;
+            ++$c;
         }
 
         $this->assertEquals(1, $c);
@@ -40,7 +40,7 @@ class FilterIteratorTest extends RealIteratorTestCase
 
         $c = 0;
         foreach ($i as $item) {
-            $c++;
+            ++$c;
         }
 
         // This would fail with \FilterIterator but works with Symfony\Component\Finder\Iterator\FilterIterator

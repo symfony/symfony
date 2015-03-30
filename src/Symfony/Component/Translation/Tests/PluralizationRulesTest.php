@@ -112,7 +112,7 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
     {
         $matrix = array();
         foreach ($langCodes as $langCode) {
-            for ($count = 0; $count < 200; $count++) {
+            for ($count = 0; $count < 200; ++$count) {
                 $plural = PluralizationRules::get($count, $langCode);
                 $matrix[$langCode][$count] = $plural;
             }

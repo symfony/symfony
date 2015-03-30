@@ -116,7 +116,7 @@ class LoggerDataCollector extends DataCollector
         $count = 0;
         foreach ($this->logger->getLogs() as $log) {
             if (isset($log['context']['type']) && ErrorHandler::TYPE_DEPRECATION === $log['context']['type']) {
-                $count++;
+                ++$count;
             }
         }
 

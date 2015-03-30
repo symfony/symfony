@@ -62,7 +62,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
     public function testMultiRowIndexFile()
     {
         $iteration = 3;
-        for ($i = 0; $i < $iteration; $i++) {
+        for ($i = 0; $i < $iteration; ++$i) {
             $profile = new Profile('token'.$i);
             $profile->setIp('127.0.0.'.$i);
             $profile->setUrl('http://foo.bar/'.$i);
@@ -74,7 +74,7 @@ class FileProfilerStorageTest extends AbstractProfilerStorageTest
         }
 
         $handle = fopen(self::$tmpDir.'/index.csv', 'r');
-        for ($i = 0; $i < $iteration; $i++) {
+        for ($i = 0; $i < $iteration; ++$i) {
             $row = fgetcsv($handle);
             $this->assertEquals('token'.$i, $row[0]);
             $this->assertEquals('127.0.0.'.$i, $row[1]);

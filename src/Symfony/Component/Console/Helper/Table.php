@@ -587,10 +587,19 @@ class Table
             ->setCellRowContentFormat('%s')
         ;
 
+        $styleGuide = new TableStyle();
+        $styleGuide
+            ->setHorizontalBorderChar('-')
+            ->setVerticalBorderChar(' ')
+            ->setCrossingChar(' ')
+            ->setCellHeaderFormat('%s')
+        ;
+
         return array(
             'default' => new TableStyle(),
             'borderless' => $borderless,
             'compact' => $compact,
+            'symfony-style-guide' => $styleGuide,
         );
     }
 }

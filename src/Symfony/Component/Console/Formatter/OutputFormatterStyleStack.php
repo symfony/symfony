@@ -96,7 +96,7 @@ class OutputFormatterStyleStack
             return $this->emptyStyle;
         }
 
-        return $this->styles[count($this->styles)-1];
+        return $this->styles[count($this->styles) - 1];
     }
 
     /**

@@ -17,7 +17,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testStore()
     {
-        for ($i = 0; $i < 10; $i ++) {
+        for ($i = 0; $i < 10; $i++) {
             $profile = new Profile('token_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');

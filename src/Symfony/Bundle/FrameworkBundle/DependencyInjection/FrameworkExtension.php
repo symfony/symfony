@@ -35,6 +35,7 @@ use Symfony\Component\Validator\Validation;
 class FrameworkExtension extends Extension
 {
     private $formConfigEnabled = false;
+    private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
 
     /**
@@ -116,8 +117,8 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
+        $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
         if (isset($config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -288,8 +289,13 @@ class FrameworkExtension extends Extension
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
 
-        if (true === $this->formConfigEnabled) {
+        if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');
+        }
+
+        if ($this->translationConfigEnabled) {
+            $loader->load('translation_debug.xml');
+            $container->getDefinition('translator.data_collector')->setDecoratedService('translator');
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -644,6 +650,7 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
+        $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
@@ -865,9 +872,9 @@ class FrameworkExtension extends Extension
     /**
      * Loads the serializer configuration.
      *
-     * @param array            $config A serializer configuration array
+     * @param array            $config    A serializer configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader An XmlFileLoader instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {

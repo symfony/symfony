@@ -40,15 +40,17 @@ class ExceptionCaster
         E_STRICT => 'E_STRICT',
     );
 
-    public static function castException(\Exception $e, array $a, Stub $stub, $isNested)
+    public static function castException(\Exception $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
         $trace = $a["\0Exception\0trace"];
         unset($a["\0Exception\0trace"]); // Ensures the trace is always last
 
-        static::filterTrace($trace, static::$traceArgs);
+        if (!($filter & Caster::EXCLUDE_VERBOSE)) {
+            static::filterTrace($trace, static::$traceArgs);
 
-        if (null !== $trace) {
-            $a["\0Exception\0trace"] = $trace;
+            if (null !== $trace) {
+                $a["\0Exception\0trace"] = $trace;
+            }
         }
         if (empty($a["\0Exception\0previous"])) {
             unset($a["\0Exception\0previous"]);

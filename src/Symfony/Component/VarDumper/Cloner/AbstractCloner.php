@@ -96,6 +96,7 @@ abstract class AbstractCloner implements ClonerInterface
     private $casters = array();
     private $prevErrorHandler;
     private $classInfo = array();
+    private $filter = 0;
 
     /**
      * @param callable[]|null $casters A map of casters.
@@ -149,9 +150,14 @@ abstract class AbstractCloner implements ClonerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Clones a PHP variable.
+     *
+     * @param mixed $var    Any PHP variable.
+     * @param int   $filter A bit field of Caster::EXCLUDE_* constants.
+     *
+     * @return Data The cloned variable represented by a Data object.
      */
-    public function cloneVar($var)
+    public function cloneVar($var, $filter = 0)
     {
         $this->prevErrorHandler = set_error_handler(function($type, $msg, $file, $line, $context) {
             if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
@@ -165,6 +171,7 @@ abstract class AbstractCloner implements ClonerInterface
 
             return false;
         });
+        $this->filter = $filter;
 
         try {
             if (!function_exists('iconv')) {
@@ -282,7 +289,7 @@ abstract class AbstractCloner implements ClonerInterface
     private function callCaster($callback, $obj, $a, $stub, $isNested)
     {
         try {
-            $cast = call_user_func($callback, $obj, $a, $stub, $isNested);
+            $cast = call_user_func($callback, $obj, $a, $stub, $isNested, $this->filter);
 
             if (is_array($cast)) {
                 $a = $cast;

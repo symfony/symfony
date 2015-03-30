@@ -111,7 +111,7 @@ class IpUtils
         $bytesTest = unpack('n*', inet_pton($requestIp));
 
         for ($i = 1, $ceil = ceil($netmask / 16); $i <= $ceil; $i++) {
-            $left = $netmask - 16 * ($i-1);
+            $left = $netmask - 16 * ($i - 1);
             $left = ($left <= 16) ? $left : 16;
             $mask = ~(0xffff >> $left) & 0xffff;
             if (($bytesAddr[$i] & $mask) != ($bytesTest[$i] & $mask)) {

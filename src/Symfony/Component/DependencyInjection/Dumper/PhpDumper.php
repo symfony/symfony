@@ -1483,14 +1483,14 @@ EOF;
             $i = $this->variableCount;
 
             if ('' === $name) {
-                $name .= $firstChars[$i%$firstCharsLength];
-                $i = (int) ($i/$firstCharsLength);
+                $name .= $firstChars[$i % $firstCharsLength];
+                $i = (int) ($i / $firstCharsLength);
             }
 
             while ($i > 0) {
                 --$i;
-                $name .= $nonFirstChars[$i%$nonFirstCharsLength];
-                $i = (int) ($i/$nonFirstCharsLength);
+                $name .= $nonFirstChars[$i % $nonFirstCharsLength];
+                $i = (int) ($i / $nonFirstCharsLength);
             }
 
             ++$this->variableCount;

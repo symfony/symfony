@@ -60,8 +60,8 @@ class ApacheUrlMatcher extends UrlMatcher
                 continue;
             }
             if (false !== $pos = strpos($name, '_', 9)) {
-                $type = substr($name, 9, $pos-9);
-                $name = substr($name, $pos+1);
+                $type = substr($name, 9, $pos - 9);
+                $name = substr($name, $pos + 1);
             } else {
                 $type = substr($name, 9);
             }

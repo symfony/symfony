@@ -235,7 +235,7 @@ abstract class AbstractToken implements TokenInterface
     public function __toString()
     {
         $class = get_class($this);
-        $class = substr($class, strrpos($class, '\\')+1);
+        $class = substr($class, strrpos($class, '\\') + 1);
 
         $roles = array();
         foreach ($this->roles as $role) {

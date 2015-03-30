@@ -151,7 +151,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testMaxSizeExceeded($bytesWritten, $limit, $sizeAsString, $limitAsString, $suffix)
     {
-        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fseek($this->file, $bytesWritten - 1, SEEK_SET);
         fwrite($this->file, '0');
         fclose($this->file);
 
@@ -200,7 +200,7 @@ abstract class FileValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testMaxSizeNotExceeded($bytesWritten, $limit)
     {
-        fseek($this->file, $bytesWritten-1, SEEK_SET);
+        fseek($this->file, $bytesWritten - 1, SEEK_SET);
         fwrite($this->file, '0');
         fclose($this->file);
 

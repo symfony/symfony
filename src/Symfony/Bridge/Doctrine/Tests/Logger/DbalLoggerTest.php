@@ -87,7 +87,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         $testString = 'abc';
 
         $shortString = str_pad('', DbalLogger::MAX_STRING_LENGTH, $testString);
-        $longString = str_pad('', DbalLogger::MAX_STRING_LENGTH+1, $testString);
+        $longString = str_pad('', DbalLogger::MAX_STRING_LENGTH + 1, $testString);
 
         $dbalLogger
             ->expects($this->once())

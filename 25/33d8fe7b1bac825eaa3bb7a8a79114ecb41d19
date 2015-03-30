@@ -1,0 +1,262 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2015-03-21T08:02:45Z
+
+Great one :)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-03-21T09:10:02Z
+
+FYI The official language icon is
+
+![icon](http://www.languageicon.org/icon.png)
+http://www.languageicon.org/
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-21T10:58:53Z
+
+@sstok  :+1:
+![selection_008](https://cloud.githubusercontent.com/assets/1753742/6764766/ff8dabbc-cfb8-11e4-8f64-179b5237ec57.png)
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2015-03-21T12:33:45Z
+
+:+1: useful, simple and efficient :)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-21T16:51:46Z
+
+To be honest, I don't like the icon, it seems too dark and too detailed for the toolbar (which uses very simple and greyish icons). I would more like something like this: (but then grey-ish and less high)
+
+![image](https://cloud.githubusercontent.com/assets/749025/6765908/dd65e114-cff2-11e4-9a3a-c97f90b8f9a5.png)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-03-22T08:08:59Z
+
+@WouterJ For the languageicon there is an IA file available, so its changeable.
+But I'm no star with Adobe Illustrator :)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-03-22T08:22:50Z
+
+Not bad, but its not retina ready. Its just to give an idea :)
+![untitled-1](https://cloud.githubusercontent.com/assets/904790/6768576/ddd4000e-d074-11e4-8a90-82109aa2e736.png)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-22T11:49:22Z
+
+Here is the result,  what is your preference:
+
+![selection_009](https://cloud.githubusercontent.com/assets/1753742/6769115/42e05766-d086-11e4-8d1c-7530f4c5ee57.png)
+
+![selection_010](https://cloud.githubusercontent.com/assets/1753742/6769204/3371b42a-d089-11e4-8174-cf1967ce691a.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-22T12:03:52Z
+
+@aitboudad I'm afraid that we can't consider the "chat icon" suggested by @WouterJ because that's not a right conceptualization of internationalization. The most used alternatives for this icon are: earth globe, flags, and the "A letter + japanese letter".
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-03-22T16:19:57Z
+
+I love this feature, however, take into account that the bar keeps getting fuller. On 1440x900 I already have more items than fit on there.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-22T18:10:22Z
+
+What about combining the A + japanese letter with the "chat" icon I suggested?
+
+![sf-translation-profiler](https://cloud.githubusercontent.com/assets/749025/6770649/d92977d0-d0c6-11e4-8d23-859241f5843b.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-22T18:12:29Z
+
+@WouterJ that could work!  In fact, a lot of existing icons use that idea: [see iconfinder references](https://www.iconfinder.com/search/?q=translation)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-22T18:27:51Z
+
+@wooterJ nice one, can you give me an svg format ?
+
+---------------------------------------------------------------------------
+
+by pborreli at 2015-03-22T18:53:02Z
+
+this one comes from [Google Material Design Icons](http://google.github.io/material-design-icons/) and has a CC-BY licence
+![image](https://cloud.githubusercontent.com/assets/77759/6770814/38169a78-d0c4-11e4-9daa-3c4f6fbb6783.png)
+https://github.com/google/material-design-icons/blob/master/action/svg/production/ic_translate_24px.svg
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-22T18:56:46Z
+
+@pborreli
+![selection_011](https://cloud.githubusercontent.com/assets/1753742/6770837/28686416-d0c5-11e4-8f1d-bbcbf2f7f670.png)
+
+---------------------------------------------------------------------------
+
+by pborreli at 2015-03-22T18:58:47Z
+
+@aitboudad I like it but I have weird design tastes :dizzy_face:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-23T09:40:57Z
+
+I changed my proposal a bit. I like the one suggested by @pborreli too btw.
+
+![sf-translation-in-profiler](https://cloud.githubusercontent.com/assets/749025/6777324/fbf8240a-d148-11e4-8474-fdc27808913f.png)
+
+(Before converting to svg, I think I have to draw the 2 characters by hand, to avoid strange icons when someone doesn't have the used font)
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-03-23T09:44:10Z
+
+@WouterJ maybe you can convert them to a path? Nice work :+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T14:44:32Z
+
+@WouterJ can you provide me an svg format ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T14:45:22Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-26T16:46:42Z
+
+@aitboudad https://gist.github.com/WouterJ/f8db92506a3aa84d7967
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T17:27:45Z
+
+Thank you @WouterJ :) , I think everything is ok now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T17:33:17Z
+
+@aitboudad Can you add a screenshot of the toolbar and the profiler page for reference?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T17:36:35Z
+
+@fabpot
+![selection_013](https://cloud.githubusercontent.com/assets/1753742/6852734/6de53c50-d3de-11e4-8bc4-b7f0057ade3e.png)
+
+![selection_014](https://cloud.githubusercontent.com/assets/1753742/6852743/7a3f0206-d3de-11e4-856b-13426d517422.png)
+
+![selection_015](https://cloud.githubusercontent.com/assets/1753742/6852763/9dd16312-d3de-11e4-9c2e-fc98f258a65a.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-26T17:41:14Z
+
+Can someone in the Symfony Japanase community please confirm that the *kanji* used in this new icon is "safe"? Thanks!
+
+![6de53c50-d3de-11e4-8bc4-b7f0057ade3e](https://cloud.githubusercontent.com/assets/73419/6852862/a5800c68-d3e7-11e4-80ed-146b8d245d7b.png)
+
+ping @hidenorigoto
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T17:50:46Z
+
+Looks like the icon is the same in the WDT and the profiler panel. But for the panel, it should be bigger (like for the other icons.)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-26T17:54:04Z
+
+And now ?
+![selection_017](https://cloud.githubusercontent.com/assets/1753742/6853122/0c18a86a-d3e1-11e4-9702-b52c00910b3c.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-27T07:15:04Z
+
+@aitboudad thanks for this PR. You did a great work. I have some questions:
+
+  * When the application is perfectly translated (all the messages are defined and no fallbacks are used), what does this panel show in the toolbar?
+
+Looking at [your latest screenshot](https://cloud.githubusercontent.com/assets/1753742/6852763/9dd16312-d3de-11e4-9c2e-fc98f258a65a.png) of the translation panel inside the Symfony profiler I have some comments:
+
+  * I'd change the column title `State(s)` by `State`
+  * I don't know if the screenshot is accurate, but at top you say `0` fallback messages, but in the table there is at least `1`
+  * I don't know if it only happens to me, but I always have problems understanding the `fallback` message state. If [your first screenshot](https://cloud.githubusercontent.com/assets/1753742/6762407/91dc9422-cf57-11e4-8f6f-f89c9d067b03.png) the state messages were better (maybe too long?). What about changing `fallback` by `same as fallback`?
+  * I also have some problems understanding the `locale` column: is it the default locale of the application? Is it the active locale used currently by the application? Is it the locale of the file where this message is defined? In case of "fallback messages", is the locale of the current message or the fallback locale?
+  * Lastly, I don't understand either the `Message preview` column. In which locale is that preview generated? If it's the default or fallback application locale, we could chnage the title by: `Message preview in the default {{ locale_name }} locale`.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-27T10:19:43Z
+
+@javiereguiluz all comments are fixed, below my answers with a screenshot:
+
+* State(s) -> State (**Done**)
+* I don't know if the screenshot is accurate, but at top you say 0 fallback messages, but in the table there is at least 1 (**Fixed**)
+* What about changing fallback by same as fallback? (**Done**)
+* For the locale column:
+  * In case of "fallback messages" the locale displayed is the fallback locale
+  * In other case, when local is null it is the active locale used currently by the application, else it's the locale passed into trans function.
+
+![selection_018](https://cloud.githubusercontent.com/assets/1753742/6865861/425e36a4-d46a-11e4-96ff-db86cfb3dbb5.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-27T10:32:12Z
+
+@aitboudad thanks for the fixes! Now, let me see if I correctly understand the table of the profiler.
+
+**The first row of the table** means:
+
+  * Your template contains `{{ 'sylius.meta.frontend_title'|trans }}`
+  * Your application locale is `pl_PL`
+  * There is no `pl_PL` translation for that string ... but there is a `pl` translation
+  * Symfony used the `pl` translation as a fallback
+
+**The fifth row of the table** means:
+
+  * Your template contains `{{ 'Zaloguj'|trans }}`
+  * Your application locale is `pl_PL`
+  * There is no `pl_PL` translation for that string ... and there is also no translation for the default `pl` locale
+  * Symfony used `Zaloguj` ut you should probably add this string to your translation catalog
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-27T10:51:49Z
+
+@javiereguiluz yes that's right
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-27T11:46:02Z
+
+I sent an email to Hidenori, from the Symfony Japanese community, and he replied to me that the icon proposed by @WouterJ is much better for representing the "translation" concept than the original icons used by Google et al. Good work @WouterJ!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-29T23:02:06Z
+
+The failure tests are not related to this PR, so it's ready for merge.
+ping @fabpot

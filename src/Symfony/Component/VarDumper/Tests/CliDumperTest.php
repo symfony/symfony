@@ -214,7 +214,7 @@ array:3 [
 
 EOTXT
             ,
-            $out
+            $var
         );
     }
 

@@ -33,7 +33,8 @@ class YamlLintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('yaml:lint')
+            ->setName('lint:yaml')
+            ->setAliases(array('yaml:lint'))
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
@@ -65,6 +66,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':l')) {
+            $output->writeln('<comment>The use of "yaml:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:yaml" instead.</comment>');
+        }
+
         $filename = $input->getArgument('filename');
 
         if (!$filename) {

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2015-03-29T07:15:11Z
+
+anyone on why travis is failing in that way "Pull request or branch commit hash has changed, aborting!" ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-29T10:15:06Z
+
+@cordoval Since #14047 Travis builds are stopped for a PR when there are more recent commits pushed to it. Actually, only the build status of the last pushed commit is of interest.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-29T10:16:27Z
+
+Just curious: Did you push another commit which you removed again later?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-03-29T13:41:36Z
+
+I did not @xabbuh

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ButtonTypeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * A reset button.
@@ -21,6 +22,16 @@ use Symfony\Component\Form\ButtonTypeInterface;
  */
 class ResetType extends AbstractType implements ButtonTypeInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => 'Reset button is invalid.',
+        ));
+    }
+
     /**
      * {@inheritdoc}
      */

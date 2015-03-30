@@ -18,6 +18,16 @@ class SearchType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => 'Search button is invalid.',
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'text';

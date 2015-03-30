@@ -23,6 +23,7 @@ class TextType extends AbstractType
     {
         $resolver->setDefaults(array(
             'compound' => false,
+            'invalid_message' => 'Text provided is invalid.',
         ));
     }
 

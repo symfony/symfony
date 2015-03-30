@@ -24,6 +24,7 @@ class CountryType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => Intl::getRegionBundle()->getCountryNames(),
+            'invalid_message' => 'Country provided is invalid.',
         ));
     }
 

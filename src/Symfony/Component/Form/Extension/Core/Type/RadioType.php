@@ -12,10 +12,20 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class RadioType extends AbstractType
 {
     /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => 'Selected value is invalid.',
+        ));
+    }
+        /**
      * {@inheritdoc}
      */
     public function getParent()

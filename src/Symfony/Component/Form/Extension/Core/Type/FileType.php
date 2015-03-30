@@ -48,6 +48,7 @@ class FileType extends AbstractType
             'compound' => false,
             'data_class' => 'Symfony\Component\HttpFoundation\File\File',
             'empty_data' => null,
+            'invalid_message' => 'File provided is invalid.',
         ));
     }
 

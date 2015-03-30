@@ -27,6 +27,7 @@ class HiddenType extends AbstractType
             // Pass errors to the parent
             'error_bubbling' => true,
             'compound' => false,
+            'invalid_message' => 'Hidden value provided is invalid.',
         ));
     }
 

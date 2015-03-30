@@ -202,6 +202,7 @@ class TimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'invalid_message' => 'Time provided is invalid.',
         ));
 
         $resolver->setNormalizers(array(

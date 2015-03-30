@@ -222,6 +222,7 @@ class ChoiceType extends AbstractType
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class' => null,
+            'invalid_message' => 'Choice selected is invalid.',
         ));
 
         $resolver->setNormalizers(array(

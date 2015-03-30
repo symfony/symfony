@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\SubmitButtonTypeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * A submit button.
@@ -26,6 +27,16 @@ class SubmitType extends AbstractType implements SubmitButtonTypeInterface
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['clicked'] = $form->isClicked();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'invalid_message' => 'Submit button is invalid.',
+        ));
     }
 
     /**

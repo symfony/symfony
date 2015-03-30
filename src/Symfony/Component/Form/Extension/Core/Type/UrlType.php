@@ -35,6 +35,7 @@ class UrlType extends AbstractType
     {
         $resolver->setDefaults(array(
             'default_protocol' => 'http',
+            'invalid_message' => 'Url provided is invalid.',
         ));
 
         $resolver->setAllowedTypes(array(

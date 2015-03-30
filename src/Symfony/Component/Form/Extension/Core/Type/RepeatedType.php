@@ -54,6 +54,7 @@ class RepeatedType extends AbstractType
             'first_name' => 'first',
             'second_name' => 'second',
             'error_bubbling' => false,
+            'invalid_message' => 'Repeated value is invalid.',
         ));
 
         $resolver->setAllowedTypes(array(

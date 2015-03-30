@@ -86,6 +86,7 @@ class CollectionType extends AbstractType
             'prototype_name' => '__name__',
             'type' => 'text',
             'options' => array(),
+            'invalid_message' => 'Collection provided is invalid.',
         ));
 
         $resolver->setNormalizers(array(

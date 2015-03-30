@@ -45,6 +45,7 @@ class ButtonType extends BaseType implements ButtonTypeInterface
 
         $resolver->setDefaults(array(
             'auto_initialize' => false,
+            'invalid_message' => 'Button is invalid.',
         ));
     }
 }

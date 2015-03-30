@@ -168,7 +168,7 @@ class Command
         }
 
         $this->bits[] = self::create($this);
-        $this->labels[$label] = count($this->bits)-1;
+        $this->labels[$label] = count($this->bits) - 1;
 
         return $this->bits[$this->labels[$label]];
     }

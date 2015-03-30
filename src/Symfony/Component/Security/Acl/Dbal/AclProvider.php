@@ -104,7 +104,7 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
-        for ($i = 0, $c = count($oids); $i<$c; $i++) {
+        for ($i = 0, $c = count($oids); $i < $c; $i++) {
             $oid = $oids[$i];
             $oidLookupKey = $oid->getIdentifier().$oid->getType();
             $oidLookup[$oidLookupKey] = $oid;
@@ -315,7 +315,7 @@ SELECTCLAUSE;
                     $this->connection->quote($batch[$i]->getType())
                 );
 
-                if ($i+1 < $count) {
+                if ($i + 1 < $count) {
                     $sql .= ' OR ';
                 }
             }
@@ -509,8 +509,8 @@ QUERY;
         $acls = $aces = $emptyArray = array();
         $oidCache = $oidLookup;
         $result = new \SplObjectStorage();
-        $loadedAces = & $this->loadedAces;
-        $loadedAcls = & $this->loadedAcls;
+        $loadedAces = &$this->loadedAces;
+        $loadedAcls = &$this->loadedAcls;
         $permissionGrantingStrategy = $this->permissionGrantingStrategy;
 
         // we need these to set protected properties on hydrated objects

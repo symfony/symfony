@@ -49,7 +49,7 @@ class SecureRandomTest extends \PHPUnit_Framework_TestCase
             $f += $c[$i] * $c[$i];
         }
 
-        $Y = 16/5000 * $f - 5000;
+        $Y = 16 / 5000 * $f - 5000;
 
         $this->assertTrue($Y > 1.03 && $Y < 57.4, 'Poker test failed, Y = '.$Y);
     }

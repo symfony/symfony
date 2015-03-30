@@ -29,7 +29,7 @@ function strip_minor_versions($version)
 
 function centered($text)
 {
-    $padding = (int) ((LINE_WIDTH - strlen($text))/2);
+    $padding = (int) ((LINE_WIDTH - strlen($text)) / 2);
 
     return str_repeat(' ', $padding).$text;
 }

@@ -60,7 +60,7 @@ abstract class DoctrineType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceListCache = & $this->choiceListCache;
+        $choiceListCache = &$this->choiceListCache;
         $registry = $this->registry;
         $propertyAccessor = $this->propertyAccessor;
         $type = $this;

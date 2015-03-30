@@ -137,6 +137,7 @@ class Inline
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
+            case preg_match(self::getHexRegex(), $value):
             case preg_match(self::getTimestampRegex(), $value):
                 return Escaper::escapeWithSingleQuotes($value);
             default:
@@ -454,6 +455,7 @@ class Inline
 
                         return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
+                    case preg_match(self::getHexRegex(), $scalar):
                         return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;
                     case '.inf' === $scalarLower:
                     case '.nan' === $scalarLower:
@@ -493,5 +495,15 @@ class Inline
         (?::(?P<tz_minute>[0-9][0-9]))?))?)?
         $~x
 EOF;
+    }
+
+    /**
+     * Gets a regex that matches a YAML number in hexadecimal notation.
+     *
+     * @return string
+     */
+    private static function getHexRegex()
+    {
+        return '~^0x[0-9a-f]++$~i';
     }
 }

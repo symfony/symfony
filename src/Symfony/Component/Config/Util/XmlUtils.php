@@ -200,6 +200,8 @@ class XmlUtils
                 return false;
             case is_numeric($value):
                 return '0x' === $value[0].$value[1] ? hexdec($value) : (float) $value;
+            case preg_match('/^0x[0-9a-f]++$/i', $value):
+                return hexdec($value);
             case preg_match('/^(-|\+)?[0-9]+(\.[0-9]+)?$/', $value):
                 return (float) $value;
             default:

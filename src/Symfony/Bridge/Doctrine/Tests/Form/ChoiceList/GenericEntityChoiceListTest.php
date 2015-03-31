@@ -266,25 +266,4 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
     }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyInitShorthandEntityName()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $item1 = new SingleIntIdEntity(1, 'Foo');
-        $item2 = new SingleIntIdEntity(2, 'Bar');
-
-        $this->em->persist($item1);
-        $this->em->persist($item2);
-
-        $choiceList = new EntityChoiceList(
-            $this->em,
-            'SymfonyTestsDoctrine:SingleIntIdEntity'
-        );
-
-        $this->assertEquals(array(1, 2), $choiceList->getIndicesForChoices(array($item1, $item2)));
-    }
 }

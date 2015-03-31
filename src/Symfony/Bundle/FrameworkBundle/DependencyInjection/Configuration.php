@@ -43,16 +43,6 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
-            // Check deprecations before the config is processed to ensure
-            // the setting has been explicitly defined in a configuration file.
-            ->beforeNormalization()
-                ->ifTrue(function ($v) { return isset($v['csrf_protection']['field_name']); })
-                ->then(function ($v) {
-                    trigger_error('The framework.csrf_protection.field_name configuration key is deprecated since version 2.4 and will be removed in 3.0. Use the framework.form.csrf_protection.field_name configuration key instead', E_USER_DEPRECATED);
-
-                    return $v;
-                })
-            ->end()
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -98,7 +88,6 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        $this->addCsrfSection($rootNode);
         $this->addFormSection($rootNode);
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
@@ -116,23 +105,6 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyAccessSection($rootNode);
 
         return $treeBuilder;
-    }
-
-    private function addCsrfSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('csrf_protection')
-                    ->canBeEnabled()
-                    ->children()
-                        ->scalarNode('field_name')
-                            ->defaultValue('_token')
-                            ->info('Deprecated since version 2.4, to be removed in 3.0. Use form.csrf_protection.field_name instead')
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
     }
 
     private function addFormSection(ArrayNodeDefinition $rootNode)
@@ -452,12 +424,6 @@ class Configuration implements ConfigurationInterface
                     ->info('validation configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('cache')
-                            ->beforeNormalization()
-                                // Can be removed in 3.0, once ApcCache support is dropped
-                                ->ifString()->then(function ($v) { return 'apc' === $v ? 'validator.mapping.cache.apc' : $v; })
-                            ->end()
-                        ->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(array('loadValidatorMetadata'))
@@ -470,15 +436,6 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
-                        ->enumNode('api')
-                            ->info('Deprecated since version 2.7, to be removed in 3.0')
-                            ->values(array('2.4', '2.5', '2.5-bc', 'auto'))
-                            ->beforeNormalization()
-                                // XML/YAML parse as numbers, not as strings
-                                ->ifTrue(function ($v) { return is_scalar($v); })
-                                ->then(function ($v) { return (string) $v; })
-                            ->end()
-                        ->end()
                     ->end()
                 ->end()
             ->end()

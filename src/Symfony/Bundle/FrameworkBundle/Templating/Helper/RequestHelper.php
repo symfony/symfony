@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -22,26 +21,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RequestHelper extends Helper
 {
-    protected $request;
     protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param Request|RequestStack $requestStack A RequestStack instance or a Request instance
-     *
-     * @deprecated since version 2.5, passing a Request instance is deprecated and support for it will be removed in 3.0.
+     * @param RequestStack $requestStack A RequestStack instance
      */
-    public function __construct($requestStack)
+    public function __construct(RequestStack $requestStack)
     {
-        if ($requestStack instanceof Request) {
-            trigger_error('Since version 2.5, passing a Request instance into the '.__METHOD__.' is deprecated and support for it will be removed in 3.0. Inject a Symfony\Component\HttpFoundation\RequestStack instance instead.', E_USER_DEPRECATED);
-            $this->request = $requestStack;
-        } elseif ($requestStack instanceof RequestStack) {
-            $this->requestStack = $requestStack;
-        } else {
-            throw new \InvalidArgumentException('RequestHelper only accepts a Request or a RequestStack instance.');
-        }
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -52,7 +41,7 @@ class RequestHelper extends Helper
      *
      * @return mixed
      *
-     * @see Request::get()
+     * @see \Symfony\Component\HttpFoundation\Request::get()
      */
     public function getParameter($key, $default = null)
     {
@@ -69,26 +58,20 @@ class RequestHelper extends Helper
         return $this->getRequest()->getLocale();
     }
 
-    private function getRequest()
-    {
-        if ($this->requestStack) {
-            if (!$this->requestStack->getCurrentRequest()) {
-                throw new \LogicException('A Request must be available.');
-            }
-
-            return $this->requestStack->getCurrentRequest();
-        }
-
-        return $this->request;
-    }
-
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {
         return 'request';
+    }
+
+    private function getRequest()
+    {
+        if ($currentRequest = $this->requestStack->getCurrentRequest()) {
+            return $currentRequest;
+        }
+
+        throw new \LogicException('A Request must be available.');
     }
 }

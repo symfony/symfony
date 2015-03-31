@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -22,26 +21,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class SessionHelper extends Helper
 {
-    protected $session;
     protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param Request|RequestStack $requestStack A RequestStack instance or a Request instance
-     *
-     * @deprecated since version 2.5, passing a Request instance is deprecated and support for it will be removed in 3.0.
+     * @param RequestStack $requestStack A RequestStack instance
      */
-    public function __construct($requestStack)
+    public function __construct(RequestStack $requestStack)
     {
-        if ($requestStack instanceof Request) {
-            trigger_error('Since version 2.5, passing a Request instance into the '.__METHOD__.' is deprecated and support for it will be removed in 3.0. Inject a Symfony\Component\HttpFoundation\RequestStack instance instead.', E_USER_DEPRECATED);
-            $this->session = $requestStack->getSession();
-        } elseif ($requestStack instanceof RequestStack) {
-            $this->requestStack = $requestStack;
-        } else {
-            throw new \InvalidArgumentException('RequestHelper only accepts a Request or a RequestStack instance.');
-        }
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -72,26 +61,20 @@ class SessionHelper extends Helper
         return $this->getSession()->getFlashBag()->has($name);
     }
 
-    private function getSession()
-    {
-        if (null === $this->session) {
-            if (!$this->requestStack->getMasterRequest()) {
-                throw new \LogicException('A Request must be available.');
-            }
-
-            $this->session = $this->requestStack->getMasterRequest()->getSession();
-        }
-
-        return $this->session;
-    }
-
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {
         return 'session';
+    }
+
+    private function getSession()
+    {
+        if ($masterRequest = $this->requestStack->getMasterRequest()) {
+            return $masterRequest->getSession();
+        }
+
+        throw new \LogicException('A Request must be available.');
     }
 }

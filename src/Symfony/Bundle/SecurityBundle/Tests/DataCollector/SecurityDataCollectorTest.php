@@ -40,26 +40,6 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($collector->getUser());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyCollectWhenAuthenticationTokenIsNull()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy());
-        $collector->collect($this->getRequest(), $this->getResponse());
-
-        $this->assertTrue($collector->isEnabled());
-        $this->assertFalse($collector->isAuthenticated());
-        $this->assertNull($collector->getTokenClass());
-        $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertCount(0, $collector->getRoles());
-        $this->assertCount(0, $collector->getInheritedRoles());
-        $this->assertEmpty($collector->getUser());
-    }
-
     /** @dataProvider provideRoles */
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {

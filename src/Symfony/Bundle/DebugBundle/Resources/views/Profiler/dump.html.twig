@@ -85,7 +85,7 @@
                     {{ dump.name }}
                 {% endif %}
                 line {{ dump.line }}:
-                <a onclick="Sfdump.toggle(this)">▶</a>
+                <a onclick="var s = this.nextElementSibling; if ('sf-dump-compact' == s.className) {this.innerHTML = '&#9660;'; s.className = 'sf-dump-expanded';} else {this.innerHTML = '&#9654;'; s.className = 'sf-dump-compact';}">&#9654;</a>
                 <span class="sf-dump-compact">
                 {% if dump.fileExcerpt %}{{ dump.fileExcerpt|raw }}{% else %}{{ dump.file|file_excerpt(dump.line) }}{% endif %}
                 </span>

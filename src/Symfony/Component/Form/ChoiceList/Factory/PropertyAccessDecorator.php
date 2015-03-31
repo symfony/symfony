@@ -99,7 +99,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
                     return $accessor->getValue($choice, $value);
                 }
 
-                return null;
+                return;
             };
         }
 

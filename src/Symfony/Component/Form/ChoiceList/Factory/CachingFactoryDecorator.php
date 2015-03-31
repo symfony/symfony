@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\ChoiceList\Factory;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Caches the choice lists created by the decorated factory.

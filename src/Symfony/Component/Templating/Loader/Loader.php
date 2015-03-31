@@ -12,7 +12,6 @@
 namespace Symfony\Component\Templating\Loader;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Templating\DebuggerInterface;
 
 /**
  * Loader is the base class for all template loader classes.

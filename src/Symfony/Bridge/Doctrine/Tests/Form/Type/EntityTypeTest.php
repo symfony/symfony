@@ -131,7 +131,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
@@ -165,7 +165,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name',
+            'choice_label' => 'name',
             'query_builder' => $qb,
         ));
 
@@ -294,7 +294,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('2');
@@ -316,7 +316,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         // the collection key is used here
@@ -340,7 +340,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit(array('1', '3'));
@@ -365,7 +365,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $existing = new ArrayCollection(array(0 => $entity2));
@@ -396,7 +396,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         // because of the composite key collection keys are used
@@ -422,7 +422,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $existing = new ArrayCollection(array(0 => $entity2));
@@ -452,7 +452,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => true,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('2');
@@ -478,7 +478,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => true,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit(array('1', '3'));
@@ -508,7 +508,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             // not all persisted entities should be displayed
             'choices' => array($entity1, $entity2),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('2');
@@ -532,7 +532,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choices' => array($item1, $item2, $item3, $item4),
-            'property' => 'name',
+            'choice_label' => 'name',
             'group_by' => 'groupName',
         ));
 
@@ -563,7 +563,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'preferred_choices' => array($entity3, $entity2),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $this->assertEquals(array(3 => new ChoiceView('Baz', '3', $entity3), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['preferred_choices']);
@@ -583,7 +583,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity2, $entity3),
             'preferred_choices' => array($entity3),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $this->assertEquals(array(3 => new ChoiceView('Baz', '3', $entity3)), $field->createView()->vars['preferred_choices']);
@@ -602,7 +602,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('3');
@@ -623,7 +623,7 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('2');
@@ -647,7 +647,7 @@ class EntityTypeTest extends TypeTestCase
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
                 ->where('e.id IN (1, 2)'),
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('3');
@@ -671,7 +671,7 @@ class EntityTypeTest extends TypeTestCase
                 return $repository->createQueryBuilder('e')
                     ->where('e.id IN (1, 2)');
             },
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('3');
@@ -695,7 +695,7 @@ class EntityTypeTest extends TypeTestCase
                 return $repository->createQueryBuilder('e')
                     ->where('e.id1 IN (10, 50)');
             },
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('2');
@@ -715,7 +715,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::SINGLE_STRING_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field->submit('foo');
@@ -736,7 +736,7 @@ class EntityTypeTest extends TypeTestCase
             'expanded' => false,
             'em' => 'default',
             'class' => self::COMPOSITE_STRING_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         // the collection key is used here
@@ -760,7 +760,7 @@ class EntityTypeTest extends TypeTestCase
         $this->factory->createNamed('name', 'entity', null, array(
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
     }
 
@@ -775,7 +775,7 @@ class EntityTypeTest extends TypeTestCase
         $this->factory->createNamed('name', 'entity', null, array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
     }
 
@@ -852,18 +852,40 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $field2 = $this->factory->createNamed('name', 'entity', null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
-            'property' => 'name',
+            'choice_label' => 'name',
         ));
 
         $this->assertInstanceOf('Symfony\Component\Form\ChoiceList\ChoiceListInterface', $field1->getConfig()->getOption('choice_list'));
         $this->assertSame($field1->getConfig()->getOption('choice_list'), $field2->getConfig()->getOption('choice_list'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyPropertyOption()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
+        $field = $this->factory->createNamed('name', 'entity', null, array(
+            'em' => 'default',
+            'class' => self::SINGLE_IDENT_CLASS,
+            'required' => false,
+            'property' => 'name',
+        ));
+
+        $this->assertEquals(array(1 => new ChoiceView('Foo', '1', $entity1), 2 => new ChoiceView('Bar', '2', $entity2)), $field->createView()->vars['choices']);
     }
 
     protected function createRegistryMock($name, $em)

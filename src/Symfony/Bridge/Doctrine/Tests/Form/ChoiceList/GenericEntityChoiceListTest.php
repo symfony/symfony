@@ -19,6 +19,9 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Doctrine\ORM\Tools\SchemaTool;
 
+/**
+ * @group legacy
+ */
 class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 {
     const SINGLE_INT_ID_CLASS = 'Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity';
@@ -36,6 +39,8 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
 
         $schemaTool = new SchemaTool($this->em);
@@ -70,7 +75,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Symfony\Component\Form\Exception\StringCastException
      * @expectedMessage   Entity "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity" passed to the choice field must have a "__toString()" method defined (or you can also override the "property" option).
      */
-    public function testEntitiesMustHaveAToStringMethod()
+    public function testLegacyEntitiesMustHaveAToStringMethod()
     {
         $entity1 = new SingleIntIdNoToStringEntity(1, 'Foo');
         $entity2 = new SingleIntIdNoToStringEntity(2, 'Bar');
@@ -96,7 +101,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\RuntimeException
      */
-    public function testChoicesMustBeManaged()
+    public function testLegacyChoicesMustBeManaged()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -118,7 +123,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         $choiceList->getChoices();
     }
 
-    public function testInitExplicitChoices()
+    public function testLegacyInitExplicitChoices()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -141,7 +146,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(1 => $entity1, 2 => $entity2), $choiceList->getChoices());
     }
 
-    public function testInitEmptyChoices()
+    public function testLegacyInitEmptyChoices()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -161,7 +166,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $choiceList->getChoices());
     }
 
-    public function testInitNestedChoices()
+    public function testLegacyInitNestedChoices()
     {
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
@@ -189,7 +194,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         ), $choiceList->getRemainingViews());
     }
 
-    public function testGroupByPropertyPath()
+    public function testLegacyGroupByPropertyPath()
     {
         $item1 = new GroupableEntity(1, 'Foo', 'Group1');
         $item2 = new GroupableEntity(2, 'Bar', 'Group1');
@@ -224,7 +229,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         ), $choiceList->getRemainingViews());
     }
 
-    public function testGroupByInvalidPropertyPathReturnsFlatChoices()
+    public function testLegacyGroupByInvalidPropertyPathReturnsFlatChoices()
     {
         $item1 = new GroupableEntity(1, 'Foo', 'Group1');
         $item2 = new GroupableEntity(2, 'Bar', 'Group1');
@@ -251,7 +256,7 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         ), $choiceList->getChoices());
     }
 
-    public function testInitShorthandEntityName()
+    public function testLegacyInitShorthandEntityName()
     {
         $item1 = new SingleIntIdEntity(1, 'Foo');
         $item2 = new SingleIntIdEntity(2, 'Bar');
@@ -267,13 +272,8 @@ class GenericEntityChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1, 2), $choiceList->getValuesForChoices(array($item1, $item2)));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyInitShorthandEntityName()
+    public function testLegacyInitShorthandEntityName2()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $item1 = new SingleIntIdEntity(1, 'Foo');
         $item2 = new SingleIntIdEntity(2, 'Bar');
 

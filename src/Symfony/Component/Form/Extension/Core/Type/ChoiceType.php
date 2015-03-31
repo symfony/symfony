@@ -233,25 +233,6 @@ class ChoiceType extends AbstractType
     {
         $choiceListFactory = $this->choiceListFactory;
 
-        $choiceList = function (Options $options, $choiceList) use ($choiceListFactory) {
-            if (null !== $options['choice_loader']) {
-                return $choiceListFactory->createListFromLoader(
-                    $options['choice_loader'],
-                    $options['choice_value']
-                );
-            }
-
-            // Harden against NULL values (like in EntityType and ModelType)
-            $choices = null !== $options['choices'] ? $options['choices'] : array();
-
-            // BC when choices are in the keys, not in the values
-            if (!$options['choices_as_values']) {
-                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value']);
-            }
-
-            return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
-        };
-
         $emptyData = function (Options $options) {
             if ($options['multiple'] || $options['expanded']) {
                 return array();
@@ -269,11 +250,29 @@ class ChoiceType extends AbstractType
             return $options['empty_value'];
         };
 
-        // deprecation note
-        $choiceListNormalizer = function (Options $options, $choiceList) {
-            trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
+        $choiceListNormalizer = function (Options $options, $choiceList) use ($choiceListFactory) {
+            if ($choiceList) {
+                trigger_error('The "choice_list" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_loader" instead.', E_USER_DEPRECATED);
 
-            return $choiceList;
+                return $choiceList;
+            }
+
+            if (null !== $options['choice_loader']) {
+                return $choiceListFactory->createListFromLoader(
+                    $options['choice_loader'],
+                    $options['choice_value']
+                );
+            }
+
+            // Harden against NULL values (like in EntityType and ModelType)
+            $choices = null !== $options['choices'] ? $options['choices'] : array();
+
+            // BC when choices are in the keys, not in the values
+            if (!$options['choices_as_values']) {
+                return $choiceListFactory->createListFromFlippedChoices($choices, $options['choice_value']);
+            }
+
+            return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) {
@@ -299,7 +298,7 @@ class ChoiceType extends AbstractType
         $resolver->setDefaults(array(
             'multiple' => false,
             'expanded' => false,
-            'choice_list' => $choiceList, // deprecated
+            'choice_list' => null, // deprecated
             'choices' => array(),
             'choices_as_values' => false,
             'choice_loader' => null,

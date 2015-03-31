@@ -43,20 +43,12 @@ class ChoiceToValueTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a scalar.');
         }
 
-        // These are now valid ArrayChoiceList values, so we can return null
-        // right away
-        if ('' === $value || null === $value) {
-            return;
-        }
-
-        $choices = $this->choiceList->getChoicesForValues(array($value));
+        $choices = $this->choiceList->getChoicesForValues(array((string) $value));
 
         if (1 !== count($choices)) {
             throw new TransformationFailedException(sprintf('The choice "%s" does not exist or is not unique', $value));
         }
 
-        $choice = current($choices);
-
-        return '' === $choice ? null : $choice;
+        return current($choices);
     }
 }

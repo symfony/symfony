@@ -368,8 +368,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals('2', $form->getViewData());
     }
 
-    public function testSubmitSingleNonExpandedObjectChoicesBc()
+    /**
+     * @group legacy
+     */
+    public function testLegacySubmitSingleNonExpandedObjectChoices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => false,
@@ -483,8 +488,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertEquals(array('2', '3'), $form->getViewData());
     }
 
-    public function testSubmitMultipleNonExpandedObjectChoicesBc()
+    /**
+     * @group legacy
+     */
+    public function testLegacySubmitMultipleNonExpandedObjectChoices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => false,
@@ -959,8 +969,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitSingleExpandedObjectChoicesBc()
+    /**
+     * @group legacy
+     */
+    public function testLegacySubmitSingleExpandedObjectChoices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
@@ -1182,8 +1197,13 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form[4]->getViewData());
     }
 
-    public function testSubmitMultipleExpandedObjectChoicesBc()
+    /**
+     * @group legacy
+     */
+    public function testLegacySubmitMultipleExpandedObjectChoices()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => true,

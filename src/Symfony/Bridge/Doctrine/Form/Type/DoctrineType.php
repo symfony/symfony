@@ -228,7 +228,9 @@ abstract class DoctrineType extends AbstractType
 
         // deprecation note
         $propertyNormalizer = function (Options $options, $propertyName) {
-            trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
+            if ($propertyName) {
+                trigger_error('The "property" option is deprecated since version 2.7 and will be removed in 3.0. Use "choice_label" instead.', E_USER_DEPRECATED);
+            }
 
             return $propertyName;
         };
@@ -249,7 +251,9 @@ abstract class DoctrineType extends AbstractType
 
         // deprecation note
         $loaderNormalizer = function (Options $options, $loader) {
-            trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
+            if ($loader) {
+                trigger_error('The "loader" option is deprecated since version 2.7 and will be removed in 3.0. Override getLoader() instead.', E_USER_DEPRECATED);
+            }
 
             return $loader;
         };
@@ -300,6 +304,7 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
         $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
+        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
 
     /**

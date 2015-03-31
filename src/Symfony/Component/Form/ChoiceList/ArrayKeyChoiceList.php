@@ -39,9 +39,6 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  * ```
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @deprecated Added for backwards compatibility in Symfony 2.7, to be removed
- *             in Symfony 3.0. Use {@link ArrayChoiceList} instead.
  */
 class ArrayKeyChoiceList extends ArrayChoiceList
 {
@@ -113,8 +110,6 @@ class ArrayKeyChoiceList extends ArrayChoiceList
         }
 
         parent::__construct($choices, $value);
-
-        trigger_error('The '.__CLASS__.' class was added for backwards compatibility in version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
     }
 
     /**

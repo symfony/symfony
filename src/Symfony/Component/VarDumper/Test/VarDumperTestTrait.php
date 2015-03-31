@@ -36,8 +36,7 @@ trait VarDumperTestTrait
         $dumper = new CliDumper($h);
         $dumper->setColors(false);
         $dumper->dump($cloner->cloneVar($data)->withRefHandles(false));
-        fseek($h, 0);
-        $data = stream_get_contents($h);
+        $data = stream_get_contents($h, -1, 0);
         fclose($h);
 
         return $data;

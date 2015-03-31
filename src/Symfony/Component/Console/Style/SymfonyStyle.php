@@ -34,6 +34,8 @@ class SymfonyStyle extends OutputStyle
     private $input;
     private $questionHelper;
     private $progressBar;
+    private $terminalWidth;
+    private $lineLength;
 
     /**
      * @param InputInterface  $input
@@ -42,6 +44,7 @@ class SymfonyStyle extends OutputStyle
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
+        $this->lineLength = min($this->getTerminalWidth(), self::MAX_LINE_LENGTH);
 
         parent::__construct($output);
     }
@@ -68,7 +71,7 @@ class SymfonyStyle extends OutputStyle
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LINE_LENGTH - Helper::strlen($prefix))));
+            $lines = array_merge($lines, explode("\n", wordwrap($message, $this->lineLength - Helper::strlen($prefix))));
 
             if (count($messages) > 1 && $key < count($message)) {
                 $lines[] = '';
@@ -82,7 +85,7 @@ class SymfonyStyle extends OutputStyle
 
         foreach ($lines as &$line) {
             $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', self::MAX_LINE_LENGTH - Helper::strlen($line));
+            $line .= str_repeat(' ', $this->lineLength - Helper::strlen($line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);
@@ -306,5 +309,84 @@ class SymfonyStyle extends OutputStyle
         }
 
         return $this->progressBar;
+    }
+
+    private function getTerminalWidth()
+    {
+        if ($this->terminalWidth) {
+            return $this->terminalWidth;
+        }
+
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            // extract [w, H] from "wxh (WxH)"
+            if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
+                return (int) $matches[1];
+            }
+            // extract [w, h] from "wxh"
+            if (preg_match('/^(\d+)x(\d+)$/', $this->getConsoleMode(), $matches)) {
+                return (int) $matches[1];
+            }
+        }
+
+        if ($sttyString = $this->getSttyColumns()) {
+            // extract [w, h] from "rows h; columns w;"
+            if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
+                return (int) $matches[2];
+            }
+            // extract [w, h] from "; h rows; w columns"
+            if (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
+                return (int) $matches[2];
+            }
+        }
+
+        return;
+    }
+
+    /**
+     * Runs and parses stty -a if it's available, suppressing any error output.
+     *
+     * @return string
+     */
+    private function getSttyColumns()
+    {
+        if (!function_exists('proc_open')) {
+            return;
+        }
+
+        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+        $process = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+        if (is_resource($process)) {
+            $info = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            return $info;
+        }
+    }
+
+    /**
+     * Runs and parses mode CON if it's available, suppressing any error output.
+     *
+     * @return string <width>x<height> or null if it could not be parsed
+     */
+    private function getConsoleMode()
+    {
+        if (!function_exists('proc_open')) {
+            return;
+        }
+
+        $descriptorspec = array(1 => array('pipe', 'w'), 2 => array('pipe', 'w'));
+        $process = proc_open('mode CON', $descriptorspec, $pipes, null, null, array('suppress_errors' => true));
+        if (is_resource($process)) {
+            $info = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($process);
+
+            if (preg_match('/--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
+                return $matches[2].'x'.$matches[1];
+            }
+        }
     }
 }

@@ -526,8 +526,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         // Build up bundles as a hash with FQN for basis to rebuild again in correct order given dependencies
         foreach ($bundles as $bundle) {
-            $bundleFQN = get_class($bundle);
-            $children[$bundleFQN] = BundleDependenciesInterface::DEP_REQUIRED;
+            $children[] = $bundleFQN = get_class($bundle);
             $rootBundles[$bundleFQN] = $bundle;
 
             if ($bundle instanceof BundleDependenciesInterface) {
@@ -559,9 +558,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      * this string must be in exactly same format as returned by get_class() and PHP 5.5's CLASS constant.
      * Example of FQN string: "Symfony\Component\HttpKernel\Bundle\BundleInterface"
      *
-     * @link BundleDependenciesInterface For further details on dependencies and DEP_* constants.
-     *
-     * @param mixed[string] $children Dependencies to apply, key FQN, value {@see BundleDependenciesInterface} constants
+     * @param string[] $children Dependencies to apply
      * @param BundleInterface[string] $bundles Ordered bundles to append dependencies to
      * @param BundleInterface[string] $rootBundles Loaded Bundles from registerRootBundles()
      * @param bool[string] $stack For recursion protection, and for debug use on exceptions
@@ -570,7 +567,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function appendDependenciesRecursively(array $children, array &$bundles, array $rootBundles, array $stack)
     {
-        foreach ($children as $dependencyFQN => $requiredFlag) {
+        while (!empty($children)) {
+            $dependencyFQN = array_shift($children);
             if (isset($bundles[$dependencyFQN])) {
                 continue;
             } elseif (isset($stack[$dependencyFQN])) {
@@ -582,9 +580,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $dependency = $rootBundles[$dependencyFQN];
             } else {
                 if (!class_exists($dependencyFQN)) {
-                    if ($requiredFlag === BundleDependenciesInterface::DEP_OPTIONAL) {
-                        continue;
-                    }
                     throw new DependencyMismatchException("Could not find '{$dependencyFQN}'", array_keys($stack));
                 }
                 $dependency = new $dependencyFQN();

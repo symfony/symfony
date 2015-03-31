@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Style;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -34,6 +35,7 @@ class SymfonyStyle extends OutputStyle
     private $input;
     private $questionHelper;
     private $progressBar;
+    private $lineLength;
 
     /**
      * @param InputInterface  $input
@@ -42,6 +44,7 @@ class SymfonyStyle extends OutputStyle
     public function __construct(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
+        $this->lineLength = min($this->getTerminalWidth(), self::MAX_LINE_LENGTH);
 
         parent::__construct($output);
     }
@@ -68,7 +71,7 @@ class SymfonyStyle extends OutputStyle
         // wrap and add newlines for each element
         foreach ($messages as $key => $message) {
             $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode("\n", wordwrap($message, self::MAX_LINE_LENGTH - Helper::strlen($prefix))));
+            $lines = array_merge($lines, explode("\n", wordwrap($message, $this->lineLength - Helper::strlen($prefix))));
 
             if (count($messages) > 1 && $key < count($message)) {
                 $lines[] = '';
@@ -82,7 +85,7 @@ class SymfonyStyle extends OutputStyle
 
         foreach ($lines as &$line) {
             $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', self::MAX_LINE_LENGTH - Helper::strlen($line));
+            $line .= str_repeat(' ', $this->lineLength - Helper::strlen($line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);
@@ -306,5 +309,13 @@ class SymfonyStyle extends OutputStyle
         }
 
         return $this->progressBar;
+    }
+
+    private function getTerminalWidth()
+    {
+        $application = new Application();
+        list ($width, $height) = $application->getTerminalDimensions();
+
+        return $width;
     }
 }

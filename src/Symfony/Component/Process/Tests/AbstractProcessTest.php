@@ -209,7 +209,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array()),
-            array(new NonStringifiable()),
+            array(new Foo()),
         );
     }
 
@@ -229,26 +229,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
             array(null, null),
             array('24.5', 24.5),
             array('input data', 'input data'),
-        );
-    }
-
-    /**
-     * @dataProvider provideLegacyInputValues
-     * @group legacy
-     */
-    public function testLegacyValidInput($expected, $value)
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $process = $this->getProcess('php -v');
-        $process->setInput($value);
-        $this->assertSame($expected, $process->getInput());
-    }
-
-    public function provideLegacyInputValues()
-    {
-        return array(
-            array('stringifiable', new Stringifiable()),
         );
     }
 
@@ -1191,14 +1171,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     abstract protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array());
 }
 
-class Stringifiable
-{
-    public function __toString()
-    {
-        return 'stringifiable';
-    }
-}
-
-class NonStringifiable
+class Foo
 {
 }

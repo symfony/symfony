@@ -46,7 +46,7 @@ class AmqpCaster
 
     public static function castConnection(\AMQPConnection $c, array $a, Stub $stub, $isNested)
     {
-        $prefix = "\0~\0";
+        $prefix = Caster::PREFIX_VIRTUAL;
 
         // BC layer in the ampq lib
         if (method_exists($c, 'getReadTimeout')) {
@@ -70,7 +70,7 @@ class AmqpCaster
 
     public static function castChannel(\AMQPChannel $c, array $a, Stub $stub, $isNested)
     {
-        $prefix = "\0~\0";
+        $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += array(
             $prefix.'isConnected' => $c->isConnected(),
@@ -85,7 +85,7 @@ class AmqpCaster
 
     public static function castQueue(\AMQPQueue $c, array $a, Stub $stub, $isNested)
     {
-        $prefix = "\0~\0";
+        $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += array(
             $prefix.'name' => $c->getName(),
@@ -100,7 +100,7 @@ class AmqpCaster
 
     public static function castExchange(\AMQPExchange $c, array $a, Stub $stub, $isNested)
     {
-        $prefix = "\0~\0";
+        $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += array(
             $prefix.'name' => $c->getName(),
@@ -114,12 +114,15 @@ class AmqpCaster
         return $a;
     }
 
-    public static function castEnvelope(\AMQPEnvelope $c, array $a, Stub $stub, $isNested)
+    public static function castEnvelope(\AMQPEnvelope $c, array $a, Stub $stub, $isNested, $filter = 0)
     {
-        $prefix = "\0~\0";
+        $prefix = Caster::PREFIX_VIRTUAL;
+
+        if (!($filter & Caster::EXCLUDE_VERBOSE)) {
+            $a += array($prefix.'body' => $c->getBody());
+        }
 
         $a += array(
-            $prefix.'body' => $c->getBody(),
             $prefix.'routingKey' => $c->getRoutingKey(),
             $prefix.'deliveryTag' => $c->getDeliveryTag(),
             $prefix.'deliveryMode' => new ConstStub($c->getDeliveryMode().(2 === $c->getDeliveryMode() ? ' (persistent)' : ' (non-persistent)'), $c->getDeliveryMode()),

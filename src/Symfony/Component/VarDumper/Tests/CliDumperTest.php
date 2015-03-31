@@ -125,7 +125,6 @@ EOTXT
   current_line_number: 1
   error_code: XML_ERROR_NONE
 }
-
 EOTXT
             ,
             $var
@@ -239,7 +238,6 @@ array:3 [
   ]
   2 => &2 array:1 [&2]
 ]
-
 EOTXT
             ,
             $var

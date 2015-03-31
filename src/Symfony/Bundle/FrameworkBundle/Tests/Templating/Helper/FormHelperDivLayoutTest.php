@@ -57,6 +57,34 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         parent::tearDown();
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyEnctype()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $form = $this->factory->createNamedBuilder('name', 'form')
+            ->add('file', 'file')
+            ->getForm();
+
+        $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form->createView()));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyNoEnctype()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        $form = $this->factory->createNamedBuilder('name', 'form')
+            ->add('text', 'text')
+            ->getForm();
+
+        $this->assertEquals('', $this->renderEnctype($form->createView()));
+    }
+
     protected function renderForm(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->form($view, $vars);

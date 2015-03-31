@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Exception;
 /**
  * DependencyMismatchException.
  *
- * For exceptions related to dependency issues, like missing required dependency or recursive dependencies.
+ * For exceptions related to dependency issues, like missing or recursive dependencies.
  *
  * @author André Roemcke <andre.romcke@ez.no>
  *
@@ -25,7 +25,7 @@ class DependencyMismatchException extends \RuntimeException
     /**
      * Constructor.
      *
-     * @param string     $msg      The message; for recursion issues, missing required dependency, ..
+     * @param string     $msg      The message; for recursion issues, missing dependency, ..
      * @param array      $stack    The Bundle dependency stack trace up until the mismatch using bundle name or FQN
      * @param \Exception $previous The previous exception if there was one
      */

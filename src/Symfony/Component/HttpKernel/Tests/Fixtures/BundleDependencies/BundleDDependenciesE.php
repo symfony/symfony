@@ -17,6 +17,6 @@ class BundleDDependenciesE implements BundleDependenciesInterface
 {
     public function getBundleDependencies()
     {
-        return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleEDependenciesD' => self::DEP_REQUIRED);
+        return array('Symfony\Component\HttpKernel\Tests\Fixtures\BundleDependencies\BundleEDependenciesD');
     }
 }

@@ -726,7 +726,6 @@ EOF;
         $aNon = new BundleDependencies\BundleADependenciesNon();
         $bA = new BundleDependencies\BundleBDependenciesA();
         $cBA = new BundleDependencies\BundleCDependenciesBA();
-        $g = new BundleDependencies\BundleGDependenciesMissingOptional();
 
         return array(
             array(
@@ -768,11 +767,6 @@ EOF;
             array(
                 array($bA, $cBA),
                 array($aNon, $bA, $cBA),
-            ),
-            // optional
-            array(
-                array($g),
-                array($g),
             ),
         );
     }

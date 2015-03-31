@@ -14,8 +14,7 @@ namespace Symfony\Component\HttpKernel\Bundle;
 /**
  * Class BundleDependenciesInterface.
  *
- * Adds capability to let Bundles specify other bundles they need to load (before this one), both required and optional
- * dependencies.
+ * Adds capability to let Bundles specify other bundles they need to load (before this one).
  *
  * This allows you to define only the bundle you want to use in registerBundles(), but don't need to take care about
  * registering the dependencies it uses, and you won't need to make any changes in your kernel if those dependencies
@@ -34,17 +33,6 @@ namespace Symfony\Component\HttpKernel\Bundle;
 interface BundleDependenciesInterface
 {
     /**
-     * @const Flag a Bundle Dependency as required, if missing throw exception
-     * @link \Symfony\Component\HttpKernel\Exception\DependencyMismatchException
-     */
-    const DEP_REQUIRED = 'req';
-
-    /**
-     * @const Flag a Bundle Dependency as optional, if missing silently ignore it
-     */
-    const DEP_OPTIONAL = 'opt';
-
-    /**
      * Returns an array of bundle dependencies Kernel should register on boot.
      *
      * Dependencies will be registered before current bundle, implying current bundle *MUST* be loaded after as it
@@ -56,20 +44,24 @@ interface BundleDependenciesInterface
      * {
      *     public function getBundleDependencies()
      *     {
+     *         // If you need to specify some bundle dependencies as optional you can achieve this using class_exits:
+     *         // $dependencies = array();
+     *         // if (class_exists('FOS\UserBundle\FOSUserBundle'))
+     *         //     $dependencies[] = 'FOS\UserBundle\FOSUserBundle';
+     *
      *         return array(
+     *             // All values must be FQN strings to avoid bundles being loaded several times
+     *             'FOS\HttpCacheBundle\FOSHttpCacheBundle',
      *
-     *             // All keys must be FQN strings to avoid bundles being loaded several times
-     *             'FOS\HttpCacheBundle\FOSHttpCacheBundle' => self::DEP_OPTIONAL,
-     *
-     *             // If you require PHP 5.5+ it is possible to use `::class` constant for required dependencies:
-     *             Oneup\FlysystemBundle\OneupFlysystemBundle::class => self::DEP_REQUIRED,
+     *             // If you require PHP 5.5 or higher it is better to use `::class` constant:
+     *             Oneup\FlysystemBundle\OneupFlysystemBundle::class,
      *         );
      *     }
      * }
      * ```
      *
      *
-     * @return mixed[string] An array where key is bundle class (FQN) names as strings, and value DEP_* constants
+     * @return string[] An array of bundle class (FQN) names as strings.
      *
      * @api
      */

@@ -723,35 +723,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             'HTTP_X_FORWARDED_PROTO' => 'https',
             'HTTP_X_FORWARDED_PORT' => '8443',
         ));
-        $port = $request->getPort();
-
-        $this->assertEquals(8443, $port, 'With PROTO and PORT set PORT takes precedence.');
+        $this->assertEquals(80, $request->getPort(), 'With PROTO and PORT on untrusted connection server value takes precedence.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertEquals(8443, $request->getPort(), 'With PROTO and PORT set PORT takes precedence.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'https',
         ));
-        $port = $request->getPort();
-
-        $this->assertEquals(443, $port, 'With only PROTO set getPort() defaults to 443.');
+        $this->assertEquals(80, $request->getPort(), 'With only PROTO set getPort() ignores trusted headers on untrusted connection.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertEquals(443, $request->getPort(), 'With only PROTO set getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'http',
         ));
-        $port = $request->getPort();
-
-        $this->assertEquals(80, $port, 'If X_FORWARDED_PROTO is set to HTTP return 80.');
+        $this->assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() ignores trusted headers on untrusted connection.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertEquals(80, $request->getPort(), 'If X_FORWARDED_PROTO is set to HTTP getPort() returns port of the original request.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'On',
         ));
-        $port = $request->getPort();
-        $this->assertEquals(443, $port, 'With only PROTO set and value is On, getPort() defaults to 443.');
+        $this->assertEquals(80, $request->getPort(), 'With only PROTO set and value is On, getPort() ignores trusted headers on untrusted connection.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertEquals(443, $request->getPort(), 'With only PROTO set and value is On, getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => '1',
         ));
-        $port = $request->getPort();
-        $this->assertEquals(443, $port, 'With only PROTO set and value is 1, getPort() defaults to 443.');
+        $this->assertEquals(80, $request->getPort(), 'With only PROTO set and value is 1, getPort() ignores trusted headers on untrusted connection.');
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $this->assertEquals(443, $request->getPort(), 'With only PROTO set and value is 1, getPort() defaults to 443.');
 
         $request = Request::create('http://example.com', 'GET', array(), array(), array(), array(
             'HTTP_X_FORWARDED_PROTO' => 'something-else',
@@ -1021,6 +1023,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->headers->set('X_FORWARDED_PROTO', 'https');
 
         Request::setTrustedProxies(array('1.1.1.1'));
+        $this->assertFalse($request->isSecure());
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $this->assertTrue($request->isSecure());
         Request::setTrustedProxies(array());
 
@@ -1480,7 +1484,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(443, $request->getPort());
         $this->assertTrue($request->isSecure());
 
+        // trusted proxy via setTrustedProxies()
+        Request::setTrustedProxies(array('3.3.3.4', '2.2.2.2'));
+        $this->assertEquals('3.3.3.3', $request->getClientIp());
+        $this->assertEquals('example.com', $request->getHost());
+        $this->assertEquals(80, $request->getPort());
+        $this->assertFalse($request->isSecure());
+
         // check various X_FORWARDED_PROTO header values
+        Request::setTrustedProxies(array('3.3.3.3', '2.2.2.2'));
         $request->headers->set('X_FORWARDED_PROTO', 'ssl');
         $this->assertTrue($request->isSecure());
 

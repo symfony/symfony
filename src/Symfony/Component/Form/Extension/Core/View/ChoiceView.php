@@ -11,34 +11,18 @@
 
 namespace Symfony\Component\Form\Extension\Core\View;
 
+use Symfony\Component\Form\ChoiceList\View\ChoiceView as BaseChoiceView;
+
 /**
  * Represents a choice in templates.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link BaseChoiceView} instead.
  */
-class ChoiceView
+class ChoiceView extends BaseChoiceView
 {
-    /**
-     * The original choice value.
-     *
-     * @var mixed
-     */
-    public $data;
-
-    /**
-     * The view representation of the choice.
-     *
-     * @var string
-     */
-    public $value;
-
-    /**
-     * The label displayed to humans.
-     *
-     * @var string
-     */
-    public $label;
-
     /**
      * Creates a new ChoiceView.
      *
@@ -48,8 +32,8 @@ class ChoiceView
      */
     public function __construct($data, $value, $label)
     {
-        $this->data = $data;
-        $this->value = $value;
-        $this->label = $label;
+        parent::__construct($label, $value, $data);
+
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\View\ChoiceView instead.', E_USER_DEPRECATED);
     }
 }

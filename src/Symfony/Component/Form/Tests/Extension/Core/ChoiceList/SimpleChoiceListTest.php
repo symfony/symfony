@@ -14,9 +14,12 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
+/**
+ * @group legacy
+ */
 class SimpleChoiceListTest extends AbstractChoiceListTest
 {
-    public function testInitArray()
+    public function testLegacyInitArray()
     {
         $choices = array('a' => 'A', 'b' => 'B', 'c' => 'C');
         $this->list = new SimpleChoiceList($choices, array('b'));
@@ -27,7 +30,7 @@ class SimpleChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
 
-    public function testInitNestedArray()
+    public function testLegacyInitNestedArray()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getChoices());
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd'), $this->list->getValues());
@@ -44,7 +47,7 @@ class SimpleChoiceListTest extends AbstractChoiceListTest
     /**
      * @dataProvider dirtyValuesProvider
      */
-    public function testGetValuesForChoicesDealsWithDirtyValues($choice, $value)
+    public function testLegacyGetValuesForChoicesDealsWithDirtyValues($choice, $value)
     {
         $choices = array(
             '0' => 'Zero',

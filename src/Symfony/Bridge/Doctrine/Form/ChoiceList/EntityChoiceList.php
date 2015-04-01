@@ -11,17 +11,20 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 /**
  * A choice list presenting a list of Doctrine entities as choices.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ *             Use {@link DoctrineChoiceLoader} instead.
  */
 class EntityChoiceList extends ObjectChoiceList
 {
@@ -126,6 +129,8 @@ class EntityChoiceList extends ObjectChoiceList
         }
 
         parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, null, $propertyAccessor);
+
+        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
     }
 
     /**

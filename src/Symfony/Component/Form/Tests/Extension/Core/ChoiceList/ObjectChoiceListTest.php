@@ -29,6 +29,9 @@ class ObjectChoiceListTest_EntityWithToString
     }
 }
 
+/**
+ * @group legacy
+ */
 class ObjectChoiceListTest extends AbstractChoiceListTest
 {
     private $obj1;
@@ -49,7 +52,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         parent::setUp();
     }
 
-    public function testInitArray()
+    public function testLegacyInitArray()
     {
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -63,7 +66,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView($this->obj1, '0', 'A'), 2 => new ChoiceView($this->obj3, '2', 'C'), 3 => new ChoiceView($this->obj4, '3', 'D')), $this->list->getRemainingViews());
     }
 
-    public function testInitNestedArray()
+    public function testLegacyInitNestedArray()
     {
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
         $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
@@ -77,7 +80,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         ), $this->list->getRemainingViews());
     }
 
-    public function testInitArrayWithGroupPath()
+    public function testLegacyInitArrayWithGroupPath()
     {
         $this->obj1 = (object) array('name' => 'A', 'category' => 'Group 1');
         $this->obj2 = (object) array('name' => 'B', 'category' => 'Group 1');
@@ -115,7 +118,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInitArrayWithGroupPathThrowsExceptionIfNestedArray()
+    public function testLegacyInitArrayWithGroupPathThrowsExceptionIfNestedArray()
     {
         $this->obj1 = (object) array('name' => 'A', 'category' => 'Group 1');
         $this->obj2 = (object) array('name' => 'B', 'category' => 'Group 1');
@@ -133,7 +136,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         );
     }
 
-    public function testInitArrayWithValuePath()
+    public function testLegacyInitArrayWithValuePath()
     {
         $this->obj1 = (object) array('name' => 'A', 'id' => 10);
         $this->obj2 = (object) array('name' => 'B', 'id' => 20);
@@ -154,7 +157,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertEquals(array(0 => new ChoiceView($this->obj1, '10', 'A'), 3 => new ChoiceView($this->obj4, '40', 'D')), $this->list->getRemainingViews());
     }
 
-    public function testInitArrayUsesToString()
+    public function testLegacyInitArrayUsesToString()
     {
         $this->obj1 = new ObjectChoiceListTest_EntityWithToString('A');
         $this->obj2 = new ObjectChoiceListTest_EntityWithToString('B');
@@ -173,7 +176,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
     /**
      * @expectedException \Symfony\Component\Form\Exception\StringCastException
      */
-    public function testInitArrayThrowsExceptionIfToStringNotFound()
+    public function testLegacyInitArrayThrowsExceptionIfToStringNotFound()
     {
         $this->obj1 = new ObjectChoiceListTest_EntityWithToString('A');
         $this->obj2 = new ObjectChoiceListTest_EntityWithToString('B');
@@ -262,7 +265,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesWithValuePath()
+    public function testLegacyGetValuesForChoicesWithValuePath()
     {
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -276,7 +279,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array('A', 'B'), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesWithValuePathPreservesKeys()
+    public function testLegacyGetValuesForChoicesWithValuePathPreservesKeys()
     {
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -290,7 +293,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(5 => 'A', 8 => 'B'), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesWithValuePathPreservesOrder()
+    public function testLegacyGetValuesForChoicesWithValuePathPreservesOrder()
     {
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -304,7 +307,7 @@ class ObjectChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array('B', 'A'), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesWithValuePathIgnoresNonExistingChoices()
+    public function testLegacyGetValuesForChoicesWithValuePathIgnoresNonExistingChoices()
     {
         $this->list = new ObjectChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),

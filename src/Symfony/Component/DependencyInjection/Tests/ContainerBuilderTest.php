@@ -333,42 +333,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->get('baz')->called, '->createService() uses another service as factory');
     }
 
-    public function testLegacyCreateServiceFactory()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $builder = new ContainerBuilder();
-        $builder->register('bar', 'Bar\FooClass');
-        $builder
-            ->register('foo1', 'Bar\FooClass')
-            ->setFactoryClass('%foo_class%')
-            ->setFactoryMethod('getInstance')
-            ->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')))
-        ;
-        $builder->setParameter('value', 'bar');
-        $builder->setParameter('foo_class', 'Bar\FooClass');
-        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the factory method to create the service instance');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
-     */
-    public function testLegacyCreateServiceFactoryService()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $builder = new ContainerBuilder();
-        $builder->register('foo_service', 'Bar\FooClass');
-        $builder
-            ->register('foo', 'Bar\FooClass')
-            ->setFactoryService('%foo_service%')
-            ->setFactoryMethod('getInstance')
-        ;
-        $builder->setParameter('foo_service', 'foo_service');
-        $this->assertTrue($builder->get('foo')->called, '->createService() calls the factory method to create the service instance');
-    }
-
     /**
      * @covers Symfony\Component\DependencyInjection\ContainerBuilder::createService
      */
@@ -718,62 +682,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $container->set('a', $a = new \stdClass());
         $this->assertEquals($a, $container->get('a'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySetOnSynchronizedService()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $container = new ContainerBuilder();
-        $container->register('baz', 'BazClass')
-            ->setSynchronized(true)
-        ;
-        $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array(new Reference('baz')))
-        ;
-
-        $container->set('baz', $baz = new \BazClass());
-        $this->assertSame($baz, $container->get('bar')->getBaz());
-
-        $container->set('baz', $baz = new \BazClass());
-        $this->assertSame($baz, $container->get('bar')->getBaz());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySynchronizedServiceWithScopes()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $container = new ContainerBuilder();
-        $container->addScope(new Scope('foo'));
-        $container->register('baz', 'BazClass')
-            ->setSynthetic(true)
-            ->setSynchronized(true)
-            ->setScope('foo')
-        ;
-        $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array(new Reference('baz', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
-        ;
-        $container->compile();
-
-        $container->enterScope('foo');
-        $container->set('baz', $outerBaz = new \BazClass(), 'foo');
-        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
-
-        $container->enterScope('foo');
-        $container->set('baz', $innerBaz = new \BazClass(), 'foo');
-        $this->assertSame($innerBaz, $container->get('bar')->getBaz());
-        $container->leaveScope('foo');
-
-        $this->assertNotSame($innerBaz, $container->get('bar')->getBaz());
-        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
-
-        $container->leaveScope('foo');
     }
 
     /**

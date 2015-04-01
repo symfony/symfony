@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
-    <service id="request" class="Request" synthetic="true" synchronized="true"/>
+    <service id="request" class="Request" synthetic="true"/>
     <service id="depends_on_request" class="stdClass">
       <call method="setRequest">
         <argument type="service" id="request" on-invalid="null" strict="false"/>

@@ -148,7 +148,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        if (count($ids) > 1 && $definition->getFactoryService(false)) {
+        if (count($ids) > 1 && $definition->getFactory()) {
             return false;
         }
 

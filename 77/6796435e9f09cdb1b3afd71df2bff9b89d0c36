@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by blaugueux at 2015-03-25T09:44:10Z
+
+<3
+
+---------------------------------------------------------------------------
+
+by EmmanuelVella at 2015-03-25T10:15:00Z
+
+@webmozart Do you plan to add ``choice_translation_domain`` too ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-25T10:42:26Z
+
+#6456 is fixed here now.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-25T10:58:25Z
+
+@webmozart  an initial work for ```choice_translation_domain```  https://github.com/symfony/symfony/pull/13651
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-25T13:34:19Z
+
+#8658 is fixed here now.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-26T09:53:19Z
+
+Fixed regression with #10572.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-26T14:26:01Z
+
+Apart from the CHANGELOG and UPGRADE files, this PR should be complete now.
+
+The ticket #9738 mentioned in the previous PR can be fixed in a separate PR. I'm not sure about #10551 yet and need to get some feedback by @beberlei first.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-26T15:22:30Z
+
+@webmozart If some tests rely on the deprecated feature, you must rename the test to something like `testLegacyXXX` and add the ` $this->iniSet('error_reporting', -1 & E_USER_DEPRECATED);` call at the beginning of the method.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-03-26T16:15:59Z
+
+`choice_filter` could also be interesting. see #14072
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-31T12:59:39Z
+
+This PR is finished now, all tests should be green. I'd like to merge this into 2.7 today, if possible.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-31T20:22:57Z
+
+Apart from the last minor things, good to merge from me :+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-03-31T20:32:51Z
+
+Thanks for all the thorough reviews @Tobion!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-31T20:36:19Z
+
+The failure for the low deps build is related to the yet missing subtree split or do we need to bump the version for the dev dependencies of the FrameworkBundle?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-31T21:54:59Z
+
+Besides that: :+1:

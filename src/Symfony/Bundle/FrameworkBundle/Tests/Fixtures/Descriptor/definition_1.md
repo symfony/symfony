@@ -3,7 +3,6 @@
 - Public: yes
 - Synthetic: no
 - Lazy: yes
-- Synchronized: no
 - Abstract: yes
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`

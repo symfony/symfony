@@ -210,24 +210,8 @@ class JsonDescriptor extends Descriptor
             'lazy' => $definition->isLazy(),
         );
 
-        if (method_exists($definition, 'isSynchronized')) {
-            $data['synchronized'] = $definition->isSynchronized(false);
-        }
-
         $data['abstract'] = $definition->isAbstract();
         $data['file'] = $definition->getFile();
-
-        if ($definition->getFactoryClass(false)) {
-            $data['factory_class'] = $definition->getFactoryClass(false);
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $data['factory_service'] = $definition->getFactoryService(false);
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $data['factory_method'] = $definition->getFactoryMethod(false);
-        }
 
         if ($factory = $definition->getFactory()) {
             if (is_array($factory)) {

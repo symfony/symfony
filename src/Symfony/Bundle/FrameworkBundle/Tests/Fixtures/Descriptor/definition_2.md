@@ -3,7 +3,6 @@
 - Public: no
 - Synthetic: yes
 - Lazy: no
-- Synchronized: no
 - Abstract: no
 - File: `/path/to/file`
 - Factory Service: `factory.service`

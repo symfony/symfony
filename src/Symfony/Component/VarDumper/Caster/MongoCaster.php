@@ -22,14 +22,12 @@ class MongoCaster
 {
     public static function castCursor(\MongoCursorInterface $cursor, array $a, Stub $stub, $isNested)
     {
-        $prefix = "\0~\0";
-
         if ($info = $cursor->info()) {
             foreach ($info as $k => $v) {
-                $a[$prefix.$k] = $v;
+                $a[Caster::PREFIX_VIRTUAL.$k] = $v;
             }
         }
-        $a[$prefix.'dead'] = $cursor->dead();
+        $a[Caster::PREFIX_VIRTUAL.'dead'] = $cursor->dead();
 
         return $a;
     }

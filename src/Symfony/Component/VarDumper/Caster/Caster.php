@@ -29,6 +29,39 @@ class Caster
     const EXCLUDE_NOT_IMPORTANT = 256;
     const EXCLUDE_STRICT = 512;
 
+    const PREFIX_VIRTUAL = "\0~\0";
+    const PREFIX_DYNAMIC = "\0+\0";
+    const PREFIX_PROTECTED = "\0*\0";
+
+    /**
+     * Casts objects to arrays and adds the dynamic property prefix.
+     *
+     * @param object          $obj       The object to cast.
+     * @param ReflectionClass $reflector The class reflector to use for inspecting the object definition.
+     *
+     * @return array The array-cast of the object, with prefixed dynamic properties.
+     */
+    public static function castObject($obj, \ReflectionClass $reflector)
+    {
+        if ($reflector->hasMethod('__debugInfo')) {
+            $a = $obj->__debugInfo();
+        } else {
+            $a = (array) $obj;
+        }
+
+        if ($a) {
+            $p = array_keys($a);
+            foreach ($p as $i => $k) {
+                if (!isset($k[0]) || ("\0" !== $k[0] && !$reflector->hasProperty($k))) {
+                    $p[$i] = self::PREFIX_DYNAMIC.$k;
+                }
+            }
+            $a = array_combine($p, $a);
+        }
+
+        return $a;
+    }
+
     /**
      * Filters out the specified properties.
      *

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
 
 /**
@@ -218,7 +219,6 @@ abstract class AbstractCloner implements ClonerInterface
         } else {
             $classInfo = array(
                 $class,
-                method_exists($class, '__debugInfo'),
                 new \ReflectionClass($class),
                 array_reverse(array('*' => '*', $class => $class) + class_parents($class) + class_implements($class)),
             );
@@ -226,23 +226,9 @@ abstract class AbstractCloner implements ClonerInterface
             $this->classInfo[$class] = $classInfo;
         }
 
-        if ($classInfo[1]) {
-            $a = $this->callCaster(function ($obj) {return $obj->__debugInfo();}, $obj, array(), null, $isNested);
-        } else {
-            $a = (array) $obj;
-        }
+        $a = $this->callCaster('Symfony\Component\VarDumper\Caster\Caster::castObject', $obj, $classInfo[1], null, $isNested);
 
-        if ($a) {
-            $p = array_keys($a);
-            foreach ($p as $i => $k) {
-                if (!isset($k[0]) || ("\0" !== $k[0] && !$classInfo[2]->hasProperty($k))) {
-                    $p[$i] = "\0+\0".$k;
-                }
-            }
-            $a = array_combine($p, $a);
-        }
-
-        foreach ($classInfo[3] as $p) {
+        foreach ($classInfo[2] as $p) {
             if (!empty($this->casters[$p = strtolower($p)])) {
                 foreach ($this->casters[$p] as $p) {
                     $a = $this->callCaster($p, $obj, $a, $stub, $isNested);
@@ -296,7 +282,7 @@ abstract class AbstractCloner implements ClonerInterface
                 $a = $cast;
             }
         } catch (\Exception $e) {
-            $a[(Stub::TYPE_OBJECT === $stub->type ? "\0~\0" : '').'⚠'] = new ThrowingCasterException($callback, $e);
+            $a[(Stub::TYPE_OBJECT === $stub->type ? Caster::PREFIX_VIRTUAL : '').'⚠'] = new ThrowingCasterException($callback, $e);
         }
 
         return $a;

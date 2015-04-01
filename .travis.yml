@@ -24,15 +24,12 @@ env:
         - SYMFONY_DEPRECATIONS_HELPER=weak
 
 before_install:
-    - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then git fetch origin "refs/pull/$TRAVIS_PULL_REQUEST/merge"; else git fetch origin "$TRAVIS_BRANCH"; fi;
-    - if [[ "$TRAVIS_COMMIT" != `git rev-parse FETCH_HEAD` ]]; then echo "Pull request or branch commit hash has changed, aborting!"; exit 1; fi;
     - travis_retry sudo apt-get install parallel
     - composer self-update
     - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then phpenv config-rm xdebug.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]] && [ $(php -r "echo PHP_MINOR_VERSION;") -le 4 ]; then echo "extension = apc.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then pecl install -f memcached-2.1.0; fi;
-    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
+    - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then (pecl install -f memcached-2.1.0 && echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini) || echo "Let's continue without memcache extension"; fi;
     - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then php -i; fi;
     - sudo locale-gen fr_FR.UTF-8 && sudo update-locale
     # Set the COMPOSER_ROOT_VERSION to the right version according to the branch being built

@@ -7,6 +7,26 @@ in 2.6 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.6.0...v2.6.1
 
+* 2.6.6 (2015-04-01)
+
+ * security #14167 CVE-2015-2308 (nicolas-grekas)
+ * security #14166 CVE-2015-2309 (neclimdul)
+ * bug #14126 [VarDumper] Fix toggle action to see source excerpt (nicolas-grekas)
+ * bug #14114 [VarDumper] Fix dumping references as properties (nicolas-grekas)
+ * bug #14074 [VarDumper] Fix dumping ThrowingCasterException (nicolas-grekas)
+ * bug #12948 [Form] [TwigBridge] Bootstrap layout whitespace control (mvar)
+ * bug #14046 [Security] StringUtils::equals() arguments in RememberMe Cookie based implementation are confused (zerkms)
+ * bug #14010 Replace GET parameters when changed in form (WouterJ)
+ * bug #13991 [Dependency Injection] Improve PhpDumper Performance for huge Containers (BattleRattle)
+ * bug #13886 [FrameworkBundle][debug:config] added support for dynamic configurations... (aitboudad)
+ * bug #14013 [DependencyInjection] prevent inlining service configurators (xabbuh)
+ * bug #14012 [DomCrawler] Improve namespace discovery performance (jakzal)
+ * bug #13997 [2.3+][Form][DoctrineBridge] Improved loading of entities and documents (guilhermeblanco)
+ * bug #13978 [WebProfilerBundle] Fix javascript toolbar on IE8 (romainneutron)
+ * bug #13987 [WebProfilerBundle] fixed undefined buttons variable. (aitboudad)
+ * bug #13953 [Translation][MoFileLoader] fixed load empty translation. (aitboudad)
+ * bug #13912 [DependencyInjection] Highest precedence for user parameters (lyrixx)
+
 * 2.6.5 (2015-03-17)
 
  * bug #13944 [HttpKernel] UriSigner::buildUrl - default params for http_build_query  (Jakub Simon)

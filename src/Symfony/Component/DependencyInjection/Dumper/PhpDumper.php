@@ -663,7 +663,7 @@ EOF;
      */
     private function addServices()
     {
-        $publicServices = $privateServices = $synchronizers = '';
+        $publicServices = $privateServices = '';
         $definitions = $this->container->getDefinitions();
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
@@ -674,7 +674,7 @@ EOF;
             }
         }
 
-        return $publicServices.$synchronizers.$privateServices;
+        return $publicServices.$privateServices;
     }
 
     private function addNewInstance($id, Definition $definition, $return, $instantiation)

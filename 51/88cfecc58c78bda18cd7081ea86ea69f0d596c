@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-27T15:02:19Z
+
+Your test for ReflectionClass need to be adapted because different PHP versions have different methods (PHP 5.3 does not have trait-related methods for instance)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-27T15:51:45Z
+
+Right, updated!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-31T15:27:25Z
+
+PR rebased and ready
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-31T15:37:59Z
+
+:+1:

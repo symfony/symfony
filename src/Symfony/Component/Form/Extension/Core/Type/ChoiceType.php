@@ -158,6 +158,11 @@ class ChoiceType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        $choiceTranslationDomain = $options['choice_translation_domain'];
+        if ($view->parent && null === $choiceTranslationDomain) {
+            $choiceTranslationDomain = $view->vars['translation_domain'];
+        }
+
         /** @var ChoiceListView $choiceListView */
         $choiceListView = $form->getConfig()->hasAttribute('choice_list_view')
             ? $form->getConfig()->getAttribute('choice_list_view')
@@ -170,6 +175,7 @@ class ChoiceType extends AbstractType
             'choices' => $choiceListView->choices,
             'separator' => '-------------------',
             'placeholder' => null,
+            'choice_translation_domain' => $choiceTranslationDomain,
         ));
 
         // The decision, whether a choice is selected, is potentially done
@@ -295,6 +301,14 @@ class ChoiceType extends AbstractType
             return $options['expanded'];
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (true === $choiceTranslationDomain) {
+                return $options['translation_domain'];
+            }
+
+            return $choiceTranslationDomain;
+        };
+
         $resolver->setDefaults(array(
             'multiple' => false,
             'expanded' => false,
@@ -317,14 +331,17 @@ class ChoiceType extends AbstractType
             // is manually set to an object.
             // See https://github.com/symfony/symfony/pull/5582
             'data_class' => null,
+            'choice_translation_domain' => true,
         ));
 
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('empty_value', $placeholderNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
 
         $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
+        $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
         $resolver->setAllowedTypes('choices_as_values', 'bool');
         $resolver->setAllowedTypes('choice_loader', array('null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface'));
         $resolver->setAllowedTypes('choice_label', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));

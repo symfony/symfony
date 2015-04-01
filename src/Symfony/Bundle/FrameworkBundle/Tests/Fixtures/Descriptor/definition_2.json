@@ -4,7 +4,6 @@
     "public": false,
     "synthetic": true,
     "lazy": false,
-    "synchronized": false,
     "abstract": false,
     "file": "\/path\/to\/file",
     "factory_service": "factory.service",

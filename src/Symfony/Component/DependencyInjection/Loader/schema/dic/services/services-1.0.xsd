@@ -90,12 +90,8 @@
     <xsd:attribute name="scope" type="xsd:string" />
     <xsd:attribute name="public" type="boolean" />
     <xsd:attribute name="synthetic" type="boolean" />
-    <xsd:attribute name="synchronized" type="boolean" />
     <xsd:attribute name="lazy" type="boolean" />
     <xsd:attribute name="abstract" type="boolean" />
-    <xsd:attribute name="factory-class" type="xsd:string" />
-    <xsd:attribute name="factory-method" type="xsd:string" />
-    <xsd:attribute name="factory-service" type="xsd:string" />
     <xsd:attribute name="alias" type="xsd:string" />
     <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="decorates" type="xsd:string" />

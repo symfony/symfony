@@ -207,7 +207,7 @@ class TextDescriptor extends Descriptor
                     foreach ($definition->getTag($showTag) as $key => $tag) {
                         $tagValues = array();
                         foreach ($tagsNames as $tagName) {
-                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
+                            $tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : '';
                         }
                         if (0 === $key) {
                             $table->addRow(array_merge(array($serviceId), $tagValues, array($definition->getClass())));
@@ -220,10 +220,10 @@ class TextDescriptor extends Descriptor
                 }
             } elseif ($definition instanceof Alias) {
                 $alias = $definition;
-                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, sprintf('alias for "%s"', $alias)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             } else {
                 // we have no information (happens with "service_container")
-                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, "") : array()));
+                $table->addRow(array_merge(array($serviceId, get_class($definition)), $tagsCount ? array_fill(0, $tagsCount, '') : array()));
             }
         }
 
@@ -240,7 +240,7 @@ class TextDescriptor extends Descriptor
             : array();
 
         $description[] = sprintf('<comment>Service Id</comment>       %s', isset($options['id']) ? $options['id'] : '-');
-        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: "-");
+        $description[] = sprintf('<comment>Class</comment>            %s', $definition->getClass() ?: '-');
 
         $tags = $definition->getTags();
         if (count($tags)) {
@@ -260,25 +260,10 @@ class TextDescriptor extends Descriptor
         $description[] = sprintf('<comment>Public</comment>           %s', $definition->isPublic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Synthetic</comment>        %s', $definition->isSynthetic() ? 'yes' : 'no');
         $description[] = sprintf('<comment>Lazy</comment>             %s', $definition->isLazy() ? 'yes' : 'no');
-        if (method_exists($definition, 'isSynchronized')) {
-            $description[] = sprintf('<comment>Synchronized</comment>     %s', $definition->isSynchronized(false) ? 'yes' : 'no');
-        }
         $description[] = sprintf('<comment>Abstract</comment>         %s', $definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $description[] = sprintf('<comment>Required File</comment>    %s', $definition->getFile() ? $definition->getFile() : '-');
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $description[] = sprintf('<comment>Factory Class</comment>    %s', $definition->getFactoryClass(false));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $description[] = sprintf('<comment>Factory Service</comment>  %s', $definition->getFactoryService(false));
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $description[] = sprintf('<comment>Factory Method</comment>   %s', $definition->getFactoryMethod(false));
         }
 
         if ($factory = $definition->getFactory()) {

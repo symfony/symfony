@@ -110,7 +110,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
-            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
     }
 
@@ -182,26 +182,10 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
         ;
 
-        if (method_exists($definition, 'isSynchronized')) {
-            $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
-        }
-
         $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
-        }
-
-        if ($definition->getFactoryClass(false)) {
-            $output .= "\n".'- Factory Class: `'.$definition->getFactoryClass(false).'`';
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $output .= "\n".'- Factory Service: `'.$definition->getFactoryService(false).'`';
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $output .= "\n".'- Factory Method: `'.$definition->getFactoryMethod(false).'`';
         }
 
         if ($factory = $definition->getFactory()) {

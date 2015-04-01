@@ -124,18 +124,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacySynchronizedServices()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        $container = include self::$fixturesPath.'/containers/container20.php';
-        $dumper = new PhpDumper($container);
-        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services20.php')), $dumper->dump(), '->dump() dumps services');
-    }
-
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';

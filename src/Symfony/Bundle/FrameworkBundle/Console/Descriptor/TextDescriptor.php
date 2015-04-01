@@ -63,8 +63,13 @@ class TextDescriptor extends Descriptor
             $tableRows[] = $row;
         }
 
-        $outputHelper = isset($options['output_helper']) ? $options['output_helper'] : $this->getOutput();
-        $outputHelper->table($tableHeaders, $tableRows);
+        if (isset($options['output_helper'])) {
+            $options['output_helper']->table($tableHeaders, $tableRows);
+        } else {
+            $table = new Table($this->getOutput());
+            $table->setHeaders($tableHeaders)->setRows($tableRows);
+            $table->render();
+        }
     }
 
     /**
@@ -90,8 +95,13 @@ class TextDescriptor extends Descriptor
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
 
-        $outputHelper = isset($options['output_helper']) ? $options['output_helper'] : $this->getOutput();
-        $outputHelper->table($tableHeaders, $tableRows);
+        if (isset($options['output_helper'])) {
+            $options['output_helper']->table($tableHeaders, $tableRows);
+        } else {
+            $table = new Table($this->getOutput());
+            $table->setHeaders($tableHeaders)->setRows($tableRows);
+            $table->render();
+        }
     }
 
     /**

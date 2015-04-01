@@ -69,6 +69,11 @@ class FatalErrorException extends LegacyFatalErrorException
 
                 unset($frame);
                 $trace = array_reverse($trace);
+            } elseif (function_exists('symfony_debug_backtrace')) {
+                $trace = symfony_debug_backtrace();
+                if (0 < $traceOffset) {
+                    array_splice($trace, 0, $traceOffset);
+                }
             } else {
                 $trace = array();
             }

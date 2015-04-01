@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-31T21:13:39Z
+
+So, I reverted #14047 and added a check to not fail if memcached can't be installed.
+If someone has a better idea, I'd close this PR happily.
+For now, I'm stuck with this.

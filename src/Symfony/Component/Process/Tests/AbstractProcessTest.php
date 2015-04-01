@@ -209,7 +209,7 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array()),
-            array(new Foo()),
+            array(new NonStringifiable()),
         );
     }
 
@@ -1171,6 +1171,6 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
     abstract protected function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array());
 }
 
-class Foo
+class NonStringifiable
 {
 }

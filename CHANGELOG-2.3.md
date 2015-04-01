@@ -7,6 +7,16 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.27 (2015-04-01)
+
+ * security #14167 CVE-2015-2308 (nicolas-grekas)
+ * security #14166 CVE-2015-2309 (neclimdul)
+ * bug #14010 Replace GET parameters when changed in form (WouterJ)
+ * bug #13991 [Dependency Injection] Improve PhpDumper Performance for huge Containers (BattleRattle)
+ * bug #13997 [2.3+][Form][DoctrineBridge] Improved loading of entities and documents (guilhermeblanco)
+ * bug #13953 [Translation][MoFileLoader] fixed load empty translation. (aitboudad)
+ * bug #13912 [DependencyInjection] Highest precedence for user parameters (lyrixx)
+
 * 2.3.26 (2015-03-17)
 
  * bug #13927 Fixing wrong variable name from #13519 (weaverryan)

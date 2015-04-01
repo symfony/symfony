@@ -1,8 +1,0 @@
-services:
-    request:
-        class: Request
-        synthetic: true
-    depends_on_request:
-        class: stdClass
-        calls:
-            - [setRequest, ['@?request']]

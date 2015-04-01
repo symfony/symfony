@@ -79,10 +79,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $outputHelper = new SymfonyStyle($input, $output);
 
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->caution('The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.');
+            $outputHelper->caution('The use of "router:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:router" instead.');
         }
 
         $name = $input->getArgument('name');
@@ -100,6 +100,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'name' => $name,
+                'output_helper' => $outputHelper,
             ));
         } else {
             $routes = $this->getContainer()->get('router')->getRouteCollection();
@@ -112,6 +113,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'output_helper' => $outputHelper,
             ));
         }
     }

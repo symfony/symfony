@@ -63,7 +63,7 @@ class TextDescriptor extends Descriptor
             $tableRows[] = $row;
         }
 
-        $this->getOutput()->table($tableHeaders, $tableRows);
+        $options['output_helper']->table($tableHeaders, $tableRows);
     }
 
     /**
@@ -89,7 +89,7 @@ class TextDescriptor extends Descriptor
             array('Options', $this->formatRouterConfig($route->getOptions())),
         );
 
-        $this->getOutput()->table($tableHeaders, $tableRows);
+        $options['output_helper']->table($tableHeaders, $tableRows);
     }
 
     /**

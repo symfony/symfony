@@ -7,6 +7,11 @@ in 2.5 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.5.0...v2.5.1
 
+* 2.5.11 (2015-04-01)
+
+ * security #14167 CVE-2015-2308 (nicolas-grekas)
+ * security #14166 CVE-2015-2309 (neclimdul)
+
 * 2.5.10 (2015-02-02)
 
  * bug #13528 [Validator] reject ill-formed strings (nicolas-grekas)

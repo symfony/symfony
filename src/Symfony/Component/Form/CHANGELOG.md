@@ -1,11 +1,21 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
 2.7.0
 -----
 
- * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
- * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
+ * deprecated the overwriting of `AbstractType::setDefaultOptions()` in favor of overwriting `AbstractType::configureOptions()`.
+ * deprecated the overwriting of `AbstractTypeExtension::setDefaultOptions()` in favor of overwriting `AbstractTypeExtension::configureOptions()`.
 
 2.6.2
 -----

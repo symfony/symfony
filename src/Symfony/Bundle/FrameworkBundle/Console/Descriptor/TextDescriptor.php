@@ -34,11 +34,13 @@ class TextDescriptor extends Descriptor
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
-        $headers = array('Name', 'Method', 'Scheme', 'Host', 'Path');
-        $table = new Table($this->getOutput());
-        $table->setStyle('compact');
-        $table->setHeaders($showControllers ? array_merge($headers, array('Controller')) : $headers);
 
+        $tableHeaders = array('Name', 'Method', 'Scheme', 'Host', 'Path');
+        if ($showControllers) {
+            $tableHeaders[] = 'Controller';
+        }
+
+        $tableRows = array();
         foreach ($routes->all() as $name => $route) {
             $row = array(
                 $name,
@@ -58,11 +60,10 @@ class TextDescriptor extends Descriptor
                 $row[] = $controller;
             }
 
-            $table->addRow($row);
+            $tableRows[] = $row;
         }
 
-        $this->writeText($this->formatSection('router', 'Current routes')."\n", $options);
-        $table->render();
+        $this->getOutput()->table($tableHeaders, $tableRows);
     }
 
     /**
@@ -73,26 +74,22 @@ class TextDescriptor extends Descriptor
         $requirements = $route->getRequirements();
         unset($requirements['_scheme'], $requirements['_method']);
 
-        // fixme: values were originally written as raw
-        $description = array(
-            '<comment>Path</comment>         '.$route->getPath(),
-            '<comment>Path Regex</comment>   '.$route->compile()->getRegex(),
-            '<comment>Host</comment>         '.('' !== $route->getHost() ? $route->getHost() : 'ANY'),
-            '<comment>Host Regex</comment>   '.('' !== $route->getHost() ? $route->compile()->getHostRegex() : ''),
-            '<comment>Scheme</comment>       '.($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'),
-            '<comment>Method</comment>       '.($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY'),
-            '<comment>Class</comment>        '.get_class($route),
-            '<comment>Defaults</comment>     '.$this->formatRouterConfig($route->getDefaults()),
-            '<comment>Requirements</comment> '.($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM'),
-            '<comment>Options</comment>      '.$this->formatRouterConfig($route->getOptions()),
+        $tableHeaders = array('Property', 'Value');
+        $tableRows = array(
+            array('Route Name', $options['name']),
+            array('Path', $route->getPath()),
+            array('Path Regex', $route->compile()->getRegex()),
+            array('Host', ('' !== $route->getHost() ? $route->getHost() : 'ANY')),
+            array('Host Regex', ('' !== $route->getHost() ? $route->compile()->getHostRegex() : '')),
+            array('Scheme', ($route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY')),
+            array('Method', ($route->getMethods() ? implode('|', $route->getMethods()) : 'ANY')),
+            array('Requirements', ($requirements ? $this->formatRouterConfig($requirements) : 'NO CUSTOM')),
+            array('Class', get_class($route)),
+            array('Defaults', $this->formatRouterConfig($route->getDefaults())),
+            array('Options', $this->formatRouterConfig($route->getOptions())),
         );
 
-        if (isset($options['name'])) {
-            array_unshift($description, '<comment>Name</comment>         '.$options['name']);
-            array_unshift($description, $this->formatSection('router', sprintf('Route "%s"', $options['name'])));
-        }
-
-        $this->writeText(implode("\n", $description)."\n", $options);
+        $this->getOutput()->table($tableHeaders, $tableRows);
     }
 
     /**
@@ -376,23 +373,24 @@ class TextDescriptor extends Descriptor
     }
 
     /**
-     * @param array $array
+     * @param array $config
      *
      * @return string
      */
-    private function formatRouterConfig(array $array)
+    private function formatRouterConfig(array $config)
     {
-        if (!count($array)) {
+        if (empty($config)) {
             return 'NONE';
         }
 
-        $string = '';
-        ksort($array);
-        foreach ($array as $name => $value) {
-            $string .= ($string ? "\n".str_repeat(' ', 13) : '').$name.': '.$this->formatValue($value);
+        ksort($config);
+
+        $configAsString = '';
+        foreach ($config as $key => $value) {
+            $configAsString .= sprintf("\n%s: %s", $key, $this->formatValue($value));
         }
 
-        return $string;
+        return trim($configAsString);
     }
 
     /**

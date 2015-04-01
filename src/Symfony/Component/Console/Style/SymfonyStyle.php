@@ -34,7 +34,6 @@ class SymfonyStyle extends OutputStyle
     private $input;
     private $questionHelper;
     private $progressBar;
-    private $terminalWidth;
     private $lineLength;
 
     /**
@@ -313,10 +312,6 @@ class SymfonyStyle extends OutputStyle
 
     private function getTerminalWidth()
     {
-        if ($this->terminalWidth) {
-            return $this->terminalWidth;
-        }
-
         if ('\\' === DIRECTORY_SEPARATOR) {
             // extract [w, H] from "wxh (WxH)"
             if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
@@ -338,8 +333,6 @@ class SymfonyStyle extends OutputStyle
                 return (int) $matches[2];
             }
         }
-
-        return;
     }
 
     /**
@@ -384,7 +377,7 @@ class SymfonyStyle extends OutputStyle
             fclose($pipes[2]);
             proc_close($process);
 
-            if (preg_match('/--------+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
+            if (preg_match('/-{8}+\r?\n.+?(\d+)\r?\n.+?(\d+)\r?\n/', $info, $matches)) {
                 return $matches[2].'x'.$matches[1];
             }
         }

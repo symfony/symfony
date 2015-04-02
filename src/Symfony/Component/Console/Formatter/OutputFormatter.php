@@ -236,6 +236,6 @@ class OutputFormatter implements OutputFormatterInterface
      */
     private function applyCurrentStyle($text)
     {
-        return $this->isDecorated() && strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
+        return $this->isDecorated() && '' !== $text ? $this->styleStack->getCurrent()->apply($text) : $text;
     }
 }

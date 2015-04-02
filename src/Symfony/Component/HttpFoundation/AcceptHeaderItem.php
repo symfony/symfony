@@ -74,7 +74,7 @@ class AcceptHeaderItem
                 $attributes[$bit] = null;
             } else {
                 $parts = explode('=', $bit);
-                $attributes[$parts[0]] = isset($parts[1]) && strlen($parts[1]) > 0 ? $parts[1] : '';
+                $attributes[$parts[0]] = isset($parts[1]) && '' !== $parts[1] ? $parts[1] : '';
             }
         }
 

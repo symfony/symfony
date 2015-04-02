@@ -332,7 +332,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         return $messages;
     }
 
-    /*
+    /**
      * @param string $locale
      */
     protected function loadCatalogue($locale)

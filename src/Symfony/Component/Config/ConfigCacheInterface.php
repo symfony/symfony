@@ -43,8 +43,8 @@ interface ConfigCacheInterface
     /**
      * Writes cache.
      *
-     * @param string              $content  The content to write into the cache
-     * @param ResourceInterface[] $metadata An array of ResourceInterface instances
+     * @param string                   $content  The content to write into the cache
+     * @param ResourceInterface[]|null $metadata An array of ResourceInterface instances
      *
      * @throws \RuntimeException When the cache file cannot be written
      */

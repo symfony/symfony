@@ -57,12 +57,23 @@
 {% endblock %}
 
 {% block panelContent %}
-    <h2>Called Translations</h2>
-    <ul>
-        <li><strong>Defined messages: {{ collector.countdefines }}</strong></li>
-        <li><strong>Fallback messages: {{ collector.countFallbacks }}</strong></li>
-        <li><strong>Missing messages: {{ collector.countMissings }}</strong></li>
-    </ul>
+    <h2>Translation Stats</h2>
+    <table>
+        <tbody>
+            <tr>
+                <th>Defined messages</th>
+                <td><pre>{{ collector.countdefines }}</pre></td>
+            </tr>
+            <tr>
+                <th scope="col" style="width: 30%">Fallback messages</th>
+                <td scope="col" style="width: 60%"><pre>{{ collector.countFallbacks }}</pre></td>
+            </tr>
+            <tr>
+                <th>Missing messages</th>
+                <td><pre>{{ collector.countMissings }}</pre></td>
+            </tr>
+        </tbody>
+    </table>
 
     <table>
         <tr>
@@ -77,7 +88,10 @@
                 <td><code>{{ translator.state(message) }}</code></td>
                 <td><code>{{ message.locale }}</code></td>
                 <td><code>{{ message.domain }}</code></td>
-                <td><code>{{ message.id }}</code></td>
+                <td>
+                    <code>{{ message.id }}</code>
+                    {% if message.count > 1 %}<br><small style="color: gray;">(used {{ message.count }} times)</small>{% endif %}
+                </td>
                 <td><code>{{ message.translation }}</code></td>
             </tr>
         {% endfor %}

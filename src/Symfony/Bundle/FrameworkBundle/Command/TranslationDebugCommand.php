@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -81,8 +82,10 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
+
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.</comment>');
+            $output->note('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
         }
 
         $locale = $input->getArgument('locale');
@@ -109,13 +112,13 @@ EOF
 
         // No defined or extracted messages
         if (empty($allMessages) || null !== $domain && empty($allMessages[$domain])) {
-            $outputMessage = sprintf('<info>No defined or extracted messages for locale "%s"</info>', $locale);
+            $outputMessage = sprintf('No defined or extracted messages for locale "%s"', $locale);
 
             if (null !== $domain) {
-                $outputMessage .= sprintf(' <info>and domain "%s"</info>', $domain);
+                $outputMessage .= sprintf(' and domain "%s"', $domain);
             }
 
-            $output->writeln($outputMessage);
+            $output->success($outputMessage);
 
             return;
         }
@@ -135,17 +138,13 @@ EOF
             }
         }
 
-        /** @var \Symfony\Component\Console\Helper\Table $table */
-        $table = new Table($output);
-
-        // Display header line
+        // Header line
         $headers = array('State(s)', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
-        $table->setHeaders($headers);
-
         // Iterate all message ids and determine their state
+        $rows = array();
         foreach ($allMessages as $domain => $messages) {
             foreach (array_keys($messages) as $messageId) {
                 $value = $currentCatalogue->get($messageId, $domain);
@@ -177,17 +176,18 @@ EOF
                     $row[] = $this->sanitizeString($fallbackCatalogue->get($messageId, $domain));
                 }
 
-                $table->addRow($row);
+                $rows[] = $row;
             }
         }
 
-        $table->render();
-
-        $output->writeln('');
-        $output->writeln('<info>Legend:</info>');
-        $output->writeln(sprintf(' %s Missing message', $this->formatState(self::MESSAGE_MISSING)));
-        $output->writeln(sprintf(' %s Unused message', $this->formatState(self::MESSAGE_UNUSED)));
-        $output->writeln(sprintf(' %s Same as the fallback message', $this->formatState(self::MESSAGE_EQUALS_FALLBACK)));
+        $output->section('Debug Translation result:');
+        $output->table($headers, $rows);
+        $output->section('Legend:');
+        $output->listing(array(
+            sprintf('%s Missing message', $this->formatState(self::MESSAGE_MISSING)),
+            sprintf('%s Unused message', $this->formatState(self::MESSAGE_UNUSED)),
+            sprintf('%s Same as the fallback message', $this->formatState(self::MESSAGE_EQUALS_FALLBACK)),
+        ));
     }
 
     private function formatState($state)

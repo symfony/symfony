@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Translation\Catalogue\DiffOperation;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,9 +68,11 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
+
         // check presence of force or dump-message
         if ($input->getOption('force') !== true && $input->getOption('dump-messages') !== true) {
-            $output->writeln('<info>You must choose one of --force or --dump-messages</info>');
+            $output->warning('You must choose one of "--force" or "--dump-messages".');
 
             return 1;
         }
@@ -78,8 +81,7 @@ EOF
         $writer = $this->getContainer()->get('translation.writer');
         $supportedFormats = $writer->getFormats();
         if (!in_array($input->getOption('output-format'), $supportedFormats)) {
-            $output->writeln('<error>Wrong output format</error>');
-            $output->writeln('Supported formats are '.implode(', ', $supportedFormats).'.');
+            $output->error(sprintf('Wrong output format. Supported formats are %s.', implode(', ', $supportedFormats)));
 
             return 1;
         }
@@ -97,18 +99,16 @@ EOF
 
         // get bundle directory
         $translationsPath = $rootPath.'/Resources/translations';
-        $output->writeln(sprintf('Generating "<info>%s</info>" translation files for "<info>%s</info>"', $input->getArgument('locale'), $currentName));
+        $output->title(sprintf('Generating "%s" translation files for "%s"', $input->getArgument('locale'), $currentName));
 
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
-        $output->writeln('Parsing templates');
         $extractor = $this->getContainer()->get('translation.extractor');
         $extractor->setPrefix($input->getOption('prefix'));
         $extractor->extract($rootPath.'/Resources/views/', $extractedCatalogue);
 
         // load any existing messages from the translation files
         $currentCatalogue = new MessageCatalogue($input->getArgument('locale'));
-        $output->writeln('Loading translation files');
         $loader = $this->getContainer()->get('translation.loader');
         $loader->loadMessages($translationsPath, $currentCatalogue);
 
@@ -119,7 +119,7 @@ EOF
 
         // Exit if no messages found.
         if (!count($operation->getDomains())) {
-            $output->writeln("\n<comment>No translation found.</comment>");
+            $output->warning('No translation found.');
 
             return;
         }
@@ -127,22 +127,24 @@ EOF
         // show compiled list of messages
         if ($input->getOption('dump-messages') === true) {
             foreach ($operation->getDomains() as $domain) {
-                $output->writeln(sprintf("\nDisplaying messages for domain <info>%s</info>:\n", $domain));
+                $output->section(sprintf('Displaying messages for domain "%s":', $domain));
                 $newKeys = array_keys($operation->getNewMessages($domain));
                 $allKeys = array_keys($operation->getMessages($domain));
+                $elements = array();
                 foreach (array_diff($allKeys, $newKeys) as $id) {
-                    $output->writeln($id);
+                    $elements[] = $id;
                 }
                 foreach ($newKeys as $id) {
-                    $output->writeln(sprintf('<fg=green>%s</>', $id));
+                    $elements[] = sprintf('<fg=green>%s</>', $id);
                 }
                 foreach (array_keys($operation->getObsoleteMessages($domain)) as $id) {
-                    $output->writeln(sprintf('<fg=red>%s</>', $id));
+                    $elements[] = sprintf('<fg=red>%s</>', $id);
                 }
+                $output->listing($elements);
             }
 
             if ($input->getOption('output-format') == 'xliff') {
-                $output->writeln('Xliff output version is <info>1.2</info>');
+                $output->text('Xliff output version is <info>1.2</info>');
             }
         }
 
@@ -152,7 +154,7 @@ EOF
 
         // save the files
         if ($input->getOption('force') === true) {
-            $output->writeln('Writing files');
+            $output->text('Writing files');
             $writer->writeTranslations($operation->getResult(), $input->getOption('output-format'), array('path' => $translationsPath, 'default_locale' => $this->getContainer()->getParameter('kernel.default_locale')));
         }
     }

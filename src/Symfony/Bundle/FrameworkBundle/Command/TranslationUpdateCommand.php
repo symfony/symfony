@@ -99,7 +99,7 @@ EOF
 
         // get bundle directory
         $translationsPath = $rootPath.'/Resources/translations';
-        $output->title(sprintf('Generating "%s" translation files for "%s"', $input->getArgument('locale'), $currentName));
+        $output->text(sprintf('Generating "%s" translation files for "%s"', $input->getArgument('locale'), $currentName));
 
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
@@ -127,7 +127,7 @@ EOF
         // show compiled list of messages
         if ($input->getOption('dump-messages') === true) {
             foreach ($operation->getDomains() as $domain) {
-                $output->section(sprintf('Displaying messages for domain "%s":', $domain));
+                $output->text(sprintf('Displaying messages for domain "%s":', $domain));
                 $newKeys = array_keys($operation->getNewMessages($domain));
                 $allKeys = array_keys($operation->getMessages($domain));
                 $elements = array();

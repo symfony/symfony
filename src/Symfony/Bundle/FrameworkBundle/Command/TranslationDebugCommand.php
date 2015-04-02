@@ -85,7 +85,7 @@ EOF
         $output = new SymfonyStyle($input, $output);
 
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->note('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
+            $output->caution('The use of "translation:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:translation" instead.');
         }
 
         $locale = $input->getArgument('locale');
@@ -180,9 +180,9 @@ EOF
             }
         }
 
-        $output->section('Debug Translation result:');
+        $output->section('Debug Translation result');
         $output->table($headers, $rows);
-        $output->section('Legend:');
+        $output->section('Legend');
         $output->listing(array(
             sprintf('%s Missing message', $this->formatState(self::MESSAGE_MISSING)),
             sprintf('%s Unused message', $this->formatState(self::MESSAGE_UNUSED)),

@@ -80,7 +80,7 @@ class LintCommandTest extends \PHPUnit_Framework_TestCase
 
         $application = new Application();
         $application->add($command);
-        $command = $application->find('twig:lint');
+        $command = $application->find('lint:twig');
 
         return new CommandTester($command);
     }

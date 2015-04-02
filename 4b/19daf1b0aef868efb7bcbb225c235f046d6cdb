@@ -1,0 +1,184 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T10:17:51Z
+
+I don't know how this will be welcome but I always find annoying to have to explicitly access the `container` property to get a global parameter from an action.
+
+I'm also wondering of naming the method to `getConfigParameter()` or `getGlobalParameter()`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T10:23:33Z
+
+@hhamon :+1: this has bugged me a lot of times!
+
+In case this proposal is accepted, my vote would be for the shortest `->getParameter()` method name.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-25T10:25:12Z
+
+:+1: for the `getParameter` method name.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-25T11:04:22Z
+
+what do you think about adding ``` hasParameter ``` too ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T11:19:45Z
+
+@aitboudad good point! Maybe we're complicating things a lot but, what if we mimick the ParamaterBag behavior and change this `getParameter(string $name)` by `getParameter(string $name, mixed $default = null)`?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T11:32:42Z
+
+I'm +1 for the default value as the second argument. Makes more sense in the Controller layer to avoid cascading `if` statements.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-03-25T13:56:34Z
+
+IMHO, ```getParameter``` can be quickly misunderstood since it is in a controller action that process an HTTP request. I mean, the first thought would be to receive a request parameter.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T14:00:42Z
+
+Good point! This is the reason why I wonder about the naming of the method...
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-25T14:54:32Z
+
+`$this->getContainerParameter($name)` then ?
+
+I'm not sure it's better than `$this->container->getParameter($name)`... unless it adds the `ParameterBag` mimic.
+
+> IMHO, getParameter can be quickly misunderstood since it is in a controller action that process an HTTP request. I mean, the first thought would be to receive a request parameter.
+
+You're right. Reading at the PR title, I firstly thought about the request parameters...
+But then, the same thought could be applied to the `get` and `has` methods, which can be misunderstood for the same reasons and might suggest retrieving query parameters...
+
+So, I believe it isn't an issue to name this new method `getParameter`.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-25T15:33:56Z
+
+``` getConfigParameter ``` ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-25T15:44:35Z
+
+I don't really see any big issue with the `getParameter()` name. Even newcomers know that when you use  `$this->...` inside a controller, you never refer to the request but the application. People usually don't have any problem understanding the `Request $request` typehinting mechinsm of obtaining the request.
+
+---------------------------------------------------------------------------
+
+by phansys at 2015-03-25T15:52:15Z
+
+@aitboudad , ```getConfigParameter()``` seems more consistent to me. @javiereguiluz, I don't believe this is actually an issue. I only share my opinion about the method naming inside the controller scope. BTW, despite as how it will called, I think it's a nice addition.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T17:53:36Z
+
+Why not naming it `getConfiguration()` to make it clearer?
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-25T17:54:42Z
+
+@weaverryan any thoughts about naming things on this PR please?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-27T15:52:52Z
+
+I wouldn't use `getConfiguration()` as the method's name. It could easily be confused with what you add in the application configuration files. To me, `getParameter()` is just fine.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-03-31T06:46:02Z
+
+:+1: for `getParameter()`. This is actually what people intuitively try to use on the basic Symfony training course, once they're shown the `get()` shortcut.
+
+However, I'm concerned with introduction of ParameterBag-like default value for two reasons. Firstly, this behaviour would be inconsistent with the way container works. It'll lead to WTF moments when accessing container parameters directly. Secondly, I think in this case it's better to fail early and throw an exception to show the application is misconfigured.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-31T06:57:02Z
+
+After reading @jakzal comments I realize how wrong was my proposal about providing a default mechanism for container parameters. In the case of request params, it makes sense in a lot of use cases (e.g. `->query->get('page', 1)`) but in the case of the container, if a required parameter doesn't exist, the application should fail.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-31T07:08:14Z
+
+Hi Jakub,
+
+Thanks for your reply. So you mean writing something like the following:
+
+```
+function getParameter($name)
+{
+    if (!$this->container->hasParameter($name)) {
+        throw new \InvalidArgumentException(sprintf('Invalid parameter "%s".', $name));
+    }
+
+    return $this->container->getParameter($name);
+}
+```
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-03-31T07:28:14Z
+
+Container's `ParameterBag` already [throws an exception if you try to access a parameter that doesn't exist](https://github.com/symfony/DependencyInjection/blob/master/ParameterBag/ParameterBag.php#L93-L107). This could be a simple proxy method:
+
+```php
+public function getParameter($name)
+{
+    return $this->container->getParameter($name);
+}
+```
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-31T07:29:33Z
+
+This is already what I've done in the PR with a protected proxy method.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-03-31T07:40:55Z
+
+Well, no. Currently the method checks if parameter exists and uses a default value otherwise.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-31T07:45:38Z
+
+Oh yes! Since I've updated the code according to @javiereguiluz proposal. I'm reverting it.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2015-03-31T07:49:22Z
+
+@jakzal fixed thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-31T08:21:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-03-31T09:10:50Z
+
+:+1:

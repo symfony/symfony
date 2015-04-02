@@ -25,9 +25,6 @@ use Symfony\Component\Templating\Helper\Helper;
 class LogoutUrlHelper extends Helper
 {
     private $generator;
-    private $listeners = array();
-    private $router;
-    private $tokenStorage;
 
     /**
      * Constructor.

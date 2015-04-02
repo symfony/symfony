@@ -706,7 +706,6 @@ class FrameworkExtension extends Extension
             ;
 
             foreach ($finder as $file) {
-                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
                 $files[] = (string) $file;
             }
 

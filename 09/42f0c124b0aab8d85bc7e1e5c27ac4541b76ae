@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by unkind at 2015-04-01T07:11:05Z
+
+http://symfony.com/doc/current/contributing/code/patches.html#work-on-your-patch
+
+There is convention for commit messages:
+
+> The summary should start with the Component you are working on in square brackets ([DependencyInjection], [FrameworkBundle], ...)

@@ -41,6 +41,11 @@ class Configuration implements ConfigurationInterface
                     ->min(-1)
                     ->defaultValue(-1)
                 ->end()
+                ->scalarNode('disable_html_for')
+                    ->info('Disable HTMLdumper in favor of CliDumper based on an expression')
+                    ->example("0 === strpos(request.headers.get('user-agent'), 'curl/')")
+                    ->defaultNull()
+                ->end()
             ->end()
         ;
 

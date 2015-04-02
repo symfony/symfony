@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Stops a background process running PHP's built-in web server.
@@ -54,14 +55,15 @@ EOF
     {
         $address = $input->getArgument('address');
         $lockFile = $this->getLockFile($address);
+        $output = new SymfonyStyle($input, $output);
 
         if (!file_exists($lockFile)) {
-            $output->writeln(sprintf('<error>No web server is listening on http://%s</error>', $address));
+            $output->error(sprintf('No web server is listening on http://%s.', $address));
 
             return 1;
         }
 
         unlink($lockFile);
-        $output->writeln(sprintf('<info>Stopped the web server listening on http://%s</info>', $address));
+        $output->success(sprintf('Stopped the web server listening on http://%s.', $address));
     }
 }

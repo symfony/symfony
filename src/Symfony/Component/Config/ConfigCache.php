@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigCache
+class ConfigCache implements ConfigCacheInterface
 {
     private $debug;
     private $file;
@@ -44,8 +44,19 @@ class ConfigCache
      * Gets the cache file path.
      *
      * @return string The cache file path
+     * @deprecated since 2.7, to be removed in 3.0. Use getFilePath() instead.
      */
     public function __toString()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Gets the cache file path.
+     *
+     * @return string The cache file path
+     */
+    public function getPath()
     {
         return $this->file;
     }

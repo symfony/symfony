@@ -4,8 +4,8 @@ CHANGELOG
 3.0.0
 -----
 
- * Removed `Symfony\Component\HttpKernel\Kernel::init()`
- * Removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
+ * removed `Symfony\Component\HttpKernel\Kernel::init()`
+ * removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
 
 2.7.0
 -----

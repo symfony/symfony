@@ -13,14 +13,14 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
 {
     public function testOnlyClearOwnOutputBuffers()
     {
-        $flatten = $this->getMock('Symfony\Component\Debug\Exception\FlattenException');
+        $flatten = $this->getMock(FlattenException::class);
         $flatten
             ->expects($this->once())
             ->method('getStatusCode')

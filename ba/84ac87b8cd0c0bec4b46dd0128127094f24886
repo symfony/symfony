@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-02T10:07:25Z
+
+@stof You should create branch on your fork...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-02T10:18:42Z
+
+@stloyd I know. This was a mistake. but closing this PR and creating a new one just for that is not worth it IMO
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-02T10:20:19Z
+
+@nicolas-grekas it would be great to check why the deps=high tests are failing currently (it is not related to a subtree update not done here)

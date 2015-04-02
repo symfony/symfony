@@ -196,7 +196,7 @@
         }
 
         {% if excluded_ajax_paths is defined %}
-            if (window.XMLHttpRequest && XMLHttpRequest.addEventListener) {
+            if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
                 var proxied = XMLHttpRequest.prototype.open;
 
                 XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {

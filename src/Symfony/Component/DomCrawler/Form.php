@@ -173,8 +173,12 @@ class Form extends Link implements \ArrayAccess
         foreach ($this->getFiles() as $name => $value) {
             $qs = http_build_query(array($name => $value), '', '&');
             if (!empty($qs)) {
+                // Make the query string conform to PHP's $_FILES rejuggling behaviour
+                $qs = preg_replace('/%5B(.*?)%5D%5B(name|type|tmp_name|error|size)%5D=/', '%5B$2%5D%5B$1%5D=', $qs);
                 parse_str($qs, $expandedValue);
                 $varName = substr($name, 0, strlen(key($expandedValue)));
+                // PHP converts whitespaces, dots, opening brackets and dashes to underscore. See http://php.net/manual/de/language.variables.external.php#81080
+                $varName = preg_replace('/[ \.\[\-]+/', '_', $varName);
                 $values = array_replace_recursive($values, array($varName => current($expandedValue)));
             }
         }

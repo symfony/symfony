@@ -460,13 +460,13 @@ class FormTest extends \PHPUnit_Framework_TestCase
     public function testGetPhpFiles()
     {
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(array('foo' => array('bar' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))), $form->getPhpFiles(), '->getPhpFiles() converts keys with [] to arrays');
+        $this->assertEquals(array('foo' => array('name' => array('bar' => ''), 'type' => array('bar' => ''), 'tmp_name' => array('bar' => ''), 'error' => array('bar' => 4), 'size' => array('bar' => 0))), $form->getPhpFiles(), '->getPhpFiles() converts keys with [] to arrays');
 
         $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(array('f.o o' => array('bar' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0))), $form->getPhpFiles(), '->getPhpFiles() preserves periods and spaces in names');
+        $this->assertEquals(array('f_o_o' => array('name' => array('bar' => ''), 'type' => array('bar' => ''), 'tmp_name' => array('bar' => ''), 'error' => array('bar' => 4), 'size' => array('bar' => 0))), $form->getPhpFiles(), '->getPhpFiles() converts periods and spaces in names');
 
         $form = $this->createForm('<form method="post"><input type="file" name="f.o o[bar][ba.z]" /><input type="file" name="f.o o[bar][]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
-        $this->assertEquals(array('f.o o' => array('bar' => array('ba.z' => array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0), array('name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0)))), $form->getPhpFiles(), '->getPhpFiles() preserves periods and spaces in names recursively');
+        $this->assertEquals(array('f_o_o' => array('name' => array('bar' => array('ba.z' => '', 0 => '')), 'type' => array('bar' => array('ba.z' => '', 0 => '')), 'tmp_name' => array('bar' => array('ba.z' => '', 0 => '')), 'error' => array('bar' => array('ba.z' => 4, 0 => 4)), 'size' => array('bar' => array('ba.z' => 0, 0 => 0)))), $form->getPhpFiles(), '->getPhpFiles() converts periods and spaces in names only in first level');
     }
 
     /**

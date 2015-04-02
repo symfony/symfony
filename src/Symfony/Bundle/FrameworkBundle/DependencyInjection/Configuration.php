@@ -69,10 +69,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->arrayNode('trusted_hosts')
-                    ->beforeNormalization()
-                        ->ifTrue(function ($v) { return is_string($v); })
-                        ->then(function ($v) { return array($v); })
-                    ->end()
+                    ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
                     ->prototype('scalar')->end()
                 ->end()
             ->end()
@@ -263,7 +260,7 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultChildrenIfNoneSet()
                                     ->prototype('scalar')->defaultValue('FrameworkBundle:Form')->end()
                                     ->validate()
-                                        ->ifTrue(function ($v) {return !in_array('FrameworkBundle:Form', $v); })
+                                        ->ifNotInArray(array('FrameworkBundle:Form'))
                                         ->then(function ($v) {
                                             return array_merge(array('FrameworkBundle:Form'), $v);
                                         })

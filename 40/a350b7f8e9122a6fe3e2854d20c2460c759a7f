@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-31T15:13:38Z
+
+This makes sense to me, just like we grouped the debug commands
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-02T13:49:15Z
+
+@aitboudad You should also trigger a deprecation notice when the old name is used (we've done that already for the debug:* commands).
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-02T14:32:51Z
+
+@fabpot done

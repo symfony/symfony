@@ -16,6 +16,12 @@ Router
    but in 2.7 you would get an error if `bar` parameter
    doesn't exist or unexpected result otherwise.
 
+ * The `getMatcherDumperInstance()` and `getGeneratorDumperInstance()` methods in the
+   `Symfony\Component\Routing\Router` have been changed from `protected` to `public`.
+   If you override these methods in a subclass, you will need to change your 
+   methods to `public` as well. Note however that this is a temporary change needed for
+   PHP 5.3 compatibility only. It will be reverted in Symfony 3.0.
+ 
 Form
 ----
 
@@ -515,3 +521,10 @@ PropertyAccess
 
         new UnexpectedTypeException($value, $path, $pathIndex);
    ```
+
+Config
+------
+
+ * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as 
+   deprecated in favor of the new `getPath()` method.
+   

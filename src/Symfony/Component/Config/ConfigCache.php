@@ -23,14 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ConfigCache
+class ConfigCache implements ConfigCacheInterface
 {
     private $debug;
     private $file;
 
     /**
-     * Constructor.
-     *
      * @param string $file  The absolute cache path
      * @param bool   $debug Whether debugging is enabled or not
      */
@@ -44,8 +42,21 @@ class ConfigCache
      * Gets the cache file path.
      *
      * @return string The cache file path
+     * @deprecated since 2.7, to be removed in 3.0. Use getPath() instead.
      */
     public function __toString()
+    {
+        trigger_error('ConfigCache::__toString() is deprecated since version 2.7 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
+
+        return $this->file;
+    }
+
+    /**
+     * Gets the cache file path.
+     *
+     * @return string The cache file path
+     */
+    public function getPath()
     {
         return $this->file;
     }

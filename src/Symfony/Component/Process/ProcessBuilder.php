@@ -172,8 +172,6 @@ class ProcessBuilder
      * @return ProcessBuilder
      *
      * @throws InvalidArgumentException In case the argument is invalid
-     *
-     * Passing an object as an input is deprecated since version 2.5 and will be removed in 3.0.
      */
     public function setInput($input)
     {

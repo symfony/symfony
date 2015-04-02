@@ -367,6 +367,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private function initializeCacheCatalogue($locale)
     {
         if (isset($this->catalogues[$locale])) {
+            /* Catalogue already initialized. */
             return;
         }
 
@@ -376,11 +377,15 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $cache = $this->getConfigCacheFactory()->cache($cacheFile,
             function (ConfigCacheInterface $cache) use ($self, $locale) {
                 $self->dumpCatalogue($locale, $cache);
-
-                return; // $this->catalogues[$locale] is now initialized
             }
         );
 
+        if (isset($this->catalogues[$locale])) {
+            /* Catalogue has been initialized as it was written out to cache. */
+            return;
+        }
+
+        /* Read catalogue from cache. */
         $catalogue = include $cache->getPath();
 
         /*
@@ -408,6 +413,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             unlink($cacheFile);
             $this->initializeCacheCatalogue($locale);
         } else {
+            /* Initialize with catalogue from cache. */
             $this->catalogues[$locale] = $catalogue;
         }
     }

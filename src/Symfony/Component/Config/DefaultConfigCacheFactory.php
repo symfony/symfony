@@ -23,8 +23,6 @@ class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
     private $debug;
 
     /**
-     * Constructor.
-     *
      * @param bool $debug The debug flag to pass to ConfigCache
      */
     public function __construct($debug)

@@ -29,8 +29,6 @@ class ConfigCache implements ConfigCacheInterface
     private $file;
 
     /**
-     * Constructor.
-     *
      * @param string $file  The absolute cache path
      * @param bool   $debug Whether debugging is enabled or not
      */

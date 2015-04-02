@@ -21,7 +21,7 @@ interface ConfigCacheInterface
     /**
      * Gets the cache file path.
      *
-     * @deprecated since version 2.7, to be removed in 3.0.
+     * @deprecated since 2.7, to be removed in 3.0. Use getPath() instead.
      * @return string The cache file path
      */
     public function __toString();
@@ -36,7 +36,7 @@ interface ConfigCacheInterface
     /**
      * Checks if the cache is still fresh.
      *
-     * @return Boolean true if the cache is fresh, false otherwise
+     * @return bool    true if the cache is fresh, false otherwise
      */
     public function isFresh();
 

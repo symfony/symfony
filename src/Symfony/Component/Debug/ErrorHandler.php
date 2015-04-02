@@ -71,9 +71,9 @@ class ErrorHandler
     private $loggers = array(
         E_DEPRECATED => array(null, LogLevel::INFO),
         E_USER_DEPRECATED => array(null, LogLevel::INFO),
-        E_NOTICE => array(null, LogLevel::NOTICE),
-        E_USER_NOTICE => array(null, LogLevel::NOTICE),
-        E_STRICT => array(null, LogLevel::NOTICE),
+        E_NOTICE => array(null, LogLevel::WARNING),
+        E_USER_NOTICE => array(null, LogLevel::WARNING),
+        E_STRICT => array(null, LogLevel::WARNING),
         E_WARNING => array(null, LogLevel::WARNING),
         E_USER_WARNING => array(null, LogLevel::WARNING),
         E_COMPILE_WARNING => array(null, LogLevel::WARNING),

@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-30T09:04:04Z
+
+this implementation is wrong. the Twig_Environment should not be configured through the TwigEngine, as this means that the ``twig`` service is not configured fully whne using it directly rather than using the templating component
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-30T09:06:26Z
+
+I see your point, but do we have a better place where we can call methods of the Twig extensions?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-01-30T09:10:16Z
+
+@xabbuh Well, there is 2 solutions here:
+
+- registering the Twig_Extension_Core explicitly (so that we have a private service for it)
+- using a service configurator to apply the logic. An example can be found [in DoctrineBundle](https://github.com/doctrine/DoctrineBundle/blob/v1.3.0/ManagerConfigurator.php) used [there](https://github.com/doctrine/DoctrineBundle/blob/v1.3.0/DependencyInjection/DoctrineExtension.php#L463)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-01-30T10:06:36Z
+
+@stof Thanks for pointing me towards service configurators.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-23T19:26:23Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-27T15:04:31Z
+
+I addressed @Tobion's last comments and added an entry to the changelog.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-27T16:20:08Z
+
+@stof what do you think about https://github.com/symfony/symfony/pull/13554#discussion_r27109500
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-27T17:17:26Z
+
+By the way, why is the DependencyInjection component not a mandatory requirement? Does this make sense at all?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-03-31T15:23:17Z
+
+ping @symfony/deciders Would be nice if we could get this into 2.7. Bumping the DependencyInjection version imho could be discussed afterwards.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-31T20:25:08Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-31T21:11:15Z
+
+:+1:

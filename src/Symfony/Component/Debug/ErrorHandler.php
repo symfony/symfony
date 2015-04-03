@@ -240,7 +240,7 @@ class ErrorHandler
     }
 
     /**
-     * Sets the PHP error levels that should throw an exception when a PHP error occurs.
+     * Sets the PHP error levels that throw an exception when a PHP error occurs.
      *
      * @param int  $levels  A bit field of E_* constants for thrown errors
      * @param bool $replace Replace or amend the previous value
@@ -282,7 +282,7 @@ class ErrorHandler
     }
 
     /**
-     * Sets the PHP error levels for which stack trace is preserved.
+     * Sets the PHP error levels for which the stack trace is preserved.
      *
      * @param int  $levels  A bit field of E_* constants for traced errors
      * @param bool $replace Replace or amend the previous value

@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by cordoval at 2015-03-29T23:56:44Z
+
+fabbot.io is now queued? how to reset that one?
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T03:28:05Z
+
+done @stof
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T03:28:57Z
+
+@tmysik can you please help me verify with this that the terminal now remains interactive? thanks
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T04:54:40Z
+
+I think the failure in tests is unrelated to this PR.
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T06:00:18Z
+
+@cordoval Will be glad to do that! However, could you please provide steps how can I get Symfony with the fix/change? Thanks.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T06:01:53Z
+
+It should be simple, you need to add my fork git remote add cordoval git@github.com:cordoval/symfony.git
+then checkout fix-netbeans-interactive-shell branch and you should be in there to test.
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T06:26:39Z
+
+@cordoval I must be doing something wrong but not sure what :/ I get:
+
+```
+Fatal error: Call to undefined method Symfony\Component\ClassLoader\DebugUniversalClassLoader::useIncludePath() in /home/gapon/NetBeansProjects/symfony2nb/vendor/symfony/src/Symfony/Component/ClassLoader/DebugUniversalClassLoader.php on line 41
+```
+
+The command NetBeans runs is:
+
+```
+"/usr/bin/php" "/home/gapon/NetBeansProjects/symfony2nb/app/console" "--ansi" "list" "--xml"
+```
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T06:32:35Z
+
+beforehand you have to run composer and all
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T06:53:25Z
+
+@cordoval Sorry, no idea what you mean exactly. What I did:
+
+* created new Symfony project as stated on the download page (using ```symfony``` installer)
+* replaced the Symfony sources by your checkout (in ```vendor``` directory)
+* run Symfony command to list commands
+
+The result is:
+
+```
+Fatal error: Class 'Symfony\Bundle\DebugBundle\DebugBundle' not found in /home/gapon/NetBeansProjects/s2nb/app/AppKernel.php on line 23
+Done.
+```
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T06:56:45Z
+
+no, don't use the installer. Development wise i always prefer to clone a symfony-standard edition and checkout branch 2.7, and then run composer install --prefer-source, then go under vendor and cd symfony/symfony then add remotes and git remote update and then checkout my branch after adding the remote. Tedious work but it is what is contributing to any package so far.
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T07:53:14Z
+
+@cordoval I followed your steps but still got:
+
+```
+Fatal error: Class 'Symfony\Bundle\DebugBundle\DebugBundle' not found in /home/gapon/NetBeansProjects/symfony-standard/app/AppKernel.php on line 23
+```
+
+Just for verification:
+
+```
+gapon@cattie ~/NetBeansProjects/symfony-standard/vendor/symfony/symfony $ git checkout fix-netbeans-interactive-shell
+Branch fix-netbeans-interactive-shell set up to track remote branch fix-netbeans-interactive-shell from cordoval.
+Switched to a new branch 'fix-netbeans-interactive-shell'
+gapon@cattie ~/NetBeansProjects/symfony-standard/vendor/symfony/symfony $ git branch
+  2.7
+* fix-netbeans-interactive-shell
+```
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-03T07:57:24Z
+
+@tmysik the branch with the bugfix is based on symfony 2.3, not on 2.7. So use the 2.4 branch of symfony-standard too to test it
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T08:11:22Z
+
+@stof So, I switched symfony-standard to ```2.4``` branch. Went to ```vendor/symfony/symfony``` and switched again to ```fix-netbeans-interactive-shell``` branch. However, listing Symfony commands ends with this error:
+
+```
+[RuntimeException]
+The console handler requires symfony/monolog-bridge 2.4+
+```
+
+Perhaps it would be great if someone could create a ZIP with properly configured symfony-standard project and proper Symfony version for NetBeans problem - I could it then just easily verify in NetBeans :)
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-03T08:28:16Z
+
+I said 2.3, not 2.4
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-03T08:28:43Z
+
+ah actually, I mixed the version in my previous comment, sorry
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T08:34:05Z
+
+@stof Perfect, thanks for the steps, it works now! And I can confirm that the Symfony commands are interactive again in NetBeans so everything works for us now. Thanks a lot, guys!
+
+---------------------------------------------------------------------------
+
+by cordoval at 2015-04-03T12:18:27Z
+
+yeah sorry to have said 2.7, i really meant 2.3. Thanks @stof. @tmysik nice! great job!
+
+This should be LGTM then :+1:
+
+---------------------------------------------------------------------------
+
+by tmysik at 2015-04-03T12:20:04Z
+
+Thanks a lot for solving this problem!

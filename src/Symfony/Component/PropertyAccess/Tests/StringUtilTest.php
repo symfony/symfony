@@ -99,6 +99,7 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('men', 'man'),
             array('mice', 'mouse'),
             array('moves', 'move'),
+            array('movies', 'movie'),
             array('nebulae', 'nebula'),
             array('neuroses', array('neuros', 'neurose', 'neurosis')),
             array('oases', array('oas', 'oase', 'oasis')),

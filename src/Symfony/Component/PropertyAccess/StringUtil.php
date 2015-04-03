@@ -60,6 +60,9 @@ class StringUtil
         // indices (index), appendices (appendix), prices (price)
         array('seci', 4, false, true, array('ex', 'ix', 'ice')),
 
+        // movies (movie)
+        array('seivom', 6, true, true, 'movie'),
+
         // babies (baby)
         array('sei', 3, false, true, 'y'),
 

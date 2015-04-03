@@ -213,10 +213,6 @@ class Container implements IntrospectableContainerInterface
 
         $this->services[$id] = $service;
 
-        if (method_exists($this, $method = 'synchronize'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
-            $this->$method();
-        }
-
         if (null === $service) {
             if (self::SCOPE_CONTAINER !== $scope) {
                 unset($this->scopedServices[$scope][$id]);

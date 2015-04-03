@@ -57,6 +57,14 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.form.resources', $config['form_themes']);
 
+        $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
+        $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);
+        $envConfiguratorDefinition->replaceArgument(1, $config['date']['interval_format']);
+        $envConfiguratorDefinition->replaceArgument(2, $config['date']['timezone']);
+        $envConfiguratorDefinition->replaceArgument(3, $config['number_format']['decimals']);
+        $envConfiguratorDefinition->replaceArgument(4, $config['number_format']['decimal_point']);
+        $envConfiguratorDefinition->replaceArgument(5, $config['number_format']['thousands_separator']);
+
         $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
 
         // register user-configured paths

@@ -35,6 +35,7 @@
                 <argument>app</argument>
                 <argument type="service" id="twig.app_variable" />
             </call>
+            <configurator service="twig.configurator.environment" method="configure" />
         </service>
 
         <service id="twig.app_variable" class="Symfony\Bridge\Twig\AppVariable" public="false">
@@ -162,6 +163,15 @@
         <service id="twig.controller.preview_error" class="%twig.controller.preview_error.class%">
             <argument type="service" id="http_kernel" />
             <argument>%twig.exception_listener.controller%</argument>
+        </service>
+
+        <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator" public="false">
+            <argument /> <!-- date format, set in TwigExtension -->
+            <argument /> <!-- interval format, set in TwigExtension -->
+            <argument /> <!-- timezone, set in TwigExtension -->
+            <argument /> <!-- decimals, set in TwigExtension -->
+            <argument /> <!-- decimal point, set in TwigExtension -->
+            <argument /> <!-- thousands separator, set in TwigExtension -->
         </service>
     </services>
 </container>

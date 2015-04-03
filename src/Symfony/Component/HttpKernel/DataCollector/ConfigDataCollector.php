@@ -23,9 +23,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigDataCollector extends DataCollector
 {
+    /**
+     * @var KernelInterface
+     */
     private $kernel;
     private $name;
     private $version;
+    private $cacheVersionInfo = true;
 
     /**
      * Constructor.
@@ -59,6 +63,7 @@ class ConfigDataCollector extends DataCollector
             'app_version' => $this->version,
             'token' => $response->headers->get('X-Debug-Token'),
             'symfony_version' => Kernel::VERSION,
+            'symfony_state' => 'unknown',
             'name' => isset($this->kernel) ? $this->kernel->getName() : 'n/a',
             'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
@@ -77,6 +82,8 @@ class ConfigDataCollector extends DataCollector
             foreach ($this->kernel->getBundles() as $name => $bundle) {
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
+
+            $this->data['symfony_state'] = $this->requestSymfonyState();
         }
     }
 
@@ -108,6 +115,21 @@ class ConfigDataCollector extends DataCollector
     public function getSymfonyVersion()
     {
         return $this->data['symfony_version'];
+    }
+
+    /**
+     * Returns the state of the current Symfony release.
+     *
+     * @return string One of: unknown, dev, stable, eom, eol
+     */
+    public function getSymfonyState()
+    {
+        return $this->data['symfony_state'];
+    }
+
+    public function setCacheVersionInfo($cacheVersionInfo)
+    {
+        $this->cacheVersionInfo = $cacheVersionInfo;
     }
 
     /**
@@ -241,5 +263,69 @@ class ConfigDataCollector extends DataCollector
     public function getName()
     {
         return 'config';
+    }
+
+    /**
+     * Tries to retrieve information about the current Symfony version.
+     *
+     * @return string One of: unknown, dev, stable, eom, eol
+     */
+    private function requestSymfonyState()
+    {
+        $versionInfo = null;
+
+        // get version information from cache or the roadmap
+        $versionCachePath = $this->kernel->getCacheDir().'/version_info.json';
+        if (file_exists($versionCachePath)) {
+            $versionInfo = json_decode(file_get_contents($versionCachePath), true);
+        } else {
+            $versionResponse = @file_get_contents('http://symfony.com/roadmap.json?version='.preg_replace('/^(\d+\.\d+).*/', '\\1', $this->data['symfony_version']));
+
+            if (false !== $versionResponse) {
+                $versionInfo = json_decode($versionResponse, true);
+
+                if (isset($versionInfo['error_message'])) {
+                    // wrong version
+                    $versionInfo = null;
+                }
+            }
+        }
+
+        // get the version state
+        $versionState = 'unknown';
+        if (null !== $versionInfo) {
+            $now = new \DateTime();
+            $eom = \DateTime::createFromFormat('m/Y', $versionInfo['eom'])->modify('last day of this month');
+            $eol = \DateTime::createFromFormat('m/Y', $versionInfo['eol'])->modify('last day of this month');
+
+            if ($now > $eom) {
+                $versionState = 'eom';
+            } elseif ($now > $eol) {
+                $versionState = 'eol';
+            } elseif ('DEV' === Kernel::EXTRA_VERSION) {
+                $versionState = 'dev';
+            } else {
+                $versionState = 'stable';
+            }
+        }
+
+        // invalidate or create cache
+        if (null === $versionInfo) {
+            // nothing to cache
+        } elseif (isset($versionInfo['previous_state'])) {
+            if ($versionInfo['previous_state'] !== $versionState) {
+                // state changed => invalidate the cache
+                unlink($versionCachePath);
+            }
+        } elseif (substr(Kernel::VERSION, 0, 3) !== $versionInfo['version']) {
+            // version changed => invalidate the cache
+            unlink($versionCachePath);
+        } elseif ($this->cacheVersionInfo) {
+            // no cache yet
+            $versionInfo['previous_state'] = $versionState;
+            file_put_contents($versionCachePath, json_encode($versionInfo));
+        }
+
+        return $versionState;
     }
 }

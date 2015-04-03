@@ -57,6 +57,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $this->fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
             $this->assertSame('bar', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
     }
 
@@ -77,6 +78,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $this->fail('RuntimeException expected');
         } catch (\RuntimeException $e) {
             $this->assertSame('bar', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
 
         $this->assertEquals(3, $logger->countErrors());

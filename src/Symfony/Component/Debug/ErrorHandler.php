@@ -399,7 +399,7 @@ class ErrorHandler
 
         if ($type & $level) {
             if ($this->scopedErrors & $type) {
-                $e['context'] = $context;
+                $e['scope_vars'] = $context;
                 if ($trace) {
                     $e['stack'] = debug_backtrace(true); // Provide object
                 }

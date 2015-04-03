@@ -72,7 +72,18 @@ class ExceptionListener implements EventSubscriberInterface
             // set handling to false otherwise it wont be able to handle further more
             $handling = false;
 
-            // throwing $e, not $exception, is on purpose: fixing error handling code paths is the most important
+            $wrapper = $e;
+
+            while ($prev = $wrapper->getPrevious()) {
+                if ($exception === $wrapper = $prev) {
+                    throw $e;
+                }
+            }
+
+            $prev = new \ReflectionProperty('Exception', 'previous');
+            $prev->setAccessible(true);
+            $prev->setValue($wrapper, $exception);
+
             throw $e;
         }
 

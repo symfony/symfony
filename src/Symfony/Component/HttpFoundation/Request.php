@@ -714,6 +714,8 @@ class Request
      * It is better to explicitly get request parameters from the appropriate
      * public property instead (query, attributes, request).
      *
+     * Note: Finding deep items is deprecated since version 2.8, to be removed in 3.0.
+     *
      * @param string $key     the key
      * @param mixed  $default the default value
      * @param bool   $deep    is parameter deep in multidimensional array
@@ -722,6 +724,10 @@ class Request
      */
     public function get($key, $default = null, $deep = false)
     {
+        if (true === $deep) {
+            @trigger_error('Using paths to find deeper items in '.__METHOD__.' is deprecated since version 2.8 and will be removed in 3.0. Filter the returned value in your own code instead.', E_USER_DEPRECATED);
+        }
+
         if ($this !== $result = $this->query->get($key, $this, $deep)) {
             return $result;
         }

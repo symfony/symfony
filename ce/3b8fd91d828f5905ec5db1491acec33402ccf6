@@ -1,0 +1,123 @@
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-17T07:53:46Z
+
+Thanks for your feedback @aitboudad, @xabbuh and @fabpot. I wait for the last feedback about ```$cacheDir``` before I push a new commit.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-17T08:17:43Z
+
+@xavierleune Could you add some tests as well?
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-17T08:47:08Z
+
+@aitboudad actually I can't see what should be tested. If I want to check input / output, I don't have any output to test. I could test if catalogues are generated, but that would be a double test. Do you have any idea ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-17T08:55:02Z
+
+@xavierleune you can check if catalogues are generated when locale it's not registered
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-17T09:50:38Z
+
+@aitboudad I'm not sure that's very relevant
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-17T10:25:36Z
+
+@aitboudad thanks for your last feedback. For the records, the "Constructor." comment should be removed from RouterCacheWarmer also.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-19T16:25:24Z
+
+@xavierleune I just left 2 comments. this will probably be my last remark :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-23T09:01:25Z
+
+ping @xavierleune
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-23T09:23:43Z
+
+Yes I'm here... I was making a new PR for some other changes :smile:
+I'll test your suggestions today.
+
+Thks
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-03-23T22:52:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-24T13:53:41Z
+
+@fabpot done, thank your for the feedback.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-24T16:33:58Z
+
+@aitboudad the last word is for you :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-24T20:51:30Z
+
+:+1:,  ping @fabpot
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-30T09:02:18Z
+
+@aitboudad I cherry picked your changes, thx
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-30T09:41:44Z
+
+@aitboudad can you please take a look to the travis build ? I'm not sur why it's broken. All tests ran fine on my laptop...
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-30T09:51:56Z
+
+@xavierleune not related to this PR (#14002 need to be merged into master)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-30T15:36:31Z
+
+@xavierleune Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-30T15:41:06Z
+
+@fabpot just FYI I moved the property resourceFiles into [options of  Translator](https://github.com/xavierleune/symfony/blob/feature/13919-translations-cache-warmer/src/Symfony/Bundle/FrameworkBundle/Translation/Translator.php#L32)
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2015-03-31T10:23:47Z
+
+@fabpot done
+@aitboudad all right, thx
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-02T07:04:29Z
+
+ping @fabpot, this is ready for merge.

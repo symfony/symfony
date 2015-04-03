@@ -49,7 +49,7 @@ class ArrayInput extends Input
     public function getFirstArgument()
     {
         foreach ($this->parameters as $key => $value) {
-            if ($key && '-' === $key[0]) {
+            if (($key && '-' === $key[0]) || !is_string($value)) {
                 continue;
             }
 

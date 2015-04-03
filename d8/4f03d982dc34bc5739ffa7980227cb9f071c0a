@@ -1,0 +1,278 @@
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-02-09T00:38:07Z
+
+why not show the text right under "Symfony Documentation" if the version of EOM/EOL ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-09T07:24:12Z
+
+Does this change imply to make one HTTP request to symfony.com for each page load in the `dev` environment (including AJAX page loads)?
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-02-09T07:56:33Z
+
+:-1: for calling external website to get such info, even if that would be only on one page (not like now on every page with profiler).
+
+IMO better would be to store such date in Kernel class, same like [version consts](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/HttpKernel/Kernel.php#L63), and then compare those in template...
+
+```php
+class Kernel
+{
+    const EOL = '01-06-2015'; // or int 1433109600
+}
+
+---------------------------------------------------------------------------
+
+by merk at 2015-02-09T07:59:50Z
+
+It could be implemented as an XHR request and use localStorage to cache the information?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-09T08:29:27Z
+
+I think we should not provide this feature. All the information is available at http://symfony.com/roadmap and developers can subscribe to receive emails about important end-of-life announcements.
+
+However, if you insist in adding this feature, I'd add a `Check version` link in the extended information panel. When the user clicks on that link, an AJX request is made to symfony.com to get the information and display it to the user. For example:
+
+![check_symfony_version](https://cloud.githubusercontent.com/assets/73419/6102914/1e307b52-b03e-11e4-871d-1fdebfb0f89a.png)
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-02-09T08:45:44Z
+
+@javiereguiluz : if the developers were keeping track, then they probably wouldn't be running such EOL versions. I don't think your solution solves the problem
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-02-09T08:47:13Z
+
+why not just package up the output of the roadmap json and put it in sensiodistributionbundle? and then just parse that?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-09T08:50:06Z
+
+I think having such a built-in feature is a great idea, but making one additional HTTP request to symfony.com for every page in the dev env of all Symfony apps is probably a bit too much.
+
+@javiereguiluz IIUC, the goal is to automatically warn the developer, adding a link is not going to help at all.
+
+@jrobeson An online version is always more flexible as it can take into account last-minute decisions like extending support for one version (because of any external factors).
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-09T08:51:16Z
+
+I actually like this feature, I often see people come by and ask questions on IRC regarding symfony versions that aren't supported anymore. I think this feature should be implemented, but the information should be retrieved when building the container.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-02-09T08:51:38Z
+
+sure an online version is more flexible, but as they get a new version of the bundle, then it will include the updated roadmap. i think we shouldn't let the perfect be the enemy of the good here.
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-02-09T08:53:14Z
+
+@Iltar: i have a problem with symfony requiring internet access unless i explicitly told it to. like on composer updates
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-09T08:53:18Z
+
+The problem with an AJAX request is that'll be catched by the ajax data collector.
+
+I agree that having a request every request isn't very great. We could cache it, so the request will only be executed whenever the cache was cleared?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-09T08:56:20Z
+
+@jrobeson in that case, you could turn it off and it would return the gray option: "Unable to retrieve information about the Symfony version.".
+
+Another option could be to show a more specific message: "Unable to retrieve information about the Symfony version, enable to framework.version_check in your configuration".
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-09T09:02:54Z
+
+FWIW, I'm strongly against adding a configuration setting for that.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-09T09:20:30Z
+
+I wonder if this is really a "problem" we need to solve:
+
+  * If you care about these things, you are already subscribed to the Symfony notifications, you execute the `security: check` command regularly, you have a continuous integration server that makes a lot of checks, etc.
+  * If you don't care about these things, no matter how many times the framework tells you that the version is outdated. You won't update, because you don't care.
+
+---------------------------------------------------------------------------
+
+by merk at 2015-02-09T09:24:29Z
+
+@javiereguiluz The issue cant be classified under such black and white terms. It is true most developers who care will be subscribed to notifications, it isnt true that those who are not subscribed do not care and will not update.
+
+There is an opportunity to educate here. A visual notification to indicate the status of symfony has an overall benefit to DX.
+
+Even if it was hard-coded `This version's support expires "roughly" 05/2015` in the Kernel it is hardly a terrible suggestion.
+
+---------------------------------------------------------------------------
+
+by merk at 2015-02-09T09:25:40Z
+
+I for one was not aware of a "security: check" command. Not everyone has extensive CI either.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-11T12:19:17Z
+
+Just to recap the discussion so far, here are some of my arguments against this feature:
+
+  * Detecting an outdated Symfony version is mostly useful in the production server, where you cannot use this feature.
+  * It will slightly hurt application performance because of the added HTTP request.
+  * It could severely hit `symfony.com` performance with a flood of requests.
+  * There are other (better?) alternatives to get informed when Symfony is out-of date (like the Symfony Roadmap email notifications).
+  * No one has ever asked for this feature. In the repository we have hundreds of specific feature requests, but not this one.
+  * Anything related to software updates (detecting new versions, notifying about them, installing them, etc.) is one of the most annoying "features" of applications such as operating systems. If you don't believe me, ask around what do people think about the following "features":
+
+![mac_updates_available](https://cloud.githubusercontent.com/assets/73419/6146751/3452d462-b1f0-11e4-8681-f48eff736713.png)
+
+![win_updates_available](https://cloud.githubusercontent.com/assets/73419/6146752/35430b30-b1f0-11e4-9952-b7921a4e2173.jpg)
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-11T12:46:36Z
+
+Thabks for your very opiniated recamp Javier. I think calling it your opinion would be much better.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-02-11T13:09:18Z
+
+I'm :+1: on this, as long as the requests are cached (on both application and symfony.com). Could it be generated as part of bootstrap?
+
+Comparing this feature to installers is not fair in my opinion. This is just an indicator, it doesn't force you to do anything. It does nothing but sits there (any annoyance coming from that is a good thing).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-11T13:26:57Z
+
+@WouterJ you are right, this is my opinion. That's why the first phrase of my last comment said *"... here are some of my arguments against this feature:"*
+
+I have yet another reason to not implement this feature:
+
+  * **Privacy**: we are making unsolicited requests to a third-party host (`symfony.com`) without asking permission to the user. This could reveal sensitive information such as the IP address (and therefore, location) of the user.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2015-02-17T10:58:33Z
+
+what about a console command like `check:version`? everyone can decide for themselves when and whether it should be checked.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-17T11:12:56Z
+
+In that case, I vote for closing this PR. As executing a command is as simple as navigating to http://symfony.com/roadmap The issue is that many users that use older versions do that because they don't check these tools.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-17T11:24:00Z
+
+@WouterJ I do like this PR and the fact that it tells you that you have a problem **without having to do anything**.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-17T11:27:12Z
+
+@fabpot I know that, I just responded to @DavidBadura (but forgot the mention...).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-17T11:27:15Z
+
+@fabpot but the price to pay may be too high: making unsolicited HTTP requests to a third-party service (symfony.com) without asking the user and without the possibility of disabling it doesn't look like *"the Symfony way of doing things right"*.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-02-17T11:30:25Z
+
+@javiereguiluz That's why I proposed to add new simple const to the Kernel class that would hold (already known from roadmap) date of EOL for that version. It's IMO simplest way that will not add any overhead to the profiler. In Twig you could compare dates same it's done in that PR, but without having to call external website...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-02-17T18:18:35Z
+
+What about running it as a Composer script (enabling it in the Symfony Standard Edition)? This way, HTTP requests would only be executed when there was network activity at all, and the user would be able to easily disable them by modifying the `composer.json` file.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-02-18T20:31:57Z
+
+:+1: for this @WouterJ idea too. The solution suggested by @fabpot (querying symfony.com in a CacheWarmer) looks like the good compromise between DX and performance.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-01T12:35:20Z
+
+I've updated this PR:
+
+ * Results are now queried once on the first request and then cached
+ * Cache is invalidated when either the state changed (e.g. a version has become eom) or the minor version changed (the developer has updated his symfony packages)
+ * Instead of having multiple methods for multiple states, there is now just one method: `getSymfonyState`
+ * Added a warning when using a dev version (this is retrieved from `Kernel::EXTRA_VERSION`).
+
+Meanwhile, I removed the lettercase changes (which was a mistake).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-23T09:27:50Z
+
+Updated the PR to apply the 2 comments, thanks! However, for some reason, Travis decided to not run the builds for my PRs...
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-23T10:33:24Z
+
+@WouterJ it ran. Just be patient. Travis allows only 5 concurrent job per repo owner, so the queue of Symfony builds can take some time when contributions are active
+
+---------------------------------------------------------------------------
+
+by stof at 2015-03-23T10:34:38Z
+
+and btw, tests are failing
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T13:26:14Z
+
+I've disabled caching in the tests, as it was causing problems. Maybe we should disable requesting the version completely, to not flood symfony.com with requests? /cc @fabpot
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:29:23Z
+
+Test failures seem unrelated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-03T14:45:05Z
+
+@WouterJ No need to disable for the tests, we have some cache on this resource. After fixing my comment, I'm :+1:
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:46:33Z
+
+Ok, fine by me. I've fixed your comment (and pushed).
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:48:44Z
+
+Pushed one final safety guard: If the version was wrong for some reason and the error page (http://symfony.com/roadmap.json?version=2.4.x) was returned, it'll also show the "Unable to retrieve information" message.

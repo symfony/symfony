@@ -97,7 +97,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function title($message)
     {
-        $this->writeln(sprintf("\n<fg=blue>%s</fg=blue>\n<fg=blue>%s</fg=blue>\n", $message, str_repeat('=', strlen($message))));
+        $this->writeln(sprintf("\n<comment>%s</>\n<comment>%s</>\n", $message, str_repeat('=', strlen($message))));
     }
 
     /**
@@ -105,7 +105,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function section($message)
     {
-        $this->writeln(sprintf("<fg=blue>%s</fg=blue>\n<fg=blue>%s</fg=blue>\n", $message, str_repeat('-', strlen($message))));
+        $this->writeln(sprintf("<comment>%s</>\n<comment>%s</>\n", $message, str_repeat('-', strlen($message))));
     }
 
     /**
@@ -119,7 +119,7 @@ class SymfonyStyle extends OutputStyle
             $elements
         );
 
-        $this->writeln(implode("\n\n", $elements)."\n");
+        $this->writeln(implode("\n", $elements)."\n");
     }
 
     /**
@@ -183,6 +183,8 @@ class SymfonyStyle extends OutputStyle
      */
     public function table(array $headers, array $rows)
     {
+        $headers = array_map(function ($value) { return sprintf('<info>%s</>', $value); } , $headers);
+
         $table = new Table($this);
         $table->setHeaders($headers);
         $table->setRows($rows);

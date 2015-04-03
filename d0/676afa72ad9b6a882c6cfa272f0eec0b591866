@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-01T14:05:40Z
+
+Tests are green for what is related to this PR, ready to merge/vote
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-01T14:41:16Z
+
+Regarding the C extension, I still don't know what the strategy is to expose it @fabpot. IIRC, you said you would write a blog post about it a long time ago, but I don't remember seeing it. It would be great to know how we deal with them.

@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberType extends AbstractType
@@ -24,7 +25,7 @@ class NumberType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addViewTransformer(new NumberToLocalizedStringTransformer(
-            $options['precision'],
+            $options['scale'],
             $options['grouping'],
             $options['rounding_mode']
         ));
@@ -35,9 +36,19 @@ class NumberType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $scale = function (Options $options) {
+            if (null !== $options['precision']) {
+                trigger_error('The form option "precision" is deprecated since version 2.7 and will be removed in 3.0. Use "scale" instead.', E_USER_DEPRECATED);
+            }
+
+            return $options['precision'];
+        };
+
         $resolver->setDefaults(array(
-            // default precision is locale specific (usually around 3)
+            // deprecated as of Symfony 2.7, to be removed in Symfony 3.0
             'precision' => null,
+            // default scale is locale specific (usually around 3)
+            'scale' => $scale,
             'grouping' => false,
             'rounding_mode' => NumberToLocalizedStringTransformer::ROUND_HALF_UP,
             'compound' => false,
@@ -52,6 +63,8 @@ class NumberType extends AbstractType
             NumberToLocalizedStringTransformer::ROUND_UP,
             NumberToLocalizedStringTransformer::ROUND_CEILING,
         ));
+
+        $resolver->setAllowedTypes('scale', array('null', 'int'));
     }
 
     /**

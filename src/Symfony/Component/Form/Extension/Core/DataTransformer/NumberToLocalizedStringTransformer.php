@@ -93,13 +93,16 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     const ROUND_HALFDOWN = \NumberFormatter::ROUND_HALFDOWN;
 
+    /**
+     * @deprecated since version 2.7, will be replaced by a $scale private property in 3.0.
+     */
     protected $precision;
 
     protected $grouping;
 
     protected $roundingMode;
 
-    public function __construct($precision = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
+    public function __construct($scale = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
         if (null === $grouping) {
             $grouping = false;
@@ -109,7 +112,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
             $roundingMode = self::ROUND_HALF_UP;
         }
 
-        $this->precision = $precision;
+        $this->precision = $scale;
         $this->grouping = $grouping;
         $this->roundingMode = $roundingMode;
     }
@@ -240,7 +243,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Rounds a number according to the configured precision and rounding mode.
+     * Rounds a number according to the configured scale and rounding mode.
      *
      * @param int|float $number A number.
      *
@@ -249,7 +252,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     private function round($number)
     {
         if (null !== $this->precision && null !== $this->roundingMode) {
-            // shift number to maintain the correct precision during rounding
+            // shift number to maintain the correct scale during rounding
             $roundingCoef = pow(10, $this->precision);
             $number *= $roundingCoef;
 

@@ -4,6 +4,7 @@ CHANGELOG
 2.7.0
 -----
 
+ * deprecated option "precision" in favor of "scale"
  * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
  * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
 

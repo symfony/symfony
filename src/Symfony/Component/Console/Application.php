@@ -855,7 +855,7 @@ class Application
             $input->setInteractive(false);
         } elseif (function_exists('posix_isatty') && $this->getHelperSet()->has('dialog')) {
             $inputStream = $this->getHelperSet()->get('dialog')->getInputStream();
-            if (!@posix_isatty($inputStream) && true !== getenv('SHELL_INTERACTIVE')) {
+            if (!@posix_isatty($inputStream) && false === getenv('SHELL_INTERACTIVE')) {
                 $input->setInteractive(false);
             }
         }

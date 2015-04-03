@@ -77,10 +77,5 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('assets.packages')) {
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
-
-        if (method_exists('Symfony\Bridge\Twig\AppVariable', 'setContainer')) {
-            // we are on Symfony <3.0, where the setContainer method exists
-            $container->getDefinition('twig.app_variable')->addMethodCall('setContainer', array(new Reference('service_container')));
-        }
     }
 }

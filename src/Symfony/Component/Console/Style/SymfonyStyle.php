@@ -119,7 +119,7 @@ class SymfonyStyle extends OutputStyle
             $elements
         );
 
-        $this->writeln(implode("\n\n", $elements)."\n");
+        $this->writeln(implode("\n", $elements)."\n");
     }
 
     /**

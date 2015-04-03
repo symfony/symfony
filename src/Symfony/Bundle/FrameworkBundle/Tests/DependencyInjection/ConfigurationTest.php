@@ -113,6 +113,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         return array(
             'http_method_override' => true,
             'trusted_proxies' => array(),
+            'ip_retriever' => 'ip_retriever.default',
             'ide' => null,
             'default_locale' => 'en',
             'form' => array(

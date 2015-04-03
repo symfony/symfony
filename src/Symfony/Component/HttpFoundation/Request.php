@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\IpRetriever\IpRetriever;
+use Symfony\Component\HttpFoundation\IpRetriever\IpRetrieverInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -30,8 +32,18 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0.
+     * @see IpRetriever
+     */
     const HEADER_FORWARDED = 'forwarded';
+
+    /**
+     * @deprecated since version 2.7, to be removed in 3.0.
+     * @see IpRetriever
+     */
     const HEADER_CLIENT_IP = 'client_ip';
+
     const HEADER_CLIENT_HOST = 'client_host';
     const HEADER_CLIENT_PROTO = 'client_proto';
     const HEADER_CLIENT_PORT = 'client_port';
@@ -46,6 +58,11 @@ class Request
     const METHOD_OPTIONS = 'OPTIONS';
     const METHOD_TRACE = 'TRACE';
     const METHOD_CONNECT = 'CONNECT';
+
+    /**
+     * @var IpRetrieverInterface|null
+     */
+    protected $ipRetriever = null;
 
     /**
      * @var string[]
@@ -70,6 +87,8 @@ class Request
      *
      * The other headers are non-standard, but widely used
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     *
+     * @see IpRetriever
      */
     protected static $trustedHeaders = array(
         self::HEADER_FORWARDED => 'FORWARDED',
@@ -816,78 +835,41 @@ class Request
     }
 
     /**
-     * Returns the client IP addresses.
-     *
-     * In the returned array the most trusted IP address is first, and the
-     * least trusted one last. The "real" client IP address is the last one,
-     * but this is also the least trusted one. Trusted proxies are stripped.
-     *
-     * Use this method carefully; you should use getClientIp() instead.
-     *
-     * @return array The client IP addresses
+     * @see IpRetriever\IpRetriever\IpRetrieverInterface::getClientIps()
      *
      * @see getClientIp()
+     *
+     * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function getClientIps()
     {
-        $clientIps = array();
-        $ip = $this->server->get('REMOTE_ADDR');
-
-        if (!self::$trustedProxies) {
-            return array($ip);
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
+        if (null === $this->ipRetriever) {
+            $this->getDefaultIpRetriever();
         }
 
-        if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
-            $forwardedHeader = $this->headers->get(self::$trustedHeaders[self::HEADER_FORWARDED]);
-            preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
-            $clientIps = $matches[3];
-        } elseif (self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
-        }
-
-        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
-        $ip = $clientIps[0]; // Fallback to this when the client IP falls into the range of trusted proxies
-
-        foreach ($clientIps as $key => $clientIp) {
-            // Remove port (unfortunately, it does happen)
-            if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
-                $clientIps[$key] = $clientIp = $match[1];
-            }
-
-            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
-                unset($clientIps[$key]);
-            }
-        }
-
-        // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : array($ip);
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+        $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
+        return $this->ipRetriever->getClientIps($this);
     }
 
     /**
-     * Returns the client IP address.
-     *
-     * This method can read the client IP address from the "X-Forwarded-For" header
-     * when trusted proxies were set via "setTrustedProxies()". The "X-Forwarded-For"
-     * header value is a comma+space separated list of IP addresses, the left-most
-     * being the original client, and each successive proxy that passed the request
-     * adding the IP address where it received the request from.
-     *
-     * If your reverse proxy uses a different header name than "X-Forwarded-For",
-     * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
-     * the "client-ip" key.
-     *
-     * @return string The client IP address
-     *
-     * @see getClientIps()
-     * @see http://en.wikipedia.org/wiki/X-Forwarded-For
+     * @see IpRetriever\IpRetriever\IpRetrieverInterface::getClientIp()
      *
      * @api
+     * @deprecated since version 2.7, to be removed in 3.0.
      */
     public function getClientIp()
     {
-        $ipAddresses = $this->getClientIps();
-
-        return $ipAddresses[0];
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
+        if (null === $this->ipRetriever) {
+            $this->getDefaultIpRetriever();
+        }
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_FORWARDED, self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $this->ipRetriever->setTrustedHeaderName(self::HEADER_CLIENT_IP, self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+        $this->ipRetriever->setTrustedProxies(self::$trustedProxies);
+        return $this->ipRetriever->getClientIp($this);
     }
 
     /**
@@ -1980,5 +1962,28 @@ class Request
         }
 
         return new static($query, $request, $attributes, $cookies, $files, $server, $content);
+    }
+
+    /**
+     * @param IpRetrieverInterface $ipRetriever
+     * @deprecated since version 2.7, to be removed in 3.0.
+     */
+    public function setIpRetriever(IpRetrieverInterface $ipRetriever)
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
+        $this->ipRetriever = $ipRetriever;
+    }
+
+    /**
+     * @return IpRetrieverInterface
+     * @deprecated since version 2.7, to be removed in 3.0.
+     */
+    private function getDefaultIpRetriever()
+    {
+        trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the ip_retriever service instead.', E_USER_DEPRECATED);
+        if (null === $this->ipRetriever) {
+            $this->ipRetriever = new IpRetriever();
+        }
+        return $this->ipRetriever;
     }
 }

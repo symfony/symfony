@@ -74,6 +74,8 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
+        $container->setAlias('ip_retriever', $config['ip_retriever']);
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }

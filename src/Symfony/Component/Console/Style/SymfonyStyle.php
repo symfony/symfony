@@ -183,7 +183,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function table(array $headers, array $rows)
     {
-        $headers = array_map(function ($value) { return sprintf('<info>%s</>', $value); } , $headers);
+        $headers = array_map(function ($value) { return sprintf('<info>%s</>', $value); }, $headers);
 
         $table = new Table($this);
         $table->setHeaders($headers);

@@ -137,6 +137,8 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
                     $locale = $fallbackCatalogue->getLocale();
                     break;
                 }
+
+                $fallbackCatalogue = $fallbackCatalogue->getFallBackCatalogue();
             }
         } else {
             $state = self::MESSAGE_MISSING;

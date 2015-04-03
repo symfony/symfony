@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Controller\PreviewErrorController;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -36,7 +37,7 @@ class PreviewErrorControllerTest extends TestCase
                     $this->assertEquals($logicalControllerName, $request->attributes->get('_controller'));
 
                     $exception = $request->attributes->get('exception');
-                    $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\FlattenException', $exception);
+                    $this->assertInstanceOf(FlattenException::class, $exception);
                     $this->assertEquals($code, $exception->getStatusCode());
                     $this->assertFalse($request->attributes->get('showException'));
 

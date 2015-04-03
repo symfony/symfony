@@ -28,29 +28,20 @@ class DebugClassLoader
 {
     private $classLoader;
     private $isFinder;
-    private $wasFinder;
     private static $caseCheck;
     private static $deprecated = array();
 
     /**
      * Constructor.
      *
-     * @param callable|object $classLoader Passing an object is @deprecated since version 2.5 and support for it will be removed in 3.0
+     * @param callable $classLoader A class loader
      *
      * @api
      */
-    public function __construct($classLoader)
+    public function __construct(callable $classLoader)
     {
-        $this->wasFinder = is_object($classLoader) && method_exists($classLoader, 'findFile');
-
-        if ($this->wasFinder) {
-            trigger_error('The '.__METHOD__.' method will no longer support receiving an object into its $classLoader argument in 3.0.', E_USER_DEPRECATED);
-            $this->classLoader = array($classLoader, 'loadClass');
-            $this->isFinder = true;
-        } else {
-            $this->classLoader = $classLoader;
-            $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
-        }
+        $this->classLoader = $classLoader;
+        $this->isFinder = is_array($classLoader) && method_exists($classLoader[0], 'findFile');
 
         if (!isset(self::$caseCheck)) {
             self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;
@@ -60,11 +51,11 @@ class DebugClassLoader
     /**
      * Gets the wrapped class loader.
      *
-     * @return callable|object A class loader. Since version 2.5, returning an object is @deprecated and support for it will be removed in 3.0
+     * @return callable The wrapped class loader
      */
     public function getClassLoader()
     {
-        return $this->wasFinder ? $this->classLoader[0] : $this->classLoader;
+        return $this->classLoader;
     }
 
     /**
@@ -112,24 +103,6 @@ class DebugClassLoader
             }
 
             spl_autoload_register($function);
-        }
-    }
-
-    /**
-     * Finds a file by class name
-     *
-     * @param string $class A class name to resolve to file
-     *
-     * @return string|null
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    public function findFile($class)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if ($this->wasFinder) {
-            return $this->classLoader[0]->findFile($class);
         }
     }
 

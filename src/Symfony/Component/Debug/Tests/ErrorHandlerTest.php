@@ -277,7 +277,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $logger = $this->getMock('Psr\Log\LoggerInterface');
 
-            $logArgCheck = function ($level, $message, $context){
+            $logArgCheck = function ($level, $message, $context) {
                 $this->assertEquals('Uncaught Exception: foo', $message);
                 $this->assertArrayHasKey('type', $context);
                 $this->assertEquals($context['type'], E_ERROR);
@@ -343,49 +343,6 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $handler->setDefaultLogger($logger, E_ERROR);
 
             $handler->handleFatalError($error);
-
-            restore_error_handler();
-            restore_exception_handler();
-        } catch (\Exception $e) {
-            restore_error_handler();
-            restore_exception_handler();
-
-            throw $e;
-        }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyInterface()
-    {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
-        try {
-            $handler = ErrorHandler::register(0);
-            $this->assertFalse($handler->handle(0, 'foo', 'foo.php', 12, array()));
-
-            restore_error_handler();
-            restore_exception_handler();
-
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
-
-            $logArgCheck = function ($level, $message, $context) {
-                $this->assertEquals('Undefined variable: undefVar', $message);
-                $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_NOTICE);
-            };
-
-            $logger
-                ->expects($this->once())
-                ->method('log')
-                ->will($this->returnCallback($logArgCheck))
-            ;
-
-            $handler = ErrorHandler::register(E_NOTICE);
-            @$handler->setLogger($logger, 'scream');
-            unset($undefVar);
-            @$undefVar++;
 
             restore_error_handler();
             restore_exception_handler();

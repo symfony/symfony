@@ -39,7 +39,6 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $var['file'] = htmlspecialchars($var['file'], ENT_QUOTES, 'UTF-8');
         $intMax = PHP_INT_MAX;
@@ -81,7 +80,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
   </samp>}
   "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {<a class=sf-dump-ref>#%d</a><samp>
     <span class=sf-dump-meta>reflection</span>: """
-      <span class=sf-dump-str title="%d characters">Closure [ &lt;user&gt; {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
+      <span class=sf-dump-str title="%d characters">Closure [ &lt;user%S&gt; %s Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {</span>
       <span class=sf-dump-str title="%d characters">  @@ {$var['file']} {$var['line']} - {$var['line']}</span>
 
       <span class=sf-dump-str title="%d characters">  - Parameters [2] {</span>

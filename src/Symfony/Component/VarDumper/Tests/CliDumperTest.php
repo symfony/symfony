@@ -38,7 +38,6 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
@@ -77,7 +76,7 @@ array:25 [
   }
   "closure" => Closure {#%d
     reflection: """
-      Closure [ <user> {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
+      Closure [ <user%S> %s Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
         @@ {$var['file']} {$var['line']} - {$var['line']}
 
         - Parameters [2] {
@@ -143,8 +142,7 @@ EOTXT
   eof: false
   options: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
-    #message: "Unexpected exception thrown from a caster: Exception"
-    message: "Foobar"
+    #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: array:1 [
       0 => array:2 [
         "call" => "%s{closure}()"

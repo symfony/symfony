@@ -81,6 +81,9 @@ class HttpKernelExtension extends \Twig_Extension
         return new ControllerReference($controller, $attributes, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'http_kernel';

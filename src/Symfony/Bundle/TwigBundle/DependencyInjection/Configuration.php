@@ -81,7 +81,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                             ->example(array('MyBundle::form.html.twig'))
                             ->validate()
-                                ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
+                                ->ifNotInArray(array('form_div_layout.html.twig'))
                                 ->then(function ($v) {
                                     return array_merge(array('form_div_layout.html.twig'), $v);
                                 })

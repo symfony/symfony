@@ -334,6 +334,20 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
+    public function testReverseTransformWithInt()
+    {
+        $transformer = new NumberToLocalizedStringTransformer();
+
+        $this->assertEquals(10, $transformer->reverseTransform(10));
+    }
+
+    public function testReverseTransformWithRoundingFloat()
+    {
+        $transformer = new NumberToLocalizedStringTransformer(1, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
+
+        $this->assertEquals(10.3, $transformer->reverseTransform(10.35));
+    }
+
     public function testReverseTransformDoesNotRoundIfNoPrecision()
     {
         $transformer = new NumberToLocalizedStringTransformer(null, null, NumberToLocalizedStringTransformer::ROUND_DOWN);
@@ -437,16 +451,6 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
         $transformer = new NumberToLocalizedStringTransformer();
 
         $transformer->transform('foo');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
-    public function testReverseTransformExpectsString()
-    {
-        $transformer = new NumberToLocalizedStringTransformer();
-
-        $transformer->reverseTransform(1);
     }
 
     /**

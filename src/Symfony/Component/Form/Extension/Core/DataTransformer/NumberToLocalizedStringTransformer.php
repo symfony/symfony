@@ -159,6 +159,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
+        if (is_int($value) || is_float($value)) {
+            return $this->round($value);
+        }
+
         if (!is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }

@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+* added deprecations checking for parent interfaces/classes to DebugClassLoader
+* added ZTS support to symfony_debug extension
+* added symfony_debug_backtrace() to symfony_debug extension
+  to track the backtrace of fatal errors
+
 2.6.0
 -----
 

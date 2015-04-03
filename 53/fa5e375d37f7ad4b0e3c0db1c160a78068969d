@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-17T19:33:43Z
+
+Thanks @stof. I've applied some fixes to this PR.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-17T20:01:13Z
+
+failures look unrelated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-18T10:17:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-18T10:42:49Z
+
+Please configure the allowed types (null|int) for `scale` with setAllowedTypes.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-18T14:02:47Z
+
+I've fixed all remaining comments and created a doc PR. Ready to merge imo :white_check_mark:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-25T11:34:52Z
+
+The idea lLooks good to me. @WouterJ Can you address the comments?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-27T16:52:46Z
+
+@fabpot I'm a bit unsure what to do:
+
+ 1. Just change `/*` to `/**`
+ 2. (1) + deprecate all other properties
+ 3. (1) + changing message to only mention rename (and not change to private) + adding renamed property for future compatibility
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-20T18:41:36Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:32:08Z
+
+For now, I've done (1). If I needed to do anything else, please say so :)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-03T15:14:47Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T15:22:16Z
+
+:+1:

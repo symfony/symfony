@@ -152,5 +152,10 @@
         <service id="translation.extractor" class="%translation.extractor.class%"/>
 
         <service id="translation.writer" class="%translation.writer.class%"/>
+
+        <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer" public="false">
+            <argument type="service" id="translator" />
+            <tag name="kernel.cache_warmer" />
+        </service>
     </services>
 </container>

@@ -95,7 +95,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), array(), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
         $translator->setLocale('invalid locale');
 
         $this->setExpectedException('\InvalidArgumentException');
@@ -106,23 +106,25 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            'fr' => array(
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ),
         );
 
         // prime the cache
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), $resourceFiles, 'yml');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
 
         // do it another time as the cache is primed now
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), array(), 'yml');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
 
         // refresh cache when resources is changed in debug mode.
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true), array(), 'yml');
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true), 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('folder', $translator->trans('folder'));
@@ -132,10 +134,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
-            __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            'fr' => array(
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ),
         );
 
-        $translator = $this->getTranslator($loader, array(), $resourceFiles, 'yml');
+        $translator = $this->getTranslator($loader, array('resource_files' => $resourceFiles), 'yml');
         $translator->setLocale('fr');
 
         $this->assertEquals('répertoire', $translator->trans('folder'));
@@ -221,14 +225,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 
-    public function getTranslator($loader, $options = array(), $resources = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    public function getTranslator($loader, $options = array(), $loaderFomat = 'loader', $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
         $translator = new $translatorClass(
             $this->getContainer($loader),
             new MessageSelector(),
             array($loaderFomat => array($loaderFomat)),
-            $options,
-            $resources
+            $options
         );
 
         if ('loader' === $loaderFomat) {
@@ -242,6 +245,22 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         }
 
         return $translator;
+    }
+
+    public function testWarmup()
+    {
+        $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
+        $resourceFiles = array(
+            'fr' => array(
+                __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
+            ),
+        );
+
+        // prime the cache
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir,  'resource_files' => $resourceFiles), 'yml');
+        $this->assertFalse(file_exists($this->tmpDir.'/catalogue.fr.php'));
+        $translator->warmup($this->tmpDir);
+        $this->assertTrue(file_exists($this->tmpDir.'/catalogue.fr.php'));
     }
 }
 

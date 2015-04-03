@@ -26,11 +26,12 @@ class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
     public function testCollectMessages()
     {
         $collector = $this->createCollector();
-        $collector->setFallbackLocales(array('fr'));
+        $collector->setFallbackLocales(array('fr', 'ru'));
 
         $collector->trans('foo');
         $collector->trans('bar');
         $collector->transChoice('choice', 0);
+        $collector->trans('bar_ru');
 
         $expectedMessages = array();
         $expectedMessages[] = array(
@@ -54,6 +55,13 @@ class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
               'domain' => 'messages',
               'state' => DataCollectorTranslator::MESSAGE_MISSING,
         );
+        $expectedMessages[] = array(
+              'id' => 'bar_ru',
+              'translation' => 'bar (ru)',
+              'locale' => 'ru',
+              'domain' => 'messages',
+              'state' => DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK,
+        );
 
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
     }
@@ -64,6 +72,7 @@ class DataCollectorTranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (en)'), 'en');
         $translator->addResource('array', array('bar' => 'bar (fr)'), 'fr');
+        $translator->addResource('array', array('bar_ru' => 'bar (ru)'), 'ru');
 
         $collector = new DataCollectorTranslator($translator);
 

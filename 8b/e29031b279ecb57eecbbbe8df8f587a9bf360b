@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2015-04-01T12:21:51Z
+
+So just that I understand correctly - the deps=high tests will be fixed as soon as everything is merged into master, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-01T13:48:25Z
+
+Yes, deps=high install 3.0 components, that currently do not have your patch included.
+There is one remaining issue: per-components tests for FrameworkBundle and TwigBridge **2.6** tests fail because the **2.7** Form that is installed as a dep by composer does not work with the 2.6 test suite.

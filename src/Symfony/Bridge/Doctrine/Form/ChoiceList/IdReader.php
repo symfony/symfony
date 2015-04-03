@@ -58,7 +58,7 @@ class IdReader
         $this->om = $om;
         $this->classMetadata = $classMetadata;
         $this->singleId = 1 === count($ids);
-        $this->intId = $this->singleId && 1 === count($ids) && in_array($idType, array('integer', 'smallint', 'bigint'));
+        $this->intId = $this->singleId && in_array($idType, array('integer', 'smallint', 'bigint'));
         $this->idField = current($ids);
     }
 

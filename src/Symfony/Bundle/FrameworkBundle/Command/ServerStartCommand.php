@@ -134,7 +134,7 @@ EOF
             return 1;
         }
 
-        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $router, null)) {
+        if (null === $process = $this->createServerProcess($output, $address, $documentRoot, $router)) {
             return 1;
         }
 

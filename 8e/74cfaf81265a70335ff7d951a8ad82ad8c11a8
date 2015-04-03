@@ -1,0 +1,106 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-02T19:01:42Z
+
+somewhat agree since php notices are raised for bad code that is usually mapped to exceptions in symfony and thus have to be avoided.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-02T20:09:33Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pborreli at 2015-04-02T20:13:58Z
+
+:heart: this PR
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-02T20:20:37Z
+
+BTW, with this PR and the following patch, we will be able to capture **with ease** all PHP errors without any external packages ;) I may send a PR to symfony-standard with a cleaner version of this patch.
+
+```diff
+commit 8374bbe849b7f9e8912110992fbdde95182b6e15
+Author: Grégoire Pineau <lyrixx@lyrixx.info>
+Date:   Thu Apr 2 16:49:56 2015 +0200
+
+    Log all PHP errors
+
+diff --git a/app/AppKernel.php b/app/AppKernel.php
+index 1e8325c..342671f 100644
+--- a/app/AppKernel.php
++++ b/app/AppKernel.php
+@@ -1,7 +1,9 @@
+ <?php
+
+-use Symfony\Component\HttpKernel\Kernel;
++use Psr\Log\LogLevel;
+ use Symfony\Component\Config\Loader\LoaderInterface;
++use Symfony\Component\Debug\ErrorHandler;
++use Symfony\Component\HttpKernel\Kernel;
+
+ class AppKernel extends Kernel
+ {
+@@ -33,4 +35,20 @@ class AppKernel extends Kernel
+     {
+         $loader->load($this->getRootDir().'/config/config_'.$this->getEnvironment().'.yml');
+     }
++
++    public function boot()
++    {
++        parent::boot();
++
++        if (false === $this->debug) {
++            $handler = ErrorHandler::register();
++
++            $handler->throwAt(0, true);
++            $handler->scopeAt(0, true);
++            $handler->traceAt(E_ALL, true);
++
++            $logger = $this->container->get('monolog.logger.php_error');
++            $handler->setDefaultLogger($this->container->get('monolog.logger.php_error'));
++        }
++    }
+ }
+diff --git a/app/config/config.yml b/app/config/config.yml
+index bf4da51..855f089 100644
+--- a/app/config/config.yml
++++ b/app/config/config.yml
+@@ -71,3 +71,7 @@ swiftmailer:
+     username:  "%mailer_user%"
+     password:  "%mailer_password%"
+     spool:     { type: memory }
++
++monolog:
++    channels:
++        - php_error
+diff --git a/app/config/config_prod.yml b/app/config/config_prod.yml
+index 342837a..443a80d 100644
+--- a/app/config/config_prod.yml
++++ b/app/config/config_prod.yml
+@@ -15,9 +15,12 @@ monolog:
+     handlers:
+         main:
+             type:         fingers_crossed
+-            action_level: error
+-            handler:      nested
+-        nested:
++            action_level: warning
++            handler:      group
++        group:
++            type: group
++            members: [ file ]
++        file:
+             type:  stream
+             path:  "%kernel.logs_dir%/%kernel.environment%.log"
+             level: debug
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-02T21:41:21Z
+
+:+1:, my reasoning being that the default of this very component (and of Symfony standard) in debug mode is to throw exceptions. Although the wording is misleading, reading the definition of the notice log level vs the warning one is clear to me: PHP notices are exceptional in prod, thus mapped to log warnings

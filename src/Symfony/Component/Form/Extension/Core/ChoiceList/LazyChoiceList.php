@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+trigger_error('The '.__NAMESPACE__.'\LazyChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
@@ -34,11 +36,6 @@ abstract class LazyChoiceList implements ChoiceListInterface
      * @var ChoiceListInterface
      */
     private $choiceList;
-
-    public function __construct()
-    {
-        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\LazyChoiceList instead.', E_USER_DEPRECATED);
-    }
 
     /**
      * {@inheritdoc}

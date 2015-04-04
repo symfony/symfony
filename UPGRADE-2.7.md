@@ -515,3 +515,10 @@ PropertyAccess
 
         new UnexpectedTypeException($value, $path, $pathIndex);
    ```
+
+Config
+------
+
+ * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as 
+   deprecated in favor of the new `getPath()` method.
+   

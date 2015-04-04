@@ -304,7 +304,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 // see https://github.com/symfony/symfony/issues/4670
                 $itemsToAdd = is_object($value) ? iterator_to_array($value) : $value;
                 $itemToRemove = array();
-                $propertyValue = & $this->readProperty($object, $property);
+                $propertyValue = &$this->readProperty($object, $property);
                 $previousValue = $propertyValue[self::VALUE];
 
                 if (is_array($previousValue) || $previousValue instanceof \Traversable) {

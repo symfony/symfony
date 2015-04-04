@@ -43,7 +43,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function has($name)
     {
-        $attributes = & $this->resolveAttributePath($name);
+        $attributes = &$this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
 
         if (null === $attributes) {
@@ -58,7 +58,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function get($name, $default = null)
     {
-        $attributes = & $this->resolveAttributePath($name);
+        $attributes = &$this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
 
         if (null === $attributes) {

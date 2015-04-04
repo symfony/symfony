@@ -109,7 +109,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
             }
 
             return $result;
-        });
+        }, array());
     }
 
     private function computeCount($messages)

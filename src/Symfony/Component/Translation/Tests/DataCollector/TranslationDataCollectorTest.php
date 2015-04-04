@@ -22,6 +22,21 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('The "DataCollector" is not available');
         }
     }
+
+    public function testCollectEmptyMessages()
+    {
+        $translator = $this->getTranslator();
+        $translator->expects($this->any())->method('getCollectedMessages')->will($this->returnValue(array()));
+
+        $dataCollector = new TranslationDataCollector($translator);
+        $dataCollector->lateCollect();
+
+        $this->assertEquals(0, $dataCollector->getCountMissings());
+        $this->assertEquals(0, $dataCollector->getCountFallbacks());
+        $this->assertEquals(0, $dataCollector->getCountDefines());
+        $this->assertEquals(array(), $dataCollector->getMessages());
+    }
+
     public function testCollect()
     {
         $collectedMessages = array(
@@ -81,11 +96,7 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $translator = $this->getTranslator();
         $translator->expects($this->any())->method('getCollectedMessages')->will($this->returnValue($collectedMessages));
 
         $dataCollector = new TranslationDataCollector($translator);
@@ -95,5 +106,16 @@ class TranslationDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $dataCollector->getCountFallbacks());
         $this->assertEquals(1, $dataCollector->getCountDefines());
         $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()));
+    }
+
+    private function getTranslator()
+    {
+        $translator = $this
+            ->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        return $translator;
     }
 }

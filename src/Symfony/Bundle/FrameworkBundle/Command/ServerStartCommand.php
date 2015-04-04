@@ -217,11 +217,10 @@ EOF
      * @param string          $address      IP address and port to listen to
      * @param string          $documentRoot The application's document root
      * @param string          $router       The router filename
-     * @param int             $timeout      Process timeout
      *
      * @return Process The process
      */
-    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router, $timeout = null)
+    private function createServerProcess(OutputInterface $output, $address, $documentRoot, $router)
     {
         $finder = new PhpExecutableFinder();
         if (false === $binary = $finder->find()) {
@@ -237,6 +236,6 @@ EOF
             $router,
         )));
 
-        return new Process('exec '.$script, $documentRoot, null, null, $timeout);
+        return new Process('exec '.$script, $documentRoot, null, null, null);
     }
 }

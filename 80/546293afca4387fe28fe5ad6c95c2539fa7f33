@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-04T15:38:12Z
+
+This PR is ready. The last failing test should be fixed once https://bugs.php.net/69376 is.

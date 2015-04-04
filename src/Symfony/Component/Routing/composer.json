@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/config": "~2.2|~3.0.0",
+        "symfony/config": "~2.7|~3.0.0",
         "symfony/http-foundation": "~2.3|~3.0.0",
         "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
         "symfony/expression-language": "~2.4|~3.0.0",

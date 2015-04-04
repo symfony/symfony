@@ -88,7 +88,7 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (false !== strpos($input->getArgument('command'), ':l')) {
+        if (false !== strpos($input->getFirstArgument(), ':l')) {
             $output->writeln('<comment>The use of "twig:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:twig" instead.</comment>');
         }
 

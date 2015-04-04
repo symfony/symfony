@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-02-10T21:41:09Z
+
+![selection_014](https://cloud.githubusercontent.com/assets/1753742/6136987/2120d624-b16d-11e4-9090-c1c708755012.png)
+
+https://blackfire.io/profiles/compare/93b74379-ba97-40b7-9153-14c1cba44b3e/graph
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-10T23:31:17Z
+
+I think this change makes sense because database entries are unlikely to be translated. And if they you would translate them, then not with the translator component but instead also read them from the database when fetching.
+
+---------------------------------------------------------------------------
+
+by tadcka at 2015-02-11T08:01:18Z
+
++1
+
+---------------------------------------------------------------------------
+
+by egils at 2015-02-11T08:14:07Z
+
+:+1: @Tobion, my thoughts exactly
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-11T09:52:49Z
+
+As the default for the Doctrine type changed to not translating, it's a bc break. As such it should be documented in the upgrade file.
+
+---------------------------------------------------------------------------
+
+by raziel057 at 2015-02-11T10:27:37Z
+
++1
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-02-11T10:55:46Z
+
+@Tobion changes has been made.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-02-11T12:02:16Z
+
+FYI the CountryType, CurrencyType, LanguageType and LocaleType use Intl component so I changed to not use trans.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-11T14:26:36Z
+
+I think the TimezoneType should disable translation as well. You don't want to manually translate all the timezone identifiers. Actually it probably should translate internally with http://php.net/manual/en/intltimezone.getdisplayname.php but that's a different story. Created: #13662
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-11T19:13:30Z
+
+Please also update the php template in https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/Resources/views/Form/choice_widget_options.html.php and you need to update https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/composer.json#L43 and https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bridge/Twig/composer.json#L24 to `~2.7`
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-16T22:02:54Z
+
+Actually, I just found #7611 and https://github.com/symfony/symfony/pull/12148#issuecomment-68875664
+So I think it makes more sense to implement this as part of `choice_translation_domain` (bool|closure) which when false or the closure returns false, then does not translate the given choice.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-24T08:23:09Z
+
+Is this one ready to be merged?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-24T12:30:54Z
+
+In theory it would be ready because it works and implementation is ok. But I think the idea expressed in https://github.com/symfony/symfony/pull/12148#issuecomment-59379024 is the better solution. But this would require @webmozart or someone else to finish #12148.
+So if we would merge this PR here, there is a high chance that we would deprecate the new option again as soon as #12148 is finished. And thus involve maiting BC and documentation confusion. So I'd prefer to wait for #12148 and then rebase this one.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-24T12:40:04Z
+
+@Tobion What's about renaming this option to choice_translation_domain (bool) ? so this won't involve a BC when adding (closure) feature ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-03-24T13:07:04Z
+
+That makes sense if we actually add the ability to set the translation domain for choices. Otherwise the name would not make sense until it is added (which might be a later release).
+
+I'd suggest to add `choice_translation_domain` (false | null | string) as option. When false it does not translate the choices. Otherwise it uses the given choice_translation_domain as translation domain for all the choices. Having a closure does not seem that common anyway since you don't want to overwrite the domain per choice, but just want to have a different domain for choices than for the widget label as given in #7611.
+
+`choice_translation_domain` defaults as lazy option to `translation_domain` thus mainting BC and is overwritten for Entity type etc. as done here to prevent unneseccary translations.
+I guess we also need to add code as in #4328 in buildView to set the translation domain based on the parent when it is null.
+
+---------------------------------------------------------------------------
+
+by EmmanuelVella at 2015-03-25T11:03:04Z
+
+:+1: for ``choice_translation_domain`` (can be ``false`` to disable translation), it would give more flexibility.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-01T11:50:53Z
+
+@Tobion change has been made, can you check now ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-01T14:03:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-01T14:14:24Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-02T07:14:29Z
+
+Doc issue: https://github.com/symfony/symfony-docs/issues/5134
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T20:24:56Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T20:56:37Z
+
+Is it intended that the Twig template [uses the label](https://github.com/symfony/symfony/pull/13651/files#diff-ebe082b8f8e40b852f895d7712b30730R77) while the PHP templates [uses the index](https://github.com/symfony/symfony/pull/13651/files#diff-b56b980552f37a32080a57032805f34dR7) in the `optgroup` element (it has been this way before, but it looks odd to me)?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T21:02:08Z
+
+And should we also document in the upgrade file that you need to update your custom form themes too?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T22:17:04Z
+
+@xabbuh
+ * upgrade ```done```
+ * for ```optgroup``` I renamed $index --> $group_label
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-04T05:59:21Z
+
+:+1:

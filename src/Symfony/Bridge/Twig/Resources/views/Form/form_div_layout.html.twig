@@ -74,13 +74,13 @@
 {%- block choice_widget_options -%}
     {% for group_label, choice in options %}
         {%- if choice is iterable -%}
-            <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+            <optgroup label="{{ choice_translation_domain is sameas(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
                 {% set options = choice %}
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
             {% set attr = choice.attr %}
-            <option value="{{ choice.value }}" {{ block('attributes') }}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            <option value="{{ choice.value }}" {{ block('attributes') }}{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is sameas(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}</option>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}

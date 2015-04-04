@@ -24,6 +24,7 @@ class LocaleType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => Intl::getLocaleBundle()->getLocaleNames(),
+            'choice_translation_domain' => false,
         ));
     }
 

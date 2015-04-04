@@ -15,7 +15,7 @@ Router
    `foo%bar%2` which would be compiled to `$foo % $bar % 2` in 2.6
    but in 2.7 you would get an error if `bar` parameter
    doesn't exist or unexpected result otherwise.
- 
+
 Form
 ----
 
@@ -23,14 +23,14 @@ Form
    AbstractType or AbstractExtensionType has been deprecated in favor of
    overriding the new "configureOptions" method.
 
-   The method "setDefaultOptions(OptionsResolverInterface $resolver)" will 
+   The method "setDefaultOptions(OptionsResolverInterface $resolver)" will
    be renamed in Symfony 3.0 to "configureOptions(OptionsResolver $resolver)".
 
    Before:
 
    ```php
     use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-    
+
     class TaskType extends AbstractType
     {
         // ...
@@ -47,7 +47,7 @@ Form
 
    ```php
     use Symfony\Component\OptionsResolver\OptionsResolver;
-    
+
     class TaskType extends AbstractType
     {
         // ...
@@ -59,12 +59,12 @@ Form
         }
     }
    ```
-   
+
  * The "choice_list" option of ChoiceType was deprecated. You should use
    "choices_as_values" or "choice_loader" now.
-   
+
    Before:
-   
+
    ```php
    $form->add('status', 'choice', array(
        'choice_list' => new ObjectChoiceList(array(
@@ -74,9 +74,9 @@ Form
        )),
    ));
    ```
-   
+
    After:
-   
+
    ```php
    $form->add('status', 'choice', array(
        'choices' => array(
@@ -87,13 +87,13 @@ Form
        'choices_as_values' => true,
    ));
    ```
-   
+
  * You should flip the keys and values of the "choices" option in ChoiceType
    and set the "choices_as_values" option to `true`. The default value of that
    option will be switched to `true` in Symfony 3.0.
-   
+
    Before:
-   
+
    ```php
    $form->add('status', 'choice', array(
        'choices' => array(
@@ -103,9 +103,9 @@ Form
        )),
    ));
    ```
-   
+
    After:
-   
+
    ```php
    $form->add('status', 'choice', array(
        'choices' => array(
@@ -116,64 +116,64 @@ Form
        'choices_as_values' => true,
    ));
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\ChoiceListInterface` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
-   
+
    public function doSomething(ChoiceListInterface $choiceList)
    {
        // ...
    }
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
-   
+
    public function doSomething(ChoiceListInterface $choiceList)
    {
        // ...
    }
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\View\ChoiceView` instead.
-   
+
    Note that the order of the arguments passed to the constructor was inverted.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\View\ChoiceView;
-   
+
    $view = new ChoiceView($data, 'value', 'Label');
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-   
+
    $view = new ChoiceView('Label', 'value', $data);
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-   
+
    $choiceList = new ChoiceList(
        array(Status::ENABLED, Status::DISABLED, Status::IGNORED),
        array('Enabled', 'Disabled', 'Ignored'),
@@ -181,19 +181,19 @@ Form
        array(Status::ENABLED),
    );
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
-   
+
    $factory = new DefaultChoiceListFactory();
-   
+
    $choices = array(Status::ENABLED, Status::DISABLED, Status::IGNORED);
    $labels = array('Enabled', 'Disabled', 'Ignored');
-   
+
    $choiceList = $factory->createListFromChoices($choices);
-   
+
    $choiceListView = $factory->createView(
        $choiceList,
        // Preferred choices
@@ -204,75 +204,75 @@ Form
        }
    );
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory::createListFromLoader()`
-   together with an implementation of 
+   together with an implementation of
    `Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList;
-   
+
    class MyLazyChoiceList extends LazyChoiceList
    {
        public function loadChoiceList()
        {
            // load $choiceList
-           
+
            return $choiceList;
        }
    }
-   
+
    $choiceList = new MyLazyChoiceList();
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
    use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
-   
+
    class MyChoiceLoader implements ChoiceLoaderInterface
    {
        // ...
    }
-   
+
    $factory = new DefaultChoiceListFactory();
-   
+
    $choiceList = $factory->createListFromLoader(new MyChoiceLoader());
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-   
+
    $choiceList = new ObjectChoiceList(
        array(Status::getInstance(Status::ENABLED), Status::getInstance(Status::DISABLED)),
        // Label property
        'name'
    );
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
-   
+
    $factory = new DefaultChoiceListFactory();
-   
+
    $choiceList = $factory->createListFromChoices(array(
-       Status::getInstance(Status::ENABLED), 
-       Status::getInstance(Status::DISABLED), 
+       Status::getInstance(Status::ENABLED),
+       Status::getInstance(Status::DISABLED),
    ));
-   
+
    $choiceListView = $factory->createView(
        $choiceList,
        // Preferred choices
@@ -281,34 +281,34 @@ Form
        'name'
    );
    ```
-   
+
  * `Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-   
+
    $choiceList = new SimpleChoiceList(array(
        Status::ENABLED => 'Enabled',
        Status::DISABLED => 'Disabled',
    ));
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
-   
+
    $factory = new DefaultChoiceListFactory();
-   
+
    $choices = array(Status::ENABLED, Status::DISABLED);
    $labels = array('Enabled', 'Disabled');
-   
+
    $choiceList = $factory->createListFromChoices($choices);
-   
+
    $choiceListView = $factory->createView(
        $choiceList,
        // Preferred choices
@@ -319,115 +319,151 @@ Form
        }
    );
    ```
-   
+
  * The "property" option of `DoctrineType` was deprecated. You should use the
    new inherited option "choice_label" instead, which has the same effect.
-   
+
    Before:
-   
+
    ```php
    $form->add('tags', 'entity', array(
        'class' => 'Acme\Entity\MyTag',
        'property' => 'name',
    ))
    ```
-   
+
    After:
-   
+
    ```php
    $form->add('tags', 'entity', array(
        'class' => 'Acme\Entity\MyTag',
        'choice_label' => 'name',
    ))
    ```
-   
+
  * The "loader" option of `DoctrineType` was deprecated and will be removed in
    Symfony 3.0. You should override the `getLoader()` method instead in a custom
    type.
-   
+
    Before:
-   
+
    ```php
    $form->add('tags', 'entity', array(
        'class' => 'Acme\Entity\MyTag',
        'loader' => new MyEntityLoader(),
    ))
    ```
-   
+
    After:
-   
+
    class MyEntityType extends DoctrineType
    {
        // ...
-       
+
        public function getLoader()
        {
            return new MyEntityLoader();
        }
    }
-   
+
  * `Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
    `Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader` instead.
-   
+
    Before:
-   
+
    ```php
    use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-   
+
    $choiceList = new EntityChoiceList($em, 'Acme\Entity\MyEntity');
    ```
-   
+
    After:
-   
+
    ```php
    use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
-   
+
    $factory = new DefaultChoiceListFactory();
-   
+
    $choices = array(Status::ENABLED, Status::DISABLED);
    $labels = array('Enabled', 'Disabled');
-   
+
    $choiceLoader = new DoctrineChoiceLoader($factory, $em, 'Acme\Entity\MyEntity');
    $choiceList = $factory->createListFromLoader($choiceLoader);
    ```
-   
+
  * Passing a query builder closure to `ORMQueryBuilderLoader` was deprecated and
    will not be supported anymore in Symfony 3.0. You should pass resolved query
    builders only.
-   
+
    Consequently, the arguments `$manager` and `$class` of `ORMQueryBuilderLoader`
    have been deprecated as well.
-   
+
    Note that the "query_builder" option of `DoctrineType` *does* support
    closures, but the closure is now resolved in the type instead of in the
    loader.
-   
+
    Before:
-   
+
    ```
    use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
-   
+
    $queryBuilder = function () {
        // return QueryBuilder
    };
    $loader = new ORMQueryBuilderLoader($queryBuilder);
    ```
-   
+
    After:
-   
+
    ```
    use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
-   
+
    // create $queryBuilder
    $loader = new ORMQueryBuilderLoader($queryBuilder);
    ```
-   
- * The classes `ChoiceToBooleanArrayTransformer`, 
+
+ * The classes `ChoiceToBooleanArrayTransformer`,
    `ChoicesToBooleanArrayTransformer`, `FixRadioInputListener` and
-   `FixCheckboxInputListener` were deprecated and will be removed in Symfony 3.0. 
-   Their functionality is covered by the new classes `RadioListMapper` and 
+   `FixCheckboxInputListener` were deprecated and will be removed in Symfony 3.0.
+   Their functionality is covered by the new classes `RadioListMapper` and
    `CheckboxListMapper`.
+
+ * The ability to translate Doctrine type entries by the translator component
+   is now disabled by default and to enable it you must explicitly set the option
+   "choice_translation_domain" to true
+
+   Before:
+
+   ```
+   $form->add('products', 'entity', array(
+       'class' => 'AppBundle/Entity/Product',
+   ));
+   ```
+
+   After:
+
+   ```
+   $form->add('products', 'entity', array(
+       'class' => 'AppBundle/Entity/Product',
+       'choice_translation_domain' => true,
+   ));
+   ```
+
+ * In the block `choice_widget_options` the `translation_domain` has been replaced
+   with the `choice_translation_domain` option.
+
+   Before:
+
+   ```jinja
+   {{ choice.label|trans({}, translation_domain) }}
+   ```
+
+   After:
+
+   ```jinja
+   {{ choice_translation_domain is sameas(false) ? choice.label : choice.label|trans({}, choice_translation_domain) }}
+   ```
 
 Serializer
 ----------

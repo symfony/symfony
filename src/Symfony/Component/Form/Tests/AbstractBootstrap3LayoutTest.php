@@ -840,7 +840,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 '/select
     [@name="name"]
     [@class="my&class form-control"]
-    [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
+    [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>200]
 '
         );
@@ -858,7 +858,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@name="name"]
     [@class="my&class form-control"]
     [./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Country[/trans]"]]
-    [./option[@value="AT"][@selected="selected"][.="[trans]Austria[/trans]"]]
+    [./option[@value="AT"][@selected="selected"][.="Austria"]]
     [count(./option)>201]
 '
         );
@@ -1388,7 +1388,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 '/select
     [@name="name"]
     [@class="my&class form-control"]
-    [./option[@value="de"][@selected="selected"][.="[trans]German[/trans]"]]
+    [./option[@value="de"][@selected="selected"][.="German"]]
     [count(./option)>200]
 '
         );
@@ -1402,7 +1402,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
 '/select
     [@name="name"]
     [@class="my&class form-control"]
-    [./option[@value="de_AT"][@selected="selected"][.="[trans]German (Austria)[/trans]"]]
+    [./option[@value="de_AT"][@selected="selected"][.="German (Austria)"]]
     [count(./option)>200]
 '
         );
@@ -1826,8 +1826,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@class="my&class form-control"]
     [not(@required)]
     [./optgroup
-        [@label="[trans]Europe[/trans]"]
-        [./option[@value="Europe/Vienna"][@selected="selected"][.="[trans]Vienna[/trans]"]]
+        [@label="Europe"]
+        [./option[@value="Europe/Vienna"][@selected="selected"][.="Vienna"]]
     ]
     [count(./optgroup)>10]
     [count(.//option)>200]

@@ -1331,6 +1331,51 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertTrue($view->vars['expanded']);
     }
 
+    public function testPassChoiceTranslationDomainToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->vars['choice_translation_domain']);
+    }
+
+    public function testChoiceTranslationDomainWithTrueValueToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+            'choice_translation_domain' => true,
+        ));
+        $view = $form->createView();
+
+        $this->assertNull($view->vars['choice_translation_domain']);
+    }
+
+    public function testDefaulChoiceTranslationDomainIsSameAsTranslationDomainToView()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices' => $this->choices,
+            'translation_domain' => 'foo',
+        ));
+        $view = $form->createView();
+
+        $this->assertEquals('foo', $view->vars['choice_translation_domain']);
+    }
+
+    public function testInheritChoiceTranslationDomainFromParent()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', 'form', null, array(
+                'translation_domain' => 'domain',
+            ))
+            ->add('child', 'choice')
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('domain', $view['child']->vars['choice_translation_domain']);
+    }
+
     public function testPlaceholderIsNullByDefaultIfRequired()
     {
         $form = $this->factory->create('choice', null, array(

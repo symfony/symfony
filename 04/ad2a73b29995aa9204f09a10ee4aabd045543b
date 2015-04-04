@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-03T07:05:23Z
+
+:+1: It looks OK to me. Thanks @aitboudad
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T10:57:38Z
+
+This will not change the number for "Defined messages" above the table, right? Does it make sense to update this value as well?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T10:59:09Z
+
+I also think not having an extra column but just an additional line if the message is used more than once as in the last proposal in #14183 looks nicer.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T11:29:06Z
+
+@xabbuh fixed.
+
+![selection_022](https://cloud.githubusercontent.com/assets/1753742/6981635/f8585ae2-d9fc-11e4-917f-cb0899c4042e.png)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T20:24:15Z
+
+@fabpot can I merge ? :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-03T20:40:38Z
+
+@aitboudad The number of defined messages (the headline above the table) is still unchanged?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T21:01:36Z
+
+@xabbuh I updated the number of defined messages.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-04T05:51:35Z
+
+:+1:

@@ -42,18 +42,19 @@ class ExceptionCaster
 
     public static function castException(\Exception $e, array $a, Stub $stub, $isNested)
     {
-        $trace = $a["\0Exception\0trace"];
-        unset($a["\0Exception\0trace"]); // Ensures the trace is always last
+        $xPrefix = PHP_VERSION_ID >= 70000 ? "\0BaseException\0" : "\0Exception\0";
+        $trace = $a[$xPrefix.'trace'];
+        unset($a[$xPrefix.'trace']); // Ensures the trace is always last
 
         static::filterTrace($trace, static::$traceArgs);
 
         if (null !== $trace) {
-            $a["\0Exception\0trace"] = $trace;
+            $a[$xPrefix.'trace'] = $trace;
         }
-        if (empty($a["\0Exception\0previous"])) {
-            unset($a["\0Exception\0previous"]);
+        if (empty($a[$xPrefix.'previous'])) {
+            unset($a[$xPrefix.'previous']);
         }
-        unset($a["\0Exception\0string"], $a["\0+\0xdebug_message"], $a["\0+\0__destructorException"]);
+        unset($a[$xPrefix.'string'], $a["\0+\0xdebug_message"], $a["\0+\0__destructorException"]);
 
         return $a;
     }
@@ -69,23 +70,20 @@ class ExceptionCaster
 
     public static function castThrowingCasterException(ThrowingCasterException $e, array $a, Stub $stub, $isNested)
     {
-        $b = (array) $a["\0Exception\0previous"];
+        $xPrefix = PHP_VERSION_ID >= 70000 ? "\0BaseException\0" : "\0Exception\0";
+        $b = (array) $a[$xPrefix.'previous'];
 
-        if (isset($b["\0*\0message"])) {
-            $a["\0~\0message"] = $b["\0*\0message"];
-        }
-
-        if (isset($a["\0Exception\0trace"])) {
-            $b["\0Exception\0trace"][0] += array(
+        if (isset($a[$xPrefix.'trace'][0])) {
+            $b[$xPrefix.'trace'][0] += array(
                 'file' => $b["\0*\0file"],
                 'line' => $b["\0*\0line"],
             );
-            array_splice($b["\0Exception\0trace"], -1 - count($a["\0Exception\0trace"]));
-            static::filterTrace($b["\0Exception\0trace"], false);
-            $a["\0~\0trace"] = $b["\0Exception\0trace"];
+            array_splice($b[$xPrefix.'trace'], -1 - count($a[$xPrefix.'trace']));
+            static::filterTrace($b[$xPrefix.'trace'], false);
+            $a["\0~\0trace"] = $b[$xPrefix.'trace'];
         }
 
-        unset($a["\0Exception\0trace"], $a["\0Exception\0previous"], $a["\0*\0code"], $a["\0*\0file"], $a["\0*\0line"]);
+        unset($a[$xPrefix.'trace'], $a[$xPrefix.'previous'], $a["\0*\0code"], $a["\0*\0file"], $a["\0*\0line"]);
 
         return $a;
     }

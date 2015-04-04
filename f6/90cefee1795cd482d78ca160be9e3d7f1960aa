@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-04T17:46:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-04T17:48:36Z
+
+Just a suggestion: without giving more context information it's hard to understand why this `strtolower` call is useless.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-04T17:53:00Z
+
+@javiereguiluz fixed!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T17:54:21Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-04T17:56:05Z
+
+@dosten thanks! Your proposal makes a lot of sense now :)

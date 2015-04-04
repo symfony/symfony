@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-03T20:51:49Z
+
+Maybe I'm wrong here - can one rely on the first argument being the command?
+
+If so, \Symfony\Component\Console\Tester\CommandTester::execute does not seem to guarantee this.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T21:02:19Z
+
+I think this is going to be fixed by https://github.com/symfony/symfony/pull/14197 already
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-03T21:09:39Z
+
+Not sure if #14197 does the right thing (tm)?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T21:41:28Z
+
+@mpdude FYI $input->getArgument('command') return the cmd name and doesn't allow to know if the user uses the alias or name to execute this command
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-04T07:11:21Z
+
+So, trying to fix it by making sure the `CommandTester` adds the command name as first argument.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-04T07:37:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-04T07:44:15Z
+
+If the first argument has such a special meaning and can (always?) be expected to contain the (unparsed?) command name, maybe that would be worth a doc note somewhere? (DocBlock?)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T09:00:01Z
+
+now it's ok :+1:
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-04T09:20:03Z
+
+Please merge so folks with open PRs can rebase and get their tests green again :-)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-04T09:29:37Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-04T12:11:36Z
+
+Can anyone see why some of the Travis builds still fail as before?

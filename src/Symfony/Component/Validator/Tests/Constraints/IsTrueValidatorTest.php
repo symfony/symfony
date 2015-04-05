@@ -11,40 +11,40 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\Constraints\False;
-use Symfony\Component\Validator\Constraints\FalseValidator;
+use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\IsTrueValidator;
 
-class FalseValidatorTest extends AbstractConstraintValidatorTest
+class IsTrueValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {
-        return new FalseValidator();
+        return new IsTrueValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new False());
+        $this->validator->validate(null, new IsTrue());
 
         $this->assertNoViolation();
     }
 
-    public function testFalseIsValid()
+    public function testTrueIsValid()
     {
-        $this->validator->validate(false, new False());
+        $this->validator->validate(true, new IsTrue());
 
         $this->assertNoViolation();
     }
 
-    public function testTrueIsInvalid()
+    public function testFalseIsInvalid()
     {
-        $constraint = new False(array(
+        $constraint = new IsTrue(array(
             'message' => 'myMessage',
         ));
 
-        $this->validator->validate(true, $constraint);
+        $this->validator->validate(false, $constraint);
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'true')
+            ->setParameter('{{ value }}', 'false')
             ->assertRaised();
     }
 }

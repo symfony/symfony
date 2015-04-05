@@ -810,10 +810,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsStringDeep()
+    public function testGetErrorsAsStringDeep()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $parent = $this->getBuilder()
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
@@ -834,10 +832,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsStringDeepWithIndentation()
+    public function testGetErrorsAsStringDeepWithIndentation()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $parent = $this->getBuilder()
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())

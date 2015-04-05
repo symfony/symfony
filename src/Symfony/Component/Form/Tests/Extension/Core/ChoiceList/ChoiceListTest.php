@@ -37,7 +37,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         parent::setUp();
     }
 
-    public function testLegacyInitArray()
+    public function testInitArray()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -56,7 +56,7 @@ class ChoiceListTest extends AbstractChoiceListTest
      * choices parameter. A choice itself that is an object implementing \Traversable
      * is not treated as hierarchical structure, but as-is.
      */
-    public function testLegacyInitNestedTraversable()
+    public function testInitNestedTraversable()
     {
         $traversableChoice = new \ArrayIterator(array($this->obj3, $this->obj4));
 
@@ -83,7 +83,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         ), $this->list->getRemainingViews());
     }
 
-    public function testLegacyInitNestedArray()
+    public function testInitNestedArray()
     {
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
         $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
@@ -100,7 +100,7 @@ class ChoiceListTest extends AbstractChoiceListTest
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testLegacyInitWithInsufficientLabels()
+    public function testInitWithInsufficientLabels()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2),
@@ -108,7 +108,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         );
     }
 
-    public function testLegacyInitWithLabelsContainingNull()
+    public function testInitWithLabelsContainingNull()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2),

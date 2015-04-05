@@ -356,6 +356,7 @@ Form
 
    After:
 
+   ```php
    class MyEntityType extends DoctrineType
    {
        // ...
@@ -365,6 +366,7 @@ Form
            return new MyEntityLoader();
        }
    }
+   ```
 
  * `Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList` was
    deprecated and will be removed in Symfony 3.0. You should use
@@ -405,7 +407,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 
    $queryBuilder = function () {
@@ -416,7 +418,7 @@ Form
 
    After:
 
-   ```
+   ```php
    use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 
    // create $queryBuilder
@@ -435,7 +437,7 @@ Form
 
    Before:
 
-   ```
+   ```php
    $form->add('products', 'entity', array(
        'class' => 'AppBundle/Entity/Product',
    ));
@@ -443,7 +445,7 @@ Form
 
    After:
 
-   ```
+   ```php
    $form->add('products', 'entity', array(
        'class' => 'AppBundle/Entity/Product',
        'choice_translation_domain' => true,

@@ -15,7 +15,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
-use Symfony\Component\Config\DefaultConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactory;
 
 /**
  * Translator.
@@ -572,7 +572,7 @@ EOF
     private function getConfigCacheFactory()
     {
         if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new DefaultConfigCacheFactory($this->debug);
+            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
         }
 
         return $this->configCacheFactory;

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config;
 
+use Symfony\Component\Config\Resource\ResourceInterface;
+
 /**
  * Interface for ConfigCache
  *
@@ -21,14 +23,6 @@ interface ConfigCacheInterface
     /**
      * Gets the cache file path.
      *
-     * @deprecated since 2.7, to be removed in 3.0. Use getPath() instead.
-     * @return string The cache file path
-     */
-    public function __toString();
-
-    /**
-     * Gets the cache file path.
-     *
      * @return string The cache file path
      */
     public function getPath();
@@ -36,12 +30,15 @@ interface ConfigCacheInterface
     /**
      * Checks if the cache is still fresh.
      *
-     * @return bool    true if the cache is fresh, false otherwise
+     * This check should take the metadata passed to the write() method into consideration.
+     *
+     * @return bool Whether the cache is still fresh.
      */
     public function isFresh();
 
     /**
-     * Writes cache.
+     * Writes the given content into the cache file. Metadata will be stored
+     * independently and can be used to check cache freshness at a later time.
      *
      * @param string                   $content  The content to write into the cache
      * @param ResourceInterface[]|null $metadata An array of ResourceInterface instances

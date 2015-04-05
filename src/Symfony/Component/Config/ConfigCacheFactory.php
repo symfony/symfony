@@ -12,14 +12,16 @@
 namespace Symfony\Component\Config;
 
 /**
- * Default implementation for ConfigCacheFactoryInterface
- * that will create an instance of ConfigCache.
+ * Basic implementation for ConfigCacheFactoryInterface
+ * that will simply create an instance of ConfigCache.
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class DefaultConfigCacheFactory implements ConfigCacheFactoryInterface
+class ConfigCacheFactory implements ConfigCacheFactoryInterface
 {
-    /** @var bool Debug flag passed to the ConfigCache */
+    /**
+     * @var bool Debug flag passed to the ConfigCache
+     */
     private $debug;
 
     /**

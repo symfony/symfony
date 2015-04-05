@@ -33,7 +33,7 @@ class DeprecationErrorHandler
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $mode) {
             if (E_USER_DEPRECATED !== $type) {
                 return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
@@ -51,10 +51,7 @@ class DeprecationErrorHandler
 
                 $group = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true) ? 'legacy' : 'remaining';
 
-                if ('legacy' === $group && 0 === (error_reporting() & E_USER_DEPRECATED)) {
-                    $ref =& $deprecations[$group]['Silenced']['count'];
-                    ++$ref;
-                } else {
+                if ('legacy' !== $group && 'weak' !== $mode) {
                     $ref =& $deprecations[$group][$msg]['count'];
                     ++$ref;
                     $ref =& $deprecations[$group][$msg][$class.'::'.$method];
@@ -99,7 +96,7 @@ class DeprecationErrorHandler
                 };
 
                 foreach (array('remaining', 'legacy', 'other') as $group) {
-                    if ($deprecations[$group]) {
+                    if ($deprecations[$group.'Count']) {
                         echo "\n", $colorize(sprintf('%s deprecation notices (%d)', ucfirst($group), $deprecations[$group.'Count']), 'legacy' !== $group), "\n";
 
                         uasort($deprecations[$group], $cmp);
@@ -120,13 +117,8 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
-                if ('weak' !== $mode) {
-                    if ($deprecations['remaining'] || $deprecations['other']) {
-                        exit(1);
-                    }
-                    if ('strict' === $mode && $deprecations['legacy'] && $deprecations['legacyCount'] !== $ref =& $deprecations['legacy']['Silenced']['count']) {
-                        exit(1);
-                    }
+                if ('weak' !== $mode && ($deprecations['remaining'] || $deprecations['other'])) {
+                    exit(1);
                 }
             });
         }

@@ -3,7 +3,8 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler;
 
-if (!class_exists('PHPUnit_Util_ErrorHandler')) {
+// Detect if we're loaded by an actual run of phpunit
+if (!class_exists('PHPUnit_TextUI_Command', false)) {
     return;
 }
 

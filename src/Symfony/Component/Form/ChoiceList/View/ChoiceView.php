@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form\ChoiceList\View;
 
+use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
+
 /**
  * Represents a choice in templates.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ChoiceView
+class ChoiceView extends LegacyChoiceView
 {
     /**
      * The label displayed to humans.

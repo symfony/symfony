@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * [BC BREAK] The extension alias is now case-insensitive.
+
 2.8.0
 -----
 

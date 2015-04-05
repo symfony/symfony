@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
+require_once __DIR__.'/Fixtures/includes/ProjectWithUpperAliasExtension.php';
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -24,7 +25,6 @@ use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -654,6 +654,19 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension($extension);
         $container->loadFromExtension('project', array('foo' => 'bar'));
         $container->compile();
+    }
+
+    public function testExtensionAliasIsCaseInsensitive()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+
+        $container->registerExtension(new \ProjectExtension());
+        $container->registerExtension(new \ProjectWithUpperAliasExtension());
+
+        $this->assertCount(1, $container->getExtensions());
+        $this->assertTrue($container->hasExtension('project'));
+        $this->assertInstanceOf('ProjectWithUpperAliasExtension', $container->getExtension('project'));
     }
 
     public function testPrivateServiceUser()

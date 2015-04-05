@@ -132,7 +132,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function registerExtension(ExtensionInterface $extension)
     {
-        $this->extensions[$extension->getAlias()] = $extension;
+        $this->extensions[strtolower($extension->getAlias())] = $extension;
 
         if (false !== $extension->getNamespace()) {
             $this->extensionsByNs[$extension->getNamespace()] = $extension;
@@ -140,7 +140,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Returns an extension by alias or namespace.
+     * Returns an extension by alias (case-insensitive)
+     * or namespace (case-sensitive).
      *
      * @param string $name An alias or a namespace
      *
@@ -152,8 +153,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getExtension($name)
     {
-        if (isset($this->extensions[$name])) {
-            return $this->extensions[$name];
+        $lowercasedName = strtolower($name);
+        if (isset($this->extensions[$lowercasedName])) {
+            return $this->extensions[$lowercasedName];
         }
 
         if (isset($this->extensionsByNs[$name])) {
@@ -176,7 +178,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Checks if we have an extension.
+     * Checks if we have an extension by alias (case-insensitive)
+     * or namespace (case-sensitive).
      *
      * @param string $name The name of the extension
      *
@@ -186,7 +189,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasExtension($name)
     {
-        return isset($this->extensions[$name]) || isset($this->extensionsByNs[$name]);
+        return isset($this->extensions[strtolower($name)]) || isset($this->extensionsByNs[$name]);
     }
 
     /**

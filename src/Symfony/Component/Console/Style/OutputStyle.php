@@ -113,4 +113,36 @@ abstract class OutputStyle implements OutputInterface, StyleInterface
     {
         return $this->output->getFormatter();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isQuiet()
+    {
+        return $this->output->isQuiet();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVerbose()
+    {
+        return $this->output->isVerbose();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVeryVerbose()
+    {
+        return $this->output->isVeryVerbose();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDebug()
+    {
+        return $this->output->isDebug();
+    }
 }

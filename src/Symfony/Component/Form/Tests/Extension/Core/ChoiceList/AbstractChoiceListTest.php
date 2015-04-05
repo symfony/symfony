@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @group legacy
  */
 abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
 {
@@ -123,8 +125,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         parent::setUp();
 
         $this->list = $this->createChoiceList();
@@ -153,151 +153,131 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testLegacyGetChoices()
+    public function testGetChoices()
     {
         $this->assertSame($this->choices, $this->list->getChoices());
     }
 
-    public function testLegacyGetValues()
+    public function testGetValues()
     {
         $this->assertSame($this->values, $this->list->getValues());
     }
 
-    public function testLegacyGetIndicesForChoices()
+    public function testGetIndicesForChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice1, $this->choice2);
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testLegacyGetIndicesForChoicesPreservesKeys()
+    public function testGetIndicesForChoicesPreservesKeys()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array(5 => $this->choice1, 8 => $this->choice2);
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testLegacyGetIndicesForChoicesPreservesOrder()
+    public function testGetIndicesForChoicesPreservesOrder()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice2, $this->choice1);
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testLegacyGetIndicesForChoicesIgnoresNonExistingChoices()
+    public function testGetIndicesForChoicesIgnoresNonExistingChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array($this->choice1, $this->choice2, 'foobar');
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    public function testLegacyGetIndicesForChoicesEmpty()
+    public function testGetIndicesForChoicesEmpty()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertSame(array(), $this->list->getIndicesForChoices(array()));
     }
 
-    public function testLegacyGetIndicesForValues()
+    public function testGetIndicesForValues()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // values and indices are always the same
         $values = array($this->value1, $this->value2);
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    public function testLegacyGetIndicesForValuesPreservesKeys()
+    public function testGetIndicesForValuesPreservesKeys()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         // values and indices are always the same
         $values = array(5 => $this->value1, 8 => $this->value2);
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    public function testLegacyGetIndicesForValuesPreservesOrder()
+    public function testGetIndicesForValuesPreservesOrder()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $values = array($this->value2, $this->value1);
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForValues($values));
     }
 
-    public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
+    public function testGetIndicesForValuesIgnoresNonExistingValues()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $values = array($this->value1, $this->value2, 'foobar');
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    public function testLegacyGetIndicesForValuesEmpty()
+    public function testGetIndicesForValuesEmpty()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->assertSame(array(), $this->list->getIndicesForValues(array()));
     }
 
-    public function testLegacyGetChoicesForValues()
+    public function testGetChoicesForValues()
     {
         $values = array($this->value1, $this->value2);
         $this->assertSame(array($this->choice1, $this->choice2), $this->list->getChoicesForValues($values));
     }
 
-    public function testLegacyGetChoicesForValuesPreservesKeys()
+    public function testGetChoicesForValuesPreservesKeys()
     {
         $values = array(5 => $this->value1, 8 => $this->value2);
         $this->assertSame(array(5 => $this->choice1, 8 => $this->choice2), $this->list->getChoicesForValues($values));
     }
 
-    public function testLegacyGetChoicesForValuesPreservesOrder()
+    public function testGetChoicesForValuesPreservesOrder()
     {
         $values = array($this->value2, $this->value1);
         $this->assertSame(array($this->choice2, $this->choice1), $this->list->getChoicesForValues($values));
     }
 
-    public function testLegacyGetChoicesForValuesIgnoresNonExistingValues()
+    public function testGetChoicesForValuesIgnoresNonExistingValues()
     {
         $values = array($this->value1, $this->value2, 'foobar');
         $this->assertSame(array($this->choice1, $this->choice2), $this->list->getChoicesForValues($values));
     }
 
     // https://github.com/symfony/symfony/issues/3446
-    public function testLegacyGetChoicesForValuesEmpty()
+    public function testGetChoicesForValuesEmpty()
     {
         $this->assertSame(array(), $this->list->getChoicesForValues(array()));
     }
 
-    public function testLegacyGetValuesForChoices()
+    public function testGetValuesForChoices()
     {
         $choices = array($this->choice1, $this->choice2);
         $this->assertSame(array($this->value1, $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testLegacyGetValuesForChoicesPreservesKeys()
+    public function testGetValuesForChoicesPreservesKeys()
     {
         $choices = array(5 => $this->choice1, 8 => $this->choice2);
         $this->assertSame(array(5 => $this->value1, 8 => $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testLegacyGetValuesForChoicesPreservesOrder()
+    public function testGetValuesForChoicesPreservesOrder()
     {
         $choices = array($this->choice2, $this->choice1);
         $this->assertSame(array($this->value2, $this->value1), $this->list->getValuesForChoices($choices));
     }
 
-    public function testLegacyGetValuesForChoicesIgnoresNonExistingChoices()
+    public function testGetValuesForChoicesIgnoresNonExistingChoices()
     {
         $choices = array($this->choice1, $this->choice2, 'foobar');
         $this->assertSame(array($this->value1, $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testLegacyGetValuesForChoicesEmpty()
+    public function testGetValuesForChoicesEmpty()
     {
         $this->assertSame(array(), $this->list->getValuesForChoices(array()));
     }

@@ -131,10 +131,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     /**
      * @group legacy
      */
-    public function testLegacyEnctype()
+    public function testEnctype()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->createNamedBuilder('name', 'form')
             ->add('file', 'file')
             ->getForm();
@@ -145,10 +143,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     /**
      * @group legacy
      */
-    public function testLegacyNoEnctype()
+    public function testNoEnctype()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->createNamedBuilder('name', 'form')
             ->add('text', 'text')
             ->getForm();

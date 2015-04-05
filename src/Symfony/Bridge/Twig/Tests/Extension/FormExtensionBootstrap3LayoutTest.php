@@ -27,6 +27,10 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
      */
     protected $extension;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function setUp()
     {
         parent::setUp();

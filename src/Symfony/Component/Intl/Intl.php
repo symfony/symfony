@@ -117,7 +117,7 @@ final class Intl
     {
         if (null === self::$currencyBundle) {
             self::$currencyBundle = new CurrencyBundle(
-                self::getDataDirectory().'/'.Intl::CURRENCY_DIR,
+                self::getDataDirectory().'/'.self::CURRENCY_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle()
             );
@@ -135,11 +135,11 @@ final class Intl
     {
         if (null === self::$languageBundle) {
             self::$languageBundle = new LanguageBundle(
-                self::getDataDirectory().'/'.Intl::LANGUAGE_DIR,
+                self::getDataDirectory().'/'.self::LANGUAGE_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle(),
                 new ScriptDataProvider(
-                    self::getDataDirectory().'/'.Intl::SCRIPT_DIR,
+                    self::getDataDirectory().'/'.self::SCRIPT_DIR,
                     self::getEntryReader()
                 )
             );
@@ -157,7 +157,7 @@ final class Intl
     {
         if (null === self::$localeBundle) {
             self::$localeBundle = new LocaleBundle(
-                self::getDataDirectory().'/'.Intl::LOCALE_DIR,
+                self::getDataDirectory().'/'.self::LOCALE_DIR,
                 self::getEntryReader()
             );
         }
@@ -174,7 +174,7 @@ final class Intl
     {
         if (null === self::$regionBundle) {
             self::$regionBundle = new RegionBundle(
-                self::getDataDirectory().'/'.Intl::REGION_DIR,
+                self::getDataDirectory().'/'.self::REGION_DIR,
                 self::getEntryReader(),
                 self::getLocaleBundle()
             );

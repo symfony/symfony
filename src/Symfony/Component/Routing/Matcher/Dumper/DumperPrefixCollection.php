@@ -66,7 +66,7 @@ class DumperPrefixCollection extends DumperCollection
 
             // Prefix starts with route's prefix
             if ('' === $collection->prefix || 0 === strpos($prefix, $collection->prefix)) {
-                $child = new DumperPrefixCollection();
+                $child = new self();
                 $child->setPrefix(substr($prefix, 0, strlen($collection->prefix) + 1));
                 $collection->add($child);
 

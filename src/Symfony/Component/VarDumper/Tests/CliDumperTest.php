@@ -173,8 +173,7 @@ EOTXT
   eof: false
   options: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
-    #message: "Unexpected exception thrown from a caster: Exception"
-    message: "Foobar"
+    #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: array:1 [
       0 => array:2 [
         "call" => "%s{closure}()"

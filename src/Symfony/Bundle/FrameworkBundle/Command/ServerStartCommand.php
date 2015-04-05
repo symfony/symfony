@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -74,6 +75,12 @@ EOF
         if (!extension_loaded('pcntl')) {
             $output->writeln('<error>This command needs the pcntl extension to run.</error>');
             $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');
+
+            if ($this->getHelper('question')->ask($input, $output, new ConfirmationQuestion('Do you want to start <info>server:run</info> immediately? [Yn] ', true))) {
+                $command = $this->getApplication()->find('server:run');
+
+                return $command->run($input, $output);
+            }
 
             return 1;
         }

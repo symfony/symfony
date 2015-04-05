@@ -17,8 +17,8 @@ use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubFilesystemLoader;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
@@ -125,7 +125,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     public function testIsChoiceSelected($expected, $choice, $value)
     {
-        $choice = new ChoiceView($choice, $choice, $choice.' label');
+        $choice = new ChoiceView($choice.' label', $choice, $choice);
 
         $this->assertSame($expected, $this->extension->isSelectedChoice($choice, $value));
     }

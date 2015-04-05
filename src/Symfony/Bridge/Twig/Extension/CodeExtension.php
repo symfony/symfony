@@ -206,6 +206,9 @@ class CodeExtension extends \Twig_Extension
         }, $text);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'code';

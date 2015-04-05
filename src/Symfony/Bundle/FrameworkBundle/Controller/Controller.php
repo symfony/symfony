@@ -318,7 +318,7 @@ abstract class Controller extends ContainerAware
     }
 
     /**
-     * Gets a service by id.
+     * Gets a container service by its id.
      *
      * @param string $id The service id
      *
@@ -329,8 +329,20 @@ abstract class Controller extends ContainerAware
         if ('request' === $id) {
             trigger_error('The "request" service is deprecated and will be removed in 3.0. Add a typehint for Symfony\\Component\\HttpFoundation\\Request to your controller parameters to retrieve the request instead.', E_USER_DEPRECATED);
         }
-        
+
         return $this->container->get($id);
+    }
+
+    /**
+     * Gets a container configuration parameter by its name.
+     *
+     * @param string $name The parameter name
+     *
+     * @return mixed
+     */
+    protected function getParameter($name)
+    {
+        return $this->container->getParameter($name);
     }
 
     /**

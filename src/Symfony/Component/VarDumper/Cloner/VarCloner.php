@@ -119,12 +119,10 @@ class VarCloner extends AbstractCloner
                             $stub = $arrayRefs[$len] = new Stub();
                             $stub->type = Stub::TYPE_ARRAY;
                             $stub->class = Stub::ARRAY_ASSOC;
-                            $stub->value = $zval['array_count'] ?: count($v);
-
-                            $a = $v;
 
                             // Copies of $GLOBALS have very strange behavior,
                             // let's detect them with some black magic
+                            $a = $v;
                             $a[$gid] = true;
 
                             // Happens with copies of $GLOBALS
@@ -137,6 +135,8 @@ class VarCloner extends AbstractCloner
                             } else {
                                 $a = $v;
                             }
+
+                            $stub->value = $zval['array_count'] ?: count($a);
                         }
                         break;
 

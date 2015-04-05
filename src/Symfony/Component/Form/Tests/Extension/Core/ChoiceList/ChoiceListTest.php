@@ -14,6 +14,9 @@ namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
+/**
+ * @group legacy
+ */
 class ChoiceListTest extends AbstractChoiceListTest
 {
     private $obj1;
@@ -34,7 +37,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         parent::setUp();
     }
 
-    public function testInitArray()
+    public function testLegacyInitArray()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2, $this->obj3, $this->obj4),
@@ -53,7 +56,7 @@ class ChoiceListTest extends AbstractChoiceListTest
      * choices parameter. A choice itself that is an object implementing \Traversable
      * is not treated as hierarchical structure, but as-is.
      */
-    public function testInitNestedTraversable()
+    public function testLegacyInitNestedTraversable()
     {
         $traversableChoice = new \ArrayIterator(array($this->obj3, $this->obj4));
 
@@ -80,7 +83,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         ), $this->list->getRemainingViews());
     }
 
-    public function testInitNestedArray()
+    public function testLegacyInitNestedArray()
     {
         $this->assertSame(array($this->obj1, $this->obj2, $this->obj3, $this->obj4), $this->list->getChoices());
         $this->assertSame(array('0', '1', '2', '3'), $this->list->getValues());
@@ -97,7 +100,7 @@ class ChoiceListTest extends AbstractChoiceListTest
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInitWithInsufficientLabels()
+    public function testLegacyInitWithInsufficientLabels()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2),
@@ -105,7 +108,7 @@ class ChoiceListTest extends AbstractChoiceListTest
         );
     }
 
-    public function testInitWithLabelsContainingNull()
+    public function testLegacyInitWithLabelsContainingNull()
     {
         $this->list = new ChoiceList(
             array($this->obj1, $this->obj2),

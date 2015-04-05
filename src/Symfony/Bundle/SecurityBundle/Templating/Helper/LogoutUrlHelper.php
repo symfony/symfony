@@ -25,9 +25,6 @@ use Symfony\Component\Templating\Helper\Helper;
 class LogoutUrlHelper extends Helper
 {
     private $generator;
-    private $listeners = array();
-    private $router;
-    private $tokenStorage;
 
     /**
      * Constructor.
@@ -79,9 +76,7 @@ class LogoutUrlHelper extends Helper
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

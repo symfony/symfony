@@ -53,7 +53,7 @@
         "symfony/finder": "For using the translation loader and cache warmer",
         "symfony/form": "For using forms",
         "symfony/validator": "For using validation",
-        "symfony/yaml": "For using the debug:config and yaml:lint commands",
+        "symfony/yaml": "For using the debug:config and lint:yaml commands",
         "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {

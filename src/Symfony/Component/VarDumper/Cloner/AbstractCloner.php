@@ -26,7 +26,13 @@ abstract class AbstractCloner implements ClonerInterface
         'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
 
         'Closure' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClosure',
-        'Reflector' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castReflector',
+        'ReflectionClass' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClass',
+        'ReflectionFunctionAbstract' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castFunctionAbstract',
+        'ReflectionMethod' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castMethod',
+        'ReflectionParameter' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castParameter',
+        'ReflectionProperty' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castProperty',
+        'ReflectionExtension' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castExtension',
+        'ReflectionZendExtension' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castZendExtension',
 
         'Doctrine\Common\Persistence\ObjectManager' => 'Symfony\Component\VarDumper\Caster\StubCaster::cutInternals',
         'Doctrine\Common\Proxy\Proxy' => 'Symfony\Component\VarDumper\Caster\DoctrineCaster::castCommonProxy',

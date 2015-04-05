@@ -15,8 +15,14 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 
+/**
+ * @group legacy
+ */
 class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var LazyChoiceListTest_Impl
+     */
     private $list;
 
     protected function setUp()
@@ -37,22 +43,22 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->list = null;
     }
 
-    public function testGetChoices()
+    public function testLegacyGetChoices()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
     }
 
-    public function testGetValues()
+    public function testLegacyGetValues()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getValues());
     }
 
-    public function testGetPreferredViews()
+    public function testLegacyGetPreferredViews()
     {
         $this->assertEquals(array(1 => new ChoiceView('b', 'b', 'B')), $this->list->getPreferredViews());
     }
 
-    public function testGetRemainingViews()
+    public function testLegacyGetRemainingViews()
     {
         $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
@@ -79,13 +85,13 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
     }
 
-    public function testGetChoicesForValues()
+    public function testLegacyGetChoicesForValues()
     {
         $values = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getChoicesForValues($values));
     }
 
-    public function testGetValuesForChoices()
+    public function testLegacyGetValuesForChoices()
     {
         $choices = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getValuesForChoices($choices));
@@ -94,7 +100,7 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testLoadChoiceListShouldReturnChoiceList()
+    public function testLegacyLoadChoiceListShouldReturnChoiceList()
     {
         $list = new LazyChoiceListTest_InvalidImpl();
 

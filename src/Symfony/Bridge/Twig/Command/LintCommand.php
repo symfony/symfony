@@ -31,13 +31,13 @@ class LintCommand extends Command
     /**
      * {@inheritdoc}
      */
-    public function __construct($name = 'twig:lint')
+    public function __construct($name = 'lint:twig')
     {
         parent::__construct($name);
     }
 
     /**
-     * Sets the twig environment
+     * Sets the twig environment.
      *
      * @param \Twig_Environment $twig
      */
@@ -57,6 +57,7 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
+            ->setAliases(array('twig:lint'))
             ->setDescription('Lints a template and outputs encountered errors')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->addArgument('filename', InputArgument::IS_ARRAY)
@@ -83,6 +84,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (false !== strpos($input->getFirstArgument(), ':l')) {
+            $output->writeln('<comment>The use of "twig:lint" command is deprecated since version 2.7 and will be removed in 3.0. Use the "lint:twig" instead.</comment>');
+        }
+
         $twig = $this->getTwigEnvironment();
 
         if (null === $twig) {
@@ -95,7 +100,7 @@ EOF
 
         if (0 === count($filenames)) {
             if (0 !== ftell(STDIN)) {
-                throw new \RuntimeException("Please provide a filename or pipe template content to STDIN.");
+                throw new \RuntimeException('Please provide a filename or pipe template content to STDIN.');
             }
 
             $template = '';
@@ -206,14 +211,14 @@ EOF
         $line =  $exception->getTemplateLine();
 
         if ($file) {
-            $output->writeln(sprintf("<error>KO</error> in %s (line %s)", $file, $line));
+            $output->writeln(sprintf('<error>KO</error> in %s (line %s)', $file, $line));
         } else {
-            $output->writeln(sprintf("<error>KO</error> (line %s)", $line));
+            $output->writeln(sprintf('<error>KO</error> (line %s)', $line));
         }
 
         foreach ($this->getContext($template, $line) as $no => $code) {
             $output->writeln(sprintf(
-                "%s %-6s %s",
+                '%s %-6s %s',
                 $no == $line ? '<error>>></error>' : '  ',
                 $no,
                 $code

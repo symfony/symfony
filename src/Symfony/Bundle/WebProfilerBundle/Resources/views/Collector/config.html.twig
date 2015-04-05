@@ -9,7 +9,18 @@
                 {% if collector.applicationname %}
                     {{ collector.applicationname }} {{ collector.applicationversion }}
                 {% else %}
-                    {{ collector.symfonyversion }}
+                    {% if 'unknown' == collector.symfonyState -%}
+                    <span class="sf-toolbar-status sf-toolbar-info-piece-additional" title="Unable to retrieve information about the Symfony version.">
+                    {%- elseif 'eol' == collector.symfonyState -%}
+                    <span class="sf-toolbar-status sf-toolbar-status-red" title="This Symfony version will no longer receive security fixes.">
+                    {%- elseif 'eom' == collector.symfonyState -%}
+                    <span class="sf-toolbar-status sf-toolbar-status-yellow" title="This Symfony version will only receive security fixes.">
+                    {%- elseif 'dev' == collector.symfonyState -%}
+                    <span class="sf-toolbar-status sf-toolbar-status-yellow" title="This Symfony version is still in the development phase.">
+                    {%- else -%}
+                    <span class="sf-toolbar-status sf-toolbar-status-green">
+                    {%- endif -%}
+                    {{ collector.symfonyversion }}</span>
                 {% endif %}
             </span>
         </a>

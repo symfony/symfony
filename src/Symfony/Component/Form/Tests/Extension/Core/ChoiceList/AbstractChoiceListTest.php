@@ -123,6 +123,8 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
         parent::setUp();
 
         $this->list = $this->createChoiceList();
@@ -151,19 +153,16 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetChoices()
+    public function testLegacyGetChoices()
     {
         $this->assertSame($this->choices, $this->list->getChoices());
     }
 
-    public function testGetValues()
+    public function testLegacyGetValues()
     {
         $this->assertSame($this->values, $this->list->getValues());
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForChoices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -172,9 +171,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForChoicesPreservesKeys()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -183,9 +179,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForChoicesPreservesOrder()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -194,9 +187,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForChoicesIgnoresNonExistingChoices()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -205,9 +195,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForChoicesEmpty()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -215,9 +202,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $this->list->getIndicesForChoices(array()));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForValues()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -227,9 +211,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForValuesPreservesKeys()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -239,9 +220,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(5 => $this->index1, 8 => $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForValuesPreservesOrder()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -250,9 +228,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index2, $this->index1), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -261,9 +236,6 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array($this->index1, $this->index2), $this->list->getIndicesForValues($values));
     }
 
-    /**
-     * @group legacy
-     */
     public function testLegacyGetIndicesForValuesEmpty()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -271,61 +243,61 @@ abstract class AbstractChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $this->list->getIndicesForValues(array()));
     }
 
-    public function testGetChoicesForValues()
+    public function testLegacyGetChoicesForValues()
     {
         $values = array($this->value1, $this->value2);
         $this->assertSame(array($this->choice1, $this->choice2), $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesPreservesKeys()
+    public function testLegacyGetChoicesForValuesPreservesKeys()
     {
         $values = array(5 => $this->value1, 8 => $this->value2);
         $this->assertSame(array(5 => $this->choice1, 8 => $this->choice2), $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesPreservesOrder()
+    public function testLegacyGetChoicesForValuesPreservesOrder()
     {
         $values = array($this->value2, $this->value1);
         $this->assertSame(array($this->choice2, $this->choice1), $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesIgnoresNonExistingValues()
+    public function testLegacyGetChoicesForValuesIgnoresNonExistingValues()
     {
         $values = array($this->value1, $this->value2, 'foobar');
         $this->assertSame(array($this->choice1, $this->choice2), $this->list->getChoicesForValues($values));
     }
 
     // https://github.com/symfony/symfony/issues/3446
-    public function testGetChoicesForValuesEmpty()
+    public function testLegacyGetChoicesForValuesEmpty()
     {
         $this->assertSame(array(), $this->list->getChoicesForValues(array()));
     }
 
-    public function testGetValuesForChoices()
+    public function testLegacyGetValuesForChoices()
     {
         $choices = array($this->choice1, $this->choice2);
         $this->assertSame(array($this->value1, $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesPreservesKeys()
+    public function testLegacyGetValuesForChoicesPreservesKeys()
     {
         $choices = array(5 => $this->choice1, 8 => $this->choice2);
         $this->assertSame(array(5 => $this->value1, 8 => $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesPreservesOrder()
+    public function testLegacyGetValuesForChoicesPreservesOrder()
     {
         $choices = array($this->choice2, $this->choice1);
         $this->assertSame(array($this->value2, $this->value1), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesIgnoresNonExistingChoices()
+    public function testLegacyGetValuesForChoicesIgnoresNonExistingChoices()
     {
         $choices = array($this->choice1, $this->choice2, 'foobar');
         $this->assertSame(array($this->value1, $this->value2), $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesEmpty()
+    public function testLegacyGetValuesForChoicesEmpty()
     {
         $this->assertSame(array(), $this->list->getValuesForChoices(array()));
     }

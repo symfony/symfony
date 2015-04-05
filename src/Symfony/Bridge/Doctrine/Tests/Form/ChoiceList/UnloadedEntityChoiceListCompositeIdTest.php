@@ -13,10 +13,11 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class UnloadedEntityChoiceListCompositeIdTest extends AbstractEntityChoiceListCompositeIdTest
 {
-    public function testGetIndicesForValuesIgnoresNonExistingValues()
+    public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
     {
         $this->markTestSkipped('Non-existing values are not detected for unloaded choice lists.');
     }

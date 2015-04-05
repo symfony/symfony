@@ -40,8 +40,10 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
      */
     public function lateCollect()
     {
-        $this->data = $this->computeCount();
-        $this->data['messages'] = $this->sanitizeCollectedMessages($this->translator->getCollectedMessages());
+        $messages = $this->sanitizeCollectedMessages($this->translator->getCollectedMessages());
+
+        $this->data = $this->computeCount($messages);
+        $this->data['messages'] = $messages;
     }
 
     /**
@@ -94,13 +96,23 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
     private function sanitizeCollectedMessages($messages)
     {
         foreach ($messages as $key => $message) {
-            $messages[$key]['translation'] = $this->sanitizeString($messages[$key]['translation']);
+            $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
         }
 
-        return $messages;
+        return array_reduce($messages, function ($result, $message) {
+            $messageId = $message['locale'].$message['domain'].$message['id'];
+            if (!isset($result[$messageId])) {
+                $message['count'] = 1;
+                $result[$messageId] = $message;
+            } else {
+                $result[$messageId]['count']++;
+            }
+
+            return $result;
+        }, array());
     }
 
-    private function computeCount()
+    private function computeCount($messages)
     {
         $count = array(
             DataCollectorTranslator::MESSAGE_DEFINED => 0,
@@ -108,7 +120,7 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
             DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK => 0,
         );
 
-        foreach ($this->translator->getCollectedMessages() as $message) {
+        foreach ($messages as $message) {
             ++$count[$message['state']];
         }
 

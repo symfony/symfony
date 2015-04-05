@@ -39,7 +39,6 @@ class CliDumperTest extends VarDumperTestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $closureLabel = 'public method';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
@@ -77,16 +76,17 @@ array:25 [
     +"bar": "bar"
   }
   "closure" => Closure {#%d
-    reflection: """
-      Closure [ <user> {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
-        @@ {$var['file']} {$var['line']} - {$var['line']}
-
-        - Parameters [2] {
-          Parameter #0 [ <required> \$a ]
-          Parameter #1 [ <optional> PDO or NULL &\$b = NULL ]
-        }
-      }
-      """
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {#%d …}
+    parameters: array:2 [
+      "\$a" => []
+      "&\$b" => array:2 [
+        "typeHint" => "PDO"
+        "default" => null
+      ]
+    ]
+    file: "{$var['file']}"
+    line: "{$var['line']} to {$var['line']}"
   }
   "line" => {$var['line']}
   "nobj" => array:1 [
@@ -166,8 +166,7 @@ EOTXT
   eof: false
   options: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
-    #message: "Unexpected exception thrown from a caster: Exception"
-    message: "Foobar"
+    #message: "Unexpected Exception thrown from a caster: Foobar"
     trace: array:1 [
       0 => array:2 [
         "call" => "%s{closure}()"

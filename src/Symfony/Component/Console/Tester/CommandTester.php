@@ -61,7 +61,7 @@ class CommandTester
             && (null !== $application = $this->command->getApplication())
             && $application->getDefinition()->hasArgument('command')
         ) {
-            $input['command'] = $this->command->getName();
+            $input = array_merge(array('command' => $this->command->getName()), $input);
         }
 
         $this->input = new ArrayInput($input);

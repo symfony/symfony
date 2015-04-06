@@ -20,7 +20,7 @@
         "symfony/asset": "~2.7|~3.0.0",
         "symfony/twig-bridge": "~2.7|~3.0.0",
         "symfony/http-foundation": "~2.5|~3.0.0",
-        "symfony/http-kernel": "~2.7|~3.0.0"
+        "symfony/http-kernel": "~2.7"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",

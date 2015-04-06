@@ -22,40 +22,34 @@ class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager = new ArgumentResolverManager();
         $this->resolver1 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
         $this->resolver2 = $this->getMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
+
+        $this->manager = new ArgumentResolverManager();
         $this->manager->add($this->resolver1);
         $this->manager->add($this->resolver2);
 
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
     }
 
+    public function testGetArgumentsWithoutControllerParameters()
+    {
+        $this->assertArguments(array(), function () { });
+    }
+
     public function testGetArgumentsFirstResolverAccepts()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(true));
-        $this->resolver1->expects($this->any())
-            ->method('resolve')
-            ->will($this->returnValue('resolved_value'));
+        $this->promiseResolverToMatch($this->resolver1, 'resolved_value');
 
-        $controller = $this->getControllerWithOneArgument();
-
-        $arguments = $this->manager->getArguments($this->request, $controller);
-        $this->assertEquals(array('resolved_value'), $arguments);
+        $this->assertArguments(array('resolved_value'), $this->getControllerWithOneParameter());
     }
 
     public function testGetArgumentsSecondResolverAccepts()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(false));
-        $this->resolver2->expects($this->any())->method('accepts')->will($this->returnValue(true));
-        $this->resolver2->expects($this->any())
-            ->method('resolve')
-            ->will($this->returnValue('resolved_value'));
+        $this->promiseResolverToNotMatch($this->resolver1);
+        $this->promiseResolverToMatch($this->resolver2, 'resolved_value');
 
-        $controller = $this->getControllerWithOneArgument();
-
-        $arguments = $this->manager->getArguments($this->request, $controller);
-        $this->assertEquals(array('resolved_value'), $arguments);
+        $this->assertArguments(array('resolved_value'), $this->getControllerWithOneParameter());
     }
 
     /**
@@ -63,55 +57,75 @@ class ArgumentResolverManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetArgumentsFailsIfNoResolverAccepts()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(false));
-        $this->resolver2->expects($this->any())->method('accepts')->will($this->returnValue(false));
+        $this->promiseResolverToNotMatch($this->resolver1);
+        $this->promiseResolverToNotMatch($this->resolver2);
 
-        $controller = $this->getControllerWithOneArgument();
-        $this->manager->getArguments($this->request, $controller);
+        $this->manager->getArguments($this->request, $this->getControllerWithOneParameter());
     }
 
-    public function testGetArgumentResolvingMultipleArguments()
+    public function testGetArgumentResolvingMultipleParameters()
     {
         $this->resolver1->expects($this->any())
-            ->method('accepts')
+            ->method('supports')
             ->will($this->onConsecutiveCalls(false, true, true));
         $this->resolver1->expects($this->any())
             ->method('resolve')
             ->will($this->onConsecutiveCalls('1st resolved by 1', '2nd resolved by 1'));
 
         $this->resolver2->expects($this->any())
-            ->method('accepts')
+            ->method('supports')
             ->will($this->onConsecutiveCalls(true, false, true));
         $this->resolver2->expects($this->any())
             ->method('resolve')
             ->will($this->onConsecutiveCalls('1st resolved by 2', '2nd resolved by 2'));
 
-        $controller = function ($a, $b, $c) { };
-
-        $arguments = $this->manager->getArguments($this->request, $controller);
-        $this->assertEquals(array('1st resolved by 2', '1st resolved by 1', '2nd resolved by 1'), $arguments);
+        $this->assertArguments(
+            array('1st resolved by 2', '1st resolved by 1', '2nd resolved by 1'),
+            function ($a, $b, $c) { }
+        );
     }
 
-    public function testControllerWithOneOptionalArgumentWhichDoesNotMatch()
+    public function testControllerWithOneOptionalParameterWhichDoesNotMatch()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(false));
-        $this->resolver2->expects($this->any())->method('accepts')->will($this->returnValue(false));
+        $this->promiseResolverToNotMatch($this->resolver1);
+        $this->promiseResolverToNotMatch($this->resolver2);
 
-        $arguments = $this->manager->getArguments($this->request, function ($a = 'default') { });
-        $this->assertEquals(array('default'), $arguments);
+        $this->assertArguments(array('default'), function ($a = 'default') { });
     }
 
-    public function testControllerWithOneOptionalArgumentWhichDoMatch()
+    public function testControllerWithOneOptionalParameterWhichDoesMatch()
     {
-        $this->resolver1->expects($this->any())->method('accepts')->will($this->returnValue(true));
-        $this->resolver1->expects($this->any())->method('resolve')->will($this->returnValue('resolved by 1'));
-        $this->resolver2->expects($this->any())->method('accepts')->will($this->returnValue(false));
+        $this->promiseResolverToMatch($this->resolver1, 'resolved by 1');
+        $this->promiseResolverToNotMatch($this->resolver2);
 
-        $arguments = $this->manager->getArguments($this->request, function ($a = 'default') { });
-        $this->assertEquals(array('resolved by 1'), $arguments);
+        $this->assertArguments(array('resolved by 1'), function ($a = 'default') { });
     }
 
-    protected function getControllerWithOneArgument()
+    public function testControllerWithOneParameterWithNullDefault()
+    {
+        $this->promiseResolverToNotMatch($this->resolver1);
+        $this->promiseResolverToNotMatch($this->resolver2);
+
+        $this->assertArguments(array(null), function ($a = null) { });
+    }
+
+    private function assertArguments(array $expected, $controller)
+    {
+        $this->assertEquals($expected, $this->manager->getArguments($this->request, $controller));
+    }
+
+    private function promiseResolverToMatch($resolver, $return)
+    {
+        $resolver->expects($this->any())->method('supports')->will($this->returnValue(true));
+        $resolver->expects($this->any())->method('resolve')->will($this->returnValue($return));
+    }
+
+    private function promiseResolverToNotMatch($resolver)
+    {
+        $resolver->expects($this->any())->method('supports')->will($this->returnValue(false));
+    }
+
+    private function getControllerWithOneParameter()
     {
         return function ($a) { };
     }

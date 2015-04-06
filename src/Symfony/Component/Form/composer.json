@@ -33,7 +33,8 @@
     },
     "conflict": {
         "symfony/doctrine-bridge": "<2.7",
-        "symfony/framework-bundle": "<2.7"
+        "symfony/twig-bridge": "<2.7",
+        "symfony/doctrine-bridge": "<2.7"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

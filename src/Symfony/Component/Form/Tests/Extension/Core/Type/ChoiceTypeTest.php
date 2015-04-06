@@ -373,8 +373,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testLegacySubmitSingleNonExpandedObjectChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => false,
@@ -493,8 +491,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testLegacySubmitMultipleNonExpandedObjectChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => false,
@@ -974,8 +970,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testLegacySubmitSingleExpandedObjectChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->create('choice', null, array(
             'multiple' => false,
             'expanded' => true,
@@ -1202,8 +1196,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
      */
     public function testLegacySubmitMultipleExpandedObjectChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $form = $this->factory->create('choice', null, array(
             'multiple' => true,
             'expanded' => true,

@@ -735,10 +735,8 @@ class SimpleFormTest extends AbstractFormTest
     /**
      * @group legacy
      */
-    public function testLegacyGetErrorsAsString()
+    public function testGetErrorsAsString()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $this->form->addError(new FormError('Error!'));
 
         $this->assertEquals("ERROR: Error!\n", $this->form->getErrorsAsString());

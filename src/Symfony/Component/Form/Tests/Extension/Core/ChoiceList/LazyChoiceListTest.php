@@ -43,55 +43,45 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->list = null;
     }
 
-    public function testLegacyGetChoices()
+    public function testGetChoices()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getChoices());
     }
 
-    public function testLegacyGetValues()
+    public function testGetValues()
     {
         $this->assertSame(array(0 => 'a', 1 => 'b', 2 => 'c'), $this->list->getValues());
     }
 
-    public function testLegacyGetPreferredViews()
+    public function testGetPreferredViews()
     {
         $this->assertEquals(array(1 => new ChoiceView('b', 'b', 'B')), $this->list->getPreferredViews());
     }
 
-    public function testLegacyGetRemainingViews()
+    public function testGetRemainingViews()
     {
         $this->assertEquals(array(0 => new ChoiceView('a', 'a', 'A'), 2 => new ChoiceView('c', 'c', 'C')), $this->list->getRemainingViews());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForChoices()
+    public function testGetIndicesForChoices()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $choices = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForChoices($choices));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGetIndicesForValues()
+    public function testGetIndicesForValues()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $values = array('b', 'c');
         $this->assertSame(array(1, 2), $this->list->getIndicesForValues($values));
     }
 
-    public function testLegacyGetChoicesForValues()
+    public function testGetChoicesForValues()
     {
         $values = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getChoicesForValues($values));
     }
 
-    public function testLegacyGetValuesForChoices()
+    public function testGetValuesForChoices()
     {
         $choices = array('b', 'c');
         $this->assertSame(array('b', 'c'), $this->list->getValuesForChoices($choices));
@@ -100,7 +90,7 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
      */
-    public function testLegacyLoadChoiceListShouldReturnChoiceList()
+    public function testLoadChoiceListShouldReturnChoiceList()
     {
         $list = new LazyChoiceListTest_InvalidImpl();
 

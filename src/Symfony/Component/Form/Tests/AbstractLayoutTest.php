@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormIntegrationTestCase
 {
     protected $csrfTokenManager;
+    protected $testableFeatures = array();
 
     protected function setUp()
     {

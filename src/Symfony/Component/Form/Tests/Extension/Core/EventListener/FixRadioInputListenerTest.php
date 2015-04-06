@@ -24,8 +24,6 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         parent::setUp();
 
         $this->choiceList = new SimpleChoiceList(array('' => 'Empty', 0 => 'A', 1 => 'B'));
@@ -38,7 +36,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $listener = null;
     }
 
-    public function testLegacyFixRadio()
+    public function testFixRadio()
     {
         $data = '1';
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
@@ -51,7 +49,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(2 => '1'), $event->getData());
     }
 
-    public function testLegacyFixZero()
+    public function testFixZero()
     {
         $data = '0';
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
@@ -64,7 +62,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1 => '0'), $event->getData());
     }
 
-    public function testLegacyFixEmptyString()
+    public function testFixEmptyString()
     {
         $data = '';
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
@@ -77,7 +75,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(0 => ''), $event->getData());
     }
 
-    public function testLegacyConvertEmptyStringToPlaceholderIfNotFound()
+    public function testConvertEmptyStringToPlaceholderIfNotFound()
     {
         $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B'));
 
@@ -91,7 +89,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('placeholder' => ''), $event->getData());
     }
 
-    public function testLegacyDontConvertEmptyStringToPlaceholderIfNoPlaceholderUsed()
+    public function testDontConvertEmptyStringToPlaceholderIfNoPlaceholderUsed()
     {
         $list = new SimpleChoiceList(array(0 => 'A', 1 => 'B'));
 

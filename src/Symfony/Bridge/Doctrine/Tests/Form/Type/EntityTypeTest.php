@@ -869,10 +869,8 @@ class EntityTypeTest extends TypeTestCase
     /**
      * @group legacy
      */
-    public function testLegacyPropertyOption()
+    public function testPropertyOption()
     {
-        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
 

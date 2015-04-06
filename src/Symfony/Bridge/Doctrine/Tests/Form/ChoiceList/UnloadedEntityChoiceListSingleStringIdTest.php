@@ -17,7 +17,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
  */
 class UnloadedEntityChoiceListSingleStringIdTest extends AbstractEntityChoiceListSingleStringIdTest
 {
-    public function testLegacyGetIndicesForValuesIgnoresNonExistingValues()
+    public function testGetIndicesForValuesIgnoresNonExistingValues()
     {
         $this->markTestSkipped('Non-existing values are not detected for unloaded choice lists.');
     }

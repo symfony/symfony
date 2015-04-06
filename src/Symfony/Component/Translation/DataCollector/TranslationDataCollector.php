@@ -95,21 +95,22 @@ class TranslationDataCollector extends DataCollector implements LateDataCollecto
 
     private function sanitizeCollectedMessages($messages)
     {
+        $result = array();
         foreach ($messages as $key => $message) {
-            $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
-        }
-
-        return array_reduce($messages, function ($result, $message) {
             $messageId = $message['locale'].$message['domain'].$message['id'];
+
             if (!isset($result[$messageId])) {
                 $message['count'] = 1;
+                $messages[$key]['translation'] = $this->sanitizeString($message['translation']);
                 $result[$messageId] = $message;
             } else {
                 $result[$messageId]['count']++;
             }
 
-            return $result;
-        }, array());
+            unset($messages[$key]);
+        }
+
+        return $result;
     }
 
     private function computeCount($messages)

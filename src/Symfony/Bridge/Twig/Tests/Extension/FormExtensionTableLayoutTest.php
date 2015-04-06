@@ -27,6 +27,10 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $extension;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function setUp()
     {
         parent::setUp();

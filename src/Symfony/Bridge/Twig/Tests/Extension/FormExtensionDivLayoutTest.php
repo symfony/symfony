@@ -28,6 +28,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
      */
     protected $extension;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function setUp()
     {
         parent::setUp();

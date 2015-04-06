@@ -27,6 +27,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported

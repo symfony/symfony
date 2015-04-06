@@ -240,6 +240,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => false,
         ));
 
+        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/select
     [@name="name"]
@@ -247,7 +249,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [not(@required)]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&b"]'.$classPart.'[not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -529,6 +531,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => false,
         ));
 
+        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+
         $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
 '/select
     [@name="name[]"]
@@ -537,7 +541,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
     [@multiple="multiple"]
     [
         ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
-        /following-sibling::option[@value="&b"][@class="foo&bar"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        /following-sibling::option[@value="&b"]'.$classPart.'[not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
     [count(./option)=2]
 '
@@ -634,6 +638,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'expanded' => true,
         ));
 
+        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
@@ -652,7 +658,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
                 ./label
                     [.="[trans]Choice&B[/trans]"]
                     [
-                        ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)][@class="foo&bar"]
+                        ./input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]'.$classPart.'
                     ]
             ]
         /following-sibling::input[@type="hidden"][@id="name__token"][@class="form-control"]
@@ -796,6 +802,8 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             'required' => true,
         ));
 
+        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/div
     [
@@ -814,7 +822,7 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
                 ./label
                     [.="[trans]Choice&B[/trans]"]
                     [
-                        ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)][@class="foo&bar"]
+                        ./input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]'.$classPart.'
                     ]
             ]
         /following-sibling::div

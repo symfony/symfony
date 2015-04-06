@@ -42,6 +42,10 @@ class YamlDumper extends Dumper
     {
         parent::__construct($container);
 
+        if (!class_exists('Symfony\Component\Yaml\Dumper')) {
+            throw new RuntimeException('Unable to dump the container as the Symfony Yaml Component is not installed.');
+        }
+
         $this->dumper = new YmlDumper();
     }
 

@@ -73,7 +73,7 @@ class RouterListener implements EventSubscriberInterface
      */
     public function setRequest(Request $request = null)
     {
-        if (null !== $request && $this->request !== $request) {
+        if (null !== $request && $this->request !== $request && null !== $this->context) {
             $this->context->fromRequest($request);
         }
         $this->request = $request;

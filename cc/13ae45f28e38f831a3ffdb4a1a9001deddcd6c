@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-01-18T20:49:25Z
+
+This is now making it impossible to debug the whole translations
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-01-18T20:59:13Z
+
+@stof What do you mean with "the whole translations"? Before the change a bundle name was already mandatory.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-03-29T21:57:54Z
+
+ping @stof I'm not sure what to do. Could you explain your last comment, please?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-29T22:22:32Z
+
+@xelaris, stof means if we put the defaults value to app/Resources folder, there is no way to debug all translations available in the app.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-03-29T22:45:10Z
+
+How was it possible before? Since the `bundle` argument of the `debug:translation` command was defined as `InputArgument::REQUIRED` it was not possible to call the command without a bundle name. So I can't see the limitation in making it optional and falling back to `app/Resources`. Maybe I overlook something?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-29T22:55:15Z
+
+IMO if we want to set a default value for this command I think it should be the whole translations.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-03-29T23:24:29Z
+
+Ok, I got the point. We could keep the `bundle` argument required, but still enable to provide a path besides a bundle name. But this in turn would be inconsistent with the `translation:update` command where the argument falls back to `app/Resources` and I think it is not very intuitive. On the other hand I agree, it would be nice to debug the whole applications translations, and at first glance the most intuitive way to do this would to call the command without a bundle name.
+However following the defined best practice, the most common way is to keep all app translations in `app/Resources`. And hence the main use case would to call the command to debug translations in `app/Resources`. It would may be nice to make this call the shortest one. IMO Debugging translations of all bundles would be a less common use case. What about an `--all` option, which could be passed, if someone would debug the whole application?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-03-30T09:46:24Z
+
+```--all``` sound good to me
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T10:01:01Z
+
+@xelaris any news ?
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-04-04T16:04:32Z
+
+I think an `--all` option is out of scope of this PR, since it adds a new feature. I can start working on it, but don't know when I get to it. So what about merging this PR (if everything else is fine) and making it possible to debug all translations in a subsequent PR?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T17:19:33Z
+
+I'm ok, then can we also move the defaults value(app/Resources folder) feature ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T18:54:11Z
+
+@xelaris TranslationUpdateCommand use defaults to app/Resources folder, forget my previous comment :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-04T18:55:11Z
+
+:+1: ping @fabpot
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-06T13:39:26Z
+
+@xelaris can apply the below patch and rebase your branch:
+
+```patch
+@@ -116,7 +116,9 @@ EOF
+
+         // Extract used messages
+         $extractedCatalogue = new MessageCatalogue($locale);
+-        $this->getContainer()->get('translation.extractor')->extract($rootPath.'/Resources/views', $extractedCatalogue);
++        if (is_dir($translationsPath)) {
++            $this->getContainer()->get('translation.extractor')->extract($translationsPath, $extractedCatalogue);
++        }
+
+         // Load defined messages
+         $currentCatalogue = new MessageCatalogue($locale);
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-06T13:40:29Z
+
+once you made the change I'll merge :)
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-04-06T15:23:06Z
+
+@aitboudad The branch is rebased and I added the `is_dir` check from the patch, but kept `$rootPath.'/Resources/views'`, since `$translationsPath` contains `$rootPath.'/Resources/translations'`.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-06T15:26:36Z
+
+@xelaris ok nice !

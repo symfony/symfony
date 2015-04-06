@@ -109,6 +109,15 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     public function getErrors($deep = false, $flatten = true);
 
     /**
+     * Removes all the errors of this form.
+     *
+     * @param bool $deep Whether to remove errors of child forms as well
+     *
+     * @return FormInterface The form instance
+     */
+    public function clearErrors($deep = false);
+
+    /**
      * Updates the form with default data.
      *
      * @param mixed $modelData The data formatted as expected for the underlying object

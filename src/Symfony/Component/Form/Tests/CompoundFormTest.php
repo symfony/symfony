@@ -918,6 +918,46 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
     }
 
+    public function testClearErrors()
+    {
+        $this->form->addError(new FormError('Error 1'));
+        $this->form->addError(new FormError('Error 2'));
+
+        $this->form->clearErrors();
+
+        $this->assertCount(0, $this->form->getErrors());
+    }
+
+    public function testClearErrorsShallow()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError(new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(false);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(1, $this->form->getErrors(true));
+    }
+
+    public function testClearErrorsDeep()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $this->form->clearErrors(true);
+
+        $this->assertCount(0, $this->form->getErrors(false));
+        $this->assertCount(0, $this->form->getErrors(true));
+    }
+
     // Basic cases are covered in SimpleFormTest
     public function testCreateViewWithChildren()
     {

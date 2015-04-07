@@ -91,6 +91,10 @@ class ProfilerController
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
 
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null))) {
+            $token = $latest['token'];
+        }
+
         if (!$profile = $this->profiler->loadProfile($token)) {
             return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array('about' => 'no_token', 'token' => $token)), 200, array('Content-Type' => 'text/html'));
         }

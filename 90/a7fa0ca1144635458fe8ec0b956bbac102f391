@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-26T01:56:52Z
+
+@javiereguiluz : May I ask you what you think, at least about the new command output (according to command style guide) ?
+Is this relevant enough given the #14017 PR and what we debated in #13988 ?
+
+Ping @inanimatt :)
+
+I'm pretty sure my tests aren't relevant, but I'm not used to. I even deleted the encoders specific static tests as I didn't know how to test them since the `salt` option no longer exists.
+Any clue is valuable to me :)
+I also tried to comply last @hhamon reviews on #14017
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-26T06:31:18Z
+
+@ogizanagi honestly I think we should change everything. The output is very different from what we propose for Symfony commands. Sadly, I also find the text contents displayed by the command very verbose :(
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-26T07:30:47Z
+
+@javiereguiluz : Actually, I think you're right. I believe the command was meant to be used by symfony's newcomers for didactic purposes. Which explains the initial full interactivity and verbosity.
+Even getting rid of *useless* questions, I only made the output heavier by adding those notes and salt generation confirmation... The help message itself is a big piece...
+Maybe it should only be a very simple utility.
+
+Should we keep, remove, or tweak:
+- In interactive mode:
+    - salt generation notice
+    - salt generation confirmation
+- any mode:
+    - command introduction
+    - bcrypt exception and notice
+- In the help:
+    - security.encoders example
+    - salt generation explanations
+    - non interactive description
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-26T11:43:49Z
+
+Changes have been made. Thanks @javiereguiluz for your precious corrections & samples for the command description and @jrobeson & @inanimatt for having reminded what was said about the `salt` option before.
+
+Should we at least make the `generateSalt` method protected in order to let users extend the command easily ? (Eventually give the encoder instance as first argument, if they have to handle multiple encoders in their application). I'm not really happy with this idea, but...
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-30T18:18:18Z
+
+@javiereguiluz : I didn't expect changing the output that much within this PR, only the behavior, but do you think the following command outputs are more compliant with your console style guide ? (I used the recently merged #14057 , but changes haven't been pushed for now)
+
+I'll be glad to change the note about salt generation when using the interactive way if it doesn't please you, but I still think the user should be warn somehow (or explain the confirmation question context).
+
+#### No interaction:
+
+##### No password:
+![screenshot 2015-03-30 a 19 46 07](https://cloud.githubusercontent.com/assets/2211145/6902817/7d868692-d716-11e4-958f-1de0f3267829.PNG)
+
+##### Bcrypt without empty salt option
+![screenshot 2015-03-30 a 19 46 36](https://cloud.githubusercontent.com/assets/2211145/6902818/7d86fcc6-d716-11e4-8814-99ee67c5537c.PNG)
+
+##### Bcryp with empty-salt option
+![screenshot 2015-03-30 a 19 47 33](https://cloud.githubusercontent.com/assets/2211145/6902819/7d8754f0-d716-11e4-8327-c5f026cf4139.PNG)
+
+#### Interaction & other encoder
+![screenshot 2015-03-30 a 19 49 05](https://cloud.githubusercontent.com/assets/2211145/6902820/7d8867fa-d716-11e4-87ba-6bb30e93ec14.PNG)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-30T18:25:31Z
+
+@ogizanagi wow! I love it! Now that the new console style guide is merged, I was planning to start updating the existing commands, but I'm glad that you already started with this command. My only suggestion: there is no need to add `✔` when the result is successful because we already provide the `[OK]` prefix and the color background.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-30T19:39:58Z
+
+Changes pushed, then ! I will update the PR description and screenshots.
+
+---------------------------------------------------------------------------
+
+by inanimatt at 2015-03-30T20:23:23Z
+
+Nice work, @ogizanagi, it's very much improved. And thanks again (and sorry) to @saro0h for the initial work on this. We got there in the end :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-03-30T20:33:54Z
+
+Yes, I feel bad for having changed this much @saro0h's original work :disappointed_relieved:
+I hope it'll be for the best.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-04-02T00:22:21Z
+
+What should be done about Travis failures in [56604789](https://travis-ci.org/symfony/symfony/jobs/56604789) and [56604790](https://travis-ci.org/symfony/symfony/jobs/56604790) ?
+Sorry, I don't fully understand the impact of the `deps` env variable  `low` and `high` values and the
+> Fatal error: Class 'Symfony\Component\Console\Style\SymfonyStyle' not found in /home/travis/build/symfony/symfony/src/Symfony/Bundle/SecurityBundle/Command/UserPasswordEncoderCommand.php on line 87
+
+ error that Travis reported.
+If it relies on lowest components, this build doesn't matter for our case, right ?
+But then, what's going on with `high` ? 3.0 ? Don't care since `SymfonyStyle` <- `OutputStyle` implements `OutputInterface` but not the 3.0 version of this interface for now ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-04-04T09:48:18Z
+
+ping @fabpot . I think this PR is ready for merging. Let me know if there is anything else to do (squash ?).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-04T09:53:48Z
+
+:+1: indeed the code looks ready to be merged ... but what should we do with the Travis issues?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-04-05T16:34:00Z
+
+@javiereguiluz : at least for 3.0 branch and `deps=high` env var, we'll need this PR (https://github.com/symfony/symfony/pull/14220) one day or another.
+For `deps=low`, AFAIU, I think we can safely ignore this build.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-05T16:38:24Z
+
+In some cases deps=high can be ignored. But deps=low should never ever be red before merging anything.
+Well, at this very moment, the upstream is red so you have no choice I know.

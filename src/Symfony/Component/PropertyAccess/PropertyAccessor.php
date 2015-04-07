@@ -306,6 +306,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $itemToRemove = array();
                 $propertyValue = &$this->readProperty($object, $property);
                 $previousValue = $propertyValue[self::VALUE];
+                // remove reference to avoid modifications
+                unset($propertyValue);
 
                 if (is_array($previousValue) || $previousValue instanceof \Traversable) {
                     foreach ($previousValue as $previousItem) {

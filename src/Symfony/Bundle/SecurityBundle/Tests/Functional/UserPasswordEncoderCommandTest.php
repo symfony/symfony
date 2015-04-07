@@ -14,6 +14,8 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\SecurityBundle\Command\UserPasswordEncoderCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder;
 
 /**
  * Tests UserPasswordEncoderCommand
@@ -24,17 +26,27 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 {
     private $passwordEncoderCommandTester;
 
-    public function testEncodePasswordPasswordPlainText()
+    public function testEncodePasswordEmptySalt()
     {
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Symfony\Component\Security\Core\User\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
+            '--empty-salt' => true,
         ));
-        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/plaintext.txt');
+        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/emptysalt.txt');
 
         $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
+    }
+
+    public function testEncodeNoPasswordNoInteraction()
+    {
+        $statusCode = $this->passwordEncoderCommandTester->execute(array(
+            'command' => 'security:encode-password',
+        ), array('interactive' => false));
+
+        $this->assertContains('[ERROR] The password must not be empty.', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertEquals($statusCode, 1);
     }
 
     public function testEncodePasswordBcrypt()
@@ -43,11 +55,15 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Custom\Class\Bcrypt\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
-        ));
-        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/bcrypt.txt');
+        ), array('interactive' => false));
 
-        $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
+        $output = $this->passwordEncoderCommandTester->getDisplay();
+        $this->assertContains('Password encoding succeeded', $output);
+
+        $encoder = new BCryptPasswordEncoder(17);
+        preg_match('# Encoded password\s{1,}([\w+\/$.]+={0,2})\s+#', $output, $matches);
+        $hash = $matches[1];
+        $this->assertTrue($encoder->isPasswordValid($hash, 'password', null));
     }
 
     public function testEncodePasswordPbkdf2()
@@ -56,24 +72,70 @@ class UserPasswordEncoderCommandTest extends WebTestCase
             'command' => 'security:encode-password',
             'password' => 'password',
             'user-class' => 'Custom\Class\Pbkdf2\User',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
-        ));
+        ), array('interactive' => false));
 
-        $expected = file_get_contents(__DIR__.'/app/PasswordEncode/pbkdf2.txt');
+        $output = $this->passwordEncoderCommandTester->getDisplay();
+        $this->assertContains('Password encoding succeeded', $output);
 
-        $this->assertEquals($expected, $this->passwordEncoderCommandTester->getDisplay());
+        $encoder = new Pbkdf2PasswordEncoder('sha512', true, 1000);
+        preg_match('# Encoded password\s{1,}([\w+\/]+={0,2})\s+#', $output, $matches);
+        $hash = $matches[1];
+        preg_match('# Generated salt\s{1,}([\w+\/]+={0,2})\s+#', $output, $matches);
+        $salt = $matches[1];
+        $this->assertTrue($encoder->isPasswordValid($hash, 'password', $salt));
+    }
+
+    public function testEncodePasswordOutput()
+    {
+        $this->passwordEncoderCommandTester->execute(
+            array(
+                'command' => 'security:encode-password',
+                'password' => 'p@ssw0rd',
+            ), array('interactive' => false)
+        );
+
+        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+    }
+
+    public function testEncodePasswordEmptySaltOutput()
+    {
+        $this->passwordEncoderCommandTester->execute(
+            array(
+                'command' => 'security:encode-password',
+                'password' => 'p@ssw0rd',
+                '--empty-salt' => true,
+            )
+        );
+
+        $this->assertContains('Password encoding succeeded', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertContains(' Encoded password   p@ssw0rd', $this->passwordEncoderCommandTester->getDisplay());
+        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
+    }
+
+    public function testEncodePasswordBcryptOutput()
+    {
+        $this->passwordEncoderCommandTester->execute(
+            array(
+                'command' => 'security:encode-password',
+                'password' => 'p@ssw0rd',
+                'user-class' => 'Custom\Class\Bcrypt\User',
+            )
+        );
+
+        $this->assertNotContains(' Generated salt ', $this->passwordEncoderCommandTester->getDisplay());
     }
 
     public function testEncodePasswordNoConfigForGivenUserClass()
     {
-        $this->setExpectedException('\RuntimeException', 'No encoder has been configured for account "Wrong/User/Class".');
+        $this->setExpectedException('\RuntimeException', 'No encoder has been configured for account "Foo\Bar\User".');
 
         $this->passwordEncoderCommandTester->execute(array(
             'command' => 'security:encode-password',
             'password' => 'password',
-            'user-class' => 'Wrong/User/Class',
-            'salt' => 'AZERTYUIOPOfghjklytrertyuiolnbcxdfghjkytrfghjk',
-        ));
+            'user-class' => 'Foo\Bar\User',
+        ), array('interactive' => false));
     }
 
     protected function setUp()

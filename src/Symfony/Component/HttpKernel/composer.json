@@ -20,6 +20,7 @@
         "symfony/event-dispatcher": "~2.5.9|~2.6,>=2.6.2|~3.0.0",
         "symfony/http-foundation": "~2.5,>=2.5.4|~3.0.0",
         "symfony/debug": "~2.6,>=2.6.2",
+        "symfony/config": "~2.7",
         "psr/log": "~1.0"
     },
     "require-dev": {

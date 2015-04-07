@@ -330,9 +330,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    /**
-     * @group GH-1635
-     */
     public function testAssociatedEntity()
     {
         $constraint = new UniqueEntity(array(
@@ -389,7 +386,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      * @expectedExceptionMessage Associated entities are not allowed to have more than one identifier field
-     * @group GH-1635
      */
     public function testAssociatedCompositeEntity()
     {

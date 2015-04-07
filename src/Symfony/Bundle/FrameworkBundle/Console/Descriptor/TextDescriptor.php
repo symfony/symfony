@@ -63,8 +63,8 @@ class TextDescriptor extends Descriptor
             $tableRows[] = $row;
         }
 
-        if (isset($options['output_helper'])) {
-            $options['output_helper']->table($tableHeaders, $tableRows);
+        if (isset($options['output'])) {
+            $options['output']->table($tableHeaders, $tableRows);
         } else {
             $table = new Table($this->getOutput());
             $table->setHeaders($tableHeaders)->setRows($tableRows);

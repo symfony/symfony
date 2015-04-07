@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-03-31T15:42:16Z
+
+@javiereguiluz the class should have a way to get them from the Application IMO
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-03-31T15:43:31Z
+
+@stof I agree with you, but I don't know how to do it :cry:
+
+---------------------------------------------------------------------------
+
+by 1ed at 2015-04-06T19:19:13Z
+
+@javiereguiluz as a last resort [webmozart/console/ConsoleIO.php#L56-L58](https://github.com/webmozart/console/blob/d63a9a4c7ca806a1a7e81c2020b4791c98fcc146/src/IO/ConsoleIO.php#L56-L58)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-07T07:38:07Z
+
+@1ed that's a nice trick! Thanks for the reference. I've just updated the code as of 70a1f80
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-07T08:23:40Z
+
+The errors reported by Travis seems to be caused by volatile tests (as reported by @stof in #14078):
+
+```
+1) Symfony\Component\Process\Tests\SigchildDisabledProcessTest::testIdleTimeoutNotExceededWhenOutputIsSent
+Failed asserting that false is true.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Process/Tests/AbstractProcessTest.php:854
+
+2) Symfony\Component\Process\Tests\SimpleProcessTest::testIdleTimeoutNotExceededWhenOutputIsSent
+Failed asserting that false is true.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Process/Tests/AbstractProcessTest.php:854
+
+3) Symfony\Component\Stopwatch\Tests\StopwatchTest::testStop
+Failed asserting that 229 matches expected 200.
+/home/travis/build/symfony/symfony/src/Symfony/Component/Stopwatch/Tests/StopwatchTest.php:79
+```

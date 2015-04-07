@@ -110,6 +110,7 @@
 {% macro display_message(log_index, log, is_deprecation) %}
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
+        {% set id = 'sf-call-stack-' ~ log_index %}
 
         {% if stack %}
             <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">

@@ -389,7 +389,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $catalogue = include $cache->getPath();
 
         /*
-         * Gracefully handle the case that the cached catalogue is in an "old" format, without a resourcesHash
+         * Gracefully handle the case when the cached catalogue is in an "old" format, without a resourcesHash
          */
         $resourcesHash = null;
         if (is_array($catalogue)) {

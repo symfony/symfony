@@ -351,15 +351,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private function initializeCacheCatalogue($locale, $forceRefresh = false)
     {
         if (isset($this->catalogues[$locale])) {
-            return;
+            return; // don't see how this could ever happen...?
         }
 
         $this->assertValidLocale($locale);
         $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
         if ($forceRefresh || !$cache->isFresh()) {
             $this->initializeCatalogue($locale);
-            $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
-
             $content = sprintf(<<<EOF
 <?php
 
@@ -368,15 +366,13 @@ use Symfony\Component\Translation\MessageCatalogue;
 \$resourcesHash = '%s';
 \$catalogue = new MessageCatalogue('%s', %s);
 
-%s
 return array(\$catalogue, \$resourcesHash);
 
 EOF
                 ,
                 $this->getResourcesHash($locale),
                 $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
+                var_export($this->catalogues[$locale]->all(), true)
             );
 
             $cache->write($content, $this->catalogues[$locale]->getResources());
@@ -399,51 +395,7 @@ EOF
         }
 
         $this->catalogues[$locale] = $catalogue;
-    }
-
-    private function getFallbackContent(MessageCatalogue $catalogue)
-    {
-        if (!$this->debug) {
-            // merge all fallback catalogues messages into $catalogue
-            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            $messages = $catalogue->all();
-            while ($fallbackCatalogue) {
-                $messages = array_replace_recursive($fallbackCatalogue->all(), $messages);
-                $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-            }
-            foreach ($messages as $domain => $domainMessages) {
-                $catalogue->add($domainMessages, $domain);
-            }
-
-            return '';
-        }
-
-        $fallbackContent = '';
-        $current = '';
-        $replacementPattern = '/[^a-z0-9_]/i';
-        $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-        while ($fallbackCatalogue) {
-            $fallback = $fallbackCatalogue->getLocale();
-            $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
-            $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
-
-            $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
-
-EOF
-                ,
-                $fallbackSuffix,
-                $fallback,
-                var_export($fallbackCatalogue->all(), true),
-                $currentSuffix,
-                $fallbackSuffix
-            );
-            $current = $fallbackCatalogue->getLocale();
-            $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-        }
-
-        return $fallbackContent;
+        $this->loadFallbackCatalogues($locale);
     }
 
     private function getResourcesHash($locale)
@@ -455,6 +407,11 @@ EOF
         return sha1(serialize($this->resources[$locale]));
     }
 
+    /**
+     * Initializes $this->catalogues[$locale] by running the appropriate loaders.
+     *
+     * @param $locale The locale to load the catalogue for
+     */
     private function doLoadCatalogue($locale)
     {
         $this->catalogues[$locale] = new MessageCatalogue($locale);
@@ -471,13 +428,15 @@ EOF
 
     private function loadFallbackCatalogues($locale)
     {
+        foreach ($this->computeFallbackLocales($locale) as $fallback) {
+            if (!isset($this->catalogues[$fallback])) {
+                $this->loadCatalogue($fallback);
+            }
+        }
+
         $current = $this->catalogues[$locale];
 
         foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
-            }
-
             $current->addFallbackCatalogue($this->catalogues[$fallback]);
             $current = $this->catalogues[$fallback];
         }
@@ -486,19 +445,36 @@ EOF
     protected function computeFallbackLocales($locale)
     {
         $locales = array();
+        $candidateLocales = array();
+
+        if (strrchr($this->locale, '_') !== false) {
+            $candidateLocales[] = substr($this->locale, 0, -strlen(strrchr($this->locale, '_')));
+        }
+
         foreach ($this->fallbackLocales as $fallback) {
+            $candidateLocales[] = $fallback;
+            if (strrchr($fallback, '_') !== false) {
+                $candidateLocales[] = substr($fallback, 0, -strlen(strrchr($fallback, '_')));
+            }
+        }
+
+        $candidateLocales = array_unique($candidateLocales);
+
+        $findSecondLevelFallback = in_array($locale, $candidateLocales);
+        $seenLocale = false;
+
+        foreach ($candidateLocales as $fallback) {
             if ($fallback === $locale) {
+                $seenLocale = true;
                 continue;
             }
 
-            $locales[] = $fallback;
+            if ($seenLocale || !$findSecondLevelFallback) {
+                $locales[] = $fallback;
+            }
         }
 
-        if (strrchr($locale, '_') !== false) {
-            array_unshift($locales, substr($locale, 0, -strlen(strrchr($locale, '_'))));
-        }
-
-        return array_unique($locales);
+        return $locales;
     }
 
     /**

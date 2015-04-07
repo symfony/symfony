@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageSelector;
@@ -162,6 +163,34 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertFalse(file_exists($this->tmpDir.'/catalogue.invalid locale.php'));
         }
+    }
+
+    public function testFallbackCatalogueIsCachedIndependently()
+    {
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b', 'c'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('foo' => 'foo (b)'), 'b');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+        $translator->addResource('array', array('baz' => 'baz (c)'), 'c');
+
+        $translator->trans('foo'); // Prime the cache with the "a", "b" and "c" catalogues
+
+        /*
+         * Now, a fresh translator should be able to re-use the cached "b" catalogue.
+         * It does not need to have a loader registered, it can use the cache.
+         */
+        $translator = new Translator('b', null, $this->tmpDir);
+        $this->assertEquals('bar (b)', $translator->trans('bar'));
+
+        /*
+         * Also, as this second translator does not have "c" as a fallback locale, "baz" from the "c" catalogue
+         * must not be available. (It was a registered fallback locale *at the time the cache was
+         * primed*).
+         */
+        $this->assertEquals('baz', $translator->trans('baz'));
     }
 
     protected function getCatalogue($locale, $messages)

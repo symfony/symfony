@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-02T13:55:35Z
+
+@fabpot Would it make sense to explicitly inject the (default) factory via the DIC in FrameworkBundle, so the factory is there as a service and can be changed easily?
+
+That would be easier than having to change the router/translator service definitions.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T18:00:14Z
+
+ @mpdude I attempt to implement this feature into #13986
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-07T10:21:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-07T10:22:58Z
+
+@aitboudad I think we all agree that #13986 and this PR and not related. Can you remove your - 1?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-07T10:23:54Z
+
+:+1:  ok :)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-07T10:30:04Z
+
+Travis failure on PHP 5.5 is due to a [volatile test](https://github.com/symfony/symfony/issues/14078). `dep=high` fails because changes to symfony/config are not yet visible in dev-master.

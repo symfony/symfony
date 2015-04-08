@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Command\Resolver\CommandResolverInterface;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -32,41 +33,64 @@ use Symfony\Component\Console\Helper\HelperSet;
 class Command
 {
     private $application;
-    private $name;
-    private $processTitle;
-    private $aliases = array();
-    private $definition;
-    private $help;
-    private $description;
+    private $configuration;
     private $ignoreValidationErrors = false;
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis;
     private $helperSet;
+
+    /**
+     * Registers command in a lazy load manner and returns proxy command.
+     *
+     * @param CommandConfiguration $configuration
+     * @param CommandResolverInterface $resolver
+     * @return Command
+     */
+    final public static function registerLazyLoaded(CommandConfiguration $configuration, CommandResolverInterface $resolver)
+    {
+        $proxyCommand = new self(null, $configuration);
+
+        $proxyCommand->setCode(function ($input, $output) use ($configuration, $resolver, $proxyCommand) {
+            $command = $resolver->resolve($configuration->getName());
+
+            if ($command instanceof Command) {
+                $command->setApplication($proxyCommand->getApplication());
+                $command->setConfiguration($proxyCommand->getConfiguration());
+                $command->setHelperSet($proxyCommand->getHelperSet());
+
+                return $command->doRun($input, $output);
+            }
+
+            if (is_callable($command)) {
+                return (int) $command($input, $output);
+            }
+
+            throw new \RuntimeException(sprintf('Command or callable was expected, %s given', gettype($command)));
+        });
+
+        return $proxyCommand;
+    }
 
     /**
      * Constructor.
      *
      * @param string|null $name The name of the command; passing null means it must be set in configure()
+     * @param CommandConfiguration|null $configuration
      *
-     * @throws \LogicException When the command name is empty
+     * @throws \LogicException
      *
      * @api
      */
-    public function __construct($name = null)
+    public function __construct($name = null, CommandConfiguration $configuration = null)
     {
-        $this->definition = new InputDefinition();
-
-        if (null !== $name) {
-            $this->setName($name);
+        if (null !== $name && null !== $configuration) {
+            throw new \LogicException(sprintf('Pass either name or configuration to the "%s".', get_class($this)));
         }
+
+        $this->configuration = $configuration ?: new CommandConfiguration($name);
 
         $this->configure();
-
-        if (!$this->name) {
-            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
-        }
     }
 
     /**
@@ -94,6 +118,16 @@ class Command
         } else {
             $this->helperSet = null;
         }
+    }
+
+    /**
+     * Sets command configuration.
+     *
+     * @param CommandConfiguration $configuration
+     */
+    public function setConfiguration(CommandConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
     }
 
     /**
@@ -129,6 +163,16 @@ class Command
     }
 
     /**
+     * Gets command configuration.
+     *
+     * @return CommandConfiguration
+     */
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+    /**
      * Checks whether the command is enabled or not in the current environment.
      *
      * Override this to check for x or y and return false if the command can not
@@ -138,7 +182,7 @@ class Command
      */
     public function isEnabled()
     {
-        return true;
+        return $this->configuration ? $this->configuration->isEnabled() : true;
     }
 
     /**
@@ -226,7 +270,7 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->definition);
+            $input->bind($this->configuration->getDefinition());
         } catch (\Exception $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -235,29 +279,17 @@ class Command
 
         $this->initialize($input, $output);
 
-        if (null !== $this->processTitle) {
+        if (null !== $this->configuration->getProcessTitle()) {
             if (function_exists('cli_set_process_title')) {
-                cli_set_process_title($this->processTitle);
+                cli_set_process_title($this->configuration->getProcessTitle());
             } elseif (function_exists('setproctitle')) {
-                setproctitle($this->processTitle);
+                setproctitle($this->configuration->getProcessTitle());
             } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
                 $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
             }
         }
 
-        if ($input->isInteractive()) {
-            $this->interact($input, $output);
-        }
-
-        $input->validate();
-
-        if ($this->code) {
-            $statusCode = call_user_func($this->code, $input, $output);
-        } else {
-            $statusCode = $this->execute($input, $output);
-        }
-
-        return is_numeric($statusCode) ? (int) $statusCode : 0;
+        return $this->doRun($input, $output);
     }
 
     /**
@@ -301,12 +333,12 @@ class Command
         }
 
         if ($mergeArgs) {
-            $currentArguments = $this->definition->getArguments();
-            $this->definition->setArguments($this->application->getDefinition()->getArguments());
-            $this->definition->addArguments($currentArguments);
+            $currentArguments = $this->configuration->getDefinition()->getArguments();
+            $this->configuration->getDefinition()->setArguments($this->application->getDefinition()->getArguments());
+            $this->configuration->getDefinition()->addArguments($currentArguments);
         }
 
-        $this->definition->addOptions($this->application->getDefinition()->getOptions());
+        $this->configuration->getDefinition()->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
         if ($mergeArgs) {
@@ -326,9 +358,9 @@ class Command
     public function setDefinition($definition)
     {
         if ($definition instanceof InputDefinition) {
-            $this->definition = $definition;
+            $this->configuration = $this->configuration->withDefinition($definition);
         } else {
-            $this->definition->setDefinition($definition);
+            $this->configuration->getDefinition()->setDefinition($definition);
         }
 
         $this->applicationDefinitionMerged = false;
@@ -345,7 +377,7 @@ class Command
      */
     public function getDefinition()
     {
-        return $this->definition;
+        return $this->configuration ? $this->configuration->getDefinition() : null;
     }
 
     /**
@@ -377,7 +409,7 @@ class Command
      */
     public function addArgument($name, $mode = null, $description = '', $default = null)
     {
-        $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
+        $this->configuration->getDefinition()->addArgument(new InputArgument($name, $mode, $description, $default));
 
         return $this;
     }
@@ -397,7 +429,7 @@ class Command
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
     {
-        $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
+        $this->configuration->getDefinition()->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
         return $this;
     }
@@ -420,9 +452,7 @@ class Command
      */
     public function setName($name)
     {
-        $this->validateName($name);
-
-        $this->name = $name;
+        $this->configuration = $this->configuration->withName($name);
 
         return $this;
     }
@@ -441,7 +471,7 @@ class Command
      */
     public function setProcessTitle($title)
     {
-        $this->processTitle = $title;
+        $this->configuration = $this->configuration->withProcessTitle($title);
 
         return $this;
     }
@@ -455,7 +485,11 @@ class Command
      */
     public function getName()
     {
-        return $this->name;
+        if (!$this->configuration->getName()) {
+            throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
+        }
+
+        return $this->configuration->getName();
     }
 
     /**
@@ -469,7 +503,7 @@ class Command
      */
     public function setDescription($description)
     {
-        $this->description = $description;
+        $this->configuration = $this->configuration->withDescription($description);
 
         return $this;
     }
@@ -483,7 +517,7 @@ class Command
      */
     public function getDescription()
     {
-        return $this->description;
+        return $this->configuration->getDescription();
     }
 
     /**
@@ -497,7 +531,7 @@ class Command
      */
     public function setHelp($help)
     {
-        $this->help = $help;
+        $this->configuration = $this->configuration->withHelp($help);
 
         return $this;
     }
@@ -511,7 +545,7 @@ class Command
      */
     public function getHelp()
     {
-        return $this->help;
+        return $this->configuration->getHelp();
     }
 
     /**
@@ -522,7 +556,7 @@ class Command
      */
     public function getProcessedHelp()
     {
-        $name = $this->name;
+        $name = $this->configuration->getName();
 
         $placeholders = array(
             '%command.name%',
@@ -549,15 +583,11 @@ class Command
      */
     public function setAliases($aliases)
     {
-        if (!is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new \InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
+        if ($aliases instanceof \Traversable) {
+            $aliases = iterator_to_array($aliases);
         }
 
-        foreach ($aliases as $alias) {
-            $this->validateName($alias);
-        }
-
-        $this->aliases = $aliases;
+        $this->configuration = $this->configuration->withAliases($aliases);
 
         return $this;
     }
@@ -571,7 +601,7 @@ class Command
      */
     public function getAliases()
     {
-        return $this->aliases;
+        return $this->configuration->getAliases();
     }
 
     /**
@@ -581,11 +611,7 @@ class Command
      */
     public function getSynopsis()
     {
-        if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
-        }
-
-        return $this->synopsis;
+        return $this->configuration->getSynopsis();
     }
 
     /**
@@ -648,18 +674,25 @@ class Command
     }
 
     /**
-     * Validates a command name.
-     *
-     * It must be non-empty and parts can optionally be separated by ":".
-     *
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException When the name is invalid
+     * @internal
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
      */
-    private function validateName($name)
+    public function doRun(InputInterface $input, OutputInterface $output)
     {
-        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+        if ($input->isInteractive()) {
+            $this->interact($input, $output);
         }
+
+        $input->validate();
+
+        if ($this->code) {
+            $statusCode = call_user_func($this->code, $input, $output);
+        } else {
+            $statusCode = $this->execute($input, $output);
+        }
+
+        return is_numeric($statusCode) ? (int) $statusCode : 0;
     }
 }

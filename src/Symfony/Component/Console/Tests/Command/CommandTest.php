@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -31,6 +32,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         self::$fixturesPath = __DIR__.'/../Fixtures/';
         require_once self::$fixturesPath.'/TestCommand.php';
+        require_once self::$fixturesPath.'/TestCommandWithSeparateConfiguration.php';
     }
 
     public function testConstructor()
@@ -45,7 +47,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testCommandNameCannotBeEmpty()
     {
-        new Command();
+        $command = new Command();
+        $command->getName();
     }
 
     public function testSetApplication()
@@ -94,25 +97,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $ret = $command->setName('foobar:bar');
         $this->assertEquals($command, $ret, '->setName() implements a fluent interface');
         $this->assertEquals('foobar:bar', $command->getName(), '->setName() sets the command name');
-    }
-
-    /**
-     * @dataProvider provideInvalidCommandNames
-     */
-    public function testInvalidCommandNames($name)
-    {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Command name "%s" is invalid.', $name));
-
-        $command = new \TestCommand();
-        $command->setName($name);
-    }
-
-    public function provideInvalidCommandNames()
-    {
-        return array(
-            array(''),
-            array('foo:'),
-        );
     }
 
     public function testGetSetDescription()
@@ -344,5 +328,105 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester = new CommandTester($command);
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testInconsistentDefinition()
+    {
+        new Command('foo', new CommandConfiguration('bar'));
+    }
+
+    public function testThatCommandIsNotLoaded()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->never())
+            ->method('resolve')
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $this->assertSame('foo:bar', $command->getName());
+    }
+
+    public function testCommandWithSeparateConfiguration()
+    {
+        $configuration =
+            CommandConfiguration::create('foo:baz')
+                ->withDescription('foo description')
+                ->withDefinition(
+                    new InputDefinition(array(
+                        new InputArgument('name'),
+                    ))
+                );
+
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('foo:baz')
+            ->will($this->returnCallback(function () {
+                return new \TestCommandWithSeparateConfiguration();
+            }))
+        ;
+
+        $command = Command::registerLazyLoaded($configuration, $resolver);
+        $command->setApplication(new Application());
+
+        $tester = new CommandTester($command);
+        $tester->execute(array('name' => 'Alice'));
+
+        $this->assertSame(
+            'interact called'.PHP_EOL.'Hello, Alice'.PHP_EOL.'Command name: foo:baz'.PHP_EOL.'Description foo description'.PHP_EOL,
+            $tester->getDisplay()
+        );
+    }
+
+    public function testThatResolverIsAllowedToReturnCallable()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->will($this->returnValue(function (InputInterface $input, OutputInterface $output) {
+                $output->writeln('Hello, world');
+
+                return 42;
+            }))
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $tester = new CommandTester($command);
+        $tester->execute(array(), array());
+
+        $this->assertSame('Hello, world'.PHP_EOL, $tester->getDisplay());
+        $this->assertSame(42, $tester->getStatusCode());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Command or callable was expected, string given
+     */
+    public function testInvalidResolver()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $resolver
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('foo:bar')
+            ->will($this->returnValue('foo'))
+        ;
+
+        $command = Command::registerLazyLoaded(CommandConfiguration::create('foo:bar'), $resolver);
+
+        $tester = new CommandTester($command);
+        $tester->execute(array());
     }
 }

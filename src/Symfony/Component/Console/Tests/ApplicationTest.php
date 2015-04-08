@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -1018,6 +1019,27 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $inputStream = $application->getHelperSet()->get('question')->getInputStream();
         $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
+    }
+
+    public function testAddingSeparateConfiguration()
+    {
+        $resolver = $this->getMockForAbstractClass('Symfony\Component\Console\Command\Resolver\CommandResolverInterface');
+
+        $application = new Application();
+        $application->setCommandResolver($resolver);
+        $application->addCommandConfiguration(CommandConfiguration::create('foo:bar'));
+
+        $this->assertTrue($application->has('foo:bar'));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage You have to specify command resolver in order to register separate command configuration
+     */
+    public function testAddingSeparateConfigurationWithoutResolver()
+    {
+        $application = new Application();
+        $application->addCommandConfiguration(CommandConfiguration::create('foo:bar'));
     }
 }
 

@@ -316,8 +316,8 @@ class SymfonyStyle extends OutputStyle
     private function getTerminalWidth()
     {
         $application = new Application();
-        list ($width, $height) = $application->getTerminalDimensions();
+        $dimensions = $application->getTerminalDimensions();
 
-        return $width;
+        return $dimensions[0] ?: self::MAX_LINE_LENGTH;
     }
 }

@@ -21,6 +21,10 @@
  * @author: Albert Jessurum <ajessu@gmail.com>
  */
 
+if (ini_get('auto_prepend_file') && !in_array(ini_get('auto_prepend_file'), get_included_files(), true)) {
+    require ini_get('auto_prepend_file');
+}
+
 if (is_file($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$_SERVER['SCRIPT_NAME'])) {
     return false;
 }

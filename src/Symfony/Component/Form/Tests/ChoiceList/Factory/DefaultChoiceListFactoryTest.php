@@ -730,6 +730,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateViewForLegacyChoiceList()
     {
         $preferred = array(new ChoiceView('Preferred', 'x', 'x'));

@@ -21,27 +21,6 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
 class ChoiceView extends LegacyChoiceView
 {
     /**
-     * The label displayed to humans.
-     *
-     * @var string
-     */
-    public $label;
-
-    /**
-     * The view representation of the choice.
-     *
-     * @var string
-     */
-    public $value;
-
-    /**
-     * The original choice value.
-     *
-     * @var mixed
-     */
-    public $data;
-
-    /**
      * Additional attributes for the HTML tag.
      *
      * @var array
@@ -58,9 +37,8 @@ class ChoiceView extends LegacyChoiceView
      */
     public function __construct($label, $value, $data, array $attr = array())
     {
-        $this->label = $label;
-        $this->value = $value;
-        $this->data = $data;
+        parent::__construct($data, $value, $label);
+
         $this->attr = $attr;
     }
 }

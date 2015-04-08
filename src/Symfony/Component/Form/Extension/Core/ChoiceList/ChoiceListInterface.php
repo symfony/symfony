@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+trigger_error('The '.__NAMESPACE__.'\ChoiceListInterface interface is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ChoiceListInterface instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInterface;
 
 /**

@@ -58,7 +58,7 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getProperties() as $property) {
-            if ($property->getDeclaringClass()->name == $className) {
+            if ($property->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $constraint) {
                     if ($constraint instanceof Constraint) {
                         $metadata->addPropertyConstraint($property->name, $constraint);
@@ -70,7 +70,7 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->name ==  $className) {
+            if ($method->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getMethodAnnotations($method) as $constraint) {
                     if ($constraint instanceof Callback) {
                         $constraint->callback = $method->getName();

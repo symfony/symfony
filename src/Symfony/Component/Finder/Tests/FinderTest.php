@@ -132,8 +132,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     /**
      * @dataProvider getRegexNameTestData
-     *
-     * @group regexName
      */
     public function testRegexName($adapter, $regex)
     {
@@ -506,7 +504,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     /**
      * @dataProvider getContainsTestData
-     * @group grep
      */
     public function testContains($adapter, $matchPatterns, $noMatchPatterns, $expected)
     {

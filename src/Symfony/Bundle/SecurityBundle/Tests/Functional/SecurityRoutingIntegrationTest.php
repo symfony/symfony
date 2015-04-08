@@ -65,7 +65,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
     /**
      * @dataProvider getConfigs
-     * @group ip_whitelist
      */
     public function testSecurityConfigurationForSingleIPAddress($config)
     {
@@ -78,7 +77,6 @@ class SecurityRoutingIntegrationTest extends WebTestCase
 
     /**
      * @dataProvider getConfigs
-     * @group ip_whitelist
      */
     public function testSecurityConfigurationForMultipleIPAddresses($config)
     {

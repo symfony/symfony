@@ -197,13 +197,15 @@ class TextDescriptor extends Descriptor
             // add commands by namespace
             foreach ($description->getNamespaces() as $namespace) {
                 if (!$describedNamespace && ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
-                    $this->writeText("\n");
-                    $this->writeText('<comment>'.$namespace['id'].'</comment>', $options);
+                    $this->writeText("\n<comment>", $options);
+                    $this->writeText($namespace['id'], array_merge($options, array('raw_output' => true)));
+                    $this->writeText("</comment>", $options);
                 }
 
                 foreach ($namespace['commands'] as $name) {
-                    $this->writeText("\n");
-                    $this->writeText(sprintf(" <info>%-${width}s</info> %s", $name, $description->getCommand($name)->getDescription()), $options);
+                    $this->writeText("\n <info>", $options);
+                    $this->writeText(sprintf("%-${width}s", $name), array_merge($options, array('raw_output' => true)));
+                    $this->writeText(sprintf("</info> %s", $description->getCommand($name)->getDescription()), $options);
                 }
             }
 

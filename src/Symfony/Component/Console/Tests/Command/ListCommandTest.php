@@ -61,4 +61,17 @@ EOF;
 
         $this->assertEquals($output, $commandTester->getDisplay(true));
     }
+
+    public function testExecuteListsCommandsNameAndNamespaceRaw()
+    {
+        require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
+        $application = new Application();
+        $application->add(new \Foo6Command());
+        $commandTester = new CommandTester($command = $application->get('list'));
+        $commandTester->execute(array('command' => $command->getName()));
+
+        $regex = '/Available commands:\s*help\s*.*\s*list.*\s*<fg=blue>foo\s*<fg=blue>foo:bar<\/fg=blue>/';
+
+        $this->assertRegExp($regex, $commandTester->getDisplay(true));
+    }
 }

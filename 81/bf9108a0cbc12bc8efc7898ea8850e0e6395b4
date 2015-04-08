@@ -1,0 +1,213 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-01-03T14:15:34Z
+
+@WouterJ could you please post two screenshots of the before/after changes for a typical Symfony command? Thanks!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-03T15:43:42Z
+
+@javiereguiluz this PR is only about the help output (docopt is only about having a syntax to describe the command). A screenshot when running `server:start --help`: (please note that only the first lines of the help message are shown)
+
+**Before**
+![sf-docopt-before](https://cloud.githubusercontent.com/assets/749025/5602820/83663b72-9367-11e4-97ab-4b9d25e78436.png)
+
+**After**
+![sf-docopt-after](https://cloud.githubusercontent.com/assets/749025/5602822/8928ade2-9367-11e4-9447-0fe0225203df.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-01-03T15:53:19Z
+
+@WouterJ thanks for the screenshots.
+
+I find the new style way less readable than the original one. I only like the square brackets for the default values.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-03T22:23:55Z
+
+I'm not familiar with the standard, but I agree with @javiereguiluz, finding the available options is far easier in the first screenshot. I think this is mainly because when I look at the command, I don't know the available options thus the shortcuts won't make any sense to me until I know the command.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-03T23:33:13Z
+
+Hmm, let's take a closer look then at what's changed, why it is that way and how we can integrate this in Symfony commands.
+
+First of all, please note that docopt is based on unix commands. It looks very similair, but has some different things. Maybe we would like that more? The differences are mostly in the command synopsis. Now with the `addUsage` method, I start to think that we maybe should use that default as well. An example:
+
+````
+$ mv --help
+Usage: mv [OPTION]... [-T] SOURCE DEST
+  or:  mv [OPTION]... SOURCE... DIRECTORY
+  or:  mv [OPTION]... -t DIRECTORY SOURCE...
+Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
+
+Mandatory arguments to long options are mandatory for short options too.
+      --backup[=CONTROL]       make a backup of each existing destination file
+  -b                           like --backup but does not accept an argument
+  -f, --force                  do not prompt before overwriting
+  -i, --interactive            prompt before overwrite
+  -n, --no-clobber             do not overwrite an existing file
+````
+
+The Command Synopsis
+---
+
+| Before | After | |
+| --- | --- | --- |
+| `-r|--router="..."` | `-r ROUTER|--router ROUTER` | This is a very common standard (see unix example). However, it'll be more usefull if we can edit the value of the value, having something like `-r FILE|--router=FILE` helps explaining the option without description.<br>Putting the value on both options is maybe more a docopt implementation detail, we can revert that. |
+| `argument` | `<argument>` | This makes a clear separation between the command name and arguments |
+| `--option argument` | `--option [--] <argument>` | Symfony supports `[--]` and as such, it should show it following the docopt standards. This is also usefull, as not many people know if `[--]` is supported and what it does, this'll help |
+
+We could default this to just:
+
+    Usage: server:start [options] [<address>]
+
+This is valid docopt, as long as the options are defined in the option description and more specific usages can be set using `addUsage()`.
+
+The Options List
+---
+
+| Before | After | |
+| --- | --- | --- |
+| `--router (-r)` | `-r, --router` | This is in the same style as unix and docopt. Consistency is better. Docopt doesn't specify if the shortcut has to be the first, so we can also use `--router, -r`. Moreover, we can tweak it to be indented like Unix commands. |
+| `--env (-e)` | `-e=E | --env=E` | For the values, reference to the row in the synopsis about alternatives | `(default: "dev")` | `[default: "dev"]` | Just to comply with docopt standards |
+
+Following this and using some of the things in Unix commands. What do you think of this proposal (not yet implemented):
+
+![sf-docopt-alternative-1](https://cloud.githubusercontent.com/assets/749025/5604134/371b876c-93a9-11e4-8114-019d598ba3aa.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-01-04T08:35:46Z
+
+@WouterJ thanks for the thorough explanation. This new proposal looks definitely much better to me.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-04T09:29:06Z
+
+Would it be possible to use a borderless table here? It would align properly, even if there are a lot of options such as with -vvv. The new proposal looks very clear to me as the `--options` are all aligned.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-04T09:34:41Z
+
+There is no need for a borderless table here. I've not aligned `-v|vv|vvv` with the rest on purpose. As it's such a big option, aligning the complete complete block with it add much whitespace for no good reason. I've moved it to the bottom, so it isn't really annoying imo.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-01-04T09:58:00Z
+
+What happens if an option has a very long description and has a very long default value? An example could be an IPv6 address.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-04T10:03:03Z
+
+You can add new lines to the description, resulting in:
+
+````
+  -l, --long  A very looong description which eventually needs
+              a line break [default: ...........................]
+````
+
+Currently, this isn't done without newline. It might be a good idea to add that.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-01-07T01:30:50Z
+
+I've now squashed, rebased and improved this PR. It now uses the latest proposed version by me. For the first time, the tests pass (this should however be fixed really soon, it took 4 days to get the tests pass).
+
+I've updated the todo items in the PR description.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-01-07T11:57:11Z
+
+Great, thanks @WouterJ :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-10T13:48:53Z
+
+@WouterJ I can see many todo items in the description, os what's the status of the PR? I had the feeling it was finished, but seeing the todo list, I'm not very sure.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-18T10:40:44Z
+
+@fabpot the feature itself is finished, but the tests are a pain to update (as there is soo much duplication and tests that shouldn't do these assertions). I think the Symfony codebase would benefit from a test cleanup :)
+
+However, this one is at the top of my "finish it" list for this week.
+
+Btw, does anyone know why Travis didn't run for the last commit? My PC has problems executing the suite (windows...), so I rely mostly on Travis for this PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-02-18T10:42:59Z
+
+@WouterJ I agree with you.
+
+It happens to me from time to time as well, Travis do not run anymore for some of my PRs and I don't see how I can force it to run them again. Anyone knows what happen?
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-02-18T10:50:51Z
+
+To me it sounds like the commit/push hook is failing, maybe a connection issue to travis?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-02-18T11:45:49Z
+
+In case it's useful, this is the official Travis documentation regarding [why PRs aren't built in some cases](http://docs.travis-ci.com/user/pull-requests/#My-Pull-Request-isn't-being-built):
+
+> **My Pull Request isn't being built**
+>
+> If a pull request isn't built or doesn't show up in Travis CI's user interface, that usually means that it can't be merged. We rely on the merge commit that GitHub transparently creates between the changes in the source branch and the upstream branch the pull request is sent against.
+>
+> So when you create or update a pull request, and Travis CI doesn't create a build for it, make sure the pull request is mergeable. If it isn't, rebase it against the upstream branch and resolve any merge conflicts. When you push the fixes up to GitHub and to the pull request, Travis CI will happily test them.
+>
+> Travis CI also currently doesn't build pull requests when the upstream branch is updated. When this happens, GitHub will update the merge commit between the downstream and upstream branch, and send out a notifications. But Travis CI currently ignores this update, as it could lead to a large number of new builds on repositories with lots of pull requests and lots of updates on the upstream branches.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-18T12:08:52Z
+
+I'll resolve the merge conflict, maybe that solves the issue. Thanks!
+
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2015-02-19T08:55:32Z
+
+:+1: great idea using docopt and having something that is more unixy
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-02-19T10:11:38Z
+
+@fabpot this PR is ready for review/merge. The test failures are not caused by this PR or at least, I can't see how this should cause the failures.
+I've created a doc issue instead of a PR, as I'm going to revisit the Console docs soon.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-03-20T18:41:53Z
+
+ping
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-03T14:32:33Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-03T15:13:06Z
+
+ping @symfony/deciders

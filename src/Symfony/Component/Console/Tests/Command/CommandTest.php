@@ -154,8 +154,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new \TestCommand();
         $command->addOption('foo');
-        $command->addArgument('foo');
-        $this->assertEquals('namespace:name [--foo] [foo]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+        $command->addArgument('bar');
+        $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
     public function testGetHelper()

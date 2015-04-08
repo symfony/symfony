@@ -22,7 +22,7 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
 
-        $this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+        $this->assertRegExp('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
     public function testExecuteListsCommandsWithXmlOption()

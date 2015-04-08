@@ -73,7 +73,7 @@ interface FormTypeInterface
      *
      * @param OptionsResolverInterface $resolver The resolver for the options.
      *
-     * @deprecated Deprecated since Symfony 2.7, to be renamed in Symfony 3.0.
+     * @deprecated since version 2.7, to be renamed in 3.0.
      *             Use the method configureOptions instead. This method will be
      *             added to the FormTypeInterface with Symfony 3.0.
      */

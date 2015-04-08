@@ -12,6 +12,8 @@
 namespace Symfony\Component\Console\Tests;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -129,6 +131,39 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->addCommands(array($foo = new \FooCommand(), $foo1 = new \Foo1Command()));
         $commands = $application->all();
         $this->assertEquals(array($foo, $foo1), array($commands['foo:bar'], $commands['foo:bar1']), '->addCommands() registers an array of commands');
+    }
+
+    public function testAddCommandConfiguration()
+    {
+        $configuration = new CommandConfiguration();
+        $configuration->setName('foo:bar');
+        $command = new Command(null, $configuration);
+        $configuration->setCommand($command);
+
+        $application = new Application();
+        $application->addCommandConfiguration($configuration);
+        $commands = $application->all();
+        $this->assertSame($command, $commands['foo:bar'], '->addCommandConfiguration() registers a command configuration');
+    }
+
+    public function testAddCommandConfigurationWithLazyCommand()
+    {
+        $initialized = false;
+        $configuration = new CommandConfiguration(function ($configuration) use (&$initialized) {
+            $initialized = true;
+
+            return new Command(null, $configuration);
+        });
+        $configuration->setName('foo:bar');
+
+        $application = new Application();
+        $application->addCommandConfiguration($configuration);
+
+        $this->assertFalse($initialized);
+        $command = $application->find('foo:bar');
+        $this->assertTrue($initialized);
+        $this->assertInstanceOf('Symfony\Component\Console\Command\Command', $command);
+        $this->assertEquals('foo:bar', $command->getName());
     }
 
     /**

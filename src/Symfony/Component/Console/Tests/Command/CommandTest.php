@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\CommandConfiguration;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -66,96 +67,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->setDefinition() also takes an array of InputArguments and InputOptions as an argument');
         $this->assertTrue($command->getDefinition()->hasOption('bar'), '->setDefinition() also takes an array of InputArguments and InputOptions as an argument');
         $command->setDefinition(new InputDefinition());
-    }
-
-    public function testAddArgument()
-    {
-        $command = new \TestCommand();
-        $ret = $command->addArgument('foo');
-        $this->assertEquals($command, $ret, '->addArgument() implements a fluent interface');
-        $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->addArgument() adds an argument to the command');
-    }
-
-    public function testAddOption()
-    {
-        $command = new \TestCommand();
-        $ret = $command->addOption('foo');
-        $this->assertEquals($command, $ret, '->addOption() implements a fluent interface');
-        $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
-    }
-
-    public function testGetNamespaceGetNameSetName()
-    {
-        $command = new \TestCommand();
-        $this->assertEquals('namespace:name', $command->getName(), '->getName() returns the command name');
-        $command->setName('foo');
-        $this->assertEquals('foo', $command->getName(), '->setName() sets the command name');
-
-        $ret = $command->setName('foobar:bar');
-        $this->assertEquals($command, $ret, '->setName() implements a fluent interface');
-        $this->assertEquals('foobar:bar', $command->getName(), '->setName() sets the command name');
-    }
-
-    /**
-     * @dataProvider provideInvalidCommandNames
-     */
-    public function testInvalidCommandNames($name)
-    {
-        $this->setExpectedException('InvalidArgumentException', sprintf('Command name "%s" is invalid.', $name));
-
-        $command = new \TestCommand();
-        $command->setName($name);
-    }
-
-    public function provideInvalidCommandNames()
-    {
-        return array(
-            array(''),
-            array('foo:'),
-        );
-    }
-
-    public function testGetSetDescription()
-    {
-        $command = new \TestCommand();
-        $this->assertEquals('description', $command->getDescription(), '->getDescription() returns the description');
-        $ret = $command->setDescription('description1');
-        $this->assertEquals($command, $ret, '->setDescription() implements a fluent interface');
-        $this->assertEquals('description1', $command->getDescription(), '->setDescription() sets the description');
-    }
-
-    public function testGetSetHelp()
-    {
-        $command = new \TestCommand();
-        $this->assertEquals('help', $command->getHelp(), '->getHelp() returns the help');
-        $ret = $command->setHelp('help1');
-        $this->assertEquals($command, $ret, '->setHelp() implements a fluent interface');
-        $this->assertEquals('help1', $command->getHelp(), '->setHelp() sets the help');
-    }
-
-    public function testGetProcessedHelp()
-    {
-        $command = new \TestCommand();
-        $command->setHelp('The %command.name% command does... Example: php %command.full_name%.');
-        $this->assertContains('The namespace:name command does...', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.name% correctly');
-        $this->assertNotContains('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name%');
-    }
-
-    public function testGetSetAliases()
-    {
-        $command = new \TestCommand();
-        $this->assertEquals(array('name'), $command->getAliases(), '->getAliases() returns the aliases');
-        $ret = $command->setAliases(array('name1'));
-        $this->assertEquals($command, $ret, '->setAliases() implements a fluent interface');
-        $this->assertEquals(array('name1'), $command->getAliases(), '->setAliases() sets the aliases');
-    }
-
-    public function testGetSynopsis()
-    {
-        $command = new \TestCommand();
-        $command->addOption('foo');
-        $command->addArgument('foo');
-        $this->assertEquals('namespace:name [--foo] [foo]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
     public function testGetHelper()
@@ -344,5 +255,30 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $tester = new CommandTester($command);
         $tester->execute(array('command' => $command->getName()));
         $this->assertXmlStringEqualsXmlFile(self::$fixturesPath.'/command_asxml.txt', $command->asXml(), '->asXml() returns an XML representation of the command');
+    }
+
+    public function testSetConfiguration()
+    {
+        $configuration = new CommandConfiguration();
+        $configuration
+            ->setName('foo:bar')
+            ->setAliases(array('name'))
+            ->setDescription('description')
+            ->setHelp('help');
+
+        // Via constructor
+        $command = new Command(null, $configuration);
+        $this->assertEquals('foo:bar', $command->getName());
+        $this->assertEquals(array('name'), $command->getAliases());
+        $this->assertEquals('description', $command->getDescription());
+        $this->assertEquals('help', $command->getHelp());
+
+        // Via setter
+        $command = new Command('foo');
+        $command->setConfiguration($configuration);
+        $this->assertEquals('foo:bar', $command->getName());
+        $this->assertEquals(array('name'), $command->getAliases());
+        $this->assertEquals('description', $command->getDescription());
+        $this->assertEquals('help', $command->getHelp());
     }
 }

@@ -14,8 +14,6 @@ namespace Symfony\Component\Console\Command;
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
 use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,42 +27,42 @@ use Symfony\Component\Console\Helper\HelperSet;
  *
  * @api
  */
-class Command
+class Command extends CommandConfiguration
 {
+    /**
+     * @var Application|null
+     */
     private $application;
-    private $name;
-    private $processTitle;
-    private $aliases = array();
-    private $definition;
-    private $help;
-    private $description;
     private $ignoreValidationErrors = false;
     private $applicationDefinitionMerged = false;
     private $applicationDefinitionMergedWithArgs = false;
     private $code;
-    private $synopsis;
     private $helperSet;
 
     /**
      * Constructor.
      *
-     * @param string|null $name The name of the command; passing null means it must be set in configure()
+     * @param string|null               $name          The name of the command; passing null means it must be set in configure()
+     * @param CommandConfiguration|null $configuration Pass the command configuration if it was defined separately from the command
      *
      * @throws \LogicException When the command name is empty
      *
      * @api
      */
-    public function __construct($name = null)
+    public function __construct($name = null, CommandConfiguration $configuration = null)
     {
-        $this->definition = new InputDefinition();
+        parent::__construct($this);
 
         if (null !== $name) {
             $this->setName($name);
         }
+        if (null !== $configuration) {
+            $this->setConfiguration($configuration);
+        }
 
         $this->configure();
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             throw new \LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
         }
     }
@@ -226,7 +224,7 @@ class Command
 
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->definition);
+            $input->bind($this->getDefinition());
         } catch (\Exception $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -235,11 +233,11 @@ class Command
 
         $this->initialize($input, $output);
 
-        if (null !== $this->processTitle) {
+        if (null !== $this->getProcessTitle()) {
             if (function_exists('cli_set_process_title')) {
-                cli_set_process_title($this->processTitle);
+                cli_set_process_title($this->getProcessTitle());
             } elseif (function_exists('setproctitle')) {
-                setproctitle($this->processTitle);
+                setproctitle($this->getProcessTitle());
             } elseif (OutputInterface::VERBOSITY_VERY_VERBOSE === $output->getVerbosity()) {
                 $output->writeln('<comment>Install the proctitle PECL to be able to change the process title.</comment>');
             }
@@ -300,13 +298,15 @@ class Command
             return;
         }
 
+        $definition = $this->getDefinition();
+
         if ($mergeArgs) {
-            $currentArguments = $this->definition->getArguments();
-            $this->definition->setArguments($this->application->getDefinition()->getArguments());
-            $this->definition->addArguments($currentArguments);
+            $currentArguments = $definition->getArguments();
+            $definition->setArguments($this->application->getDefinition()->getArguments());
+            $definition->addArguments($currentArguments);
         }
 
-        $this->definition->addOptions($this->application->getDefinition()->getOptions());
+        $definition->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
         if ($mergeArgs) {
@@ -325,27 +325,11 @@ class Command
      */
     public function setDefinition($definition)
     {
-        if ($definition instanceof InputDefinition) {
-            $this->definition = $definition;
-        } else {
-            $this->definition->setDefinition($definition);
-        }
+        parent::setDefinition($definition);
 
         $this->applicationDefinitionMerged = false;
 
         return $this;
-    }
-
-    /**
-     * Gets the InputDefinition attached to this Command.
-     *
-     * @return InputDefinition An InputDefinition instance
-     *
-     * @api
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
     }
 
     /**
@@ -361,231 +345,6 @@ class Command
     public function getNativeDefinition()
     {
         return $this->getDefinition();
-    }
-
-    /**
-     * Adds an argument.
-     *
-     * @param string $name        The argument name
-     * @param int    $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string $description A description text
-     * @param mixed  $default     The default value (for InputArgument::OPTIONAL mode only)
-     *
-     * @return Command The current instance
-     *
-     * @api
-     */
-    public function addArgument($name, $mode = null, $description = '', $default = null)
-    {
-        $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
-
-        return $this;
-    }
-
-    /**
-     * Adds an option.
-     *
-     * @param string $name        The option name
-     * @param string $shortcut    The shortcut (can be null)
-     * @param int    $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string $description A description text
-     * @param mixed  $default     The default value (must be null for InputOption::VALUE_REQUIRED or InputOption::VALUE_NONE)
-     *
-     * @return Command The current instance
-     *
-     * @api
-     */
-    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
-    {
-        $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
-
-        return $this;
-    }
-
-    /**
-     * Sets the name of the command.
-     *
-     * This method can set both the namespace and the name if
-     * you separate them by a colon (:)
-     *
-     *     $command->setName('foo:bar');
-     *
-     * @param string $name The command name
-     *
-     * @return Command The current instance
-     *
-     * @throws \InvalidArgumentException When the name is invalid
-     *
-     * @api
-     */
-    public function setName($name)
-    {
-        $this->validateName($name);
-
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Sets the process title of the command.
-     *
-     * This feature should be used only when creating a long process command,
-     * like a daemon.
-     *
-     * PHP 5.5+ or the proctitle PECL library is required
-     *
-     * @param string $title The process title
-     *
-     * @return Command The current instance
-     */
-    public function setProcessTitle($title)
-    {
-        $this->processTitle = $title;
-
-        return $this;
-    }
-
-    /**
-     * Returns the command name.
-     *
-     * @return string The command name
-     *
-     * @api
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the description for the command.
-     *
-     * @param string $description The description for the command
-     *
-     * @return Command The current instance
-     *
-     * @api
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Returns the description for the command.
-     *
-     * @return string The description for the command
-     *
-     * @api
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * Sets the help for the command.
-     *
-     * @param string $help The help for the command
-     *
-     * @return Command The current instance
-     *
-     * @api
-     */
-    public function setHelp($help)
-    {
-        $this->help = $help;
-
-        return $this;
-    }
-
-    /**
-     * Returns the help for the command.
-     *
-     * @return string The help for the command
-     *
-     * @api
-     */
-    public function getHelp()
-    {
-        return $this->help;
-    }
-
-    /**
-     * Returns the processed help for the command replacing the %command.name% and
-     * %command.full_name% patterns with the real values dynamically.
-     *
-     * @return string The processed help for the command
-     */
-    public function getProcessedHelp()
-    {
-        $name = $this->name;
-
-        $placeholders = array(
-            '%command.name%',
-            '%command.full_name%',
-        );
-        $replacements = array(
-            $name,
-            $_SERVER['PHP_SELF'].' '.$name,
-        );
-
-        return str_replace($placeholders, $replacements, $this->getHelp());
-    }
-
-    /**
-     * Sets the aliases for the command.
-     *
-     * @param string[] $aliases An array of aliases for the command
-     *
-     * @return Command The current instance
-     *
-     * @throws \InvalidArgumentException When an alias is invalid
-     *
-     * @api
-     */
-    public function setAliases($aliases)
-    {
-        if (!is_array($aliases) && !$aliases instanceof \Traversable) {
-            throw new \InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
-        }
-
-        foreach ($aliases as $alias) {
-            $this->validateName($alias);
-        }
-
-        $this->aliases = $aliases;
-
-        return $this;
-    }
-
-    /**
-     * Returns the aliases for the command.
-     *
-     * @return array An array of aliases for the command
-     *
-     * @api
-     */
-    public function getAliases()
-    {
-        return $this->aliases;
-    }
-
-    /**
-     * Returns the synopsis for the command.
-     *
-     * @return string The synopsis
-     */
-    public function getSynopsis()
-    {
-        if (null === $this->synopsis) {
-            $this->synopsis = trim(sprintf('%s %s', $this->name, $this->definition->getSynopsis()));
-        }
-
-        return $this->synopsis;
     }
 
     /**
@@ -648,18 +407,20 @@ class Command
     }
 
     /**
-     * Validates a command name.
+     * Set the configuration for the command.
      *
-     * It must be non-empty and parts can optionally be separated by ":".
+     * Use this if the configuration was defined separately from the command.
      *
-     * @param string $name
-     *
-     * @throws \InvalidArgumentException When the name is invalid
+     * @param CommandConfiguration $configuration
      */
-    private function validateName($name)
+    public function setConfiguration(CommandConfiguration $configuration)
     {
-        if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
-        }
+        $this->setEnabled($configuration->isEnabled());
+        $this->setName($configuration->getName());
+        $this->setProcessTitle($configuration->getProcessTitle());
+        $this->setAliases($configuration->getAliases());
+        parent::setDefinition($configuration->getDefinition());
+        $this->setHelp($configuration->getHelp());
+        $this->setDescription($configuration->getDescription());
     }
 }

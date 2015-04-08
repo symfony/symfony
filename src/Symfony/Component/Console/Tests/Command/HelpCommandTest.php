@@ -31,7 +31,7 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
-        $command->setCommand(new ListCommand());
+        $command->setTargetCommand(new ListCommand());
         $commandTester->execute(array());
         $this->assertRegExp('/list \[--xml\] \[--raw\] \[--format="\.\.\."\] \[namespace\]/', $commandTester->getDisplay(), '->execute() returns a text help for the given command');
     }
@@ -40,7 +40,7 @@ class HelpCommandTest extends \PHPUnit_Framework_TestCase
     {
         $command = new HelpCommand();
         $commandTester = new CommandTester($command);
-        $command->setCommand(new ListCommand());
+        $command->setTargetCommand(new ListCommand());
         $commandTester->execute(array('--format' => 'xml'));
         $this->assertRegExp('/<command/', $commandTester->getDisplay(), '->execute() returns an XML help text if --xml is passed');
     }

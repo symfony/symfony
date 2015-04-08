@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
@@ -183,6 +184,34 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('en-US', $translator->getLocale());
     }
 
+    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
+    {
+        /*
+         * Because the cache file contains a catalogue including all of its fallback
+         * catalogues, we must take the active set of fallback locales into
+         * consideration when loading a catalogue from the cache.
+         */
+        $translator = $this->createTranslator(new ArrayLoader(), array('cache_dir' => $this->tmpDir));
+        $translator->setLocale('a');
+        $translator->setFallbackLocales(array('b'));
+        $translator->addResource('loader', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('loader', array('bar' => 'bar (b)'), 'b');
+
+        $this->assertEquals('bar (b)', $translator->trans('bar'));
+
+        // Remove fallback locale
+        $translator->setFallbackLocales(array());
+        $this->assertEquals('bar', $translator->trans('bar'));
+
+        // Use a fresh translator with no fallback locales, result should be the same
+        $translator = $this->createTranslator(new ArrayLoader(), array('cache_dir' => $this->tmpDir));
+        $translator->setLocale('a');
+        $translator->addResource('loader', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('loader', array('bar' => 'bar (b)'), 'b');
+
+        $this->assertEquals('bar', $translator->trans('bar'));
+    }
+
     protected function getCatalogue($locale, $messages)
     {
         $catalogue = new MessageCatalogue($locale);
@@ -265,12 +294,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
-        $translator = new $translatorClass(
-            $this->getContainer($loader),
-            new MessageSelector(),
-            array('loader' => array('loader')),
-            $options
-        );
+        $translator = $this->createTranslator($loader, $options, $translatorClass);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');
@@ -279,6 +303,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
         $translator->addResource('loader', 'foo', 'fr.UTF-8');
         $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+
+        return $translator;
+    }
+
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    {
+        $translator = new $translatorClass(
+            $this->getContainer($loader),
+            new MessageSelector(),
+            array('loader' => array('loader')),
+            $options
+        );
 
         return $translator;
     }

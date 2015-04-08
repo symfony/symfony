@@ -14,6 +14,8 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Loader\PhpFileLoader;
+use Symfony\Component\Translation\Dumper\PhpFileDumper;
 
 class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -127,6 +129,29 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertFalse(file_exists($this->tmpDir.'/catalogue.invalid locale.php'));
         }
+    }
+
+    public function testRefreshCacheWhenResourcesFileChange()
+    {
+        $resourceFile = $this->tmpDir.'/messages.fr.php';
+        $loader = new PhpFileLoader();
+        $dumper = new PhpFileDumper();
+
+        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $dumper->dump($this->getCatalogue('fr', array('foo' => 'foo A')), array('path' => $this->tmpDir));
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', $resourceFile, 'fr');
+        $this->assertEquals('foo A', $translator->trans('foo'));
+
+        $dumper->dump($this->getCatalogue('fr', array('foo' => 'foo B')), array('path' => $this->tmpDir));
+        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', $resourceFile, 'fr');
+
+        // Touch the resourceFile, we'll set it to one +1 hour.
+        touch($resourceFile, time() + 3600);
+
+        $this->assertEquals('foo B', $translator->trans('foo'));
     }
 
     protected function getCatalogue($locale, $messages)

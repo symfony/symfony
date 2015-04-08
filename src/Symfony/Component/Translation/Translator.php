@@ -372,7 +372,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $cacheFile = $this->cacheDir.'/catalogue.'.$locale.'.php';
+        $cacheFile = $this->getCatalogueCachePath($locale);
         $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
         $cache = $this->getConfigCacheFactory()->cache($cacheFile,
             function (ConfigCacheInterface $cache) use ($self, $locale) {
@@ -501,6 +501,11 @@ EOF
         }
 
         return sha1(serialize($this->resources[$locale]));
+    }
+
+    private function getCatalogueCachePath($locale)
+    {
+        return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->fallbackLocales)).'.php';
     }
 
     private function doLoadCatalogue($locale)

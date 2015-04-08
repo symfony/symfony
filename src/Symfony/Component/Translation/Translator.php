@@ -13,7 +13,9 @@ namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheFactory;
 
 /**
  * Translator.
@@ -65,6 +67,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $debug;
 
     /**
+     * @var ConfigCacheFactoryInterface|null
+     */
+    private $configCacheFactory;
+
+    /**
      * Constructor.
      *
      * @param string               $locale   The locale
@@ -82,6 +89,16 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->selector = $selector ?: new MessageSelector();
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
+    }
+
+    /**
+     * Sets the ConfigCache factory to use.
+     *
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     */
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    {
+        $this->configCacheFactory = $configCacheFactory;
     }
 
     /**
@@ -297,7 +314,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         return $messages;
     }
 
-    /*
+    /**
      * @param string $locale
      */
     protected function loadCatalogue($locale)
@@ -328,21 +345,71 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * @param string $locale
-     * @param bool   $forceRefresh
      */
-    private function initializeCacheCatalogue($locale, $forceRefresh = false)
+    private function initializeCacheCatalogue($locale)
     {
         if (isset($this->catalogues[$locale])) {
+            /* Catalogue already initialized. */
             return;
         }
 
         $this->assertValidLocale($locale);
-        $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
-        if ($forceRefresh || !$cache->isFresh()) {
-            $this->initializeCatalogue($locale);
-            $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
+        $cacheFile = $this->cacheDir.'/catalogue.'.$locale.'.php';
+        $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
+        $cache = $this->getConfigCacheFactory()->cache($cacheFile,
+            function (ConfigCacheInterface $cache) use ($self, $locale) {
+                $self->dumpCatalogue($locale, $cache);
+            }
+        );
 
-            $content = sprintf(<<<EOF
+        if (isset($this->catalogues[$locale])) {
+            /* Catalogue has been initialized as it was written out to cache. */
+            return;
+        }
+
+        /* Read catalogue from cache. */
+        $catalogue = include $cache->getPath();
+
+        /*
+         * Gracefully handle the case when the cached catalogue is in an "old" format, without a resourcesHash
+         */
+        $resourcesHash = null;
+        if (is_array($catalogue)) {
+            list($catalogue, $resourcesHash) = $catalogue;
+        }
+
+        if ($this->debug && $resourcesHash !== $this->getResourcesHash($locale)) {
+            /*
+             * This approach of resource checking has the disadvantage that a second
+             * type of freshness check happens based on content *inside* the cache, while
+             * the idea of ConfigCache is to make this check transparent to the client (and keeps
+             * the resources in a .meta file).
+             *
+             * Thus, we might run into the unfortunate situation that we just thought (a few lines above)
+             * that the cache is fresh -- and now that we look into it, we figure it's not.
+             *
+             * For now, just unlink the cache and try again. See
+             * https://github.com/symfony/symfony/pull/11862#issuecomment-54634631 and/or
+             * https://github.com/symfony/symfony/issues/7176 for possible better approaches.
+             */
+            unlink($cacheFile);
+            $this->initializeCacheCatalogue($locale);
+        } else {
+            /* Initialize with catalogue from cache. */
+            $this->catalogues[$locale] = $catalogue;
+        }
+    }
+
+    /**
+     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
+     * @internal
+     */
+    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    {
+        $this->initializeCatalogue($locale);
+        $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
+
+        $content = sprintf(<<<EOF
 <?php
 
 use Symfony\Component\Translation\MessageCatalogue;
@@ -354,33 +421,14 @@ use Symfony\Component\Translation\MessageCatalogue;
 return array(\$catalogue, \$resourcesHash);
 
 EOF
-                ,
-                $this->getResourcesHash($locale),
-                $locale,
-                var_export($this->catalogues[$locale]->all(), true),
-                $fallbackContent
-            );
+            ,
+            $this->getResourcesHash($locale),
+            $locale,
+            var_export($this->catalogues[$locale]->all(), true),
+            $fallbackContent
+        );
 
-            $cache->write($content, $this->catalogues[$locale]->getResources());
-
-            return;
-        }
-
-        $catalogue = include $cache;
-
-        /*
-         * Old cache returns only the catalogue, without resourcesHash
-         */
-        $resourcesHash = null;
-        if (is_array($catalogue)) {
-            list($catalogue, $resourcesHash) = $catalogue;
-        }
-
-        if ($this->debug && $resourcesHash !== $this->getResourcesHash($locale)) {
-            return $this->initializeCacheCatalogue($locale, true);
-        }
-
-        $this->catalogues[$locale] = $catalogue;
+        $cache->write($content, $this->catalogues[$locale]->getResources());
     }
 
     private function getFallbackContent(MessageCatalogue $catalogue)
@@ -495,5 +543,20 @@ EOF
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
+    }
+
+    /**
+     * Provides the ConfigCache factory implementation, falling back to a
+     * default implementation if necessary.
+     *
+     * @return ConfigCacheFactoryInterface $configCacheFactory
+     */
+    private function getConfigCacheFactory()
+    {
+        if (!$this->configCacheFactory) {
+            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
+        }
+
+        return $this->configCacheFactory;
     }
 }

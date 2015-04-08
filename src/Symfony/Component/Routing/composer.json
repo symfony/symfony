@@ -28,6 +28,9 @@
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/config": "<2.7"
+    },
     "suggest": {
         "symfony/config": "For using the all-in-one router or any loader",
         "symfony/yaml": "For using the YAML loader",

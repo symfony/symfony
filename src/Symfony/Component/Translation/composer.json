@@ -25,6 +25,9 @@
         "symfony/yaml": "~2.7|~3.0",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/config": "<2.7"
+    },
     "suggest": {
         "symfony/config": "",
         "symfony/yaml": "",

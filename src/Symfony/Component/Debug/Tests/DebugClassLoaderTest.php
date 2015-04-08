@@ -61,6 +61,10 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testUnsilencing()
     {
+        if (PHP_VERSION_ID >= 70000) {
+            $this->markTestSkipped('PHP7 throws exceptions, unsilencing is not required anymore.');
+        }
+
         ob_start();
 
         $this->iniSet('log_errors', 0);

@@ -40,6 +40,9 @@
         "symfony/translation": "~2.7|~3.0",
         "symfony/var-dumper": "~2.7|~3.0"
     },
+    "conflict": {
+        "symfony/config": "<2.7"
+    },
     "suggest": {
         "symfony/browser-kit": "",
         "symfony/class-loader": "",

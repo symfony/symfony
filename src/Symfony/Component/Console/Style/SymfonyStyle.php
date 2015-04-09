@@ -73,7 +73,7 @@ class SymfonyStyle extends OutputStyle
             $message = OutputFormatter::escape($message);
             $lines = array_merge($lines, explode("\n", wordwrap($message, $this->lineLength - Helper::strlen($prefix))));
 
-            if (count($messages) > 1 && $key < count($message)) {
+            if (count($messages) > 1 && $key < count($messages) - 1) {
                 $lines[] = '';
             }
         }

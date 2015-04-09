@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-09T15:15:54Z
+
+@mpdude I made an update that refer to your comment, is it ok :) ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-09T15:30:30Z
+
+:+1: for the "expect never" change.
+
+Besides that, I wouldn't touch the cache file. How that works (and what effects it has) is an implementation detail of the `ConfigCache`. And I don't see what additional assertions this change would bring.
+
+Maybe someone else can comment?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-09T18:25:28Z
+
+it seems to be OK, I'll merge it.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-09T18:28:00Z
+
+Disregard my previous comment – I was looking at an outdated version of the "Files changed" tab.
+
+Sorry.

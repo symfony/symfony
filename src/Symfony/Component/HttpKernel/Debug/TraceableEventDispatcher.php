@@ -472,9 +472,9 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         // get the original listener
         if (is_object($listener)) {
             if (null === $eventId) {
-                foreach (array_keys($this->wrappedListeners) as $eventId) {
-                    if (isset($this->wrappedListeners[$eventId][$listener])) {
-                        return $this->wrappedListeners[$eventId][$listener];
+                foreach ($this->wrappedListeners as $eventId => $eventListeners) {
+                    if (isset($eventListeners[$listener])) {
+                        return $eventListeners[$listener];
                     }
                 }
             } elseif (isset($this->wrappedListeners[$eventId][$listener])) {

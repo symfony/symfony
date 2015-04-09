@@ -1388,6 +1388,27 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
         );
     }
 
+    public function testRange()
+    {
+        $form = $this->factory->createNamed('name', 'range', 123.45, array(
+            'min' => 1.25,
+            'max' => 234.56,
+            'step' => 0.25,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array('attr' => array('class' => 'my&class')),
+'/input
+    [@type="range"]
+    [@name="name"]
+    [@min="1.25"]
+    [@max="234.56"]
+    [@step="0.25"]
+    [@class="my&class form-control"]
+    [@value="123.45"]
+'
+        );
+    }
+
     public function testLanguage()
     {
         $form = $this->factory->createNamed('name', 'language', 'de');

@@ -352,7 +352,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $cache = new ConfigCache($this->cacheDir.'/catalogue.'.$locale.'.php', $this->debug);
+        $cache = new ConfigCache($this->getCatalogueCachePath($locale), $this->debug);
         if (!$cache->isFresh()) {
             $this->initializeCatalogue($locale);
 
@@ -402,6 +402,11 @@ EOF
         }
 
         $this->catalogues[$locale] = include $cache;
+    }
+
+    private function getCatalogueCachePath($locale)
+    {
+        return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->fallbackLocales)).'.php';
     }
 
     private function doLoadCatalogue($locale)

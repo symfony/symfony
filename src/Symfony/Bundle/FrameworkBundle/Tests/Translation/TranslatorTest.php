@@ -255,12 +255,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
             ),
         );
+        $catalogueHash = sha1(serialize(array(
+            'resources' => array(),
+            'fallback_locales' => array(),
+        )));
 
         // prime the cache
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir,  'resource_files' => $resourceFiles), 'yml');
-        $this->assertFalse(file_exists($this->tmpDir.'/catalogue.fr.php'));
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
+
+        $this->assertFalse(file_exists($this->tmpDir.'/catalogue.fr.'.$catalogueHash.'.php'));
         $translator->warmup($this->tmpDir);
-        $this->assertTrue(file_exists($this->tmpDir.'/catalogue.fr.php'));
+        $this->assertTrue(file_exists($this->tmpDir.'/catalogue.fr.'.$catalogueHash.'.php'));
     }
 }
 

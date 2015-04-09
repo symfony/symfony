@@ -18,14 +18,14 @@ namespace Symfony\Component\Routing;
  */
 class CompiledRoute implements \Serializable
 {
-    private $variables;
-    private $tokens;
-    private $staticPrefix;
-    private $regex;
-    private $pathVariables;
-    private $hostVariables;
-    private $hostRegex;
-    private $hostTokens;
+    protected $variables;
+    protected $tokens;
+    protected $staticPrefix;
+    protected $regex;
+    protected $pathVariables;
+    protected $hostVariables;
+    protected $hostRegex;
+    protected $hostTokens;
 
     /**
      * Constructor.

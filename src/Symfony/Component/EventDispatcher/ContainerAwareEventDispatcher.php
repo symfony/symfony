@@ -124,7 +124,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     public function getListeners($eventName = null)
     {
         if (null === $eventName) {
-            foreach (array_keys($this->listenerIds) as $serviceEventName) {
+            foreach ($this->listenerIds as $serviceEventName => $args) {
                 $this->lazyLoad($serviceEventName);
             }
         } else {

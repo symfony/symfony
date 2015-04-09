@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
@@ -105,7 +104,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->trans('foo');
     }
 
-    public function testLoadRessourcesWithCaching()
+    public function testLoadResourcesWithCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
@@ -133,7 +132,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('folder', $translator->trans('folder'));
     }
 
-    public function testLoadRessourcesWithoutCaching()
+    public function testLoadResourcesWithoutCaching()
     {
         $loader = new \Symfony\Component\Translation\Loader\YamlFileLoader();
         $resourceFiles = array(
@@ -271,17 +270,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 __DIR__.'/../Fixtures/Resources/translations/messages.fr.yml',
             ),
         );
-        $catalogueHash = sha1(serialize(array(
-            'resources' => array(),
-            'fallback_locales' => array(),
-        )));
 
         // prime the cache
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
-
-        $this->assertFalse(file_exists($this->tmpDir.'/catalogue.fr.'.$catalogueHash.'.php'));
+        $translator->setLocale('fr');
         $translator->warmup($this->tmpDir);
-        $this->assertTrue(file_exists($this->tmpDir.'/catalogue.fr.'.$catalogueHash.'.php'));
+
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader
+            ->expects($this->never())
+            ->method('load');
+
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'resource_files' => $resourceFiles), 'yml');
+        $translator->setLocale('fr');
+        $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
     private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator', $loaderFomat = 'loader')

@@ -4,7 +4,7 @@ CHANGELOG
 3.0.0
 -----
 
- * The first argument of `Crawler::each()` and `Crawler::reduce()` are type hinted with `callback` instead of `Closure`.
+ * The first argument of `Crawler::each()` and `Crawler::reduce()` are type hinted with `callable` instead of `Closure`.
 
 2.5.0
 -----

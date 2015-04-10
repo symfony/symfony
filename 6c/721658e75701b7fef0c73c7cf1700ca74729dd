@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by barryvdh at 2015-04-09T07:46:44Z
+
+But actually, the reason for that check is that you don't want to add an extra line if it's the last message, right? So shouldn't the check be `&& $key < count($messages) - 1`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-10T14:16:14Z
+
+ping @kbond
+
+---------------------------------------------------------------------------
+
+by kbond at 2015-04-10T15:22:26Z
+
+Looks good to me.

@@ -19,9 +19,9 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/event-dispatcher": "~2.1|~3.0.0",
-        "symfony/process": "~2.1|~3.0.0",
+        "symfony/phpunit-bridge": "~2.7",
+        "symfony/event-dispatcher": "~2.1",
+        "symfony/process": "~2.1",
         "psr/log": "~1.0"
     },
     "suggest": {

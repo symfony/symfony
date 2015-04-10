@@ -17,12 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/dependency-injection": "~2.3|~3.0.0",
+        "symfony/dependency-injection": "~2.3",
         "ocramius/proxy-manager": "~0.4|~1.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/config": "~2.3|~3.0.0"
+        "symfony/phpunit-bridge": "~2.7",
+        "symfony/config": "~2.3"
     },
     "autoload": {
         "psr-0": {

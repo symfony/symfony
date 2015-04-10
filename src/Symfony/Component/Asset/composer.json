@@ -22,7 +22,7 @@
         "symfony/http-foundation": ""
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/phpunit-bridge": "~2.7",
         "symfony/http-foundation": "~2.4"
     },
     "autoload": {

@@ -29,7 +29,7 @@
     "target-dir": "Symfony/Component/ClassLoader",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

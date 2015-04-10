@@ -22,4 +22,4 @@ You can run the unit tests with the following command:
     $ phpunit
 
 [0]: http://www.php.net/manual/en/intl.setup.php
-[1]: http://symfony.com/doc/2.7/components/intl.html
+[1]: http://symfony.com/doc/2.8/components/intl.html

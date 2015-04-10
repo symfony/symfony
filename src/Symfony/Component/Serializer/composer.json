@@ -19,10 +19,10 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0",
-        "symfony/yaml": "~2.0|~3.0.0",
-        "symfony/config": "~2.2|~3.0.0",
-        "symfony/property-access": "~2.3|~3.0.0",
+        "symfony/phpunit-bridge": "~2.7",
+        "symfony/yaml": "~2.0",
+        "symfony/config": "~2.2",
+        "symfony/property-access": "~2.3",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },

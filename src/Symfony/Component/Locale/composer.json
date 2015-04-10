@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/intl": "~2.3|~3.0.0"
+        "symfony/intl": "~2.3"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0.0"
+        "symfony/phpunit-bridge": "~2.7"
     },
     "autoload": {
         "psr-0": { "Symfony\\Component\\Locale\\": "" }

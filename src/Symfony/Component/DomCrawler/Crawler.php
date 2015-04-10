@@ -323,9 +323,9 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Calls an anonymous function on each node of the list.
+     * Execute a callback on each node of the list.
      *
-     * The anonymous function receives the position and the node wrapped
+     * The callback receives the position and the node wrapped
      * in a Crawler instance as arguments.
      *
      * Example:
@@ -334,17 +334,17 @@ class Crawler extends \SplObjectStorage
      *         return $node->text();
      *     });
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $fn A callback
      *
-     * @return array An array of values returned by the anonymous function
+     * @return array An array of values returned by the callback
      *
      * @api
      */
-    public function each(\Closure $closure)
+    public function each(callable $fn)
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $closure(new static($node, $this->uri, $this->baseHref), $i);
+            $data[] = $fn(new static($node, $this->uri, $this->baseHref), $i);
         }
 
         return $data;
@@ -364,21 +364,21 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
-     * Reduces the list of nodes by calling an anonymous function.
+     * Reduces the list of nodes by calling a callback.
      *
-     * To remove a node from the list, the anonymous function must return false.
+     * To remove a node from the list, the callback must return false.
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $fn A callback
      *
      * @return Crawler A Crawler instance with the selected nodes.
      *
      * @api
      */
-    public function reduce(\Closure $closure)
+    public function reduce(callable $fn)
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $closure(new static($node, $this->uri, $this->baseHref), $i)) {
+            if (false !== $fn(new static($node, $this->uri, $this->baseHref), $i)) {
                 $nodes[] = $node;
             }
         }

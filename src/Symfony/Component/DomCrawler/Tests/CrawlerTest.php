@@ -310,7 +310,7 @@ EOF
             return $i.'-'.$node->text();
         });
 
-        $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
+        $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes a callback on each node of the list');
     }
 
     public function testSlice()

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-04-06T12:10:05Z
+
+:+1: and yes its a new feature, but the maintainers should be able to merge to 2.7 without reopening.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-06T12:38:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-10T08:03:57Z
+
+Could it be in 2.7 beta1 ?
+ping @stof @fabpot
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-10T08:09:00Z
+
+this is a new feature, so it should go in 2.7.
+
+:+1: from me. @fabpot I think we could still include it in 2.7-beta1
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-10T08:10:01Z
+
+So should I recreate the PR ? Or you can merge it in 2.7 ?

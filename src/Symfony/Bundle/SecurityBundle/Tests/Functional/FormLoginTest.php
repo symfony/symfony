@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-/**
- * @group functional
- */
 class FormLoginTest extends WebTestCase
 {
     /**

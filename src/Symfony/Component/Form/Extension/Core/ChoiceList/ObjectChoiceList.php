@@ -33,9 +33,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
- *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList}
- *             instead.
+ * @deprecated since Symfony 2.7, to be removed in version 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ArrayChoiceList} instead.
  */
 class ObjectChoiceList extends ChoiceList
 {

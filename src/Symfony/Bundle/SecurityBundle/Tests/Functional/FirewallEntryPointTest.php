@@ -13,9 +13,6 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 
-/**
- * @group functional
- */
 class FirewallEntryPointTest extends WebTestCase
 {
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()

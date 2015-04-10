@@ -28,7 +28,7 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInter
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since Symfony 2.7, to be removed in Symfony 3.0.
+ * @deprecated since version 2.7, to be removed in 3.0.
  *             Use {@link BaseChoiceListInterface} instead.
  */
 interface ChoiceListInterface extends BaseChoiceListInterface

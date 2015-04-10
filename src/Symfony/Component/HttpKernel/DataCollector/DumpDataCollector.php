@@ -79,7 +79,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $line = $trace[$i]['line'];
 
                 while (++$i < 7) {
-                    if (isset($trace[$i]['function']) && empty($trace[$i]['class']) && 'call_user_func' !== $trace[$i]['function']) {
+                    if (isset($trace[$i]['function'], $trace[$i]['file']) && empty($trace[$i]['class']) && 0 !== strpos($trace[$i]['function'], 'call_user_func')) {
                         $file = $trace[$i]['file'];
                         $line = $trace[$i]['line'];
 

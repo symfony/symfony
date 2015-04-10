@@ -354,9 +354,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $cacheFile = $this->cacheDir.'/catalogue.'.$locale.'.php';
         $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-        $cache = $this->getConfigCacheFactory()->cache($cacheFile,
+        $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
             function (ConfigCacheInterface $cache) use ($self, $locale) {
                 $self->dumpCatalogue($locale, $cache);
             }
@@ -368,40 +367,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         /* Read catalogue from cache. */
-        $catalogue = include $cache->getPath();
-
-        /*
-         * Gracefully handle the case when the cached catalogue is in an "old" format, without a resourcesHash
-         */
-        $resourcesHash = null;
-        if (is_array($catalogue)) {
-            list($catalogue, $resourcesHash) = $catalogue;
-        }
-
-        if ($this->debug && $resourcesHash !== $this->getResourcesHash($locale)) {
-            /*
-             * This approach of resource checking has the disadvantage that a second
-             * type of freshness check happens based on content *inside* the cache, while
-             * the idea of ConfigCache is to make this check transparent to the client (and keeps
-             * the resources in a .meta file).
-             *
-             * Thus, we might run into the unfortunate situation that we just thought (a few lines above)
-             * that the cache is fresh -- and now that we look into it, we figure it's not.
-             *
-             * For now, just unlink the cache and try again. See
-             * https://github.com/symfony/symfony/pull/11862#issuecomment-54634631 and/or
-             * https://github.com/symfony/symfony/issues/7176 for possible better approaches.
-             */
-            unlink($cacheFile);
-            $this->initializeCacheCatalogue($locale);
-        } else {
-            /* Initialize with catalogue from cache. */
-            $this->catalogues[$locale] = $catalogue;
-        }
+        $this->catalogues[$locale] = include $cache->getPath();
     }
 
     /**
      * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
+     *
      * @internal
      */
     public function dumpCatalogue($locale, ConfigCacheInterface $cache)
@@ -414,15 +385,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
 
 use Symfony\Component\Translation\MessageCatalogue;
 
-\$resourcesHash = '%s';
 \$catalogue = new MessageCatalogue('%s', %s);
 
 %s
-return array(\$catalogue, \$resourcesHash);
+return \$catalogue;
 
 EOF
             ,
-            $this->getResourcesHash($locale),
             $locale,
             var_export($this->catalogues[$locale]->all(), true),
             $fallbackContent
@@ -476,13 +445,14 @@ EOF
         return $fallbackContent;
     }
 
-    private function getResourcesHash($locale)
+    private function getCatalogueCachePath($locale)
     {
-        if (!isset($this->resources[$locale])) {
-            return '';
-        }
+        $catalogueHash = sha1(serialize(array(
+            'resources' => isset($this->resources[$locale]) ? $this->resources[$locale] : array(),
+            'fallback_locales' => $this->fallbackLocales,
+        )));
 
-        return sha1(serialize($this->resources[$locale]));
+        return $this->cacheDir.'/catalogue.'.$locale.'.'.$catalogueHash.'.php';
     }
 
     private function doLoadCatalogue($locale)

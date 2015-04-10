@@ -232,7 +232,7 @@ abstract class Constraint
      */
     public function addImplicitGroupName($group)
     {
-        if (in_array(Constraint::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
+        if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }

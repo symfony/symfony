@@ -159,7 +159,7 @@ class NativeRequestHandler implements RequestHandlerInterface
      * It's safe to pass an already converted array, in which case this method
      * just returns the original array unmodified.
      *
-     * This method is identical to {@link Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
+     * This method is identical to {@link \Symfony\Component\HttpFoundation\FileBag::fixPhpFilesArray}
      * and should be kept as such in order to port fixes quickly and easily.
      *
      * @param array $data

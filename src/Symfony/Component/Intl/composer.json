@@ -27,8 +27,8 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
-        "symfony/filesystem": "~2.7|~3.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/filesystem": "~2.8|~3.0"
     },
     "suggest": {
         "ext-intl": "to use the component with locales other than \"en\""

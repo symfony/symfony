@@ -17,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/security-core": "~2.7|~3.0"
+        "symfony/security-core": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
-        "symfony/http-foundation": "~2.7|~3.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/http-foundation": "For using the class SessionTokenStorage."

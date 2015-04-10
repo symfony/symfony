@@ -17,19 +17,19 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/event-dispatcher": "~2.7|~3.0",
-        "symfony/intl": "~2.7|~3.0",
-        "symfony/options-resolver": "~2.7|~3.0",
-        "symfony/property-access": "~2.7|~3.0"
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/options-resolver": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.7|~3.0",
-        "symfony/http-foundation": "~2.7|~3.0",
-        "symfony/http-kernel": "~2.7|~3.0",
-        "symfony/security-csrf": "~2.7|~3.0",
-        "symfony/translation": "~2.7|~3.0"
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/validator": "For form validation.",

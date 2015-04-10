@@ -23,10 +23,10 @@
         "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
-        "symfony/class-loader": "~2.7|~3.0",
-        "symfony/http-kernel": "~2.7|~3.0",
-        "symfony/http-foundation": "~2.7|~3.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/class-loader": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/http-foundation": "",

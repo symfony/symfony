@@ -19,14 +19,14 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
-        "symfony/config": "~2.7|~3.0",
-        "symfony/intl": "~2.7|~3.0",
-        "symfony/yaml": "~2.7|~3.0",
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/yaml": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "conflict": {
-        "symfony/config": "<2.7"
+        "symfony/config": "<2.8"
     },
     "suggest": {
         "symfony/config": "",

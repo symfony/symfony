@@ -20,10 +20,10 @@
         "monolog/monolog": "~1.11"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7|~3.0",
-        "symfony/http-kernel": "~2.7|~3.0",
-        "symfony/console": "~2.7|~3.0",
-        "symfony/event-dispatcher": "~2.7|~3.0"
+        "symfony/phpunit-bridge": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/console": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/http-kernel": "For using the debugging handlers together with the response life cycle of the HTTP kernel.",

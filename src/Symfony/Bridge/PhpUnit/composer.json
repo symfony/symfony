@@ -23,9 +23,8 @@
     },
     "autoload": {
         "files": [ "bootstrap.php" ],
-        "psr-0": { "Symfony\\Bridge\\PhpUnit\\": "" }
+        "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" }
     },
-    "target-dir": "Symfony/Bridge/PhpUnit",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

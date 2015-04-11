@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInterface;
+use Symfony\Component\Form\FormConfigBuilder;
 
 /**
  * Contains choices that can be selected in a form field.

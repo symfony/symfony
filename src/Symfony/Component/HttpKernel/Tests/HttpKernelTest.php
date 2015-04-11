@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHandleWhenControllerThrowsAnExceptionAndRawIsTrue()
+    public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrue()
     {
         $exception = new \RuntimeException();
         $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () use ($exception) { throw $exception; }));
@@ -39,14 +39,14 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalseAndNoListenerIsRegistered()
+    public function testHandleWhenControllerThrowsAnExceptionAndCatchIsFalseAndNoListenerIsRegistered()
     {
         $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
         $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
     }
 
-    public function testHandleWhenControllerThrowsAnExceptionAndRawIsFalse()
+    public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithAHandlingListener()
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
@@ -54,10 +54,29 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         });
 
         $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
-        $response = $kernel->handle(new Request());
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
 
         $this->assertEquals('500', $response->getStatusCode());
         $this->assertEquals('foo', $response->getContent());
+    }
+
+    public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithANonHandlingListener()
+    {
+        $exception = new \RuntimeException();
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
+            // should set a response, but does not
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use($exception) { throw $exception; }));
+
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $this->fail('LogicException expected');
+        } catch (\LogicException $e) {
+            $this->assertSame($exception, $e->getPrevious());
+        }
     }
 
     public function testHandleExceptionWithARedirectionResponse()

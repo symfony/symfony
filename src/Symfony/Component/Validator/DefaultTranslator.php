@@ -92,7 +92,7 @@ class DefaultTranslator implements TranslatorInterface
      * have the same expressiveness. While Translator supports intervals in
      * message translations, which are needed for languages other than English,
      * this translator does not. You should use Translator or a custom
-     * implementation of {@link TranslatorInterface} if you need this or similar
+     * implementation of {@link \Symfony\Component\Translation\TranslatorInterface} if you need this or similar
      * functionality.
      *
      * Example usage:

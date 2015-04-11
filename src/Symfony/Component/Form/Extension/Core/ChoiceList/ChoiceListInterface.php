@@ -127,7 +127,7 @@ interface ChoiceListInterface
      * Returns the indices corresponding to the given choices.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *
@@ -145,7 +145,7 @@ interface ChoiceListInterface
      * Returns the indices corresponding to the given values.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *

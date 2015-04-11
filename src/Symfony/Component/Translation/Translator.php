@@ -16,6 +16,7 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Translation\Catalogue\DiffOperation;
 
 /**
  * Translator.
@@ -420,21 +421,6 @@ EOF
 
     private function getFallbackContent(MessageCatalogue $catalogue)
     {
-        if (!$this->debug) {
-            // merge all fallback catalogues messages into $catalogue
-            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            $messages = $catalogue->all();
-            while ($fallbackCatalogue) {
-                $messages = array_replace_recursive($fallbackCatalogue->all(), $messages);
-                $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-            }
-            foreach ($messages as $domain => $domainMessages) {
-                $catalogue->add($domainMessages, $domain);
-            }
-
-            return '';
-        }
-
         $fallbackContent = '';
         $current = '';
         $replacementPattern = '/[^a-z0-9_]/i';
@@ -444,6 +430,18 @@ EOF
             $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
             $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
 
+            if (!$this->debug) {
+                // keep only missing messages.
+                $currentCatalogue = new MessageCatalogue($fallbackCatalogue->getLocale(), $catalogue->all());
+                $operation = new DiffOperation($fallbackCatalogue, $currentCatalogue);
+                $fallbackMessages = array();
+                foreach ($operation->getDomains() as $domain) {
+                    $fallbackMessages[$domain] = $operation->getObsoleteMessages($domain);
+                }
+            } else {
+                $fallbackMessages = $fallbackCatalogue->all();
+            }
+
             $fallbackContent .= sprintf(<<<EOF
 \$catalogue%s = new MessageCatalogue('%s', %s);
 \$catalogue%s->addFallbackCatalogue(\$catalogue%s);
@@ -452,7 +450,7 @@ EOF
                 ,
                 $fallbackSuffix,
                 $fallback,
-                var_export($fallbackCatalogue->all(), true),
+                var_export($fallbackMessages, true),
                 $currentSuffix,
                 $fallbackSuffix
             );

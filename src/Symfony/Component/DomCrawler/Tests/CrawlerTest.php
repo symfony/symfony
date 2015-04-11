@@ -304,13 +304,22 @@ EOF
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
-    public function testEach()
+    /**
+     * @dataProvider testEachProvider
+     */
+    public function testEach($callback)
     {
-        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(function ($node, $i) {
-            return $i.'-'.$node->text();
-        });
+        $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each($callback);
 
         $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes a callback on each node of the list');
+    }
+
+    public function testEachProvider()
+    {
+        return array(
+            array(function ($node, $i) { return $i.'-'.$node->text(); }),
+            array(array(new MyCallback(), 'eachCallback')),
+        );
     }
 
     public function testSlice()
@@ -323,16 +332,25 @@ EOF
         $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
     }
 
-    public function testReduce()
+    /**
+     * @dataProvider testReduceProvider
+     */
+    public function testReduce($callback)
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
-        $nodes = $crawler->reduce(function ($node, $i) {
-            return $i !== 1;
-        });
+        $nodes = $crawler->reduce($callback);
         $this->assertNotSame($nodes, $crawler, '->reduce() returns a new instance of a crawler');
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $nodes, '->reduce() returns a new instance of a crawler');
 
         $this->assertCount(2, $nodes, '->reduce() filters the nodes in the list');
+    }
+
+    public function testReduceProvider()
+    {
+        return array(
+            array(function ($node, $i) { return $i !== 1; }),
+            array(array(new MyCallback(), 'reduceCallback')),
+        );
     }
 
     public function testAttr()
@@ -1068,5 +1086,18 @@ HTML;
         $domxpath = new \DOMXPath($dom);
 
         return $domxpath->query('//div');
+    }
+}
+
+class MyCallback
+{
+    public function eachCallback($node, $i)
+    {
+        return $i.'-'.$node->text();
+    }
+
+    public function reduceCallback($node, $i)
+    {
+        return $i !== 1;
     }
 }

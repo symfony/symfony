@@ -28,9 +28,8 @@
         "symfony/process": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\BrowserKit\\": "" }
+        "psr-4": { "Symfony\\Component\\BrowserKit\\": "" }
     },
-    "target-dir": "Symfony/Component/BrowserKit",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

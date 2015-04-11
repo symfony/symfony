@@ -33,9 +33,8 @@
         "symfony/routing": "For using the HttpUtils class to create sub-requests, redirect the user, and match URLs"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\Http\\": "" }
+        "psr-4": { "Symfony\\Component\\Security\\Http\\": "" }
     },
-    "target-dir": "Symfony/Component/Security/Http",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

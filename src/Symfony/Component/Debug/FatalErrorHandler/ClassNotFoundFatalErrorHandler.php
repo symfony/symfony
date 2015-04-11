@@ -77,7 +77,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     /**
      * Tries to guess the full namespace for a given class name.
      *
-     * By default, it looks for PSR-0 classes registered via a Symfony or a Composer
+     * By default, it looks for PSR-0 and PSR-4 classes registered via a Symfony or a Composer
      * autoloader (that should cover all common cases).
      *
      * @param string $class A class name (without its namespace)
@@ -113,6 +113,13 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
 
             if ($function[0] instanceof ComposerClassLoader || $function[0] instanceof SymfonyClassLoader || $function[0] instanceof SymfonyUniversalClassLoader) {
                 foreach ($function[0]->getPrefixes() as $prefix => $paths) {
+                    foreach ($paths as $path) {
+                        $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
+                    }
+                }
+            }
+            if ($function[0] instanceof ComposerClassLoader) {
+                foreach ($function[0]->getPrefixesPsr4() as $prefix => $paths) {
                     foreach ($paths as $path) {
                         $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
                     }

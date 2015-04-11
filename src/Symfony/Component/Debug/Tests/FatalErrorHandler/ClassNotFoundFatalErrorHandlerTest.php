@@ -15,9 +15,30 @@ use Symfony\Component\ClassLoader\ClassLoader as SymfonyClassLoader;
 use Symfony\Component\ClassLoader\UniversalClassLoader as SymfonyUniversalClassLoader;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\FatalErrorHandler\ClassNotFoundFatalErrorHandler;
+use Symfony\Component\Debug\DebugClassLoader;
+use Composer\Autoload\ClassLoader as ComposerClassLoader;
 
 class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    public static function setUpBeforeClass()
+    {
+        foreach (spl_autoload_functions() as $function) {
+            if (!is_array($function)) {
+                continue;
+            }
+
+            // get class loaders wrapped by DebugClassLoader
+            if ($function[0] instanceof DebugClassLoader) {
+                $function = $function[0]->getClassLoader();
+            }
+
+            if ($function[0] instanceof ComposerClassLoader) {
+                $function[0]->add('Symfony\Component\Debug\Tests\Fixtures', dirname(dirname(dirname(dirname(dirname(__DIR__))))));
+                break;
+            }
+        }
+    }
+
     /**
      * @dataProvider provideClassNotFoundData
      */

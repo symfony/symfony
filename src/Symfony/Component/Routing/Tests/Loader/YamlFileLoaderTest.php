@@ -22,9 +22,11 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader($this->getMock('Symfony\Component\Config\FileLocator'));
 
         $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
+        $this->assertTrue($loader->supports('bar.yaml'), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
 
         $this->assertTrue($loader->supports('foo.yml', 'yaml'), '->supports() checks the resource type if specified');
+        $this->assertTrue($loader->supports('bar.yaml', 'yaml'), '->supports() checks the resource type if specified');
         $this->assertFalse($loader->supports('foo.yml', 'foo'), '->supports() checks the resource type if specified');
     }
 

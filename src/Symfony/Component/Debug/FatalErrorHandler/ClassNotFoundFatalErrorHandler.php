@@ -77,7 +77,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
     /**
      * Tries to guess the full namespace for a given class name.
      *
-     * By default, it looks for PSR-0 classes registered via a Symfony or a Composer
+     * By default, it looks for PSR-0 and PSR-4 classes registered via a Symfony or a Composer
      * autoloader (that should cover all common cases).
      *
      * @param string $class A class name (without its namespace)

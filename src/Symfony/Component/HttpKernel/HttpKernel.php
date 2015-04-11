@@ -229,7 +229,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         if (!$event->hasResponse()) {
             $this->finishRequest($request, $type);
 
-            throw new \LogicException('No listeners of the "kernel.exception" event set a Response', 0, $e);
+            if ($this->dispatcher->hasListeners(KernelEvents::EXCEPTION)) {
+                throw new \LogicException('No listeners of the "kernel.exception" event set a Response', 0, $e);
+            }
+
+            throw $e;
         }
 
         $response = $event->getResponse();

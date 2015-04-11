@@ -23,17 +23,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class HttpKernelTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrue()
     {
-        $exception = new \RuntimeException();
-        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () use ($exception) { throw $exception; }));
+        $kernel = new HttpKernel(new EventDispatcher(), $this->getResolver(function () { throw new \RuntimeException(); }));
 
-        try {
-            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
-            $this->fail('LogicException expected');
-        } catch (\LogicException $e) {
-            $this->assertSame($exception, $e->getPrevious());
-        }
+        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
     }
 
     /**

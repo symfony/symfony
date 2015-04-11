@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Encapsulates common logic of {@link FormType} and {@link ButtonType}.
  *
  * This type does not appear in the form's type inheritance chain and as such
- * cannot be extended (via {@link FormTypeExtension}s) nor themed.
+ * cannot be extended (via {@link \Symfony\Component\Form\FormExtensionInterface}) nor themed.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

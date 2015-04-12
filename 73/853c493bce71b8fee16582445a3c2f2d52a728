@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-11T11:41:52Z
+
+can you remove alias ```twig:lint``` too ? see https://github.com/symfony/symfony/pull/14116
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-04-11T13:28:24Z
+
+done

@@ -196,6 +196,37 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
+    public function testGetCatalogueBehavesConsistently()
+    {
+        /*
+         * Create a translator that loads two catalogues for two different locales.
+         * The catalogues contain distinct sets of messages.
+         */
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $catalogue = $translator->getCatalogue('a');
+        $this->assertFalse($catalogue->defines('bar')); // Sure, the "a" catalogue does not contain that message.
+
+        /*
+         * Now, repeat the same test.
+         * Behind the scenes, the cache is used. But that should not matter, right?
+         */
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $catalogue = $translator->getCatalogue('a');
+        $this->assertFalse($catalogue->defines('bar'));
+    }
+
     protected function getCatalogue($locale, $messages)
     {
         $catalogue = new MessageCatalogue($locale);

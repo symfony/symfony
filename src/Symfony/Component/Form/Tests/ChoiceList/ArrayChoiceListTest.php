@@ -44,14 +44,6 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
         return array('0', '1', '2', '3', '4', '5', '6');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\InvalidArgumentException
-     */
-    public function testFailIfKeyMismatch()
-    {
-        new ArrayChoiceList(array(0 => 'a', 1 => 'b'), array(1 => 'a', 2 => 'b'));
-    }
-
     public function testCreateChoiceListWithValueCallback()
     {
         $callback = function ($choice) {

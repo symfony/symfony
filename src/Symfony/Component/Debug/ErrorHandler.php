@@ -208,14 +208,9 @@ class ErrorHandler
      * @param callable $handler A handler that will be called on Exception
      *
      * @return callable|null The previous exception handler
-     *
-     * @throws \InvalidArgumentException
      */
-    public function setExceptionHandler($handler)
+    public function setExceptionHandler(callable $handler = null)
     {
-        if (null !== $handler && !is_callable($handler)) {
-            throw new \LogicException('The exception handler must be a valid PHP callable.');
-        }
         $prev = $this->exceptionHandler;
         $this->exceptionHandler = $handler;
 

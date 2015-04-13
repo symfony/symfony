@@ -48,15 +48,15 @@ class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
         $result = $this->denormalizer->denormalize(
             array(
                 array('foo' => 'one', 'bar' => 'two'),
-                array('foo' => 'three', 'bar' => 'four')
+                array('foo' => 'three', 'bar' => 'four'),
             ),
-            __NAMESPACE__ . '\ArrayDummy[]'
+            __NAMESPACE__.'\ArrayDummy[]'
         );
 
         $this->assertEquals(
             array(
                 new ArrayDummy('one', 'two'),
-                new ArrayDummy('three', 'four')
+                new ArrayDummy('three', 'four'),
             ),
             $result
         );
@@ -66,16 +66,16 @@ class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->serializer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), __NAMESPACE__ . '\ArrayDummy', $this->anything())
+            ->with($this->anything(), __NAMESPACE__.'\ArrayDummy', $this->anything())
             ->will($this->returnValue(true));
 
         $this->assertTrue(
             $this->denormalizer->supportsDenormalization(
                 array(
                     array('foo' => 'one', 'bar' => 'two'),
-                    array('foo' => 'three', 'bar' => 'four')
+                    array('foo' => 'three', 'bar' => 'four'),
                 ),
-                __NAMESPACE__ . '\ArrayDummy[]'
+                __NAMESPACE__.'\ArrayDummy[]'
             )
         );
     }
@@ -90,9 +90,9 @@ class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
             $this->denormalizer->supportsDenormalization(
                 array(
                     array('foo' => 'one', 'bar' => 'two'),
-                    array('foo' => 'three', 'bar' => 'four')
+                    array('foo' => 'three', 'bar' => 'four'),
                 ),
-                __NAMESPACE__ . '\InvalidClass[]'
+                __NAMESPACE__.'\InvalidClass[]'
             )
         );
     }
@@ -102,7 +102,7 @@ class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->denormalizer->supportsDenormalization(
                 array('foo' => 'one', 'bar' => 'two'),
-                __NAMESPACE__ . '\ArrayDummy'
+                __NAMESPACE__.'\ArrayDummy'
             )
         );
     }

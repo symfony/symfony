@@ -232,15 +232,15 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
                 new PropertyNormalizer(),
                 new ObjectNormalizer(),
                 new CustomNormalizer(),
-                new ArrayDenormalizer()
+                new ArrayDenormalizer(),
             ),
             array(
-                'json' => new JsonEncoder()
+                'json' => new JsonEncoder(),
             )
         );
 
         $this->assertTrue(
-            $serializer->supportsDenormalization(array(), __NAMESPACE__ . '\Model[]', 'json')
+            $serializer->supportsDenormalization(array(), __NAMESPACE__.'\Model[]', 'json')
         );
     }
 
@@ -250,22 +250,22 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         $expectedData = array(
             Model::fromArray(array('title' => 'foo', 'numbers' => array(5, 3))),
-            Model::fromArray(array('title' => 'bar', 'numbers' => array(2, 8)))
+            Model::fromArray(array('title' => 'bar', 'numbers' => array(2, 8))),
         );
 
         $serializer = new Serializer(
             array(
                 new GetSetMethodNormalizer(),
-                new ArrayDenormalizer()
+                new ArrayDenormalizer(),
             ),
             array(
-                'json' => new JsonEncoder()
+                'json' => new JsonEncoder(),
             )
         );
 
         $this->assertEquals(
             $expectedData,
-            $serializer->deserialize($jsonData, __NAMESPACE__ . '\Model[]', 'json')
+            $serializer->deserialize($jsonData, __NAMESPACE__.'\Model[]', 'json')
         );
     }
 }

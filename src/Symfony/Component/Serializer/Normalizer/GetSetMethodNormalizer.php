@@ -135,7 +135,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->supports($type);
+        return class_exists($type) && $this->supports($type);
     }
 
     /**

@@ -83,7 +83,7 @@ class ConfigDataCollector extends DataCollector
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
 
-            $this->data['symfony_state'] = $this->caculateSymfonyState();
+            $this->data['symfony_state'] = $this->calculateSymfonyState();
         }
     }
 
@@ -270,7 +270,7 @@ class ConfigDataCollector extends DataCollector
      *
      * @return string One of: unknown, dev, stable, eom, eol
      */
-    private function caculateSymfonyState()
+    private function calculateSymfonyState()
     {
         $now = new \DateTime();
         $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE)->modify('last day of this month');

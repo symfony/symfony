@@ -83,7 +83,7 @@ class ConfigDataCollector extends DataCollector
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
 
-            $this->data['symfony_state'] = $this->requestSymfonyState();
+            $this->data['symfony_state'] = $this->caculateSymfonyState();
         }
     }
 
@@ -270,60 +270,20 @@ class ConfigDataCollector extends DataCollector
      *
      * @return string One of: unknown, dev, stable, eom, eol
      */
-    private function requestSymfonyState()
+    private function caculateSymfonyState()
     {
-        $versionInfo = null;
+        $now = new \DateTime();
+        $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
+        $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE)->modify('last day of this month');
 
-        // get version information from cache or the roadmap
-        $versionCachePath = $this->kernel->getCacheDir().'/version_info.json';
-        if (file_exists($versionCachePath)) {
-            $versionInfo = json_decode(file_get_contents($versionCachePath), true);
+        if ($now > $eol) {
+            $versionState = 'eol';
+        } elseif ($now > $eom) {
+            $versionState = 'eom';
+        } elseif ('DEV' === Kernel::EXTRA_VERSION) {
+            $versionState = 'dev';
         } else {
-            $versionResponse = @file_get_contents('http://symfony.com/roadmap.json?version='.preg_replace('/^(\d+\.\d+).*/', '\\1', $this->data['symfony_version']));
-
-            if (false !== $versionResponse) {
-                $versionInfo = json_decode($versionResponse, true);
-
-                if (isset($versionInfo['error_message'])) {
-                    // wrong version
-                    $versionInfo = null;
-                }
-            }
-        }
-
-        // get the version state
-        $versionState = 'unknown';
-        if (null !== $versionInfo) {
-            $now = new \DateTime();
-            $eom = \DateTime::createFromFormat('m/Y', $versionInfo['eom'])->modify('last day of this month');
-            $eol = \DateTime::createFromFormat('m/Y', $versionInfo['eol'])->modify('last day of this month');
-
-            if ($now > $eom) {
-                $versionState = 'eom';
-            } elseif ($now > $eol) {
-                $versionState = 'eol';
-            } elseif ('DEV' === Kernel::EXTRA_VERSION) {
-                $versionState = 'dev';
-            } else {
-                $versionState = 'stable';
-            }
-        }
-
-        // invalidate or create cache
-        if (null === $versionInfo) {
-            // nothing to cache
-        } elseif (isset($versionInfo['previous_state'])) {
-            if ($versionInfo['previous_state'] !== $versionState) {
-                // state changed => invalidate the cache
-                unlink($versionCachePath);
-            }
-        } elseif (substr(Kernel::VERSION, 0, 3) !== $versionInfo['version']) {
-            // version changed => invalidate the cache
-            unlink($versionCachePath);
-        } elseif ($this->cacheVersionInfo) {
-            // no cache yet
-            $versionInfo['previous_state'] = $versionState;
-            file_put_contents($versionCachePath, json_encode($versionInfo));
+            $versionState = 'stable';
         }
 
         return $versionState;

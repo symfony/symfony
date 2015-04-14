@@ -155,7 +155,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
 
             // add the text up to the next tag
-            $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
+            $output .= $this->applyCurrentStyle($this->substr($message, $offset, $pos - $offset));
             $offset = $pos + strlen($text);
 
             // opening tag?
@@ -177,7 +177,7 @@ class OutputFormatter implements OutputFormatterInterface
             }
         }
 
-        $output .= $this->applyCurrentStyle(substr($message, $offset));
+        $output .= $this->applyCurrentStyle($this->substr($message, $offset));
 
         return str_replace('\\<', '<', $output);
     }
@@ -237,5 +237,23 @@ class OutputFormatter implements OutputFormatterInterface
     private function applyCurrentStyle($text)
     {
         return $this->isDecorated() && strlen($text) > 0 ? $this->styleStack->getCurrent()->apply($text) : $text;
+    }
+
+    /**
+     * Get part of string with mbstring extension support.
+     *
+     * @param string $str    The string being checked.
+     * @param int    $start  The first position used in str.
+     * @param int    $length [optional] The maximum length of the returned string.
+     *
+     * @return string String the extracted part of string or false on failure.
+     */
+    private function substr($str, $start, $length = null)
+    {
+        if (defined('MB_OVERLOAD_STRING')) {
+            return mb_substr($str, $start, $length, '8bit');
+        }
+
+        return substr($str, $start, $length);
     }
 }

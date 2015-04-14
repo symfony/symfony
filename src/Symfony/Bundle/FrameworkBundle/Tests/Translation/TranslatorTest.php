@@ -93,27 +93,27 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
+    }
 
-        // refresh cache again when resource file resources file change
+    public function testRefreshCacheWhenResourcesAreNoLongerFresh()
+    {
         $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
-        $resource
-            ->expects($this->at(0))
-            ->method('isFresh')
-            ->will($this->returnValue(false))
-        ;
-        $catalogue = $this->getCatalogue('fr', array('foo' => 'foo fresh'));
-        $catalogue->addResource($resource);
-
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $resource->method('isFresh')->will($this->returnValue(false));
         $loader
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('load')
-            ->will($this->returnValue($catalogue))
-        ;
+            ->will($this->returnValue($this->getCatalogue('fr', array(), array($resource))));
 
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
+        // prime the cache
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true));
         $translator->setLocale('fr');
-        $this->assertEquals('foo fresh', $translator->trans('foo'));
+        $translator->trans('foo');
+
+        // prime the cache second time
+        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true));
+        $translator->setLocale('fr');
+        $translator->trans('foo');
     }
 
     public function testTransWithCachingWithInvalidLocale()
@@ -235,11 +235,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
-    protected function getCatalogue($locale, $messages)
+    protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
             $catalogue->set($key, $translation);
+        }
+        foreach ($resources as $resource) {
+            $catalogue->addResource($resource);
         }
 
         return $catalogue;

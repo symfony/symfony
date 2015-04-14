@@ -420,21 +420,6 @@ EOF
 
     private function getFallbackContent(MessageCatalogue $catalogue)
     {
-        if (!$this->debug) {
-            // merge all fallback catalogues messages into $catalogue
-            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            $messages = $catalogue->all();
-            while ($fallbackCatalogue) {
-                $messages = array_replace_recursive($fallbackCatalogue->all(), $messages);
-                $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-            }
-            foreach ($messages as $domain => $domainMessages) {
-                $catalogue->add($domainMessages, $domain);
-            }
-
-            return '';
-        }
-
         $fallbackContent = '';
         $current = '';
         $replacementPattern = '/[^a-z0-9_]/i';

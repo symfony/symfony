@@ -223,6 +223,19 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request);
     }
 
+    public function testListenerCanRemoveItselfWhenExecuted()
+    {
+        $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $listener1 = function () use ($eventDispatcher, &$listener1) {
+            $eventDispatcher->removeListener('foo', $listener1);
+        };
+        $eventDispatcher->addListener('foo', $listener1);
+        $eventDispatcher->addListener('foo', function () {});
+        $eventDispatcher->dispatch('foo');
+
+        $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
+    }
+
     protected function getHttpKernel($dispatcher, $controller)
     {
         $resolver = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolverInterface');

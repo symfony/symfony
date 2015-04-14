@@ -88,6 +88,18 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
      */
     public function removeListener($eventName, $listener)
     {
+        if (isset($this->wrappedListeners[$this->lastEventId])) {
+            foreach ($this->wrappedListeners[$this->lastEventId] as $wrappedListener) {
+                $originalListener = $this->wrappedListeners[$this->lastEventId][$wrappedListener];
+
+                if ($originalListener === $listener) {
+                    unset($this->wrappedListeners[$this->lastEventId][$wrappedListener]);
+
+                    return $this->dispatcher->removeListener($eventName, $wrappedListener);
+                }
+            }
+        }
+
         return $this->dispatcher->removeListener($eventName, $listener);
     }
 

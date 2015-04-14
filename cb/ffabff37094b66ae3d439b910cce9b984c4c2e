@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-11T15:26:50Z
+
+BC break fixed in #14318.
+I would agree if #14265 and #13986 has been merged into 2.7 as I think we shouldn't overlooked the impact of performance here.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-11T16:11:07Z
+
+I don't think #14318 is a solution. Just extend the test to also check the fallback catalogue and you'll see that the problem has only been shifted there.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-11T16:15:40Z
+
+I used the test, isn't it?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-11T19:00:34Z
+
+Whenever you remove messages from the catalogue (currently upon caching), they will later on be missing. So I think this cannot be fixed :frowning:
+
+I'd suggest we focus on caching and loading smaller chunks instead, for example only a single domain and locale at a time.
+
+And also the #13986 attempt (however implemented) would gain so much that merging fallbacks might no longer be necessary.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T10:21:09Z
+
+@mpdude Is there a use case for the last commit ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-12T10:25:45Z
+
+I cannot tell. It's just that it behaved differently before and only occurs when reading from the cache in production.
+
+I don't know what to do here - @symfony/deciders time?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T10:32:39Z
+
+ok let's wait for the feedback :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T10:38:42Z
+
+FYI I agree that it should be removed in the next version 2.8
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-12T10:44:21Z
+
+Haven't read the whole thing, so not sure if this is relevant, but if something introduced in 2.7 should be removed, it's still possible during the beta period.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T10:48:08Z
+
+we should removed once #14265 and #13986 merged.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-12T11:20:44Z
+
+Note that knowing from which locale comes the translation **is** important when using the translator: it impacts the pluralization rules. So it this info is lost, it introduces a bug in the translator
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T11:22:16Z
+
+@stof fixed in #14318
+@mpdude we should not avoid your arguments, I keep the decision for you
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-13T09:56:22Z
+
+I have tried various approaches to fix `MessageCatalogue::addFallbackCatalogue` while keeping the optimization in place.
+
+Although in the best case I was able to get consistent results independent of whether a cache was used or not, there would still be a difference in the messages available in the returned catalogue (all messages from a particular locale present in <= 2.6, only the actual fallbacks in 2.7).
+
+Also, in my attempts the MessageCatalogue chain would be very fragile with results (correctness & optimization) depending on adding fallbacks in a particular order (top-down) or not changing catalogues  after the optimization has been applied – at least ugly API-wise.
+
+So, for the time being, I would like to recommend merging this PR; that is, *revert the optimization introduced in 2.7*.
+
+For now, that would keep results unchanged for our users and gives us time to thoroughly think this through, before adding another (new) mode of behaviour we'd be required to support in the future.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T11:34:59Z
+
+@mpdude ok thank you for your effort here :) , can you update the PR contribution header in the description and squash your commits.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-13T11:47:21Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T11:48:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-13T23:06:03Z
+
+:+1:

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by kalessil at 2015-04-04T09:38:13Z
+
+//cc @stof
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-04T12:35:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-04-04T15:51:31Z
+
+BTW, where it will be best place to report 28 remaining reference mismatches (it's too much work for me)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-05T06:37:22Z
+
+@kalessil Can you create an issue on Github an tag it as an easy pick? Thanks.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-04-06T12:36:23Z
+
+@nicolas-grekas : done.
+
+It's also #14097 pending due to Travis related issues.
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-04-08T18:48:19Z
+
+I created an issue with list of other ref-mismatches, as was mentioned upper.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-11T20:16:57Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-15T01:02:00Z
+
+:+1:

@@ -344,7 +344,7 @@ class Crawler extends \SplObjectStorage
     {
         $data = array();
         foreach ($this as $i => $node) {
-            $data[] = $callback(new static($node, $this->uri, $this->baseHref), $i);
+            $data[] = call_user_func($callback, new static($node, $this->uri, $this->baseHref), $i);
         }
 
         return $data;
@@ -378,7 +378,7 @@ class Crawler extends \SplObjectStorage
     {
         $nodes = array();
         foreach ($this as $i => $node) {
-            if (false !== $callback(new static($node, $this->uri, $this->baseHref), $i)) {
+            if (false !== call_user_func($callback, new static($node, $this->uri, $this->baseHref), $i)) {
                 $nodes[] = $node;
             }
         }

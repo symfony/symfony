@@ -48,16 +48,16 @@ class NormalizationBuilder
     }
 
     /**
-     * Registers a closure to run before the normalization or an expression builder to build it if null is provided.
+     * Registers a callback to run before the normalization or an expression builder to build it if null is provided.
      *
-     * @param \Closure $closure
+     * @param callable $callback
      *
      * @return ExprBuilder|NormalizationBuilder
      */
-    public function before(\Closure $closure = null)
+    public function before(callable $callback = null)
     {
-        if (null !== $closure) {
-            $this->before[] = $closure;
+        if (null !== $callback) {
+            $this->before[] = $callback;
 
             return $this;
         }

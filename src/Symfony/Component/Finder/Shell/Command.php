@@ -32,7 +32,7 @@ class Command
     private $labels = array();
 
     /**
-     * @var \Closure|null
+     * @var callable|null
      */
     private $errorHandler;
 
@@ -218,11 +218,11 @@ class Command
     }
 
     /**
-     * @param \Closure $errorHandler
+     * @param callable $errorHandler
      *
      * @return Command
      */
-    public function setErrorHandler(\Closure $errorHandler)
+    public function setErrorHandler(callable $errorHandler)
     {
         $this->errorHandler = $errorHandler;
 
@@ -230,7 +230,7 @@ class Command
     }
 
     /**
-     * @return \Closure|null
+     * @return callable|null
      */
     public function getErrorHandler()
     {
@@ -253,7 +253,7 @@ class Command
             $output = preg_split('~(\r\n|\r|\n)~', stream_get_contents($pipes[1]), -1, PREG_SPLIT_NO_EMPTY);
 
             if ($error = stream_get_contents($pipes[2])) {
-                $errorHandler($error);
+                call_user_func($errorHandler, $error);
             }
 
             proc_close($process);

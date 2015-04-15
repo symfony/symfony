@@ -20,6 +20,36 @@ UPGRADE FROM 2.x to 3.0
    `DebugClassLoader`. The difference is that the constructor now takes a
    loader to wrap.
 
+### Config
+
+ * Any `callable` can now be used as an argument with the builder methods that
+   previously only accepted closures. The signatures of these methods need to
+   be changed in any overriding custom builder class.
+
+   Before:
+
+   ```php
+   use Symfony\Component\Config\Definition\Builder;
+
+   Builder\ExprBuilder::always(\Closure $closure)
+   Builder\ExprBuilder::ifTrue(\Closure $closure)
+   Builder\ExprBuilder::then(\Closure $closure)
+   Builder\NormalizationBuilder::before(\Closure $closure)
+   Builder\ValidationBuilder::rule(\Closure $closure)
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Config\Definition\Builder;
+
+   Builder\ExprBuilder::always(callable $callback)
+   Builder\ExprBuilder::ifTrue(callable $callback)
+   Builder\ExprBuilder::then(callable $callback)
+   Builder\NormalizationBuilder::before(callable $callback)
+   Builder\ValidationBuilder::rule(callable $callback)
+   ```
+
 ### Console
 
  * The `dialog` helper has been removed in favor of the `question` helper.

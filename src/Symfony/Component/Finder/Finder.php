@@ -483,13 +483,13 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Sorts files and directories by an anonymous function.
+     * Sorts files and directories by a callback function.
      *
-     * The anonymous function receives two \SplFileInfo instances to compare.
+     * The callback function receives two \SplFileInfo instances to compare.
      *
      * This can be slow as all the matching files and directories must be retrieved for comparison.
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $callback A callback function
      *
      * @return Finder The current Finder instance
      *
@@ -497,9 +497,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @api
      */
-    public function sort(\Closure $closure)
+    public function sort(callable $callback)
     {
-        $this->sort = $closure;
+        $this->sort = $callback;
 
         return $this;
     }
@@ -603,12 +603,12 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Filters the iterator with an anonymous function.
+     * Filters the iterator with a callback function.
      *
-     * The anonymous function receives a \SplFileInfo and must return false
+     * The callback function receives a \SplFileInfo and must return false
      * to remove files.
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $callback A callback function
      *
      * @return Finder The current Finder instance
      *
@@ -616,9 +616,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @api
      */
-    public function filter(\Closure $closure)
+    public function filter(callable $callback)
     {
-        $this->filters[] = $closure;
+        $this->filters[] = $callback;
 
         return $this;
     }

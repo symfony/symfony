@@ -32,16 +32,16 @@ class ValidationBuilder
     }
 
     /**
-     * Registers a closure to run as normalization or an expression builder to build it if null is provided.
+     * Registers a callback to run as normalization or an expression builder to build it if null is provided.
      *
-     * @param \Closure $closure
+     * @param callable $callback
      *
      * @return ExprBuilder|ValidationBuilder
      */
-    public function rule(\Closure $closure = null)
+    public function rule(callable $callback = null)
     {
-        if (null !== $closure) {
-            $this->rules[] = $closure;
+        if (null !== $callback) {
+            $this->rules[] = $callback;
 
             return $this;
         }

@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-15T07:19:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-15T07:20:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-15T08:35:27Z
+
+I would move the exceptions in the `dump` and `load` methods instead. Creating an instance of the Loader or the Dumper is technically possible without the dependency; dumping or loading is not.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-15T08:49:24Z
+
+@fabpot in case of the Dumper, the Yaml\Dumper is created in the constructor, so we'd also need to move its instantiation.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-15T09:32:27Z
+
+@jakzal Sure, but we can move this call to avoid the call in the constructor.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-15T10:52:31Z
+
+:+1: for throwing the exception only when someone actually tries to load a YAML file. It makes things easier for projects using a delegating loader to support multiple formats.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T14:55:32Z
+
+@fabpot @stof @jakzal done
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-15T14:58:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-15T15:02:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-15T15:04:18Z
+
+except for the small change in the exception message, :+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T15:07:54Z
+
+@stof done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-15T15:11:16Z
+
+:+1:

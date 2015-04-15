@@ -115,6 +115,26 @@ abstract class BaseTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($view['child']->vars['translation_domain']);
     }
 
+    public function testPassTranslationParamsToView()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, array(
+            'translation_params' => array('foo' => 'bar'),
+        ));
+        $view = $form->createView();
+
+        $this->assertSame(array('foo' => 'bar'), $view->vars['translation_params']);
+    }
+
+    public function testDefaultTranslationParams()
+    {
+        $view = $this->factory->createNamedBuilder('parent', 'form')
+            ->add('child', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertEmpty($view['child']->vars['translation_params']);
+    }
+
     public function testPassLabelToView()
     {
         $form = $this->factory->createNamed('__test___field', $this->getTestedType(), null, array('label' => 'My label'));

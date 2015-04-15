@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T15:51:20Z
+
+@xabbuh ``get('table');`` what it should return in 3.0, an instance of `table` or it will be removed ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-13T15:55:32Z
+
+@aitboudad [It's deprecated](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Console/Helper/HelperSet.php#L81-87), so imho it should be removed.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T15:57:28Z
+
+@xabbuh deprecated only if it's an instance of [TableHelper](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Console/Helper/HelperSet.php#L85)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-13T16:03:00Z
+
+@aitboudad That additional check was added to tackle the default helper set, but not breaking it for people using the helper set in another context IIRC.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T16:07:00Z
+
+@xabbuh ok, thank you :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-13T16:18:27Z
+
+@aitboudad ``get('table')`` can only return an helper. and making the table a stateful helper was precisely the design mistake leading to the deprecation of TableHelper.
+So in 3.0, ``->get('table')`` will throw an exception sayign that there is no ``table`` helper
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T17:07:28Z
+
+@stof  this makes sense, thanks !

@@ -43,6 +43,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function has($name)
     {
+        // reference mismatch: if fixed, re-introduced in array_key_exists; keep as it is
         $attributes = $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
 
@@ -58,6 +59,7 @@ class NamespacedAttributeBag extends AttributeBag
      */
     public function get($name, $default = null)
     {
+        // reference mismatch: if fixed, re-introduced in array_key_exists; keep as it is
         $attributes = $this->resolveAttributePath($name);
         $name = $this->resolveKey($name);
 

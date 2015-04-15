@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by jaytaph at 2015-04-10T08:27:42Z
+
+@aitboudad @fabpot Added an optional argument. However, one thing that is missing here (but this seems to be the case everywhere considering regular expressions in the Finder, is that it always assumes the start and end delimiter to be the same. This is not the case in some occasions: the end-delimiter for `[` is `]`, and the same goes for `{`, `<` and `(`.  But i think this is maybe something for another issue?

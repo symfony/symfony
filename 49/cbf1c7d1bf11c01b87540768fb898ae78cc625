@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by kalessil at 2015-03-28T16:34:45Z
+
+@nicolas-grekas : as proposed <a href="https://github.com/symfony/symfony/pull/13995#discussion_r26871175">here</a> foreach related issues cleaned up.
+
+src/Symfony/Component/Security/Acl/Dbal/AclProvider.php:650
+src/Symfony/Component/Security/Acl/Dbal/AclProvider.php:658
+
+I can not follow what happens there, so both loops remain untouched.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-03-30T15:26:45Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-03-30T15:33:08Z
+
+:+1: with comment above to be fixed before merging
+
+---------------------------------------------------------------------------
+
+by kalessil at 2015-04-10T20:46:52Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-11T20:25:51Z
+
+:+1:

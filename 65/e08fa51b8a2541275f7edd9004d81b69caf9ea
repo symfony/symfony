@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-14T19:16:50Z
+
+@xabbuh can you do the same for `LoggingTranslator`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-14T19:22:20Z
+
+@aitboudad The constructor argument in the `LoggingTranslator` is not type-hinted. So, there's not much to simplify/clarify and I think adding the type hint is not covered by the BC promise. What do you think about this?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-14T20:18:18Z
+
+@xabbuh ok let's do it and I think it should be in `2.6`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-14T20:50:01Z
+
+@aitboudad see #14356
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-14T21:02:17Z
+
+:+1:

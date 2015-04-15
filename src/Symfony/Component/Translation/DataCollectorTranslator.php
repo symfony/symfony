@@ -21,7 +21,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     const MESSAGE_EQUALS_FALLBACK = 2;
 
     /**
-     * @var TranslatorInterface
+     * @var TranslatorInterface|TranslatorBagInterface
      */
     private $translator;
 
@@ -31,11 +31,11 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     private $messages = array();
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
     public function __construct(TranslatorInterface $translator)
     {
-        if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {
+        if (!$translator instanceof TranslatorBagInterface) {
             throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
         }
 

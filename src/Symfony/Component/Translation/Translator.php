@@ -327,10 +327,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $this->assertValidLocale($locale);
-        $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
         $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
-            function (ConfigCacheInterface $cache) use ($self, $locale) {
-                $self->dumpCatalogue($locale, $cache);
+            function (ConfigCacheInterface $cache) use ($locale) {
+                $this->dumpCatalogue($locale, $cache);
             }
         );
 
@@ -343,12 +342,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         $this->catalogues[$locale] = include $cache->getPath();
     }
 
-    /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
-     *
-     * @internal
-     */
-    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    private function dumpCatalogue($locale, ConfigCacheInterface $cache)
     {
         $this->initializeCatalogue($locale);
         $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);

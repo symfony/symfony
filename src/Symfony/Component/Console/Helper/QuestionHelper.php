@@ -75,7 +75,7 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Returns the helper's input stream
+     * Returns the helper's input stream.
      *
      * @return resource
      */
@@ -95,8 +95,6 @@ class QuestionHelper extends Helper
     /**
      * Asks the question to the user.
      *
-     * This method is public for PHP 5.3 compatibility, it should be private.
-     *
      * @param OutputInterface $output
      * @param Question        $question
      *
@@ -105,7 +103,7 @@ class QuestionHelper extends Helper
      * @throws \Exception
      * @throws \RuntimeException
      */
-    public function doAsk(OutputInterface $output, Question $question)
+    private function doAsk(OutputInterface $output, Question $question)
     {
         $this->writePrompt($output, $question);
 
@@ -148,7 +146,7 @@ class QuestionHelper extends Helper
      * Outputs the question prompt.
      *
      * @param OutputInterface $output
-     * @param Question $question
+     * @param Question        $question
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {

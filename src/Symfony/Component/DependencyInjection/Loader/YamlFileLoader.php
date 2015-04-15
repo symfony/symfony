@@ -271,7 +271,7 @@ class YamlFileLoader extends FileLoader
     protected function loadFile($file)
     {
         if (!class_exists('Symfony\Component\Yaml\Parser')) {
-            throw new RuntimeException('Unable to load YAML files service definitions as the Symfony Yaml Component is not installed.');
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
         }
 
         if (!stream_is_local($file)) {

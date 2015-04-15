@@ -33,7 +33,8 @@ work for you:
 Installation
 ------------
 
-The best way to install Symfony is to use the [official Symfony Installer][8]. It allows you to start a new project based on the version you want.
+The best way to install Symfony is to use the [official Symfony Installer][8].
+It allows you to start a new project based on the version you want.
 
 Documentation
 -------------

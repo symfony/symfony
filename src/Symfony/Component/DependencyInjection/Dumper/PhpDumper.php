@@ -1231,7 +1231,7 @@ EOF;
             if (false !== strpos($class, '$')) {
                 throw new RuntimeException('Cannot dump definitions which have a variable class name.');
             }
-
+            
             return sprintf('new \\%s(%s)', substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         } elseif ($value instanceof Variable) {
             return '$'.$value;

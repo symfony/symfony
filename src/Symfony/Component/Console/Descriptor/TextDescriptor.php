@@ -155,7 +155,7 @@ class TextDescriptor extends Descriptor
             $messages[] = '';
 
             if ($describedNamespace) {
-                $messages[] = sprintf("<comment>Available commands for the \"%s\" namespace:</comment>", $describedNamespace);
+                $messages[] = sprintf('<comment>Available commands for the "%s" namespace:</comment>', $describedNamespace);
             } else {
                 $messages[] = '<comment>Available commands:</comment>';
             }

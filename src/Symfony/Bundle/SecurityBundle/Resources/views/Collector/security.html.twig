@@ -31,9 +31,9 @@
                 <span>{{ collector.tokenClass|abbr_class }}</span>
             </div>
             {% endif %}
-            {% if collector.providerKey != null %}
+            {% if collector.providerKey %}
             <div class="sf-toolbar-info-piece">
-                <a title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}">Logout</a>
+                <a class="sf-btn" title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}"><span class="sf-icon sf-danger">&times;</span> Logout</a>
             </div>
             {% endif %}
         {% elseif collector.enabled %}

@@ -31,6 +31,11 @@
                 <span>{{ collector.tokenClass|abbr_class }}</span>
             </div>
             {% endif %}
+            {% if collector.providerKey != null %}
+            <div class="sf-toolbar-info-piece">
+                <a title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}">Logout</a>
+            </div>
+            {% endif %}
         {% elseif collector.enabled %}
             <div class="sf-toolbar-info-piece">
                 <span>You are not authenticated.</span>

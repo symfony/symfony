@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -84,13 +85,14 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $documentRoot = $input->getOption('docroot');
+        $outputStyle = new SymfonyStyle($input, $output);
 
         if (null === $documentRoot) {
             $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
         }
 
         if (!is_dir($documentRoot)) {
-            $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
+            $outputStyle->error(sprintf('The given document root directory "%s" does not exist.', $documentRoot));
 
             return 1;
         }
@@ -98,13 +100,15 @@ EOF
         $env = $this->getContainer()->getParameter('kernel.environment');
 
         if ('prod' === $env) {
-            $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
+            $outputStyle->error('Running PHP built-in server in production environment is NOT recommended!');
         }
 
-        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
-        $output->writeln('Quit the server with CONTROL-C.');
+        $outputStyle->text(array(
+            sprintf('Server running on <info>http://%s</info>.', $input->getArgument('address')),
+            'Quit the server with CONTROL-C.',
+        ));
 
-        if (null === $builder = $this->createPhpProcessBuilder($input, $output, $env)) {
+        if (null === $builder = $this->createPhpProcessBuilder($input, $outputStyle, $env)) {
             return 1;
         }
 
@@ -121,17 +125,17 @@ EOF
             ->run($output, $process, null, null, OutputInterface::VERBOSITY_VERBOSE);
 
         if (!$process->isSuccessful()) {
-            $output->writeln('<error>Built-in server terminated unexpectedly</error>');
+            $outputStyle->error('Built-in server terminated unexpectedly.');
 
             if ($process->isOutputDisabled()) {
-                $output->writeln('<error>Run the command again with -v option for more details</error>');
+                $outputStyle->error('Run the command again with -v option for more details.');
             }
         }
 
         return $process->getExitCode();
     }
 
-    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)
+    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $outputStyle, $env)
     {
         $router = $input->getOption('router') ?: $this
             ->getContainer()
@@ -140,7 +144,7 @@ EOF
         ;
 
         if (!file_exists($router)) {
-            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+            $outputStyle->error(sprintf('The given router script "%s" does not exist.', $router));
 
             return;
         }
@@ -149,7 +153,7 @@ EOF
         $finder = new PhpExecutableFinder();
 
         if (false === $binary = $finder->find()) {
-            $output->writeln('<error>Unable to find PHP binary to run server</error>');
+            $outputStyle->error('Unable to find PHP binary to run server.');
 
             return;
         }

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
@@ -72,9 +73,11 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
+
         if (!extension_loaded('pcntl')) {
-            $output->writeln('<error>This command needs the pcntl extension to run.</error>');
-            $output->writeln('You can either install it or use the <info>server:run</info> command instead to run the built-in web server.');
+            $output->error('This command needs the pcntl extension to run.');
+            $output->text('You can either install it or use the <comment>"server:run"</comment> command instead to run the built-in web server.');
 
             if ($this->getHelper('question')->ask($input, $output, new ConfirmationQuestion('Do you want to start <info>server:run</info> immediately? [Yn] ', true))) {
                 $command = $this->getApplication()->find('server:run');
@@ -92,7 +95,7 @@ EOF
         }
 
         if (!is_dir($documentRoot)) {
-            $output->writeln(sprintf('<error>The given document root directory "%s" does not exist</error>', $documentRoot));
+            $output->error(sprintf('The given document root directory "%s" does not exist.', $documentRoot));
 
             return 1;
         }
@@ -101,37 +104,37 @@ EOF
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
-            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
+            $output->text('The address has to be of the form <comment>bind-address:port</comment>.');
 
             return 1;
         }
 
         if ($this->isOtherServerProcessRunning($address)) {
-            $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+            $output->error(sprintf('A process is already listening on http://%s.', $address));
 
             return 1;
         }
 
         if ('prod' === $env) {
-            $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
+            $output->error('Running PHP built-in server in production environment is NOT recommended!');
         }
 
         $pid = pcntl_fork();
 
         if ($pid < 0) {
-            $output->writeln('<error>Unable to start the server process</error>');
+            $output->error('Unable to start the server process.');
 
             return 1;
         }
 
         if ($pid > 0) {
-            $output->writeln(sprintf('<info>Web server listening on http://%s</info>', $address));
+            $output->success(sprintf('Web server listening on http://%s.', $address));
 
             return;
         }
 
         if (posix_setsid() < 0) {
-            $output->writeln('<error>Unable to set the child process as session leader</error>');
+            $output->error('Unable to set the child process as session leader.');
 
             return 1;
         }
@@ -146,7 +149,7 @@ EOF
         touch($lockFile);
 
         if (!$process->isRunning()) {
-            $output->writeln('<error>Unable to start the server process</error>');
+            $output->error('Unable to start the server process.');
             unlink($lockFile);
 
             return 1;
@@ -205,7 +208,7 @@ EOF
 
         $finder = new PhpExecutableFinder();
         if (false === $binary = $finder->find()) {
-            $output->writeln('<error>Unable to find PHP binary to start server</error>');
+            $output->error('Unable to find PHP binary to start server.');
 
             return;
         }

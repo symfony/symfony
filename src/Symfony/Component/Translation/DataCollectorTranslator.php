@@ -116,16 +116,13 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     private function collectMessage($locale, $domain, $id, $translation)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
         $id = (string) $id;
         $catalogue = $this->translator->getCatalogue($locale);
+        $locale = $catalogue->getLocale();
         if ($catalogue->defines($id, $domain)) {
             $state = self::MESSAGE_DEFINED;
         } elseif ($catalogue->has($id, $domain)) {

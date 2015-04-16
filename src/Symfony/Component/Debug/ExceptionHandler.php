@@ -278,7 +278,7 @@ EOF;
     {
         $parts = explode('\\', $class);
 
-        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, array_pop($parts));
+        return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
     }
 
     /**

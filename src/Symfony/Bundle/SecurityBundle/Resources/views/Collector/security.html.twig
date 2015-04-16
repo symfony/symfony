@@ -33,7 +33,7 @@
             {% endif %}
             {% if collector.providerKey != null %}
             <div class="sf-toolbar-info-piece">
-            <a title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}">Logout</a>
+                <a title="Logout from the {{ collector.providerKey }} firewall" href="{{ logout_path(collector.providerKey) }}">Logout</a>
             </div>
             {% endif %}
         {% elseif collector.enabled %}

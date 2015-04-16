@@ -57,7 +57,7 @@ class Translator extends BaseTranslator
 
         $this->options = array_merge($this->options, $options);
 
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

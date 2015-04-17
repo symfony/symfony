@@ -175,7 +175,7 @@
                 <target>Şəklin yüksəkliyi çox kiçikdir ({{ height }}px). Ən az {{ min_height }}px olmalıdır.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user's current password.</source>
+                <source>This value should be the user current password.</source>
                 <target>Bu dəyər istifadəçinin hazırkı parolu olmalıdır.</target>
             </trans-unit>
             <trans-unit id="48">

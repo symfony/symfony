@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-04-12T11:18:49Z
+
+What about yaml files in the translation component ?
+
+---------------------------------------------------------------------------
+
+by thunderer at 2015-04-12T12:27:44Z
+
+@stof Can you tell me why are they related to changes in this PR? YamlFileLoader in Translation component does not validate extension of YAML files.
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-04-12T12:41:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-04-12T17:44:01Z
+
+The validation also looks for `yml` files: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L804
+
+---------------------------------------------------------------------------
+
+by thunderer at 2015-04-12T18:08:59Z
+
+@GromNaN I don't think such places should be "fixed" to allow other variants since it's framework convention to read configuration from this exact `/(configuration|validation|[a-z]+).yml/` file and it should be there exactly as specified. Those loaders changed in this PR can be used in various contexts and as such should accept any valid data or file name. There is a difference between requiring exact match for `Resources/config/file.yml` and allowing to load any YAML file when for example using standalone Symfony components (like I do for example).
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T11:57:17Z
+
+@thunderer for the translation loader the extension must be added in https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/Resources/config/translation.xml#L67
+
+---------------------------------------------------------------------------
+
+by thunderer at 2015-04-13T12:03:33Z
+
+@aitboudad Do you mean something like the code below? If so, the same needs to be done below for dumper services. I don't know though why it's needed, if you could enlighten me a little bit on this topic I'd be very grateful.
+
+```xml
+<service id="translation.loader.yml" class="%translation.loader.yml.class%">
+    <tag name="translation.loader" alias="yml" />
+    <tag name="translation.loader" alias="yaml" />
+</service>
+```
+
+inb4 @aitboudad: So I'll add `<tag name="translation.loader" alias="yaml" legacy-alias="yml" />` and will it be ok?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-13T12:07:42Z
+
+@thunderer something like: https://github.com/symfony/symfony/blob/2.7/src/Symfony/Bundle/FrameworkBundle/Resources/config/translation.xml#L71
+
+---------------------------------------------------------------------------
+
+by thunderer at 2015-04-15T18:19:51Z
+
+@Tobion @xabbuh @stof @fabpot @sstok @GromNaN Apart from the change mentioned by @aitboudad is there anything more I can do in this PR to be merged? To be honest I'm not sure to do it properly, so any comments on that would be also appreciated. Thanks in advance.

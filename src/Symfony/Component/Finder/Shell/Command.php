@@ -289,7 +289,7 @@ class Command
      */
     public function addAtIndex($bit, $index)
     {
-        array_splice($this->bits, $index, 0, $bit);
+        array_splice($this->bits, $index, 0, $bit instanceof Command ? array($bit) : $bit);
 
         return $this;
     }

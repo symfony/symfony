@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-04-17T09:08:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-17T09:27:53Z
+
+@stof  allowing `null` value for locale look wrong should we throw an exception in that case or we use `en` as default locale ?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-17T09:49:46Z
+
+@aitboudad how could the locale be null now? the `default_locale` config should add validation that it is not null if you mean that.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-17T10:10:54Z
+
+I'm not talking about `default_locale` but it looks good idea too.
+right now the `Symfony\Component\Translation\Translator` allow set `null` value for the default locale but it shouldn't( [Translator.php#L77](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L77))  so I think we need to add some check in [setLocale](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L151) to avoid null value.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-17T10:13:58Z
+
+The constructor does not allow null value. It says `string`. So I don't see what you mean.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-17T10:29:34Z
+
+It says `string` but we can pass `null` value.
+
+```patch
+     public function setLocale($locale)
+     {
++        if (null === $locale) {
++            throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
++        }
+         $this->assertValidLocale($locale);
+         $this->locale = $locale;
+     }
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-17T12:58:12Z
+
+Why would you do that? Wrong values are not supported. What if someone passes an array or an object? You want to catch that as well?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-17T14:18:40Z
+
+@Tobion ok seems that it's not necessary :)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-17T14:40:11Z
+
+@aitboudad our rule in Symfony is to rely on the phpdoc to describe the signature of the method for scalar types (because PHP 5.x does not have scalar typehints). We don't perform scalar type checks in all methods.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-17T14:54:18Z
+
+:+1:

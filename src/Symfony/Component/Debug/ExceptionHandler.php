@@ -78,11 +78,8 @@ class ExceptionHandler
      *
      * @return callable|null The previous exception handler if any
      */
-    public function setHandler($handler)
+    public function setHandler(callable $handler = null)
     {
-        if (null !== $handler && !is_callable($handler)) {
-            throw new \LogicException('The exception handler must be a valid PHP callable.');
-        }
         $old = $this->handler;
         $this->handler = $handler;
 

@@ -5,6 +5,11 @@ CHANGELOG
 -----
 
  * removed `ReferenceDumper` class
+ * [BC BREAK] Any `callable` is now an allowed argument for methods `ExprBuilder::always()`,
+   `ExprBuilder::ifTrue()`, `ExprBuilder::then()`, `NormalizationBuilder::before()` and
+   `ValidationBuilder::rule()` instead of just closures. The BC break only affects custom
+   implementations of these methods in extended builders, where the method argument type hint
+   needs to be changed from `\Closure` to `callable`.
 
 2.7.0
 -----

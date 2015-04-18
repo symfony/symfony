@@ -303,16 +303,6 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage Invalid callable provided to Command::setCode.
-     */
-    public function testSetCodeWithNonCallable()
-    {
-        $command = new \TestCommand();
-        $command->setCode(array($this, 'nonExistentMethod'));
-    }
-
     public function callableMethodCommand(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('from the code...');

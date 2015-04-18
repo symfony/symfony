@@ -68,14 +68,9 @@ class StreamedResponse extends Response
      * Sets the PHP callback associated with this Response.
      *
      * @param callable $callback A valid PHP callback
-     *
-     * @throws \LogicException
      */
-    public function setCallback($callback)
+    public function setCallback(callable $callback)
     {
-        if (!is_callable($callback)) {
-            throw new \LogicException('The Response callback must be a valid PHP callable.');
-        }
         $this->callback = $callback;
     }
 

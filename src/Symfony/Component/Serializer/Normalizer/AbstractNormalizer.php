@@ -88,15 +88,9 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param callable $circularReferenceHandler
      *
      * @return self
-     *
-     * @throws InvalidArgumentException
      */
-    public function setCircularReferenceHandler($circularReferenceHandler)
+    public function setCircularReferenceHandler(callable $circularReferenceHandler)
     {
-        if (!is_callable($circularReferenceHandler)) {
-            throw new InvalidArgumentException('The given circular reference handler is not callable.');
-        }
-
         $this->circularReferenceHandler = $circularReferenceHandler;
 
         return $this;

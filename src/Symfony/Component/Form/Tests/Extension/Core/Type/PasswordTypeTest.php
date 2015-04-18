@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+use Symfony\Component\Form\Test\TypeTestCase;
+
+class PasswordTypeTest extends TypeTestCase
 {
     public function testEmptyIfNotSubmitted()
     {

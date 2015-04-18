@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-15T08:02:07Z
+
+@Tobion see new patch
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-16T07:29:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T08:25:47Z
+
+@nicolas-grekas why not do the fix suggested in #14111? Unset https://github.com/nicolas-grekas/symfony/blob/fix-14111/src/Symfony/Component/Config/Loader/FileLoader.php#L104 in the catch block. That makes more sense to me. When an exception in the loading is thrown, the loading state of that resource must be unset.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T08:57:54Z
+
+@Tobion agreed, I updated the FileLoader to release the resource on exceptions.
+I also moved the fatal error resiliency to the Routing\DelegatingLoader of the FrameworkBundle.
+The very issue with #14342 is failing to load *routes* with double fatal errors (PHP allows recovering from one, but not from two). Thus, patching the DelegatingLoader of the Router component is too generic to me now. Focusing on the DelegatingLoader specifically used for routing is the right target.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T10:04:31Z
+
+The case handled here is not with an exception but with a fatal error:
+- the first time the routes are loaded, a fatal error is triggered (e.g. parse error in controller while loading annotations)
+- PHP abruptly empties the stack trace, bypassing all catch blocks. It then calls the registered shutdown functions.
+- the ErrorHandler catches the fatal error at this stage and converts it to a FatalErrorException, then re-injects this exception to the HttpKernel with ->terminateWithException (that calls handleException())
+- at this stage, if we try to load the routes again, we must prevent the fatal error from occurring a second time, that's why we have this state
+- the webprofiler triggers an url generation, which requires the routes being loaded
+- this patch handles the case and prevents the second fatal error by triggering an exception beforehand
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T10:25:52Z
+
+Can we not move that logic to the error handler? So when the error handler handles FatalErrorException by reinjecting it to the Kernel::terminateWithException, it will ignore a second fatal error?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T10:28:31Z
+
+We can't: a second fatal error kills the process immediately
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T10:47:28Z
+
+So what about a decorator implementation? The DelagatingLoader has nothing to do with this new code. and makes it unusable for users using a different loader.
+It could be named something like `NoReoccuringFatalErrorLoaderDecorator` ^^
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T10:58:00Z
+
+A decorator would create an overhead (one more class for the autoloader + loading and applying the decoration definition) for everyone, for a case that happen only occasionally while developing, and is very exceptional in prod. This DelegatingLoader already decorates the DelegatingLoader of the router component by inheritance. To me, it's fine.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-16T11:12:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T12:09:54Z
+
+@nicolas-grekas why isn't this logic in the component btw ? It should be avoided when using the standalone component too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T12:17:06Z
+
+If we put the logic in the component, it will break using the DelegatingLoader recursively, if anyone does so.
+Moving to AnnotationFileLoader will not fix the resiliency for fatal errors occurring in a ClosureLoader or a PhpFileLoader.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T12:22:27Z
+
+@nicolas-grekas this means that these loaders need the same protection
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-16T14:07:44Z
+
+Or that the delegating loader is the right place to wrap this concern, which is my stand.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T23:10:31Z
+
+@nicolas-grekas as I said previously, it can be the right place in the context of the fullstack framework, but not in the standalone usage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-17T06:23:09Z
+
+@stof the fatal error resiliency mechanism collides with recursively calling a loader. As such, if I add it to ClosureLoader or PhpFileLoader, it will break anyone's code using them recursively. The FrameworkBundle is responsible for configuring the error handler for its usage. It's no shocking to me that the FrameworkBundle also handles this corollary edge case for fatal errors.
+As said, for anyone not using the Routing\DelegatingLoader, the fallback error handling mechanism is perfectly fine. The FrameworkBundle is able to add more DX sugar. That's the only point.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-18T08:29:10Z
+
+:+1:

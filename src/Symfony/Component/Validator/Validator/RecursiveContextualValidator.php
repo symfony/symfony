@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;
 use Symfony\Component\Validator\Mapping\MetadataInterface;
+use Symfony\Component\Validator\Mapping\PreprocessingMetadataInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\MetadataFactoryInterface;
@@ -482,6 +483,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
+        if ($metadata instanceof PreprocessingMetadataInterface) {
+          $metadata->preprocessValue($object);
+        }
         $context->setNode($object, $object, $metadata, $propertyPath);
 
         if (!$context->isObjectInitialized($cacheKey)) {
@@ -676,6 +680,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
      */
     private function validateGenericNode($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
+        if ($metadata instanceof PreprocessingMetadataInterface) {
+          $metadata->preprocessValue($value);
+        }
         $context->setNode($value, $object, $metadata, $propertyPath);
 
         foreach ($groups as $key => $group) {

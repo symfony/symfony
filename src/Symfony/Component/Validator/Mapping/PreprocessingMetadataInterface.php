@@ -18,6 +18,7 @@ namespace Symfony\Component\Validator\Mapping;
  * they are passed on the constraint validators.
  *
  * @since  2.7
+ *
  * @author Wolfgang Ziegler <fago@wolfgangziegler.net>
  *
  * @see CascadingStrategy

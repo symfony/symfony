@@ -65,21 +65,21 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
     {
         $container = include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+        $this->assertEquals('<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
-    <service id=\"foo\" class=\"FooClass\">
-      <argument type=\"service\">
-        <service class=\"BarClass\">
-          <argument type=\"service\">
-            <service class=\"BazClass\"/>
+    <service id="foo" class="FooClass">
+      <argument type="service">
+        <service class="BarClass">
+          <argument type="service">
+            <service class="BazClass"/>
           </argument>
         </service>
       </argument>
     </service>
   </services>
 </container>
-", $dumper->dump());
+', $dumper->dump());
     }
 
     public function testDumpEntities()

@@ -12,43 +12,26 @@
 namespace Symfony\Component\Translation\Loader;
 
 use Symfony\Component\Translation\Exception\InvalidResourceException;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\Resource\FileResource;
 
 /**
  * JsonFileLoader loads translations from an json file.
  *
  * @author singles
  */
-class JsonFileLoader extends ArrayLoader implements LoaderInterface
+class JsonFileLoader extends FileLoader
 {
     /**
      * {@inheritdoc}
      */
-    public function load($resource, $locale, $domain = 'messages')
+    protected function loadResource($resource)
     {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
-
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
-
         $messages = json_decode(file_get_contents($resource), true);
 
         if (0 < $errorCode = json_last_error()) {
             throw new InvalidResourceException(sprintf('Error parsing JSON - %s', $this->getJSONErrorMessage($errorCode)));
         }
 
-        if (null === $messages) {
-            $messages = array();
-        }
-
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
-
-        return $catalogue;
+        return $messages;
     }
 
     /**

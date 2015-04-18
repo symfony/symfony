@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-08T19:56:54Z
+
+See https://bugs.php.net/64566
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-09T08:39:30Z
+
+What about `auto_append_file`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-10T05:41:45Z
+
+auto_append_file is bugged also, but we can't do anything about it, there is no sane way to detect that the filewill not be included.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-10T06:01:21Z
+
+Do we really need to support it here? Would it be better to just wait for the PHP bug fix? I mean, how many Symfony users are using this "weird" PHP feature anyway?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-10T06:03:22Z
+
+I rely on this to have a consistent debugging env (think `dump()`) all the time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-18T10:18:40Z
+
+ping @symfony/deciders @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-18T10:19:39Z
+
+:+1:

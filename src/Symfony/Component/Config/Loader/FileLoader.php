@@ -103,7 +103,12 @@ abstract class FileLoader extends Loader
             }
             self::$loading[$resource] = true;
 
-            $ret = $loader->load($resource, $type);
+            try {
+                $ret = $loader->load($resource, $type);
+            } catch (\Exception $e) {
+                unset(self::$loading[$resource]);
+                throw $e;
+            }
 
             unset(self::$loading[$resource]);
 

@@ -38,14 +38,6 @@ class ExceptionListener implements EventSubscriberInterface
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        static $handling;
-
-        if (true === $handling) {
-            return false;
-        }
-
-        $handling = true;
-
         $exception = $event->getException();
         $request = $event->getRequest();
 
@@ -65,12 +57,9 @@ class ExceptionListener implements EventSubscriberInterface
         $request->setMethod('GET');
 
         try {
-            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, true);
+            $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
         } catch (\Exception $e) {
             $this->logException($e, sprintf('Exception thrown when handling an exception (%s: %s at %s line %s)', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()), false);
-
-            // set handling to false otherwise it wont be able to handle further more
-            $handling = false;
 
             $wrapper = $e;
 
@@ -88,8 +77,6 @@ class ExceptionListener implements EventSubscriberInterface
         }
 
         $event->setResponse($response);
-
-        $handling = false;
     }
 
     public static function getSubscribedEvents()

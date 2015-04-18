@@ -27,13 +27,6 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 class OptionsResolver implements Options
 {
     /**
-     * The fully qualified name of the {@link Options} interface.
-     *
-     * @internal
-     */
-    const OPTIONS_INTERFACE = 'Symfony\\Component\\OptionsResolver\\Options';
-
-    /**
      * The names of all defined options.
      *
      * @var array
@@ -171,7 +164,7 @@ class OptionsResolver implements Options
             $reflClosure = new \ReflectionFunction($value);
             $params = $reflClosure->getParameters();
 
-            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && self::OPTIONS_INTERFACE === $class->name) {
+            if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
                 // Initialize the option if no previous value exists
                 if (!isset($this->defaults[$option])) {
                     $this->defaults[$option] = null;

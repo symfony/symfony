@@ -1850,7 +1850,7 @@ class Request
 
         $len = strlen($prefix);
 
-        if (preg_match("#^(%[[:xdigit:]]{2}|.){{$len}}#", $string, $match)) {
+        if (preg_match("#^(%[[:xdigit:]]{2}|.){{".$len."}}#", $string, $match)) {
             return $match[0];
         }
 

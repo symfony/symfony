@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-15T14:51:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-15T15:01:58Z
+
+what does it do exactly ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-15T15:38:21Z
+
+Screaming is a feature that allows logging of @-silenced PHP errors. (e.g. `@unlink($file)`)
+In dev mode, screaming is enabled for all PHP error levels.
+But in the logs we don't want a silenced PHP warning to come up as LogLevel::WARNING.
+We'd prefer having to add `-vv` to app/console to see them
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-15T15:39:21Z
+
+yeah, looks good to me. :+1:
+
+Btw, it would be great to fix the deps=low tests
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-15T18:15:04Z
+
+@stof see #14344

@@ -198,6 +198,34 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     }
 
     /**
+     * Check if the specified message ID exists
+     *
+     * @param string      $id     The message id (may also be an object that can be cast to string)
+     * @param string|null $domain The domain for the message or null to use the default
+     * @param string|null $locale The locale or null to use the default
+     *
+     * @return bool true if the message has a translation, false otherwise
+     */
+    public function hasId($id, $domain = null, $locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        } else {
+            $this->assertValidLocale($locale);
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        return $this->catalogues[$locale]->has((string) $id, $domain);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @api

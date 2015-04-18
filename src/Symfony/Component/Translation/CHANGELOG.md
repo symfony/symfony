@@ -8,6 +8,7 @@ CHANGELOG
  * added TranslatorBagInterface
  * added LoggingTranslator
  * added Translator::getMessages() for retrieving the message catalogue as an array
+ * added Translator::hasId() for checking if a message ID has been registered
 
 2.5.0
 -----

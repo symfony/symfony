@@ -474,6 +474,104 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider      getTransFileTests
+     * @expectedException \Symfony\Component\Translation\Exception\NotFoundResourceException
+     */
+    public function testHasIdWithoutFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en');
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en');
+
+        // force catalogue loading
+        $translator->hasId('foo');
+    }
+
+    /**
+     * @dataProvider getTransFileTests
+     */
+    public function testHasIdWithFallbackLocaleFile($format, $loader)
+    {
+        $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
+        $translator = new Translator('en_GB');
+        $translator->addLoader($format, new $loaderClass());
+        $translator->addResource($format, __DIR__.'/fixtures/non-existing', 'en_GB');
+        $translator->addResource($format, __DIR__.'/fixtures/resources.'.$format, 'en', 'resources');
+
+        $this->assertTrue($translator->hasId('foo', 'resources'));
+    }
+
+    public function testHasIdWithFallbackLocaleBis()
+    {
+        $translator = new Translator('en_US');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+        $this->assertTrue($translator->hasId('bar'));
+    }
+
+    public function testHasIdWithFallbackLocaleTer()
+    {
+        $translator = new Translator('fr_FR');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (en_US)'), 'en_US');
+        $translator->addResource('array', array('bar' => 'bar (en)'), 'en');
+
+        $translator->setFallbackLocales(array('en_US', 'en'));
+
+        $this->assertTrue($translator->hasId('foo'));
+        $this->assertTrue($translator->hasId('bar'));
+    }
+
+    public function testHasIdNonExistentWithFallback()
+    {
+        $translator = new Translator('fr');
+        $translator->setFallbackLocales(array('en'));
+        $translator->addLoader('array', new ArrayLoader());
+        $this->assertFalse($translator->hasId('non-existent'));
+    }
+
+    public function testHasIdWithFallbackLocale()
+    {
+        $translator = new Translator('fr_FR');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
+
+        $translator->setFallbackLocales(array('en'));
+
+        $this->assertTrue($translator->hasId('bar'));
+    }
+
+    /**
+     * @dataProvider      getValidLocalesTests
+     */
+    public function testHasIdValidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->hasId('foo', '', $locale);
+        // no assertion. this method just asserts that no exception is thrown
+    }
+
+    /**
+     * @dataProvider      getInvalidLocalesTests
+     * @expectedException \InvalidArgumentException
+     */
+    public function testHasIdInvalidLocale($locale)
+    {
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+
+        $translator->hasId('foo', '', $locale);
+    }
+
+    /**
      * @dataProvider dataProviderGetMessages
      */
     public function testGetMessages($resources, $locale, $expected)

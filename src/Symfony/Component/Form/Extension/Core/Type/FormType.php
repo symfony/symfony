@@ -185,12 +185,22 @@ class FormType extends BaseType
             return $attributes;
         };
 
+        $readOnlyNormalizer = function (Options $options, $readOnly) {
+            if (null !== $readOnly) {
+                trigger_error('The form option "read_only" is deprecated since version 2.7 and will be removed in 3.0. Use "attr[\'readonly\']" instead.', E_USER_DEPRECATED);
+
+                return $readOnly;
+            }
+
+            return false;
+        };
+
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
             'required' => true,
-            'read_only' => false,
+            'read_only' => null,
             'max_length' => null,
             'pattern' => null,
             'property_path' => null,
@@ -208,6 +218,8 @@ class FormType extends BaseType
             'attr' => $defaultAttr,
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
+
+        $resolver->setNormalizer('read_only', $readOnlyNormalizer);
 
         $resolver->setAllowedTypes('label_attr', 'array');
     }

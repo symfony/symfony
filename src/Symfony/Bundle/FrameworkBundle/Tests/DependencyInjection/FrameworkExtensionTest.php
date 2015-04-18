@@ -258,6 +258,17 @@ abstract class FrameworkExtensionTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "foo" translation path does not exist.
+     */
+    public function testTranslatorWithInvalidPaths()
+    {
+        $container = $this->createContainer();
+        $loader = new FrameworkExtension();
+        $loader->load(array(array('translator' => array('paths' => array('foo')))), $container);
+    }
+
+    /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testTemplatingRequiresAtLeastOneEngine()

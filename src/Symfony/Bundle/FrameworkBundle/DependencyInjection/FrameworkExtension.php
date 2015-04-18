@@ -661,6 +661,15 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = array();
+
+        foreach ($config['paths'] as $path) {
+            if (!is_dir($path)) {
+                throw new \InvalidArgumentException(sprintf('The "%s" translation path does not exist.', $path));
+            }
+
+            $dirs[] = $path;
+        }
+
         if (class_exists('Symfony\Component\Validator\Validation')) {
             $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
 

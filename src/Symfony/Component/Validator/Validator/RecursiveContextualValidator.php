@@ -590,9 +590,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $object,
                     $cacheKey.':'.$propertyName,
                     $propertyMetadata,
-                    $propertyPath
-                        ? $propertyPath.'.'.$propertyName
-                        : $propertyName,
+                    PropertyPath::append($propertyPath, $propertyName),
                     $groups,
                     $cascadedGroups,
                     TraversalStrategy::IMPLICIT,

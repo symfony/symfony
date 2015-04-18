@@ -42,7 +42,7 @@ class PropertyPath
                 return $basePath.$subPath;
             }
 
-            return $basePath ? $basePath.'.'.$subPath : $subPath;
+            return '' !== (string) $basePath ? $basePath.'.'.$subPath : $subPath;
         }
 
         return $basePath;

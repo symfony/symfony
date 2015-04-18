@@ -484,7 +484,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private function validateClassNode($object, $cacheKey, ClassMetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
         if ($metadata instanceof PreprocessingMetadataInterface) {
-          $metadata->preprocessValue($object);
+          $object = $metadata->preprocessValue($object);
         }
         $context->setNode($object, $object, $metadata, $propertyPath);
 
@@ -681,7 +681,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
     private function validateGenericNode($value, $object, $cacheKey, MetadataInterface $metadata = null, $propertyPath, array $groups, $cascadedGroups, $traversalStrategy, ExecutionContextInterface $context)
     {
         if ($metadata instanceof PreprocessingMetadataInterface) {
-          $metadata->preprocessValue($value);
+          $value = $metadata->preprocessValue($value);
         }
         $context->setNode($value, $object, $metadata, $propertyPath);
 

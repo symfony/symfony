@@ -30,7 +30,9 @@ interface PreprocessingMetadataInterface extends MetadataInterface
      * Pre-processes the value before validation.
      *
      * @param mixed $value The value to be validated.
+     *
+     * @return mixed The pre-processed value.
      */
-    public function preprocessValue(&$value);
+    public function preprocessValue($value);
 
 }

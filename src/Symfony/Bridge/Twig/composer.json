@@ -23,7 +23,7 @@
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/asset": "~2.7|~3.0.0",
         "symfony/finder": "~2.3|~3.0.0",
-        "symfony/form": "~2.7|~3.0.0",
+        "symfony/form": "~2.8|~3.0.0",
         "symfony/http-kernel": "~2.3|~3.0.0",
         "symfony/intl": "~2.3|~3.0.0",
         "symfony/routing": "~2.2|~3.0.0",

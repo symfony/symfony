@@ -61,10 +61,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $request = $event->getRequest();
 
         if ($response->headers->has('X-Debug-Token') && null !== $this->urlGenerator) {
-            $response->headers->set(
-                'X-Debug-Token-Link',
-                $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')))
-            );
+            try {
+                $response->headers->set(
+                    'X-Debug-Token-Link',
+                    $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')))
+                );
+            } catch (\Exception $e) {
+                $response->headers->set('X-Debug-Error', get_class($e).': '.$e->getMessage());
+            }
         }
 
         if (!$event->isMasterRequest()) {

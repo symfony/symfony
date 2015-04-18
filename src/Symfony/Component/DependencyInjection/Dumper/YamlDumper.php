@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -33,20 +32,6 @@ class YamlDumper extends Dumper
     private $dumper;
 
     /**
-     * Constructor.
-     *
-     * @param ContainerBuilder $container The service container to dump
-     *
-     * @api
-     */
-    public function __construct(ContainerBuilder $container)
-    {
-        parent::__construct($container);
-
-        $this->dumper = new YmlDumper();
-    }
-
-    /**
      * Dumps the service container as an YAML string.
      *
      * @param array $options An array of options
@@ -57,6 +42,14 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = array())
     {
+        if (!class_exists('Symfony\Component\Yaml\Dumper')) {
+            throw new RuntimeException('Unable to dump the container as the Symfony Yaml Component is not installed.');
+        }
+
+        if (null === $this->dumper) {
+            $this->dumper = new YmlDumper();
+        }
+
         return $this->addParameters()."\n".$this->addServices();
     }
 

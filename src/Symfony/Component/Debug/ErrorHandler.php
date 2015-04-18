@@ -101,7 +101,7 @@ class ErrorHandler
     private static $stackedErrorLevels = array();
 
     /**
-     * Same init value as thrownErrors
+     * Same init value as thrownErrors.
      *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
@@ -415,7 +415,7 @@ class ErrorHandler
         } else {
             try {
                 $this->isRecursive = true;
-                $this->loggers[$type][0]->log($this->loggers[$type][1], $message, $e);
+                $this->loggers[$type][0]->log(($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG, $message, $e);
                 $this->isRecursive = false;
             } catch (\Exception $e) {
                 $this->isRecursive = false;
@@ -437,13 +437,12 @@ class ErrorHandler
      */
     public function handleException(\Exception $exception, array $error = null)
     {
-        $level = error_reporting();
-        if ($this->loggedErrors & E_ERROR & ($level | $this->screamedErrors)) {
+        if ($this->loggedErrors & E_ERROR) {
             $e = array(
                 'type' => E_ERROR,
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'level' => $level,
+                'level' => error_reporting(),
                 'stack' => $exception->getTrace(),
             );
             if ($exception instanceof FatalErrorException) {
@@ -547,7 +546,7 @@ class ErrorHandler
     }
 
     /**
-     * Unstacks stacked errors and forwards to the logger
+     * Unstacks stacked errors and forwards to the logger.
      */
     public static function unstackErrors()
     {
@@ -676,7 +675,7 @@ class ErrorHandler
 }
 
 /**
- * Private class used to work around https://bugs.php.net/54275
+ * Private class used to work around https://bugs.php.net/54275.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *

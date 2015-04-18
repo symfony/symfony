@@ -58,7 +58,8 @@ class FileLoaderLoadException extends \Exception
         if ('@' === $resource[0]) {
             $parts = explode(DIRECTORY_SEPARATOR, $resource);
             $bundle = substr($parts[0], 1);
-            $message .= ' '.sprintf('Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            $message .= sprintf(' Make sure the "%s" bundle is correctly registered and loaded in the application kernel class.', $bundle);
+            $message .= sprintf(' If the bundle is registered, make sure the bundle path "%s" is not empty.', $resource);
         }
 
         parent::__construct($message, $code, $previous);

@@ -93,6 +93,7 @@ class Cookie
             $dateTime = \DateTime::createFromFormat('U', $this->expires, new \DateTimeZone('GMT'));
 
             if ($dateTime === false) {
+                // this throw will provoke PHP fatal
                 throw new \UnexpectedValueException(sprintf('The cookie expiration time "%s" is not valid.'), $this->expires);
             }
 

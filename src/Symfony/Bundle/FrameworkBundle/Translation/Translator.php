@@ -69,7 +69,7 @@ class Translator extends BaseTranslator implements WarmableInterface
             $this->loadResources();
         }
 
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
     }
 
     /**

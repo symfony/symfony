@@ -39,7 +39,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $this->compiler = $container->getCompiler();
         $this->formatter = $this->compiler->getLoggingFormatter();
 
-        foreach (array_keys($container->getDefinitions()) as $id) {
+        foreach ($container->getDefinitions() as $id => $definition) {
             // yes, we are specifically fetching the definition from the
             // container to ensure we are not operating on stale data
             $definition = $container->getDefinition($id);

@@ -92,7 +92,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                 return;
             }
 
-            $value = & $objectOrArray;
+            $value = &$objectOrArray;
         }
     }
 
@@ -456,8 +456,10 @@ class PropertyAccessor implements PropertyAccessorInterface
         // see https://github.com/symfony/symfony/issues/4670
         $itemsToAdd = is_object($collection) ? iterator_to_array($collection) : $collection;
         $itemToRemove = array();
-        $propertyValue = $this->readProperty($object, $property);
+        $propertyValue = &$this->readProperty($object, $property);
         $previousValue = $propertyValue[self::VALUE];
+        // remove reference to avoid modifications
+        unset($propertyValue);
 
         if (is_array($previousValue) || $previousValue instanceof \Traversable) {
             foreach ($previousValue as $previousItem) {

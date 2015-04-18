@@ -100,7 +100,7 @@ class TokenStream
             throw new InternalErrorException('Unexpected token stream end.');
         }
 
-        return $this->tokens[$this->cursor ++];
+        return $this->tokens[$this->cursor++];
     }
 
     /**

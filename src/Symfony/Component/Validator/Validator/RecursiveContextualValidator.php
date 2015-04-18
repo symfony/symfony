@@ -34,6 +34,7 @@ use Symfony\Component\Validator\Util\PropertyPath;
  * Recursive implementation of {@link ContextualValidatorInterface}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveContextualValidator implements ContextualValidatorInterface
@@ -526,7 +527,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 } elseif ($metadata->isGroupSequenceProvider()) {
                     // The group sequence is dynamically obtained from the validated
                     // object
-                    /** @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
+                    /* @var \Symfony\Component\Validator\GroupSequenceProviderInterface $object */
                     $group = $object->getGroupSequence();
                     $defaultOverridden = true;
 

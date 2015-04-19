@@ -13,7 +13,6 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
-use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -248,7 +247,7 @@ class ChoiceType extends AbstractType
         };
 
         $emptyValue = function (Options $options) {
-            return $options['required'] ? null : '';
+            return $options['required'] && empty($options['choices']) ? '' : null;
         };
 
         // for BC with the "empty_value" option
@@ -417,6 +416,12 @@ class ChoiceType extends AbstractType
             'translation_domain' => $options['translation_domain'],
             'block_name' => 'entry',
         );
+
+        // Resolve label_attr to the right level
+        if (isset($choiceOpts['attr']['label_attr'])) {
+            $choiceOpts['label_attr'] = $choiceOpts['attr']['label_attr'];
+            unset($choiceOpts['attr']['label_attr']);
+        }
 
         if ($options['multiple']) {
             $choiceType = 'checkbox';

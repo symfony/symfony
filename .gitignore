@@ -6,3 +6,4 @@ package*.tar
 packages.json
 phpunit.xml
 /vendor/
+/.idea

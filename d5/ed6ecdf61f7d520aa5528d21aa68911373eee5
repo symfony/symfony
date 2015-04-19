@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T23:10:48Z
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T23:41:08Z
+
+The test failing seems to not be related:
+```
+Fatal error: Cannot redeclare class Symfony\Component\Debug\Exception\UndefinedFunctionException in /home/travis/build/symfony/symfony/src/Symfony/Component/Security/Http/vendor/symfony/debug/Symfony/Component/Debug/Exception/UndefinedFunctionException.php on line 33
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T08:45:26Z
+
+I think we should remove the test too. It doesn't make sense to test PHP's built-in features imho.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T11:54:11Z
+
+@nicolas-grekas it looks like there is a weird thing in the Debug component. why does it try to define the class twice ?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-16T14:07:42Z
+
+@xabbuh agree, done!

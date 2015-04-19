@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-14T21:23:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-15T06:41:08Z
+
+@xabbuh I don't understand what you are trying to do and the uses cases. Can you explain it to me ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-15T06:55:39Z
+
+@dupuchba The use case is to be able to remove a listener from of one of the event listeners while an event us dispatched. Previously, this was not possible because during the dispatch all listeners are wrapped by the `TraceableEventDispatcher` with a `WrappedListener` while the code was looking for an unwrapped one (see the example in #13972).
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-15T06:57:32Z
+
+ok :+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-16T11:11:45Z
+
+@xabbuh for the performance reason I suggest to store object hash instead in `wrappedListeners`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T11:39:11Z
+
+@aitboudad The issue is that a listener is not necessarily an object.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T11:49:58Z
+
+@aitboudad I don't see how this would increase performance anyway. The listener itself will already be in memory anyway inside the WrapperListener
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T11:52:41Z
+
+@stof It would speed up the lookup in `removeListener()`, but I don't think that it's that important anyway (dispatching an event already requires to touch each listener).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T11:56:33Z
+
+@xabbuh how would it be faster than the ``===`` check ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T12:08:08Z
+
+@stof We wouldn't have to iterate the saved listeners, but access `$this->wrappedListeners[$eventName][$listener]` instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-16T12:18:08Z
+
+@xabbuh anyway, this is a no-go. Listeners are callable, not objects
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T12:21:22Z
+
+@stof Sure, that's why I did it this way.

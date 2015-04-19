@@ -78,7 +78,7 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!isset($view->vars['attr']['readonly']) && isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly'])) {
+            if (!isset($view->vars['attr']['readonly']) && isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly']) {
                 $view->vars['attr']['readonly'] = true;
             }
         }

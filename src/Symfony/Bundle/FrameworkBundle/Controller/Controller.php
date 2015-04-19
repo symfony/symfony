@@ -120,6 +120,7 @@ class Controller extends ContainerAware
      * @param mixed $object     The object
      *
      * @throws \LogicException
+     *
      * @return bool
      */
     protected function isGranted($attributes, $object = null)
@@ -305,20 +306,11 @@ class Controller extends ContainerAware
      */
     public function getUser()
     {
-        if (!$this->container->has('security.token_storage')) {
+        if (!$this->container->has('security.current_user_provider')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }
 
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
-            return;
-        }
-
-        return $user;
+        return $this->container->get('security.current_user_provider')->getUser();
     }
 
     /**
@@ -362,7 +354,7 @@ class Controller extends ContainerAware
     }
 
     /**
-     * Checks the validity of a CSRF token
+     * Checks the validity of a CSRF token.
      *
      * @param string $id    The id used when generating the token
      * @param string $token The actual token sent with the request that should be validated

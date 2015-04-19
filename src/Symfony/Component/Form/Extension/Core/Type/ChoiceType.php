@@ -247,7 +247,7 @@ class ChoiceType extends AbstractType
         };
 
         $emptyValue = function (Options $options) {
-            return $options['required'] ? null : '';
+            return $options['required'] ? '' : null;
         };
 
         // for BC with the "empty_value" option

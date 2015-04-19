@@ -534,7 +534,7 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $attr, $label_attr) // todo check why red
+            ->with($list, null, null, null, null, $attr, $label_attr)
             ->will($this->returnValue($view));
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));
@@ -572,7 +572,7 @@ class CachingFactoryDecoratorTest extends \PHPUnit_Framework_TestCase
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
-            ->with($list, null, null, null, null, $attr, $label_attr) // todo check
+            ->with($list, null, null, null, null, $attr, $label_attr)
             ->will($this->returnValue($view));
 
         $this->assertSame($view, $this->factory->createView($list, null, null, null, null, $attr, $label_attr));

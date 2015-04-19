@@ -31,6 +31,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
 
     private $called;
     private $dispatcher;
+    private $wrappedListeners;
 
     /**
      * Constructor.
@@ -45,6 +46,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $this->stopwatch = $stopwatch;
         $this->logger = $logger;
         $this->called = array();
+        $this->wrappedListeners = array();
     }
 
     /**
@@ -68,6 +70,16 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
      */
     public function removeListener($eventName, $listener)
     {
+        if (isset($this->wrappedListeners[$eventName])) {
+            foreach ($this->wrappedListeners[$eventName] as $index => $wrappedListener) {
+                if ($wrappedListener->getWrappedListener() === $listener) {
+                    $listener = $wrappedListener;
+                    unset($this->wrappedListeners[$eventName][$index]);
+                    break;
+                }
+            }
+        }
+
         return $this->dispatcher->removeListener($eventName, $listener);
     }
 
@@ -216,12 +228,15 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $this->dispatcher->removeListener($eventName, $listener);
             $info = $this->getListenerInfo($listener, $eventName);
             $name = isset($info['class']) ? $info['class'] : $info['type'];
-            $this->dispatcher->addListener($eventName, new WrappedListener($listener, $name, $this->stopwatch, $this));
+            $wrappedListener = new WrappedListener($listener, $name, $this->stopwatch, $this);
+            $this->wrappedListeners[$eventName][] = $wrappedListener;
+            $this->dispatcher->addListener($eventName, $wrappedListener);
         }
     }
 
     private function postProcess($eventName)
     {
+        unset($this->wrappedListeners[$eventName]);
         $skipped = false;
         foreach ($this->dispatcher->getListeners($eventName) as $listener) {
             if (!$listener instanceof WrappedListener) { // #12845: a new listener was added during dispatch.
@@ -259,7 +274,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     }
 
     /**
-     * Returns information about the listener
+     * Returns information about the listener.
      *
      * @param object $listener  The listener
      * @param string $eventName The event name

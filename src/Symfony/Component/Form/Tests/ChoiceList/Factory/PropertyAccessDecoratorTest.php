@@ -285,7 +285,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
                 return $groupBy((object) array('group' => null));
             }));
 
-        $this->assertNull($this->factory->createView( // todo check red
+        $this->assertNull($this->factory->createView(
             $list,
             null, // preferred choices
             null, // label
@@ -305,7 +305,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
                 return $attr((object) array('property' => 'attr'));
             }));
 
-        $this->assertSame('attr', $this->factory->createView( // todo check red
+        $this->assertSame('attr', $this->factory->createView(
             $list,
             null, // preferred choices
             null, // label

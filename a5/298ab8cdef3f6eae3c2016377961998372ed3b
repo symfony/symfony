@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by sstok at 2015-04-19T07:14:29Z
+
+xlf is the file extension, xliff is the format. just as you have yml for YAML files.
+So not sure if this is a good change.
+
+And this is BC (even it it fixes a bug), you can no longer use xliff as format, so you need to support both xliff and xlf.
+
+---------------------------------------------------------------------------
+
+by xelaris at 2015-04-19T08:20:11Z
+
+@sstok Maybe my description wasn't clear enough. You can not use `xliff` as a value for the `output-format` argument now. Thats the reason for this PR.
+
+```
+$ app/console translation:update --output-format xliff en --dump-messages
+Wrong output format
+Supported formats are php, xlf, po, mo, yml, ts, csv, ini, json, res.
+```
+
+The translation *loader* still supports both 'xliff' and 'xlf' extension and type, but the *dumper* can dump `.xlf` files only and is registered for the `xlf` type only. So you have to use `xlf` not only as `extension` but also as the name of the `format`. The same is true for YAML, where the name of the format you have to use is `yml`, like the extension.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-19T11:06:33Z
+
+:+1:

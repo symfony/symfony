@@ -157,7 +157,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $label_attr = null) // todo check
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $label_attr = null)
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.

@@ -83,7 +83,7 @@ class ConfigDataCollector extends DataCollector
                 $this->data['bundles'][$name] = $bundle->getPath();
             }
 
-            $this->data['symfony_state'] = $this->calculateSymfonyState();
+            $this->data['symfony_state'] = $this->determineSymfonyState();
         }
     }
 
@@ -268,9 +268,9 @@ class ConfigDataCollector extends DataCollector
     /**
      * Tries to retrieve information about the current Symfony version.
      *
-     * @return string One of: unknown, dev, stable, eom, eol
+     * @return string One of: dev, stable, eom, eol
      */
-    private function calculateSymfonyState()
+    private function determineSymfonyState()
     {
         $now = new \DateTime();
         $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE)->modify('last day of this month');
@@ -280,7 +280,7 @@ class ConfigDataCollector extends DataCollector
             $versionState = 'eol';
         } elseif ($now > $eom) {
             $versionState = 'eom';
-        } elseif ('DEV' === Kernel::EXTRA_VERSION) {
+        } elseif ('' !== Kernel::EXTRA_VERSION) {
             $versionState = 'dev';
         } else {
             $versionState = 'stable';

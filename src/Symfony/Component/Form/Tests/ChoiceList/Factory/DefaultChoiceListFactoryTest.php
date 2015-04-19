@@ -639,7 +639,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             null, // group
             array(
                 'B' => array('attr1' => 'value1'),
-                'C' => array('attr2' => 'value2')
+                'C' => array('attr2' => 'value2'),
             )
         );
 
@@ -730,6 +730,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    /**
+     * @group legacy
+     */
     public function testCreateViewForLegacyChoiceList()
     {
         $preferred = array(new ChoiceView('Preferred', 'x', 'x'));

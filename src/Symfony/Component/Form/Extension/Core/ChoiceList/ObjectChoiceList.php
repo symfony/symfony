@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
+trigger_error('The '.__NAMESPACE__.'\ObjectChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Form\Exception\StringCastException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -96,8 +98,6 @@ class ObjectChoiceList extends ChoiceList
         $this->valuePath = null !== $valuePath ? new PropertyPath($valuePath) : null;
 
         parent::__construct($choices, array(), $preferredChoices);
-
-        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Component\Form\ChoiceList\ArrayChoiceList instead.', E_USER_DEPRECATED);
     }
 
     /**

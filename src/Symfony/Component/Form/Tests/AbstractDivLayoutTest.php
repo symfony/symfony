@@ -806,7 +806,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                     return array(
                         'class' => 'option_input_class', // expected
                         'label_attr' => array(
-                            'class' => 'option_label_class', // error
+                            'class' => 'option_label_class', // expected
                         ),
                     );
                 },
@@ -816,21 +816,21 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
 
         $html = $this->renderRow($view['choice']);
 
-        // __OK__   @Field div     --expected class="choice_field_class" | attr
+        // __OK__ @Field div     --expected class="choice_field_class" | attr
         $this->assertContains('<div id="name_choice" class="choice_field_class">',                                                           $html);
 
-        // __OK__   @Field_label   --expected class="choice_label_class" | label_attr
+        // __OK__ @Field_label   --expected class="choice_label_class" | label_attr
         $this->assertContains('<label class="choice_label_class">[trans]Choice[/trans]</label>',                                             $html);
 
-        // Before Patch tests fails
-        // __FAIL__ @Options  x2   --error label_attr=_ARRAY_            | choice_attr                 ERRORS   1 & 2
+        // All green
+        // __OK__ @Options  x2   --error label_attr=_ARRAY_            | choice_attr
         if (!$multiple) {
             $this->assertContains('<input type="radio" id="name_choice_0" name="name[choice]" class="option_input_class" value="0" />',      $html);
         } else {
             $this->assertContains('<input type="checkbox" id="name_choice_0" name="name[choice][]" class="option_input_class" value="0" />', $html);
         }
 
-        // __FAIL__ @Options_label --missing class="option_label_class"  | choice_attr [ label_attr ]  FAILURES 1 & 2
+        // __OK__ @Options_label --expected class="option_label_class" | choice_attr [ label_attr ]
         $this->assertContains('<label class="option_label_class" for="name_choice_0">[trans]Bernhard[/trans]</label>',                                 $html);
     }
 

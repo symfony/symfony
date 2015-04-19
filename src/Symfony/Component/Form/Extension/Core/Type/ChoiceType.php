@@ -418,6 +418,20 @@ class ChoiceType extends AbstractType
             'block_name' => 'entry',
         );
 
+        // Start fix
+        /*
+         * patch label_attr as passing it as an array to choiceOpts throw an exception in twig rendering
+         * need it for labels of <input type="radio|checkbox"> tags
+         * if expanded is true only, no need to pass array for html attributes in <option> tags
+         * addSubForm is called only is expanded is set to true so no need to catch the exception elsewhere
+         * as label_attr seems to be the only use case to me
+         */
+        if (isset($choiceOpts['attr']['label_attr'])) {
+            $choiceOpts['label_attr'] = $choiceOpts['attr']['label_attr']; // pass label_attr to the right level
+            unset($choiceOpts['attr']['label_attr']);                      // unset wrong level
+        }
+        // End fix
+
         if ($options['multiple']) {
             $choiceType = 'checkbox';
             // The user can check 0 or more checkboxes. If required

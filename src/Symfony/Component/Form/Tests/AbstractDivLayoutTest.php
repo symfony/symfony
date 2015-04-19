@@ -778,4 +778,64 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         // foo="foo"
         $this->assertContains('<div id="form" foo="foo">', $html);
     }
+
+    /**
+     * This is a test for div rendering and maybe needs testing with bootstrap and table layouts
+     *
+     * @dataProvider getOptionsWithChoiceAttr
+     */
+    public function testFormWithChoiceFieldHavingOptionsWithChoiceAttr($multiple)
+    {
+        $view = $this->factory->createNamedBuilder('name', 'form')
+            ->add('choice', 'choice', array(
+                'required' => false,
+                'expanded' => true,
+                'multiple' => $multiple,
+                'attr' => array(
+                    'class' => 'choice_field_class', // expected
+                ),
+                'label_attr' => array(
+                    'class' => 'choice_label_class', // expected
+                ),
+                'choices' => array(
+                    'Bernhard' => 'a',
+                    'Fabien'   => 'b',
+                ),
+                'choices_as_values' => true,
+                'choice_attr' => function($option, $key) {
+                    return array(
+                        'class' => 'option_input_class', // expected
+                        'label_attr' => array(
+                            'class' => 'option_label_class', // error
+                        ),
+                    );
+                },
+            ))
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderRow($view['choice']);
+
+        // __OK__   @Field div     --expected class="choice_field_class" | attr
+        $this->assertContains('<div id="name_choice" class="choice_field_class">',                                                           $html);
+
+        // __OK__   @Field_label   --expected class="choice_label_class" | label_attr
+        $this->assertContains('<label class="choice_label_class">[trans]Choice[/trans]</label>',                                             $html);
+
+        // Before Patch tests fails
+        // __FAIL__ @Options  x2   --error label_attr=_ARRAY_            | choice_attr                 ERRORS   1 & 2
+        if (!$multiple) {
+            $this->assertContains('<input type="radio" id="name_choice_0" name="name[choice]" class="option_input_class" value="0" />',      $html);
+        } else {
+            $this->assertContains('<input type="checkbox" id="name_choice_0" name="name[choice][]" class="option_input_class" value="0" />', $html);
+        }
+
+        // __FAIL__ @Options_label --missing class="option_label_class"  | choice_attr [ label_attr ]  FAILURES 1 & 2
+        $this->assertContains('<label class="option_label_class" for="name_choice_0">[trans]Bernhard[/trans]</label>',                                 $html);
+    }
+
+    public function getOptionsWithChoiceAttr()
+    {
+        return array(array(true), array(false));
+    }
 }

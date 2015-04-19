@@ -914,6 +914,31 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testSingleChoiceExpandedLabelAttributes()
+    {
+        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
+            'choice_label_attr' => array('Choice&B' => array('class' => 'foo&bar')),
+            'multiple' => false,
+            'expanded' => true,
+        ));
+
+        $classPart = in_array('choice_label_attr', $this->testableFeatures) ? '[@class="foo&bar required"]' : '';
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked]
+        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)]
+        /following-sibling::label[@for="name_1"]'.$classPart.'[.="[trans]Choice&B[/trans]"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=3]
+'
+        );
+    }
+
     public function testSingleChoiceExpandedWithPlaceholder()
     {
         $form = $this->factory->createNamed('name', 'choice', '&a', array(
@@ -1005,6 +1030,34 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"]'.$classPart.'[not(@checked)][not(@required)]
         /following-sibling::label[@for="name_1"][.="[trans]Choice&B[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
+        /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
+    ]
+    [count(./input)=4]
+'
+        );
+    }
+
+    public function testMultipleChoiceExpandedLabelAttributes()
+    {
+        $form = $this->factory->createNamed('name', 'choice', array('&a', '&c'), array(
+            'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
+            'choice_label_attr' => array('Choice&B' => array('class' => 'foo&bar')),
+            'multiple' => true,
+            'expanded' => true,
+            'required' => true,
+        ));
+
+        $classPart = in_array('choice_attr', $this->testableFeatures) ? '[@class="foo&bar"]' : '';
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [
+        ./input[@type="checkbox"][@name="name[]"][@id="name_0"][@checked][not(@required)]
+        /following-sibling::label[@for="name_0"][.="[trans]Choice&A[/trans]"]
+        /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][not(@checked)][not(@required)]
+        /following-sibling::label[@for="name_1"]'.$classPart.'[.="[trans]Choice&B[/trans]"]
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_2"][@checked][not(@required)]
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]

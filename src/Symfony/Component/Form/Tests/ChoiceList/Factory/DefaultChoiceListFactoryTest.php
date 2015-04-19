@@ -29,6 +29,10 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 
     private $obj4;
 
+    private $obj5;
+
+    private $obj6;
+
     private $list;
 
     /**
@@ -48,6 +52,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             case 'b': return 'b';
             case 'c': return '1';
             case 'd': return '2';
+            case 'e': return '0.1';
+            case 'f': return '0.2';
         }
     }
 
@@ -71,6 +77,11 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         return $object->attr;
     }
 
+    public function getLabelAttr($object)
+    {
+        return $object->label_attr;
+    }
+
     public function getGroup($object)
     {
         return $this->obj1 === $object || $this->obj2 === $object ? 'Group 1' : 'Group 2';
@@ -82,8 +93,10 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->obj2 = (object) array('label' => 'B', 'index' => 'x', 'value' => 'b', 'preferred' => true, 'group' => 'Group 1', 'attr' => array('attr1' => 'value1'));
         $this->obj3 = (object) array('label' => 'C', 'index' => 'y', 'value' => 1, 'preferred' => true, 'group' => 'Group 2', 'attr' => array('attr2' => 'value2'));
         $this->obj4 = (object) array('label' => 'D', 'index' => 'z', 'value' => 2, 'preferred' => false, 'group' => 'Group 2', 'attr' => array());
+        $this->obj5 = (object) array('label' => 'E', 'index' => 'u', 'value' => '', 'preferred' => true, 'group' => 'Group 3', 'attr' => array('label_attr2' => 'label_value2'));
+        $this->obj6 = (object) array('label' => 'F', 'index' => 'v', 'value' => '', 'preferred' => false, 'group' => 'Group 3', 'attr' => array('label_attr1' => 'label_value1'));
         $this->list = new ArrayChoiceList(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4)
+            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6)
         );
         $this->factory = new DefaultChoiceListFactory();
     }
@@ -99,7 +112,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromChoicesFlat()
     {
         $list = $this->factory->createListFromChoices(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4)
+            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6)
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -108,7 +121,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromChoicesFlatTraversable()
     {
         $list = $this->factory->createListFromChoices(
-            new \ArrayIterator(array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4))
+            new \ArrayIterator(array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6))
         );
 
         $this->assertObjectListWithGeneratedValues($list);
@@ -117,7 +130,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromChoicesFlatValuesAsCallable()
     {
         $list = $this->factory->createListFromChoices(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4),
+            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6),
             array($this, 'getValue')
         );
 
@@ -127,7 +140,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromChoicesFlatValuesAsClosure()
     {
         $list = $this->factory->createListFromChoices(
-            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4),
+            array('A' => $this->obj1, 'B' => $this->obj2, 'C' => $this->obj3, 'D' => $this->obj4, 'E' => $this->obj5, 'F' => $this->obj6),
             function ($object) { return $object->value; }
         );
 
@@ -140,6 +153,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
                 'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
+                'Group 3' => array('E' => $this->obj5, 'F' => $this->obj6),
             )
         );
 
@@ -152,6 +166,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             new \ArrayIterator(array(
                     'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
                     'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
+                    'Group 3' => array('E' => $this->obj5, 'F' => $this->obj6),
                 ))
         );
 
@@ -164,6 +179,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
                 'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
+                'Group 3' => array('E' => $this->obj5, 'F' => $this->obj6),
             ),
             array($this, 'getValue')
         );
@@ -177,6 +193,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('A' => $this->obj1, 'B' => $this->obj2),
                 'Group 2' => array('C' => $this->obj3, 'D' => $this->obj4),
+                'Group 3' => array('E' => $this->obj5, 'F' => $this->obj6),
             ),
             function ($object) { return $object->value; }
         );
@@ -195,7 +212,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromFlippedChoicesFlat()
     {
         $list = $this->factory->createListFromFlippedChoices(
-            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D')
+            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D', 'e' => 'E', 'f' => 'F')
         );
 
         $this->assertScalarListWithGeneratedValues($list);
@@ -204,7 +221,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromFlippedChoicesFlatTraversable()
     {
         $list = $this->factory->createListFromFlippedChoices(
-            new \ArrayIterator(array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D'))
+            new \ArrayIterator(array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D', 'e' => 'E', 'f' => 'F'))
         );
 
         $this->assertScalarListWithGeneratedValues($list);
@@ -213,7 +230,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromFlippedChoicesFlatValuesAsCallable()
     {
         $list = $this->factory->createListFromFlippedChoices(
-            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D'),
+            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D', 'e' => 'E', 'f' => 'F'),
             array($this, 'getScalarValue')
         );
 
@@ -223,13 +240,15 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromFlippedChoicesFlatValuesAsClosure()
     {
         $list = $this->factory->createListFromFlippedChoices(
-            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D'),
+            array('a' => 'A', 'b' => 'B', 'c' => 'C', 'd' => 'D', 'e' => 'E', 'f' => 'F'),
             function ($choice) {
                 switch ($choice) {
                     case 'a': return 'a';
                     case 'b': return 'b';
                     case 'c': return '1';
                     case 'd': return '2';
+                    case 'e': return '0.1';
+                    case 'f': return '0.2';
                 }
             }
         );
@@ -243,6 +262,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('a' => 'A', 'b' => 'B'),
                 'Group 2' => array('c' => 'C', 'd' => 'D'),
+                'Group 3' => array('e' => 'E', 'f' => 'F'),
             )
         );
 
@@ -255,6 +275,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             new \ArrayIterator(array(
                     'Group 1' => array('a' => 'A', 'b' => 'B'),
                     'Group 2' => array('c' => 'C', 'd' => 'D'),
+                    'Group 3' => array('e' => 'E', 'f' => 'F'),
                 ))
         );
 
@@ -267,6 +288,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('a' => 'A', 'b' => 'B'),
                 'Group 2' => array('c' => 'C', 'd' => 'D'),
+                'Group 3' => array('e' => 'E', 'f' => 'F'),
             ),
             array($this, 'getScalarValue')
         );
@@ -280,6 +302,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('a' => 'A', 'b' => 'B'),
                 'Group 2' => array('c' => 'C', 'd' => 'D'),
+                'Group 3' => array('e' => 'E', 'f' => 'F'),
             ),
             function ($choice) {
                 switch ($choice) {
@@ -287,6 +310,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case 'b': return 'b';
                     case 'c': return '1';
                     case 'd': return '2';
+                    case 'e': return '0.1';
+                    case 'f': return '0.2';
                 }
             }
         );
@@ -323,6 +348,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     1 => new ChoiceView('B', '1', $this->obj2),
                     2 => new ChoiceView('C', '2', $this->obj3),
                     3 => new ChoiceView('D', '3', $this->obj4),
+                    4 => new ChoiceView('E', '4', $this->obj5),
+                    5 => new ChoiceView('F', '5', $this->obj6),
                 ), array()
         ), $view);
     }
@@ -350,6 +377,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     1 => new ChoiceView('B', '1', $this->obj2),
                     2 => new ChoiceView('C', '2', $this->obj3),
                     3 => new ChoiceView('D', '3', $this->obj4),
+                    4 => new ChoiceView('E', '4', $this->obj3),
+                    5 => new ChoiceView('F', '5', $this->obj4),
                 ), array()
         ), $view);
     }
@@ -451,6 +480,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case '1': return 'B';
                     case '2': return 'C';
                     case '3': return 'D';
+                    case '4': return 'E';
+                    case '5': return 'F';
                 }
             }
         );
@@ -496,6 +527,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case 'B': return 'x';
                     case 'C': return 'y';
                     case 'D': return 'z';
+                    case 'E': return 'u';
+                    case 'F': return 'v';
                 }
             }
         );
@@ -515,6 +548,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     case '1': return 'x';
                     case '2': return 'y';
                     case '3': return 'z';
+                    case '4': return 'u';
+                    case '5': return 'v';
                 }
             }
         );
@@ -532,6 +567,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'Group 1' => array('A' => true, 'B' => true),
                 'Group 2' => array('C' => true, 'D' => true),
+                'Group 3' => array('E' => true, 'F' => true),
             )
         );
 
@@ -548,6 +584,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             new \ArrayIterator(array(
                 'Group 1' => array('A' => true, 'B' => true),
                 'Group 2' => array('C' => true, 'D' => true),
+                'Group 3' => array('E' => true, 'F' => true),
             ))
         );
 
@@ -591,7 +628,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             null, // label
             null, // index
             function ($object) use ($obj1, $obj2) {
-                return $obj1 === $object || $obj2 === $object ? 'Group 1'
+                return $obj1 === $object || $obj2 === $object
+                    ? 'Group 1'
                     : 'Group 2';
             }
         );
@@ -646,6 +684,24 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    public function testCreateViewFlatLabelAttrAsArray()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            array(
+                'E' => array('label_attr1' => 'label_value1'),
+                'F' => array('label_attr2' => 'label_value2')
+            )
+        );
+
+        $this->assertFlatViewWithLabelAttr($view);
+    }
+
     public function testCreateViewFlatAttrEmpty()
     {
         $view = $this->factory->createView(
@@ -654,6 +710,21 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             null, // label
             null, // index
             null, // group
+            array()
+        );
+
+        $this->assertFlatView($view);
+    }
+
+    public function testCreateViewFlatLabelAttrEmpty()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
             array()
         );
 
@@ -674,6 +745,21 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    public function testCreateViewFlatLabelAttrAsCallable()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            array($this, 'getLabelAttr')
+        );
+
+        $this->assertFlatViewWithLabelAttr($view);
+    }
+
     public function testCreateViewFlatAttrAsClosure()
     {
         $view = $this->factory->createView(
@@ -688,6 +774,23 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertFlatViewWithAttr($view);
+    }
+
+    public function testCreateViewFlatLabelAttrAsClosure()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            function ($object) {
+                return $object->label_attr;
+            }
+        );
+
+        $this->assertFlatViewWithLabelAttr($view);
     }
 
     public function testCreateViewFlatAttrClosureReceivesKey()
@@ -710,6 +813,27 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFlatViewWithAttr($view);
     }
 
+    public function testCreateViewFlatLabelAttrClosureReceivesKey()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            null, // attr
+            function ($object, $key) {
+                switch ($key) {
+                    case 'E': return array('label_attr2' => 'label_value2');
+                    case 'F': return array('label_attr1' => 'label_value1');
+                    default: return array();
+                }
+            }
+        );
+
+        $this->assertFlatViewWithLabelAttr($view);
+    }
+
     public function testCreateViewFlatAttrClosureReceivesValue()
     {
         $view = $this->factory->createView(
@@ -728,6 +852,26 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertFlatViewWithAttr($view);
+    }
+
+    public function testCreateViewFlatLabelAttrClosureReceivesValue()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            function ($object, $key, $value) {
+                switch ($value) {
+                    case '0.1': return array('label_attr1' => 'label_value1');
+                    case '0.2': return array('label_attr2' => 'label_value2');
+                    default: return array();
+                }
+            }
+        );
+
+        $this->assertFlatViewWithLabelAttr($view);
     }
 
     public function testCreateViewForLegacyChoiceList()
@@ -757,6 +901,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => 'b',
             'C' => 'c',
             'D' => 'd',
+            'E' => 'e',
+            'F' => 'f',
         ), $list->getChoices());
 
         $this->assertSame(array(
@@ -764,6 +910,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => 'b',
             'C' => 'c',
             'D' => 'd',
+            'E' => 'e',
+            'F' => 'f',
         ), $list->getValues());
     }
 
@@ -774,6 +922,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => $this->obj2,
             'C' => $this->obj3,
             'D' => $this->obj4,
+            'E' => $this->obj5,
+            'F' => $this->obj6,
         ), $list->getChoices());
 
         $this->assertSame(array(
@@ -781,6 +931,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => '1',
             'C' => '2',
             'D' => '3',
+            'E' => '4',
+            'F' => '5',
         ), $list->getValues());
     }
 
@@ -791,6 +943,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => 'b',
             'C' => 'c',
             'D' => 'd',
+            'E' => 'e',
+            'F' => 'f',
         ), $list->getChoices());
 
         $this->assertSame(array(
@@ -798,6 +952,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => 'b',
             'C' => '1',
             'D' => '2',
+            'E' => '0.1',
+            'F' => '0.2',
         ), $list->getValues());
     }
 
@@ -808,6 +964,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => $this->obj2,
             'C' => $this->obj3,
             'D' => $this->obj4,
+            'E' => $this->obj5,
+            'F' => $this->obj6,
         ), $list->getChoices());
 
         $this->assertSame(array(
@@ -815,6 +973,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             'B' => 'b',
             'C' => '1',
             'D' => '2',
+            'E' => '0.1',
+            'F' => '0.2',
         ), $list->getValues());
     }
 
@@ -827,6 +987,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                 ), array(
                     1 => new ChoiceView('B', '1', $this->obj2),
                     2 => new ChoiceView('C', '2', $this->obj3),
+                ), array(
+                    5 => new ChoiceView('E', '5', $this->obj5),
+                    4 => new ChoiceView('F', '4', $this->obj6),
                 )
         ), $view);
     }
@@ -835,11 +998,14 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(new ChoiceListView(
                 array(
-                    'w' => new ChoiceView('A', '0', $this->obj1),
-                    'z' => new ChoiceView('D', '3', $this->obj4),
+                    'w' => new ChoiceView('A', '0',   $this->obj1),
+                    'z' => new ChoiceView('D', '3',   $this->obj4),
                 ), array(
-                    'x' => new ChoiceView('B', '1', $this->obj2),
-                    'y' => new ChoiceView('C', '2', $this->obj3),
+                    'x' => new ChoiceView('B', '1',   $this->obj2),
+                    'y' => new ChoiceView('C', '2',   $this->obj3),
+                ), array(
+                    'u' => new ChoiceView('E', '0.1', $this->obj4),
+                    'v' => new ChoiceView('F', '0.2', $this->obj5),
                 )
         ), $view);
     }
@@ -862,6 +1028,35 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                         '2',
                         $this->obj3,
                         array('attr2' => 'value2')
+                    ),
+                ), array(
+                5 => new ChoiceView('E', '5', $this->obj5),
+                4 => new ChoiceView('F', '4', $this->obj6),
+            )
+        ), $view);
+    }
+
+    private function assertFlatViewWithLabelAttr($view)
+    {
+        $this->assertEquals(new ChoiceListView(
+                array(
+                    0 => new ChoiceView('A', '0', $this->obj1),
+                    3 => new ChoiceView('D', '3', $this->obj4),
+                ), array(
+                    1 => new ChoiceView('B', '1', $this->obj2),
+                    2 => new ChoiceView('C', '2', $this->obj3),
+                ), array(
+                    5 => new ChoiceView(
+                        'E',
+                        '5',
+                        $this->obj5,
+                        array('label_attr2' => 'label_value2')
+                    ),
+                    4 => new ChoiceView(
+                        'F',
+                        '4',
+                        $this->obj6,
+                        array('label_attr1' => 'label_value1')
                     ),
                 )
         ), $view);
@@ -887,6 +1082,15 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
                     'Group 2' => new ChoiceGroupView(
                         'Group 2',
                         array(2 => new ChoiceView('C', '2', $this->obj3))
+                    ),
+                ), array(
+                    'Group 1' => new ChoiceGroupView(
+                        'Group 2',
+                        array(5 => new ChoiceView('E', '5', $this->obj5))
+                    ),
+                    'Group 2' => new ChoiceGroupView(
+                        'Group 2',
+                        array(4 => new ChoiceView('F', '4', $this->obj6))
                     ),
                 )
         ), $view);

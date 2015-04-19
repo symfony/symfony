@@ -29,6 +29,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
 
     protected $testableFeatures = array(
         'choice_attr',
+        'choice_label_attr',
     );
 
     protected function getExtensions()

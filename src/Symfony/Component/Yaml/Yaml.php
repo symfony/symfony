@@ -48,16 +48,21 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      *
-     * @deprecated The ability to pass file names to the Yaml::parse method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.
+     * @deprecated The ability to pass file names to the Yaml::parse method is deprecated since version 2.7 and will be removed in 3.0. Pass the YAML contents of the file instead.
+     * @deprecated The ability to pass $timestampAsDateTime = false to the Yaml::parse method is deprecated since version 2.7. The argument will be removed in 3.0. Pass true instead.
      *
      * @api
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $timestampAsDateTime = false)
     {
+        if ($timestampAsDateTime) {
+            trigger_error('The ability to pass $timestampAsDateTime = false to the '.__METHOD__.' method is deprecated since version 2.7. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
+        }
+        
         // if input is a file, process it
         $file = '';
         if (strpos($input, "\n") === false && is_file($input)) {
-            trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
+            trigger_error('The ability to pass file names to the '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Pass the YAML contents of the file instead.', E_USER_DEPRECATED);
 
             if (false === is_readable($input)) {
                 throw new ParseException(sprintf('Unable to parse "%s" as the file is not readable.', $input));
@@ -95,10 +100,16 @@ class Yaml
      *
      * @return string A YAML string representing the original PHP array
      *
+     * @deprecated The ability to pass $dateTimeSupport = false to the Yaml::dump method is deprecated since version 2.7. The argument will be removed in 3.0. Pass true instead.
+     *
      * @api
      */
     public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false, $dateTimeSupport = false)
     {
+        if ($dateTimeSupport) {
+            trigger_error('The ability to pass $dateTimeSupport = false to the '.__METHOD__.' method is deprecated since version 2.7. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
+        }
+        
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 

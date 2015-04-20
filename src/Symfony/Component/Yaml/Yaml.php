@@ -91,16 +91,17 @@ class Yaml
      * @param int   $indent                 The amount of spaces to use for indentation of nested nodes.
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
+     * @param bool  $dateTimeSupport        true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string A YAML string representing the original PHP array
      *
      * @api
      */
-    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false, $dateTimeSupport = false)
     {
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 
-        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport);
+        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport);
     }
 }

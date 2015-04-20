@@ -270,4 +270,54 @@ class ChoiceValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', '"3"')
             ->assertRaised();
     }
+
+    public function testValidEmptyChoiceArray()
+    {
+        $constraint = new Choice(array(
+            'choices' => array(),
+        ));
+
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidEmptyChoiceArrayWithMultipleChoices()
+    {
+        $constraint = new Choice(array(
+            'choices' => array(),
+            'multiple' => true,
+        ));
+
+        $this->validator->validate(array(), $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidChoiceMultipleWithEmptyChoiceArray()
+    {
+        $constraint = new Choice(array(
+            'choices' => array(),
+            'multipleMessage' => 'myMessage',
+            'multiple' => true,
+        ));
+
+        $this->validator->validate(array('foo'), $constraint);
+
+        $this->buildViolation('myMessage')
+             ->setParameter('{{ value }}', '"foo"')
+             ->assertRaised();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
+    public function testExpectArrayForChoicesOption()
+    {
+        $constraint = new Choice(array(
+            'choices' => 'foo',
+        ));
+
+        $this->validator->validate('foo', $constraint);
+    }
 }

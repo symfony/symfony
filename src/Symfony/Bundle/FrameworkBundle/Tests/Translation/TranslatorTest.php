@@ -95,27 +95,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testRefreshCacheWhenResourcesAreNoLongerFresh()
-    {
-        $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $resource->method('isFresh')->will($this->returnValue(false));
-        $loader
-            ->expects($this->exactly(2))
-            ->method('load')
-            ->will($this->returnValue($this->getCatalogue('fr', array(), array($resource))));
-
-        // prime the cache
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true));
-        $translator->setLocale('fr');
-        $translator->trans('foo');
-
-        // prime the cache second time
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir, 'debug' => true));
-        $translator->setLocale('fr');
-        $translator->trans('foo');
-    }
-
     public function testTransWithCachingWithInvalidLocale()
     {
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
@@ -169,113 +148,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testGetLocale()
+    public function testGetDefaultLocale()
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-
-        $request
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
             ->expects($this->once())
-            ->method('getLocale')
+            ->method('getParameter')
+            ->with('kernel.default_locale')
             ->will($this->returnValue('en'))
         ;
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('isScopeActive')
-            ->with('request')
-            ->will($this->onConsecutiveCalls(false, true))
-        ;
-
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with('request')
-            ->will($this->returnValue(true))
-        ;
-
-        $container
-            ->expects($this->once())
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue($request))
-        ;
-
         $translator = new Translator($container, new MessageSelector());
 
-        $this->assertNull($translator->getLocale());
         $this->assertSame('en', $translator->getLocale());
-    }
-
-    public function testGetLocaleWithInvalidLocale()
-    {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-
-        $request
-            ->expects($this->once())
-            ->method('getLocale')
-            ->will($this->returnValue('foo bar'))
-        ;
-        $request
-            ->expects($this->once())
-            ->method('getDefaultLocale')
-            ->will($this->returnValue('en-US'))
-        ;
-
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-
-        $container
-            ->expects($this->once())
-            ->method('isScopeActive')
-            ->with('request')
-            ->will($this->returnValue(true))
-        ;
-
-        $container
-            ->expects($this->once())
-            ->method('has')
-            ->with('request')
-            ->will($this->returnValue(true))
-        ;
-
-        $container
-            ->expects($this->any())
-            ->method('get')
-            ->with('request')
-            ->will($this->returnValue($request))
-        ;
-
-        $translator = new Translator($container, new MessageSelector());
-        $this->assertSame('en-US', $translator->getLocale());
-    }
-
-    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
-    {
-        /*
-         * Because the cache file contains a catalogue including all of its fallback
-         * catalogues, we must take the active set of fallback locales into
-         * consideration when loading a catalogue from the cache.
-         */
-        $translator = $this->createTranslator(new ArrayLoader(), array('cache_dir' => $this->tmpDir));
-        $translator->setLocale('a');
-        $translator->setFallbackLocales(array('b'));
-        $translator->addResource('loader', array('foo' => 'foo (a)'), 'a');
-        $translator->addResource('loader', array('bar' => 'bar (b)'), 'b');
-
-        $this->assertEquals('bar (b)', $translator->trans('bar'));
-
-        // Remove fallback locale
-        $translator->setFallbackLocales(array());
-        $this->assertEquals('bar', $translator->trans('bar'));
-
-        // Use a fresh translator with no fallback locales, result should be the same
-        $translator = $this->createTranslator(new ArrayLoader(), array('cache_dir' => $this->tmpDir));
-        $translator->setLocale('a');
-        $translator->addResource('loader', array('foo' => 'foo (a)'), 'a');
-        $translator->addResource('loader', array('bar' => 'bar (b)'), 'b');
-
-        $this->assertEquals('bar', $translator->trans('bar'));
     }
 
     protected function getCatalogue($locale, $messages, $resources = array())

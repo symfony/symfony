@@ -235,11 +235,37 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($fallback->defines('foo'));
     }
 
-    protected function getCatalogue($locale, $messages)
+    public function testRefreshCacheWhenResourcesAreNoLongerFresh()
+    {
+        $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $resource->method('isFresh')->will($this->returnValue(false));
+        $loader
+            ->expects($this->exactly(2))
+            ->method('load')
+            ->will($this->returnValue($this->getCatalogue('fr', array(), array($resource))));
+
+        // prime the cache
+        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', 'foo', 'fr');
+        $translator->trans('foo');
+
+        // prime the cache second time
+        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator->addLoader('loader', $loader);
+        $translator->addResource('loader', 'foo', 'fr');
+        $translator->trans('foo');
+    }
+
+    protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
             $catalogue->set($key, $translation);
+        }
+        foreach ($resources as $resource) {
+            $catalogue->addResource($resource);
         }
 
         return $catalogue;

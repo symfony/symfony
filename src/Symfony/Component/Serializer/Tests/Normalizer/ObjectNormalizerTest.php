@@ -476,7 +476,7 @@ class ObjectDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 
     public function setObject($object)
@@ -515,7 +515,7 @@ class ObjectConstructorDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 }
 
@@ -548,6 +548,6 @@ class ObjectConstructorOptionalArgsDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 }

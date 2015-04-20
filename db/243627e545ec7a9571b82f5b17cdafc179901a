@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-13T09:39:55Z
+
+I don't feel that this information should be added to the interface, but to the actual implementation in the `EventDispatcher` class instead. Adding this information to the interface adds a new requirement to fullfil for third-party implementation of the interface which should be considered a BC break.
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-13T10:23:04Z
+
+Ok @xabbuh I didn't thought about that :-).
+Let me add The information to the `EventDispatcher` instead.
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-13T10:38:55Z
+
+@xabbuh done, tell me if you have other observations :-).
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-13T10:44:47Z
+
+@xabbuh this is already a requirement today actually. The code already relies on listeners being sorted (the TraceableeventDispatcher would dispatch in the wrong order in case the inner dispatcher does not return them sorted for instance). So it is already a requirement of the interface
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-13T10:56:09Z
+
+@stof ok, I was not sure about it so It has to go on the interface.
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-13T10:57:46Z
+
+@stof @xabbuh done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-13T14:43:24Z
+
+@stof Then it must indeed be added to the interface itself.
+
+Sorry for the confusion @dupuchba.
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-13T15:16:56Z
+
+@xabbuh no problem, your feedback was still valuable.
+
+---------------------------------------------------------------------------
+
+by dupuchba at 2015-04-14T11:40:49Z
+
+@xabbuh is it ok to merge ?(ping @stof )
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-20T08:21:38Z
+
+:+1:

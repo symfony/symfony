@@ -863,6 +863,16 @@ class ResponseTest extends ResponseTestCase
     {
         return new Response();
     }
+
+    public function testReasonPhrase()
+    {
+        $response = Response::create();
+        $statusCode = Response::HTTP_UNAUTHORIZED;
+        $reasonPhrase = "You do not have Administrator access";
+        $response->setStatusCode($statusCode, $reasonPhrase);
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($reasonPhrase, $response->getReasonPhrase());
+    }
 }
 
 class StringableObject

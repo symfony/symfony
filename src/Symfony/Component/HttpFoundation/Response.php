@@ -500,6 +500,18 @@ class Response
     }
 
     /**
+     * Retrieves the reason phrase (AKA status text) for the current web response.
+     *
+     * @return string Reason phrase
+     *
+     * @api
+     */
+    public function getReasonPhrase()
+    {
+        return $this->statusText;
+    }
+
+    /**
      * Sets the response charset.
      *
      * @param string $charset Character set

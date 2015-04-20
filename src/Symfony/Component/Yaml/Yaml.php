@@ -42,6 +42,7 @@ class Yaml
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
      * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
+     * @param bool   $timestampAsDateTime    True if timestamps must be parsed as DateTime objects rather than Unix timestamps (integers)
      *
      * @return array The YAML converted to a PHP array
      *
@@ -51,7 +52,7 @@ class Yaml
      *
      * @api
      */
-    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
+    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $timestampAsDateTime = false)
     {
         // if input is a file, process it
         $file = '';
@@ -69,7 +70,7 @@ class Yaml
         $yaml = new Parser();
 
         try {
-            return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+            return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
         } catch (ParseException $e) {
             if ($file) {
                 $e->setParsedFile($file);

@@ -26,6 +26,7 @@ class Inline
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;
     private static $objectForMap = false;
+    private static $timestampAsDateTime = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -35,16 +36,18 @@ class Inline
      * @param bool   $objectSupport          true if object support is enabled, false otherwise
      * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
      * @param array  $references             Mapping of variable names to values
+     * @param bool   $timestampAsDateTime    true if timestamps must be parsed as DateTime objects rather than Unix timestamps (integers)
      *
      * @return array A PHP array representing the YAML string
      *
      * @throws ParseException
      */
-    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array())
+    public static function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $references = array(), $timestampAsDateTime = false)
     {
         self::$exceptionOnInvalidType = $exceptionOnInvalidType;
         self::$objectSupport = $objectSupport;
         self::$objectForMap = $objectForMap;
+        self::$timestampAsDateTime = $timestampAsDateTime;
 
         $value = trim($value);
 
@@ -502,6 +505,9 @@ class Inline
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
+                        if (self::$timestampAsDateTime) {
+                            return new \DateTime($scalar);
+                        }
                         return strtotime($scalar);
                 }
             default:

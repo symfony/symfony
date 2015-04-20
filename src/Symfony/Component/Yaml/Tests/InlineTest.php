@@ -34,6 +34,16 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getTestsForParseWithTimestampAsDateTime
+     */
+    public function testParseTimestampAsDateTime($yamlTimestamp)
+    {
+        $expected = serialize(new \DateTime($yamlTimestamp));
+		$actual = serialize(Inline::parse($yamlTimestamp, false, false, false, null, true));
+		$this->assertSame($expected, $actual);
+    }
+
+    /**
      * @dataProvider getTestsForDump
      */
     public function testDump($yaml, $value)
@@ -320,6 +330,17 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('[foo, [[], {}]]', array('foo', array(array(), new \stdClass()))),
             array('[foo, [[{}, {}], {}]]', array('foo', array(array(new \stdClass(), new \stdClass()), new \stdClass()))),
             array('[foo, {bar: {}}]', array('foo', '1' => (object) array('bar' => new \stdClass()))),
+        );
+    }
+
+    public function getTestsForParseWithTimestampAsDateTime()
+    {
+        return array(
+            array('2007-10-30'),
+            array('2007-10-30T02:59:43Z'),
+            array('2007-10-30 02:59:43 Z'),
+            array('1960-10-30 02:59:43 Z'),
+            array('1730-10-30T02:59:43Z'),
         );
     }
 

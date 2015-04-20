@@ -45,12 +45,13 @@ class Parser
      * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool   $objectSupport          true if object support is enabled, false otherwise
      * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param bool   $timestampAsDateTime    true if timestamps must be parsed as DateTime objects rather than Unix timestamps (integers)
      *
      * @return mixed A PHP value
      *
      * @throws ParseException If the YAML is not valid
      */
-    public function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
+    public function parse($value, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $timestampAsDateTime = false)
     {
         if (!preg_match('//u', $value)) {
             throw new ParseException('The YAML value does not appear to be valid UTF-8.');
@@ -95,7 +96,7 @@ class Parser
                     $c = $this->getRealCurrentLineNb() + 1;
                     $parser = new self($c);
                     $parser->refs = &$this->refs;
-                    $data[] = $parser->parse($this->getNextEmbedBlock(null, true), $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                    $data[] = $parser->parse($this->getNextEmbedBlock(null, true), $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
                 } else {
                     if (isset($values['leadspaces'])
                         && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $values['value'], $matches)
@@ -110,9 +111,9 @@ class Parser
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + strlen($values['leadspaces']) + 1);
                         }
 
-                        $data[] = $parser->parse($block, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                        $data[] = $parser->parse($block, $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
                     } else {
-                        $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                        $data[] = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
                     }
                 }
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))) {
@@ -122,7 +123,7 @@ class Parser
                 $context = 'mapping';
 
                 // force correct settings
-                Inline::parse(null, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+                Inline::parse(null, $exceptionOnInvalidType, $objectSupport, $objectForMap, null, $timestampAsDateTime);
                 try {
                     $key = Inline::parseScalar($values['key']);
                 } catch (ParseException $e) {
@@ -161,7 +162,7 @@ class Parser
                         $c = $this->getRealCurrentLineNb() + 1;
                         $parser = new self($c);
                         $parser->refs = &$this->refs;
-                        $parsed = $parser->parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                        $parsed = $parser->parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
 
                         if (!is_array($parsed)) {
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
@@ -212,7 +213,7 @@ class Parser
                         $c = $this->getRealCurrentLineNb() + 1;
                         $parser = new self($c);
                         $parser->refs = &$this->refs;
-                        $value = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                        $value = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
@@ -220,7 +221,7 @@ class Parser
                         }
                     }
                 } else {
-                    $value = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap);
+                    $value = $this->parseValue($values['value'], $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime);
                     // Spec: Keys MUST be unique; first one wins.
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
@@ -236,7 +237,7 @@ class Parser
                 // 1-liner optionally followed by newline(s)
                 if ($this->lines[0] === trim($value)) {
                     try {
-                        $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+                        $value = Inline::parse($this->lines[0], $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs, $timestampAsDateTime);
                     } catch (ParseException $e) {
                         $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                         $e->setSnippet($this->currentLine);
@@ -433,15 +434,16 @@ class Parser
      * Parses a YAML value.
      *
      * @param string $value                  A YAML value
-     * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
-     * @param bool   $objectSupport          True if object support is enabled, false otherwise
+     * @param bool   $exceptionOnInvalidType true if an exception must be thrown on invalid types false otherwise
+     * @param bool   $objectSupport          true if object support is enabled, false otherwise
      * @param bool   $objectForMap           true if maps should return a stdClass instead of array()
+     * @param bool   $timestampAsDateTime    true if timestamps must be parsed as DateTime objects rather than Unix timestamps (integers)
      *
      * @return mixed A PHP value
      *
      * @throws ParseException When reference does not exist
      */
-    private function parseValue($value, $exceptionOnInvalidType, $objectSupport, $objectForMap)
+    private function parseValue($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $timestampAsDateTime)
     {
         if (0 === strpos($value, '*')) {
             if (false !== $pos = strpos($value, '#')) {
@@ -464,7 +466,7 @@ class Parser
         }
 
         try {
-            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs);
+            return Inline::parse($value, $exceptionOnInvalidType, $objectSupport, $objectForMap, $this->refs, $timestampAsDateTime);
         } catch (ParseException $e) {
             $e->setParsedLine($this->getRealCurrentLineNb() + 1);
             $e->setSnippet($this->currentLine);

@@ -195,7 +195,7 @@ class FormType extends BaseType
 
         $readOnlyNormalizer = function (Options $options, $readOnly) {
             if (null !== $readOnly) {
-                trigger_error('The form option "read_only" is deprecated since version 2.7 and will be removed in 3.0. Use "attr[\'readonly\']" instead.', E_USER_DEPRECATED);
+                trigger_error('The form option "read_only" is deprecated since version 2.8 and will be removed in 3.0. Use "attr[\'readonly\']" instead.', E_USER_DEPRECATED);
 
                 return $readOnly;
             }

@@ -109,9 +109,15 @@ class Inline
                 return 'null';
             case is_object($value):
                 if ($value instanceof \DateTime) {
+                    if ($value->getTimezone()->getName() === date_default_timezone_get()) {
+                        if (0 === (int) $value->format('His')) {
+                            return $value->format('Y-m-d');
+                        }
+                        return $value->format('Y-m-d H:i:s');
+                    }
                     return $value->format(\DateTime::W3C);
                 }
-
+                
                 if ($objectSupport) {
                     return '!!php/object:'.serialize($value);
                 }

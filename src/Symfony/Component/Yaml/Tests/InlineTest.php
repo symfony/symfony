@@ -410,6 +410,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     public function getTestsForDumpWithDateTimeSupport () {
         return array(
             array('2015-04-21T05:30:30-08:00', new \DateTime('2015-04-21 05:30:30 -8')),
+            array('2015-04-21T00:00:00-02:00', new \DateTime('2015-04-21 -2')),
+            array('2015-04-21T00:00:00+00:00', new \DateTime('2015-04-21 -0')),
+            array('2015-04-21 05:30:30', new \DateTime('2015-04-21 05:30:30')),
+            array('2015-04-21', new \DateTime('2015-04-21')),
         );
     }
 }

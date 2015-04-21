@@ -94,7 +94,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function has($id, $domain = 'messages')
     {
-        if (isset($this->messages[$domain][$id])) {
+        if ($this->defines($id, $domain)) {
             return true;
         }
 
@@ -120,7 +120,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function get($id, $domain = 'messages')
     {
-        if (isset($this->messages[$domain][$id])) {
+        if ($this->defines($id, $domain)) {
             return $this->messages[$domain][$id];
         }
 

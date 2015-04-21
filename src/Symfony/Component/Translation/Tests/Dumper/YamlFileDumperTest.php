@@ -16,16 +16,38 @@ use Symfony\Component\Translation\Dumper\YamlFileDumper;
 
 class YamlFileDumperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDump()
+    public function testTreeDump()
     {
         $catalogue = new MessageCatalogue('en');
-        $catalogue->add(array('foo' => 'bar'));
+        $catalogue->add(
+            array(
+                'foo.bar1' => 'value1',
+                'foo.bar2' => 'value2',
+            ));
+
+        $tempDir = sys_get_temp_dir();
+        $dumper = new YamlFileDumper();
+        $dumper->dump($catalogue, array('path' => $tempDir, 'as_tree' => true, 'inline' => 999));
+
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/messages.yml'), file_get_contents($tempDir.'/messages.en.yml'));
+
+        unlink($tempDir.'/messages.en.yml');
+    }
+
+    public function testLinearDump()
+    {
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->add(
+            array(
+                'foo.bar1' => 'value1',
+                'foo.bar2' => 'value2',
+            ));
 
         $tempDir = sys_get_temp_dir();
         $dumper = new YamlFileDumper();
         $dumper->dump($catalogue, array('path' => $tempDir));
 
-        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/resources.yml'), file_get_contents($tempDir.'/messages.en.yml'));
+        $this->assertEquals(file_get_contents(__DIR__.'/../fixtures/messages_linear.yml'), file_get_contents($tempDir.'/messages.en.yml'));
 
         unlink($tempDir.'/messages.en.yml');
     }

@@ -86,8 +86,6 @@ class Container implements IntrospectableContainerInterface
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?: new ParameterBag();
-
-        $this->set('service_container', $this);
     }
 
     /**
@@ -198,11 +196,9 @@ class Container implements IntrospectableContainerInterface
         $id = strtolower($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' is no longer a self-reference but always
-            // $this, so ignore this call.
-            // @todo Throw InvalidArgumentException in next major release.
-            return;
+            throw new InvalidArgumentException('You cannot set service "service_container".');
         }
+
         if (self::SCOPE_CONTAINER !== $scope) {
             if (!isset($this->scopedServices[$scope])) {
                 throw new RuntimeException(sprintf('You cannot set service "%s" of inactive scope.', $id));
@@ -351,9 +347,7 @@ class Container implements IntrospectableContainerInterface
         $id = strtolower($id);
 
         if ('service_container' === $id) {
-            // BC: 'service_container' was a synthetic service previously.
-            // @todo Change to false in next major release.
-            return true;
+            return false;
         }
 
         if (isset($this->aliases[$id])) {

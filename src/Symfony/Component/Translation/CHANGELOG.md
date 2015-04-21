@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added options 'as_tree', 'inline' to YamlFileDumper
+
 2.7.0
 -----
 

@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Dumper;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Translation\Util\ArrayConverter;
 
 /**
  * YamlFileDumper generates yaml files from a message catalogue.
@@ -24,9 +25,19 @@ class YamlFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    protected function format(MessageCatalogue $messages, $domain)
+    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
-        return Yaml::dump($messages->all($domain));
+        $data = $messages->all($domain);
+
+        if (isset($options['as_tree']) && $options['as_tree']) {
+            $data = ArrayConverter::expandToTree($data);
+        }
+
+        if (isset($options['inline']) && ($inline = (int) $options['inline']) > 0) {
+            return Yaml::dump($data, $inline);
+        }
+
+        return Yaml::dump($data);
     }
 
     /**
@@ -35,5 +46,13 @@ class YamlFileDumper extends FileDumper
     protected function getExtension()
     {
         return 'yml';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function format(MessageCatalogue $messages, $domain)
+    {
+        return $this->formatCatalogue($messages, $domain);
     }
 }

@@ -82,8 +82,24 @@ abstract class FileDumper implements DumperInterface
                 }
             }
             // save file
-            file_put_contents($fullpath, $this->format($messages, $domain));
+            file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
         }
+    }
+
+    /**
+     * Transforms a domain of a message catalogue to its string representation.
+     *
+     * Override this function in child class if $options is used for message formatting.
+     *
+     * @param MessageCatalogue $messages
+     * @param string           $domain
+     * @param array            $options
+     *
+     * @return string representation
+     */
+    protected function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
+    {
+        return $this->format($messages, $domain);
     }
 
     /**

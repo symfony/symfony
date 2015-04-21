@@ -110,7 +110,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
-            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
     }
 

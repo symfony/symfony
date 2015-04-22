@@ -85,6 +85,30 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
     }
 
+    public function testGetCatalogueReturnsConsolidatedCatalogue()
+    {
+        /*
+         * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).
+         * In that case, getCatalogue() will probably have to load all missing domains in order to return
+         * one complete catalogue.
+         */
+
+        $locale = 'whatever';
+        $translator = new Translator($locale);
+        $translator->addLoader('loader-a', new ArrayLoader());
+        $translator->addLoader('loader-b', new ArrayLoader());
+        $translator->addResource('loader-a', array('foo' => 'foofoo'), $locale, 'domain-a');
+        $translator->addResource('loader-b', array('bar' => 'foobar'), $locale, 'domain-b');
+
+        /*
+         * Test that we get a single catalogue comprising messages
+         * from different loaders and different domains
+         */
+        $catalogue = $translator->getCatalogue($locale);
+        $this->assertTrue($catalogue->defines('foo', 'domain-a'));
+        $this->assertTrue($catalogue->defines('bar', 'domain-b'));
+    }
+
     public function testSetFallbackLocales()
     {
         $translator = new Translator('en');
@@ -136,11 +160,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransWithFallbackLocale()
     {
         $translator = new Translator('fr_FR');
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foofoo'), 'en_US');
-        $translator->addResource('array', array('bar' => 'foobar'), 'en');
-
         $translator->setFallbackLocales(array('en'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('bar' => 'foobar'), 'en');
 
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
@@ -280,12 +303,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransValidLocale($locale)
     {
-        $translator = new Translator('en', new MessageSelector());
+        $translator = new Translator($locale, new MessageSelector());
         $translator->addLoader('array', new ArrayLoader());
-        $translator->addResource('array', array('foo' => 'foofoo'), 'en');
+        $translator->addResource('array', array('test' => 'OK'), $locale);
 
-        $translator->trans('foo', array(), '', $locale);
-        // no assertion. this method just asserts that no exception is thrown
+        $this->assertEquals('OK', $translator->trans('test'));
+        $this->assertEquals('OK', $translator->trans('test', array(), null, $locale));
     }
 
     /**

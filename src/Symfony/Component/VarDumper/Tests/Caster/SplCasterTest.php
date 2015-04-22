@@ -106,14 +106,14 @@ SplFileObject {
   ]
   flags: DROP_NEW_LINE|SKIP_EMPTY
   maxLineLen: 0
-  fstat: array:7 [
+  fstat: array:26 [
     "dev" => %d
     "ino" => %d
     "nlink" => %d
     "rdev" => 0
     "blksize" => %d
     "blocks" => %d
-    "…" => "…20"
+     …20
   ]
   eof: false
   key: 0

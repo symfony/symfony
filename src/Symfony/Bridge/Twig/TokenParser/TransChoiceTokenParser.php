@@ -56,7 +56,7 @@ class TransChoiceTokenParser extends TransTokenParser
         if ($stream->test('into')) {
             // {% transchoice count into "fr" %}
             $stream->next();
-            $locale =  $this->parser->getExpressionParser()->parseExpression();
+            $locale = $this->parser->getExpressionParser()->parseExpression();
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

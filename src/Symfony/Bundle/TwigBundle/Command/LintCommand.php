@@ -110,7 +110,7 @@ EOF
 
     protected function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
     {
-        $line =  $exception->getTemplateLine();
+        $line = $exception->getTemplateLine();
         $lines = $this->getContext($template, $line);
 
         if ($file) {

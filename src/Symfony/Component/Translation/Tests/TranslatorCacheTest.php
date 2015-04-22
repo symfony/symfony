@@ -178,8 +178,17 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
-    public function testGetCatalogueBehavesConsistently()
+    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
     {
+        /*
+         * As a safeguard against potential BC breaks, make sure that primary and fallback
+         * catalogues (reachable via getFallbackCatalogue()) always contain the full set of
+         * messages provided by the loader. This must also be the case when these catalogues
+         * are (internally) read from a cache.
+         *
+         * Optimizations inside the translator must not change this behaviour.
+         */
+
         /*
          * Create a translator that loads two catalogues for two different locales.
          * The catalogues contain distinct sets of messages.

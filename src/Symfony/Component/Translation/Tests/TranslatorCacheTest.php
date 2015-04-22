@@ -57,8 +57,8 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatACacheIsUsed($debug)
     {
-        $locale = 'whatever';
-        $format = 'what-you-like';
+        $locale = 'any_locale';
+        $format = 'some_format';
         $msgid = 'test';
 
         // Prime the cache
@@ -87,8 +87,8 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * will never be revalidated.
          */
 
-        $locale = 'whatever';
-        $format = 'what-you-like';
+        $locale = 'any_locale';
+        $format = 'some_format';
         $msgid = 'test';
 
         $catalogue = new MessageCatalogue($locale, array());
@@ -125,8 +125,8 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * sure there's still a useable cache for the first one.
          */
 
-        $locale = 'whatever';
-        $format = 'what-you-like';
+        $locale = 'any_locale';
+        $format = 'some_format';
         $msgid = 'test';
 
         // Create a Translator and prime its cache

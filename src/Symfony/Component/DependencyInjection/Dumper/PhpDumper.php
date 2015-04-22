@@ -203,7 +203,7 @@ class PhpDumper extends Dumper
 
         $code = '';
         foreach ($calls as $id => $callCount) {
-            if ('service_container' === $id || $id === $cId) {
+            if (ContainerInterface::CONTAINER_ID === $id || $id === $cId) {
                 continue;
             }
 
@@ -905,8 +905,6 @@ EOF;
         \$this->scopedServices =
         \$this->scopeStacks = array();
 
-        \$this->set('service_container', \$this);
-
 EOF;
 
         $code .= "\n";
@@ -1431,7 +1429,7 @@ EOF;
      */
     private function getServiceCall($id, Reference $reference = null)
     {
-        if ('service_container' === $id) {
+        if (ContainerInterface::CONTAINER_ID === $id) {
             return '$this';
         }
 

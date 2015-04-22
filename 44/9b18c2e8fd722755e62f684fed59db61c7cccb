@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T05:00:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T09:27:15Z
+
+I also added support for `SplFileObject`
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T09:45:56Z
+
+What about tests ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-21T09:47:55Z
+
+:+1: this is great @lyrixx!
+
+I have a proposal: could it be possible to show some of the information in a human-friendly way? Example:
+
+```
+Symfony\Component\Finder\SplFileInfo {#69
+  basename: "grisou.jpg"
+  filename: "grisou.jpg"
+  extension: "jpg"
+  path: "fixtures"
+  pathname: "fixtures/grisou.jpg"
+  realPath: "/home/greg/dev/github.com/lyrixx/gaga-photo/fixtures/grisou.jpg"
+  perms: 33256 (rwxr-xr-x)
+  inode: 12197643
+  size: 966553 bytes (0.96 MB)
+  owner: 1000
+  group: 1000
+  aTime: 1429564875 (April 20, 2015 23:21:15)
+  mTime: 1408282656 (August 17, 2014 15:37:36)
+  cTime: 1429564191 (April 20, 2015 23:09:51)
+  type: "file"
+  writable: true
+  readable: true
+  executable: true
+  file: true
+  dir: false
+  link: false
+}
+```
+
+Changes:
+
+  * All the filename, extension, path, etc. properties are grouped at the beginning.
+  * File size is showed in the original bytes length and in the "human size" (MB, KB, etc.)
+  * Dates are displayed in the original timestamp and in understandable format.
+  * Perms are also transformed to the usual human format.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T10:01:12Z
+
+@javiereguiluz  Oups, I did not updated the "sample" but most of your comments are already addressed.
+
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-04-21T10:08:54Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-21T10:14:29Z
+
+@lyrixx awesome! Thanks.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T10:15:02Z
+
+@javiereguiluz I updated the description, and move some "property"
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-21T10:38:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T10:57:33Z
+
+I had to rework the implementation to not throw exception when the file is special (link a remote file)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T11:53:20Z
+
+-1 until tests are not added (I'm putting an explicit -1 vote here as other voters seems to validate it without tests, which is not a good idea).
+
+Otherwise, the idea is good
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T12:53:45Z
+
+@stof you should be happy now ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T14:07:06Z
+
+Travis is green, but fabbot is KO...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-21T17:11:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T17:14:28Z
+
+@lyrixx it would be great to avoid setting non-working links in the fabbot commit status for pending builds (either not setting the URL if Travis supports it, or making the page valid, saying that the inspection is in progress)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T17:20:03Z
+
+:+1:
+
+@lyrixx what about adding the support for ``Symfony\Component\Finder\SplFileInfo`` too, which adds the relative path too ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T18:08:22Z
+
+@stof It's already supported because the VarDumper is awesome ;)
+(It starts by casting the "higher" extended class to finish by the current class, and because the `Symfony\Component\Finder\SplFileInfo` is "just" a regular class with private attribute, it just works)
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$f = new Symfony\Component\Finder\SplFileInfo(__FILE__, 'relativePath', 'relativePathname');
+die(dump($f));
+```
+
+=>
+
+```
+Symfony\Component\Finder\SplFileInfo {#4
+  -relativePath: "relativePath"
+  -relativePathname: "relativePathname"
+  path: "/home/greg/dev/github.com/symfony/symfony"
+  filename: "test.php"
+  basename: "test.php"
+  pathname: "/home/greg/dev/github.com/symfony/symfony/test.php"
+  extension: "php"
+  realPath: "/home/greg/dev/github.com/symfony/symfony/test.php"
+  aTime: 2015-04-21 20:05:29
+  mTime: 2015-04-21 20:05:27
+  cTime: 2015-04-21 20:05:27
+  inode: 12851779
+  size: 157
+  perms: 0100644
+  owner: 1000
+  group: 1000
+  type: "file"
+  writable: true
+  readable: true
+  executable: false
+  file: true
+  dir: false
+  link: false
+}
+```

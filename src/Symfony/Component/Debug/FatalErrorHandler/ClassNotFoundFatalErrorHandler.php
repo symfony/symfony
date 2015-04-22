@@ -139,7 +139,9 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
      */
     private function findClassInPath($path, $class, $prefix)
     {
-        if (!$path = realpath($path)) {
+        if ($subPath = realpath($path.'/'.strtr($prefix, '\\', '/'))) {
+            $path = $subPath;
+        } elseif (!$path = realpath($path)) {
             return array();
         }
 

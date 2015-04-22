@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-11T11:36:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-17T11:00:40Z
+
+the use of `FileResource` in catalogue is optional, so instead of throwing an exception what do you think to avoid `addResource` call ?
+
+```php
+if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+    $catalogue->addResource(new FileResource($resource));
+}
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-22T15:10:17Z
+
+@aitboudad Is this what you had in mind?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-22T15:45:16Z
+
+@xabbuh yes thanks !

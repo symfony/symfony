@@ -1,0 +1,117 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T19:41:24Z
+
+how does this behave in case the closure passed as argument was already bound previously ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-21T19:45:19Z
+
+Symfony is the last one to bind, so symfony wins:
+
+```
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+$application = new Application();
+
+$code = function (InputInterface $input, OutputInterface $output) use ($application) {
+    $output->writeln('===================');
+    $application = $this->getApplication();
+    $help = $application->find('help');
+    $output->writeln($help->getHelp());
+    $output->writeln('===================');
+};
+
+$code = $code->bindTo($application);
+
+$application->add((new Command('process')))
+    ->setDescription('Play all other commands')
+    ->setCode($code)
+;
+$application->run();
+```
+
+=>
+
+```
+php test.php  process
+===================
+The %command.name% command displays help for a given command:
+
+  php %command.full_name% list
+
+You can also output the help in other formats by using the --format option:
+
+  php %command.full_name% --format=xml list
+
+To display the list of available commands, please use the list command.
+===================
+```
+
+(yeah, we can do crazy things with closure binding....)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-22T08:52:23Z
+
+I'd bind only if the closure is not already bound, so that we keep BC
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-22T08:59:33Z
+
+The JS way to bind closures is better IMO, by making sure that the first one binding a closure wins, letting the creator of the closure can control how it is called without having to bother with code using the closure.
+
+Is there a way to detect whether the closure was bound explicitly in PHP ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-22T09:02:26Z
+
+> Is there a way to detect whether the closure was bound explicitly in PHP ?
+
+yes, http://php.net/manual/en/reflectionfunctionabstract.getclosurethis.php
+
+```php
+        if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
+            $r = new \ReflectionFunction($code);
+            if (null === $r->getClosureThis()) {
+                $code = \Closure::bind($code, $this);
+            }
+        }
+```
+
+but I'm not able to unbind a closure in tests ... (even if the [doc](http://php.net/manual/en/closure.bindto.php) says it's possible)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-22T09:16:05Z
+
+Here we go, should be ok now...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-22T09:29:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-23T09:01:50Z
+
+@stof Is it ok for you?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T09:03:19Z
+
+:+1:

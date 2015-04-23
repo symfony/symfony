@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 interface FormTypeExtensionInterface
 {
+    const ALL_TYPES = 'ALL';
+
     /**
      * Builds the form.
      *

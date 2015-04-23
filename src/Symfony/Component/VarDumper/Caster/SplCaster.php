@@ -160,18 +160,7 @@ class SplCaster
         }
 
         if (isset($a[$prefix.'fstat'])) {
-            $fstat = $a[$prefix.'fstat'];
-            $fstat = array(
-                'dev' => $fstat['dev'],
-                'ino' => $fstat['ino'],
-                'nlink' => $fstat['nlink'],
-                'rdev' => $fstat['rdev'],
-                'blksize' => $fstat['blksize'],
-                'blocks' => $fstat['blocks'],
-                '…' => '…'.(count($fstat) - 6),
-            );
-
-            $a[$prefix.'fstat'] = $fstat;
+            $a[$prefix.'fstat'] = new CutArrayStub($a[$prefix.'fstat'], array('dev', 'ino', 'nlink', 'rdev', 'blksize', 'blocks'));
         }
 
         return $a;

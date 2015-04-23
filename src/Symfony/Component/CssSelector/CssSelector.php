@@ -15,6 +15,8 @@ use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
 use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
 use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;
 use Symfony\Component\CssSelector\Parser\Shortcut\HashParser;
+use Symfony\Component\CssSelector\SelectorCache\ArraySelectorCache;
+use Symfony\Component\CssSelector\SelectorCache\SelectorCacheInterface;
 use Symfony\Component\CssSelector\XPath\Extension\HtmlExtension;
 use Symfony\Component\CssSelector\XPath\Translator;
 
@@ -69,6 +71,11 @@ class CssSelector
     private static $html = true;
 
     /**
+     * @var SelectorCacheInterface
+     */
+    private static $cache;
+
+    /**
      * Translates a CSS expression to its XPath equivalent.
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
@@ -82,6 +89,14 @@ class CssSelector
      */
     public static function toXPath($cssExpr, $prefix = 'descendant-or-self::')
     {
+        self::$cache = self::$cache ?: new ArraySelectorCache();
+
+        $key = ($prefix ?: '').$cssExpr.(self::$html ? '::html' : '');
+
+        if (null !== $xpath = self::$cache->fetch($key)) {
+            return $xpath;
+        }
+
         $translator = new Translator();
 
         if (self::$html) {
@@ -95,7 +110,11 @@ class CssSelector
             ->registerParserShortcut(new HashParser())
         ;
 
-        return $translator->cssToXPath($cssExpr, $prefix);
+        $xpath = $translator->cssToXPath($cssExpr, $prefix);
+
+        self::$cache->save($key, $xpath);
+
+        return $xpath;
     }
 
     /**
@@ -112,5 +131,15 @@ class CssSelector
     public static function disableHtmlExtension()
     {
         self::$html = false;
+    }
+
+    /**
+     * Sets a custom selector cache.
+     *
+     * @param SelectorCacheInterface|null $cache
+     */
+    public static function setSelectorCache(SelectorCacheInterface $cache = null)
+    {
+        self::$cache = $cache;
     }
 }

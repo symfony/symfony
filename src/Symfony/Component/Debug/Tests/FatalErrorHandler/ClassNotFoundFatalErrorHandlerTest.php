@@ -98,7 +98,7 @@ class ClassNotFoundFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $symfonyAutoloader = new SymfonyClassLoader();
         $symfonyAutoloader->addPrefixes($prefixes);
 
-        $debugClassLoader = new DebugClassLoader($symfonyAutoloader);
+        $debugClassLoader = new DebugClassLoader(array($symfonyAutoloader, 'loadClass'));
 
         return array(
             array(

@@ -32,7 +32,7 @@ class ChoiceValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint->choices && !$constraint->callback) {
+        if (!is_array($constraint->choices) && !$constraint->callback) {
             throw new ConstraintDefinitionException('Either "choices" or "callback" must be specified on constraint Choice');
         }
 

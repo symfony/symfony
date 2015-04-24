@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-20T15:05:58Z
+
+Why should legacy tests be excluded?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-20T15:09:38Z
+
+Because on this matrix line, 2.8 is installed with 3.0 deps. Legacy tests are for interfaces that are removed in 3.0.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-20T15:22:52Z
+
+I think tests should be skipped if they rely on an interface that doesn't exist (because a 3.0 dep is installed). Just not executing all legacy tests will potentially hide alot of problems or wrong dependencies.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-20T15:25:08Z
+
+We are talking about one line in the matrix, not all of them. All other lines on 2.8 do run legacy tests.
+This line is very specific and only for testing 2.8 with 3.0.

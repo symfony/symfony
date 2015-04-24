@@ -362,7 +362,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(2, $xmlMappings);
-        $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlMappings[0]);
+        try {
+            // Testing symfony/symfony
+            $this->assertStringEndsWith('Component'.DIRECTORY_SEPARATOR.'Form/Resources/config/validation.xml', $xmlMappings[0]);
+        } catch (\Exception $e) {
+            // Testing symfony/framework-bundle with deps=high
+            $this->assertStringEndsWith('symfony'.DIRECTORY_SEPARATOR.'form/Resources/config/validation.xml', $xmlMappings[0]);
+        }
         $this->assertStringEndsWith('TestBundle'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'validation.xml', $xmlMappings[1]);
 
         $yamlMappings = $calls[4][1][0];

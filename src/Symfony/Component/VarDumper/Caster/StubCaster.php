@@ -33,6 +33,11 @@ class StubCaster
         }
     }
 
+    public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, $isNested)
+    {
+        return $isNested ? $c->preservedSubset : $a;
+    }
+
     public static function cutInternals($obj, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {

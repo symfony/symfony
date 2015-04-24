@@ -293,6 +293,33 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'from the code...'.PHP_EOL, $tester->getDisplay());
     }
 
+    public function getSetCodeBindToClosureTests()
+    {
+        return array(
+            array(true, 'not bound to the command'),
+            array(false, 'bound to the command'),
+        );
+    }
+
+    /** @dataProvider getSetCodeBindToClosureTests */
+    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    {
+        if (PHP_VERSION_ID < 50400) {
+            $this->markTestSkipped('Test skipped, for PHP 5.4+ only.');
+        }
+
+        $code = createClosure();
+        if ($previouslyBound) {
+            $code = $code->bindTo($this);
+        }
+
+        $command = new \TestCommand();
+        $command->setCode($code);
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+        $this->assertEquals('interact called'.PHP_EOL.$expected.PHP_EOL, $tester->getDisplay());
+    }
+
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();
@@ -317,4 +344,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     {
         $output->writeln('from the code...');
     }
+}
+
+// In order to get an unbound closure, we should create it outside a class
+// scope.
+function createClosure()
+{
+    return function(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln($this instanceof Command ? 'bound to the command' : 'not bound to the command');
+    };
 }

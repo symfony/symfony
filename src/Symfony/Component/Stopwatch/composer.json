@@ -22,9 +22,8 @@
         "symfony/phpunit-bridge": "~2.8|~3.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Stopwatch\\": "" }
+        "psr-4": { "Symfony\\Component\\Stopwatch\\": "" }
     },
-    "target-dir": "Symfony/Component/Stopwatch",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

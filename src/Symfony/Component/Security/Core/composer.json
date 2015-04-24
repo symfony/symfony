@@ -34,9 +34,8 @@
         "symfony/expression-language": "For using the expression voter"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Security\\Core\\": "" }
+        "psr-4": { "Symfony\\Component\\Security\\Core\\": "" }
     },
-    "target-dir": "Symfony/Component/Security/Core",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

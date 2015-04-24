@@ -30,9 +30,8 @@
         "psr/log": "For using the console logger"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Console\\": "" }
+        "psr-4": { "Symfony\\Component\\Console\\": "" }
     },
-    "target-dir": "Symfony/Component/Console",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

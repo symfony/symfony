@@ -37,8 +37,11 @@ class ConfigCacheFactory implements ConfigCacheFactoryInterface
      */
     public function cache($file, $callback)
     {
-        $cache = new ConfigCache($file, $this->debug);
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException(sprintf('Invalid type for callback argument. Expected callable, but got "%s".', gettype($callback)));
+        }
 
+        $cache = new ConfigCache($file, $this->debug);
         if (!$cache->isFresh()) {
             call_user_func($callback, $cache);
         }

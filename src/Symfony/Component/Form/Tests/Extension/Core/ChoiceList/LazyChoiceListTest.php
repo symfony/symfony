@@ -12,8 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
-use Symfony\Component\Form\Extension\Core\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\Fixtures\LazyChoiceListImpl;
+use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\Fixtures\LazyChoiceListInvalidImpl;
 
 /**
  * @group legacy
@@ -21,7 +22,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var LazyChoiceListTest_Impl
+     * @var LazyChoiceListImpl
      */
     private $list;
 
@@ -29,7 +30,7 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->list = new LazyChoiceListTest_Impl(new SimpleChoiceList(array(
+        $this->list = new LazyChoiceListImpl(new SimpleChoiceList(array(
             'a' => 'A',
             'b' => 'B',
             'c' => 'C',
@@ -92,31 +93,8 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadChoiceListShouldReturnChoiceList()
     {
-        $list = new LazyChoiceListTest_InvalidImpl();
+        $list = new LazyChoiceListInvalidImpl();
 
         $list->getChoices();
-    }
-}
-
-class LazyChoiceListTest_Impl extends LazyChoiceList
-{
-    private $choiceList;
-
-    public function __construct($choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
-
-    protected function loadChoiceList()
-    {
-        return $this->choiceList;
-    }
-}
-
-class LazyChoiceListTest_InvalidImpl extends LazyChoiceList
-{
-    protected function loadChoiceList()
-    {
-        return new \stdClass();
     }
 }

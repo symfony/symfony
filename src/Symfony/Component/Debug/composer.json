@@ -33,9 +33,8 @@
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Debug\\": "" }
+        "psr-4": { "Symfony\\Component\\Debug\\": "" }
     },
-    "target-dir": "Symfony/Component/Debug",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

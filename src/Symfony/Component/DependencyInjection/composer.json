@@ -30,9 +30,8 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DependencyInjection\\": "" }
+        "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" }
     },
-    "target-dir": "Symfony/Component/DependencyInjection",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

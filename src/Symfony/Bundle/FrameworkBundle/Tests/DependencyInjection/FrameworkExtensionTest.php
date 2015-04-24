@@ -456,6 +456,22 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('serializer'));
     }
 
+    public function testAssetHelperWhenAssetsAreEnabled()
+    {
+        $container = $this->createContainerFromFile('full');
+        $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
+
+        $this->assertSame('assets.packages', (string) $packages);
+    }
+
+    public function testAssetHelperWhenTemplatesAreEnabledAndAssetsAreDisabled()
+    {
+        $container = $this->createContainerFromFile('assets_disabled');
+        $packages = $container->getDefinition('templating.helper.assets')->getArgument(0);
+
+        $this->assertSame('assets.packages', (string) $packages);
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(

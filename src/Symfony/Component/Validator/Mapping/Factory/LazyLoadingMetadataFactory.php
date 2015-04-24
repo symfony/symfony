@@ -14,6 +14,8 @@ namespace Symfony\Component\Validator\Mapping\Factory;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 /**
@@ -28,7 +30,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
  * Whenever a new metadata instance is created, it is passed to the loader,
  * which can configure the metadata based on configuration loaded from the
  * filesystem or a database. If you want to use multiple loaders, wrap them in a
- * {@link Loader\LoaderChain}.
+ * {@link LoaderChain}.
  *
  * You can also optionally pass a {@link CacheInterface} instance to the
  * constructor. This cache will be used for persisting the generated metadata

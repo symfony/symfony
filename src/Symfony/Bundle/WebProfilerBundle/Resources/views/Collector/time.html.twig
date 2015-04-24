@@ -103,13 +103,13 @@
                 return dict.hasOwnProperty(key)
                     ? dict[key]
                     : null;
-                }
+                };
 
             this.set = function(key, value) {
                 dict[key] = value;
 
                 return value;
-            }
+            };
         };
 
         /**
@@ -383,7 +383,7 @@
 
                 return this;
             };
-        };
+        }
 
         function canvasAutoUpdateOnResizeAndSubmit(e) {
             e.preventDefault();

@@ -168,7 +168,7 @@ class DebugClassLoader
                 }
                 $parent = $refl->getParentClass();
 
-                if (!$parent || strncmp($ns, $parent, $len)) {
+                if (!$parent || strncmp($ns, $parent->name, $len)) {
                     if ($parent && isset(self::$deprecated[$parent->name]) && strncmp($ns, $parent->name, $len)) {
                         trigger_error(sprintf('The %s class extends %s that is deprecated %s', $name, $parent->name, self::$deprecated[$parent->name]), E_USER_DEPRECATED);
                     }

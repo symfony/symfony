@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\ChoiceList;
 
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface as BaseChoiceListInterface;
+use Symfony\Component\Form\FormConfigBuilder;
 
 /**
  * Contains choices that can be selected in a form field.
@@ -87,7 +88,7 @@ interface ChoiceListInterface extends BaseChoiceListInterface
      * Returns the indices corresponding to the given choices.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *
@@ -107,7 +108,7 @@ interface ChoiceListInterface extends BaseChoiceListInterface
      * Returns the indices corresponding to the given values.
      *
      * The indices must be positive integers or strings accepted by
-     * {@link FormConfigBuilder::validateName()}.
+     * {@link \Symfony\Component\Form\FormConfigBuilder::validateName()}.
      *
      * The index "placeholder" is internally reserved.
      *

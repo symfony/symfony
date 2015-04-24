@@ -23,6 +23,7 @@ abstract class AbstractCloner implements ClonerInterface
 {
     public static $defaultCasters = array(
         'Symfony\Component\VarDumper\Caster\CutStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
+        'Symfony\Component\VarDumper\Caster\CutArrayStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castCutArray',
         'Symfony\Component\VarDumper\Caster\ConstStub' => 'Symfony\Component\VarDumper\Caster\StubCaster::castStub',
 
         'Closure' => 'Symfony\Component\VarDumper\Caster\ReflectionCaster::castClosure',
@@ -78,6 +79,8 @@ abstract class AbstractCloner implements ClonerInterface
 
         'ArrayObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castArrayObject',
         'SplDoublyLinkedList' => 'Symfony\Component\VarDumper\Caster\SplCaster::castDoublyLinkedList',
+        'SplFileInfo' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileInfo',
+        'SplFileObject' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFileObject',
         'SplFixedArray' => 'Symfony\Component\VarDumper\Caster\SplCaster::castFixedArray',
         'SplHeap' => 'Symfony\Component\VarDumper\Caster\SplCaster::castHeap',
         'SplObjectStorage' => 'Symfony\Component\VarDumper\Caster\SplCaster::castObjectStorage',

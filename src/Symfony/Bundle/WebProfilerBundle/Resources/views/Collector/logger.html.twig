@@ -93,7 +93,7 @@
                 {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
                 {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
                     {% set log_loop_index = log_loop_index + 1 %}
-                    <li class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
+                    <li class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 or is_deprecation %} warning{% endif %}">
                         {{ logger.display_message(loop.index, log, is_deprecation) }}
                     </li>
                 {% endif %}
@@ -113,6 +113,8 @@
     {% if is_deprecation %}
         {% set stack = log.context.stack|default([]) %}
         {% set id = 'sf-call-stack-' ~ log_index %}
+
+        DEPRECATED - {{ log.message }}
 
         {% if stack %}
             <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">

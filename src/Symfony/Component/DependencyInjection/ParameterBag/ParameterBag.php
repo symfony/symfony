@@ -96,7 +96,7 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $alternatives = array();
-            foreach (array_keys($this->parameters) as $key) {
+            foreach ($this->parameters as $key => $parameterValue) {
                 $lev = levenshtein($name, $key);
                 if ($lev <= strlen($name) / 3 || false !== strpos($key, $name)) {
                     $alternatives[] = $key;

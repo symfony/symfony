@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\Util\XliffUtils;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -109,77 +109,19 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
-     * Validates and parses the given file into a SimpleXMLElement.
+     * Validates and parses the given file into an array that contains a SimpleXml instance and the encoding.
      *
      * @param string $file
      *
+     * @return array
+     *
      * @throws \RuntimeException
-     *
-     * @return \SimpleXMLElement
-     *
      * @throws InvalidResourceException
      */
     private function parseFile($file)
     {
-        try {
-            $dom = XmlUtils::loadFile($file);
-        } catch (\InvalidArgumentException $e) {
-            throw new InvalidResourceException(sprintf('Unable to load "%s": %s', $file, $e->getMessage()), $e->getCode(), $e);
-        }
-
-        $internalErrors = libxml_use_internal_errors(true);
-
-        $location = str_replace('\\', '/', __DIR__).'/schema/dic/xliff-core/xml.xsd';
-        $parts = explode('/', $location);
-        if (0 === stripos($location, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'sf2');
-            if ($tmpfile) {
-                copy($location, $tmpfile);
-                $parts = explode('/', str_replace('\\', '/', $tmpfile));
-            }
-        }
-        $drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-        $location = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
-
-        $source = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-1.2-strict.xsd');
-        $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
-
-        if (!@$dom->schemaValidateSource($source)) {
-            throw new InvalidResourceException(implode("\n", $this->getXmlErrors($internalErrors)));
-        }
-
-        $dom->normalizeDocument();
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
+        $dom = XliffUtils::loadFile($file);
 
         return array(simplexml_import_dom($dom), strtoupper($dom->encoding));
-    }
-
-    /**
-     * Returns the XML errors of the internal XML parser.
-     *
-     * @param bool $internalErrors
-     *
-     * @return array An array of errors
-     */
-    private function getXmlErrors($internalErrors)
-    {
-        $errors = array();
-        foreach (libxml_get_errors() as $error) {
-            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
-                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
-                $error->code,
-                trim($error->message),
-                $error->file ?: 'n/a',
-                $error->line,
-                $error->column
-            );
-        }
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($internalErrors);
-
-        return $errors;
     }
 }

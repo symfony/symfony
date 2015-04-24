@@ -206,6 +206,27 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/_profiler/xxxxxxxx', $response->headers->get('X-Debug-Token-Link'));
     }
 
+    public function testThrowingUrlGenerator()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->getUrlGeneratorMock();
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', array('token' => 'xxxxxxxx'))
+            ->will($this->throwException(new \Exception('foo')))
+        ;
+
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, 'bottom', $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('Exception: foo', $response->headers->get('X-Debug-Error'));
+    }
+
     protected function getRequestMock($isXmlHttpRequest = false, $requestFormat = 'html', $hasSession = true)
     {
         $request = $this->getMock(

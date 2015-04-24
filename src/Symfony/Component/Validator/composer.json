@@ -43,9 +43,8 @@
         "symfony/expression-language": "For using the 2.4 Expression validator"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Validator\\": "" }
+        "psr-4": { "Symfony\\Component\\Validator\\": "" }
     },
-    "target-dir": "Symfony/Component/Validator",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

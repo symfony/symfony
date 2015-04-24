@@ -31,9 +31,8 @@
         "symfony/event-dispatcher": "Needed when using log messages in console commands."
      },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Monolog\\": "" }
+        "psr-4": { "Symfony\\Bridge\\Monolog\\": "" }
     },
-    "target-dir": "Symfony/Bridge/Monolog",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

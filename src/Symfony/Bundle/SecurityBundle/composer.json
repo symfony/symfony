@@ -41,9 +41,8 @@
         "ircmaxell/password-compat": "~1.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\SecurityBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" }
     },
-    "target-dir": "Symfony/Bundle/SecurityBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

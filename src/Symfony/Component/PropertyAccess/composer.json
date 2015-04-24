@@ -22,9 +22,8 @@
         "symfony/phpunit-bridge": "~2.7|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\PropertyAccess\\": "" }
+        "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" }
     },
-    "target-dir": "Symfony/Component/PropertyAccess",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

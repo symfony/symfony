@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -28,14 +29,23 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
     {
         $output->writeln('Available registered bundles with their extension alias if available:');
 
-        $table = $this->getHelperSet()->get('table');
+        if (class_exists('Symfony\Component\Console\Helper\Table')) {
+            $table = new Table($output);
+        } else {
+            $table = $this->getHelperSet()->get('table');
+        }
+
         $table->setHeaders(array('Bundle name', 'Extension alias'));
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             $extension = $bundle->getContainerExtension();
             $table->addRow(array($bundle->getName(), $extension ? $extension->getAlias() : ''));
         }
 
-        $table->render($output);
+        if (class_exists('Symfony\Component\Console\Helper\Table')) {
+            $table->render();
+        } else {
+            $table->render($output);
+        }
     }
 
     protected function findExtension($name)

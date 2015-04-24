@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
+trigger_error('The '.__NAMESPACE__.'\EntityChoiceList class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
+
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\RuntimeException;
@@ -129,8 +131,6 @@ class EntityChoiceList extends ObjectChoiceList
         }
 
         parent::__construct($entities, $labelPath, $preferredEntities, $groupPath, null, $propertyAccessor);
-
-        trigger_error('The '.__CLASS__.' class is deprecated since version 2.7 and will be removed in 3.0. Use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader instead.', E_USER_DEPRECATED);
     }
 
     /**

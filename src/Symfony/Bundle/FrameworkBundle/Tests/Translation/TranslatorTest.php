@@ -93,27 +93,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('other choice 1 (PT-BR)', $translator->transChoice('other choice', 1));
         $this->assertEquals('foobarbaz (fr.UTF-8)', $translator->trans('foobarbaz'));
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
-
-        // refresh cache again when resource file resources file change
-        $resource = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
-        $resource
-            ->expects($this->at(0))
-            ->method('isFresh')
-            ->will($this->returnValue(false))
-        ;
-        $catalogue = $this->getCatalogue('fr', array('foo' => 'foo fresh'));
-        $catalogue->addResource($resource);
-
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
-        $loader
-            ->expects($this->at(0))
-            ->method('load')
-            ->will($this->returnValue($catalogue))
-        ;
-
-        $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
-        $translator->setLocale('fr');
-        $this->assertEquals('foo fresh', $translator->trans('foo'));
     }
 
     public function testTransWithCachingWithInvalidLocale()
@@ -169,11 +148,29 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    protected function getCatalogue($locale, $messages)
+    public function testGetDefaultLocale()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('getParameter')
+            ->with('kernel.default_locale')
+            ->will($this->returnValue('en'))
+        ;
+
+        $translator = new Translator($container, new MessageSelector());
+
+        $this->assertSame('en', $translator->getLocale());
+    }
+
+    protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
             $catalogue->set($key, $translation);
+        }
+        foreach ($resources as $resource) {
+            $catalogue->addResource($resource);
         }
 
         return $catalogue;

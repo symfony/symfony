@@ -24,9 +24,8 @@
         "symfony/finder": "~2.0,>=2.0.5|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\ClassLoader\\": "" }
+        "psr-4": { "Symfony\\Component\\ClassLoader\\": "" }
     },
-    "target-dir": "Symfony/Component/ClassLoader",
     "extra": {
         "branch-alias": {
             "dev-master": "2.8-dev"

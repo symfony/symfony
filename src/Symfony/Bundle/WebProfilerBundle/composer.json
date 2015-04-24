@@ -29,9 +29,8 @@
         "symfony/stopwatch": "~2.2|~3.0.0"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }
+        "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" }
     },
-    "target-dir": "Symfony/Bundle/WebProfilerBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

@@ -99,6 +99,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 // remove leading zeros
                 $entry = (string) (int) $entry;
             }
+            // unset reference to keep scope clear
+            unset($entry);
         }
 
         return $result;

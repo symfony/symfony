@@ -222,21 +222,11 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        } else {
-            $this->assertValidLocale($locale);
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        return strtr($this->catalogues[$locale]->get((string) $id, $domain), $parameters);
+        return strtr($this->getCatalogue($locale)->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -246,23 +236,13 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        } else {
-            $this->assertValidLocale($locale);
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
         $id = (string) $id;
-
-        $catalogue = $this->catalogues[$locale];
+        $catalogue = $this->getCatalogue($locale);
+        $locale = $catalogue->getLocale();
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
@@ -282,6 +262,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     {
         if (null === $locale) {
             $locale = $this->getLocale();
+        } else {
+            $this->assertValidLocale($locale);
         }
 
         if (!isset($this->catalogues[$locale])) {
@@ -310,16 +292,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function getMessages($locale = null)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        }
-
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
         $catalogues = array();
-        $catalogues[] = $catalogue = $this->catalogues[$locale];
+        $catalogues[] = $catalogue = $this->getCatalogue($locale);
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $catalogues[] = $catalogue;
         }
@@ -420,21 +394,6 @@ EOF
 
     private function getFallbackContent(MessageCatalogue $catalogue)
     {
-        if (!$this->debug) {
-            // merge all fallback catalogues messages into $catalogue
-            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            $messages = $catalogue->all();
-            while ($fallbackCatalogue) {
-                $messages = array_replace_recursive($fallbackCatalogue->all(), $messages);
-                $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-            }
-            foreach ($messages as $domain => $domainMessages) {
-                $catalogue->add($domainMessages, $domain);
-            }
-
-            return '';
-        }
-
         $fallbackContent = '';
         $current = '';
         $replacementPattern = '/[^a-z0-9_]/i';

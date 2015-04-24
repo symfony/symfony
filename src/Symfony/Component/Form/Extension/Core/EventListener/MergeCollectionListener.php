@@ -74,7 +74,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         // If we are not allowed to change anything, return immediately
-        if ((!$this->allowAdd && !$this->allowDelete) || $data === $dataToMergeInto) {
+        if ($data === $dataToMergeInto || (!$this->allowAdd && !$this->allowDelete)) {
             $event->setData($dataToMergeInto);
 
             return;

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T07:42:53Z
+
+This is a cherry-pick of 17f61afe0885a56c8128fb3d3bac1e209b4ba0e6 augmented with more strictness when looking up for candidates.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T09:00:47Z
+
+I added a test with a wrapping DebugClassLoader and better isolated the legacy one.

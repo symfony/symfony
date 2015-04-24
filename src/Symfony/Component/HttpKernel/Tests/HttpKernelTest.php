@@ -71,8 +71,8 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         try {
             $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
             $this->fail('LogicException expected');
-        } catch (\LogicException $e) {
-            $this->assertSame($exception, $e->getPrevious());
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
         }
     }
 

@@ -151,7 +151,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $dispatcher = new EventDispatcher();
         $kernel = new HttpKernel($dispatcher, $this->getResolver(false));
 
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, false);
+        $kernel->handle(new Request());
     }
 
     /**

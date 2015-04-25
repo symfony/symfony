@@ -748,7 +748,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if (!isset($this->aliasDefinitions[$id]) {
+        if (!isset($this->aliasDefinitions[$id])) {
             throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
         }
 

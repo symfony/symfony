@@ -470,7 +470,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
         }
 
-        if (!$this->hasDefinition($id) && isset($this->aliasDefinitions[$id])) {
+        if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
             return $this->get($this->aliasDefinitions[$id]);
         }
 
@@ -686,7 +686,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new InvalidArgumentException('$id must be a string, or an Alias object.');
         }
 
-        if ($alias === strtolower($id)) {
+        if ($alias === (string) $id) {
             throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
         }
 
@@ -748,7 +748,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if (!$this->hasAlias($id)) {
+        if (!isset($this->aliasDefinitions[$id])) {
             throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
         }
 
@@ -866,7 +866,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if (!$this->hasDefinition($id)) {
+        if (!array_key_exists($id, $this->definitions)) {
             throw new InvalidArgumentException(sprintf('The service definition "%s" does not exist.', $id));
         }
 
@@ -888,8 +888,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findDefinition($id)
     {
-        while ($this->hasAlias($id)) {
-            $id = (string) $this->getAlias($id);
+        $id = strtolower($id);
+
+        while (isset($this->aliasDefinitions[$id])) {
+            $id = (string) $this->aliasDefinitions[$id];
         }
 
         return $this->getDefinition($id);

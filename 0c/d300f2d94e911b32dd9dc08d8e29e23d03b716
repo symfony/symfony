@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-09T21:13:35Z
+
+the failed test for `dep=high` is not related to this PR.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-09T22:53:53Z
+
+can you squash your commits into one, please
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-11T08:47:04Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-04-11T08:59:32Z
+
+This would be easier with a true/false provider in my opinion:
+
+```php
+public function booleanProvider()
+{
+    return array(array(true), array(false));
+}
+
+/**
+ * @dataProvider booleanProvider
+ */
+public function testSomething($debug)
+{
+}
+```
+
+Then you would just test it with true and with false instead of implementing a foreach in each method.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-11T09:02:51Z
+
+~~~Yes, have been thinking about this... I found it easier to read this way, but I'll change it if at least one other person asks for it as well ;-).~~~ 
+
+~~~@aitboudad :-)?~~~
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-11T09:27:26Z
+
+As the `@dataProvider` approach also allows to remove the `deleteTmpDir()` call, it's a good thing(TM).
+
+Thanks @iltar!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T21:58:50Z
+
+@mpdude can you squash your commits :)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-13T09:10:42Z
+
+Squashed.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-14T07:35:58Z
+
+Hm, sounds a bit whacky, doesn't it?
+
+But if you prefer I'll change that.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-14T07:39:23Z
+
+@mpdude ok keep it as you like it :smile:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-19T17:05:45Z
+
+@mpdude I think we must apply these changes into `2.6`, can you create a PR for `2.6` in favor of this ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-21T16:23:11Z
+
+@aitboudad Some of the methods I changed/refactored are not yet available in 2.6. Do we really need to backport this? (Or maybe even move it to 2.8 instead?)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T16:33:38Z
+
+@mpdude keeping the same test structure between branches makes the maintenance much easier for us when merging between branches (avoiding conflicts). So test improvements should be applied to the older versions being meaningful
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-21T17:00:30Z
+
+if some change are only relevant for `2.7` you can keep it in this PR, I already do the same thing in https://github.com/symfony/symfony/pull/14341#issuecomment-93702680 ;)
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-22T06:29:41Z
+
+See #14437. I'll probably need to rebase this one after #14437 is merged and makes it up into 2.7?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-24T08:02:01Z
+
+@mpdude you can rebase now
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-24T13:13:30Z
+
+@aitboudad Thanks for the heads-up
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-24T19:55:25Z
+
+@mpdude Can you rebase once again (tests have been fixed in #14464)?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-24T21:24:34Z
+
+@xabbuh Done. (/cc @aitboudad)

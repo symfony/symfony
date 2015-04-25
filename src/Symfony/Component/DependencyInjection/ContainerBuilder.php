@@ -470,7 +470,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new LogicException(sprintf('The service "%s" has a circular reference to itself.', $id));
         }
 
-        if (!$this->hasDefinition($id) && isset($this->aliasDefinitions[$id])) {
+        if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
             return $this->get($this->aliasDefinitions[$id]);
         }
 
@@ -888,8 +888,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findDefinition($id)
     {
-        while ($this->hasAlias($id)) {
-            $id = (string) $this->getAlias($id);
+        $id = strtolower($id);
+
+        while (isset($this->aliasDefinitions[$id])) {
+            $id = (string) $this->aliasDefinitions[$id];
         }
 
         return $this->getDefinition($id);

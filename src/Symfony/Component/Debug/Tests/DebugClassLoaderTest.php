@@ -104,9 +104,14 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             // if an exception is thrown, the test passed
             restore_error_handler();
             restore_exception_handler();
-            $this->assertEquals(E_STRICT, $exception->getSeverity());
             $this->assertStringStartsWith(__FILE__, $exception->getFile());
-            $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
+            if (PHP_VERSION_ID < 70000) {
+                $this->assertRegexp('/^Runtime Notice: Declaration/', $exception->getMessage());
+                $this->assertEquals(E_STRICT, $exception->getSeverity());
+            } else {
+                $this->assertRegexp('/^Warning: Declaration/', $exception->getMessage());
+                $this->assertEquals(E_WARNING, $exception->getSeverity());
+            }
         } catch (\Exception $exception) {
             restore_error_handler();
             restore_exception_handler();

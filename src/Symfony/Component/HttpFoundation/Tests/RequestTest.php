@@ -1370,6 +1370,28 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 '/foo',
                 '/bar+baz',
             ),
+            array(
+                '/foo/bar/app.php/baz',
+                array(
+                    'DOCUMENT_ROOT' => '/home/John Doe/public_html',
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/app.php',
+                    'SCRIPT_NAME' => '/app.php',
+                    'PHP_SELF' => '/app.php',
+                ),
+                '',
+                '/foo/bar/app.php/baz',
+            ),
+            array(
+                '/foo/bar/app.php/baz',
+                array(
+                    'DOCUMENT_ROOT' => '/home/John Doe/public_html',
+                    'SCRIPT_FILENAME' => '/home/John Doe/public_html/foo/app.php',
+                    'SCRIPT_NAME' => '/foo/app.php',
+                    'PHP_SELF' => '/foo/app.php',
+                ),
+                '/foo',
+                '/bar/app.php/baz',
+            ),
         );
     }
 

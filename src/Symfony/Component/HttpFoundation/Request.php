@@ -1679,7 +1679,8 @@ class Request
      */
     protected function prepareBaseUrl()
     {
-        $filename = basename($this->server->get('SCRIPT_FILENAME'));
+        $fullFilename = $this->server->get('SCRIPT_FILENAME');
+        $filename = basename($fullFilename);
 
         if (basename($this->server->get('SCRIPT_NAME')) === $filename) {
             $baseUrl = $this->server->get('SCRIPT_NAME');
@@ -1733,6 +1734,13 @@ class Request
         // from PATH_INFO or QUERY_STRING
         if (strlen($requestUri) >= strlen($baseUrl) && (false !== $pos = strpos($requestUri, $baseUrl)) && $pos !== 0) {
             $baseUrl = substr($requestUri, 0, $pos + strlen($baseUrl));
+        }
+
+        $documentRoot = $this->server->get('DOCUMENT_ROOT');
+
+        if (null !== $documentRoot && $fullFilename !== rtrim($documentRoot, '/').'/'.ltrim($baseUrl, '/')){
+            // document root + base URL doesn't equal full filename; fall back to blank
+            return '';
         }
 
         return rtrim($baseUrl, '/');

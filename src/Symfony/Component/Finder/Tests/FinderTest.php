@@ -853,15 +853,4 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($expected, $finder);
         $this->assertIteratorInForeach($expected, $finder);
     }
-
-    public function testShellCommand()
-    {
-        $cmd = Command::create()->add('--force');
-        $this->assertSame('--force', $cmd->join());
-
-        $cmd->addAtIndex(Command::create()->add('-F'), 0);
-        $this->assertSame('-F --force', $cmd->join());
-        $cmd->addAtIndex(Command::create()->add('-A'), 2);
-        $this->assertSame('-F --force -A', $cmd->join());
-    }
 }

@@ -95,7 +95,7 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $paramValues = array('value' => $tokenValue,
                              'lastUsed' => $lastUsed,
                              'series' => $series,);
-        $paramTypes =  array('value' => \PDO::PARAM_STR,
+        $paramTypes = array('value' => \PDO::PARAM_STR,
                              'lastUsed' => DoctrineType::DATETIME,
                              'series' => \PDO::PARAM_STR,);
         $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);

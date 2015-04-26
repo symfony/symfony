@@ -161,7 +161,7 @@ EOF
         }
 
         // Display header line
-        $headers = array('State(s)', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
+        $headers = array('State', 'Domain', 'Id', sprintf('Message Preview (%s)', $locale));
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $headers[] = sprintf('Fallback Message Preview (%s)', $fallbackCatalogue->getLocale());
         }
@@ -208,26 +208,20 @@ EOF
         } else {
             $table->render($output);
         }
-
-        $output->writeln('');
-        $output->writeln('<info>Legend:</info>');
-        $output->writeln(sprintf(' %s Missing message', $this->formatState(self::MESSAGE_MISSING)));
-        $output->writeln(sprintf(' %s Unused message', $this->formatState(self::MESSAGE_UNUSED)));
-        $output->writeln(sprintf(' %s Same as the fallback message', $this->formatState(self::MESSAGE_EQUALS_FALLBACK)));
     }
 
     private function formatState($state)
     {
         if (self::MESSAGE_MISSING === $state) {
-            return '<fg=red>x</>';
+            return '<error>missing</error>';
         }
 
         if (self::MESSAGE_UNUSED === $state) {
-            return '<fg=yellow>o</>';
+            return '<comment>unused</comment>';
         }
 
         if (self::MESSAGE_EQUALS_FALLBACK === $state) {
-            return '<fg=green>=</>';
+            return '<info>fallback</info>';
         }
 
         return $state;

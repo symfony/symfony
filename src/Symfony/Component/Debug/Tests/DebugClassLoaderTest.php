@@ -212,6 +212,32 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($xError, $lastError);
     }
+
+    public function testReservedForPhp7()
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            $this->markTestSkipped('PHP7 already prevents using reserved names.');
+        }
+
+        set_error_handler('var_dump', 0);
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\Float', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'Test\Symfony\Component\Debug\Tests\Float uses a reserved class name (Float) that will break on PHP 7.0',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
 }
 
 class ClassLoader
@@ -249,6 +275,8 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedParentClass extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedInterfaceClass' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class DeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\DeprecatedInterface {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\Float' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
         }
     }
 }

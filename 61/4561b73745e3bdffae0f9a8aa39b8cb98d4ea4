@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-04-24T15:27:25Z
+
+@Tobion please use your fork to send PRs, not the symfony repo. This avoids creating useless versions of Packagist (and also avoids triggering 2 Travis builds, for the branch and for the PR)
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-24T17:14:52Z
+
+Yes was by accident.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T12:20:44Z
+
+Looks like it should be merged in 2.6 instead, right?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-27T13:08:02Z
+
+Yes should be mergeable in 2.6

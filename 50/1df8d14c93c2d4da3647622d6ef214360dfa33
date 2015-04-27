@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-23T21:47:29Z
+
+:+1: PD: `trigger_error` not `error_trigger`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-23T21:49:05Z
+
+indeed :D thanks
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-24T02:52:44Z
+
+Hmmm.. this is weird:
+```bash
+Fatal error: Cannot redeclare class Symfony\Component\Debug\Exception\UndefinedFunctionException in /home/travis/build/symfony/symfony/src/Symfony/Component/Security/Http/vendor/symfony/debug/Symfony/Component/Debug/Exception/UndefinedFunctionException.php on line 33
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-24T05:39:56Z
+
+See https://github.com/symfony/symfony/pull/14451

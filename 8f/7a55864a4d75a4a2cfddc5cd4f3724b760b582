@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-25T17:00:44Z
+
+`get` could be optimized this way as well with `getDefinition` and `hasDefinition`
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-25T17:09:58Z
+
+@Tobion  agree, btw you know the reason why in some hassers `array_key_exists` is used?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-25T19:37:40Z
+
+to support `null`
+:+1:

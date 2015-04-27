@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by hacfi at 2015-04-22T14:26:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-22T14:27:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-22T14:29:00Z
+
+The `PhpDumper` generate the container with the `$this->set('service_container', $this)` line. see https://github.com/symfony/symfony/blob/2.6/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L902
+can this be removed and the tests fixed?
+
+---------------------------------------------------------------------------
+
+by hacfi at 2015-04-22T14:30:44Z
+
+@xabbuh Have a look at https://github.com/symfony/symfony/pull/14445/files to see which changes to the tests are necessary.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-22T14:33:58Z
+
+@hacfi any reason to keep a blank line between `$this->scopeStacks = array();` and `$this->scopes = array();` in the dumped container?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-22T14:36:05Z
+
+@dosten @hacfi Imho the change to the `PhpDumper` then should be done for the `2.3` branch too. What do you think?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-22T14:37:03Z
+
+@xabbuh :+1:
+
+---------------------------------------------------------------------------
+
+by hacfi at 2015-04-22T14:41:46Z
+
+@dosten Nope :)..just didn’t think about that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-26T14:36:46Z
+
+:+1:

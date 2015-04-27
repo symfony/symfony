@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-21T06:59:17Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-21T07:00:07Z
+
+@Zzortell Could you please also rebase and add a test for this feature?
+
+---------------------------------------------------------------------------
+
+by Zzortell at 2015-04-21T07:54:53Z
+
+I integrate this commit in #14420 so you can close this one.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-21T08:37:08Z
+
+@Zzortell These are separate things. I think there should be two PRs. It's easier to review this way.
+
+---------------------------------------------------------------------------
+
+by Zzortell at 2015-04-21T09:19:42Z
+
+@xabbuh What do you mean when you say rebase ? Because I rebased it when I pushed it
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-21T19:16:42Z
+
+@Zzortell Never mind, I must have looked at the wrong Travis build. So everything is fine. :+1:
+
+---------------------------------------------------------------------------
+
+by Zzortell at 2015-04-21T20:20:14Z
+
+Travais failed because of errors in Process and Debug components. Nothing to do with this PR. Let's merge !

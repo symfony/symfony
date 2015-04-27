@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-23T06:43:20Z
+
+@pmodin thanks for fixing this problem.
+
+As you know, languages designed for humans are a fractal of bad design and they are plagued with exceptions. That's why some of us want to remove the "magic pluralizator" implemented by Symfony. Hopefully getting more and more issue reports and pull requests for this feature will also make the other developers change their opinion about this.
+
+---------------------------------------------------------------------------
+
+by pmodin at 2015-04-23T08:06:10Z
+
+@javiereguiluz yes, I've seen some discussions about this, most recently in #14189. I haven't been in the loop enough recently to argue on how to progress, but you, as well as the others, do have valid points. I unfortunately have nothing further to add to that discussion right now.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-23T11:42:52Z
+
+@javiereguiluz I agree with you, but don't know what more I could do a.t.m. :unamused:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T12:43:25Z
+
+@javiereguiluz until we find a way to provide explicitly the singular names for the adder and remover methods (see https://github.com/symfony/symfony/issues/5013 for the discussion about that) , we cannot drop the existing singularization (you will see even more complains if you ask people to define ``addElements`` and ``removeElements`` to add and remove a single element, because this makes the code totally confusing, breaking DX)

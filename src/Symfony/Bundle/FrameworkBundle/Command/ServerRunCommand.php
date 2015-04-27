@@ -117,7 +117,7 @@ EOF
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $address));
         $output->writeln('Quit the server with CONTROL-C.');
 
-        if (null === $builder = $this->createPhpProcessBuilder($output, $adress, $input->getOption('router'), $env)) {
+        if (null === $builder = $this->createPhpProcessBuilder($output, $address, $input->getOption('router'), $env)) {
             return 1;
         }
 

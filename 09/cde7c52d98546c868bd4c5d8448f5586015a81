@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-20T21:29:19Z
+
+The failing tests in the Translation component don't seem to be related to your changes, but a rebase might fix that.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T04:55:27Z
+
+Removed the short array notation (it became a reflex) and rebased.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T12:23:30Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-27T08:16:54Z
+
+ping @symfony/deciders. I'll want to include this fix in the next release.

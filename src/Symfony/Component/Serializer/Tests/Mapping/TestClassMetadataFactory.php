@@ -30,11 +30,13 @@ class TestClassMetadataFactory
         $bar = new AttributeMetadata('bar');
         $bar->addGroup('b');
         $bar->addGroup('c');
+        $bar->addGroup('name_converter');
         $expected->addAttributeMetadata($bar);
 
         $fooBar = new AttributeMetadata('fooBar');
         $fooBar->addGroup('a');
         $fooBar->addGroup('b');
+        $fooBar->addGroup('name_converter');
         $expected->addAttributeMetadata($fooBar);
 
         $symfony = new AttributeMetadata('symfony');
@@ -53,6 +55,7 @@ class TestClassMetadataFactory
 
         if ($withInterface) {
             $symfony->addGroup('a');
+            $symfony->addGroup('name_converter');
         }
 
         // load reflection class so that the comparison passes

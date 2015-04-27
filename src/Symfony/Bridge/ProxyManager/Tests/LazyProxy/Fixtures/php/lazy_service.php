@@ -26,9 +26,6 @@ class LazyServiceProjectServiceContainer extends Container
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
-
-        $this->set('service_container', $this);
-
         $this->scopes = array();
         $this->scopeChildren = array();
     }

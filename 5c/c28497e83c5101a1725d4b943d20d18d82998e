@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-26T12:18:30Z
+
+:+1: but the target branch should be `2.8`
+
+\cc @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-26T14:08:25Z
+
+:+1: I like it. Thanks @nicolasdewez
+
+---------------------------------------------------------------------------
+
+by nicolasdewez at 2015-04-26T15:49:15Z
+
+@aitboudad : must do i make something ? (it's my first PR for symfony)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-26T16:06:46Z
+
+@nicolasdewez no it's ok I'll merge into `2.8` but for the next time try to choose the right Branch :)
+
+* `2.3`  fixing a bug.
+* `2.8`  adding a new feature which is backward compatible;
+* `master`, adding a new and backward incompatible feature.
+
+see http://symfony.com/doc/2.7/contributing/code/patches.html#choose-the-right-branch

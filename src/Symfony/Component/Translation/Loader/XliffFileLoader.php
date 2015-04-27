@@ -78,7 +78,10 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->setMetadata((string) $source, array('notes' => $notes), $domain);
             }
         }
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }

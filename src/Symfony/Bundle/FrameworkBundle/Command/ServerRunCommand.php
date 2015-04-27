@@ -23,7 +23,7 @@ use Symfony\Component\Process\ProcessBuilder;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ContainerAwareCommand
+class ServerRunCommand extends ServerCommand
 {
     /**
      * {@inheritdoc}
@@ -96,15 +96,28 @@ EOF
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
+        $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $output->writeln('The address has to be of the form <comment>bind-address:port</comment>.');
+
+            return 1;
+        }
+
+        if ($this->isOtherServerProcessRunning($address)) {
+            $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+
+            return 1;
+        }
 
         if ('prod' === $env) {
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $input->getArgument('address')));
+        $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $address));
         $output->writeln('Quit the server with CONTROL-C.');
 
-        if (null === $builder = $this->createPhpProcessBuilder($input, $output, $env)) {
+        if (null === $builder = $this->createPhpProcessBuilder($output, $adress, $input->getOption('router'), $env)) {
             return 1;
         }
 
@@ -131,9 +144,9 @@ EOF
         return $process->getExitCode();
     }
 
-    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env)
+    private function createPhpProcessBuilder(OutputInterface $output, $address, $router, $env)
     {
-        $router = $input->getOption('router') ?: $this
+        $router = $router ?: $this
             ->getContainer()
             ->get('kernel')
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
@@ -154,6 +167,6 @@ EOF
             return;
         }
 
-        return new ProcessBuilder(array($binary, '-S', $input->getArgument('address'), $router));
+        return new ProcessBuilder(array($binary, '-S', $address, $router));
     }
 }

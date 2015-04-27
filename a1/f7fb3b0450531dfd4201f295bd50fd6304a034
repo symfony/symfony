@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-14T21:05:06Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-04-15T06:29:55Z
+
+looks good to me :+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-15T09:29:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-15T09:30:07Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-15T14:24:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T12:37:10Z
+
+Ok to merge it in 2.7?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-21T12:40:24Z
+
+@dunglas https://github.com/symfony/symfony/issues/13505#issuecomment-93674629 :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T12:43:44Z
+
+@aitboudad I know that but it can be considered as part of the "serializer groups" and "object normalizer" feature and those features have been released with the beta ;)
+
+I think it's better to have polished features in 2.7 stable and this is some polish.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T12:44:55Z
+
+Btw the PR was open 8 days before the release of the beta.
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-21T12:48:13Z
+
+IMO it's totally correct to have this in 2.7 as this is addition to new feature introduced in that version, so it's like "bugfix" ;)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-21T13:31:37Z
+
+well I think this can be considered as a bugfix.
+@dunglas Is there a use case for adding `setters` supports ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-04-21T13:45:43Z
+
+@aitboudad it's a matter of taste but I think yes. In fact this PR is derived from a use case in a project I work on:
+- I have 2 groups: one for normalization, another for denormalization
+- I set my groups on interfaces trough annotations (so no property available)
+- I like to put my denormalization group definitions on setters, I think it's easier to find them as it's a mutation operation than when they are on a getter.

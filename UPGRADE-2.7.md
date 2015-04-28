@@ -1,6 +1,30 @@
 UPGRADE FROM 2.6 to 2.7
 =======================
 
+FrameworkBundle
+---------------
+
+ * The decoupling of Twig and the Symfony Templating system made the inclusion
+   of the service ```templating.helper.router``` only available when the configuration
+   specified also the PHP engine. Because some bundles use this related service the
+   following update is required:
+
+   Before:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['twig']
+   ```
+
+   After:
+
+   ```yaml
+   framework:
+       templating:
+           engines: ['twig', 'php']
+   ```
+
 Router
 ------
 

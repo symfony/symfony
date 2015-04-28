@@ -279,7 +279,13 @@ class ConfigDataCollector extends DataCollector
         if (file_exists($versionCachePath)) {
             $versionInfo = json_decode(file_get_contents($versionCachePath), true);
         } else {
-            $versionResponse = @file_get_contents('http://symfony.com/roadmap.json?version='.preg_replace('/^(\d+\.\d+).*/', '\\1', $this->data['symfony_version']));
+            $context = stream_context_create(array(
+                'http' => array(
+                    'header' => "User-Agent: symfony-web-profiler\r\n",
+                ),
+            ));
+
+            $versionResponse = @file_get_contents('http://symfony.com/roadmap.json?version='.preg_replace('/^(\d+\.\d+).*/', '\\1', $this->data['symfony_version']), false, $context);
 
             if (false !== $versionResponse) {
                 $versionInfo = json_decode($versionResponse, true);

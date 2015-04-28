@@ -1,0 +1,136 @@
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-14T14:42:32Z
+
+Not sure it should be hardcoded date or just timestamp, but :+1:
+
+---------------------------------------------------------------------------
+
+by Green-Cat at 2015-04-14T15:12:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-04-14T17:40:58Z
+
+:-1: This is easy to forget for the developers and more work to maintain. What's wrong with caching away the info from symfony.com?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-14T18:05:07Z
+
+@iltar Yes, when opening a new Symfony branch, two more constants have to be adjusted in addition to the other six constants in that file. In the current release model, this would happen twice a year. Since this very file has to be changed anyway, I don't think that adjusting the constants will be forgotten.
+
+The problem is not the caching. It's the fact that this external call happens at all. In my case, the development happens in a network environment with restricted internet access, so this call would always run into timeouts. Apart from that, some companies are really concerned about data being sent to some cloud services. It is hard to explain to them that my application framework wants to call home every now and then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-14T18:07:49Z
+
+Please also read the comments @javiereguiluz made to #13626 and my bug report #14349 on why this call is problematic.
+
+---------------------------------------------------------------------------
+
+by iltar at 2015-04-14T19:35:14Z
+
+@derrabus I don't really see the trouble a `file_get_contents()` does. If they don't trust the framework you use, why bother using it? I also believe that if you really have a network that tight, you won't be working with 3rd party apis either. Considering this would called once in a while, having a 1 second timeout wouldn't be a problem. So what about an option to add a timeout/disable this all together?
+
+I'm not going to be the one maintaining this, but I can imagine they want to prevent updating extra files every branch because someone couldn't open symfony.com
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-14T19:44:53Z
+
+I think this change is legitimate. I don't care updating 2 more constants (and even if I forget, I'm pretty sure someone will notice pretty fast :)).
+
+---------------------------------------------------------------------------
+
+by mpajunen at 2015-04-14T19:56:53Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-14T20:07:45Z
+
+@iltar It's not even about maintaining extra files. The `Kernel` class that holds the two constants my patch introduces needs to be updated anyway when opening a new branch, since it holds other version information of the Symfony framework as well:
+
+```php
+    const VERSION = '2.7.0-DEV';
+    const VERSION_ID = '20700';
+    const MAJOR_VERSION = '2';
+    const MINOR_VERSION = '7';
+    const RELEASE_VERSION = '0';
+    const EXTRA_VERSION = 'DEV';
+```
+
+And it's not about just opening symfony.com. In this network, the whole web traffic is funneled through a proxy. If you're not using the proxy, you run into a timeout. They won't simply open symfony.com because they don't have a mechanism to do so. Either use the proxy or die trying to bypass it. Furthermore, I'd like to keep the ability to code where ever I am. Inside a train. Inside a plane. On the beach. And, I really love the prossibility to wipe my cache, no matter if I have an internet connection or not.
+
+Slowing down the application by 1 sec. on each request would also not be an option to me. But in the current implementation, the timeout is whatever your php.ini settings are set to, which is 60 sec. by default, afaik. Also, the current implementation does not cache failed requests, so I run into this timeout on _every_ request.
+
+And yes, the application I mentioned in my bug report is an intranet application. It only calls other services inside this intranet, no external APIs. That version check would be the only external service that is called. Ever.
+
+My client does trust the Symfony framework a lot! They really do! But they also have very strict policies regarding network communication. And I won't get an exception to those policies for an occasional version check. :-/
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-14T20:11:36Z
+
+Thanks, @fabpot. Don't you have a script for updating those constants, anyway? :-)
+
+---------------------------------------------------------------------------
+
+by ChadSikorra at 2015-04-15T03:40:58Z
+
+@derrabus Sorry to add more noise here, but I think it's a lazy SysAdmin unwilling to add a proxy exception for a URL rather than the proxy not being able to ;) I work on a network that has a corporate proxy where all user traffic is funneled through (I manage the proxy as well...). An exception with good justification, such as in this case, is easily done. Though I would agree that the timeout value is a bit too high here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-15T05:05:26Z
+
+@derrabus Yes, I do have a script that updates these constants for me :)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-15T06:34:46Z
+
+@ChadSikorra You got me wrong. We are able to connect to symfony.com through the proxy. If the version check used the proxy, it would probably work. Instead the version check tries to connect directly to symfony.com and runs into a timeout.
+
+---------------------------------------------------------------------------
+
+by ChadSikorra at 2015-04-15T18:01:17Z
+
+@derrabus Ah, good point! Sometimes I overlook the obvious...hah. Wherever I've seen proxies deployed we have also deployed a proxy "firewall" service on the client (if needed). Basically it's a Windows service that intercepts outbound traffic to forward it to the proxy. So even if a client is using an application that isn't proxy aware it will still go through the proxy. Though I suppose not all proxy setups will be configured like that.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-19T09:42:53Z
+
+:+1: I do care a lot about this feature in Symfony, but I don't care much about the implementation of it.
+
+In my PR, having such things in the code base was rejected as it wasn't flexible enough. Is this not a problem anymore? (I do see that releases are only extended, in which case a user would see the EOM message too early, which could lead to some confusion, but isn't a big problem).
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-04-19T11:43:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-19T11:55:23Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-19T11:57:24Z
+
+:+1: (with the method name change suggested by @WouterJ)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2015-04-19T12:40:24Z
+
+Thank you for your feedback, @WouterJ. I've applied the changes you suggested.

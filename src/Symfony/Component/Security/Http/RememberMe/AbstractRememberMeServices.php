@@ -293,7 +293,18 @@ abstract class AbstractRememberMeServices implements RememberMeServicesInterface
             $this->logger->debug('Clearing remember-me cookie.', array('name' => $this->options['name']));
         }
 
-        $request->attributes->set(self::COOKIE_ATTR_NAME, new Cookie($this->options['name'], null, 1, $this->options['path'], $this->options['domain']));
+        // Hard coded the default values for secure and http only, would be better if those where constants
+        $request->attributes->set(
+            self::COOKIE_ATTR_NAME,
+            new Cookie($this->options['name'],
+                null,
+                1,
+                $this->options['path'],
+                $this->options['domain'],
+                isset($this->options['secure']) ? $this->options['secure'] : false,
+                isset($this->options['httponly']) ? $this->options['httponly'] : true
+            )
+        );
     }
 
     /**

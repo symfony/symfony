@@ -127,6 +127,9 @@ class DateTimeType extends AbstractType
                 'hours',
                 'minutes',
                 'seconds',
+                'hours_with_keys',
+                'minutes_with_keys',
+                'seconds_with_keys',
                 'with_minutes',
                 'with_seconds',
                 'empty_value',
@@ -251,6 +254,9 @@ class DateTimeType extends AbstractType
             'hours',
             'minutes',
             'seconds',
+            'hours_with_keys',
+            'minutes_with_keys',
+            'seconds_with_keys',
         ));
 
         $resolver->setAllowedValues('input', array(

@@ -57,8 +57,12 @@ class TimeType extends AbstractType
             if ('choice' === $options['widget']) {
                 $hours = $minutes = array();
 
-                foreach ($options['hours'] as $hour) {
-                    $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
+                if (isset($options['hours_with_keys']) && is_array($options['hours_with_keys'])) {
+                    $hours = $options['hours_with_keys'];
+                } else {
+                    foreach ($options['hours'] as $hour) {
+                        $hours[$hour] = str_pad($hour, 2, '0', STR_PAD_LEFT);
+                    }
                 }
 
                 // Only pass a subset of the options to children
@@ -66,8 +70,12 @@ class TimeType extends AbstractType
                 $hourOptions['placeholder'] = $options['placeholder']['hour'];
 
                 if ($options['with_minutes']) {
-                    foreach ($options['minutes'] as $minute) {
-                        $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
+                    if (isset($options['minutes_with_keys']) && is_array($options['minutes_with_keys'])) {
+                        $minutes = $options['minutes_with_keys'];
+                    } else {
+                        foreach ($options['minutes'] as $minute) {
+                            $minutes[$minute] = str_pad($minute, 2, '0', STR_PAD_LEFT);
+                        }
                     }
 
                     $minuteOptions['choices'] = $minutes;
@@ -77,8 +85,12 @@ class TimeType extends AbstractType
                 if ($options['with_seconds']) {
                     $seconds = array();
 
-                    foreach ($options['seconds'] as $second) {
-                        $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
+                    if (isset($options['seconds_with_keys']) && is_array($options['seconds_with_keys'])) {
+                        $seconds = $options['seconds_with_keys'];
+                    } else {
+                        foreach ($options['seconds'] as $second) {
+                            $seconds[$second] = str_pad($second, 2, '0', STR_PAD_LEFT);
+                        }
                     }
 
                     $secondOptions['choices'] = $seconds;
@@ -193,6 +205,9 @@ class TimeType extends AbstractType
             'hours' => range(0, 23),
             'minutes' => range(0, 59),
             'seconds' => range(0, 59),
+            'hours_with_keys' => null,
+            'minutes_with_keys' => null,
+            'seconds_with_keys' => null,
             'widget' => 'choice',
             'input' => 'datetime',
             'with_minutes' => true,

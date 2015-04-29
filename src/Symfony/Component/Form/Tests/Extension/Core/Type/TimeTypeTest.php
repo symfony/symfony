@@ -324,6 +324,49 @@ class TimeTypeTest extends TestCase
         ), $view['hour']->vars['choices']);
     }
 
+    public function testHoursWithKeysOption()
+    {
+        $form = $this->factory->create('time', null, array(
+            'hours_with_keys' => array(17=>'5pm', 18=>'6pm'),
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('5pm', '17', '17'),
+            new ChoiceView('6pm', '18', '18'),
+        ), $view['hour']->vars['choices']);
+    }
+
+    public function testMinutesWithKeysOption()
+    {
+        $form = $this->factory->create('time', null, array(
+            'minutes_with_keys' => array(5=>'five', 10=>'ten'),
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('five', '5', '5'),
+            new ChoiceView('ten', '10', '10'),
+        ), $view['minute']->vars['choices']);
+    }
+
+    public function testSecondsWithKeysOption()
+    {
+        $form = $this->factory->create('time', null, array(
+            'with_seconds'=>true,
+            'seconds_with_keys' => array(5=>'five', 10=>'ten'),
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals(array(
+            new ChoiceView('five', '5', '5'),
+            new ChoiceView('ten', '10', '10'),
+        ), $view['second']->vars['choices']);
+    }
+
     public function testIsMinuteWithinRangeReturnsTrueIfWithin()
     {
         $form = $this->factory->create('time', null, array(

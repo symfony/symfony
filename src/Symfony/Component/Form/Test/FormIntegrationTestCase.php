@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Form\Test;
 
+use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormTypeExtensionInterface;
+use Symfony\Component\Form\FormTypeGuesserInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -33,16 +36,31 @@ abstract class FormIntegrationTestCase extends \PHPUnit_Framework_TestCase
             ->getFormFactory();
     }
 
+    /**
+     * Returns Extensions to be added on FormFactory setUp
+     *
+     * @return FormExtensionInterface[]
+     */
     protected function getExtensions()
     {
         return array();
     }
 
+    /**
+     * Returns TypeExtensions to be added on FormFactory setUp
+     *
+     * @return FormTypeExtensionInterface[]
+     */
     protected function getTypeExtensions()
     {
         return array();
     }
 
+    /**
+     * Returns TypeGuessers to be added on FormFactory setUp
+     *
+     * @return FormTypeGuesserInterface[]
+     */
     protected function getTypeGuessers()
     {
         return array();

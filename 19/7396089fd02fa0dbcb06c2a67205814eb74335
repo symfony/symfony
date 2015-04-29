@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-12T09:16:38Z
+
+If merged, should be in 2.8.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-12T13:36:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by sgehrig at 2015-04-15T07:21:37Z
+
+@aitboudad: Anything more I need to do?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-15T09:26:17Z
+
+@sgehrig only one ;) , use `$table = new Table($output);` instead of `getHelperSet`
+
+---------------------------------------------------------------------------
+
+by sgehrig at 2015-04-15T20:00:48Z
+
+@aitboudad Done. Thanks for your patience ;-)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-24T08:08:44Z
+
+@symfony/deciders Is it ok for you?
+
+---------------------------------------------------------------------------
+
+by sgehrig at 2015-04-28T19:16:06Z
+
+Fixed those coding style issues. They resulted from the rebase merge.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-28T19:31:53Z
+
+@sgehrig Thanks, can you please also revert the changes to the other `if` statements where you wrapped conditions?
+
+---------------------------------------------------------------------------
+
+by sgehrig at 2015-04-28T19:39:18Z
+
+Need to get used to the Symfony code guidelines... ;-) Unnecessary changes should have been reverted...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-28T19:45:46Z
+
+:+1:
+
+@sgehrig I didn't want to bother you. It's just easier to track changes in the future (for example when using `git blame`) if we limit changes to what is really necessary. Thank you for your patience!
+
+---------------------------------------------------------------------------
+
+by sgehrig at 2015-04-28T19:50:43Z
+
+@xabbuh No problem... ;-)

@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Finder;
 
+if (!defined('GLOB_BRACE')) {
+    define('GLOB_BRACE', 1024);
+}
+
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Adapter\GnuFindAdapter;
 use Symfony\Component\Finder\Adapter\BsdFindAdapter;

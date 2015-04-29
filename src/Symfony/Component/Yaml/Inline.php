@@ -121,7 +121,7 @@ class Inline
                 return 'true';
             case false === $value:
                 return 'false';
-            case ctype_digit($value):
+            case preg_match('/^\d+$/D', $value):
                 return is_string($value) ? "'$value'" : (int) $value;
             case is_numeric($value):
                 $locale = setlocale(LC_NUMERIC, 0);
@@ -481,12 +481,12 @@ class Inline
                         return;
                     case 0 === strpos($scalar, '!!float '):
                         return (float) substr($scalar, 8);
-                    case ctype_digit($scalar):
+                    case preg_match('/^\d+$/D', $scalar):
                         $raw = $scalar;
                         $cast = (int) $scalar;
 
                         return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
-                    case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
+                    case '-' === $scalar[0] && preg_match('/^\d+$/D', substr($scalar, 1)):
                         $raw = $scalar;
                         $cast = (int) $scalar;
 

@@ -14,22 +14,18 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Translation trait.
+ * Translator trait.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Michaël Garrez <michael.garrez@gmail.com>
  */
-trait TranslationTrait
+trait TranslatorTrait
 {
     /**
      * @see TranslatorInterface::trans()
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        if (!$this->container->has('translator')) {
-            throw new \LogicException('You can not use the trans method if translator is disabled.');
-        }
-
         return $this->container->get('translator')->trans($id, $parameters, $domain, $locale);
     }
 
@@ -38,10 +34,6 @@ trait TranslationTrait
      */
     public function transChoice($id, $number, $parameters = array(), $domain = null, $locale = null)
     {
-        if (!$this->container->has('translator')) {
-            throw new \LogicException('You can not use the transChoice method if translator is disabled.');
-        }
-
         return $this->container->get('translator')->transChoice($id, $number, $parameters, $domain, $locale);
     }
 }

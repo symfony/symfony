@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Application;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
-use Symfony\Bundle\FrameworkBundle\Application\TranslationTrait;
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationTrait;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;

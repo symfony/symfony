@@ -1,12 +1,16 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Added `TranslatorTrait` which provides shortcuts for Translator `trans()` and `transChoice()` methods
+
 2.7.0
 -----
 
  * Added possibility to extract translation messages from a file or files besides extracting from a directory
  * Added `TranslationsCacheWarmer` to create catalogues at warmup
- * Added `TranslatorTrait` which provides shortcuts for Translator `trans()` and `transChoice()` methods
 
 2.6.0
 -----

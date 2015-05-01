@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-29T13:02:32Z
+
+The failing tests seems to be unrelated.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-29T13:50:47Z
+
+it would be better to avoid defining the constant if it is unsupported. It could break other tools checking the support for the feature by detecting the constant (we stopped redefining constants for ``ENT_SUBSTITUTE`` for this reason for instance, even though we may still have a few places using this pattern for other constants)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-29T14:00:04Z
+
+@webbird proposed this solution:
+`defined('GLOB_BRACE') ? GLOB_BRACE | GLOB_ONLYDIR : GLOB_ONLYDIR` this is better?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-29T21:29:48Z
+
+btw, we override JSON_PRETTY_PRINT, this needs to be replaced in 2.6, 2.7 and 2.8? Ex:
+- `Symfony/Bridge/Twig/Command/LintCommand`
+- `Symfony/Bundle/FrameworkBundle/Command/YamlLintCommand`
+- `Symfony/Bundle/FrameworkBundle/Console/Descriptor/JsonDescriptor`
+- `Symfony/Component/Translation/Dumper/JsonFileDumper`
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-01T01:39:22Z
+
+@stof i have updated the PR.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-01T07:57:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-01T10:19:10Z
+
+:+1:

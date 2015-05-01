@@ -17,14 +17,14 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/http-kernel": "~2.6",
-        "symfony/twig-bridge": "~2.6",
-        "symfony/var-dumper": "~2.6"
+        "symfony/http-kernel": "~2.6|~3.0.0",
+        "symfony/twig-bridge": "~2.6|~3.0.0",
+        "symfony/var-dumper": "~2.6|~3.0.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/config": "~2.3",
-        "symfony/dependency-injection": "~2.3"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/config": "~2.3|~3.0.0",
+        "symfony/dependency-injection": "~2.3|~3.0.0"
     },
     "suggest": {
         "symfony/config": "For service container configuration",
@@ -36,7 +36,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

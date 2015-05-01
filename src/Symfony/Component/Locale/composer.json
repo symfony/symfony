@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/intl": "~2.3"
+        "symfony/intl": "~2.3|~3.0.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Locale\\": "" }
@@ -28,7 +28,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

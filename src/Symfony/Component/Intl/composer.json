@@ -27,8 +27,8 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~2.7",
-        "symfony/filesystem": "~2.1"
+        "symfony/phpunit-bridge": "~2.7|~3.0.0",
+        "symfony/filesystem": "~2.1|~3.0.0"
     },
     "suggest": {
         "ext-intl": "to use the component with locales other than \"en\""
@@ -41,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

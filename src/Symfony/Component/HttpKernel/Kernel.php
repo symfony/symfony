@@ -25,10 +25,12 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleDependenciesInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
+use Symfony\Component\HttpKernel\Exception\DependencyMismatchException;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
@@ -60,10 +62,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
-    const VERSION = '2.7.0-DEV';
-    const VERSION_ID = '20700';
+    const VERSION = '2.8.0-DEV';
+    const VERSION_ID = '20800';
     const MAJOR_VERSION = '2';
-    const MINOR_VERSION = '7';
+    const MINOR_VERSION = '8';
     const RELEASE_VERSION = '0';
     const EXTRA_VERSION = 'DEV';
 
@@ -462,7 +464,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $topMostBundles = array();
         $directChildren = array();
 
-        foreach ($this->registerBundles() as $bundle) {
+        foreach ($this->registeredDependencies() as $bundle) {
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
                 throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
@@ -505,6 +507,95 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $this->bundleMap[$bundle] = $bundleMap;
                 array_pop($bundleMap);
             }
+        }
+    }
+
+    /**
+     * Returns an array of bundles to register, with dependencies, ordered
+     *
+     * @uses appendDependenciesRecursively
+     *
+     * @return BundleInterface[] An array of bundle instances.
+     */
+    protected function registeredDependencies()
+    {
+        $bundles = $this->registerBundles();
+        $children = $rootBundles = array();
+        $hasDependencies = false;
+
+        // Build up bundles as a hash with FQN for basis to rebuild again in correct order given dependencies
+        foreach ($bundles as $bundle) {
+            $children[] = $bundleFQN = get_class($bundle);
+            $rootBundles[$bundleFQN] = $bundle;
+
+            if ($bundle instanceof BundleDependenciesInterface) {
+                $hasDependencies = true;
+            }
+        }
+
+        if (!$hasDependencies) {
+            return $bundles;
+        }
+
+        // Rebuild bundles order with dependencies recursively
+        $bundles = array();
+        $stack = array(get_class($this) => true);
+        $this->appendDependenciesRecursively(
+            $children,
+            $bundles,
+            $rootBundles,
+            $stack
+       );
+
+        return $bundles;
+    }
+
+    /**
+     * Append dependencies of bundles recursively
+     *
+     * Accepted arguments are as documented below where `string` implies a string with class FQN(Fully Qualified Name),
+     * this string must be in exactly same format as returned by get_class() and PHP 5.5's CLASS constant.
+     * Example of FQN string: "Symfony\Component\HttpKernel\Bundle\BundleInterface"
+     *
+     * @param string[] $children Dependencies to apply
+     * @param BundleInterface[string] $bundles Ordered bundles to append dependencies to
+     * @param BundleInterface[string] $rootBundles Loaded Bundles from registerRootBundles()
+     * @param bool[string] $stack For recursion protection, and for debug use on exceptions
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\DependencyMismatchException On missing dependencies
+     */
+    protected function appendDependenciesRecursively(array $children, array &$bundles, array $rootBundles, array $stack)
+    {
+        while (!empty($children)) {
+            $dependencyFQN = array_shift($children);
+            if (isset($bundles[$dependencyFQN])) {
+                continue;
+            } elseif (isset($stack[$dependencyFQN])) {
+                throw new DependencyMismatchException("Recursive dependency for '{$dependencyFQN}'", array_keys($stack));
+            }
+
+            // If already loaded root bundle, use that to not re instantiate
+            if (isset($rootBundles[$dependencyFQN])) {
+                $dependency = $rootBundles[$dependencyFQN];
+            } else {
+                if (!class_exists($dependencyFQN)) {
+                    throw new DependencyMismatchException("Could not find '{$dependencyFQN}'", array_keys($stack));
+                }
+                $dependency = new $dependencyFQN();
+            }
+
+            // Append dependencies of the dependency before we append dependency itself
+            if ($dependency instanceof BundleDependenciesInterface) {
+                $stack[$dependencyFQN] = true;
+                $this->appendDependenciesRecursively(
+                    $dependency->getBundleDependencies(),
+                    $bundles,
+                    $rootBundles,
+                    $stack
+               );
+            }
+
+            $bundles[$dependencyFQN] = $dependency;
         }
     }
 

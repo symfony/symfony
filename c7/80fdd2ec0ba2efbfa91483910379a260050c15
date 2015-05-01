@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-28T20:28:21Z
+
+IMO, it's a bug in PHP and this PR is a workaround. We should merge it on 2.3.
+Otherwise, :+1:

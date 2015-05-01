@@ -11,10 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-if (!defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -156,7 +152,9 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT));
+        $flags = defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0;
+
+        $output->writeln(json_encode($filesInfo, $flags));
 
         return min($errors, 1);
     }

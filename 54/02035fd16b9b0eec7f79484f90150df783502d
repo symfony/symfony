@@ -1,0 +1,132 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-26T22:41:34Z
+
+:+1: btw, https://symfony.com/search seems to be offline
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-04-26T22:44:10Z
+
+@dosten : i noticed that myself. but i didn't presume to remove the feature totally :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-27T11:23:04Z
+
+Could we use `//symfony.com/search` instead of forcing to use HTTPS?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-27T11:47:41Z
+
+@javiereguiluz why not always using HTTPS ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T11:50:29Z
+
+Always using https looks fine to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T11:50:48Z
+
+also because we will remove HTTP support for symfony.com in the next coming days/weeks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T11:51:38Z
+
+So, what about changing all references to symfony.com to use HTTPS?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-27T12:39:25Z
+
+@stof today we've seen an example of the consequences of forcing to use HTTPS everywhere: Composer has enforced `https` and that has provoked the chaos, breaking hundreds of deployments based on Capifony: https://github.com/everzet/capifony/pull/568
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-27T15:28:48Z
+
+@javiereguiluz this provoqued chaos because Capifony is downloading the file without following redirections (curl being a low-level client, it requires following redirections explicitly with ``-L``, otherwise you just see the 302 response). So *any* URL change would break Capifony. It is not specifc to the http vs https thing.
+Just changing the link won't break anything here. And given that browsers do follow redirections, forcing the usage of HTTPS would work fine here too (be careful with APIs exposed on symfony.com though)
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-04-27T20:10:29Z
+
+@fabpot : I'd really like it if all symfony.com was available via https only (via HSTS), but for this issue, I just want the warning gone :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-27T20:47:18Z
+
+@javiereguiluz BTW, we plan to move to HTTPS only on symfony.com. I guess it's time to update all links / doc ;)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-27T20:52:07Z
+
+@lyrixx you all seem very confident that nothing will break if you disable `http`. I trust you because I know you and the rest of the team will plan the transition carefully. Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T21:05:37Z
+
+@javiereguiluz The first step is to default to HTTPS and redirect the HTTP traffic to HTTPS. Removing the HTTP traffic altogether will take more time as there are so many links out there pointing to the HTTP version of symfony.com.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-04-27T21:19:36Z
+
+@fabpot I'm not sure we want to **remove** HTTP traffic. We could keep the 301 forever.
+But the change to HTTP to HTTPS is not so simple IMHO. Because we have to keep a working alternative for people without `openssl` module to be able to download sf.tgz and demo.tgz
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-04-27T21:58:51Z
+
+@fabpot : using HSTS makes that more or less automatic. Sadly older browers ruin it for some :(
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-04-27T22:00:42Z
+
+Having any of this discussion isn't really relevant to the context of this one PR. Can the PR be merged as is?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-28T11:58:25Z
+
+:+1: on this PR
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-28T11:58:45Z
+
+We should also check other places where we might link to symfony.com in Symfony
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-28T21:58:51Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jrobeson at 2015-04-29T23:01:14Z
+
+@stof: i think that's out of the context of this PR.
+
+However i did check for symfony.com usages.  They consist of usages in:
+
+ * tests
+ * composer.json files
+ * READMEs
+ * xml namespaces
+ * xml schema locations
+ * phpdoc @link references
+ * documentation link in collector
+ * CONTRIBUTING.md

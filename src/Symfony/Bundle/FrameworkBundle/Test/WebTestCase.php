@@ -130,7 +130,7 @@ abstract class WebTestCase extends \PHPUnit_Framework_TestCase
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to http://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 
         $file = current($results);

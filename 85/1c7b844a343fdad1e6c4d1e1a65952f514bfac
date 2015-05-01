@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-01T08:41:17Z
+
+:+1: Imho this should go into 2.3 though.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-01T09:14:26Z
+
+@xabbuh these classes don't exist in 2.3 (all places existing in 2.3 have already been changed earlier)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-01T09:18:51Z
+
+oh indeed
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-01T13:55:25Z
+
+@fabpot all in one line or can i do something like this?
+```php
+return json_encode(
+    $messages->all($domain),
+    defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0
+);
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-01T13:57:19Z
+
+@dosten One line please :)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-01T14:01:45Z
+
+@fabpot done

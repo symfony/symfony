@@ -108,7 +108,7 @@ class Inline
 
                 return 'null';
             case is_object($value):
-                if ($value instanceof \DateTime) {
+                if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
                     if ($value->getTimezone()->getName() === date_default_timezone_get()) {
                         if (0 === (int) $value->format('His')) {
                             return $value->format('Y-m-d');

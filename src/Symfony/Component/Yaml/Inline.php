@@ -522,6 +522,7 @@ class Inline
                         if (self::$timestampAsDateTime) {
                             return new \DateTime($scalar);
                         }
+
                         return strtotime($scalar);
                 }
             default:

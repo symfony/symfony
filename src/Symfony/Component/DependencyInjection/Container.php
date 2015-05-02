@@ -86,8 +86,6 @@ class Container implements IntrospectableContainerInterface
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?: new ParameterBag();
-
-        $this->set('service_container', $this);
     }
 
     /**

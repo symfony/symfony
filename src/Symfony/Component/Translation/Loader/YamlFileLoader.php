@@ -43,6 +43,10 @@ class YamlFileLoader extends ArrayLoader
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new \LogicException('Loading translations from the YAML format requires the Symfony Yaml component.');
+        }
+
         if (null === $this->yamlParser) {
             $this->yamlParser = new YamlParser();
         }
@@ -64,7 +68,10 @@ class YamlFileLoader extends ArrayLoader
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }

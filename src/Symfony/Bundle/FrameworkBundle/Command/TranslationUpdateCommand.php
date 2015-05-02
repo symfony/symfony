@@ -152,7 +152,7 @@ EOF
                 }
             }
 
-            if ($input->getOption('output-format') == 'xliff') {
+            if ($input->getOption('output-format') == 'xlf') {
                 $output->writeln('Xliff output version is <info>1.2</info>');
             }
         }

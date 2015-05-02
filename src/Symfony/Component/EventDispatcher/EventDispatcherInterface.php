@@ -77,7 +77,7 @@ interface EventDispatcherInterface
     public function removeSubscriber(EventSubscriberInterface $subscriber);
 
     /**
-     * Gets the listeners of a specific event or all listeners.
+     * Gets the listeners of a specific event or all listeners sorted by descending priority.
      *
      * @param string $eventName The name of the event
      *

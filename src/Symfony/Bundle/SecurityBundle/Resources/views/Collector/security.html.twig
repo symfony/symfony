@@ -1,7 +1,7 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    {% if collector.user %}
+    {% if collector.tokenClass %}
         {% set color_code = (collector.enabled and collector.authenticated) ? 'green' : 'yellow'  %}
         {% set authentication_color_code = (collector.enabled and collector.authenticated) ? 'green' : 'red'  %}
         {% set authentication_color_text = (collector.enabled and collector.authenticated) ? 'Yes' : 'No'  %}
@@ -9,7 +9,7 @@
         {% set color_code = collector.enabled ? 'red' : 'black'  %}
     {% endif %}
     {% set text %}
-        {% if collector.user %}
+        {% if collector.tokenClass %}
             <div class="sf-toolbar-info-piece">
                 <b>Logged in as</b>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ color_code }}">{{ collector.user }}</span>
@@ -47,7 +47,7 @@
 
 {% block panel %}
     <h2>Security</h2>
-    {% if collector.user %}
+    {% if collector.tokenClass %}
         <table>
             <tr>
                 <th>Username</th>

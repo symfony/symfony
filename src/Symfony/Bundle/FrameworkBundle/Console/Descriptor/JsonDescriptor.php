@@ -11,10 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
-if (!defined('JSON_PRETTY_PRINT')) {
-    define('JSON_PRETTY_PRINT', 128);
-}
-
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -174,7 +170,13 @@ class JsonDescriptor extends Descriptor
      */
     private function writeData(array $data, array $options)
     {
-        $this->write(json_encode($data, (isset($options['json_encoding']) ? $options['json_encoding'] : 0) | JSON_PRETTY_PRINT)."\n");
+        $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+
+        if (defined('JSON_PRETTY_PRINT')) {
+            $flags |= JSON_PRETTY_PRINT;
+        }
+
+        $this->write(json_encode($data, $flags)."\n");
     }
 
     /**

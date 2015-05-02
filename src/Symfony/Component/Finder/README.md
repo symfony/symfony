@@ -50,4 +50,4 @@ You can run the unit tests with the following command:
 
 [1]: http://api.symfony.com/2.5/Symfony/Component/Finder/SplFileInfo.html
 [2]: http://php.net/splfileinfo
-[3]: http://symfony.com/doc/current/components/finder.html#usage
+[3]: https://symfony.com/doc/current/components/finder.html#usage

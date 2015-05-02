@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-01T14:10:04Z
+
+Changing schema URLs imho is a BC break and I think changing the tests isn't worth it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-01T14:24:41Z
+
+@fabpot Do you have plans to enable HTTPS on api.symfony.com too?

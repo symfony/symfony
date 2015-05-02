@@ -179,7 +179,7 @@ class DebugClassLoader
             }
 
             if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {
-                trigger_error(sprintf('%s uses a reserved class name (%s) that will break on PHP 7.0', $name, $refl->getShortName()), E_USER_DEPRECATED);
+                trigger_error(sprintf('%s uses a reserved class name (%s) that will break on PHP 7 and higher', $name, $refl->getShortName()), E_USER_DEPRECATED);
             } elseif (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {

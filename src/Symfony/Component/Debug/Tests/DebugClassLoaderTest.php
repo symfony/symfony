@@ -238,7 +238,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         $xError = array(
             'type' => E_USER_DEPRECATED,
-            'message' => 'Test\Symfony\Component\Debug\Tests\Float uses a reserved class name (Float) that will break on PHP 7.0',
+            'message' => 'Test\Symfony\Component\Debug\Tests\Float uses a reserved class name (Float) that will break on PHP 7 and higher',
         );
 
         $this->assertSame($xError, $lastError);

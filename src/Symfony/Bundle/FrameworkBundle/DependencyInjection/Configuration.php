@@ -582,6 +582,7 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(array('en'))
                         ->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
+                        ->scalarNode('cache')->defaultValue('translation.cache.default')->end()
                     ->end()
                 ->end()
             ->end()

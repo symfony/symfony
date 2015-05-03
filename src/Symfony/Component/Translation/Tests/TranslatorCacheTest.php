@@ -16,6 +16,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageCache;
 
 class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,13 +63,13 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $msgid = 'test';
 
         // Prime the cache
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator = $this->getTranslator($locale, $debug);
         $translator->addLoader($format, new ArrayLoader());
         $translator->addResource($format, array($msgid => 'OK'), $locale);
         $translator->trans($msgid);
 
         // Try again and see we get a valid result whilst no loader can be used
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator = $this->getTranslator($locale, $debug);
         $translator->addLoader($format, $this->createFailingLoader());
         $translator->addResource($format, array($msgid => 'OK'), $locale);
         $this->assertEquals('OK', $translator->trans($msgid), '-> caching does not work in '.($debug ? 'debug' : 'production'));
@@ -85,7 +86,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
             ))))
         ;
 
-        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator = $this->getTranslator('fr', true);
         $translator->setLocale('fr');
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'foo', 'fr');
@@ -101,7 +102,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
             ))))
         ;
 
-        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator = $this->getTranslator('fr', true);
         $translator->setLocale('fr');
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'bar', 'fr');
@@ -126,7 +127,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $format = 'some_format';
         $msgid = 'test';
 
-        $catalogue = new MessageCatalogue($locale, array());
+        $catalogue = $this->getCatalogue($locale, array());
         $catalogue->addResource(new StaleResource()); // better use a helper class than a mock, because it gets serialized in the cache and re-loaded
 
         /** @var LoaderInterface|\PHPUnit_Framework_MockObject_MockObject $loader */
@@ -138,13 +139,13 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         ;
 
         // 1st pass
-        $translator = new Translator($locale, null, $this->tmpDir, true);
+        $translator = $this->getTranslator($locale, true);
         $translator->addLoader($format, $loader);
         $translator->addResource($format, null, $locale);
         $translator->trans($msgid);
 
         // 2nd pass
-        $translator = new Translator($locale, null, $this->tmpDir, true);
+        $translator = $this->getTranslator($locale, true);
         $translator->addLoader($format, $loader);
         $translator->addResource($format, null, $locale);
         $translator->trans($msgid);
@@ -165,19 +166,19 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $msgid = 'test';
 
         // Create a Translator and prime its cache
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator = $this->getTranslator($locale, $debug);
         $translator->addLoader($format, new ArrayLoader());
         $translator->addResource($format, array($msgid => 'OK'), $locale);
         $translator->trans($msgid);
 
         // Create another Translator with a different catalogue for the same locale
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator = $this->getTranslator($locale, $debug);
         $translator->addLoader($format, new ArrayLoader());
         $translator->addResource($format, array($msgid => 'FAIL'), $locale);
         $translator->trans($msgid);
 
         // Now the first translator must still have a useable cache.
-        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator = $this->getTranslator($locale, $debug);
         $translator->addLoader($format, $this->createFailingLoader());
         $translator->addResource($format, array($msgid => 'OK'), $locale);
         $this->assertEquals('OK', $translator->trans($msgid), '-> the cache was overwritten by another translator instance in '.($debug ? 'debug' : 'production'));
@@ -190,7 +191,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * catalogues, we must take the set of fallback locales into consideration when
          * loading a catalogue from the cache.
          */
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = $this->getTranslator('a', false);
         $translator->setFallbackLocales(array('b'));
 
         $translator->addLoader('array', new ArrayLoader());
@@ -204,7 +205,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
 
         // Use a fresh translator with no fallback locales, result should be the same
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = $this->getTranslator('a', false);
 
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
@@ -228,7 +229,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * Create a translator that loads two catalogues for two different locales.
          * The catalogues contain distinct sets of messages.
          */
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = $this->getTranslator('a', false);
         $translator->setFallbackLocales(array('b'));
 
         $translator->addLoader('array', new ArrayLoader());
@@ -246,7 +247,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
          * Now, repeat the same test.
          * Behind the scenes, the cache is used. But that should not matter, right?
          */
-        $translator = new Translator('a', null, $this->tmpDir);
+        $translator = $this->getTranslator('a', false);
         $translator->setFallbackLocales(array('b'));
 
         $translator->addLoader('array', new ArrayLoader());
@@ -272,16 +273,23 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->getCatalogue('fr', array(), array($resource))));
 
         // prime the cache
-        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator = $this->getTranslator('fr', true);
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'foo', 'fr');
         $translator->trans('foo');
 
         // prime the cache second time
-        $translator = new Translator('fr', null, $this->tmpDir, true);
+        $translator = $this->getTranslator('fr', true);
         $translator->addLoader('loader', $loader);
         $translator->addResource('loader', 'foo', 'fr');
         $translator->trans('foo');
+    }
+
+    protected function getTranslator($locale, $debug)
+    {
+        $cache = new MessageCache($this->tmpDir, $debug);
+
+        return new Translator($locale, null, $cache);
     }
 
     protected function getCatalogue($locale, $messages, $resources = array())

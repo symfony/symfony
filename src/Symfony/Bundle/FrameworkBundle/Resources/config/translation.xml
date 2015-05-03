@@ -33,6 +33,7 @@
         <parameter key="translation.loader.class">Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader</parameter>
         <parameter key="translation.extractor.class">Symfony\Component\Translation\Extractor\ChainExtractor</parameter>
         <parameter key="translation.writer.class">Symfony\Component\Translation\Writer\TranslationWriter</parameter>
+        <parameter key="translator.cache.prefix" />
     </parameters>
 
     <services>
@@ -44,7 +45,7 @@
                 <argument key="cache_dir">%kernel.cache_dir%/translations</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <argument type="collection" /> <!-- translation resources -->
+            <argument type="service" id="translation.cache" on-invalid="null" />
         </service>
 
         <service id="translator.logging" class="Symfony\Component\Translation\LoggingTranslator" public="false">
@@ -156,6 +157,12 @@
         <service id="translation.warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer" public="false">
             <argument type="service" id="translator" />
             <tag name="kernel.cache_warmer" />
+        </service>
+
+        <!-- Cache -->
+        <service id="translation.cache.default" class="Symfony\Component\Translation\MessageCache" public="false">
+            <argument>%kernel.cache_dir%/translations</argument> <!-- cache_dir -->
+            <argument>%kernel.debug%</argument> <!-- debug -->
         </service>
     </services>
 </container>

@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface
+class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, FallbackLocaleAwareInterface
 {
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;
@@ -35,8 +35,8 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      */
     public function __construct(TranslatorInterface $translator)
     {
-        if (!$translator instanceof TranslatorBagInterface) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        if (!($translator instanceof TranslatorBagInterface && $translator instanceof FallbackLocaleAwareInterface)) {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and FallbackLocaleAwareInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
@@ -66,6 +66,16 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
     /**
      * {@inheritdoc}
+     */
+    public function resolveLocale($id, $domain = null, $locale = null)
+    {
+        return $this->translator->resolveLocale($id, $domain, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
      */
     public function setLocale($locale)
     {
@@ -118,25 +128,25 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             $domain = 'messages';
         }
 
+        if (null === $locale) {
+            $locale = $this->translator->getLocale();
+        }
+
         $id = (string) $id;
-        $catalogue = $this->translator->getCatalogue($locale);
-        $locale = $catalogue->getLocale();
-        if ($catalogue->defines($id, $domain)) {
-            $state = self::MESSAGE_DEFINED;
-        } elseif ($catalogue->has($id, $domain)) {
-            $state = self::MESSAGE_EQUALS_FALLBACK;
+        $resolvedLocale = $this->translator->resolveLocale($id, $domain, $locale);
 
-            $fallbackCatalogue = $catalogue->getFallBackCatalogue();
-            while ($fallbackCatalogue) {
-                if ($fallbackCatalogue->defines($id, $domain)) {
-                    $locale = $fallbackCatalogue->getLocale();
-                    break;
-                }
+        switch (true) {
+            case $resolvedLocale == $locale:
+                $state = self::MESSAGE_DEFINED;
+                break;
 
-                $fallbackCatalogue = $fallbackCatalogue->getFallBackCatalogue();
-            }
-        } else {
-            $state = self::MESSAGE_MISSING;
+            case $resolvedLocale === null:
+                $state = self::MESSAGE_MISSING;
+                break;
+
+            default:
+                $state = self::MESSAGE_EQUALS_FALLBACK;
+                $locale = $resolvedLocale;
         }
 
         $this->messages[] = array(

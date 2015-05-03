@@ -14,7 +14,6 @@ namespace Symfony\Component\Translation\Tests;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\MessageCatalogue;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -73,40 +72,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setLocale($locale);
 
         $this->assertEquals($locale, $translator->getLocale());
-    }
-
-    public function testGetCatalogue()
-    {
-        $translator = new Translator('en');
-
-        $this->assertEquals(new MessageCatalogue('en'), $translator->getCatalogue());
-
-        $translator->setLocale('fr');
-        $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
-    }
-
-    public function testGetCatalogueReturnsConsolidatedCatalogue()
-    {
-        /*
-         * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).
-         * In that case, getCatalogue() will probably have to load all missing domains in order to return
-         * one complete catalogue.
-         */
-
-        $locale = 'whatever';
-        $translator = new Translator($locale);
-        $translator->addLoader('loader-a', new ArrayLoader());
-        $translator->addLoader('loader-b', new ArrayLoader());
-        $translator->addResource('loader-a', array('foo' => 'foofoo'), $locale, 'domain-a');
-        $translator->addResource('loader-b', array('bar' => 'foobar'), $locale, 'domain-b');
-
-        /*
-         * Test that we get a single catalogue comprising messages
-         * from different loaders and different domains
-         */
-        $catalogue = $translator->getCatalogue($locale);
-        $this->assertTrue($catalogue->defines('foo', 'domain-a'));
-        $this->assertTrue($catalogue->defines('bar', 'domain-b'));
     }
 
     public function testSetFallbackLocales()

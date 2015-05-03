@@ -22,7 +22,7 @@ use Symfony\Component\Config\ConfigCacheFactory;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Translator implements TranslatorInterface, TranslatorBagInterface
+class Translator implements TranslatorInterface, TranslatorBagInterface, FallbackLocaleAwareInterface
 {
     /**
      * @var MessageCatalogueInterface[]
@@ -206,7 +206,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
-        return strtr($this->getCatalogue($locale)->get((string) $id, $domain), $parameters);
+        return strtr($this->getCatalogueInternal($locale)->get((string) $id, $domain), $parameters);
     }
 
     /**
@@ -219,36 +219,52 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
         }
 
         $id = (string) $id;
-        $catalogue = $this->getCatalogue($locale);
+        $bestLocale = $this->resolveLocale($id, $domain, $locale);
+
+        if (null !== $bestLocale) {
+           return strtr($this->selector->choose($this->getCatalogueInternal($locale)->get($id, $domain), (int) $number, $bestLocale), $parameters);
+        } else {
+           return strtr($this->selector->choose($id, (int) $number, $locale), $parameters);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveLocale($id, $domain = null, $locale = null)
+    {
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
+        $id = (string) $id;
+        $catalogue = $this->getCatalogueInternal($locale);
         $locale = $catalogue->getLocale();
         while (!$catalogue->defines($id, $domain)) {
             if ($cat = $catalogue->getFallbackCatalogue()) {
                 $catalogue = $cat;
                 $locale = $catalogue->getLocale();
             } else {
-                break;
+                return;
             }
         }
 
-        return strtr($this->selector->choose($catalogue->get($id, $domain), (int) $number, $locale), $parameters);
+        return $locale;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated TranslatorBagInterface implementation will be removed in 3.0.
      */
     public function getCatalogue($locale = null)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        } else {
-            $this->assertValidLocale($locale);
-        }
+        trigger_error(
+            'The Translator will no longer implement TranslatorBagInterface in 3.0. If you want to find the locale actually used for a translation, use the resolveLocale() method instead.',
+            E_USER_DEPRECATED
+        );
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        return $this->catalogues[$locale];
+        return $this->getCatalogueInternal($locale);
     }
 
     /**
@@ -274,7 +290,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use TranslatorBagInterface::getCatalogue() method instead.', E_USER_DEPRECATED);
 
-        $catalogue = $this->getCatalogue($locale);
+        $catalogue = $this->getCatalogueInternal($locale);
         $messages = $catalogue->all();
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $messages = array_replace_recursive($catalogue->all(), $messages);
@@ -478,5 +494,20 @@ EOF
         }
 
         return $this->configCacheFactory;
+    }
+
+    private function getCatalogueInternal($locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        } else {
+            $this->assertValidLocale($locale);
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        return $this->catalogues[$locale];
     }
 }

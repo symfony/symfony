@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
+class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, FallbackLocaleAwareInterface
 {
     /**
      * @var TranslatorInterface|TranslatorBagInterface
@@ -34,8 +34,8 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger)
     {
-        if (!$translator instanceof TranslatorBagInterface) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        if (!($translator instanceof TranslatorBagInterface && $translator instanceof FallbackLocaleAwareInterface)) {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface, TranslatorBagInterface and FallbackLocaleAwareInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
@@ -66,6 +66,16 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 
     /**
      * {@inheritdoc}
+     */
+    public function resolveLocale($id, $domain = null, $locale = null)
+    {
+        return $this->translator->resolveLocale($id, $domain, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
      */
     public function setLocale($locale)
     {
@@ -109,16 +119,20 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
             $domain = 'messages';
         }
 
-        $id = (string) $id;
-        $catalogue = $this->translator->getCatalogue($locale);
-        if ($catalogue->defines($id, $domain)) {
-            return;
+        if (null === $locale) {
+            $locale = $this->translator->getLocale();
         }
 
-        if ($catalogue->has($id, $domain)) {
-            $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
+        $id = (string) $id;
+
+        $resolvedLocale = $this->translator->resolveLocale($id, $domain, $locale);
+
+        if ($locale === $resolvedLocale) {
+            return;
+        } elseif ($resolvedLocale === null) {
+            $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $locale));
         } else {
-            $this->logger->warning('Translation not found.', array('id' => $id, 'domain' => $domain, 'locale' => $catalogue->getLocale()));
+            $this->logger->debug('Translation use fallback catalogue.', array('id' => $id, 'domain' => $domain, 'locale' => $resolvedLocale));
         }
     }
 }

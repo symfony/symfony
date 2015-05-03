@@ -496,6 +496,13 @@ EOF
         return $this->configCacheFactory;
     }
 
+    /**
+     * Could be renamed back to getCatalogue() and made private once we drop TranslatorBagInterface in 3.0.
+     *
+     * @param string $locale
+     *
+     * @return MessageCatalogueInterface
+     */
     private function getCatalogueInternal($locale = null)
     {
         if (null === $locale) {

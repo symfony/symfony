@@ -178,6 +178,56 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
+    public function testLegacyPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
+    {
+        $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
+
+        /*
+         * As a safeguard against potential BC breaks, make sure that primary and fallback
+         * catalogues (reachable via getFallbackCatalogue()) always contain the full set of
+         * messages provided by the loader. This must also be the case when these catalogues
+         * are (internally) read from a cache.
+         *
+         * Optimizations inside the translator must not change this behaviour.
+         */
+
+        /*
+         * Create a translator that loads two catalogues for two different locales.
+         * The catalogues contain distinct sets of messages.
+         */
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('foo' => 'foo (b)'), 'b');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $catalogue = $translator->getCatalogue('a');
+        $this->assertFalse($catalogue->defines('bar')); // Sure, the "a" catalogue does not contain that message.
+
+        $fallback = $catalogue->getFallbackCatalogue();
+        $this->assertTrue($fallback->defines('foo')); // "foo" is present in "a" and "b"
+
+        /*
+         * Now, repeat the same test.
+         * Behind the scenes, the cache is used. But that should not matter, right?
+         */
+        $translator = new Translator('a', null, $this->tmpDir);
+        $translator->setFallbackLocales(array('b'));
+
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (a)'), 'a');
+        $translator->addResource('array', array('foo' => 'foo (b)'), 'b');
+        $translator->addResource('array', array('bar' => 'bar (b)'), 'b');
+
+        $catalogue = $translator->getCatalogue('a');
+        $this->assertFalse($catalogue->defines('bar'));
+
+        $fallback = $catalogue->getFallbackCatalogue();
+        $this->assertTrue($fallback->defines('foo'));
+    }
+
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()
     {
         $resource = $this->getMock('Symfony\Component\Config\Resource\SelfCheckingResourceInterface');

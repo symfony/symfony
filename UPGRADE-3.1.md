@@ -112,3 +112,9 @@ Yaml
 
  * The `!!php/object` tag to indicate dumped PHP objects has been deprecated
    and will be removed in Symfony 4.0. Use the `!php/object` tag instead.
+
+Validator
+---------
+
+ * The `DateTimeValidator::PATTERN` constant is deprecated and will be removed in
+   Symfony 4.0.

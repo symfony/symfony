@@ -43,17 +43,17 @@ class Dumper
      * @param int   $indent                 The level of indentation (used internally)
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
-     * @param bool  $dateTimeSupport        true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
+     * @param bool  $timestampAsDateTime    true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string The YAML representation of the PHP value
      */
-    public function dump($input, $inline = 0, $indent = 0, $exceptionOnInvalidType = false, $objectSupport = false, $dateTimeSupport = false)
+    public function dump($input, $inline = 0, $indent = 0, $exceptionOnInvalidType = false, $objectSupport = false, $timestampAsDateTime = false)
     {
         $output = '';
         $prefix = $indent ? str_repeat(' ', $indent) : '';
 
         if ($inline <= 0 || !is_array($input) || empty($input)) {
-            $output .= $prefix.Inline::dump($input, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport);
+            $output .= $prefix.Inline::dump($input, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime);
         } else {
             $isAHash = array_keys($input) !== range(0, count($input) - 1);
 
@@ -62,9 +62,9 @@ class Dumper
 
                 $output .= sprintf('%s%s%s%s',
                     $prefix,
-                    $isAHash ? Inline::dump($key, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport).':' : '-',
+                    $isAHash ? Inline::dump($key, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime).':' : '-',
                     $willBeInlined ? ' ' : "\n",
-                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport)
+                    $this->dump($value, $inline - 1, $willBeInlined ? 0 : $indent + $this->indentation, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime)
                 ).($willBeInlined ? "\n" : '');
             }
         }

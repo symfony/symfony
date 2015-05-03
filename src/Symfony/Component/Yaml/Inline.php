@@ -92,13 +92,13 @@ class Inline
      * @param mixed $value                  The PHP variable to convert
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
-     * @param bool  $dateTimeSupport        true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
+     * @param bool  $timestampAsDateTime    true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string The YAML string representing the PHP array
      *
      * @throws DumpException When trying to dump PHP resource
      */
-    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false, $dateTimeSupport = false)
+    public static function dump($value, $exceptionOnInvalidType = false, $objectSupport = false, $timestampAsDateTime = false)
     {
         switch (true) {
             case is_resource($value):
@@ -130,7 +130,7 @@ class Inline
 
                 return 'null';
             case is_array($value):
-                return self::dumpArray($value, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport);
+                return self::dumpArray($value, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime);
             case null === $value:
                 return 'null';
             case true === $value:
@@ -179,11 +179,11 @@ class Inline
      * @param array $value                  The PHP array to dump
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
-     * @param bool  $dateTimeSupport        true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
+     * @param bool  $timestampAsDateTime    true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string The YAML string representing the PHP array
      */
-    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport)
+    private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime)
     {
         // array
         $keys = array_keys($value);
@@ -193,7 +193,7 @@ class Inline
         ) {
             $output = array();
             foreach ($value as $val) {
-                $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport);
+                $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime);
             }
 
             return sprintf('[%s]', implode(', ', $output));
@@ -202,7 +202,7 @@ class Inline
         // mapping
         $output = array();
         foreach ($value as $key => $val) {
-            $output[] = sprintf('%s: %s', self::dump($key, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport), self::dump($val, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport));
+            $output[] = sprintf('%s: %s', self::dump($key, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime), self::dump($val, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime));
         }
 
         return sprintf('{ %s }', implode(', ', $output));

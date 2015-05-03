@@ -96,23 +96,23 @@ class Yaml
      * @param int   $indent                 The amount of spaces to use for indentation of nested nodes.
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
-     * @param bool  $dateTimeSupport        true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
+     * @param bool  $timestampAsDateTime    true if DateTime objects must be dumped as YAML timestamps, false if DateTime objects are not supported
      *
      * @return string A YAML string representing the original PHP array
      *
-     * @deprecated The ability to pass $dateTimeSupport = false to the Yaml::dump method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.
+     * @deprecated The ability to pass $timestampAsDateTime = false to the Yaml::dump method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.
      *
      * @api
      */
-    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false, $dateTimeSupport = false)
+    public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false, $timestampAsDateTime = false)
     {
-        if ($dateTimeSupport) {
-            trigger_error('The ability to pass $dateTimeSupport = false to the '.__METHOD__.' method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
+        if ($timestampAsDateTime) {
+            trigger_error('The ability to pass $timestampAsDateTime = false to the '.__METHOD__.' method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
         }
 
         $yaml = new Dumper();
         $yaml->setIndentation($indent);
 
-        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport, $dateTimeSupport);
+        return $yaml->dump($array, $inline, 0, $exceptionOnInvalidType, $objectSupport, $timestampAsDateTime);
     }
 }

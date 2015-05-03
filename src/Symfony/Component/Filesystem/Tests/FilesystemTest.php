@@ -19,7 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class FilesystemTest extends FilesystemTestCase
 {
     /**
-     * @var \Symfony\Component\Filesystem\Filesystem $filesystem
+     * @var \Symfony\Component\Filesystem\Filesystem
      */
     private $filesystem = null;
 

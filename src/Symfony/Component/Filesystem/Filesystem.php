@@ -455,8 +455,8 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to.
-     * @param string   $content  The data to write into the file.
+     * @param string $filename The file to be written to.
+     * @param string $content  The data to write into the file.
      *
      * @throws IOException If the file cannot be written to.
      */

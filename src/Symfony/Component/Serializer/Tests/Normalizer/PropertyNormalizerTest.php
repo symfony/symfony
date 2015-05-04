@@ -419,6 +419,11 @@ class PropertyNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->normalizer->normalize($obj, 'any');
     }
+
+    public function testNoTraversableSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
+    }
 }
 
 class PropertyDummy

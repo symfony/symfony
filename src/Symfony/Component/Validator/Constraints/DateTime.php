@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Radu Murzea <radu.murzea@gmail.com>
  *
  * @api
  */
@@ -34,4 +35,5 @@ class DateTime extends Constraint
     );
 
     public $message = 'This value is not a valid datetime.';
+    public $format = 'Y-m-d H:i:s';
 }

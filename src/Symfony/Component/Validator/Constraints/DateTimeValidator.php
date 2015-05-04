@@ -17,11 +17,15 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Radu Murzea <radu.murzea@gmail.com>
  *
  * @api
  */
 class DateTimeValidator extends DateValidator
 {
+    /**
+     * @deprecated since version 2.8, to be removed in 3.0.
+     */
     const PATTERN = '/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/';
 
     /**
@@ -43,48 +47,79 @@ class DateTimeValidator extends DateValidator
 
         $value = (string) $value;
 
-        if (!preg_match(static::PATTERN, $value, $matches)) {
+        $dateTimeObject = \DateTime::createFromFormat($constraint->format, $value);
+        $errors = \DateTime::getLastErrors();
+
+        //the value was successfully parsed
+        if ($errors['error_count'] + $errors['warning_count'] <= 0) {
+            return;
+        }
+
+        //see the function's phpdoc for details
+        $errorCode = $this->getViolationCode($errors, 'errors');
+
+        if (! is_null($errorCode)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_FORMAT_ERROR)
+                    ->setCode($errorCode)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_FORMAT_ERROR)
+                    ->setCode($errorCode)
                     ->addViolation();
             }
 
             return;
         }
 
-        if (!DateValidator::checkDate($matches[1], $matches[2], $matches[3])) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_DATE_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_DATE_ERROR)
-                    ->addViolation();
-            }
-        }
+        //see the function's phpdoc for details
+        $warningCode = $this->getViolationCode($errors, 'warnings');
 
-        if (!TimeValidator::checkTime($matches[4], $matches[5], $matches[6])) {
+        if (! is_null($warningCode)) {
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_TIME_ERROR)
+                    ->setCode($warningCode)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(DateTime::INVALID_TIME_ERROR)
+                    ->setCode($warningCode)
                     ->addViolation();
             }
+
+            return;
+        }
+    }
+    
+    /**
+     * PHP's DateTime stores the errors and warning at unpredictable indexes,
+     * so it's a bit trickier to retrieve them (we have to use array_values + array_shift).
+     * 
+     * Also, based on the error/warning message string, we can guess if it was
+     * a date problem, time problem or format/general problem.
+     * 
+     * @param array $errors result from calling \DateTime::getLastErrors()
+     * @param string $key the key under which to search for errors/warnings
+     * @return mixed an integer representing the error code or NULL if everything was ok
+     */
+    private function getViolationCode($errors, $key)
+    {
+        if (isset($errors[$key]) && count($errors[$key]) > 0) {
+            $allErrors = array_values($errors[$key]);
+            $firstError = array_shift($allErrors);
+
+            if (strpos($firstError, 'date') !== false) {
+                return DateTime::INVALID_DATE_ERROR;
+            } elseif (strpos($firstError, 'time') !== false) {
+                return DateTime::INVALID_TIME_ERROR;
+            } else {
+                return DateTime::INVALID_FORMAT_ERROR;
+            }
+        } else {
+            return;
         }
     }
 }

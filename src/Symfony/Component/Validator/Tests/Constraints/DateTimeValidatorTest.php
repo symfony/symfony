@@ -98,6 +98,8 @@ class DateTimeValidatorTest extends AbstractConstraintValidatorTest
             array('foobar', DateTime::INVALID_FORMAT_ERROR),
             array('2010-01-01', DateTime::INVALID_FORMAT_ERROR),
             array('00:00:00', DateTime::INVALID_FORMAT_ERROR),
+            array('2010-0101 01:02:03', DateTime::INVALID_FORMAT_ERROR),
+            array('2010-01-01X01:02:03', DateTime::INVALID_FORMAT_ERROR),
             array('2010-01-01 00:00', DateTime::INVALID_FORMAT_ERROR),
             array('2010-13-01 00:00:00', DateTime::INVALID_DATE_ERROR),
             array('2010-04-32 00:00:00', DateTime::INVALID_DATE_ERROR),
@@ -105,6 +107,29 @@ class DateTimeValidatorTest extends AbstractConstraintValidatorTest
             array('2010-01-01 24:00:00', DateTime::INVALID_TIME_ERROR),
             array('2010-01-01 00:60:00', DateTime::INVALID_TIME_ERROR),
             array('2010-01-01 00:00:60', DateTime::INVALID_TIME_ERROR),
+        );
+    }
+
+    /**
+     * @dataProvider getCustomDateTimes
+     */
+    public function testCustomFormatDateTime($format, $dateTime)
+    {
+        $constraint = new DateTime(array(
+            'format' => $format,
+        ));
+
+        $this->validator->validate($dateTime, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function getCustomDateTimes()
+    {
+        return array(
+            array('d-m-Y', '15-07-2015'),
+            array('m-Y-d i:H', '11-2013-29 47:19'),
+            array('Y F d', '2002 March 17'),
         );
     }
 }

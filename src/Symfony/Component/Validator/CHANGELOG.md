@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+* deprecated `Date` and `Time` constraints
+* deprecated `DateValidator` and `TimeValidator` validators
+* deprecated `PATTERN` constant in `DateTimeValidator`
+* added new optional `format` option to `DateTime` constraint
+
 2.7.0
 -----
 

@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraint;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ * 
+ * @deprecated since version 2.8, to be removed in 3.0. Use {@link DateTime} instead.
  */
 class Time extends Constraint
 {

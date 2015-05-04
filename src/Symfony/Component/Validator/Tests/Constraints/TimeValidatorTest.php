@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
 use Symfony\Component\Validator\Validation;
 
+/**
+ * @deprecated since version 2.8, to be removed in 3.0.
+ */
 class TimeValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function getApiVersion()

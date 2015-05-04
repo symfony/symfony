@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
 use Symfony\Component\Validator\Validation;
 
+/**
+ * @deprecated since version 2.8, to be removed in 3.0.
+ */
 class DateValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function getApiVersion()

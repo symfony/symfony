@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
+ * 
+ * @deprecated since version 2.8, to be removed in 3.0. Use {@link DateTimeValidator} instead.
  */
 class TimeValidator extends ConstraintValidator
 {

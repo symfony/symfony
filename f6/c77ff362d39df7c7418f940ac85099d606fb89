@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-04-20T09:10:05Z
+
+:-1: on this change, as its goal is to allow using an invalid property path. The drupal code should be fixed instead.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2015-04-20T09:26:24Z
+
+Fair, for the usecase of symfony and custom PHP classes, this is not what you wanna do.
+On the other hand, properties are an abstract concept, not necessarily bound to concrete classes.
+
+I guess the way to fix it would be to use traversables for that part of our property path.
+
+On the other hand I wish we would have communicated when the symfony validator was rewritten
+
+---------------------------------------------------------------------------
+
+by fago at 2015-04-20T09:37:16Z
+
+I don't see why 0.value would be an invalid property path? Where does it say numbers are not allowed?
+On the contrary, when numerically indexed arrays are validated you'll always end up with numbers in the property path?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-04-21T13:21:25Z
+
+@stof Why? To me this seems like a simple bug fix.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-21T13:51:41Z
+
+Agree, it's a simple bug fix. That the goal is a wrong use-case doesn't matter.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-04-24T12:06:17Z
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-04T07:17:05Z
+
+No response from @stof. I'm going to merge this.

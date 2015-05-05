@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-05-03T14:25:37Z
+
+Btw, I'm aware of the test failures. I would like to see first if this is a correct change, before changing 1000+ tests.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-03T15:43:25Z
+
+Makes sense for me :+1:
+
+---------------------------------------------------------------------------
+
+by webmozart at 2015-05-04T06:39:48Z
+
+Sounds like a good approach!
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-05-04T09:39:56Z
+
+Thanks for the quick response, @webmozart! I've now fixed the tests.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-05-04T12:24:21Z
+
+Failing tests for 5.3.3 are not related to this PR. Btw, if everything is correct, the tests should pass if you hit rerun.

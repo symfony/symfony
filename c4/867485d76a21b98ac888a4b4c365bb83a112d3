@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-27T12:09:04Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-28T12:09:16Z
+
+this looks weird to me. It means that your debugging output will not break the content of the response (a json response would not be valid json anymore for instance).
+This seems a bad idea IMO.
+
+And for instance, for AJAX requests, the link to the profile is available in the toolbar of the main page even though the toolbar is not injected in the ajax response. So the profile is accessible in such case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-28T12:17:25Z
+
+This is just what happens when you use var_dump(), with a better experience: currently, you either have no output at all, which is a huge WTF, or an HTML blob, regardless of the actual content-type.

@@ -65,14 +65,21 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testAccessDecisionManagerInterfaceSetting()
     {
-        // mock our stub voter that implements the AccessDecisionManagerAwareInterface
-        $voter = $this->getMock('Symfony\Component\Security\Core\Tests\Authorization\VoterWithAccessDecisionManagerAwareInterfaceStub');
+        $strategies = array('affirmative', 'consensus', 'unanimous');
 
-        $voter->expects($this->once())
-              ->method('setAccessDecisionManager')
-              ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authorization\AccessDecisionManager'));
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        foreach ($strategies as $strategy) {
+            // mock our stub voter that implements the AccessDecisionManagerAwareInterface
+            $voter = $this->getMock('Symfony\Component\Security\Core\Tests\Authorization\VoterWithAccessDecisionManagerAwareInterfaceStub');
 
-        $manager = new AccessDecisionManager(array($voter));
+            $manager = new AccessDecisionManager(array($voter), $strategy);
+
+            $voter->expects($this->once())
+                  ->method('setAccessDecisionManager')
+                  ->with($manager);
+
+            $manager->decide($token, array('ROLE_DOES_NOT_MATTER'));
+        }
     }
 
     /**

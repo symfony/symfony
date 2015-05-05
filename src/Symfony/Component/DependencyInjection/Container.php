@@ -314,11 +314,9 @@ class Container implements IntrospectableContainerInterface
                     }
 
                     throw new ServiceNotFoundException($id, null, null, $alternatives);
-                }
-                if ($strtolower) {
+                } else if ($strtolower) {
                     return;
-                }
-                else {
+                } else {
                     continue;
                 }
 

@@ -692,6 +692,13 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
             }
         }
+        foreach ($config['paths'] as $dir) {
+            if (is_dir($dir)) {
+                $dirs[] = $dir;
+            } else {
+                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
+            }
+        }
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/translations')) {
             $dirs[] = $dir;
         }

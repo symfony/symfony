@@ -39,6 +39,7 @@ framework:
     translator:
         enabled:  true
         fallback: fr
+        paths: ['%kernel.root_dir%/Fixtures/translations']
     validation:
         enabled: true
         cache:   apc

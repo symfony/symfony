@@ -336,33 +336,16 @@ class TextDescriptor extends Descriptor
 
         $this->writeText($this->formatSection('event_dispatcher', $label)."\n", $options);
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
 
         if (null !== $event) {
             $this->writeText("\n");
-            $table = new Table($this->getOutput());
-            $table->getStyle()->setCellHeaderFormat('%s');
-            $table->setHeaders(array('Order', 'Callable'));
-
-            foreach ($registeredListeners as $order => $listener) {
-                $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($listener)));
-            }
-
-            $table->render();
+            $this->renderEventListenerTable($registeredListeners);
         } else {
             ksort($registeredListeners);
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->writeText(sprintf("\n<info>[Event]</info> %s\n", $eventListened), $options);
-
-                $table = new Table($this->getOutput());
-                $table->getStyle()->setCellHeaderFormat('%s');
-                $table->setHeaders(array('Order', 'Callable'));
-
-                foreach ($eventListeners as $order => $eventListener) {
-                    $table->addRow(array(sprintf('#%d', $order + 1), $this->formatCallable($eventListener)));
-                }
-
-                $table->render();
+                $this->renderEventListenerTable($eventListeners);
             }
         }
     }
@@ -373,6 +356,26 @@ class TextDescriptor extends Descriptor
     protected function describeCallable($callable, array $options = array())
     {
         $this->writeText($this->formatCallable($callable), $options);
+    }
+
+    /**
+     * @param array $array
+     */
+    private function renderEventListenerTable(array $eventListeners)
+    {
+        $table = new Table($this->getOutput());
+        $table->getStyle()->setCellHeaderFormat('%s');
+        $table->setHeaders(array('Order', 'Callable', 'Priority'));
+
+        krsort($eventListeners);
+        $order = 1;
+        foreach ($eventListeners as $priority => $listeners) {
+            foreach ($listeners as $listener) {
+                $table->addRow(array(sprintf('#%d', $order++), $this->formatCallable($listener), $priority));
+            }
+        }
+
+        $table->render();
     }
 
     /**

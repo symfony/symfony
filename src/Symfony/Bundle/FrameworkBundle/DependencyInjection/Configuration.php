@@ -583,6 +583,13 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->booleanNode('logging')->defaultValue($this->debug)->end()
                     ->end()
+                    ->fixXmlConfig('path')
+                    ->children()
+                        ->arrayNode('paths')
+                            ->prototype('scalar')->end()
+                            ->defaultValue(array())
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

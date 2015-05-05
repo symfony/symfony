@@ -695,11 +695,11 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->config->getErrorBubbling()) {
-            if (null === $error->getOrigin()) {
-                $error->setOrigin($this);
-            }
+        if (null === $error->getOrigin()) {
+            $error->setOrigin($this);
+        }
 
+        if ($this->parent && $this->config->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;

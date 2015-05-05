@@ -18,6 +18,7 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
 
 class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -735,8 +736,9 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewForLegacyChoiceList()
     {
-        $preferred = array(new ChoiceView('Preferred', 'x', 'x'));
-        $other = array(new ChoiceView('Other', 'y', 'y'));
+        // legacy ChoiceList instances provide legacy ChoiceView objects
+        $preferred = array(new LegacyChoiceView('x', 'x', 'Preferred'));
+        $other = array(new LegacyChoiceView('y', 'y', 'Other'));
 
         $list = $this->getMock('Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface');
 
@@ -749,8 +751,8 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 
         $view = $this->factory->createView($list);
 
-        $this->assertSame($other, $view->choices);
-        $this->assertSame($preferred, $view->preferredChoices);
+        $this->assertEquals(array(new ChoiceView('Other', 'y', 'y')), $view->choices);
+        $this->assertEquals(array(new ChoiceView('Preferred', 'x', 'x')), $view->preferredChoices);
     }
 
     private function assertScalarListWithGeneratedValues(ChoiceListInterface $list)

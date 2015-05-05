@@ -20,6 +20,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface as LegacyChoiceListInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView as LegacyChoiceView;
 
 /**
  * Default implementation of {@link ChoiceListFactoryInterface}.
@@ -140,9 +141,16 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
     {
         // Backwards compatibility
-        if ($list instanceof LegacyChoiceListInterface && null === $preferredChoices
+        if ($list instanceof LegacyChoiceListInterface && empty($preferredChoices)
             && null === $label && null === $index && null === $groupBy && null === $attr) {
-            return new ChoiceListView($list->getRemainingViews(), $list->getPreferredViews());
+            $mapToNonLegacyChoiceView = function (LegacyChoiceView $choiceView) {
+                return new ChoiceView($choiceView->label, $choiceView->value, $choiceView->data);
+            };
+
+            return new ChoiceListView(
+                array_map($mapToNonLegacyChoiceView, $list->getRemainingViews()),
+                array_map($mapToNonLegacyChoiceView, $list->getPreferredViews())
+            );
         }
 
         $preferredViews = array();

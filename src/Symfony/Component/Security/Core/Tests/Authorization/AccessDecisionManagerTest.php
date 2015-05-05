@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerAwareInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
@@ -60,6 +61,18 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     public function testSetUnsupportedStrategy()
     {
         new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
+    }
+
+    public function testAccessDecisionManagerInterfaceSetting()
+    {
+        // mock our stub voter that implements the AccessDecisionManagerAwareInterface
+        $voter = $this->getMock('Symfony\Component\Security\Core\Tests\Authorization\VoterWithAccessDecisionManagerAwareInterfaceStub');
+
+        $voter->expects($this->once())
+              ->method('setAccessDecisionManager')
+              ->with($this->isInstanceOf('Symfony\Component\Security\Core\Authorization\AccessDecisionManager'));
+
+        $manager = new AccessDecisionManager(array($voter));
     }
 
     /**
@@ -195,4 +208,9 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
         return $voter;
     }
+}
+
+// stub class that implements AccessDecisionManagerAwareInterface
+abstract class VoterWithAccessDecisionManagerAwareInterfaceStub implements VoterInterface, AccessDecisionManagerAwareInterface
+{
 }

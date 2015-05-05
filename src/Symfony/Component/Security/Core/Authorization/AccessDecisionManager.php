@@ -56,6 +56,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+
+        // inject this AccessDecisionManager into any voters that want it
+        foreach ($this->voters as $voter) {
+            if ($voter instanceof AccessDecisionManagerAwareInterface) {
+                $voter->setAccessDecisionManager($this);
+            }
+        }
     }
 
     /**

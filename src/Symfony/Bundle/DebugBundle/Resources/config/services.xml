@@ -15,6 +15,7 @@
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
             <argument>%kernel.charset%</argument>
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">

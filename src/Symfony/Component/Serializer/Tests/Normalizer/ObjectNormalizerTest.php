@@ -429,6 +429,11 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\ObjectDummy')
         );
     }
+
+    public function testNoTraversableSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
+    }
 }
 
 class ObjectDummy

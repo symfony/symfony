@@ -502,6 +502,11 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->normalizer->denormalize(array('non_existing' => true), __NAMESPACE__.'\PropertyDummy')
         );
     }
+
+    public function testNoTraversableSupport()
+    {
+        $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
+    }
 }
 
 class GetSetDummy

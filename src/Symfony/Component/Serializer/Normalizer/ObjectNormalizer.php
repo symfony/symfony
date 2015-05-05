@@ -43,7 +43,7 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data);
+        return is_object($data) && !$data instanceof \Traversable;
     }
 
     /**

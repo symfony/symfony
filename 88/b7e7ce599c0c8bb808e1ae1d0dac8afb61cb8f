@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-05T20:47:56Z
+
+@Seldaek see #14399
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-05-05T20:55:05Z
+
+Oh fail I did not see that.. I'd argue mine wins for testing it works and not just testing it fails though ;)
+
+Also my version adds the paths at the best location IMO which is over the symfony translations but under the application ones. Anyway I'll leave open and leave our dear @symfony/deciders decide because I spent enough time on this as it is :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-05T22:02:15Z
+
+:smile: well I closed my own PR, what do you think about adding [priority](https://github.com/symfony/symfony/pull/14399#issuecomment-94318105) ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-06T01:41:32Z
+
+I definitely support this idea. But, even further, (and please don't let this get off-topic - this comment is off-topic enough), I wish resource paths were registered in a way more like how this change allows - i.e. bundles register their own translation paths, instead of having the core look at every bundle and register paths *for* them. I think that adds to the "magic" of Symfony - a lot is automatic when you use a bundle. I experimented with an approach for templates in https://github.com/symfony/symfony/pull/13928/files#diff-40488c4aeae121d3032bbe13e2f5801eR26 where bundles register template paths, instead in core.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-05-06T10:36:36Z
+
+@aitboudad not sure if we need such a complex system that priority is necessary or not. I mean the need doesn't seem to have come up until now so I doubt it's a real problem. Usually you just want to override stuff from third parties in your app and that's it.
+
+@weaverryan sounds like a good improvement for another PR yeah but I know I won't have time to pull it off :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-06T10:42:56Z
+
+@weaverryan @Seldaek Sounds like a use case for Puli. :) /cc @webmozart
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-06T13:49:18Z
+
+@xabbuh I agree (at least in theory - I've talked with Bernhard on Skype about Puli), but it's a very complex problem, especially when you think about integrating it with Symfony and keeping BC as much as possible. Right now, I'm interested in what our  ideal API for setting paths to translations, views, etc would look like. When that's more clear, we should see if Puli can fill in for a lot of the work that would need to make this happen.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-06T16:33:25Z
+
+Ready to be merged?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2015-05-06T16:36:44Z
+
+To me yes. It doesn't prevent further improvements as were discussed above.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-06T18:46:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2015-05-06T20:23:33Z
+
+Yep - my comments should not stop merging at all :+1: from me - it looks very simple.

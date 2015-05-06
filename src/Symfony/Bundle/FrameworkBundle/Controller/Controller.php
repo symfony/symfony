@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -120,6 +121,7 @@ class Controller extends ContainerAware
      * @param mixed $object     The object
      *
      * @throws \LogicException
+     *
      * @return bool
      */
     protected function isGranted($attributes, $object = null)
@@ -376,5 +378,23 @@ class Controller extends ContainerAware
         }
 
         return $this->container->get('security.csrf.token_manager')->isTokenValid(new CsrfToken($id, $token));
+    }
+
+    /**
+     * Returns a HttpException.
+     *
+     * This will result in a response based on given status code. Usage example:
+     *
+     *     throw $this->createHttpException(500);
+     *
+     * @param int             $statusCode The HTTP status code
+     * @param string          $message    A message
+     * @param \Exception|null $previous   The previous exception
+     *
+     * @return HttpException
+     */
+    protected function createHttpException($statusCode, $message = null, \Exception $previous = null)
+    {
+        return new HttpException($statusCode, $message, $previous);
     }
 }

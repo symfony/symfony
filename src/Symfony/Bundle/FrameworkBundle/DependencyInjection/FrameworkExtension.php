@@ -665,6 +665,14 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('translator.logging', $config['logging']);
 
+        if (isset($config['cache'])) {
+            $container->setParameter(
+                'translator.cache.prefix',
+                'translator_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+            );
+            $container->setAlias('translation.cache', $config['cache']);
+        }
+
         // Discover translation directories
         $dirs = array();
         if (class_exists('Symfony\Component\Validator\Validation')) {

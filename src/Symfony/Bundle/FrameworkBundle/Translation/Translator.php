@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\MessageCacheInterface;
 
 /**
  * Translator.
@@ -46,14 +47,15 @@ class Translator extends BaseTranslator implements WarmableInterface
      *   * debug:     Whether to enable debugging or not (false by default)
      *   * resource_files: List of translation resources available grouped by locale.
      *
-     * @param ContainerInterface $container A ContainerInterface instance
-     * @param MessageSelector    $selector  The message selector for pluralization
-     * @param array              $loaderIds An array of loader Ids
-     * @param array              $options   An array of options
+     * @param ContainerInterface    $container A ContainerInterface instance
+     * @param MessageSelector       $selector  The message selector for pluralization
+     * @param array                 $loaderIds An array of loader Ids
+     * @param array                 $options   An array of options
+     * @param MessageCacheInterface $cache     The message cache
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
+    public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array(), MessageCacheInterface $cache = null)
     {
         $this->container = $container;
         $this->loaderIds = $loaderIds;
@@ -69,7 +71,8 @@ class Translator extends BaseTranslator implements WarmableInterface
             $this->loadResources();
         }
 
-        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
+        $cache = $cache ?: $this->options['cache_dir'];
+        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $cache, $this->options['debug']);
     }
 
     /**

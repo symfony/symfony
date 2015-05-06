@@ -96,7 +96,7 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
 
         // Guess type
         $entity = current($qb->getRootEntities());
-        $metadata = $qb->getEntityManager(En)->getClassMetadata($entity);
+        $metadata = $qb->getEntityManager()->getClassMetadata($entity);
         if (in_array($metadata->getTypeOfField($identifier), array('integer', 'bigint', 'smallint'))) {
             $parameterType = Connection::PARAM_INT_ARRAY;
         } else {

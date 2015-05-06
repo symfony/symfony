@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Loads entities using a {@link QueryBuilder} instance.
@@ -59,8 +59,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
         if ($queryBuilder instanceof \Closure) {
             trigger_error('Passing a QueryBuilder closure to '.__CLASS__.'::__construct() is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-            if (!$manager instanceof EntityManager) {
-                throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManager');
+            if (!$manager instanceof EntityManagerInterface) {
+                throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManagerInterface');
             }
 
             trigger_error('Passing an EntityManager to '.__CLASS__.'::__construct() is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);

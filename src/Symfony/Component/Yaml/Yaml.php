@@ -55,7 +55,7 @@ class Yaml
      */
     public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false, $timestampAsDateTime = false)
     {
-        if ($timestampAsDateTime) {
+        if (!$timestampAsDateTime) {
             trigger_error('The ability to pass $timestampAsDateTime = false to the '.__METHOD__.' method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
         }
 
@@ -106,7 +106,7 @@ class Yaml
      */
     public static function dump($array, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false, $timestampAsDateTime = false)
     {
-        if ($timestampAsDateTime) {
+        if (!$timestampAsDateTime) {
             trigger_error('The ability to pass $timestampAsDateTime = false to the '.__METHOD__.' method is deprecated since version 2.8. The argument will be removed in 3.0. Pass true instead.', E_USER_DEPRECATED);
         }
 

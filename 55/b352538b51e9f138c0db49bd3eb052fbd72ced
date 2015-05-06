@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2015-05-04T15:20:25Z
+
+You need to update the UPGRADE-2.8.md file too, to describe the migration path.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-04T21:27:37Z
+
+@stof done and I also simplified ` getMessages` see #14549
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-05T10:16:46Z
+
+@stof I deprecated [loadCatalogue](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L312) too
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-05T12:53:03Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-06T07:22:59Z
+
+@aitboudad I don't see where you deprecate the `loadCatalogue()` method.
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-06T09:19:16Z
+
+@xabbuh see https://github.com/symfony/symfony/pull/14546#discussion_r29662641
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-06T09:36:24Z
+
+:+1:

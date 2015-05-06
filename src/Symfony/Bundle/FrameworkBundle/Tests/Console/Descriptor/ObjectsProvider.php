@@ -114,6 +114,7 @@ class ObjectsProvider
 
     /**
      * @deprecated since version 2.7, to be removed in 3.0
+     *
      * @internal
      */
     public static function getLegacyContainerDefinitions()

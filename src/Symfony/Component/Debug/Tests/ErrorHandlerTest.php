@@ -59,9 +59,14 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $that = $this;
         $exceptionCheck = function ($exception) use ($that) {
             $that->assertInstanceOf('Symfony\Component\Debug\Exception\ContextErrorException', $exception);
-            $that->assertEquals(E_STRICT, $exception->getSeverity());
             $that->assertEquals(2, $exception->getLine());
-            $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+            if (PHP_VERSION_ID < 70000) {
+                $that->assertEquals(E_STRICT, $exception->getSeverity());
+                $that->assertStringStartsWith('Runtime Notice: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+            } else {
+                $that->assertEquals(E_WARNING, $exception->getSeverity());
+                $that->assertStringStartsWith('Warning: Declaration of _CompileTimeError::foo() should be compatible with', $exception->getMessage());
+            }
             $that->assertArrayHasKey('bar', $exception->getContext());
         };
 

@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\IdReader;
@@ -25,7 +24,6 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Exception\RuntimeException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -124,7 +122,7 @@ abstract class DoctrineType extends AbstractType
             if (null === $options['choices']) {
                 // We consider two query builders with an equal SQL string and
                 // equal parameters to be equal
-                $qbParts = $options['query_builder']
+                $qbParts = $options['query_builder'] instanceof \Doctrine\ORM\QueryBuilder
                     ? array(
                         $options['query_builder']->getQuery()->getSQL(),
                         $options['query_builder']->getParameters()->toArray(),
@@ -240,10 +238,6 @@ abstract class DoctrineType extends AbstractType
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
             if (is_callable($queryBuilder)) {
                 $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
-
-                if (!$queryBuilder instanceof QueryBuilder) {
-                    throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
-                }
             }
 
             return $queryBuilder;
@@ -305,7 +299,6 @@ abstract class DoctrineType extends AbstractType
 
         $resolver->setAllowedTypes('em', array('null', 'string', 'Doctrine\Common\Persistence\ObjectManager'));
         $resolver->setAllowedTypes('loader', array('null', 'Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface'));
-        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
 
     /**

@@ -30,11 +30,15 @@ $filesystem->rename($origin, $target);
 
 $filesystem->symlink($originDir, $targetDir, $copyOnWindows = false);
 
+$filesystem->tempnam($dir, $prefix);
+
 $filesystem->makePathRelative($endPath, $startPath);
 
 $filesystem->mirror($originDir, $targetDir, \Traversable $iterator = null, $options = array());
 
 $filesystem->isAbsolutePath($file);
+
+$filesystem->dumpFile($file, $content);
 ```
 
 Resources

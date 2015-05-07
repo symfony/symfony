@@ -453,7 +453,7 @@ class Filesystem
     }
 
     /**
-     * Creates a temporary file with support for custom steam wrappers.
+     * Creates a temporary file with support for custom stream wrappers.
      *
      * @param string $dir    The directory where the temporary filename will be created.
      * @param string $prefix The prefix of the generated temporary filename.

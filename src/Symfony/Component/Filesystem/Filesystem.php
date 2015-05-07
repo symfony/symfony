@@ -469,7 +469,7 @@ class Filesystem
             $scheme = $components[0];
             $dir = $components[1];
         } else {
-            $scheme = FALSE;
+            $scheme = false;
             $dir = $components[0];
         }
         // Loop until we create a valid temp file or have reached $limit attempts
@@ -485,7 +485,7 @@ class Filesystem
                 }
             }
             // If scheme exists and is valid
-            else if (FALSE !== $scheme && file_exists($dir)) {
+            else if (false !== $scheme && file_exists($dir)) {
                 // Remove temp file in filesystem
                 unlink($tmpFile);
                 // Use the scheme version

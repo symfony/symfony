@@ -449,6 +449,57 @@ class Filesystem
     }
 
     /**
+     * Creates a temporary file with support for custom stream wrappers.
+     *
+     * @param string $dir    The directory where the temporary filename will be created.
+     * @param string $prefix The prefix of the generated temporary filename.
+     *                       Note: Windows uses only the first three characters of prefix.
+     *
+     * @return string The new temporary filename (with path), or false on failure.
+     */
+    public function tempnam($dir, $prefix)
+    {
+        $limit = 10;
+        list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
+
+        // If no scheme or scheme is "file" create temp file in local filesystem
+        if (null === $scheme || 'file' === $scheme) {
+            $tmpFile = tempnam($hierarchy, $prefix);
+
+            // If tempnam failed or no scheme return the filename otherwise prepend the scheme
+            return false === $tmpFile || null === $scheme ? $tmpFile : $scheme.'://'.$tmpFile;
+        }
+
+        // Loop until we create a valid temp file or have reached $limit attempts
+        for ($i = 0; $i < $limit; $i++) {
+
+            // Create a unique filename
+            $tmpFile = $dir.'/'.$prefix.uniqid(mt_rand(), true);
+
+            // If the file already exists restart the loop
+            // Use fopen instead of file_exists as some streams do not support stat
+            $handle = @fopen($tmpFile, 'r');
+            if (false !== $handle) {
+                continue;
+            }
+
+            // Close the file if it was successfully opened
+            @fclose($handle);
+
+            // Create the file, if unsuccessful then stream is not writable so set to false
+            // Use file_put_contents instead of touch as it supports stream wrappers
+            if (false === @file_put_contents($tmpFile, '')) {
+                return false;
+            }
+
+            return $tmpFile;
+
+        }
+
+        return false;
+    }
+
+    /**
      * Atomically dumps content into a file.
      *
      * @param string   $filename The file to be written to.
@@ -468,7 +519,7 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
-        $tmpFile = tempnam($dir, basename($filename));
+        $tmpFile = $this->tempnam($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
@@ -497,4 +548,19 @@ class Filesystem
 
         return $files;
     }
+
+    /**
+     * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> array(file, tmp)).
+     *
+     * @param string $filename The filename to be parsed.
+     *
+     * @return array The filename scheme and hierarchical part
+     */
+    private function getSchemeAndHierarchy($filename)
+    {
+        $components = explode('://', $filename, 2);
+
+        return count($components) >= 2 ? array($components[0], $components[1]) : array(null, $components[0]);
+    }
+
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added tempnam() a stream aware version of PHP's native tempnam()
+
 2.6.0
 -----
 

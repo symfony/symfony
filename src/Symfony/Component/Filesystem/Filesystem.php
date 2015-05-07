@@ -453,14 +453,13 @@ class Filesystem
     }
 
     /**
-     * Creates a temporary file with support for custom steam wrappers
+     * Creates a temporary file with support for custom steam wrappers.
      *
-     * @param string   $dir    The directory where the temporary filename will be created.
-     * @param string   $prefix The prefix of the generated temporary filename.
-     *                         Note: Windows uses only the first three characters of prefix.
+     * @param string $dir    The directory where the temporary filename will be created.
+     * @param string $prefix The prefix of the generated temporary filename.
+     *                       Note: Windows uses only the first three characters of prefix.
      *
      * @return string The new temporary filename (with path), or FALSE on failure.
-     *
      */
     public function tempNam($dir, $prefix) {
         $limit = 10;
@@ -504,6 +503,7 @@ class Filesystem
             }
             break;
         }
+
         return $tmpFile;
     }
 

@@ -955,60 +955,6 @@ class FilesystemTest extends FilesystemTestCase
         );
     }
 
-    public function testDumpFile()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, 'bar');
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDumpFileAndSetPermissions()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, 'bar', 0753);
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-
-        // skip mode check on Windows
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(753, $filename);
-        }
-    }
-
-    public function testDumpFileWithNullMode()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
-
-        $this->filesystem->dumpFile($filename, 'bar', null);
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-
-        // skip mode check on Windows
-        if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(600, $filename);
-        }
-    }
-
-    public function testDumpFileOverwritesAnExistingFile()
-    {
-        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo.txt';
-        file_put_contents($filename, 'FOO BAR');
-
-        $this->filesystem->dumpFile($filename, 'bar');
-
-        $this->assertFileExists($filename);
-        $this->assertSame('bar', file_get_contents($filename));
-    }
-
     public function testTempNam()
     {
         $dirname = $this->workspace;
@@ -1067,6 +1013,83 @@ class FilesystemTest extends FilesystemTestCase
 
         // Tear down
         unlink($filename);
+    }
+
+    public function testDumpFile()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDumpFileAndSetPermissions()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', 0753);
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(753, $filename);
+        }
+    }
+
+    public function testDumpFileWithNullMode()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar', null);
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->assertFilePermissions(600, $filename);
+        }
+    }
+
+    public function testDumpFileOverwritesAnExistingFile()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo.txt';
+        file_put_contents($filename, 'FOO BAR');
+
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function testDumpFileWithFileScheme()
+    {
+        $scheme = 'file://';
+        $filename = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    public function testDumpFileWithZlibScheme()
+    {
+        $scheme = 'compress.zlib://';
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        // Zlib stat uses file:// wrapper so remove scheme
+        $this->assertFileExists(str_replace($scheme, '', $filename));
+        $this->assertSame('bar', file_get_contents($filename));
     }
 
     public function testCopyShouldKeepExecutionPermission()

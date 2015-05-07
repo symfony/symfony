@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-06T01:11:58Z
+
+This PR fixes the failing tests, the fail in 5.5.9 is because a volatile test (see #14444) and the fails in 5.5.9 (low deps) seems to not be related.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-06T16:37:25Z
+
+#14419 was on 2.7, do we just have the problem on master?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-06T19:08:23Z
+
+@fabpot yes, in 2.7 runs ok but it's failing in master

@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractF
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 /**
  * This class contains the configuration information.
@@ -59,7 +60,10 @@ class MainConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('access_denied_url')->defaultNull()->example('/foo/error403')->end()
-                ->enumNode('session_fixation_strategy')->cannotBeEmpty()->values(array('none', 'migrate', 'invalidate'))->defaultValue('migrate')->end()
+                ->enumNode('session_fixation_strategy')
+                    ->values(array(SessionAuthenticationStrategy::NONE, SessionAuthenticationStrategy::MIGRATE, SessionAuthenticationStrategy::INVALIDATE))
+                    ->defaultValue(SessionAuthenticationStrategy::MIGRATE)
+                ->end()
                 ->booleanNode('hide_user_not_found')->defaultTrue()->end()
                 ->booleanNode('always_authenticate_before_granting')->defaultFalse()->end()
                 ->booleanNode('erase_credentials')->defaultTrue()->end()

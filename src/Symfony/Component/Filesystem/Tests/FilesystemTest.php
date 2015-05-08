@@ -968,7 +968,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testTempNamWithFileScheme()
     {
         $scheme = 'file://';
-        $dirname =  $scheme.$this->workspace;
+        $dirname = $scheme.$this->workspace;
 
         $filename = $this->filesystem->tempNam($dirname, 'foo');
 
@@ -980,7 +980,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testTempNamWithZlibScheme()
     {
         $scheme = 'compress.zlib://';
-        $dirname =  $scheme.$this->workspace;
+        $dirname = $scheme.$this->workspace;
 
         $filename = $this->filesystem->tempNam($dirname, 'bar');
 
@@ -993,7 +993,7 @@ class FilesystemTest extends FilesystemTestCase
     public function testTempNamWithHTTPSchemeFails()
     {
         $scheme = 'http://';
-        $dirname =  $scheme.$this->workspace;
+        $dirname = $scheme.$this->workspace;
 
         $filename = $this->filesystem->tempNam($dirname, 'bar');
 
@@ -1003,12 +1003,12 @@ class FilesystemTest extends FilesystemTestCase
     public function testTempNamOnUnwritableFallsBackToSysTmp()
     {
         $scheme = 'file://';
-        $dirname =  $scheme.$this->workspace.DIRECTORY_SEPARATOR.'does_not_exist';
+        $dirname = $scheme.$this->workspace.DIRECTORY_SEPARATOR.'does_not_exist';
 
         $filename = $this->filesystem->tempNam($dirname, 'bar');
 
         $this->assertNotFalse($filename);
-        $this->assertStringStartsWith(rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR), $filename);
+        $this->assertStringStartsWith(rtrim($scheme.sys_get_temp_dir(), DIRECTORY_SEPARATOR), $filename);
         $this->assertFileExists($filename);
 
         // Tear down

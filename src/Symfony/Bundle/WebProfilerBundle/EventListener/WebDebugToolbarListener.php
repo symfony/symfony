@@ -115,15 +115,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $pos = strripos($content, '</body>');
 
         if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+            $toolbar = $this->twig->render(
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
                 array(
                     'position' => $this->position,
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                 )
-            ))."\n";
-            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
+            );
+            $content = substr($content, 0, $pos)."\n".$toolbar."\n".substr($content, $pos);
             $response->setContent($content);
         }
     }

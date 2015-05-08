@@ -17,6 +17,16 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="argument_resolver.manager" class="Symfony\Component\HttpKernel\Controller\ArgumentResolverManager" />
+
+        <service id="argument_resolver.request" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestArgumentResolver">
+            <tag name="kernel.argument_resolver" />
+        </service>
+
+        <service id="argument_resolver.request_attributes" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributesArgumentResolver">
+            <tag name="kernel.argument_resolver" />
+        </service>
+
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>

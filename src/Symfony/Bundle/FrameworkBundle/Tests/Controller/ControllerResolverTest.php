@@ -65,12 +65,12 @@ class ControllerResolverTest extends BaseControllerResolverTest
 
         $resolver = $this->createControllerResolver(null, null, $container);
         $request = Request::create('/');
-        $request->attributes->set('_controller', 'foo:controllerMethod1');
+        $request->attributes->set('_controller', 'foo:controllerMethod');
 
         $controller = $resolver->getController($request);
 
         $this->assertInstanceOf(get_class($this), $controller[0]);
-        $this->assertSame('controllerMethod1', $controller[1]);
+        $this->assertSame('controllerMethod', $controller[1]);
     }
 
     public function testGetControllerInvokableService()

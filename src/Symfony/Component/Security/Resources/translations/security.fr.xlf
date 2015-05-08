@@ -8,7 +8,7 @@
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
-                <target>Les droits d'authentification n'ont pas pu être trouvés.</target>
+                <target>Les identifiants d'authentification n'ont pas pu être trouvés.</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>Authentication request could not be processed due to a system problem.</source>
@@ -16,7 +16,7 @@
             </trans-unit>
             <trans-unit id="4">
                 <source>Invalid credentials.</source>
-                <target>Droits invalides.</target>
+                <target>Identifiants invalides.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>Credentials have expired.</source>
-                <target>Les droits ont expirés.</target>
+                <target>Les identifiants ont expiré.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>Account is disabled.</source>

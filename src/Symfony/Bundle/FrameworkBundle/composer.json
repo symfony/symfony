@@ -35,7 +35,7 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",
         "symfony/browser-kit": "~2.4",
-        "symfony/console": "~2.6",
+        "symfony/console": "~2.7",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/finder": "~2.0,>=2.0.5",

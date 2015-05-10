@@ -113,7 +113,9 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->start();
         usleep(100000);
         $event->ensureStopped();
-        $this->assertEquals(300, $event->getDuration(), null, self::DELTA);
+        $duration = $event->getDuration();
+        usleep(100000);
+        $this->assertEquals($duration, $event->getDuration());
     }
 
     public function testStartTime()

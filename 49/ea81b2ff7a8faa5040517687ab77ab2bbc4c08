@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by lolautruche at 2015-05-11T13:04:13Z
+
+Ping @Tobion
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-11T15:06:57Z
+
+Please also move the public property check before the `__set` in `writeProperty` to be consistent.
+
+---------------------------------------------------------------------------
+
+by lolautruche at 2015-05-11T15:10:25Z
+
+Sure, done :)
+
+Travis failures don't seem to be related to my patch (unrelated deprecation warnings).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-11T15:21:30Z
+
+:+1:

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-11T17:04:39Z
+
+:+1: wouldn't be better to use `ConfigCacheFactory` too.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-11T17:06:22Z
+
+@aitboudad The instance is passed to the method. What exactly do you propose to change there?

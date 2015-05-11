@@ -24,7 +24,8 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7",
         "symfony/config": "~2.3",
-        "symfony/dependency-injection": "~2.3"
+        "symfony/dependency-injection": "~2.3",
+        "symfony/web-profiler-bundle": "~2.3"
     },
     "suggest": {
         "symfony/config": "For service container configuration",

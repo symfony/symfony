@@ -292,15 +292,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function getMessages($locale = null)
     {
-        $catalogues = array();
-        $catalogues[] = $catalogue = $this->getCatalogue($locale);
+        $catalogue = $this->getCatalogue($locale);
+        $messages = $catalogue->all();
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
-            $catalogues[] = $catalogue;
-        }
-        $messages = array();
-        for ($i = count($catalogues) - 1; $i >= 0; $i--) {
-            $localeMessages = $catalogues[$i]->all();
-            $messages = array_replace_recursive($messages, $localeMessages);
+            $messages = array_replace_recursive($catalogue->all(), $messages);
         }
 
         return $messages;

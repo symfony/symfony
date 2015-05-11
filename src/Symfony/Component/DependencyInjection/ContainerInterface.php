@@ -50,7 +50,6 @@ interface ContainerInterface
      *
      * @return object The associated service
      *
-     * @throws InvalidArgumentException          if the service is not defined
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
      *

@@ -58,7 +58,6 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         foreach ($reflectionMethods as $method) {
             if ($this->isGetMethod($method)) {
                 $attributeName = lcfirst(substr($method->name, 0 === strpos($method->name, 'is') ? 2 : 3));
-
                 if (in_array($attributeName, $this->ignoredAttributes)) {
                     continue;
                 }
@@ -104,14 +103,14 @@ class GetSetMethodNormalizer extends AbstractNormalizer
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
         foreach ($normalizedData as $attribute => $value) {
+            if ($this->nameConverter) {
+                $attribute = $this->nameConverter->denormalize($attribute);
+            }
+
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
             if ($allowed && !$ignored) {
-                if ($this->nameConverter) {
-                    $attribute = $this->nameConverter->denormalize($attribute);
-                }
-
                 $setter = 'set'.ucfirst($attribute);
 
                 if (method_exists($object, $setter)) {
@@ -128,7 +127,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
     }
 
     /**

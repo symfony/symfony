@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
- * DumpDataCollectorTest
- *
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
@@ -56,6 +56,49 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(0, $collector->getDumpsCount());
         $this->assertSame('a:0:{}', $collector->serialize());
+    }
+
+    public function testCollectDefault()
+    {
+        $data = new Data(array(array(123)));
+
+        $collector = new DumpDataCollector();
+
+        $collector->dump($data);
+        $line = __LINE__ - 1;
+
+        ob_start();
+        $collector->collect(new Request(), new Response());
+        $output = ob_get_clean();
+
+        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
+    }
+
+    public function testCollectHtml()
+    {
+        $data = new Data(array(array(123)));
+
+        $collector = new DumpDataCollector(null, 'test://%f:%l');
+
+        $collector->dump($data);
+        $line = __LINE__ - 1;
+        $file = __FILE__;
+        $xOutput = <<<EOTXT
+
+<span class="sf-dump-meta"><a href="test://{$file}:{$line}" title="{$file}">DumpDataCollectorTest.php</a> on line {$line}:</span> <pre class=sf-dump id=sf-dump data-indent-pad="  "><span class=sf-dump-num>123</span>
+</pre>
+
+EOTXT;
+
+        ob_start();
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/html');
+        $collector->collect(new Request(), $response);
+        $output = ob_get_clean();
+        $output = preg_replace('#<(script|style).*?</\1>#s', '', $output);
+        $output = preg_replace('/sf-dump-\d+/', 'sf-dump', $output);
+
+        $this->assertSame($xOutput, $output);
     }
 
     public function testFlush()

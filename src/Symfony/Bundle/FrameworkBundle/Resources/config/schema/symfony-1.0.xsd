@@ -169,6 +169,7 @@
     <xsd:complexType name="translator">
         <xsd:sequence>
             <xsd:element name="fallback" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="path" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="fallback" type="xsd:string" />

@@ -170,7 +170,13 @@ class JsonDescriptor extends Descriptor
      */
     private function writeData(array $data, array $options)
     {
-        $this->write(json_encode($data, (isset($options['json_encoding']) ? $options['json_encoding'] : 0) | JSON_PRETTY_PRINT)."\n");
+        $flags = isset($options['json_encoding']) ? $options['json_encoding'] : 0;
+
+        if (defined('JSON_PRETTY_PRINT')) {
+            $flags |= JSON_PRETTY_PRINT;
+        }
+
+        $this->write(json_encode($data, $flags)."\n");
     }
 
     /**
@@ -281,17 +287,27 @@ class JsonDescriptor extends Descriptor
     {
         $data = array();
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
         if (null !== $event) {
-            foreach ($registeredListeners as $listener) {
-                $data[] = $this->getCallableData($listener);
+            krsort($registeredListeners);
+            foreach ($registeredListeners as $priority => $listeners) {
+                foreach ($listeners as $listener) {
+                    $listener = $this->getCallableData($listener);
+                    $listener['priority'] = $priority;
+                    $data[] = $listener;
+                }
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
-                foreach ($eventListeners as $eventListener) {
-                    $data[$eventListened][] = $this->getCallableData($eventListener);
+                krsort($eventListeners);
+                foreach ($eventListeners as $priority => $listeners) {
+                    foreach ($listeners as $listener) {
+                        $listener = $this->getCallableData($listener);
+                        $listener['priority'] = $priority;
+                        $data[$eventListened][] = $listener;
+                    }
                 }
             }
         }

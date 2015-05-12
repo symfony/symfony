@@ -54,7 +54,7 @@ class AnnotationLoader implements LoaderInterface
                 $classMetadata->addAttributeMetadata($attributesMetadata[$property->name]);
             }
 
-            if ($property->getDeclaringClass()->name == $className) {
+            if ($property->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getPropertyAnnotations($property) as $groups) {
                     if ($groups instanceof Groups) {
                         foreach ($groups->getGroups() as $group) {
@@ -68,10 +68,10 @@ class AnnotationLoader implements LoaderInterface
         }
 
         foreach ($reflectionClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->name == $className) {
+            if ($method->getDeclaringClass()->name === $className) {
                 foreach ($this->reader->getMethodAnnotations($method) as $groups) {
                     if ($groups instanceof Groups) {
-                        if (preg_match('/^(get|is)(.+)$/i', $method->name, $matches)) {
+                        if (preg_match('/^(get|is|has|set)(.+)$/i', $method->name, $matches)) {
                             $attributeName = lcfirst($matches[2]);
 
                             if (isset($attributesMetadata[$attributeName])) {
@@ -85,7 +85,7 @@ class AnnotationLoader implements LoaderInterface
                                 $attributeMetadata->addGroup($group);
                             }
                         } else {
-                            throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get" or "is".', $className, $method->name));
+                            throw new MappingException(sprintf('Groups on "%s::%s" cannot be added. Groups can only be added on methods beginning with "get", "is", "has" or "set".', $className, $method->name));
                         }
                     }
 

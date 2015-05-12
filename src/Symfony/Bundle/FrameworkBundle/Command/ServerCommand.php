@@ -41,4 +41,25 @@ abstract class ServerCommand extends ContainerAwareCommand
     {
         return sys_get_temp_dir().'/'.strtr($address, '.:', '--').'.pid';
     }
+
+    protected function isOtherServerProcessRunning($address)
+    {
+        $lockFile = $this->getLockFile($address);
+
+        if (file_exists($lockFile)) {
+            return true;
+        }
+
+        list($hostname, $port) = explode(':', $address);
+
+        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
+
+        if (false !== $fp) {
+            fclose($fp);
+
+            return true;
+        }
+
+        return false;
+    }
 }

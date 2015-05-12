@@ -114,6 +114,7 @@ class ObjectsProvider
 
     /**
      * @deprecated since version 2.7, to be removed in 3.0
+     *
      * @internal
      */
     public static function getLegacyContainerDefinitions()
@@ -157,8 +158,8 @@ class ObjectsProvider
     {
         $eventDispatcher = new EventDispatcher();
 
-        $eventDispatcher->addListener('event1', 'global_function');
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; });
+        $eventDispatcher->addListener('event1', 'global_function', 255);
+        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return array('event_dispatcher_1' => $eventDispatcher);

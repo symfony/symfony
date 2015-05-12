@@ -37,6 +37,7 @@ class Yaml
      * @param string $input                  A string containing YAML
      * @param bool   $exceptionOnInvalidType True if an exception must be thrown on invalid types false otherwise
      * @param bool   $objectSupport          True if object support is enabled, false otherwise
+     * @param bool   $objectForMap           True if maps should return a stdClass instead of array()
      *
      * @return array The YAML converted to a PHP array
      *
@@ -44,11 +45,11 @@ class Yaml
      *
      * @api
      */
-    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false)
+    public static function parse($input, $exceptionOnInvalidType = false, $objectSupport = false, $objectForMap = false)
     {
         $yaml = new Parser();
 
-        return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport);
+        return $yaml->parse($input, $exceptionOnInvalidType, $objectSupport, $objectForMap);
     }
 
     /**

@@ -127,7 +127,7 @@ class PropertyNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return is_object($data) && !$data instanceof \Traversable && $this->supports(get_class($data));
     }
 
     /**

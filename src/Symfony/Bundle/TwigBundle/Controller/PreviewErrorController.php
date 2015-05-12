@@ -35,7 +35,7 @@ class PreviewErrorController
 
     public function previewErrorPageAction(Request $request, $code)
     {
-        $exception = FlattenException::create(new \Exception("Something has intentionally gone wrong."), $code);
+        $exception = FlattenException::create(new \Exception('Something has intentionally gone wrong.'), $code);
 
         /*
          * This Request mimics the parameters set by

@@ -23,7 +23,7 @@ use Symfony\Component\Process\ProcessBuilder;
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
-class ServerRunCommand extends ContainerAwareCommand
+class ServerRunCommand extends ServerCommand
 {
     /**
      * {@inheritdoc}
@@ -97,20 +97,26 @@ EOF
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
+        $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $address = $address.':'.$input->getOption('port');
+        }
+
+        if ($this->isOtherServerProcessRunning($address)) {
+            $output->writeln(sprintf('<error>A process is already listening on http://%s.</error>', $address));
+
+            return 1;
+        }
 
         if ('prod' === $env) {
             $output->writeln('<error>Running PHP built-in server in production environment is NOT recommended!</error>');
         }
 
-        $address = $input->getArgument('address');
-        if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
-        }
-
         $output->writeln(sprintf("Server running on <info>http://%s</info>\n", $address));
         $output->writeln('Quit the server with CONTROL-C.');
 
-        if (null === $builder = $this->createPhpProcessBuilder($input, $output, $env, $address)) {
+        if (null === $builder = $this->createPhpProcessBuilder($output, $address, $input->getOption('router'), $env)) {
             return 1;
         }
 
@@ -137,9 +143,9 @@ EOF
         return $process->getExitCode();
     }
 
-    private function createPhpProcessBuilder(InputInterface $input, OutputInterface $output, $env, $address)
+    private function createPhpProcessBuilder(OutputInterface $output, $address, $router, $env)
     {
-        $router = $input->getOption('router') ?: $this
+        $router = $router ?: $this
             ->getContainer()
             ->get('kernel')
             ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))

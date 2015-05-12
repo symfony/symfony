@@ -23,17 +23,23 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
      */
     private $foo;
     /**
-     * @Groups({"b", "c"})
+     * @Groups({"b", "c", "name_converter"})
      */
     protected $bar;
     private $fooBar;
     private $symfony;
 
+    /**
+     * @Groups({"b"})
+     */
     public function setBar($bar)
     {
         $this->bar = $bar;
     }
 
+    /**
+     * @Groups({"c"})
+     */
     public function getBar()
     {
         return $this->bar;
@@ -55,9 +61,9 @@ class GroupDummy extends GroupDummyParent implements GroupDummyInterface
     }
 
     /**
-     * @Groups({"a", "b"})
+     * @Groups({"a", "b", "name_converter"})
      */
-    public function getFooBar()
+    public function isFooBar()
     {
         return $this->fooBar;
     }

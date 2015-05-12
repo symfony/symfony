@@ -110,7 +110,7 @@ class MarkdownDescriptor extends Descriptor
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
-            $this->write(sprintf("**`%s`:** `%s`", $options['id'], get_class($service)));
+            $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
     }
 
@@ -266,21 +266,30 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(sprintf('# %s', $title)."\n");
 
-        $registeredListeners = $eventDispatcher->getListeners($event);
+        $registeredListeners = $eventDispatcher->getListeners($event, true);
         if (null !== $event) {
-            foreach ($registeredListeners as $order => $listener) {
-                $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");
-                $this->describeCallable($listener);
+            krsort($registeredListeners);
+            $order = 1;
+            foreach ($registeredListeners as $priority => $listeners) {
+                foreach ($listeners as $listener) {
+                    $this->write("\n".sprintf('## Listener %d', $order++)."\n");
+                    $this->describeCallable($listener);
+                    $this->write(sprintf('- Priority: `%d`', $priority)."\n");
+                }
             }
         } else {
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {
                 $this->write("\n".sprintf('## %s', $eventListened)."\n");
-
-                foreach ($eventListeners as $order => $eventListener) {
-                    $this->write("\n".sprintf('### Listener %d', $order + 1)."\n");
-                    $this->describeCallable($eventListener);
+                krsort($eventListeners);
+                $order = 1;
+                foreach ($eventListeners as $priority => $listeners) {
+                    foreach ($listeners as $listener) {
+                        $this->write("\n".sprintf('### Listener %d', $order++)."\n");
+                        $this->describeCallable($listener);
+                        $this->write(sprintf('- Priority: `%d`', $priority)."\n");
+                    }
                 }
             }
         }

@@ -1708,7 +1708,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('evil.com', $request->getHost());
 
         // add a trusted domain and all its subdomains
-        Request::setTrustedHosts(array('.*\.?trusted.com$'));
+        Request::setTrustedHosts(array('^([a-z]{9}\.)?trusted\.com$'));
 
         // untrusted host
         $request->headers->set('host', 'evil.com');

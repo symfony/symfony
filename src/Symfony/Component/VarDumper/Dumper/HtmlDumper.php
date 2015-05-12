@@ -176,6 +176,9 @@ return function (root) {
             }
         });
     };
+    function isCtrlKey(e) {
+        return e.ctrlKey || e.metaKey;
+    }
     addEventListener(root, 'mouseover', function (e) {
         if ('' != refStyle.innerHTML) {
             refStyle.innerHTML = '';
@@ -192,7 +195,7 @@ return function (root) {
     a('click', function (a, e) {
         if (/\bsf-dump-toggle\b/.test(a.className)) {
             e.preventDefault();
-            if (!toggle(a, e.ctrlKey)) {
+            if (!toggle(a, isCtrlKey(e))) {
                 var r = doc.getElementById(a.getAttribute('href').substr(1)),
                     s = r.previousSibling,
                     f = r.parentNode,
@@ -206,7 +209,7 @@ return function (root) {
                     r.innerHTML = r.innerHTML.replace(new RegExp('^'+f[0].replace(rxEsc, '\\$1'), 'mg'), t[0]);
                 }
                 if ('sf-dump-compact' == r.className) {
-                    toggle(s, e.ctrlKey);
+                    toggle(s, isCtrlKey(e));
                 }
             }
 

@@ -166,27 +166,6 @@ EOF
         }
     }
 
-    private function isOtherServerProcessRunning($address)
-    {
-        $lockFile = $this->getLockFile($address);
-
-        if (file_exists($lockFile)) {
-            return true;
-        }
-
-        list($hostname, $port) = explode(':', $address);
-
-        $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
-
-        if (false !== $fp) {
-            fclose($fp);
-
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * Determine the absolute file path for the router script, using the environment to choose a standard script
      * if no custom router script is specified.

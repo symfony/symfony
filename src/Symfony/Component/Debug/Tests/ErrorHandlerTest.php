@@ -331,7 +331,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $logArgCheck = function ($level, $message, $context) {
                 $this->assertEquals('Fatal Parse Error: foo', $message);
                 $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_ERROR);
+                $this->assertEquals($context['type'], E_PARSE);
             };
 
             $logger
@@ -340,7 +340,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnCallback($logArgCheck))
             ;
 
-            $handler->setDefaultLogger($logger, E_ERROR);
+            $handler->setDefaultLogger($logger, E_PARSE);
 
             $handler->handleFatalError($error);
 

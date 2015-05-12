@@ -30,6 +30,7 @@ class DebugClassLoader
     private $isFinder;
     private static $caseCheck;
     private static $deprecated = array();
+    private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
 
     /**
      * Constructor.
@@ -59,7 +60,7 @@ class DebugClassLoader
     }
 
     /**
-     * Wraps all autoloaders
+     * Wraps all autoloaders.
      */
     public static function enable()
     {
@@ -150,7 +151,9 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
 
-            if (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+            if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {
+                trigger_error(sprintf('%s uses a reserved class name (%s) that will break on PHP 7 and higher', $name, $refl->getShortName()), E_USER_DEPRECATED);
+            } elseif (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
                 if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-12T10:05:14Z
+
+Great it works!
+No test is skipped for the Yaml component, which means the fr_FR locale is installed.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-12T11:08:37Z
+
+:+1: Great that the language pack packages are now whitelisted

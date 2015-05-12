@@ -134,6 +134,9 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
      */
     public function loadChoicesForValues(array $values, $value = null)
     {
+        // Filters empty values in order to avoid generation of clauses like
+        // "WHERE id IN ('')"
+        $values = array_diff($values, array(''));
         // Performance optimization
         // Also prevents the generation of "WHERE id IN ()" queries through the
         // object loader. At least with MySQL and on the development machine

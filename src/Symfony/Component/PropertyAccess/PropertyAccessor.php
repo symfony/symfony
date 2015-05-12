@@ -314,11 +314,11 @@ class PropertyAccessor implements PropertyAccessorInterface
             $result[self::VALUE] = $object->$isser();
         } elseif ($reflClass->hasMethod($hasser) && $reflClass->getMethod($hasser)->isPublic()) {
             $result[self::VALUE] = $object->$hasser();
-        } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
-            $result[self::VALUE] = $object->$property;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
             $result[self::VALUE] = &$object->$property;
             $result[self::IS_REF] = true;
+        } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
+            $result[self::VALUE] = $object->$property;
         } elseif (!$classHasProperty && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
             // exclude $classHasProperty, otherwise if in the previous clause
@@ -410,9 +410,9 @@ class PropertyAccessor implements PropertyAccessorInterface
             $object->$setter($value);
         } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
             $object->$getsetter($value);
-        } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
-            $object->$property = $value;
         } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
+            $object->$property = $value;
+        } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
             $object->$property = $value;
         } elseif (!$classHasProperty && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly

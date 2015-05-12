@@ -12,10 +12,11 @@
 namespace Symfony\Component\Translation;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
-use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Translation\Provider\Cache;
+use Symfony\Component\Translation\Provider\DefaultProvider;
+use Symfony\Component\Translation\Provider\MessageCatalogueProviderInterface;
+use Symfony\Component\Translation\Provider\TranslatorLegacyHelper;
 
 /**
  * Translator.
@@ -40,34 +41,30 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     private $fallbackLocales = array();
 
     /**
-     * @var LoaderInterface[]
-     */
-    private $loaders = array();
-
-    /**
-     * @var array
-     */
-    private $resources = array();
-
-    /**
      * @var MessageSelector
      */
     private $selector;
 
     /**
-     * @var string
+     * The MessageCatalogueProviderInterface instance that will be used
+     * from within loadCatalogue().
+     *
+     * @var MessageCatalogueProviderInterface
      */
-    private $cacheDir;
+    private $provider;
 
     /**
-     * @var bool
+     * The MessageCatalogueProviderInterface instance that actually does the
+     * loading.
+     *
+     * We need to keep this as a separate entity so that it can be called
+     * independently from within initializeCatalogue(), which is a protected
+     * method and might be called by subclasses without going through loadCatalogue()
+     * or without using the "regular" ::$messageCatalogueProvider.
+     *
+     * @var MessageCatalogueProviderInterface
      */
-    private $debug;
-
-    /**
-     * @var ConfigCacheFactoryInterface|null
-     */
-    private $configCacheFactory;
+    private $loader;
 
     /**
      * Constructor.
@@ -83,8 +80,16 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     {
         $this->setLocale($locale);
         $this->selector = $selector ?: new MessageSelector();
-        $this->cacheDir = $cacheDir;
-        $this->debug = $debug;
+
+        $this->loader = new DefaultProvider();
+
+        $provider = new TranslatorLegacyHelper($this, $this->loader);
+
+        if ($cacheDir !== null) {
+            $this->provider = new Cache($provider, $debug, $cacheDir);
+        } else {
+            $this->provider = $provider;
+        }
     }
 
     /**
@@ -94,7 +99,9 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
     {
-        $this->configCacheFactory = $configCacheFactory;
+        if ($this->provider instanceof Cache) {
+            $this->provider->setConfigCacheFactory($configCacheFactory);
+        }
     }
 
     /**
@@ -105,7 +112,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function addLoader($format, LoaderInterface $loader)
     {
-        $this->loaders[$format] = $loader;
+        $this->provider->addLoader($format, $loader);
     }
 
     /**
@@ -120,13 +127,8 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function addResource($format, $resource, $locale, $domain = null)
     {
-        if (null === $domain) {
-            $domain = 'messages';
-        }
-
         $this->assertValidLocale($locale);
-
-        $this->resources[$locale][] = array($format, $resource, $domain);
+        $this->provider->addResource($format, $resource, $locale, $domain);
 
         if (in_array($locale, $this->fallbackLocales)) {
             $this->catalogues = array();
@@ -258,7 +260,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     protected function getLoaders()
     {
-        return $this->loaders;
+        return $this->provider->getLoaders();
     }
 
     /**
@@ -288,11 +290,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     protected function loadCatalogue($locale)
     {
-        if (null === $this->cacheDir) {
-            $this->initializeCatalogue($locale);
-        } else {
-            $this->initializeCacheCatalogue($locale);
-        }
+        $this->catalogues[$locale] = $this->provider->provideCatalogue($locale, $this->computeFallbackLocales($locale));
     }
 
     /**
@@ -301,136 +299,20 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     protected function initializeCatalogue($locale)
     {
         $this->assertValidLocale($locale);
-
-        try {
-            $this->doLoadCatalogue($locale);
-        } catch (NotFoundResourceException $e) {
-            if (!$this->computeFallbackLocales($locale)) {
-                throw $e;
-            }
-        }
-        $this->loadFallbackCatalogues($locale);
+        $this->catalogues[$locale] = $this->loader->provideCatalogue($locale, $this->computeFallbackLocales($locale));
     }
 
     /**
-     * @param string $locale
-     */
-    private function initializeCacheCatalogue($locale)
-    {
-        if (isset($this->catalogues[$locale])) {
-            /* Catalogue already initialized. */
-            return;
-        }
-
-        $this->assertValidLocale($locale);
-        $self = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-        $cache = $this->getConfigCacheFactory()->cache($this->getCatalogueCachePath($locale),
-            function (ConfigCacheInterface $cache) use ($self, $locale) {
-                $self->dumpCatalogue($locale, $cache);
-            }
-        );
-
-        if (isset($this->catalogues[$locale])) {
-            /* Catalogue has been initialized as it was written out to cache. */
-            return;
-        }
-
-        /* Read catalogue from cache. */
-        $this->catalogues[$locale] = include $cache->getPath();
-    }
-
-    /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be made protected (or even private, if possible) in 3.0.
+     * This serves as an access point for TranslatorLegacyHelper to dispatch back to the
+     * (possibly overriden) initializeCatalogue() method.
      *
      * @internal
      */
-    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    public function accessInitializeCatalogue($locale)
     {
         $this->initializeCatalogue($locale);
-        $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
 
-        $content = sprintf(<<<EOF
-<?php
-
-use Symfony\Component\Translation\MessageCatalogue;
-
-\$catalogue = new MessageCatalogue('%s', %s);
-
-%s
-return \$catalogue;
-
-EOF
-            ,
-            $locale,
-            var_export($this->catalogues[$locale]->all(), true),
-            $fallbackContent
-        );
-
-        $cache->write($content, $this->catalogues[$locale]->getResources());
-    }
-
-    private function getFallbackContent(MessageCatalogue $catalogue)
-    {
-        $fallbackContent = '';
-        $current = '';
-        $replacementPattern = '/[^a-z0-9_]/i';
-        $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-        while ($fallbackCatalogue) {
-            $fallback = $fallbackCatalogue->getLocale();
-            $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
-            $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
-
-            $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
-
-EOF
-                ,
-                $fallbackSuffix,
-                $fallback,
-                var_export($fallbackCatalogue->all(), true),
-                $currentSuffix,
-                $fallbackSuffix
-            );
-            $current = $fallbackCatalogue->getLocale();
-            $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
-        }
-
-        return $fallbackContent;
-    }
-
-    private function getCatalogueCachePath($locale)
-    {
-        return $this->cacheDir.'/catalogue.'.$locale.'.'.sha1(serialize($this->fallbackLocales)).'.php';
-    }
-
-    private function doLoadCatalogue($locale)
-    {
-        $this->catalogues[$locale] = new MessageCatalogue($locale);
-
-        if (isset($this->resources[$locale])) {
-            foreach ($this->resources[$locale] as $resource) {
-                if (!isset($this->loaders[$resource[0]])) {
-                    throw new \RuntimeException(sprintf('The "%s" translation loader is not registered.', $resource[0]));
-                }
-                $this->catalogues[$locale]->addCatalogue($this->loaders[$resource[0]]->load($resource[1], $locale, $resource[2]));
-            }
-        }
-    }
-
-    private function loadFallbackCatalogues($locale)
-    {
-        $current = $this->catalogues[$locale];
-
-        foreach ($this->computeFallbackLocales($locale) as $fallback) {
-            if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
-            }
-
-            $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());
-            $current->addFallbackCatalogue($fallbackCatalogue);
-            $current = $fallbackCatalogue;
-        }
+        return $this->catalogues[$locale];
     }
 
     protected function computeFallbackLocales($locale)
@@ -463,20 +345,5 @@ EOF
         if (1 !== preg_match('/^[a-z0-9@_\\.\\-]*$/i', $locale)) {
             throw new \InvalidArgumentException(sprintf('Invalid "%s" locale.', $locale));
         }
-    }
-
-    /**
-     * Provides the ConfigCache factory implementation, falling back to a
-     * default implementation if necessary.
-     *
-     * @return ConfigCacheFactoryInterface $configCacheFactory
-     */
-    private function getConfigCacheFactory()
-    {
-        if (!$this->configCacheFactory) {
-            $this->configCacheFactory = new ConfigCacheFactory($this->debug);
-        }
-
-        return $this->configCacheFactory;
     }
 }

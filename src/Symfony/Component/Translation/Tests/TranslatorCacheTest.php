@@ -153,6 +153,32 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider runForDebugAndProduction
      */
+    public function testDifferentTranslatorsForSameLocaleDoNotInterfere($debug)
+    {
+        $locale = 'any_locale';
+        $format = 'some_format';
+        $msgid = 'test';
+
+        // Create a Translator and prime its cache
+        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator->addLoader($format, new ArrayLoader());
+        $translator->addResource($format, array($msgid => 'FAIL'), $locale);
+        $translator->trans($msgid);
+
+        /*
+         * Create another Translator with the same locale but a different resource.
+         * It should not use the first translator's cache but return the value from its own resource.
+         */
+        $translator = new Translator($locale, null, $this->tmpDir, $debug);
+        $translator->addLoader($format, new ArrayLoader());
+        $translator->addResource($format, array($msgid => 'OK'), $locale);
+
+        $this->assertEquals('OK', $translator->trans($msgid), '-> different translators for the same domain interfere in '.($debug ? 'debug' : 'production'));
+    }
+
+    /**
+     * @dataProvider runForDebugAndProduction
+     */
     public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug)
     {
         /*

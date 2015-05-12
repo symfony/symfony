@@ -3,7 +3,7 @@
     "type": "symfony-bundle",
     "description": "Symfony DebugBundle",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,7 +12,7 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
@@ -24,7 +24,8 @@
     "require-dev": {
         "symfony/phpunit-bridge": "~2.7|~3.0.0",
         "symfony/config": "~2.3|~3.0.0",
-        "symfony/dependency-injection": "~2.3|~3.0.0"
+        "symfony/dependency-injection": "~2.3|~3.0.0",
+        "symfony/web-profiler-bundle": "~2.3|~3.0.0"
     },
     "suggest": {
         "symfony/config": "For service container configuration",

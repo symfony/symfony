@@ -191,6 +191,13 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->get('bar') === $builder->get('foo'), '->setAlias() creates a service that is an alias to another one');
 
         try {
+            $builder->setAlias('foobar', 'foobar');
+            $this->fail('->setAlias() throws an InvalidArgumentException if the alias references itself');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('An alias can not reference itself, got a circular reference on "foobar".', $e->getMessage(), '->setAlias() throws an InvalidArgumentException if the alias references itself');
+        }
+
+        try {
             $builder->getAlias('foobar');
             $this->fail('->getAlias() throws an InvalidArgumentException if the alias does not exist');
         } catch (\InvalidArgumentException $e) {

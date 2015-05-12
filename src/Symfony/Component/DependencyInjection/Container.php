@@ -86,8 +86,6 @@ class Container implements IntrospectableContainerInterface
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?: new ParameterBag();
-
-        $this->set('service_container', $this);
     }
 
     /**
@@ -261,7 +259,6 @@ class Container implements IntrospectableContainerInterface
      *
      * @return object The associated service
      *
-     * @throws InvalidArgumentException          if the service is not defined
      * @throws ServiceCircularReferenceException When a circular reference is detected
      * @throws ServiceNotFoundException          When the service is not defined
      * @throws \Exception                        if an exception has been thrown when the service has been resolved

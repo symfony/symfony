@@ -319,7 +319,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
                 'norm' => "'Foobar'",
             ),
             'errors' => array(
-                array('message' => 'Invalid!', 'origin' => null, 'trace' => array()),
+                array('message' => 'Invalid!', 'origin' => spl_object_hash($form), 'trace' => array()),
             ),
             'synchronized' => 'true',
         ), $this->dataExtractor->extractSubmittedData($form));
@@ -360,7 +360,7 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
                 'norm' => "'Foobar'",
             ),
             'errors' => array(
-                array('message' => 'Invalid!', 'origin' => null, 'trace' => array(
+                array('message' => 'Invalid!', 'origin' => spl_object_hash($form), 'trace' => array(
                     array(
                         'class' => "'Exception'",
                         'message' => "''",

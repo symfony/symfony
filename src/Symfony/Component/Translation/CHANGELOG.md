@@ -3,7 +3,8 @@ CHANGELOG
 
 2.8.0
 -----
- * deprecated Translator::getMessages(), rely on the TranslatorBagInterface::getCatalogue() method instead.
+
+ * deprecated Translator::getMessages(), use TranslatorBagInterface::getCatalogue() instead.
 
 2.7.0
 -----

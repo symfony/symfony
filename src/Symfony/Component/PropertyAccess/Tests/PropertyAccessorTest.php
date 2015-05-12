@@ -438,4 +438,12 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foobar', $object->getProperty());
     }
+
+    public function testSetValueDeepWithMagicGetter()
+    {
+        $obj = new TestClassMagicGet('foo');
+        $obj->publicProperty = array('foo' => array('bar' => 'some_value'));
+        $this->propertyAccessor->setValue($obj, 'publicProperty[foo][bar]', 'Updated');
+        $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
+    }
 }

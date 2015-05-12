@@ -67,6 +67,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     const RELEASE_VERSION = '0';
     const EXTRA_VERSION = 'DEV';
 
+    const END_OF_MAINTENANCE = '05/2018';
+    const END_OF_LIFE = '05/2019';
+
     /**
      * Constructor.
      *
@@ -671,7 +674,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
-        if (class_exists('ProxyManager\Configuration')) {
+        if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
         }
 
@@ -691,8 +694,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if (class_exists('ProxyManager\Configuration')) {
-            $dumper->setProxyDumper(new ProxyDumper());
+        if (class_exists('ProxyManager\Configuration') && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')) {
+            $dumper->setProxyDumper(new ProxyDumper(md5($cache->getPath())));
         }
 
         $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));

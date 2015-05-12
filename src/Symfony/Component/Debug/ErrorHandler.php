@@ -14,6 +14,7 @@ namespace Symfony\Component\Debug;
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Debug\Exception\ContextErrorException;
+use Symfony\Component\Debug\Exception\FatalBaseException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
 use Symfony\Component\Debug\FatalErrorHandler\UndefinedFunctionFatalErrorHandler;
@@ -430,22 +431,34 @@ class ErrorHandler
     /**
      * Handles an exception by logging then forwarding it to an other handler.
      *
-     * @param \Exception $exception An exception to handle
-     * @param array      $error     An array as returned by error_get_last()
+     * @param \Exception|\BaseException $exception An exception to handle
+     * @param array                     $error     An array as returned by error_get_last()
      *
      * @internal
      */
-    public function handleException(\Exception $exception, array $error = null)
+    public function handleException($exception, array $error = null)
     {
-        if ($this->loggedErrors & E_ERROR) {
+        if (!$exception instanceof \Exception) {
+            $exception = new FatalBaseException($exception);
+        }
+        $type = $exception instanceof FatalErrorException ? $exception->getSeverity() : E_ERROR;
+
+        if ($this->loggedErrors & $type) {
             $e = array(
-                'type' => E_ERROR,
+                'type' => $type,
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'level' => error_reporting(),
                 'stack' => $exception->getTrace(),
             );
-            if ($exception instanceof FatalErrorException) {
+            if ($exception instanceof FatalBaseException) {
+                $error = array(
+                    'type' => $type,
+                    'message' => $message = $exception->getMessage(),
+                    'file' => $e['file'],
+                    'line' => $e['line'],
+                );
+            } elseif ($exception instanceof FatalErrorException) {
                 $message = 'Fatal '.$exception->getMessage();
             } elseif ($exception instanceof \ErrorException) {
                 $message = 'Uncaught '.$exception->getMessage();
@@ -473,6 +486,9 @@ class ErrorHandler
         try {
             call_user_func($this->exceptionHandler, $exception);
         } catch (\Exception $handlerException) {
+            $this->exceptionHandler = null;
+            $this->handleException($handlerException);
+        } catch (\BaseException $handlerException) {
             $this->exceptionHandler = null;
             $this->handleException($handlerException);
         }

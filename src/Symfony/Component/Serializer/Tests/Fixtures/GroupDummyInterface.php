@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 interface GroupDummyInterface
 {
     /**
-     * @Groups({"a"})
+     * @Groups({"a", "name_converter"})
      */
     public function getSymfony();
 }

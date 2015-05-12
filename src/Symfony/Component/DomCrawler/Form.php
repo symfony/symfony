@@ -44,8 +44,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @api
      */
-    public function __construct(\DOMElement $node, $currentUri, $method = null)
-    {
+    public function __construct(\DOMElement $node, $currentUri, $method = null) {
         parent::__construct($node, $currentUri, $method);
 
         $this->initialize();
@@ -72,9 +71,10 @@ class Form extends Link implements \ArrayAccess
      */
     public function setValues(array $values)
     {
-        foreach ($values as $name => $value) {
-            $this->fields->set($name, $value);
-        }
+      foreach ($values as $name => $value)
+      {
+        $this->fields->set($name, $value);
+      }
 
         return $this;
     }

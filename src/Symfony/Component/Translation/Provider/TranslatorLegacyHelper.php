@@ -31,6 +31,7 @@ use Symfony\Component\Translation\Translator;
  * "inner" instance in turn.
  *
  * @internal
+ *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
 class TranslatorLegacyHelper implements MessageCatalogueProviderInterface

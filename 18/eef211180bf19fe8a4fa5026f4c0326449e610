@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-12T06:25:19Z
+
+I added a check for the `Origin` header, so that programmatic calls (either XHR, embedded assets or CORS requests) don't break with invalid content.
+This PR is ready for the first most basic round of tweaking regarding #14608
+The next step is giving easy control over dumps destination, but that's for an other PR.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-05-12T15:38:35Z
+
+seems :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-12T19:12:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-12T20:24:48Z
+
+:+1:

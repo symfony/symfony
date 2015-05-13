@@ -2,7 +2,7 @@ CONTRIBUTORS
 ============
 
 Symfony is the result of the work of many people who made the code better
-(see http://symfony.com/contributors for more information):
+(see https://symfony.com/contributors for more information):
 
  - Fabien Potencier (fabpot)
  - Bernhard Schussek (bschussek)

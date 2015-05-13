@@ -11,7 +11,7 @@ Resources
 
 Documentation:
 
-http://symfony.com/doc/2.8/book/security.html
+https://symfony.com/doc/2.8/book/security.html
 
 Tests
 -----

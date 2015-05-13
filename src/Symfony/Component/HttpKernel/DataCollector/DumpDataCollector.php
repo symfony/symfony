@@ -123,10 +123,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         if ($this->dumper) {
             $this->doDump($data, $name, $file, $line);
-        } else {
-            $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
-            ++$this->dataCount;
         }
+
+        $this->data[] = compact('data', 'name', 'file', 'line', 'fileExcerpt');
+        ++$this->dataCount;
 
         if ($this->stopwatch) {
             $this->stopwatch->stop('dump');
@@ -136,7 +136,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
         // Sub-requests and programmatic calls stay in the collected profile.
-        if (($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
+        if ($this->dumper || ($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
             return;
         }
 
@@ -154,13 +154,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 $this->dumper = new CliDumper('php://output', $this->charset);
             }
 
-            foreach ($this->data as $i => $dump) {
-                $this->data[$i] = null;
+            foreach ($this->data as $dump) {
                 $this->doDump($dump['data'], $dump['name'], $dump['file'], $dump['line']);
             }
-
-            $this->data = array();
-            $this->dataCount = 0;
         }
     }
 

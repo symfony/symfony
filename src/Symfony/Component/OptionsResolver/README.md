@@ -17,4 +17,4 @@ You can run the unit tests with the following command:
     $ composer install
     $ phpunit
 
-[1]: http://symfony.com/doc/current/components/options_resolver.html
+[1]: https://symfony.com/doc/current/components/options_resolver.html

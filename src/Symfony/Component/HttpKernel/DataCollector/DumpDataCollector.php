@@ -130,13 +130,13 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        if ($this->requestStack && $this->requestStack->getMasterRequest() !== $request) {
+        // Sub-requests and programmatic calls stay in the collected profile.
+        if (($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
             return;
         }
 
-        // In all conditions that remove the web debug toolbar, dumps are written on the output.
+        // In all other conditions that remove the web debug toolbar, dumps are written on the output.
         if (!$this->requestStack
-            || $request->isXmlHttpRequest()
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))

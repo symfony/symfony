@@ -104,7 +104,7 @@ class AclProvider implements AclProviderInterface
         $currentBatch = array();
         $oidLookup = array();
 
-        for ($i = 0, $c = count($oids); $i<$c; $i++) {
+        for ($i = 0, $c = count($oids); $i < $c; $i++) {
             $oid = $oids[$i];
             $oidLookupKey = $oid->getIdentifier().$oid->getType();
             $oidLookup[$oidLookupKey] = $oid;
@@ -173,7 +173,8 @@ class AclProvider implements AclProviderInterface
             }
 
             // Is it time to load the current batch?
-            if ((self::MAX_BATCH_SIZE === count($currentBatch) || ($i + 1) === $c) && count($currentBatch) > 0) {
+            $currentBatchesCount = count($currentBatch);
+            if ($currentBatchesCount > 0 && (self::MAX_BATCH_SIZE === $currentBatchesCount || ($i + 1) === $c)) {
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $aclNotFoundException) {
@@ -314,7 +315,7 @@ SELECTCLAUSE;
                     $this->connection->quote($batch[$i]->getType())
                 );
 
-                if ($i+1 < $count) {
+                if ($i + 1 < $count) {
                     $sql .= ' OR ';
                 }
             }
@@ -508,8 +509,8 @@ QUERY;
         $acls = $aces = $emptyArray = array();
         $oidCache = $oidLookup;
         $result = new \SplObjectStorage();
-        $loadedAces = & $this->loadedAces;
-        $loadedAcls = & $this->loadedAcls;
+        $loadedAces = &$this->loadedAces;
+        $loadedAcls = &$this->loadedAcls;
         $permissionGrantingStrategy = $this->permissionGrantingStrategy;
 
         // we need these to set protected properties on hydrated objects
@@ -559,10 +560,11 @@ QUERY;
                 // attach ACL to the result set; even though we do not enforce that every
                 // object identity has only one instance, we must make sure to maintain
                 // referential equality with the oids passed to findAcls()
-                if (!isset($oidCache[$objectIdentifier.$classType])) {
-                    $oidCache[$objectIdentifier.$classType] = $acl->getObjectIdentity();
+                $oidCacheKey = $objectIdentifier.$classType;
+                if (!isset($oidCache[$oidCacheKey])) {
+                    $oidCache[$oidCacheKey] = $acl->getObjectIdentity();
                 }
-                $result->attach($oidCache[$objectIdentifier.$classType], $acl);
+                $result->attach($oidCache[$oidCacheKey], $acl);
             // so, this hasn't been hydrated yet
             } else {
                 // create object identity if we haven't done so yet
@@ -670,7 +672,7 @@ QUERY;
             // let's see if we have already hydrated this
             if (isset($acls[$parentId])) {
                 $aclParentAclProperty->setValue($acl, $acls[$parentId]);
-                $processed += 1;
+                ++$processed;
 
                 continue;
             }

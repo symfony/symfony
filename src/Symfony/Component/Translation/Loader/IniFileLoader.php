@@ -20,7 +20,7 @@ use Symfony\Component\Config\Resource\FileResource;
  *
  * @author stealth35
  */
-class IniFileLoader extends ArrayLoader implements LoaderInterface
+class IniFileLoader extends ArrayLoader
 {
     /**
      * {@inheritdoc}
@@ -38,7 +38,10 @@ class IniFileLoader extends ArrayLoader implements LoaderInterface
         $messages = parse_ini_file($resource, true);
 
         $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }

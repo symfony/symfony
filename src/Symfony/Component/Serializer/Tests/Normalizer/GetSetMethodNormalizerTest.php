@@ -260,7 +260,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \LogicException
+     * @expectedException \Symfony\Component\Serializer\Exception\LogicException
      * @expectedExceptionMessage Cannot normalize attribute "object" because injected serializer is not a normalizer
      */
     public function testUnableToNormalizeObjectAttribute()
@@ -374,7 +374,7 @@ class GetSetDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 
     public function setObject($object)
@@ -418,7 +418,7 @@ class GetConstructorDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 }
 
@@ -456,6 +456,6 @@ class GetConstructorOptionalArgsDummy
 
     public function otherMethod()
     {
-        throw new \RuntimeException("Dummy::otherMethod() should not be called");
+        throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 }

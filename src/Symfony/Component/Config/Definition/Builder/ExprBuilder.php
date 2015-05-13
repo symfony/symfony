@@ -224,7 +224,7 @@ class ExprBuilder
     public static function buildExpressions(array $expressions)
     {
         foreach ($expressions as $k => $expr) {
-            if ($expr instanceof ExprBuilder) {
+            if ($expr instanceof self) {
                 $if = $expr->ifPart;
                 $then = $expr->thenPart;
                 $expressions[$k] = function ($v) use ($if, $then) {

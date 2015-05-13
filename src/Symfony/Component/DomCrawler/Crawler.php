@@ -45,9 +45,10 @@ class Crawler extends \SplObjectStorage
     /**
      * Constructor.
      *
-     * @param mixed  $node A Node to use as the base for the crawling
+     * @param mixed  $node       A Node to use as the base for the crawling
      * @param string $currentUri The current URI
-     * @param string $baseHref The base href value
+     * @param string $baseHref   The base href value
+     *
      * @api
      */
     public function __construct($node = null, $currentUri = null, $baseHref = null)
@@ -846,7 +847,7 @@ class Crawler extends \SplObjectStorage
             }
         }
 
-        return sprintf("concat(%s)", implode($parts, ', '));
+        return sprintf('concat(%s)', implode($parts, ', '));
     }
 
     /**
@@ -1026,7 +1027,7 @@ class Crawler extends \SplObjectStorage
      */
     private function findNamespacePrefixes($xpath)
     {
-        if (preg_match_all('/(?P<prefix>[a-z_][a-z_0-9\-\.]*):[^"\/]/i', $xpath, $matches)) {
+        if (preg_match_all('/(?P<prefix>[a-z_][a-z_0-9\-\.]*):[^"\/:]/i', $xpath, $matches)) {
             return array_unique($matches['prefix']);
         }
 

@@ -419,6 +419,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(array('index' => array('%!@$§.' => 'Bernhard')), '[index][%!@$§.]', 'Bernhard'),
             array((object) array('%!@$§' => 'Bernhard'), '%!@$§', 'Bernhard'),
             array((object) array('property' => (object) array('%!@$§' => 'Bernhard')), 'property.%!@$§', 'Bernhard'),
+
+            // nested objects and arrays
+            array(array('foo' => new TestClass('bar')), '[foo].publicGetSetter', 'bar'),
+            array(new TestClass(array('foo' => 'bar')), 'publicGetSetter[foo]', 'bar'),
+            array(new TestClass(new TestClass('bar')), 'publicGetter.publicGetSetter', 'bar'),
+            array(new TestClass(array('foo' => new TestClass('bar'))), 'publicGetter[foo].publicGetSetter', 'bar'),
+            array(new TestClass(new TestClass(new TestClass('bar'))), 'publicGetter.publicGetter.publicGetSetter', 'bar'),
+            array(new TestClass(array('foo' => array('baz' => new TestClass('bar')))), 'publicGetter[foo][baz].publicGetSetter', 'bar'),
         );
     }
 
@@ -429,5 +437,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($object, 'property', 'foobar');
 
         $this->assertEquals('foobar', $object->getProperty());
+    }
+
+    public function testSetValueDeepWithMagicGetter()
+    {
+        $obj = new TestClassMagicGet('foo');
+        $obj->publicProperty = array('foo' => array('bar' => 'some_value'));
+        $this->propertyAccessor->setValue($obj, 'publicProperty[foo][bar]', 'Updated');
+        $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\MessageSelector;
@@ -26,7 +27,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->deleteTmpDir();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->deleteTmpDir();
     }
@@ -77,6 +78,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // do it another time as the cache is primed now
         $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader->expects($this->never())->method('load');
+
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
         $translator->setLocale('fr');
         $translator->setFallbackLocales(array('en', 'es', 'pt-PT', 'pt_BR', 'fr.UTF-8', 'sr@latin'));
@@ -102,11 +105,29 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->trans('foo');
     }
 
-    protected function getCatalogue($locale, $messages)
+    public function testGetDefaultLocale()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container
+            ->expects($this->once())
+            ->method('getParameter')
+            ->with('kernel.default_locale')
+            ->will($this->returnValue('en'))
+        ;
+
+        $translator = new Translator($container, new MessageSelector());
+
+        $this->assertSame('en', $translator->getLocale());
+    }
+
+    protected function getCatalogue($locale, $messages, $resources = array())
     {
         $catalogue = new MessageCatalogue($locale);
         foreach ($messages as $key => $translation) {
             $catalogue->set($key, $translation);
+        }
+        foreach ($resources as $resource) {
+            $catalogue->addResource($resource);
         }
 
         return $catalogue;
@@ -184,12 +205,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function getTranslator($loader, $options = array(), $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
     {
-        $translator = new $translatorClass(
-            $this->getContainer($loader),
-            new MessageSelector(),
-            array('loader' => array('loader')),
-            $options
-        );
+        $translator = $this->createTranslator($loader, $options, $translatorClass);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');
@@ -198,6 +214,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
         $translator->addResource('loader', 'foo', 'fr.UTF-8');
         $translator->addResource('loader', 'foo', 'sr@latin'); // Latin Serbian
+
+        return $translator;
+    }
+
+    private function createTranslator($loader, $options, $translatorClass = '\Symfony\Bundle\FrameworkBundle\Translation\Translator')
+    {
+        $translator = new $translatorClass(
+            $this->getContainer($loader),
+            new MessageSelector(),
+            array('loader' => array('loader')),
+            $options
+        );
 
         return $translator;
     }

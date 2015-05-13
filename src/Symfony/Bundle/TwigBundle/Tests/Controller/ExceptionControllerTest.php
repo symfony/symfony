@@ -13,7 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\Controller;
 
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\Controller\ExceptionController;
-use Symfony\Component\HttpKernel\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExceptionControllerTest extends TestCase
@@ -40,8 +40,7 @@ class ExceptionControllerTest extends TestCase
         $request->headers->set('X-Php-Ob-Level', 1);
 
         $controller = new ExceptionController($twig, false);
-        $response = $controller->showAction($request, $flatten);
-        $this->assertEquals('UTF-8', $response->getCharset(), 'Request charset is explicitly set to UTF-8');
+        $controller->showAction($request, $flatten);
     }
 
     public function testShowActionCanBeForcedToShowErrorPage()

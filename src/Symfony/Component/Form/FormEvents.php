@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -12,10 +13,10 @@ namespace Symfony\Component\Form;
 
 /**
  * To learn more about how form events work check the documentation
- * entry at {@link http://symfony.com/doc/any/components/form/form_events.html}
+ * entry at {@link https://symfony.com/doc/any/components/form/form_events.html}.
  *
  * To learn how to dynamically modify forms using events check the cookbook
- * entry at {@link http://symfony.com/doc/any/cookbook/form/dynamic_form_modification.html}
+ * entry at {@link https://symfony.com/doc/any/cookbook/form/dynamic_form_modification.html}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

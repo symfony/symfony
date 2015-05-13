@@ -131,8 +131,11 @@ EOF
             }
         }
 
-        /** @var \Symfony\Component\Console\Helper\Table $table */
-        $table = new Table($output);
+        if (class_exists('Symfony\Component\Console\Helper\Table')) {
+            $table = new Table($output);
+        } else {
+            $table = $this->getHelperSet()->get('table');
+        }
 
         // Display header line
         $headers = array('State(s)', 'Id', sprintf('Message Preview (%s)', $locale));
@@ -177,7 +180,11 @@ EOF
             }
         }
 
-        $table->render();
+        if (class_exists('Symfony\Component\Console\Helper\Table')) {
+            $table->render();
+        } else {
+            $table->render($output);
+        }
 
         $output->writeln('');
         $output->writeln('<info>Legend:</info>');

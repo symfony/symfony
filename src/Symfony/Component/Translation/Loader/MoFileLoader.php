@@ -18,7 +18,7 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  */
-class MoFileLoader extends ArrayLoader implements LoaderInterface
+class MoFileLoader extends ArrayLoader
 {
     /**
      * Magic used for validating the format of a MO file as well as
@@ -66,7 +66,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         }
 
         $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }
@@ -88,7 +91,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         $stat = fstat($stream);
 
         if ($stat['size'] < self::MO_HEADER_SIZE) {
-            throw new InvalidResourceException("MO stream content has an invalid format.");
+            throw new InvalidResourceException('MO stream content has an invalid format.');
         }
         $magic = unpack('V1', fread($stream, 4));
         $magic = hexdec(substr(dechex(current($magic)), -8));
@@ -98,7 +101,7 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
         } elseif ($magic == self::MO_BIG_ENDIAN_MAGIC) {
             $isBigEndian = true;
         } else {
-            throw new InvalidResourceException("MO stream content has an invalid format.");
+            throw new InvalidResourceException('MO stream content has an invalid format.');
         }
 
         // formatRevision
@@ -136,6 +139,10 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
             fseek($stream, $offsetTranslated + $i * 8);
             $length = $this->readLong($stream, $isBigEndian);
             $offset = $this->readLong($stream, $isBigEndian);
+
+            if ($length < 1) {
+                continue;
+            }
 
             fseek($stream, $offset);
             $translated = fread($stream, $length);

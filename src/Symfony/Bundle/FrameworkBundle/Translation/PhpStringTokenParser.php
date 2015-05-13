@@ -51,7 +51,7 @@ class PhpStringTokenParser
 {
     protected static $replacements = array(
         '\\' => '\\',
-        '$' =>  '$',
+        '$' => '$',
         'n' => "\n",
         'r' => "\r",
         't' => "\t",
@@ -77,7 +77,7 @@ class PhpStringTokenParser
         if ('\'' === $str[$bLength]) {
             return str_replace(
                 array('\\\\', '\\\''),
-                array(  '\\', '\''),
+                array('\\', '\''),
                 substr($str, $bLength + 1, -1)
             );
         } else {

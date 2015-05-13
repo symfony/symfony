@@ -52,7 +52,7 @@ final class RoleSecurityIdentity implements SecurityIdentityInterface
      */
     public function equals(SecurityIdentityInterface $sid)
     {
-        if (!$sid instanceof RoleSecurityIdentity) {
+        if (!$sid instanceof self) {
             return false;
         }
 

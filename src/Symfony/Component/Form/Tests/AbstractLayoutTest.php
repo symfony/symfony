@@ -92,9 +92,15 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
             'attr' => array('class' => 'my&class'),
         ), $vars));
 
-        $xpath = trim($xpath).'
-    [@id="my&id"]
+        if (!isset($vars['id'])) {
+            $xpath = trim($xpath).'
+    [@id="my&id"]';
+        }
+
+        if (!isset($vars['attr']['class'])) {
+            $xpath .= '
     [@class="my&class"]';
+        }
 
         $this->assertMatchesXpath($html, $xpath);
     }
@@ -122,6 +128,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     abstract protected function setTheme(FormView $view, array $themes);
 
+    /**
+     * @group legacy
+     */
     public function testLegacyEnctype()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
@@ -133,6 +142,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         $this->assertEquals('enctype="multipart/form-data"', $this->renderEnctype($form->createView()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyNoEnctype()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

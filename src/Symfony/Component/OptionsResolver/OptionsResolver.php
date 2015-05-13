@@ -252,7 +252,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new AccessException('Options cannot be made required from a lazy option or normalizer.');
         }
 
-        foreach ((array) $optionNames as $key => $option) {
+        foreach ((array) $optionNames as $option) {
             $this->defined[$option] = true;
             $this->required[$option] = true;
         }
@@ -333,7 +333,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             throw new AccessException('Options cannot be defined from a lazy option or normalizer.');
         }
 
-        foreach ((array) $optionNames as $key => $option) {
+        foreach ((array) $optionNames as $option) {
             $this->defined[$option] = true;
         }
 
@@ -418,7 +418,18 @@ class OptionsResolver implements Options, OptionsResolverInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the normalizers for an array of options.
+     *
+     * @param array $normalizers An array of closures
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If the option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     *
+     * @see setNormalizer()
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setNormalizers(array $normalizers)
     {
@@ -473,7 +484,7 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ));
         }
 
-        $this->allowedValues[$option] = $allowedValues instanceof \Closure ? array($allowedValues) : (array) $allowedValues;
+        $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
@@ -527,12 +538,14 @@ class OptionsResolver implements Options, OptionsResolverInterface
             ));
         }
 
-        if ($allowedValues instanceof \Closure) {
-            $this->allowedValues[$option][] = $allowedValues;
-        } elseif (!isset($this->allowedValues[$option])) {
-            $this->allowedValues[$option] = (array) $allowedValues;
+        if (!is_array($allowedValues)) {
+            $allowedValues = array($allowedValues);
+        }
+
+        if (!isset($this->allowedValues[$option])) {
+            $this->allowedValues[$option] = $allowedValues;
         } else {
-            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], (array) $allowedValues);
+            $this->allowedValues[$option] = array_merge($this->allowedValues[$option], $allowedValues);
         }
 
         // Make sure the option is processed
@@ -657,14 +670,8 @@ class OptionsResolver implements Options, OptionsResolverInterface
         }
 
         foreach ((array) $optionNames as $option) {
-            unset($this->defined[$option]);
-            unset($this->defaults[$option]);
-            unset($this->required[$option]);
-            unset($this->resolved[$option]);
-            unset($this->lazy[$option]);
-            unset($this->normalizers[$option]);
-            unset($this->allowedTypes[$option]);
-            unset($this->allowedValues[$option]);
+            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
+            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
         }
 
         return $this;

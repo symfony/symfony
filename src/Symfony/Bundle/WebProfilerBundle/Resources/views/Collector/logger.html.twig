@@ -88,10 +88,15 @@
 
     {% if collector.logs %}
         <ul class="alt">
-            {% for log in collector.logs if priority >= 0 and log.priority >= priority or priority < 0 and log.context.type|default(0) == priority %}
-                <li class="{{ cycle(['odd', 'even'], loop.index) }}{% if log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}{% if log.context.scream is defined %} scream{% endif %}">
-                    {{ logger.display_message(loop.index, log) }}
-                </li>
+            {% set log_loop_index = 0 %}
+            {% for log in collector.logs %}
+                {% set is_deprecation = log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
+                {% if priority == '-100' ? is_deprecation : log.priority >= priority %}
+                    {% set log_loop_index = log_loop_index + 1 %}
+                    <li class="{{ cycle(['odd', 'even'], log_loop_index) }}{% if log.context.scream is defined %} scream{% elseif log.priority >= 400 %} error{% elseif log.priority >= 300 %} warning{% endif %}">
+                        {{ logger.display_message(loop.index, log, is_deprecation) }}
+                    </li>
+                {% endif %}
             {% else %}
                 <li><em>No logs available for this priority.</em></li>
             {% endfor %}
@@ -104,15 +109,18 @@
 {% endblock %}
 
 
-{% macro display_message(log_index, log) %}
-    {% if log.context.level is defined and log.context.type is defined and (constant('E_DEPRECATED') == log.context.type or constant('E_USER_DEPRECATED') == log.context.type) %}
-        DEPRECATION -  {{ log.message }}
-        {% set id = 'sf-call-stack-' ~ log_index %}
-        <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
-            <img class="toggle" id="{{ id }}-off" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display:none">
-            <img class="toggle" id="{{ id }}-on" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display:inline">
-        </a>
-        {% for index, call in log.context.stack if index > 1 %}
+{% macro display_message(log_index, log, is_deprecation) %}
+    {% if is_deprecation %}
+        {% set stack = log.context.stack|default([]) %}
+
+        {% if stack %}
+            <a href="#" onclick="Sfjs.toggle('{{ id }}', document.getElementById('{{ id }}-on'), document.getElementById('{{ id }}-off')); return false;">
+                <img class="toggle" id="{{ id }}-off" alt="-" src="data:image/gif;base64,R0lGODlhEgASAMQSANft94TG57Hb8GS44ez1+mC24IvK6ePx+Wa44dXs92+942e54o3L6W2844/M6dnu+P/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABIALAAAAAASABIAQAVCoCQBTBOd6Kk4gJhGBCTPxysJb44K0qD/ER/wlxjmisZkMqBEBW5NHrMZmVKvv9hMVsO+hE0EoNAstEYGxG9heIhCADs=" style="display:none">
+                <img class="toggle" id="{{ id }}-on" alt="+" src="data:image/gif;base64,R0lGODlhEgASAMQTANft99/v+Ga44bHb8ITG52S44dXs9+z1+uPx+YvK6WC24G+944/M6W28443L6dnu+Ge54v/+/l614P///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABMALAAAAAASABIAQAVS4DQBTiOd6LkwgJgeUSzHSDoNaZ4PU6FLgYBA5/vFID/DbylRGiNIZu74I0h1hNsVxbNuUV4d9SsZM2EzWe1qThVzwWFOAFCQFa1RQq6DJB4iIQA7" style="display:inline">
+            </a>
+        {% endif %}
+
+        {% for index, call in stack if index > 1 %}
             {% if index == 2 %}
                 <ul class="sf-call-stack" id="{{ id }}" style="display: none">
             {% endif %}
@@ -128,7 +136,7 @@
 
             <li>Called from {{ call.file is defined and call.line is defined ? call.file|format_file(call.line, from) : from|raw }}</li>
 
-            {% if index == log.context.stack|length - 1 %}
+            {% if index == stack|length - 1 %}
                 </ul>
             {% endif %}
         {% endfor %}

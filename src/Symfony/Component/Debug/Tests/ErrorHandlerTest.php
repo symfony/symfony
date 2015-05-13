@@ -336,7 +336,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $logArgCheck = function ($level, $message, $context) use ($that) {
                 $that->assertEquals('Fatal Parse Error: foo', $message);
                 $that->assertArrayHasKey('type', $context);
-                $that->assertEquals($context['type'], E_ERROR);
+                $that->assertEquals($context['type'], E_PARSE);
             };
 
             $logger
@@ -345,7 +345,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnCallback($logArgCheck))
             ;
 
-            $handler->setDefaultLogger($logger, E_ERROR);
+            $handler->setDefaultLogger($logger, E_PARSE);
 
             $handler->handleFatalError($error);
 
@@ -359,6 +359,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyInterface()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);

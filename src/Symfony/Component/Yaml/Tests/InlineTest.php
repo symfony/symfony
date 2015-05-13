@@ -52,7 +52,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
         $required_locales = array('fr_FR.UTF-8', 'fr_FR.UTF8', 'fr_FR.utf-8', 'fr_FR.utf8', 'French_France.1252');
         if (false === setlocale(LC_ALL, $required_locales)) {
-            $this->markTestSkipped('Could not set any of required locales: '.implode(", ", $required_locales));
+            $this->markTestSkipped('Could not set any of required locales: '.implode(', ', $required_locales));
         }
 
         $this->assertEquals('1.2', Inline::dump(1.2));
@@ -222,8 +222,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('{ foo  : bar, bar : foo,  false  :   false,  null  :   null,  integer :  12  }', array('foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12)),
             array('{foo: \'bar\', bar: \'foo: bar\'}', array('foo' => 'bar', 'bar' => 'foo: bar')),
             array('{\'foo\': \'bar\', "bar": \'foo: bar\'}', array('foo' => 'bar', 'bar' => 'foo: bar')),
-            array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', array('foo\'' => 'bar', "bar\"" => 'foo: bar')),
-            array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', array('foo: ' => 'bar', "bar: " => 'foo: bar')),
+            array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', array('foo\'' => 'bar', 'bar"' => 'foo: bar')),
+            array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
 
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),

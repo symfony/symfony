@@ -92,16 +92,16 @@ class UriSigner
     private function buildUrl(array $url, array $params = array())
     {
         ksort($params);
-        $url['query'] = http_build_query($params);
+        $url['query'] = http_build_query($params, '', '&');
 
-        $scheme   = isset($url['scheme']) ? $url['scheme'].'://' : '';
-        $host     = isset($url['host']) ? $url['host'] : '';
-        $port     = isset($url['port']) ? ':'.$url['port'] : '';
-        $user     = isset($url['user']) ? $url['user'] : '';
-        $pass     = isset($url['pass']) ? ':'.$url['pass']  : '';
-        $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($url['path']) ? $url['path'] : '';
-        $query    = isset($url['query']) && $url['query'] ? '?'.$url['query'] : '';
+        $scheme = isset($url['scheme']) ? $url['scheme'].'://' : '';
+        $host = isset($url['host']) ? $url['host'] : '';
+        $port = isset($url['port']) ? ':'.$url['port'] : '';
+        $user = isset($url['user']) ? $url['user'] : '';
+        $pass = isset($url['pass']) ? ':'.$url['pass']  : '';
+        $pass = ($user || $pass) ? "$pass@" : '';
+        $path = isset($url['path']) ? $url['path'] : '';
+        $query = isset($url['query']) && $url['query'] ? '?'.$url['query'] : '';
         $fragment = isset($url['fragment']) ? '#'.$url['fragment'] : '';
 
         return $scheme.$user.$pass.$host.$port.$path.$query.$fragment;

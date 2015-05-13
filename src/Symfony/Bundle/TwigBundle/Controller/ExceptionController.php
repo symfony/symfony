@@ -62,7 +62,7 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
-        return Response::create($this->twig->render(
+        return new Response($this->twig->render(
             $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
             array(
                 'status_code' => $code,
@@ -71,7 +71,7 @@ class ExceptionController
                 'logger' => $logger,
                 'currentContent' => $currentContent,
             )
-        ))->setCharset('UTF-8');
+        ));
     }
 
     /**

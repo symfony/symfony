@@ -38,7 +38,6 @@ class CliDumperTest extends \PHPUnit_Framework_TestCase
         ob_start();
         $dumper->dump($data);
         $out = ob_get_clean();
-        $closureLabel = PHP_VERSION_ID >= 50400 ? 'public method' : 'function';
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res1 = (int) $var['res'];
@@ -77,7 +76,7 @@ array:25 [
   }
   "closure" => Closure {#%d
     reflection: """
-      Closure [ <user> {$closureLabel} Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
+      Closure [ <user%S> %s Symfony\Component\VarDumper\Tests\Fixture\{closure} ] {
         @@ {$var['file']} {$var['line']} - {$var['line']}
 
         - Parameters [2] {
@@ -101,6 +100,85 @@ array:25 [
   "file" => "{$var['file']}"
   b"bin-key-é" => ""
 ]
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
+    public function testThrowingCaster()
+    {
+        $out = fopen('php://memory', 'r+b');
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+        $cloner->addCasters(array(
+            ':stream' => function () {
+                throw new \Exception('Foobar');
+            },
+        ));
+        $line = __LINE__ - 3;
+        $file = __FILE__;
+        $ref = (int) $out;
+
+        $data = $cloner->cloneVar($out);
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertStringMatchesFormat(
+            <<<EOTXT
+:stream {@{$ref}
+  wrapper_type: "PHP"
+  stream_type: "MEMORY"
+  mode: "w+b"
+  unread_bytes: 0
+  seekable: true
+  uri: "php://memory"
+  timed_out: false
+  blocked: true
+  eof: false
+  options: []
+  ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {#%d
+    #message: "Unexpected Exception thrown from a caster: Foobar"
+    trace: array:1 [
+      0 => array:2 [
+        "call" => "%s{closure}()"
+        "file" => "{$file}:{$line}"
+      ]
+    ]
+  }
+}
+
+EOTXT
+            ,
+            $out
+        );
+    }
+
+    public function testRefsInProperties()
+    {
+        $var = (object) array('foo' => 'foo');
+        $var->bar =& $var->foo;
+
+        $dumper = new CliDumper();
+        $dumper->setColors(false);
+        $cloner = new VarCloner();
+
+        $out = fopen('php://memory', 'r+b');
+        $data = $cloner->cloneVar($var);
+        $dumper->dump($data, $out);
+        rewind($out);
+        $out = stream_get_contents($out);
+
+        $this->assertStringMatchesFormat(
+            <<<EOTXT
+{#%d
+  +"foo": &1 "foo"
+  +"bar": &1 "foo"
+}
 
 EOTXT
             ,

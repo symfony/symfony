@@ -99,20 +99,16 @@ class ProfilerController
             throw new NotFoundHttpException(sprintf('Panel "%s" is not available for token "%s".', $panel, $token));
         }
 
-        return Response::create(
-            $this->twig->render($this->getTemplateManager()->getName($profile, $panel), array(
-                'token' => $token,
-                'profile' => $profile,
-                'collector' => $profile->getCollector($panel),
-                'panel' => $panel,
-                'page' => $page,
-                'request' => $request,
-                'templates' => $this->getTemplateManager()->getTemplates($profile),
-                'is_ajax' => $request->isXmlHttpRequest(),
-            )),
-            200,
-            array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+        return new Response($this->twig->render($this->getTemplateManager()->getName($profile, $panel), array(
+            'token' => $token,
+            'profile' => $profile,
+            'collector' => $profile->getCollector($panel),
+            'panel' => $panel,
+            'page' => $page,
+            'request' => $request,
+            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'is_ajax' => $request->isXmlHttpRequest(),
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -151,13 +147,9 @@ class ProfilerController
 
         $this->profiler->disable();
 
-        return Response::create(
-            $this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
-                'about' => $about,
-            )),
-            200,
-            array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+        return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
+            'about' => $about,
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -205,17 +197,13 @@ class ProfilerController
             // the profiler is not enabled
         }
 
-        return Response::create(
-            $this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
-                'position' => $position,
-                'profile' => $profile,
-                'templates' => $this->getTemplateManager()->getTemplates($profile),
-                'profiler_url' => $url,
-                'token' => $token,
-            )),
-            200,
-            array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+        return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
+            'position' => $position,
+            'profile' => $profile,
+            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'profiler_url' => $url,
+            'token' => $token,
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -253,7 +241,7 @@ class ProfilerController
             $token = $session->get('_profiler_search_token');
         }
 
-        return Response::create(
+        return new Response(
             $this->twig->render('@WebProfiler/Profiler/search.html.twig', array(
                 'token' => $token,
                 'ip' => $ip,
@@ -266,7 +254,7 @@ class ProfilerController
             )),
             200,
             array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+        );
     }
 
     /**
@@ -296,22 +284,18 @@ class ProfilerController
         $end = $request->query->get('end', null);
         $limit = $request->query->get('limit');
 
-        return Response::create(
-            $this->twig->render('@WebProfiler/Profiler/results.html.twig', array(
-                'token' => $token,
-                'profile' => $profile,
-                'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
-                'ip' => $ip,
-                'method' => $method,
-                'url' => $url,
-                'start' => $start,
-                'end' => $end,
-                'limit' => $limit,
-                'panel' => null,
-            )),
-            200,
-            array('Content-Type' => 'text/html')
-        )->setCharset('UTF-8');
+        return new Response($this->twig->render('@WebProfiler/Profiler/results.html.twig', array(
+            'token' => $token,
+            'profile' => $profile,
+            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end),
+            'ip' => $ip,
+            'method' => $method,
+            'url' => $url,
+            'start' => $start,
+            'end' => $end,
+            'limit' => $limit,
+            'panel' => null,
+        )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**
@@ -385,7 +369,7 @@ class ProfilerController
         phpinfo();
         $phpinfo = ob_get_clean();
 
-        return Response::create($phpinfo, 200, array('Content-Type' => 'text/html'))->setCharset('UTF-8');
+        return new Response($phpinfo, 200, array('Content-Type' => 'text/html'));
     }
 
     /**

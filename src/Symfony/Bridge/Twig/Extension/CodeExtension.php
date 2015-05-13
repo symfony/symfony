@@ -58,18 +58,18 @@ class CodeExtension extends \Twig_Extension
         $parts = explode('\\', $class);
         $short = array_pop($parts);
 
-        return sprintf("<abbr title=\"%s\">%s</abbr>", $class, $short);
+        return sprintf('<abbr title="%s">%s</abbr>', $class, $short);
     }
 
     public function abbrMethod($method)
     {
         if (false !== strpos($method, '::')) {
             list($class, $method) = explode('::', $method, 2);
-            $result = sprintf("%s::%s()", $this->abbrClass($class), $method);
+            $result = sprintf('%s::%s()', $this->abbrClass($class), $method);
         } elseif ('Closure' === $method) {
-            $result = sprintf("<abbr title=\"%s\">%s</abbr>", $method, $method);
+            $result = sprintf('<abbr title="%s">%s</abbr>', $method, $method);
         } else {
-            $result = sprintf("<abbr title=\"%s\">%s</abbr>()", $method, $method);
+            $result = sprintf('<abbr title="%s">%s</abbr>()', $method, $method);
         }
 
         return $result;
@@ -89,9 +89,9 @@ class CodeExtension extends \Twig_Extension
             if ('object' === $item[0]) {
                 $parts = explode('\\', $item[1]);
                 $short = array_pop($parts);
-                $formattedValue = sprintf("<em>object</em>(<abbr title=\"%s\">%s</abbr>)", $item[1], $short);
+                $formattedValue = sprintf('<em>object</em>(<abbr title="%s">%s</abbr>)', $item[1], $short);
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
             } elseif ('string' === $item[0]) {
                 $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES, $this->charset));
             } elseif ('null' === $item[0]) {
@@ -212,6 +212,9 @@ class CodeExtension extends \Twig_Extension
         }, $text);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'code';

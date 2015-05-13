@@ -27,7 +27,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsAttribute($attribute, $supported)
     {
-        list($voter, , $permissionMap, ,) = $this->getVoter(true, false);
+        list($voter, , $permissionMap) = $this->getVoter(true, false);
 
         $permissionMap
             ->expects($this->once())
@@ -44,7 +44,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsAttributeNonString($attribute)
     {
-        list($voter, , , , ,) = $this->getVoter(true, false);
+        list($voter) = $this->getVoter(true, false);
 
         $this->assertFalse($voter->supportsAttribute($attribute));
     }
@@ -72,7 +72,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsClass($class)
     {
-        list($voter, , , ,) = $this->getVoter();
+        list($voter) = $this->getVoter();
 
         $this->assertTrue($voter->supportsClass($class));
     }
@@ -88,7 +88,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 
     public function testVote()
     {
-        list($voter, , $permissionMap, ,) = $this->getVoter();
+        list($voter, , $permissionMap) = $this->getVoter();
         $permissionMap
             ->expects($this->atLeastOnce())
             ->method('getMasks')
@@ -103,7 +103,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVoteWhenNoObjectIsPassed($allowIfObjectIdentityUnavailable)
     {
-        list($voter, , $permissionMap, ,) = $this->getVoter($allowIfObjectIdentityUnavailable);
+        list($voter, , $permissionMap) = $this->getVoter($allowIfObjectIdentityUnavailable);
         $permissionMap
             ->expects($this->once())
             ->method('getMasks')
@@ -124,7 +124,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVoteWhenOidStrategyReturnsNull($allowIfUnavailable)
     {
-        list($voter, , $permissionMap, $oidStrategy,) = $this->getVoter($allowIfUnavailable);
+        list($voter, , $permissionMap, $oidStrategy) = $this->getVoter($allowIfUnavailable);
         $permissionMap
             ->expects($this->once())
             ->method('getMasks')

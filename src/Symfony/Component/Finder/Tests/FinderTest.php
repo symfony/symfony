@@ -132,8 +132,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     /**
      * @dataProvider getRegexNameTestData
-     *
-     * @group regexName
      */
     public function testRegexName($adapter, $regex)
     {
@@ -392,7 +390,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePath();
         }
 
-        $ref = array("", "", "", "", "foo", "");
+        $ref = array('', '', '', '', 'foo', '');
 
         sort($ref);
         sort($paths);
@@ -413,7 +411,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             $paths[] = $file->getRelativePathname();
         }
 
-        $ref = array("test.php", "toto", "test.py", "foo", "foo".DIRECTORY_SEPARATOR."bar.tmp", "foo bar");
+        $ref = array('test.php', 'toto', 'test.py', 'foo', 'foo'.DIRECTORY_SEPARATOR.'bar.tmp', 'foo bar');
 
         sort($paths);
         sort($ref);
@@ -506,7 +504,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     /**
      * @dataProvider getContainsTestData
-     * @group grep
      */
     public function testContains($adapter, $matchPatterns, $noMatchPatterns, $expected)
     {

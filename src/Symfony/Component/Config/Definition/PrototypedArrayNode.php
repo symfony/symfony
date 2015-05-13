@@ -117,7 +117,7 @@ class PrototypedArrayNode extends ArrayNode
         if (null === $children) {
             $this->defaultChildren = array('defaults');
         } else {
-            $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+            $this->defaultChildren = is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
     }
 
@@ -231,7 +231,7 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $isAssoc = array_keys($value) !== range(0, count($value) -1);
+        $isAssoc = array_keys($value) !== range(0, count($value) - 1);
         $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {

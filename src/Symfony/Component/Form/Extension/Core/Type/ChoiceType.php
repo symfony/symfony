@@ -134,7 +134,7 @@ class ChoiceType extends AbstractType
             // Add "[]" to the name in case a select tag with multiple options is
             // displayed. Otherwise only one of the selected options is sent in the
             // POST request.
-            $view->vars['full_name'] = $view->vars['full_name'].'[]';
+            $view->vars['full_name'] .= '[]';
         }
     }
 
@@ -163,7 +163,7 @@ class ChoiceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $choiceListCache = & $this->choiceListCache;
+        $choiceListCache = &$this->choiceListCache;
 
         $choiceList = function (Options $options) use (&$choiceListCache) {
             // Harden against NULL values (like in EntityType and ModelType)

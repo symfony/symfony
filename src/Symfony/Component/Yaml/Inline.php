@@ -129,7 +129,7 @@ class Inline
                     setlocale(LC_NUMERIC, 'C');
                 }
                 if (is_float($value)) {
-                    $repr = strval($value);
+                    $repr = (string) $value;
                     if (is_infinite($value)) {
                         $repr = str_ireplace('INF', '.Inf', $repr);
                     } elseif (floor($value) == $value && $repr == $value) {
@@ -137,7 +137,7 @@ class Inline
                         $repr = '!!float '.$repr;
                     }
                 } else {
-                    $repr = is_string($value) ? "'$value'" : strval($value);
+                    $repr = is_string($value) ? "'$value'" : (string) $value;
                 }
                 if (false !== $locale) {
                     setlocale(LC_NUMERIC, $locale);
@@ -149,6 +149,7 @@ class Inline
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
             case Escaper::requiresSingleQuoting($value):
+            case preg_match(self::getHexRegex(), $value):
             case preg_match(self::getTimestampRegex(), $value):
                 return Escaper::escapeWithSingleQuotes($value);
             default:
@@ -169,8 +170,9 @@ class Inline
     {
         // array
         $keys = array_keys($value);
-        if ((1 == count($keys) && '0' == $keys[0])
-            || (count($keys) > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) == count($keys) * (count($keys) - 1) / 2)
+        $keysCount = count($keys);
+        if ((1 === $keysCount && '0' == $keys[0])
+            || ($keysCount > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) === $keysCount * ($keysCount - 1) / 2)
         ) {
             $output = array();
             foreach ($value as $val) {
@@ -285,7 +287,7 @@ class Inline
     {
         $output = array();
         $len = strlen($sequence);
-        $i += 1;
+        ++$i;
 
         // [foo, bar, ...]
         while ($i < $len) {
@@ -344,7 +346,7 @@ class Inline
     {
         $output = array();
         $len = strlen($mapping);
-        $i += 1;
+        ++$i;
 
         // {foo: bar, bar:foo, ...}
         while ($i < $len) {
@@ -466,7 +468,7 @@ class Inline
                     case 0 === strpos($scalar, '!str'):
                         return (string) substr($scalar, 5);
                     case 0 === strpos($scalar, '! '):
-                        return intval(self::parseScalar(substr($scalar, 2)));
+                        return (int) self::parseScalar(substr($scalar, 2));
                     case 0 === strpos($scalar, '!!php/object:'):
                         if (self::$objectSupport) {
                             return unserialize(substr($scalar, 13));
@@ -481,23 +483,24 @@ class Inline
                         return (float) substr($scalar, 8);
                     case ctype_digit($scalar):
                         $raw = $scalar;
-                        $cast = intval($scalar);
+                        $cast = (int) $scalar;
 
                         return '0' == $scalar[0] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
                         $raw = $scalar;
-                        $cast = intval($scalar);
+                        $cast = (int) $scalar;
 
-                        return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                        return '0' == $scalar[1] ? octdec($scalar) : (((string) $raw === (string) $cast) ? $cast : $raw);
                     case is_numeric($scalar):
-                        return '0x' == $scalar[0].$scalar[1] ? hexdec($scalar) : floatval($scalar);
+                    case preg_match(self::getHexRegex(), $scalar):
+                        return '0x' === $scalar[0].$scalar[1] ? hexdec($scalar) : (float) $scalar;
                     case '.inf' === $scalarLower:
                     case '.nan' === $scalarLower:
                         return -log(0);
                     case '-.inf' === $scalarLower:
                         return log(0);
                     case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $scalar):
-                        return floatval(str_replace(',', '', $scalar));
+                        return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         return strtotime($scalar);
                 }
@@ -529,5 +532,15 @@ class Inline
         (?::(?P<tz_minute>[0-9][0-9]))?))?)?
         $~x
 EOF;
+    }
+
+    /**
+     * Gets a regex that matches a YAML number in hexadecimal notation.
+     *
+     * @return string
+     */
+    private static function getHexRegex()
+    {
+        return '~^0x[0-9a-f]++$~i';
     }
 }

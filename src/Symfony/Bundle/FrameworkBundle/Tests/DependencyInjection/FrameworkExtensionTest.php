@@ -359,7 +359,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testValidationPaths()
     {
-        require_once __DIR__."/Fixtures/TestBundle/TestBundle.php";
+        require_once __DIR__.'/Fixtures/TestBundle/TestBundle.php';
 
         $container = $this->createContainerFromFile('validation_annotations', array(
             'kernel.bundles' => array('TestBundle' => 'Symfony\Bundle\FrameworkBundle\Tests\TestBundle'),

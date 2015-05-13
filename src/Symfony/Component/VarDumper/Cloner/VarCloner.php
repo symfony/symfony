@@ -38,8 +38,9 @@ class VarCloner extends AbstractCloner
         $maxItems = $this->maxItems;
         $maxString = $this->maxString;
         $cookie = (object) array();     // Unique object used to detect hard references
+        $gid = uniqid(mt_rand(), true); // Unique string used to detect the special $GLOBALS variable
         $a = null;                      // Array cast for nested structures
-        $stub = null;                   // Stub capturing the main properties of an original item value,
+        $stub = null;                   // Stub capturing the main properties of an original item value
                                         // or null if the original value is used directly
         $zval = array(                  // Main properties of the current value
             'type' => null,
@@ -118,20 +119,24 @@ class VarCloner extends AbstractCloner
                             $stub = $arrayRefs[$len] = new Stub();
                             $stub->type = Stub::TYPE_ARRAY;
                             $stub->class = Stub::ARRAY_ASSOC;
-                            $stub->value = $zval['array_count'] ?: count($v);
 
+                            // Copies of $GLOBALS have very strange behavior,
+                            // let's detect them with some black magic
                             $a = $v;
-                            $a[] = null;
-                            $h = count($v);
-                            array_pop($a);
+                            $a[$gid] = true;
 
                             // Happens with copies of $GLOBALS
-                            if ($h !== $stub->value) {
+                            if (isset($v[$gid])) {
+                                unset($v[$gid]);
                                 $a = array();
                                 foreach ($v as $gk => &$gv) {
                                     $a[$gk] =& $gv;
                                 }
+                            } else {
+                                $a = $v;
                             }
+
+                            $stub->value = $zval['array_count'] ?: count($a);
                         }
                         break;
 

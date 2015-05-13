@@ -103,8 +103,8 @@ class UniqueEntityValidator extends ConstraintValidator
 
                 if (count($relatedId) > 1) {
                     throw new ConstraintDefinitionException(
-                        "Associated entities are not allowed to have more than one identifier field to be ".
-                        "part of a unique constraint in: ".$class->getName()."#".$fieldName
+                        'Associated entities are not allowed to have more than one identifier field to be '.
+                        'part of a unique constraint in: '.$class->getName().'#'.$fieldName
                     );
                 }
                 $criteria[$fieldName] = array_pop($relatedId);

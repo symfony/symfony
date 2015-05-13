@@ -78,7 +78,10 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->setMetadata((string) $source, array('notes' => $notes), $domain);
             }
         }
-        $catalogue->addResource(new FileResource($resource));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource));
+        }
 
         return $catalogue;
     }
@@ -171,7 +174,7 @@ class XliffFileLoader implements LoaderInterface
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),
-                $error->file ? $error->file : 'n/a',
+                $error->file ?: 'n/a',
                 $error->line,
                 $error->column
             );

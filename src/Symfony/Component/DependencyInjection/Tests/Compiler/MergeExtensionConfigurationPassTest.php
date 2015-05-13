@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;

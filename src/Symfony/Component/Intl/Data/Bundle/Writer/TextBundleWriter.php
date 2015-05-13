@@ -145,7 +145,7 @@ class TextBundleWriter implements BundleWriterInterface
             fprintf($file, "%s%d,\n", str_repeat('    ', $indentation + 1), $int);
         }
 
-        fprintf($file, "%s}", str_repeat('    ', $indentation));
+        fprintf($file, '%s}', str_repeat('    ', $indentation));
     }
 
     /**
@@ -212,7 +212,7 @@ class TextBundleWriter implements BundleWriterInterface
         }
 
         if (!$fallback) {
-            fwrite($file, ":table(nofallback)");
+            fwrite($file, ':table(nofallback)');
         }
 
         fwrite($file, "{\n");

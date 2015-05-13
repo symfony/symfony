@@ -48,8 +48,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             '.' => 'dot as a key',
             '.\'\'.' => 'concatenation as a key',
             '\'\'.' => 'concatenation from the start key',
-            'optimize concatenation' => "string1%some_string%string2",
-            'optimize concatenation with empty string' => "string1%empty_value%string2",
+            'optimize concatenation' => 'string1%some_string%string2',
+            'optimize concatenation with empty string' => 'string1%empty_value%string2',
             'optimize concatenation from the start' => '%empty_value%start',
             'optimize concatenation at the end' => 'end%empty_value%',
         ));
@@ -74,8 +74,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $container = new ContainerBuilder();
         $container->setDefinition('test', $definition);
-        $container->setParameter('foo', 'wiz'.dirname(dirname(__FILE__)));
-        $container->setParameter('bar', dirname(__FILE__));
+        $container->setParameter('foo', 'wiz'.dirname(__DIR__));
+        $container->setParameter('bar', __DIR__);
         $container->setParameter('baz', '%bar%/PhpDumperTest.php');
         $container->setParameter('buz', dirname(dirname(__DIR__)));
         $container->compile();

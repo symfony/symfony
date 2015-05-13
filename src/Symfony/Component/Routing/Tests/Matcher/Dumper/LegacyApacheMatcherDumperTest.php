@@ -15,6 +15,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\Dumper\ApacheMatcherDumper;
 
+/**
+ * @group legacy
+ */
 class LegacyApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $fixturesPath;
@@ -24,7 +27,7 @@ class LegacyApacheMatcherDumperTest extends \PHPUnit_Framework_TestCase
         self::$fixturesPath = realpath(__DIR__.'/../../Fixtures/');
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $this->iniSet('error_reporting', -1 & ~E_USER_DEPRECATED);
     }

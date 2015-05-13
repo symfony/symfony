@@ -33,16 +33,16 @@ class FormFieldRegistry
     {
         $segments = $this->getSegments($field->getName());
 
-        $target = & $this->fields;
+        $target = &$this->fields;
         while ($segments) {
             if (!is_array($target)) {
                 $target = array();
             }
             $path = array_shift($segments);
             if ('' === $path) {
-                $target = & $target[];
+                $target = &$target[];
             } else {
-                $target = & $target[$path];
+                $target = &$target[$path];
             }
         }
         $target = $field;
@@ -58,13 +58,13 @@ class FormFieldRegistry
     public function remove($name)
     {
         $segments = $this->getSegments($name);
-        $target = & $this->fields;
+        $target = &$this->fields;
         while (count($segments) > 1) {
             $path = array_shift($segments);
             if (!array_key_exists($path, $target)) {
                 return;
             }
-            $target = & $target[$path];
+            $target = &$target[$path];
         }
         unset($target[array_shift($segments)]);
     }
@@ -82,13 +82,13 @@ class FormFieldRegistry
     public function &get($name)
     {
         $segments = $this->getSegments($name);
-        $target = & $this->fields;
+        $target = &$this->fields;
         while ($segments) {
             $path = array_shift($segments);
             if (!array_key_exists($path, $target)) {
                 throw new \InvalidArgumentException(sprintf('Unreachable field "%s"', $path));
             }
-            $target = & $target[$path];
+            $target = &$target[$path];
         }
 
         return $target;
@@ -123,7 +123,7 @@ class FormFieldRegistry
      */
     public function set($name, $value)
     {
-        $target = & $this->get($name);
+        $target = &$this->get($name);
         if (!is_array($value) || $target instanceof Field\ChoiceFormField) {
             $target->setValue($value);
         } else {
@@ -176,7 +176,7 @@ class FormFieldRegistry
     private function walk(array $array, $base = '', array &$output = array())
     {
         foreach ($array as $k => $v) {
-            $path = empty($base) ? $k : sprintf("%s[%s]", $base, $k);
+            $path = empty($base) ? $k : sprintf('%s[%s]', $base, $k);
             if (is_array($v)) {
                 $this->walk($v, $path, $output);
             } else {

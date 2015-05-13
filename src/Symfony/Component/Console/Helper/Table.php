@@ -179,7 +179,7 @@ class Table
         reset($this->rows);
 
         foreach ($row as $key => $cellValue) {
-            if (!strstr($cellValue, "\n")) {
+            if (false === strpos($cellValue, "\n")) {
                 continue;
             }
 

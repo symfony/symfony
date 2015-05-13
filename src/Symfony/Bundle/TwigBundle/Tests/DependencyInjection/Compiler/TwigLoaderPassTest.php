@@ -29,7 +29,7 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
      */
     private $pass;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->builder = $this->getMock(
             'Symfony\Component\DependencyInjection\ContainerBuilder',

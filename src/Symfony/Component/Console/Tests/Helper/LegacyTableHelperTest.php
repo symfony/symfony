@@ -14,6 +14,9 @@ namespace Symfony\Component\Console\Tests\Helper;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 
+/**
+ * @group legacy
+ */
 class LegacyTableHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $stream;
@@ -178,10 +181,10 @@ TABLE
             array(
                 array('ISBN', 'Title', 'Author'),
                 array(
-                    array("99921-58-10-7", "Divine\nComedy", "Dante Alighieri"),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("9971-5-0210-2", "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
-                    array("960-425-059-0", "The Lord of the Rings", "J. R. R.\nTolkien"),
+                    array('99921-58-10-7', "Divine\nComedy", 'Dante Alighieri'),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('9971-5-0210-2', "Harry Potter\nand the Chamber of Secrets", "Rowling\nJoanne K."),
+                    array('960-425-059-0', 'The Lord of the Rings', "J. R. R.\nTolkien"),
                 ),
                 TableHelper::LAYOUT_DEFAULT,
 <<<TABLE

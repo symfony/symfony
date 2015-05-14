@@ -13,6 +13,9 @@ namespace Symfony\Component\HttpKernel;
 
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -31,7 +34,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
 use Symfony\Component\HttpKernel\DependencyInjection\AddClassesToCachePass;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 
 /**
@@ -60,6 +62,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected $startTime;
     protected $loadClassCache;
 
+    /**
+     * @var ConfigCacheFactoryInterface
+     */
+    private $configCacheFactory;
+
     const VERSION = '2.7.0-DEV';
     const VERSION_ID = '20700';
     const MAJOR_VERSION = '2';
@@ -73,17 +80,19 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Constructor.
      *
-     * @param string $environment The environment
-     * @param bool   $debug       Whether to enable debugging or not
+     * @param string                      $environment        The environment
+     * @param bool                        $debug              Whether to enable debugging or not
+     * @param ConfigCacheFactoryInterface $configCacheFactory The factory used to create the config cache
      *
      * @api
      */
-    public function __construct($environment, $debug)
+    public function __construct($environment, $debug, ConfigCacheFactoryInterface $configCacheFactory = null)
     {
         $this->environment = $environment;
         $this->debug = (bool) $debug;
         $this->rootDir = $this->getRootDir();
         $this->name = $this->getName();
+        $this->configCacheFactory = $configCacheFactory ?: new ConfigCacheFactory($this->debug);
 
         if ($this->debug) {
             $this->startTime = microtime(true);
@@ -539,15 +548,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function initializeContainer()
     {
         $class = $this->getContainerClass();
-        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
+        $that = $this; // needed for compatibility with PHP 5.3, to be removed in Symfony 3.0
         $fresh = true;
-        if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
+        $cache = $this->configCacheFactory->cache($this->getCacheDir().'/'.$class.'.php', function (ConfigCacheInterface $cache) use ($that, &$fresh) {
+            $container = $that->buildContainer();
             $container->compile();
-            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+            $that->dumpContainer($cache, $container, $that->getContainerClass(), $that->getContainerBaseClass());
 
             $fresh = false;
-        }
+        });
 
         require_once $cache->getPath();
 
@@ -684,12 +693,12 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     /**
      * Dumps the service container to PHP code in the cache.
      *
-     * @param ConfigCache      $cache     The config cache
-     * @param ContainerBuilder $container The service container
-     * @param string           $class     The name of the class to generate
-     * @param string           $baseClass The name of the container's base class
+     * @param ConfigCacheInterface $cache     The config cache
+     * @param ContainerBuilder     $container The service container
+     * @param string               $class     The name of the class to generate
+     * @param string               $baseClass The name of the container's base class
      */
-    protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
+    protected function dumpContainer(ConfigCacheInterface $cache, ContainerBuilder $container, $class, $baseClass)
     {
         // cache the container
         $dumper = new PhpDumper($container);

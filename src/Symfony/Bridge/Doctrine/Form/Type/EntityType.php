@@ -23,7 +23,7 @@ class EntityType extends DoctrineType
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        
+
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
@@ -37,11 +37,11 @@ class EntityType extends DoctrineType
 
             return $queryBuilder;
         };
-        
+
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
         $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
-    
+
     /**
      * Return the default loader object.
      *
@@ -59,5 +59,24 @@ class EntityType extends DoctrineType
     public function getName()
     {
         return 'entity';
+    }
+
+    /**
+     * We consider two query builders with an equal SQL string and
+     * equal parameters to be equal.
+     * 
+     * @param QueryBuilder $queryBuilder
+     * 
+     * @return array
+     * 
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    {
+        return array(
+                $queryBuilder->getQuery()->getSQL(),
+                $queryBuilder->getParameters()->toArray(),
+        );
     }
 }

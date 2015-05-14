@@ -90,6 +90,24 @@ abstract class DoctrineType extends AbstractType
         return (string) $value;
     }
 
+    /**
+     * Gets important parts from QueryBuilder that will allow to cache its results.
+     * For instance in ORM two query builders with an equal SQL string and
+     * equal parameters are considered to be equal.
+     * 
+     * @param object $queryBuilder
+     * 
+     * @return array|false Array with important QueryBuilder parts or false if
+     *                     they can't be determined
+     * 
+     * @internal This method is public to be usable as callback. It should not
+     *           be used in user code.
+     */
+    public function getQueryBuilderPartsForCachingHash($queryBuilder)
+    {
+        return false;
+    }
+
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
         $this->registry = $registry;
@@ -115,29 +133,28 @@ abstract class DoctrineType extends AbstractType
         $type = $this;
 
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
-            // This closure and the "query_builder" options should be pushed to
-            // EntityType in Symfony 3.0 as they are specific to the ORM
 
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
-                // We consider two query builders with an equal SQL string and
-                // equal parameters to be equal
-                $qbParts = $options['query_builder'] instanceof \Doctrine\ORM\QueryBuilder
-                    ? array(
-                        $options['query_builder']->getQuery()->getSQL(),
-                        $options['query_builder']->getParameters()->toArray(),
-                    )
-                    : null;
 
-                $hash = CachingFactoryDecorator::generateHash(array(
-                    $options['em'],
-                    $options['class'],
-                    $qbParts,
-                    $options['loader'],
-                ));
+                $hash = null;
+                $qbParts = null;
 
-                if (isset($choiceLoaders[$hash])) {
-                    return $choiceLoaders[$hash];
+                // If there is no QueryBuilder we can safely cache DoctrineChoiceLoader,
+                // also if concrete Type can return important QueryBuilder parts to generate
+                // hash key we go for it as well
+                if (!$options['query_builder'] || false !== ($qbParts = $type->getQueryBuilderPartsForCachingHash($options['query_builder']))) {
+
+                    $hash = CachingFactoryDecorator::generateHash(array(
+                        $options['em'],
+                        $options['class'],
+                        $qbParts,
+                        $options['loader'],
+                    ));
+
+                    if (isset($choiceLoaders[$hash])) {
+                        return $choiceLoaders[$hash];
+                    }
                 }
 
                 if ($options['loader']) {
@@ -149,7 +166,7 @@ abstract class DoctrineType extends AbstractType
                     $entityLoader = $type->getLoader($options['em'], $queryBuilder, $options['class']);
                 }
 
-                $choiceLoaders[$hash] = new DoctrineChoiceLoader(
+                $doctrineChoiceLoader = new DoctrineChoiceLoader(
                     $choiceListFactory,
                     $options['em'],
                     $options['class'],
@@ -157,7 +174,11 @@ abstract class DoctrineType extends AbstractType
                     $entityLoader
                 );
 
-                return $choiceLoaders[$hash];
+                if ($hash !== null) {
+                    $choiceLoaders[$hash] = $doctrineChoiceLoader;
+                }
+
+                return $doctrineChoiceLoader;
             }
         };
 

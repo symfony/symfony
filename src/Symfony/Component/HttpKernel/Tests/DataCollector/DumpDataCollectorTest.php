@@ -71,7 +71,11 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $collector->collect(new Request(), new Response());
         $output = ob_get_clean();
 
-        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
+        if (PHP_VERSION_ID >= 50400) {
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
+        } else {
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n123\n", $output);
+        }
     }
 
     public function testCollectHtml()
@@ -84,8 +88,8 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $line = __LINE__ - 1;
         $file = __FILE__;
         $xOutput = <<<EOTXT
-
-<span class="sf-dump-meta"><a href="test://{$file}:{$line}" title="{$file}">DumpDataCollectorTest.php</a> on line {$line}:</span> <pre class=sf-dump id=sf-dump data-indent-pad="  "><span class=sf-dump-num>123</span>
+ <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
+<span class=sf-dump-num>123</span>
 </pre>
 
 EOTXT;
@@ -110,6 +114,10 @@ EOTXT;
 
         ob_start();
         $collector = null;
-        $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+        if (PHP_VERSION_ID >= 50400) {
+            $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
+        } else {
+            $this->assertSame("\"DumpDataCollectorTest.php on line {$line}:\"\n456\n", ob_get_clean());
+        }
     }
 }

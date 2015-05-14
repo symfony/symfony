@@ -75,7 +75,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 
     public function testLogLongString()
     {
-        $logger = $this->getMock('Symfony\\Component\\HttpKernel\\Log\\LoggerInterface');
+        $logger = $this->getMock('Psr\\Log\\LoggerInterface');
 
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')
@@ -107,7 +107,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Testing log shortening of utf8 charsets requires the mb_detect_encoding() function.');
         }
 
-        $logger = $this->getMock('Symfony\\Component\\HttpKernel\\Log\\LoggerInterface');
+        $logger = $this->getMock('Psr\\Log\\LoggerInterface');
 
         $dbalLogger = $this
             ->getMockBuilder('Symfony\\Bridge\\Doctrine\\Logger\\DbalLogger')

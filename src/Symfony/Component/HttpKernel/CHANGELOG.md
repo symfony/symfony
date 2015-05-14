@@ -6,6 +6,24 @@ CHANGELOG
 
  * removed `Symfony\Component\HttpKernel\Kernel::init()`
  * removed `Symfony\Component\HttpKernel\Kernel::isClassInActiveBundle()` and `Symfony\Component\HttpKernel\KernelInterface::isClassInActiveBundle()`
+ * removed `Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher::setProfiler()`
+ * removed `Symfony\Component\HttpKernel\EventListener\FragmentListener::getLocalIpAddresses()`
+ * removed `Symfony\Component\HttpKernel\EventListener\LocaleListener::setRequest()`
+ * removed `Symfony\Component\HttpKernel\EventListener\RouterListener::setRequest()`
+ * removed `Symfony\Component\HttpKernel\EventListener\ProfilerListener::onKernelRequest()`
+ * removed `Symfony\Component\HttpKernel\Fragment\FragmentHandler::setRequest()`
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::hasSurrogateEsiCapability()` 
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::addSurrogateEsiCapability()` 
+ * removed `Symfony\Component\HttpKernel\HttpCache\Esi::needsEsiParsing()`
+ * removed `Symfony\Component\HttpKernel\HttpCache\HttpCache::getEsi()`
+ * removed `Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel`
+ * removed `Symfony\Component\HttpKernel\DependencyInjection\RegisterListenersPass`
+ * removed `Symfony\Component\HttpKernel\EventListener\ErrorsLoggerListener`
+ * removed `Symfony\Component\HttpKernel\EventListener\EsiListener`
+ * removed `Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategy`
+ * removed `Symfony\Component\HttpKernel\HttpCache\EsiResponseCacheStrategyInterface`
+ * removed `Symfony\Component\HttpKernel\Log\LoggerInterface`
+ * removed `Symfony\Component\HttpKernel\Log\NullLogger`
 
 2.7.0
 -----

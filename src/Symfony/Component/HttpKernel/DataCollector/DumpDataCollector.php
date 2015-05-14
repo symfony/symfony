@@ -199,12 +199,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $dumps = array();
 
         foreach ($this->data as $dump) {
-            if (method_exists($dump['data'], 'withMaxDepth')) {
-                $dumper->dump($dump['data']->withMaxDepth($maxDepthLimit)->withMaxItemsPerDepth($maxItemsPerDepth));
-            } else {
-                // getLimitedClone is @deprecated, to be removed in 3.0
-                $dumper->dump($dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth));
-            }
+            $dumper->dump($dump['data']->withMaxDepth($maxDepthLimit)->withMaxItemsPerDepth($maxItemsPerDepth));
+            
             rewind($data);
             $dump['data'] = stream_get_contents($data);
             ftruncate($data, 0);

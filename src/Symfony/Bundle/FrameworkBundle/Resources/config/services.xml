@@ -9,9 +9,8 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="http_kernel" class="Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel">
+        <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel">
             <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
             <argument type="service" id="request_stack" />
         </service>

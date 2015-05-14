@@ -72,6 +72,7 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $output = ob_get_clean();
 
         $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n123\n", $output);
+        $this->assertSame(1, $collector->getDumpsCount());
     }
 
     public function testCollectHtml()
@@ -99,6 +100,7 @@ EOTXT;
         $output = preg_replace('/sf-dump-\d+/', 'sf-dump', $output);
 
         $this->assertSame($xOutput, $output);
+        $this->assertSame(1, $collector->getDumpsCount());
     }
 
     public function testFlush()

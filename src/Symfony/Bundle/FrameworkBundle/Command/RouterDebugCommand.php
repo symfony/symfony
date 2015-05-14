@@ -56,7 +56,7 @@ class RouterDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
                 new InputOption('show-controllers', null,  InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output route(s) in other formats', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output route(s) in other formats, available formats are ("txt", "xml", "json", "md")', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
             ))
             ->setDescription('Displays current routes for an application')

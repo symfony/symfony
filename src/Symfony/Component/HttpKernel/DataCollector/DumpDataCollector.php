@@ -35,13 +35,16 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $rootRefs;
     private $charset;
     private $dumper;
+    private $dumperIsInjected;
 
-    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null)
+    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null, DataDumperInterface $dumper = null)
     {
         $this->stopwatch = $stopwatch;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->charset = $charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8';
         $this->requestStack = $requestStack;
+        $this->dumper = $dumper;
+        $this->dumperIsInjected = null !== $dumper;
 
         // All clones share these properties by reference:
         $this->rootRefs = array(
@@ -170,7 +173,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->data = array();
         $this->dataCount = 0;
         $this->isCollected = true;
-        $this->dumper = null;
+        if (!$this->dumperIsInjected) {
+            $this->dumper = null;
+        }
 
         return $ser;
     }

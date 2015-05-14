@@ -35,13 +35,17 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private $rootRefs;
     private $charset;
     private $dumper;
+    private $dumperIsInjected;
+    private $output;
 
-    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null)
+    public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null, DataDumperInterface $dumper = null)
     {
         $this->stopwatch = $stopwatch;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->charset = $charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8';
         $this->requestStack = $requestStack;
+        $this->dumper = $dumper;
+        $this->dumperIsInjected = null !== $dumper;
 
         // All clones share these properties by reference:
         $this->rootRefs = array(
@@ -57,8 +61,10 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = ++$this->clonesCount;
     }
 
-    public function dump(Data $data)
+    public function dump(Data $data, $output = null)
     {
+        $this->output = $output;
+
         if ($this->stopwatch) {
             $this->stopwatch->start('dump');
         }
@@ -149,10 +155,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             || false === strripos($response->getContent(), '</body>')
         ) {
             if ($response->headers->has('Content-Type') && false !== strpos($response->headers->get('Content-Type'), 'html')) {
-                $this->dumper = new HtmlDumper('php://output', $this->charset);
+                $this->dumper = new HtmlDumper(null, $this->charset);
             } else {
-                $this->dumper = new CliDumper('php://output', $this->charset);
+                $this->dumper = new CliDumper(null, $this->charset);
             }
+            $this->output = 'php://output';
 
             foreach ($this->data as $dump) {
                 $this->doDump($dump['data'], $dump['name'], $dump['file'], $dump['line']);
@@ -170,7 +177,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->data = array();
         $this->dataCount = 0;
         $this->isCollected = true;
-        $this->dumper = null;
+        if (!$this->dumperIsInjected) {
+            $this->dumper = null;
+        }
 
         return $ser;
     }
@@ -225,6 +234,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if (0 === $this->clonesCount-- && !$this->isCollected && $this->data) {
             $this->clonesCount = 0;
             $this->isCollected = true;
+            $this->output = 'php://output';
 
             $h = headers_list();
             $i = count($h);
@@ -234,9 +244,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             }
 
             if ('cli' !== PHP_SAPI && stripos($h[$i], 'html')) {
-                $this->dumper = new HtmlDumper('php://output', $this->charset);
+                $this->dumper = new HtmlDumper(null, $this->charset);
             } else {
-                $this->dumper = new CliDumper('php://output', $this->charset);
+                $this->dumper = new CliDumper(null, $this->charset);
             }
 
             foreach ($this->data as $i => $dump) {
@@ -277,9 +287,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             $contextDumper($name, $file, $line, $this->fileLinkFormat);
         } else {
             $cloner = new VarCloner();
-            $this->dumper->dump($cloner->cloneVar($name.' on line '.$line.':'));
+            $this->dumper->dump($cloner->cloneVar($name.' on line '.$line.':'), $this->output);
         }
-        $this->dumper->dump($data);
+        $this->dumper->dump($data, $this->output);
     }
 
     private function htmlEncode($s)

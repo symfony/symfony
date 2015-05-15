@@ -31,6 +31,11 @@
         "symfony/security-csrf": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0"
     },
+    "conflict": {
+        "symfony/doctrine-bridge": "<2.7",
+        "symfony/framework-bundle": "<2.7",
+        "symfony/twig-bridge": "<2.7"
+    },
     "suggest": {
         "symfony/validator": "For form validation.",
         "symfony/security-csrf": "For protecting forms against CSRF attacks.",

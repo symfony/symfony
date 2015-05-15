@@ -52,11 +52,11 @@ class SymfonyStyle extends OutputStyle
     /**
      * Formats a message as a block of text.
      *
-     * @param string|array $messages  The message to write in the block
-     * @param string|null  $type      The block type (added in [] on first line)
-     * @param string|null  $style     The style to apply to the whole block
-     * @param string       $prefix    The prefix for the block
-     * @param bool         $padding   Whether to add vertical padding
+     * @param string|array $messages The message to write in the block
+     * @param string|null  $type     The block type (added in [] on first line)
+     * @param string|null  $style    The style to apply to the whole block
+     * @param string       $prefix   The prefix for the block
+     * @param bool         $padding  Whether to add vertical padding
      */
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
     {
@@ -85,7 +85,7 @@ class SymfonyStyle extends OutputStyle
 
         foreach ($lines as &$line) {
             $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', $this->lineLength - Helper::strlen($line));
+            $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);

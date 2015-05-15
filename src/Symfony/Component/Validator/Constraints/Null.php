@@ -19,4 +19,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @api
  */
-class Null extends IsNull {}
+class Null extends IsNull
+{
+}

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated `DefaultTranslator` in favor of `Symfony\Component\Translation\IdentityTranslator`
+ * deprecated PHP7-incompatible constraints (Null, True, False) and related validators (NullValidator, TrueValidator, FalseValidator) in favor of their `Is`-prefixed equivalent
 
 2.6.0
 -----

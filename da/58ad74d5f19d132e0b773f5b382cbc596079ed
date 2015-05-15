@@ -1,0 +1,373 @@
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-05T23:50:58Z
+
+We can actually provide the deprecated classes through a class_alias...
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-06T01:43:50Z
+
+You missed to rename the file `NullValidatorTest.php`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-06T08:19:30Z
+
+You should do the False and True constraints in the same PR I believe
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-06T09:29:57Z
+
+Do we really want to do that on 2.3? Deprecations are usually forbidden on 2.3.
+I'd personally be fine with having PHP7 being fully supported with 2.7 only.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2015-04-06T09:33:21Z
+
+About the new class name. What about `IsNull` instead ? That way we can write `Assert\IsNull`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-06T09:55:07Z
+
+We don't deprecate things in maintenance branches. This must be done in 2.7
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-04-06T11:44:22Z
+
+The only reason to add those deprecation in 2.3 would be to allow 2.3 to be PHP 7 compatible. Is that what we want?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-04-06T11:58:14Z
+
+What about `Nil` and `NotNil`?
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-06T12:02:12Z
+
+If 2.3 is still supported by the time PHP 7 comes out it would make sense to put this in 2.3, per https://github.com/symfony/symfony/issues/14086 we're quite close to being compatible so if we drop PHP 7 support it shouldn't be just because we're deprecating a few constraints :)
+
+Does anyone have any further ideas about new names for the following constraints, I've already seen the following:
+NotNull: NotNull (*as it's not a reserved word) / NotNil / IsNotNull / NotNullConstraint
+Null: Nil / IsNull  / NullConstraint
+True: Truthy / IsTrue / TrueConstraint
+False: Falsy / IsFalse / FalseConstraint
+
+---------------------------------------------------------------------------
+
+by sstok at 2015-04-06T12:13:05Z
+
+I would vote for isNull as its descriptive and consistent with isTrue.
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-06T13:15:39Z
+
+I will add the new True and False constraints to this PR as well once the Null constraint has been properly reviewed and once there's consensus on the new naming.
+
+Just FYI, this is currently causing a test failure on Drupal 8/PHP 7 as it uses the Null constraint in a test.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-06T13:53:17Z
+
+@WouterJ :+1: Also `Truthy` and `Falsy`. What do you think?
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-08T10:30:20Z
+
+Thanks all, just to be clear, what are we renaming these constraints to?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-08T12:00:36Z
+
+The NullValidator needs to be deprecated too
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-19T22:11:14Z
+
+Does this seem ready? What still needs to happen here?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T20:07:56Z
+
+@stefanruijsenaars the comment from @nicolas-grekas in https://github.com/symfony/symfony/pull/14228#issuecomment-89972754 has not been taken into account
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-21T20:08:59Z
+
+@stefanruijsenaars note that your commits are not associated to your github account (the email used when committing is not known by github). You might want to change this
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-22T19:55:05Z
+
+The `trigger_error` calls must be added. Oh this is for 2.3. Then these calls should be added in 2.7 i guess.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-04-22T20:00:07Z
+
+And the same approach should be done for `False` and `True`.
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-23T07:45:53Z
+
+As soon as I have confirmation that this looks good as far as Null is concerned I can do the same for False and True...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T07:58:41Z
+
+Is it possible that someone has type hinted `Constraints\Null` or `Constraints\NullValidator` (same question for False/True?)
+Because the new classes do not pass the deprecated hints, which is a BC break.
+To make it pass, we must make `IsNullValidator` extend the deprecated `NullValidator`.
+We must also alias `Null` when loading `IsNull`, and load IsNull from Null.php using class_exists (I know, I said the opposite yesterday, sorry for the mistake...)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T08:01:48Z
+
+Btw, there is no need for checking PHP_VERSION_ID. This should be done whatever the version of PHP. You should also use `__NAMESPACE__` instead of the literal namespace in class_exists
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T09:38:00Z
+
+@nicolas-grekas I don't see any reason for someone to typehint the NullValidator. constraint validators are used inside the validator, not inside your own code.
+
+And the version check needs to be done: we cannot create the ``Null`` alias on PHP 7 given it is a forbidden class name (which is precisely the reason for this renaming)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T09:49:30Z
+
+@stof OK for the PHP7 check (http://3v4l.org/t8u78)
+For the type hint, that does not mean we should not do it properly.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T09:53:30Z
+
+@nicolas-grekas when renaming a class, the best way to make it pass typehints is actually with a class_alias. It is the only way to make the typehint pass both ways (if you make the new class extend the old one, people using the deprecated class because they rely on the BC layer cannot call code typehinting the new class, which means you have to typehint the deprecated class everywhere, which is a pain)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T09:59:56Z
+
+@stof class_alias is terrible idea: it breaks the DebugClassLoader (or an equivalent strategy) from detecting deprecated use of inheritance.
+In this case, we have no choice, because for are forbidden from inheriting from the deprecated class (Null).
+Except in this specific case, having the new inherit from the deprecated is exactly the same type hint wise: new and old pass the old hints when the BC layer is in place. When the BC layer is removed, so is the class_alias, and hints break the same way in one case or another.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T10:14:52Z
+
+Oh, and we do not want the deprecated class to pass the new hints. If someone creates a new interface with a new hint, than you must give it a new object, not the old one.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T12:12:15Z
+
+@nicolas-grekas but this means that as long as we keep a BC layer in place, our code is forced to keep typehinting the deprecated class to have a BC layer working (otherwise, we would have to ensure that none of the new features can be called for cases where the user instantiated the BC layer, which can be hard, because it means we cannot rely on the new codebase to implement BC layers).
+
+If you look at existing BC layers, most places are extending classes in a way allowing BC classes to be passed to the codebase using the new typehint (allowing to update the code to stop relying on deprecated classes)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T13:13:48Z
+
+@stof our code is forced to keep the deprecated type hint. This is coherent with the BC policy that forbids changing it. For userland code, once a deprecation is added, all the symfony code base must be updated to use only the new objects so the new type hint can be used very fast.
+
+> most places are extending classes in a way allowing BC classes to be passed to the codebase using the new typehint
+
+I'm not sure of this. See #14223 for an example of what I'm thinking about. See also:
+```sh
+grep 'extends Legacy' -RI
+Component/Validator/Context/ExecutionContextInterface.php:interface ExecutionContextInterface extends LegacyExecutionContextInterface
+Component/Validator/Mapping/MetadataInterface.php:interface MetadataInterface extends LegacyMetadataInterface
+Component/Validator/Mapping/Factory/MetadataFactoryInterface.php:interface MetadataFactoryInterface extends LegacyMetadataFactoryInterface
+Component/Debug/Exception/FlattenException.php:class FlattenException extends LegacyFlattenException
+Component/Debug/Exception/FatalErrorException.php:class FatalErrorException extends LegacyFatalErrorException
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T13:14:58Z
+
+Not to say that class_alias() breaks static analyses also.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-23T14:03:21Z
+
+@nicolas-grekas static analysis tools could discover calls to ``class_alias`` (unless you use variables coming from elsewhere in it, the static analysis tool can know which alias is beign defined).
+
+Regarding the inheritance order, you found 5 occurrences. Now, count the number of deprecated classes we have doing things the opposite way. There are much more than 5.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-23T14:32:16Z
+
+The other occurrences are mistakes that have no consequences because they are not used as type hints.
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-24T14:35:54Z
+
+Could anyone summarize what changes we still need or is this still under
+discussion?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-26T08:16:51Z
+
+@stefanruijsenaars I just added a few minor comments, otherwise I'm :+1:
+
+The discussion was a bit more general with @stof and I'm fine with not applying my rant here: if nobody did type hint any of the deprecated classes, which looks likely, then the current patch won't break anyones code. If that holds false, we could easily fix it later. Currently, the patch is simpler, thus pragmatic.
+
+For triggering notices on top of this deprecation, #14472 will do the job.
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-26T15:33:29Z
+
+OK cool! @nicolas-grekas I have committed your changes and added True and False. Let's give
+this a final review so we can get this in :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-26T17:15:06Z
+
+Looks like a test is broken. Could you please squash the commits also?
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-04-26T22:37:26Z
+
+Could anyone clarify where the error in the checks and the failed build comes from? I don't see any test fails anymore...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-04T16:04:19Z
+
+@stefanruijsenaars can you please rebase and squash?
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-05-04T16:05:51Z
+
+Will do, but there still seem to be a couple of unexplained test failures.
+Are those just flukes?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-04T16:16:07Z
+
+Let's see if they still occur after the rebase
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-07T09:51:54Z
+
+:+1:
+This PR allows going a few tests farther on PHP7. Still, we can see a fatal error for the Validator component. It seems unrelated but I don't understand it:
+https://travis-ci.org/symfony/symfony/jobs/61229099#L355
+A bug in PHP7?
+Anyway, good to merge for me.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-07T12:58:31Z
+
+Too bad that XDebug is not yet available for PHP 7. It would be much easier to debug this with a stack trace for the fatal error
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-10T11:29:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-05-11T09:15:02Z
+
+The checks seems stuck, can we re-queue this somehow?
+
+---------------------------------------------------------------------------
+
+by Berdir at 2015-05-11T22:08:18Z
+
+I wasn't able to reproduce the recursion that travis reports. The validator tests are running through for me on php7 (PHP 7.0.0-dev (cli) (built: May  6 2015 00:41:14)).
+
+However, I have a lot of test fails, all because the string representation of a DateTime object is somehow different, it expects 'Jan 1, 2000, 12:00 AM' but actually gets 'Jan 1, 2000 12:00 AM' (note the missing , after the year). But that seems like a different problem and could be environment specific.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-12T14:24:48Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by LionsAd at 2015-05-13T00:47:38Z
+
+So we probably need a 2.7 PR as well?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-13T08:32:32Z
+
+@stefanruijsenaars can you please remove any comment telling about deprecation (in the patch but also in the PR title/description)?
+We are going to consider this as a pure bug fix on 2.3, and we will make an other PR on 2.7 to add the deprecation back after the merge.
+
+---------------------------------------------------------------------------
+
+by stefanruijsenaars at 2015-05-13T08:44:43Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-13T08:58:21Z
+
+Looking at the tests, you need to patch one more file:
+https://github.com/stefanruijsenaars/symfony/blob/php7-nullconstraint/src/Symfony/Component/Form/composer.json#L28
+should be:
+`        "symfony/validator": "~2.3.0,>=2.3.29",`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-13T09:08:52Z
+
+Why not using `~2.3.29` instead then?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-13T09:09:40Z
+
+@xabbuh indeed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-13T09:26:06Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-05-15T09:23:22Z
+
+:+1:

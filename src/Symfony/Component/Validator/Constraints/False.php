@@ -19,4 +19,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @api
  */
-class False extends IsFalse {}
+class False extends IsFalse
+{
+}

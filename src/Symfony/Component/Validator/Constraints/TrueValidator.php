@@ -16,4 +16,6 @@ namespace Symfony\Component\Validator\Constraints;
  *
  * @api
  */
-class TrueValidator extends IsTrueValidator {}
+class TrueValidator extends IsTrueValidator
+{
+}

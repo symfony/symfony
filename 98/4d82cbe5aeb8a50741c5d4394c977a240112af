@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-03-30T23:27:45Z
+
+NB, preincrementation is about 30% faster in most cases, and this pull is only changing those cases where the behaviour of the code is unchanged to using preincrementation.
+
+:+1: from me. :)
+
+---------------------------------------------------------------------------
+
+by trq at 2015-03-31T00:12:34Z
+
+$i += $i is faster still if we really want to get into micro optimisations.
+
+On Tue, 31 Mar 2015 at 10:27 Graham Campbell <notifications@github.com>
+wrote:
+
+> NB, preincrementation is about 30% faster in most cases, and this pull is
+> only changing those cases where the behaviour of the code is unchanged to
+> using preincrementation.
+>
+> [image: :+1:] from me. :)
+>
+> —
+> Reply to this email directly or view it on GitHub
+> <https://github.com/symfony/symfony/pull/14121#issuecomment-87875459>.
+>
+
+---------------------------------------------------------------------------
+
+by gharlan at 2015-03-31T06:48:10Z
+
+@trq for me it is more important to standardize code style.
+
+why is the build failing on PHP 5.3.3?
+
+> The command "if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then pecl install -f memcached-2.1.0; fi;" failed and exited with 1 during .
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-01T11:43:52Z
+
+@GrahamCampbell when you enable OPCache optimizations, it already optimizes the pre/post incrementation automatically AFAIK
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-04-01T13:30:55Z
+
+> when you enable OPCache optimizations, it already optimizes the pre/post incrementation automatically AFAIK
+
+Nice. :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-04-05T16:17:31Z
+
+~~I think I'd be :-1: on this one.~~ It's not a hard stand, but I also see no added value here (the perf is not relevant), and I see downsides (readability and making merges harder)
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-04-06T20:22:04Z
+
+It is always good to write it same way in whole project.
+:+1: for standarization
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2015-04-11T15:46:35Z
+
+@keradus What if we were to standardise postincrementation?
+
+---------------------------------------------------------------------------
+
+by keradus at 2015-04-11T16:07:44Z
+
+Only `++$i` or only `$i++` is fine with me.
+But first one is faster - and not all envs has Zend's OPCache

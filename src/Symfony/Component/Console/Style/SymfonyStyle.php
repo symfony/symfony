@@ -85,7 +85,7 @@ class SymfonyStyle extends OutputStyle
 
         foreach ($lines as &$line) {
             $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', $this->lineLength - Helper::strlen($line));
+            $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
 
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);

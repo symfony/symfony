@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-12T20:17:04Z
+
+The result looks good. Though I don't understand why this is necessary.
+
+@ogizanagi Did you find the cause for this issue?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-05-12T20:32:44Z
+
+@xabbuh : AFAIU, it's only due to extra backslashes introduced by the `OutputFormatter::escape()` method: https://github.com/symfony/symfony/blob/1d45ca894b76c419d212c451c7d0026f9f14442a/src/Symfony/Component/Console/Formatter/OutputFormatter.php#L36
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-12T20:38:00Z
+
+@ogizanagi Indeed, that makes sense.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-12T20:54:25Z
+
+:+1:

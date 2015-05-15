@@ -38,7 +38,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $this->session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->expects($this->any())->method('getSession')->will($this->returnValue($this->session));
-        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException', array('getMessage'));
     }
 
     public function testForward()

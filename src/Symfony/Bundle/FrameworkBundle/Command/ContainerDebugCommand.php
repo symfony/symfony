@@ -145,7 +145,7 @@ EOF
         $optionsCount = 0;
         foreach ($options as $option) {
             if ($input->getOption($option)) {
-                $optionsCount++;
+                ++$optionsCount;
             }
         }
 

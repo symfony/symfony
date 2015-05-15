@@ -71,7 +71,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testCsrfProtectionByDefaultIfRootAndCompound()
     {
         $view = $this->factory
-            ->create('form', null, array(
+            ->create('form', array(
                 'csrf_field_name' => 'csrf',
                 'compound' => true,
             ))
@@ -85,7 +85,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $view = $this->factory
             ->createNamedBuilder('root', 'form')
             ->add($this->factory
-                ->createNamedBuilder('form', 'form', null, array(
+                ->createNamedBuilder('form', 'form', array(
                     'csrf_field_name' => 'csrf',
                     'compound' => true,
                 ))
@@ -100,7 +100,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionByDefaultIfRootButNotCompound()
     {
         $view = $this->factory
-            ->create('form', null, array(
+            ->create('form', array(
                 'csrf_field_name' => 'csrf',
                 'compound' => false,
             ))
@@ -112,7 +112,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testCsrfProtectionCanBeDisabled()
     {
         $view = $this->factory
-            ->create('form', null, array(
+            ->create('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_protection' => false,
                 'compound' => true,
@@ -130,7 +130,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue(new CsrfToken('TOKEN_ID', 'token')));
 
         $view = $this->factory
-            ->create('form', null, array(
+            ->create('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -149,7 +149,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue('token'));
 
         $view = $this->factory
-            ->createNamed('FORM_NAME', 'form', null, array(
+            ->createNamed('FORM_NAME', 'form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -167,7 +167,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue('token'));
 
         $view = $this->factory
-            ->createNamed('', 'form', null, array(
+            ->createNamed('', 'form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -196,7 +196,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createBuilder('form', null, array(
+            ->createBuilder('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -228,7 +228,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createNamedBuilder('FORM_NAME', 'form', null, array(
+            ->createNamedBuilder('FORM_NAME', 'form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -259,7 +259,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->will($this->returnValue($valid));
 
         $form = $this->factory
-            ->createNamedBuilder('', 'form', null, array(
+            ->createNamedBuilder('', 'form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'compound' => true,
@@ -285,7 +285,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isTokenValid');
 
         $form = $this->factory
-            ->createBuilder('form', null, array(
+            ->createBuilder('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -314,7 +314,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $form = $this->factory
             ->createNamedBuilder('root', 'form')
             ->add($this->factory
-                ->createNamedBuilder('form', 'form', null, array(
+                ->createNamedBuilder('form', 'form', array(
                     'csrf_field_name' => 'csrf',
                     'csrf_token_manager' => $this->tokenManager,
                     'csrf_token_id' => 'TOKEN_ID',
@@ -336,7 +336,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
             ->method('isTokenValid');
 
         $form = $this->factory
-            ->create('form', null, array(
+            ->create('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_token_id' => 'TOKEN_ID',
@@ -351,7 +351,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
     public function testNoCsrfProtectionOnPrototype()
     {
         $prototypeView = $this->factory
-            ->create('collection', null, array(
+            ->create('collection', array(
                 'type' => new FormTypeCsrfExtensionTest_ChildType(),
                 'options' => array(
                     'csrf_field_name' => 'csrf',
@@ -379,7 +379,7 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
              ->will($this->returnValue('[trans]Foobar[/trans]'));
 
         $form = $this->factory
-            ->createBuilder('form', null, array(
+            ->createBuilder('form', array(
                 'csrf_field_name' => 'csrf',
                 'csrf_token_manager' => $this->tokenManager,
                 'csrf_message' => 'Foobar',

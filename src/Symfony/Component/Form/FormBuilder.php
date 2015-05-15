@@ -103,10 +103,10 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, $options);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, $options);
     }
 
     /**

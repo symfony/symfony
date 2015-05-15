@@ -33,7 +33,7 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testNotEmptyIfSubmittedAndNotAlwaysEmpty()
     {
-        $form = $this->factory->create('password', null, array('always_empty' => false));
+        $form = $this->factory->create('password', array('always_empty' => false));
         $form->submit('pAs5w0rd');
         $view = $form->createView();
 
@@ -42,7 +42,7 @@ class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testNotTrimmed()
     {
-        $form = $this->factory->create('password', null);
+        $form = $this->factory->create('password');
         $form->submit(' pAs5w0rd ');
         $data = $form->getData();
 

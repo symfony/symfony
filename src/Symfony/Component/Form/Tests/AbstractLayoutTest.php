@@ -156,7 +156,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testLabelWithCustomTextPassedAsOption()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'label' => 'Custom label',
         ));
         $html = $this->renderLabel($form->createView());
@@ -184,7 +184,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testLabelWithCustomTextPassedAsOptionAndDirectly()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'label' => 'Custom label',
         ));
         $html = $this->renderLabel($form->createView(), 'Overridden label');
@@ -252,7 +252,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     // https://github.com/symfony/symfony/issues/5029
     public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'label' => 'Custom label',
         ));
         $html = $this->renderLabel($form->createView(), null, array(
@@ -306,7 +306,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     {
         $options = array('label_format' => 'form.%name%');
 
-        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+        $form = $this->factory->createNamedBuilder('myform', 'form', $options)
             ->add('myfield', 'text')
             ->getForm();
         $view = $form->get('myfield')->createView();
@@ -324,7 +324,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     {
         $options = array('label_format' => 'form.%name%');
 
-        $form = $this->factory->createNamedBuilder('myform', 'form', null, $options)
+        $form = $this->factory->createNamedBuilder('myform', 'form', $options)
             ->add('myfield', 'text', array('label_format' => 'field.%name%'))
             ->getForm();
         $view = $form->get('myfield')->createView();
@@ -411,7 +411,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCheckedCheckbox()
     {
-        $form = $this->factory->createNamed('name', 'checkbox', true);
+        $form = $this->factory->createNamed('name', 'checkbox', array('data' => true));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -425,7 +425,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testUncheckedCheckbox()
     {
-        $form = $this->factory->createNamed('name', 'checkbox', false);
+        $form = $this->factory->createNamed('name', 'checkbox', array('data' => false));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -438,7 +438,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCheckboxWithValue()
     {
-        $form = $this->factory->createNamed('name', 'checkbox', false, array(
+        $form = $this->factory->createNamed('name', 'checkbox', array(
+            'data' => false,
             'value' => 'foo&bar',
         ));
 
@@ -453,7 +454,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoice()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => false,
@@ -486,7 +488,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceAttributes()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'multiple' => false,
@@ -508,7 +511,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceWithPreferred()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
@@ -531,7 +535,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceWithPreferredAndNoSeparator()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
@@ -553,7 +558,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceWithPreferredAndBlankSeparator()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'preferred_choices' => array('&b'),
             'multiple' => false,
@@ -576,7 +582,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testChoiceWithOnlyPreferred()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'preferred_choices' => array('&a', '&b'),
             'multiple' => false,
@@ -592,7 +599,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceNonRequired()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => false,
             'multiple' => false,
@@ -615,7 +623,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceNonRequiredNoneSelected()
     {
-        $form = $this->factory->createNamed('name', 'choice', null, array(
+        $form = $this->factory->createNamed('name', 'choice', array(
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => false,
             'multiple' => false,
@@ -638,7 +646,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceNonRequiredWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => false,
@@ -662,7 +671,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceRequiredWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => true,
             'multiple' => false,
@@ -689,7 +699,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceRequiredWithPlaceholderViaView()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => true,
             'multiple' => false,
@@ -715,7 +726,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceGrouped()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array(
                 'Group&1' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
                 'Group&2' => array('&c' => 'Choice&C'),
@@ -745,7 +757,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoice()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => true,
             'multiple' => true,
@@ -768,7 +781,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoiceAttributes()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'required' => true,
@@ -792,7 +806,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoiceSkipsPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => true,
             'expanded' => false,
@@ -814,7 +829,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoiceNonRequired()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'required' => false,
             'multiple' => true,
@@ -836,7 +852,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceExpanded()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => true,
@@ -858,7 +875,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceExpandedAttributes()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'multiple' => false,
@@ -881,7 +899,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceExpandedWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'choice', '&a', array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => '&a',
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B'),
             'multiple' => false,
             'expanded' => true,
@@ -906,7 +925,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSingleChoiceExpandedWithBooleanValue()
     {
-        $form = $this->factory->createNamed('name', 'choice', true, array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => true,
             'choices' => array('1' => 'Choice&A', '0' => 'Choice&B'),
             'multiple' => false,
             'expanded' => true,
@@ -928,7 +948,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoiceExpanded()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a', '&c'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a', '&c'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
             'multiple' => true,
             'expanded' => true,
@@ -953,7 +974,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMultipleChoiceExpandedAttributes()
     {
-        $form = $this->factory->createNamed('name', 'choice', array('&a', '&c'), array(
+        $form = $this->factory->createNamed('name', 'choice', array(
+            'data' => array('&a', '&c'),
             'choices' => array('&a' => 'Choice&A', '&b' => 'Choice&B', '&c' => 'Choice&C'),
             'choice_attr' => array('Choice&B' => array('class' => 'foo&bar')),
             'multiple' => true,
@@ -979,7 +1001,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCountry()
     {
-        $form = $this->factory->createNamed('name', 'country', 'AT');
+        $form = $this->factory->createNamed('name', 'country', array('data' => 'AT'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -992,7 +1014,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCountryWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'country', 'AT', array(
+        $form = $this->factory->createNamed('name', 'country', array(
+            'data' => 'AT',
             'placeholder' => 'Select&Country',
             'required' => false,
         ));
@@ -1009,7 +1032,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTime()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'with_seconds' => false,
         ));
@@ -1048,7 +1072,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTimeWithPlaceholderGlobal()
     {
-        $form = $this->factory->createNamed('name', 'datetime', null, array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
@@ -1090,7 +1114,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     {
         $data = array('year' => '2011', 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5');
 
-        $form = $this->factory->createNamed('name', 'datetime', $data, array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => $data,
             'input' => 'array',
             'required' => false,
         ));
@@ -1129,7 +1154,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTimeWithSeconds()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'with_seconds' => true,
         ));
@@ -1171,7 +1197,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTimeSingleText()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'date_widget' => 'single_text',
             'time_widget' => 'single_text',
@@ -1197,7 +1224,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTimeWithWidgetSingleText()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'widget' => 'single_text',
             'model_timezone' => 'UTC',
@@ -1215,7 +1243,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateTimeWithWidgetSingleTextIgnoreDateAndTimeWidgets()
     {
-        $form = $this->factory->createNamed('name', 'datetime', '2011-02-03 04:05:06', array(
+        $form = $this->factory->createNamed('name', 'datetime', array(
+            'data' => '2011-02-03 04:05:06',
             'input' => 'string',
             'date_widget' => 'choice',
             'time_widget' => 'choice',
@@ -1235,7 +1264,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateChoice()
     {
-        $form = $this->factory->createNamed('name', 'date', '2011-02-03', array(
+        $form = $this->factory->createNamed('name', 'date', array(
+            'data' => '2011-02-03',
             'input' => 'string',
             'widget' => 'choice',
         ));
@@ -1260,7 +1290,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateChoiceWithPlaceholderGlobal()
     {
-        $form = $this->factory->createNamed('name', 'date', null, array(
+        $form = $this->factory->createNamed('name', 'date', array(
             'input' => 'string',
             'widget' => 'choice',
             'placeholder' => 'Change&Me',
@@ -1287,7 +1317,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateChoiceWithPlaceholderOnYear()
     {
-        $form = $this->factory->createNamed('name', 'date', null, array(
+        $form = $this->factory->createNamed('name', 'date', array(
             'input' => 'string',
             'widget' => 'choice',
             'required' => false,
@@ -1314,7 +1344,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateText()
     {
-        $form = $this->factory->createNamed('name', 'date', '2011-02-03', array(
+        $form = $this->factory->createNamed('name', 'date', array(
+            'data' => '2011-02-03',
             'input' => 'string',
             'widget' => 'text',
         ));
@@ -1342,7 +1373,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDateSingleText()
     {
-        $form = $this->factory->createNamed('name', 'date', '2011-02-03', array(
+        $form = $this->factory->createNamed('name', 'date', array(
+            'data' => '2011-02-03',
             'input' => 'string',
             'widget' => 'single_text',
         ));
@@ -1370,7 +1402,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testBirthDay()
     {
-        $form = $this->factory->createNamed('name', 'birthday', '2000-02-03', array(
+        $form = $this->factory->createNamed('name', 'birthday', array(
+            'data' => '2000-02-03',
             'input' => 'string',
         ));
 
@@ -1394,7 +1427,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testBirthDayWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'birthday', '1950-01-01', array(
+        $form = $this->factory->createNamed('name', 'birthday', array(
+            'data' => '1950-01-01',
             'input' => 'string',
             'placeholder' => '',
             'required' => false,
@@ -1423,7 +1457,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testEmail()
     {
-        $form = $this->factory->createNamed('name', 'email', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'email', array('data' => 'foo&bar'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1437,7 +1471,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testEmailWithMaxLength()
     {
-        $form = $this->factory->createNamed('name', 'email', 'foo&bar', array(
+        $form = $this->factory->createNamed('name', 'email', array(
+            'data' => 'foo&bar',
             'attr' => array('maxlength' => 123),
         ));
 
@@ -1464,7 +1499,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testHidden()
     {
-        $form = $this->factory->createNamed('name', 'hidden', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'hidden', array('data' => 'foo&bar'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1477,7 +1512,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testReadOnly()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'read_only' => true,
         ));
 
@@ -1492,7 +1527,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testDisabled()
     {
-        $form = $this->factory->createNamed('name', 'text', null, array(
+        $form = $this->factory->createNamed('name', 'text', array(
             'disabled' => true,
         ));
 
@@ -1507,7 +1542,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testInteger()
     {
-        $form = $this->factory->createNamed('name', 'integer', 123);
+        $form = $this->factory->createNamed('name', 'integer', array('data' => 123));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1520,7 +1555,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testLanguage()
     {
-        $form = $this->factory->createNamed('name', 'language', 'de');
+        $form = $this->factory->createNamed('name', 'language', array('data' => 'de'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -1533,7 +1568,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testLocale()
     {
-        $form = $this->factory->createNamed('name', 'locale', 'de_AT');
+        $form = $this->factory->createNamed('name', 'locale', array('data' => 'de_AT'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -1546,7 +1581,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testMoney()
     {
-        $form = $this->factory->createNamed('name', 'money', 1234.56, array(
+        $form = $this->factory->createNamed('name', 'money', array(
+            'data' => 1234.56,
             'currency' => 'EUR',
         ));
 
@@ -1562,7 +1598,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testNumber()
     {
-        $form = $this->factory->createNamed('name', 'number', 1234.56);
+        $form = $this->factory->createNamed('name', 'number', array('data' => 1234.56));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1575,7 +1611,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testPassword()
     {
-        $form = $this->factory->createNamed('name', 'password', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'password', array('data' => 'foo&bar'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1587,7 +1623,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testPasswordSubmittedWithNotAlwaysEmpty()
     {
-        $form = $this->factory->createNamed('name', 'password', null, array(
+        $form = $this->factory->createNamed('name', 'password', array(
             'always_empty' => false,
         ));
         $form->submit('foo&bar');
@@ -1603,7 +1639,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testPasswordWithMaxLength()
     {
-        $form = $this->factory->createNamed('name', 'password', 'foo&bar', array(
+        $form = $this->factory->createNamed('name', 'password', array(
+            'data' => 'foo&bar',
             'attr' => array('maxlength' => 123),
         ));
 
@@ -1618,7 +1655,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testPercent()
     {
-        $form = $this->factory->createNamed('name', 'percent', 0.1);
+        $form = $this->factory->createNamed('name', 'percent', array('data' => 0.1));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1632,7 +1669,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCheckedRadio()
     {
-        $form = $this->factory->createNamed('name', 'radio', true);
+        $form = $this->factory->createNamed('name', 'radio', array('data' => true));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1646,7 +1683,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testUncheckedRadio()
     {
-        $form = $this->factory->createNamed('name', 'radio', false);
+        $form = $this->factory->createNamed('name', 'radio', array('data' => false));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1659,7 +1696,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testRadioWithValue()
     {
-        $form = $this->factory->createNamed('name', 'radio', false, array(
+        $form = $this->factory->createNamed('name', 'radio', array(
+            'data' => false,
             'value' => 'foo&bar',
         ));
 
@@ -1674,7 +1712,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTextarea()
     {
-        $form = $this->factory->createNamed('name', 'textarea', 'foo&bar', array(
+        $form = $this->factory->createNamed('name', 'textarea', array(
+            'data' => 'foo&bar',
             'attr' => array('pattern' => 'foo'),
         ));
 
@@ -1689,7 +1728,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testText()
     {
-        $form = $this->factory->createNamed('name', 'text', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'text', array('data' => 'foo&bar'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1703,7 +1742,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTextWithMaxLength()
     {
-        $form = $this->factory->createNamed('name', 'text', 'foo&bar', array(
+        $form = $this->factory->createNamed('name', 'text', array(
+            'data' => 'foo&bar',
             'attr' => array('maxlength' => 123),
         ));
 
@@ -1719,7 +1759,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testSearch()
     {
-        $form = $this->factory->createNamed('name', 'search', 'foo&bar');
+        $form = $this->factory->createNamed('name', 'search', array('data' => 'foo&bar'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1733,7 +1773,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTime()
     {
-        $form = $this->factory->createNamed('name', 'time', '04:05:06', array(
+        $form = $this->factory->createNamed('name', 'time', array(
+            'data' => '04:05:06',
             'input' => 'string',
             'with_seconds' => false,
         ));
@@ -1757,7 +1798,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeWithSeconds()
     {
-        $form = $this->factory->createNamed('name', 'time', '04:05:06', array(
+        $form = $this->factory->createNamed('name', 'time', array(
+            'data' => '04:05:06',
             'input' => 'string',
             'with_seconds' => true,
         ));
@@ -1788,7 +1830,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeText()
     {
-        $form = $this->factory->createNamed('name', 'time', '04:05:06', array(
+        $form = $this->factory->createNamed('name', 'time', array(
+            'data' => '04:05:06',
             'input' => 'string',
             'widget' => 'text',
         ));
@@ -1818,7 +1861,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeSingleText()
     {
-        $form = $this->factory->createNamed('name', 'time', '04:05:06', array(
+        $form = $this->factory->createNamed('name', 'time', array(
+            'data' => '04:05:06',
             'input' => 'string',
             'widget' => 'single_text',
         ));
@@ -1835,7 +1879,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeWithPlaceholderGlobal()
     {
-        $form = $this->factory->createNamed('name', 'time', null, array(
+        $form = $this->factory->createNamed('name', 'time', array(
             'input' => 'string',
             'placeholder' => 'Change&Me',
             'required' => false,
@@ -1860,7 +1904,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimeWithPlaceholderOnYear()
     {
-        $form = $this->factory->createNamed('name', 'time', null, array(
+        $form = $this->factory->createNamed('name', 'time', array(
             'input' => 'string',
             'required' => false,
             'placeholder' => array('hour' => 'Change&Me'),
@@ -1897,7 +1941,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimezone()
     {
-        $form = $this->factory->createNamed('name', 'timezone', 'Europe/Vienna');
+        $form = $this->factory->createNamed('name', 'timezone', array('data' => 'Europe/Vienna'));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/select
@@ -1915,7 +1959,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTimezoneWithPlaceholder()
     {
-        $form = $this->factory->createNamed('name', 'timezone', null, array(
+        $form = $this->factory->createNamed('name', 'timezone', array(
             'placeholder' => 'Select&Timezone',
             'required' => false,
         ));
@@ -1932,7 +1976,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
     public function testUrl()
     {
         $url = 'http://www.google.com?foo1=bar1&foo2=bar2';
-        $form = $this->factory->createNamed('name', 'url', $url);
+        $form = $this->factory->createNamed('name', 'url', array('data' => $url));
 
         $this->assertWidgetMatchesXpath($form->createView(), array(),
 '/input
@@ -1945,7 +1989,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testCollectionPrototype()
     {
-        $form = $this->factory->createNamedBuilder('name', 'form', array('items' => array('one', 'two', 'three')))
+        $form = $this->factory->createNamedBuilder('name', 'form', array(
+                'data' => array('items' => array('one', 'two', 'three'))
+            ))
             ->add('items', 'collection', array('allow_add' => true))
             ->getForm()
             ->createView();
@@ -2007,7 +2053,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testStartTag()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('form', array(
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ));
@@ -2019,7 +2065,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testStartTagForPutRequest()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('form', array(
             'method' => 'put',
             'action' => 'http://example.com/directory',
         ));
@@ -2036,7 +2082,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testStartTagWithOverriddenVars()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('form', array(
             'method' => 'put',
             'action' => 'http://example.com/directory',
         ));
@@ -2051,7 +2097,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testStartTagForMultipartForm()
     {
-        $form = $this->factory->createBuilder('form', null, array(
+        $form = $this->factory->createBuilder('form', array(
                 'method' => 'get',
                 'action' => 'http://example.com/directory',
             ))
@@ -2065,7 +2111,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testStartTagWithExtraAttributes()
     {
-        $form = $this->factory->create('form', null, array(
+        $form = $this->factory->create('form', array(
             'method' => 'get',
             'action' => 'http://example.com/directory',
         ));
@@ -2079,7 +2125,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testWidgetAttributes()
     {
-        $form = $this->factory->createNamed('text', 'text', 'value', array(
+        $form = $this->factory->createNamed('text', 'text', array(
+            'data' => 'value',
             'required' => true,
             'disabled' => true,
             'read_only' => true,
@@ -2094,7 +2141,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testWidgetAttributeNameRepeatedIfTrue()
     {
-        $form = $this->factory->createNamed('text', 'text', 'value', array(
+        $form = $this->factory->createNamed('text', 'text', array(
+            'data' => 'value',
             'attr' => array('foo' => true),
         ));
 
@@ -2106,7 +2154,8 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testWidgetAttributeHiddenIfFalse()
     {
-        $form = $this->factory->createNamed('text', 'text', 'value', array(
+        $form = $this->factory->createNamed('text', 'text', array(
+            'data' => 'value',
             'attr' => array('foo' => false),
         ));
 
@@ -2117,7 +2166,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testButtonAttributes()
     {
-        $form = $this->factory->createNamed('button', 'button', null, array(
+        $form = $this->factory->createNamed('button', 'button', array(
             'disabled' => true,
             'attr' => array('class' => 'foobar', 'data-foo' => 'bar'),
         ));
@@ -2130,7 +2179,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testButtonAttributeNameRepeatedIfTrue()
     {
-        $form = $this->factory->createNamed('button', 'button', null, array(
+        $form = $this->factory->createNamed('button', 'button', array(
             'attr' => array('foo' => true),
         ));
 
@@ -2142,7 +2191,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testButtonAttributeHiddenIfFalse()
     {
-        $form = $this->factory->createNamed('button', 'button', null, array(
+        $form = $this->factory->createNamed('button', 'button', array(
             'attr' => array('foo' => false),
         ));
 
@@ -2153,7 +2202,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValue()
     {
-        $form = $this->factory->createNamed('textarea', 'textarea', '  ');
+        $form = $this->factory->createNamed('textarea', 'textarea', array('data' => '  '));
 
         $html = $this->renderWidget($form->createView());
 
@@ -2162,7 +2211,9 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
     {
-        $form = $this->factory->createBuilder('form', array('textarea' => '  '))
+        $form = $this->factory->createBuilder('form', array(
+                'data' => array('textarea' => '  ')
+            ))
             ->add('textarea', 'textarea')
             ->getForm();
 
@@ -2173,7 +2224,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
 
     public function testWidgetContainerAttributeHiddenIfFalse()
     {
-        $form = $this->factory->createNamed('form', 'form', null, array(
+        $form = $this->factory->createNamed('form', 'form', array(
             'attr' => array('foo' => false),
         ));
 

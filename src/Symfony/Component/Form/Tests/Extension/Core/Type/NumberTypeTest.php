@@ -37,7 +37,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithGrouping()
     {
-        $form = $this->factory->create('number', null, array('grouping' => true));
+        $form = $this->factory->create('number', array('grouping' => true));
         $form->setData('12345.67890');
         $view = $form->createView();
 
@@ -46,7 +46,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithScale()
     {
-        $form = $this->factory->create('number', null, array('scale' => 2));
+        $form = $this->factory->create('number', array('scale' => 2));
         $form->setData('12345.67890');
         $view = $form->createView();
 
@@ -55,7 +55,7 @@ class NumberTypeTest extends TestCase
 
     public function testDefaultFormattingWithRounding()
     {
-        $form = $this->factory->create('number', null, array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
+        $form = $this->factory->create('number', array('scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP));
         $form->setData('12345.54321');
         $view = $form->createView();
 

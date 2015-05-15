@@ -115,7 +115,7 @@ class EntityTypeTest extends TypeTestCase
      */
     public function testInvalidClassOption()
     {
-        $this->factory->createNamed('name', 'entity', null, array(
+        $this->factory->createNamed('name', 'entity', array(
             'class' => 'foo',
         ));
     }
@@ -127,7 +127,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
@@ -144,7 +144,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
@@ -161,7 +161,7 @@ class EntityTypeTest extends TypeTestCase
         $this->persist(array($entity1, $entity2));
         $qb = $this->em->createQueryBuilder()->select('e')->from(self::SINGLE_IDENT_CLASS, 'e');
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
@@ -177,7 +177,7 @@ class EntityTypeTest extends TypeTestCase
      */
     public function testConfigureQueryBuilderWithNonQueryBuilderAndNonClosure()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => new \stdClass(),
@@ -189,7 +189,7 @@ class EntityTypeTest extends TypeTestCase
      */
     public function testConfigureQueryBuilderWithClosureReturningNonQueryBuilder()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function () {
@@ -202,7 +202,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSetDataSingleNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -215,7 +215,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSetDataMultipleExpandedNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => true,
             'em' => 'default',
@@ -229,7 +229,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSetDataMultipleNonExpandedNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -243,7 +243,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => true,
             'em' => 'default',
@@ -257,7 +257,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -271,7 +271,7 @@ class EntityTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNull()
     {
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -289,7 +289,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -311,7 +311,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -335,7 +335,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -360,7 +360,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -391,7 +391,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -417,7 +417,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => false,
             'em' => 'default',
@@ -447,7 +447,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => true,
             'em' => 'default',
@@ -473,7 +473,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => true,
             'expanded' => true,
             'em' => 'default',
@@ -503,7 +503,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             // not all persisted entities should be displayed
@@ -528,7 +528,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($item1, $item2, $item3, $item4));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choices' => array($item1, $item2, $item3, $item4),
@@ -559,7 +559,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'preferred_choices' => array($entity3, $entity2),
@@ -578,7 +578,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity2, $entity3),
@@ -598,7 +598,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -619,7 +619,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'choices' => array($entity1, $entity2),
@@ -642,7 +642,7 @@ class EntityTypeTest extends TypeTestCase
 
         $repository = $this->em->getRepository(self::SINGLE_IDENT_CLASS);
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => $repository->createQueryBuilder('e')
@@ -664,7 +664,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'query_builder' => function ($repository) {
@@ -688,7 +688,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2, $entity3));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
             'query_builder' => function ($repository) {
@@ -710,7 +710,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -731,7 +731,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'multiple' => false,
             'expanded' => false,
             'em' => 'default',
@@ -757,7 +757,7 @@ class EntityTypeTest extends TypeTestCase
             ->with(self::SINGLE_IDENT_CLASS)
             ->will($this->returnValue($this->em));
 
-        $this->factory->createNamed('name', 'entity', null, array(
+        $this->factory->createNamed('name', 'entity', array(
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
             'choice_label' => 'name',
@@ -772,7 +772,7 @@ class EntityTypeTest extends TypeTestCase
         $this->emRegistry->expects($this->never())
             ->method('getManagerForClass');
 
-        $this->factory->createNamed('name', 'entity', null, array(
+        $this->factory->createNamed('name', 'entity', array(
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'choice_label' => 'name',
@@ -848,14 +848,14 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1));
 
-        $field1 = $this->factory->createNamed('name', 'entity', null, array(
+        $field1 = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
             'choice_label' => 'name',
         ));
 
-        $field2 = $this->factory->createNamed('name', 'entity', null, array(
+        $field2 = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
@@ -876,7 +876,7 @@ class EntityTypeTest extends TypeTestCase
 
         $this->persist(array($entity1, $entity2));
 
-        $field = $this->factory->createNamed('name', 'entity', null, array(
+        $field = $this->factory->createNamed('name', 'entity', array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,

@@ -914,9 +914,9 @@ class Form implements \IteratorAggregate, FormInterface
             }
 
             if (null === $type) {
-                $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
+                $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, $options);
             } else {
-                $child = $this->config->getFormFactory()->createNamed($child, $type, null, $options);
+                $child = $this->config->getFormFactory()->createNamed($child, $type, $options);
             }
         } elseif ($child->getConfig()->getAutoInitialize()) {
             throw new RuntimeException(sprintf(

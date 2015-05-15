@@ -110,7 +110,7 @@ class CompoundFormTest extends AbstractFormTest
         $factory = Forms::createFormFactoryBuilder()
             ->getFormFactory();
 
-        $child = $factory->create('file', null, array('auto_initialize' => false));
+        $child = $factory->create('file', array('auto_initialize' => false));
 
         $this->form->add($child);
         $this->form->submit(array('file' => null), false);
@@ -172,7 +172,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('foo', 'text', null, array(
+            ->with('foo', 'text', array(
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ))
@@ -191,7 +191,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('0', 'text', null, array(
+            ->with('0', 'text', array(
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ))
@@ -253,7 +253,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createForProperty')
-            ->with('\stdClass', 'foo', null, array(
+            ->with('\stdClass', 'foo', array(
                 'bar' => 'baz',
                 'auto_initialize' => false,
             ))

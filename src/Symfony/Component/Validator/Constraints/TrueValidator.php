@@ -11,41 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @api
  */
-class TrueValidator extends ConstraintValidator
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function validate($value, Constraint $constraint)
-    {
-        if (!$constraint instanceof True) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\True');
-        }
-
-        if (null === $value) {
-            return;
-        }
-
-        if (true !== $value && 1 !== $value && '1' !== $value) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->addViolation();
-            }
-        }
-    }
-}
+class TrueValidator extends IsTrueValidator {}

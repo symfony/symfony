@@ -158,6 +158,8 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
             case 'Symfony\Component\Validator\Constraints\True':
             case 'Symfony\Component\Validator\Constraints\False':
+            case 'Symfony\Component\Validator\Constraints\IsTrue':
+            case 'Symfony\Component\Validator\Constraints\IsFalse':
                 return new TypeGuess('checkbox', array(), Guess::MEDIUM_CONFIDENCE);
         }
     }
@@ -175,6 +177,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\NotNull':
             case 'Symfony\Component\Validator\Constraints\NotBlank':
             case 'Symfony\Component\Validator\Constraints\True':
+            case 'Symfony\Component\Validator\Constraints\IsTrue':
                 return new ValueGuess(true, Guess::HIGH_CONFIDENCE);
         }
     }

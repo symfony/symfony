@@ -54,9 +54,9 @@ Symfony\Component\Validator\Tests\Fixtures\Entity:
     lastName:
       - NotNull: ~
     valid:
-      - "True": ~
+      - "IsTrue": ~
     permissions:
-      - "True": ~
+      - "IsTrue": ~
 
 Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity:
   group_sequence_provider: true

@@ -528,3 +528,9 @@ Config
  * The `__toString()` method of the `\Symfony\Component\Config\ConfigCache` is marked as 
    deprecated in favor of the new `getPath()` method.
    
+Validator
+---------
+
+ * The PHP7-incompatible constraints (Null, True, False) and related validators
+   (NullValidator, TrueValidator, FalseValidator) are marked as deprecated
+   in favor of their `Is`-prefixed equivalent.

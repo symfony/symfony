@@ -61,4 +61,36 @@ class CssSelectorTest extends \PHPUnit_Framework_TestCase
             array('div > .foo', "div/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' foo ')]"),
         );
     }
+
+    public function testCachedSelector()
+    {
+        $selectorCacheMock = $this->getMock('Symfony\Component\CssSelector\SelectorCache\SelectorCacheInterface');
+
+        $xpath = null;
+
+        $selectorCacheMock
+            ->expects($this->exactly(2))
+            ->method('fetch')
+            ->with('descendant-or-self::div.foo::html')
+            ->will($this->returnCallback(function () use (&$xpath) {
+                return $xpath;
+            }))
+        ;
+
+        $selectorCacheMock
+            ->expects($this->exactly(1))
+            ->method('save')
+            ->with('descendant-or-self::div.foo::html', "descendant-or-self::div[@class and contains(concat(' ', normalize-space(@class), ' '), ' foo ')]")
+            ->will($this->returnCallback(function ($key, $expr) use (&$xpath) {
+                $xpath = $expr;
+            }))
+        ;
+
+        CssSelector::setSelectorCache($selectorCacheMock);
+
+        CssSelector::toXPath('div.foo');
+        CssSelector::toXPath('div.foo');
+
+        CssSelector::setSelectorCache(null);
+    }
 }

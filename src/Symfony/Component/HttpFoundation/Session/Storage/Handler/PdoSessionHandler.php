@@ -323,7 +323,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
     {
         $maxlifetime = (int) ini_get('session.gc_maxlifetime');
 
-        $metaStmnt = $this->pdo->prepare('SELECT `' . $this->dataCol . '` FROM ' . $this->table);
+        $metaStmnt = $this->pdo->prepare('SELECT `'.$this->dataCol.'` FROM '.$this->table);
         $metaStmnt->execute();
         if (strlen($data) > $metaStmnt->getColumnMeta(0)['len']) {
             throw new \DomainException('The data to be saved in session table exceeds the size of the field');

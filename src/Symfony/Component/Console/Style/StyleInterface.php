@@ -12,7 +12,7 @@
 namespace Symfony\Component\Console\Style;
 
 /**
- * Output style helpers
+ * Output style helpers.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -92,9 +92,9 @@ interface StyleInterface
     /**
      * Asks a question.
      *
-     * @param string          $question
-     * @param string|null     $default
-     * @param callable|null   $validator
+     * @param string        $question
+     * @param string|null   $default
+     * @param callable|null $validator
      *
      * @return string
      */
@@ -132,7 +132,7 @@ interface StyleInterface
     public function choice($question, array $choices, $default = null);
 
     /**
-     * Add newline(s)
+     * Add newline(s).
      *
      * @param int $count The number of newlines
      */

@@ -37,6 +37,7 @@ class ServerStartCommand extends ServerCommand
                 new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('launch-browser', 'b', InputOption::VALUE_NONE, 'Launch browser window when the server is started'),
             ))
             ->setName('server:start')
             ->setDescription('Starts PHP built-in web server in the background')
@@ -156,6 +157,10 @@ EOF
             return 1;
         }
 
+        if ($input->getOption('launch-browser')) {
+            $this->launchBrowser($output, $address);
+        }
+
         // stop the web server when the lock file is removed
         while ($process->isRunning()) {
             if (!file_exists($lockFile)) {
@@ -222,5 +227,22 @@ EOF
         )));
 
         return new Process('exec '.$script, $documentRoot, null, null, null);
+    }
+
+    private function launchBrowser($output, $address)
+    {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $cmdOpen = 'start';
+        } elseif (false !== stripos(PHP_OS, 'dar')) {
+            $cmdOpen = 'open';
+        } else {
+            $cmdOpen = 'xdg-open';
+        }
+
+        $process = new Process(sprintf('exec %s http://%s', $cmdOpen, $address));
+        $process->run();
+        if (!$process->isSuccessful()) {
+            $output->writeln('<error>Unable to start the browser window</error>');
+        }
     }
 }

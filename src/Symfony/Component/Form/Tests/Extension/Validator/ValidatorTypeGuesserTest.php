@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\True;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -64,7 +64,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return array(
             array(new NotNull(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
             array(new NotBlank(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
-            array(new True(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
+            array(new IsTrue(), new ValueGuess(true, Guess::HIGH_CONFIDENCE)),
             array(new Length(10), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
             array(new Range(array('min' => 1, 'max' => 20)), new ValueGuess(false, Guess::LOW_CONFIDENCE)),
         );
@@ -82,6 +82,18 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, $constraint);
 
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyGuessRequired()
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            $this->markTestSkipped('Cannot use a class called True on PHP 7 or higher.');
+        }
+        $true = 'Symfony\Component\Validator\Constraints\True';
+        $this->testGuessRequired(new $true(), new ValueGuess(true, Guess::HIGH_CONFIDENCE));
     }
 
     public function testGuessRequiredReturnsFalseForUnmappedProperties()

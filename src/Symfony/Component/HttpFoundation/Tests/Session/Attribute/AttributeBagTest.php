@@ -177,7 +177,7 @@ class AttributeBagTest extends \PHPUnit_Framework_TestCase
         $i = 0;
         foreach ($this->bag as $key => $val) {
             $this->assertEquals($this->array[$key], $val);
-            $i++;
+            ++$i;
         }
 
         $this->assertEquals(count($this->array), $i);

@@ -196,7 +196,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $i = 0;
         foreach ($headerBag as $key => $val) {
-            $i++;
+            ++$i;
             $this->assertEquals(array($headers[$key]), $val);
         }
 

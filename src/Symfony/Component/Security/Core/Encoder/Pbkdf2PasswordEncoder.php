@@ -87,11 +87,11 @@ class Pbkdf2PasswordEncoder extends BasePasswordEncoder
         $blocks = ceil($length / strlen(hash($algorithm, null, true)));
         $digest = '';
 
-        for ($i = 1; $i <= $blocks; $i++) {
+        for ($i = 1; $i <= $blocks; ++$i) {
             $ib = $block = hash_hmac($algorithm, $salt.pack('N', $i), $password, true);
 
             // Iterations
-            for ($j = 1; $j < $iterations; $j++) {
+            for ($j = 1; $j < $iterations; ++$j) {
                 $ib ^= ($block = hash_hmac($algorithm, $block, $password, true));
             }
 

@@ -189,9 +189,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     public function testTooBigArray()
     {
         $a = array();
-        for ($i = 0; $i < 20; $i++) {
-            for ($j = 0; $j < 50; $j++) {
-                for ($k = 0; $k < 10; $k++) {
+        for ($i = 0; $i < 20; ++$i) {
+            for ($j = 0; $j < 50; ++$j) {
+                for ($k = 0; $k < 10; ++$k) {
                     $a[$i][$j][$k] = 'value';
                 }
             }

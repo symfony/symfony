@@ -586,7 +586,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $r->setAccessible(true);
         $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
 
-        for ($i = 0; $i <= 17; $i++) {
+        for ($i = 0; $i <= 17; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getSymbol($i));
             $this->assertSame($expected[2][$i], $currencyFormatter->getSymbol($i));
         }
@@ -601,7 +601,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
         $r->setAccessible(true);
         $expected = $r->getValue('Symfony\Component\Intl\NumberFormatter\NumberFormatter');
 
-        for ($i = 0; $i <= 5; $i++) {
+        for ($i = 0; $i <= 5; ++$i) {
             $this->assertSame($expected[1][$i], $decimalFormatter->getTextAttribute($i));
             $this->assertSame($expected[2][$i], $currencyFormatter->getTextAttribute($i));
         }

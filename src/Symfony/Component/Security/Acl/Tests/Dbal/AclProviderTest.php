@@ -130,7 +130,7 @@ class AclProviderTest extends \PHPUnit_Framework_TestCase
         $i = 0;
         foreach ($aces as $index => $ace) {
             $this->assertEquals($i, $index);
-            $i++;
+            ++$i;
         }
 
         $sid = $aces[0]->getSecurityIdentity();

@@ -41,6 +41,11 @@ class Configuration implements ConfigurationInterface
                     ->min(-1)
                     ->defaultValue(-1)
                 ->end()
+                ->scalarNode('dump_destination')
+                    ->info('A stream URL where dumps should be written to')
+                    ->example('php://stderr')
+                    ->defaultNull()
+                ->end()
             ->end()
         ;
 

@@ -145,7 +145,7 @@ class DialogHelper extends InputAwareHelper
                 // Backspace Character
                 if ("\177" === $c) {
                     if (0 === $numMatches && 0 !== $i) {
-                        $i--;
+                        --$i;
                         // Move cursor backwards
                         $output->write("\033[1D");
                     }
@@ -198,7 +198,7 @@ class DialogHelper extends InputAwareHelper
                 } else {
                     $output->write($c);
                     $ret .= $c;
-                    $i++;
+                    ++$i;
 
                     $numMatches = 0;
                     $ofs = 0;

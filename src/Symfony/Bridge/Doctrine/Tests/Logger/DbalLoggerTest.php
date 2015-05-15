@@ -121,7 +121,7 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
 
         $shortString = '';
         $longString = '';
-        for ($i = 1; $i <= DbalLogger::MAX_STRING_LENGTH; $i++) {
+        for ($i = 1; $i <= DbalLogger::MAX_STRING_LENGTH; ++$i) {
             $shortString .= $testStringArray[$i % $testStringCount];
             $longString .= $testStringArray[$i % $testStringCount];
         }

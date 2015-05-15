@@ -854,7 +854,7 @@ QUERY;
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; $i++) {
+            for ($i = 0, $c = count($new); $i < $c; ++$i) {
                 $ace = $new[$i];
 
                 if (null === $ace->getId()) {
@@ -895,7 +895,7 @@ QUERY;
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; $i++) {
+            for ($i = 0, $c = count($new); $i < $c; ++$i) {
                 $ace = $new[$i];
 
                 if (null !== $ace->getId()) {
@@ -905,7 +905,7 @@ QUERY;
         }
 
         foreach ($changes[0] as $old) {
-            for ($i = 0, $c = count($old); $i < $c; $i++) {
+            for ($i = 0, $c = count($old); $i < $c; ++$i) {
                 $ace = $old[$i];
 
                 if (!isset($currentIds[$ace->getId()])) {
@@ -928,7 +928,7 @@ QUERY;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        for ($i = 0, $c = count($new); $i < $c; $i++) {
+        for ($i = 0, $c = count($new); $i < $c; ++$i) {
             $ace = $new[$i];
 
             if (null === $ace->getId()) {
@@ -969,7 +969,7 @@ QUERY;
         list($old, $new) = $changes;
         $currentIds = array();
 
-        for ($i = 0, $c = count($new); $i < $c; $i++) {
+        for ($i = 0, $c = count($new); $i < $c; ++$i) {
             $ace = $new[$i];
 
             if (null !== $ace->getId()) {
@@ -977,7 +977,7 @@ QUERY;
             }
         }
 
-        for ($i = 0, $c = count($old); $i < $c; $i++) {
+        for ($i = 0, $c = count($old); $i < $c; ++$i) {
             $ace = $old[$i];
 
             if (!isset($currentIds[$ace->getId()])) {

@@ -66,7 +66,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
             // should set a response, but does not
         });
 
-        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use($exception) { throw $exception; }));
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use ($exception) { throw $exception; }));
 
         try {
             $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);

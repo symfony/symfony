@@ -17,7 +17,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testStore()
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $profile = new Profile('token_'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://foo.bar');
@@ -159,7 +159,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $dt = new \DateTime('now');
         $start = $dt->getTimestamp();
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $dt->modify('+1 minute');
             $profile = new Profile('time_'.$i);
             $profile->setIp('127.0.0.1');
@@ -181,7 +181,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testRetrieveByEmptyUrlAndIp()
     {
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; ++$i) {
             $profile = new Profile('token_'.$i);
             $profile->setMethod('GET');
             $this->getStorage()->write($profile);
@@ -193,7 +193,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
     public function testRetrieveByMethodAndLimit()
     {
         foreach (array('POST', 'GET') as $method) {
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i < 5; ++$i) {
                 $profile = new Profile('token_'.$i.$method);
                 $profile->setMethod($method);
                 $this->getStorage()->write($profile);
@@ -233,7 +233,7 @@ abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testDuplicates()
     {
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; ++$i) {
             $profile = new Profile('foo'.$i);
             $profile->setIp('127.0.0.1');
             $profile->setUrl('http://example.net/');

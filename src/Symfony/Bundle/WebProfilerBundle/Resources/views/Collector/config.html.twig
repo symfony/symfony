@@ -8,7 +8,7 @@
             <span>
                 {% if collector.applicationname %}
                     {{ collector.applicationname }} {{ collector.applicationversion }}
-                {% else %}
+                {% elseif collector.symfonyState is defined %}
                     {% if 'unknown' == collector.symfonyState -%}
                     <span class="sf-toolbar-status sf-toolbar-info-piece-additional" title="Unable to retrieve information about the Symfony version.">
                     {%- elseif 'eol' == collector.symfonyState -%}

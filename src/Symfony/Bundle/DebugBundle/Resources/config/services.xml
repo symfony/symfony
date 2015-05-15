@@ -16,6 +16,7 @@
             <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
+            <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
         </service>
 
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
@@ -25,6 +26,10 @@
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />
+        <service id="var_dumper.cli_dumper" class="Symfony\Component\VarDumper\Dumper\CliDumper">
+            <argument>null</argument><!-- debug.dump_destination -->
+            <argument>%kernel.charset%</argument>
+        </service>
     </services>
 
 </container>

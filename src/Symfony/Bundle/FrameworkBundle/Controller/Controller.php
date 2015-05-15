@@ -240,6 +240,7 @@ class Controller extends ContainerAware
      *
      * @param string|FormTypeInterface $type    The built type of the form
      * @param mixed                    $data    The initial data for the form
+     *                                          Deprecated since version 2.8, to be removed in 3.0.
      * @param array                    $options Options for the form
      *
      * @return Form
@@ -253,6 +254,7 @@ class Controller extends ContainerAware
      * Creates and returns a form builder instance.
      *
      * @param mixed $data    The initial data for the form
+     *                       Deprecated since version 2.8, to be removed in 3.0.
      * @param array $options Options for the form
      *
      * @return FormBuilder

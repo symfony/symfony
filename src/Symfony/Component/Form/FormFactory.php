@@ -73,6 +73,7 @@ class FormFactory implements FormFactoryInterface
     public function createNamedBuilder($name, $type = 'form', $data = null, array $options = array())
     {
         if (null !== $data && !array_key_exists('data', $options)) {
+            trigger_error('Support for passing data as an argument is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
             $options['data'] = $data;
         }
 

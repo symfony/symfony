@@ -23,6 +23,7 @@ interface FormFactoryInterface
      *
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
+     *                                          Deprecated since version 2.8, to be removed in 3.0.
      * @param array                    $options The options
      *
      * @return FormInterface The form named after the type
@@ -39,6 +40,7 @@ interface FormFactoryInterface
      * @param string|int               $name    The name of the form
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
+     *                                          Deprecated since version 2.8, to be removed in 3.0.
      * @param array                    $options The options
      *
      * @return FormInterface The form
@@ -55,6 +57,7 @@ interface FormFactoryInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
+     *                         Deprecated since version 2.8, to be removed in 3.0.
      * @param array  $options  The options for the builder
      *
      * @return FormInterface The form named after the property
@@ -68,6 +71,7 @@ interface FormFactoryInterface
      *
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
+     *                                          Deprecated since version 2.8, to be removed in 3.0.
      * @param array                    $options The options
      *
      * @return FormBuilderInterface The form builder
@@ -82,6 +86,7 @@ interface FormFactoryInterface
      * @param string|int               $name    The name of the form
      * @param string|FormTypeInterface $type    The type of the form
      * @param mixed                    $data    The initial data
+     *                                          Deprecated since version 2.8, to be removed in 3.0.
      * @param array                    $options The options
      *
      * @return FormBuilderInterface The form builder
@@ -99,6 +104,7 @@ interface FormFactoryInterface
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for
      * @param mixed  $data     The initial data
+     *                         Deprecated since version 2.8, to be removed in 3.0.
      * @param array  $options  The options for the builder
      *
      * @return FormBuilderInterface The form builder named after the property

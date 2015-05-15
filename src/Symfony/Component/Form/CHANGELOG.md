@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated the `$data` argument from
+    - `Symfony\Component\Form\FormFactoryInterface::create()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamed()`
+    - `Symfony\Component\Form\FormFactoryInterface::createForProperty()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createNamedBuilder()`
+    - `Symfony\Component\Form\FormFactoryInterface::createBuilderForProperty()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createForm()`
+    - `Symfony\Bundle\FrameworkBundle\Controller\Controller::createFormBuilder()`
+
 2.7.0
 -----
 

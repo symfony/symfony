@@ -1655,7 +1655,7 @@ class Request
                         $lang = $codes[1];
                     }
                 } else {
-                    for ($i = 0, $max = count($codes); $i < $max; $i++) {
+                    for ($i = 0, $max = count($codes); $i < $max; ++$i) {
                         if ($i === 0) {
                             $lang = strtolower($codes[0]);
                         } else {

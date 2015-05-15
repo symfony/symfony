@@ -106,7 +106,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        list($listener, $tokenStorage, $service, $manager,) = $this->getListener(false, false);
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
         $tokenStorage
             ->expects($this->once())

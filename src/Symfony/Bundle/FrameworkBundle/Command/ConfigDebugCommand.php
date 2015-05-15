@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -57,8 +58,9 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "config:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:config" instead.</comment>');
+            $output->caution('The use of "config:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:config" instead.');
         }
 
         $name = $input->getArgument('name');

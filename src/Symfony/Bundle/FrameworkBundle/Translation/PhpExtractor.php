@@ -148,7 +148,7 @@ class PhpExtractor implements ExtractorInterface
     {
         $tokenIterator = new \ArrayIterator($tokens);
 
-        for ($key = 0; $key < $tokenIterator->count(); $key++) {
+        for ($key = 0; $key < $tokenIterator->count(); ++$key) {
             foreach ($this->sequences as $sequence) {
                 $message = '';
                 $tokenIterator->seek($key);

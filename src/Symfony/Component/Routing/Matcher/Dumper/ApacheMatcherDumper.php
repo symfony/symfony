@@ -63,7 +63,7 @@ class ApacheMatcherDumper extends MatcherDumper
 
             if (null !== $hostRegex && $prevHostRegex !== $hostRegex) {
                 $prevHostRegex = $hostRegex;
-                $hostRegexUnique++;
+                ++$hostRegexUnique;
 
                 $rule = array();
 

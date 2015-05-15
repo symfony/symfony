@@ -18,4 +18,6 @@ trigger_error('The '.__NAMESPACE__.'\TrueValidator class is deprecated since ver
  *
  * @deprecated since version 2.7, to be removed in 3.0. Use IsTrueValidator instead.
  */
-class TrueValidator extends IsTrueValidator {}
+class TrueValidator extends IsTrueValidator
+{
+}

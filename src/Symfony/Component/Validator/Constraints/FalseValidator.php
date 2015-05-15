@@ -18,4 +18,6 @@ trigger_error('The '.__NAMESPACE__.'\FalseValidator class is deprecated since ve
  *
  * @deprecated since version 2.7, to be removed in 3.0. Use IsFalseValidator instead.
  */
-class FalseValidator extends IsFalseValidator {}
+class FalseValidator extends IsFalseValidator
+{
+}

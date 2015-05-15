@@ -21,4 +21,6 @@ trigger_error('The '.__NAMESPACE__.'\Null class is deprecated since version 2.7 
  *
  * @deprecated since version 2.7, to be removed in 3.0. Use IsNull instead.
  */
-class Null extends IsNull {}
+class Null extends IsNull
+{
+}

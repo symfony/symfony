@@ -18,4 +18,6 @@ trigger_error('The '.__NAMESPACE__.'\NullValidator class is deprecated since ver
  *
  * @deprecated since version 2.7, to be removed in 3.0. Use IsNullValidator instead.
  */
-class NullValidator extends IsNullValidator {}
+class NullValidator extends IsNullValidator
+{
+}

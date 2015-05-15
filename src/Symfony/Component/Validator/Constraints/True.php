@@ -21,4 +21,6 @@ trigger_error('The '.__NAMESPACE__.'\True class is deprecated since version 2.7 
  *
  * @deprecated since version 2.7, to be removed in 3.0. Use IsTrue instead.
  */
-class True extends IsTrue {}
+class True extends IsTrue
+{
+}

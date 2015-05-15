@@ -118,12 +118,12 @@ abstract class AbstractBootstrap3LayoutTest extends AbstractLayoutTest
             [@class="list-unstyled"]
             [
                 ./li
-                    [.="[trans]Error 1[/trans]"]
+                    [.=" [trans]Error 1[/trans]"]
                     [
                         ./span[@class="glyphicon glyphicon-exclamation-sign"]
                     ]
                 /following-sibling::li
-                    [.="[trans]Error 2[/trans]"]
+                    [.=" [trans]Error 2[/trans]"]
                     [
                         ./span[@class="glyphicon glyphicon-exclamation-sign"]
                     ]

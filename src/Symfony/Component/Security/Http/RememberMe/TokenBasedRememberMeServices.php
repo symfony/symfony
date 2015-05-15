@@ -82,7 +82,7 @@ class TokenBasedRememberMeServices extends AbstractRememberMeServices
         }
 
         $result = 0;
-        for ($i = 0; $i < $c; $i++) {
+        for ($i = 0; $i < $c; ++$i) {
             $result |= ord($hash1[$i]) ^ ord($hash2[$i]);
         }
 

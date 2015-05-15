@@ -237,7 +237,7 @@ abstract class AnnotationClassLoader implements LoaderInterface
         if ($this->defaultRouteIndex > 0) {
             $name .= '_'.$this->defaultRouteIndex;
         }
-        $this->defaultRouteIndex++;
+        ++$this->defaultRouteIndex;
 
         return $name;
     }

@@ -60,7 +60,7 @@ class StringUtils
 
         $result = 0;
 
-        for ($i = 0; $i < $knownLen; $i++) {
+        for ($i = 0; $i < $knownLen; ++$i) {
             $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
         }
 

@@ -125,7 +125,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $invoked = 0;
         $listener = function () use (&$invoked) {
-            $invoked++;
+            ++$invoked;
         };
         $this->dispatcher->addListener('pre.foo', $listener);
         $this->dispatcher->addListener('post.foo', $listener);

@@ -334,7 +334,7 @@ class TableHelper extends Helper
         }
 
         $markup = $this->crossingChar;
-        for ($column = 0; $column < $count; $column++) {
+        for ($column = 0; $column < $count; ++$column) {
             $markup .= str_repeat($this->horizontalBorderChar, $this->getColumnWidth($column))
                     .$this->crossingChar
             ;
@@ -366,7 +366,7 @@ class TableHelper extends Helper
         }
 
         $this->renderColumnSeparator();
-        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; $column++) {
+        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; ++$column) {
             $this->renderCell($row, $column, $cellFormat);
             $this->renderColumnSeparator();
         }

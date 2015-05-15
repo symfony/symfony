@@ -142,7 +142,7 @@ EOF
         $result = array();
         while ($position < $max) {
             $result[$position + 1] = $lines[$position];
-            $position++;
+            ++$position;
         }
 
         return $result;

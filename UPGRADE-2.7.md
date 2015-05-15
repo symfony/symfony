@@ -1,6 +1,12 @@
 UPGRADE FROM 2.6 to 2.7
 =======================
 
+HttpKernel
+----------
+
+ * The `$cache` argument type of the `dumpContainer()` method in the `Symfony\Component\HttpKernel\Kernel`
+   class was changed from `Symfony\Component\Config\ConfigCache` to `Symfony\Component\Config\ConfigCacheInterface`.
+
 Router
 ------
 

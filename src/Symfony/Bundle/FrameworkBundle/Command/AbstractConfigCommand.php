@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
@@ -27,24 +28,21 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     protected function listBundles(OutputInterface $output)
     {
-        $output->writeln('Available registered bundles with their extension alias if available:');
-
-        if (class_exists('Symfony\Component\Console\Helper\Table')) {
-            $table = new Table($output);
-        } else {
-            $table = $this->getHelperSet()->get('table');
-        }
-
-        $table->setHeaders(array('Bundle name', 'Extension alias'));
+        $headers = array('Bundle name', 'Extension alias');
+        $rows = array();
         foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
             $extension = $bundle->getContainerExtension();
-            $table->addRow(array($bundle->getName(), $extension ? $extension->getAlias() : ''));
+            $rows[] = array($bundle->getName(), $extension ? $extension->getAlias() : '');
         }
 
-        if (class_exists('Symfony\Component\Console\Helper\Table')) {
-            $table->render();
+        $message = 'Available registered bundles with their extension alias if available:';
+        if ($output instanceof StyleInterface) {
+            $output->writeln(' '.$message);
+            $output->table($headers, $rows);
         } else {
-            $table->render($output);
+            $output->writeln($message);
+            $table = new Table($output);
+            $table->setHeaders($headers)->setRows($rows)->render($output);
         }
     }
 

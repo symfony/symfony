@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-05-14T13:33:27Z
+
+Hello,
+
+I have a problem with the dependency injection of the Framework bundle.
+
+in the services.xml file in the framework bundle I got this :
+
+```
+<service id="http_kernel" class="Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
+        </service>
+```
+But the Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel class is marked as deprecated in the HttpKernel component.
+
+By what should I replace this class to make it work ?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-05-14T14:07:14Z
+
+@vincentaubert You can use `Symfony\Component\HttpKernel\HttpKernel` instead.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-14T14:08:01Z
+
+You should replace it by `Symfony\Component\HttpKernel\HttpKernel` and remove `<argument type="service" id="service_container" />` from the definition.
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-05-14T15:03:14Z
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-05-14T21:39:42Z
+
+ping @symfony/mergers
+
+This PR is ready for merge.
+
+The 2 failing tests have been fixed in the 2.7 branch via the #14637 PR but the 2.7 branch hasn't been merged in master at the moment.
+
+I launched the tests locally with the patch and all the tests passed
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-15T04:04:41Z
+
+`ProfilerListener::getSubscribedEvents()` remove the `KernelEvents::REQUEST => array('onKernelRequest', 1024),` line and the comments above.
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-05-15T06:57:22Z
+
+fixed thanks
+
+---------------------------------------------------------------------------
+
+by vincentaubert at 2015-05-15T14:20:04Z
+
+done and code rebased on the latest master

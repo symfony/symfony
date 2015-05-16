@@ -281,57 +281,60 @@ class Container implements IntrospectableContainerInterface
             if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
                 return $this->services[$id];
             }
-        }
 
-        if (isset($this->loading[$id])) {
-            throw new ServiceCircularReferenceException($id, array_keys($this->loading));
-        }
-
-        if (isset($this->methodMap[$id])) {
-            $method = $this->methodMap[$id];
-        } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
-            // $method is set to the right value, proceed
-        } else {
-            if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                if (!$id) {
-                    throw new ServiceNotFoundException($id);
-                }
-
-                $alternatives = array();
-                foreach ($this->services as $key => $associatedService) {
-                    $lev = levenshtein($id, $key);
-                    if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
-                        $alternatives[] = $key;
-                    }
-                }
-
-                throw new ServiceNotFoundException($id, null, null, $alternatives);
+            if (isset($this->loading[$id])) {
+                throw new ServiceCircularReferenceException($id, array_keys($this->loading));
             }
 
-            return;
-        }
+            if (isset($this->methodMap[$id])) {
+                $method = $this->methodMap[$id];
+            } elseif (method_exists($this, $method = 'get'.strtr($id, array('_' => '', '.' => '_', '\\' => '_')).'Service')) {
+                // $method is set to the right value, proceed
+            } else {
+                if ($strtolower && self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                    if (!$id) {
+                        throw new ServiceNotFoundException($id);
+                    }
 
-        $this->loading[$id] = true;
+                    $alternatives = array();
+                    foreach ($this->services as $key => $associatedServices) {
+                        $lev = levenshtein($id, $key);
+                        if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
+                            $alternatives[] = $key;
+                        }
+                    }
 
-        try {
-            $service = $this->$method();
-        } catch (\Exception $e) {
+                    throw new ServiceNotFoundException($id, null, null, $alternatives);
+                } else if ($strtolower) {
+                    return;
+                } else {
+                    continue;
+                }
+
+            }
+
+            $this->loading[$id] = true;
+
+            try {
+                $service = $this->$method();
+            } catch (\Exception $e) {
+                unset($this->loading[$id]);
+
+                if (array_key_exists($id, $this->services)) {
+                    unset($this->services[$id]);
+                }
+
+                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                    return;
+                }
+
+                throw $e;
+            }
+
             unset($this->loading[$id]);
 
-            if (array_key_exists($id, $this->services)) {
-                unset($this->services[$id]);
-            }
-
-            if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return;
-            }
-
-            throw $e;
+            return $service;
         }
-
-        unset($this->loading[$id]);
-
-        return $service;
     }
 
     /**

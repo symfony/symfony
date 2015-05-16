@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-15T22:16:05Z
+
+@dosten you need  change `dumpCatalogue` too, see [Translator.php#L392](https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/Translation/Translator.php#L392)
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T22:38:16Z
+
+@aitboudad done
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-15T22:38:51Z
+
+It would be better to group in one PR all changes for closures support > 5.4, not only `Translator` ?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-15T22:56:55Z
+
+I will go to make all changes in this PR since this only makes some changes missing in #12841
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-16T00:45:35Z
+
+@aitboudad done, something more?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-16T00:47:42Z
+
+no it's ok for me, :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-16T08:53:54Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mpdude at 2015-04-16T19:34:56Z
+
+As the one who wrote most of this (or that) code, thanks for bringing this up! :+1:
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-04-21T17:33:14Z
+
+ping @Tobion @stof
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-01T03:37:16Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-05-01T12:05:25Z
+
+@dosten the code is still broken. please make sure the tests pass before pinging people.
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-01T12:50:16Z
+
+ @Tobion sorry, fixed and rebased but the tests still failing: `The service definition "templating.helper.assets" does not exist.`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-05-15T13:56:14Z
+
+@dosten can you please rebase+squash?
+
+---------------------------------------------------------------------------
+
+by dosten at 2015-05-15T14:22:15Z
+
+@nicolas-grekas done

@@ -70,6 +70,6 @@ class WebProfilerExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://symfony.com/schema/dic/webprofiler';
+        return 'https://symfony.com/schema/dic/webprofiler';
     }
 }

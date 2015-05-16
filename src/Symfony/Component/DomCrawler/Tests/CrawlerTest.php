@@ -72,10 +72,10 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
 
-        $crawler->addHtmlContent('<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
+        $crawler->addHtmlContent('<html><head><base href="https://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
 
-        $this->assertEquals('http://symfony.com', $crawler->filterXPath('//base')->attr('href'), '->addHtmlContent() adds nodes from an HTML string');
-        $this->assertEquals('http://symfony.com/contact', $crawler->filterXPath('//a')->link()->getUri(), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('https://symfony.com', $crawler->filterXPath('//base')->attr('href'), '->addHtmlContent() adds nodes from an HTML string');
+        $this->assertEquals('https://symfony.com/contact', $crawler->filterXPath('//a')->link()->getUri(), '->addHtmlContent() adds nodes from an HTML string');
     }
 
     /**
@@ -94,11 +94,11 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddHtmlContentInvalidBaseTag()
     {
-        $crawler = new Crawler(null, 'http://symfony.com');
+        $crawler = new Crawler(null, 'https://symfony.com');
 
         $crawler->addHtmlContent('<html><head><base target="_top"></head><a href="/contact"></a></html>', 'UTF-8');
 
-        $this->assertEquals('http://symfony.com/contact', current($crawler->filterXPath('//a')->links())->getUri(), '->addHtmlContent() correctly handles a non-existent base tag href attribute');
+        $this->assertEquals('https://symfony.com/contact', current($crawler->filterXPath('//a')->links())->getUri(), '->addHtmlContent() correctly handles a non-existent base tag href attribute');
     }
 
     /**

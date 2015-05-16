@@ -47,9 +47,9 @@ class XmlDumper extends Dumper
         $this->document = new \DOMDocument('1.0', 'utf-8');
         $this->document->formatOutput = true;
 
-        $container = $this->document->createElementNS('http://symfony.com/schema/dic/services', 'container');
+        $container = $this->document->createElementNS('https://symfony.com/schema/dic/services', 'container');
         $container->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $container->setAttribute('xsi:schemaLocation', 'http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd');
+        $container->setAttribute('xsi:schemaLocation', 'https://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd');
 
         $this->addParameters($container);
         $this->addServices($container);

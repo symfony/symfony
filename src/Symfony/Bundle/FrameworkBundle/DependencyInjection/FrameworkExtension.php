@@ -698,6 +698,6 @@ class FrameworkExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://symfony.com/schema/dic/symfony';
+        return 'https://symfony.com/schema/dic/services/services-1.0.xsdhttps://symfony.com/schema/dic/symfony';
     }
 }

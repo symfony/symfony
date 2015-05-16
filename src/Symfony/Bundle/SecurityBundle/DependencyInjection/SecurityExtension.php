@@ -615,7 +615,7 @@ class SecurityExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://symfony.com/schema/dic/security';
+        return 'https://symfony.com/schema/dic/security';
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container)

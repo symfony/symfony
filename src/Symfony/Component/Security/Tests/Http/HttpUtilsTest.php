@@ -31,9 +31,9 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
     public function testCreateRedirectResponseWithAbsoluteUrl()
     {
         $utils = new HttpUtils($this->getUrlGenerator());
-        $response = $utils->createRedirectResponse($this->getRequest(), 'http://symfony.com/');
+        $response = $utils->createRedirectResponse($this->getRequest(), 'https://symfony.com/');
 
-        $this->assertTrue($response->isRedirect('http://symfony.com/'));
+        $this->assertTrue($response->isRedirect('https://symfony.com/'));
     }
 
     public function testCreateRedirectResponseWithRouteName()
@@ -93,7 +93,7 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
     public function testCreateRequestWithAbsoluteUrl()
     {
         $utils = new HttpUtils($this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface'));
-        $subRequest = $utils->createRequest($this->getRequest(), 'http://symfony.com/');
+        $subRequest = $utils->createRequest($this->getRequest(), 'https://symfony.com/');
 
         $this->assertEquals('/', $subRequest->getPathInfo());
     }

@@ -60,7 +60,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $userProvider = $this->getProvider();
         $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request();
-        $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
+        $request->cookies->set('foo', base64_encode('class:foouser:123456789:fooHash'));
 
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
@@ -136,6 +136,27 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', $returnedToken);
         $this->assertSame($user, $returnedToken->getUser());
         $this->assertEquals('fookey', $returnedToken->getKey());
+    }
+
+    // this is temporary, just to show that, without encoding username, cookie value is invalid
+    public function testUsernameMustBeEncodedAsItMightContainCookiePartsDelimiter()
+    {
+        $username = 'foo'.TokenBasedRememberMeServices::COOKIE_DELIMITER.'user';
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger
+            ->expects($this->at(1))
+            ->method('debug')
+            ->with('Remember-Me authentication failed: The cookie is invalid.');
+
+        $service = $this->getService($this->getProvider(), array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null, 'lifetime' => 3600), $logger);
+        $request = new Request();
+        $request->cookies->set('foo', $this->getCookie('fooclass', $username, time() + 3600, 'foopass'));
+
+        $returnedToken = $service->autoLogin($request);
+
+        $this->assertNull($returnedToken);
+        $this->assertTrue($request->attributes->get(RememberMeServicesInterface::COOKIE_ATTR_NAME)->isCleared());
     }
 
     public function testLogout()

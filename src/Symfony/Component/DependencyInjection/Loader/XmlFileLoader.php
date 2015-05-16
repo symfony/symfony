@@ -147,15 +147,11 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'scope', 'public', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
             }
-        }
-
-        if ($value = $service->getAttribute('synchronized')) {
-            $definition->setSynchronized(XmlUtils::phpize($value), 'request' !== (string) $service->getAttribute('id'));
         }
 
         if ($files = $this->getChildren($service, 'file')) {

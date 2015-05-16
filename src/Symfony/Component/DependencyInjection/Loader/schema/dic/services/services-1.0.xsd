@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<xsd:schema xmlns="http://symfony.com/schema/dic/services"
+<xsd:schema xmlns="https://symfony.com/schema/dic/services"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-     targetNamespace="http://symfony.com/schema/dic/services"
+     targetNamespace="https://symfony.com/schema/dic/services"
      elementFormDefault="qualified">
 
   <xsd:annotation>

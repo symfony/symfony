@@ -37,7 +37,7 @@ class XmlFileLoader extends FileLoader
         $path = $this->locator->locate($resource);
 
         $xml = $this->parseFile($path);
-        $xml->registerXPathNamespace('container', 'http://symfony.com/schema/dic/services');
+        $xml->registerXPathNamespace('container', 'https://symfony.com/schema/dic/services');
 
         $this->container->addResource(new FileResource($path));
 
@@ -277,7 +277,7 @@ class XmlFileLoader extends FileLoader
      */
     public function validateSchema(\DOMDocument $dom)
     {
-        $schemaLocations = array('http://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
+        $schemaLocations = array('https://symfony.com/schema/dic/services' => str_replace('\\', '/', __DIR__.'/schema/dic/services/services-1.0.xsd'));
 
         if ($element = $dom->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'schemaLocation')) {
             $items = preg_split('/\s+/', $element);
@@ -318,9 +318,9 @@ class XmlFileLoader extends FileLoader
 
         $source = <<<EOF
 <?xml version="1.0" encoding="utf-8" ?>
-<xsd:schema xmlns="http://symfony.com/schema"
+<xsd:schema xmlns="https://symfony.com/schema"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://symfony.com/schema"
+    targetNamespace="https://symfony.com/schema"
     elementFormDefault="qualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
@@ -349,7 +349,7 @@ EOF
     private function validateExtensions(\DOMDocument $dom, $file)
     {
         foreach ($dom->documentElement->childNodes as $node) {
-            if (!$node instanceof \DOMElement || 'http://symfony.com/schema/dic/services' === $node->namespaceURI) {
+            if (!$node instanceof \DOMElement || 'https://symfony.com/schema/dic/services' === $node->namespaceURI) {
                 continue;
             }
 
@@ -375,7 +375,7 @@ EOF
     private function loadFromExtensions(SimpleXMLElement $xml)
     {
         foreach (dom_import_simplexml($xml)->childNodes as $node) {
-            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://symfony.com/schema/dic/services') {
+            if (!$node instanceof \DOMElement || $node->namespaceURI === 'https://symfony.com/schema/dic/services') {
                 continue;
             }
 

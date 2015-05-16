@@ -153,6 +153,6 @@ class TwigExtension extends Extension
 
     public function getNamespace()
     {
-        return 'http://symfony.com/schema/dic/twig';
+        return 'https://symfony.com/schema/dic/twig';
     }
 }

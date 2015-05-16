@@ -66,7 +66,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals('<?xml version="1.0" encoding="utf-8"?>
-<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+<container xmlns="https://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
   <services>
     <service id="foo" class="FooClass">
       <argument type="service">
@@ -87,7 +87,7 @@ class XmlDumperTest extends \PHPUnit_Framework_TestCase
         include self::$fixturesPath.'/containers/container12.php';
         $dumper = new XmlDumper($container);
         $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
-<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd\">
+<container xmlns=\"https://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
   <services>
     <service id=\"foo\" class=\"FooClass\Foo\">
       <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>

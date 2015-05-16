@@ -1,0 +1,147 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-04-05T14:20:08Z
+
+@romqin thanks a lot for fixing this annoying issue!
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-05T14:28:59Z
+
+:+1: indeed I wonder how to make it work with absolute URL ?
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-05T14:42:46Z
+
+@aitboudad what if I add this :
+```patch
++ var path = url.substr({{ app.request.basePath|length }});
+- if (url.substr(0, 1) === '/' && !url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
++ if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-05T14:56:19Z
+
+@romqin
+```patch
+- var path = url.substr({{ app.request.basePath|length }});
++ var path = url.replace('{{ app.request.schemeAndHttpHost }}', '');
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-05T15:09:01Z
+
+Or this, but maybe it's overkill :
+```js
+var path = url;
+if (url.substr(0, 1) === '/') {
+    if (0 === url.indexOf('{{ app.request.getBasePath }}')) {
+        path = url.substr({{ app.request.basePath|length }});
+    }
+}
+else if (0 === url.indexOf('{{ app.request.getSchemeAndHttpHost() ~ app.request.getBasePath }}')) {
+    path = url.substr({{ (app.request.getSchemeAndHttpHost() ~ app.request.basePath)|length }});
+}
+
+if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-05T15:31:42Z
+
+look good but I'd prefer to use ```replace``` instead of ```substr``` to simplify code :)
+```js
+var path = (url.substr(0, 1) === '/') ? url.replace('{{ app.request.basePath }}', ''):url.replace('{{ app.request.schemeAndHttpHost ~ app.request.basePath }}', '');
+if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+```
+
+---------------------------------------------------------------------------
+
+by florianbelhomme at 2015-04-07T10:49:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-07T12:14:33Z
+
+@aitboudad the issue with ``replace`` is that it will not only replace at the beginning of the string
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-07T12:22:37Z
+
+@stof no it will replace only the first occurrence.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-07T12:27:54Z
+
+@aitboudad but what if the path is not found at the beginning, but is found later in the string ?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-07T12:38:22Z
+
+@stof got it
+
+```patch
+-  ? url.replace('{{ app.request.basePath }}', '')
+-  : url.replace('{{ app.request.schemeAndHttpHost ~ app.request.basePath }}', '');
++  ? url.replace(/^({{ app.request.basePath|e('js') }})/, '')
++  : url.replace(/^({{ (app.request.schemeAndHttpHost ~ app.request.basePath)|e('js') }})/, '');
+```
+
+is that ok ?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-07T13:02:09Z
+
+@aitboudad no. you need to escape the path for a usage into a regex (especially given that ``/`` is the delimiter, and it appears in the path)
+
+---------------------------------------------------------------------------
+
+by stof at 2015-04-07T13:09:39Z
+
+@romqin this looks like the right solution (except the escaping needed to output the value as a JS string)
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-07T14:07:47Z
+
+Like this ?
+```js
+var path = url;
+if (url.substr(0, 1) === '/') {
+    if (0 === url.indexOf('{{ app.request.basePath|e('js') }}')) {
+        path = url.substr({{ app.request.basePath|length }});
+    }
+}
+else if (0 === url.indexOf('{{ (app.request.schemeAndHttpHost ~ app.request.basePath)|e('js') }}')) {
+    path = url.substr({{ (app.request.schemeAndHttpHost ~ app.request.basePath)|length }});
+}
+
+if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+```
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-04-07T14:23:24Z
+
+@romqin now it work for all url, you need check ```path.substr(0, 1) === '/'``` also
+
+```js
+if (path.substr(0, 1) === '/' && !path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+```
+
+---------------------------------------------------------------------------
+
+by romqin at 2015-04-10T07:05:39Z
+
+Would be great to have this fix in 2.7 beta1
+ping @stof @fabpot @aitboudad @javiereguiluz

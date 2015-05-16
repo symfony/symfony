@@ -227,15 +227,20 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->setHelperSet($helperSet);
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
         $answer = $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
 
         $this->assertSame($expectedValue, $answer);
     }
 
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The provided answer is ambiguous. Value should be one of env_2 or env_3.
+     */
     public function testAmbiguousChoiceFromChoicelist()
     {
         $possibleChoices = array(
-            'env_1' => 'My environment 1',
+            'env_1' => 'My first environment',
             'env_2' => 'My environment',
             'env_3' => 'My environment',
         );
@@ -246,12 +251,9 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->setHelperSet($helperSet);
 
         $question = new ChoiceQuestion('Please select the environment to load', $possibleChoices);
+        $question->setMaxAttempts(1);
 
-        try {
-            $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
-        } catch (\InvalidArgumentException $e) {
-            $this->assertEquals('The provided answer is ambiguous. Value should be one of env_2 or env_3.', $e->getMessage());
-        }
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
     }
 
     public function answerProvider()

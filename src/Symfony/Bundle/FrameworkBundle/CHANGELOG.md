@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Added `TranslatorTrait` which provides shortcuts for Translator `trans()` and `transChoice()` methods
+
 2.7.0
 -----
 

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2015-04-08T14:36:12Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stloyd at 2015-04-08T14:41:01Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-05-16T12:47:58Z
+
+Why do you consider this as a new feature? Looks like a bug to me, no?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2015-05-16T14:07:43Z
+
+@fabpot I think so as it throw an exception when we remove an already registed path, you can merge it into `2.3` without problems
